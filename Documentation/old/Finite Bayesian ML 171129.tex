@@ -1,0 +1,356 @@
+
+\documentclass[12pt]{article}
+% \documentclass{report}
+% \documentclass[journal]{IEEEtran}
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{bm}
+
+\usepackage[retainorgcmds]{IEEEtrantools}
+
+
+\title{Bayesian Learning using a Non-Informative Prior over Finite-Dimensional Spaces}
+\author{Paul Rademacher}
+\date{October 20, 2017}
+
+
+%\graphicspath{ {C:/Users/Paul/Documents/PhD/Dissertation/Documentation/Figures/} }
+\graphicspath{ {Figures/} }
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+
+\begin{document}
+
+\maketitle
+
+
+
+
+\section{Introduction}
+
+This report details a Bayesian perspective on stastical learning theory when both the input and outputs exist in finite dimensional spaces and a uniform prior distribution is used. To simplify the presentation, the first sections will assume that the predictions are not driven by any observable variable; subsequently, the results will be extended to the more practical case where we want to generate an estimate given observed data.
+
+While the validity of Bayesian methods for statistical signal processing and machine learning has long been contended, the author believes it to be a justified approach that does not necessarily imply that the generative model is `random'; rather, it simply reflects the desire of the user to formulate risk as a weighted sum of learner performance across the space of models. 
+
+The uniform, or `non-informative', prior is of specific interest because it reflects the user's lack of confidence that his/her data was generated using any specific distribution. Integrating a learner's risk with such a prior provides a Bayesian analogy to the ``No Free Lunch'' theorem; however, it will be shown that for a general loss metric, all learning functions \emph{do not} provide the same performance.
+
+After examining the joint and conditional probability mass functions for the unobserved outputs and the training data, the results will be applied to two of the most common loss functions in machine learning: the squared error loss function (common for regression), and the 0-1 loss function (common for classification). Optimal learners will be presented and the loss as a function of space dimensions and volume of training data will be provided. Additionally, asymptotic results for these values will be discussed to provide insight into how well these learners perform for infinite input-output spaces and as the number of training examples increases. 
+
+
+
+
+\section{Basic model: scalar estimate, no observations, identical decison space}
+
+
+\subsection{Model}
+
+In this simplified treatment, we want to design a learner to provide an estimate of unobserved ``output'' variable $\mathrm{y} \in \mathcal{Y} = \{ y_1, \ldots, y_M \}$ using $N$ observed training examples $\mathrm{D} \in \mathcal{D} = \mathcal{Y}^N$. It is assumed that the output and training data are independently and identically distributed according to an unknown probability mass function (PMF), $\bm{\theta} \in \bm{\Theta} = \left\{ \bm{\theta} \in {\mathbb{R}^+}^M: \sum_{m=1}^M \bm{\theta}_m = 1 \right\} $, such that,
+
+\begin{equation}
+\text{P}(y,D | \bm{\theta}) = \text{P}(y | \bm{\theta}) \prod_{n=1}^N \text{P}(D(n) | \bm{\theta}) \;,
+\end{equation}
+
+\begin{equation}
+\text{P}_{\mathrm{y}}(y_m|\bm{\theta}) = \text{P}(\mathrm{y} = y_m | \bm{\theta}) = \bm{\theta}_m
+\end{equation}
+
+\begin{equation}
+\text{P}_{\mathrm{D}(n)}(y_m|\bm{\theta}) = \text{P}(\mathrm{D}(n) = y_m | \bm{\theta}) = \bm{\theta}_m
+\end{equation}
+
+
+Our objective is to create a learning function $f: \mathcal{Y}^N \mapsto \mathcal{H}$ that minimizes a chosen risk function $\mathcal{R}(f) \in \mathbb{R}^+$.  The algorithm designer makes two decisions regarding how risk is calculated. First, he/she chooses a loss function $\mathcal{L}: \mathcal{H} \times \mathcal{Y} \mapsto \mathbb{R}^+$ that assigns a penalty dependent on both the unobserved output and the estimated value. Using this function, we calculate the conditional risk for a given model $\bm{\theta}$,
+
+\begin{equation}
+\mathcal{R}_{\bm{\theta}}(f) = \text{E}_{\mathrm{D}|\bm{\theta}} \left[ \text{E}_{\mathrm{y}|\bm{\theta}} \left[ \mathcal{L}(f(\mathrm{D}),\mathrm{y}) \right] \right] \;.
+\end{equation}
+
+Note the conditional independence between $\mathrm{y}$ and $\mathrm{D}$. The second choice the designer has is how to formulate a scalar risk from the set of conditional risks $\mathcal{R}_{\bm{\theta}}(f): \bm{\Theta} \mapsto \mathbb{R}^+$. An obvious choice is to integrate over $\bm{\Theta}$; if the designer has some prior knowledge, a weighting function $w(\bm{\theta}) \in \mathbb{R}^+$ can be used, such that the full risk function is,
+
+\begin{equation}
+\mathcal{R}(f) = \int_{\bm{\Theta}} w(\bm{\theta}) \mathcal{R}_{\bm{\theta}}(f)\mathrm{d}\bm{\theta} \;.
+\end{equation}
+
+Since affine transformation of an objective function will not change its minimizer, we can freely scale the non-negative weighting function $w$ such that $\int_{\bm{\Theta}} w(\bm{\theta}) \mathrm{d}\bm{\theta} = 1$. As a result, $w$ is now a valid probability density function, allowing use of the Bayesian toolset and reducing the risk function to,   
+
+\begin{equation}
+\mathcal{R}(f) = \text{E}_{\bm{\theta}}\left[  \mathcal{R}_{\bm{\theta}}(f) \right] = \text{E}_{\mathrm{y},\mathrm{D}}\left[ \mathcal{L}(f(\mathrm{D}),\mathrm{y}) \right] \;.
+\end{equation}
+
+Now the unobserved variable $\mathrm{y}$ and the observed training data $\mathrm{D}$ are treated as jointly distributed random variables. At last, we express the optimal learning function,
+
+\begin{equation}
+f^* = \argmin_{f} \mathcal{R}(f) \;,
+\end{equation}
+
+and, more informatively, the specific estimate for a given training set, 
+
+\begin{equation} \label{f_opt_general}
+f^*(\mathrm{D}) = \argmin_{h \in \mathcal{H}} \text{E}_{y|\mathrm{D}}\left[ \mathcal{L}(h,y) \right] \;.
+\end{equation}
+
+
+
+
+
+\subsection{Closed-forms for the Probability Distributions}
+
+Having formulated risk using a Bayesian treatment of the model $\bm{\theta}$, we now seek a closed form expression for the optimal learner $f^*$. From equation \eqref{f_opt_general}, we see that the learner is dependent on $\text{P}(y|D)$; this section will formulate this conditional PMF by finding $\text{P}(D)$, extending to the closely related $\text{P}(y,D)$, and them simply applying Bayes theorem.
+
+
+\subsubsection{Model PDF, $\text{p}(\bm{\theta})$}
+
+To compactly express $\text{P}(D)$, we are forced to integrate out the model parameter $\bm{\theta}$. To this end, we first elaborate on the properties of the uniform distribution $\text{P}(\bm{\theta})$. Although the previous subsection provided general equations for any model distribution $\text{p}(\bm{\theta})$, the following discussion will assume that the model distribution is uniform over $\bm{\Theta}$. Note that the probability distribution function (PDF) for $\bm{\theta}$ is degenerate, since $\text{dim}(\bm{\Theta}) < M$ . Thus, we can choose to focus exclusively on the first $M-1$ elements of $\bm{\theta}$, which we will represent as,
+
+\begin{equation}
+\bar{\bm{\theta}} \in \bar{\bm{\Theta}} = \left\{ \bar{\bm{\theta}} \in {\mathbb{R}^+}^{M-1}: \sum_{m=1}^{M-1} \bar{\bm{\theta}}_m \leq 1 \right\} \;.
+\end{equation}
+
+FIGURES (simplex sets) ?????????
+
+To express $\text{p}\left(\bar{\bm{\theta}}\right)$, we require a formulation of the hypervolume of set $\bar{\bm{\Theta}}$. This quantity is straightforward (PROOF???) to determine and allows us to provide the uniform distribution,
+
+\begin{equation}
+\text{p}\left(\bar{\bm{\theta}}\right)= (M-1)!,  \quad \forall \bar{\bm{\theta}} \in \bar{\bm{\Theta}} \;.
+\end{equation}
+
+\begin{equation}
+\text{p}(\bm{\theta}) = \text{p}(\bar{\bm{\theta}},\bm{\theta}_M) = \text{p}\left( \bm{\theta}_M | \bar{\bm{\theta}} \right) \text{p}\left(\bar{\bm{\theta}}\right)
+= \delta\left( \bm{\theta}_M,1-\bm{1}^\text{T}\bar{\bm{\theta}} \right) \cdot  (M-1)!
+\end{equation}
+
+
+
+\subsubsection{Training data marginal PMF, $\text{P}(D)$}
+
+Next we determine $\text{P}(D)$ -- extension to the joint distribution is straightfoward. Our starting point is expression of the PDF via the conditional independence of the training data for a given model $\bm{\theta}$,
+
+\begin{equation}
+\text{P}(D) = \int_{\bm{\Theta}} \left[ \prod_{n=1}^N \text{P}(D(n) | \bm{\theta}) \right] \text{p}(\bm{\theta}) \mathrm{d}\bm{\theta} \;.
+\end{equation}
+
+Since $\text{P}(D(n) = y_m | \bm{\theta}) = \bm{\theta}_m$, we can simplify the PMF to,
+
+\begin{equation}
+\text{P}(D) = \int_{\bm{\Theta}} \left[ \prod_{m=1}^M \bm{\theta}_m^{\bar{\bm{\mathrm{N}}}_m(D)} \right] \text{p}(\bm{\theta}) \mathrm{d}\bm{\theta} \;,
+\end{equation}
+
+where we have introduced a new random variable (sufficient statistic???) via transform function $\bar{\bm{N}}: \mathcal{Y}^N \mapsto \left\{ \bar{\bm{N}}??? \in \mathbb{N}^M: \sum_{m=1}^M \bar{\bm{N}}_m = N \right\}$, which is defined as,
+
+\begin{equation}
+\bar{\bm{N}}_m(D) = \sum_{n=1}^N \delta[D(n),y_m] \;.
+\end{equation}
+
+Note the dimensionality reduction from $N$ to $M$ provided by the transformation. Finally, as detailed in APPENDIX???, the training data PMF reduces to,
+
+\begin{equation} \label{P_D}
+\text{P}(D) = \binom{N+M-1}{M-1,\bar{\bm{N}}_1(D),\ldots,\bar{\bm{N}}_M(D)}^{-1} 
+= \binom{N+M-1}{M-1,N}^{-1} \binom{N}{\bar{\bm{N}}_1(D),\ldots,\bar{\bm{N}}_M(D)}^{-1} \;.
+\end{equation}
+
+Note the use of multinomial and binomial coefficients, as well as the functional dependence on $\mathrm{D}$ only through $\bar{\bm{\mathrm{N}}}$. It should be clear that since the PDF is inversely proportionate to the multinomial coefficient of $\bar{\bm{N}}$, training data sets are more probable when they are more ``concentrated''. 
+
+
+
+
+
+\subsubsection{Output conditional PMF, $\text{P}(y | D)$}
+
+Equation \eqref{P_D} can be used to illuminate the forms of all the PMF's of interest, namely $\text{P}(y)$, $\text{P}(y,D)$, and $\text{P}(y | D)$.  $\text{P}(y)$ follows immediately by evaluating $\text{P}(D)$ for $N=1$, leading to a uniform PMF,
+
+\begin{equation}
+\text{P}(y_m) = \text{E}[\bm{\theta}_m] = M^{-1}, \qquad m=1,\ldots,M \;.
+\end{equation}
+
+The joint distribution between $\mathrm{y}$ and $\mathrm{D}$ is expressed by simply extending $\text{P}(D)$ to $N+1$ data and treating $y$ separately in the multinomial coefficient:
+
+\begin{equation}
+\text{P}(y_m,D) = \binom{N+M}{M-1,\ldots,\bar{\bm{N}}_{m-1}(D),\bar{\bm{N}}_m(D)+1,\bar{\bm{N}}_{m+1}(D),\ldots}^{-1} \;.
+\end{equation}
+
+Combining previous results, the PMF of the unobserved output conditioned on the training set is,
+
+\begin{equation} \label{P_y_D_basic}
+\text{P}(y_m | D) = \frac{\text{P}(y_m,D)}{\text{P}(D)} = \frac{\bar{\bm{N}}_m(D)+1}{N+M} \;.
+\end{equation}
+
+A more interesting form for the conditonal PMF is,
+
+\begin{equation} \label{P_y_D}
+\text{P}(y_m | D) = \left(\frac{M}{N+M}\right) M^{-1} + \left(\frac{N}{N+M}\right) \frac{\bar{\bm{N}}_m(D)}{N} \;.
+\end{equation}
+
+FIGURE EX????
+
+Observe how the terms in parentheses act as weighting factors providing a convex combination of two distributions: a uniform distribution independent of the data (specifically, $\text{P}(y_m) = \text{E}[\bm{\theta}_m]$) and an empirical distribution independent of any prior knowledge.
+
+The asymptotic behavior of this conditional PMF if of specific interest. As the cardinality $|\mathcal{Y}| = M$ increases relative to the number of training samples $N$, the PMF trends towards a uniform, ``uninformative'' distribution. Conversely, as the number of training points increases towards infinity, the PMF trends towards the empirical distribution. 
+
+
+
+
+
+
+\subsubsection{Model Posterior, $\text{P}(\bm{\theta} | D)$}
+
+Although we have already found the posterior PMF $\text{P}(y | D)$ via Bayes theorem, it is informative to consider another approach using a ``hidden'' distribution: the model posterior PMF, $\text{p}(\bm{\theta} | D)$. 
+
+As mentioned previously, $\mathrm{y}$ and $\mathrm{D}$ have the property of conditional independence given the model; as such, $\text{P}(y,D) = \text{E}_{\bm{\theta}} \left[ \text{P}(y | \bm{\theta}) \text{P}(D | \bm{\theta}) \right]$. This enables the following interpretation of the PMF of $\mathrm{y}$ conditioned on the observed training data:
+
+\begin{equation}
+\text{P}(y_m | \mathrm{D}) = \text{E}_{\bm{\theta} | \mathrm{D}} \left[ \text{P}(y_m|\bm{\theta}) \right] = \text{E}\left[ \bm{\theta}_m | \mathrm{D} \right] \;.
+\end{equation}
+
+As such, the posterior PMF $\text{P}(y | D)$ can we thought of as the expected value of $\bm{\theta}$ given the training data. This should be intuitively satisfying -- before observing the training set, the PMF of $y$ is simply $\text{E}[\bm{\theta}]$; the observations simply refine the distribution of the unknown model. Using previous results, we express the model posterior PMF in closed form:
+
+\begin{equation}
+\text{p}(\bm{\theta} | D) = \frac{\text{P}(D | \bm{\theta}) \text{p}(\bm{\theta})}{\text{P}(D)}
+= (N+M-1)! \prod_{m=1}^M \frac{\bm{\theta}_m^{\bar{\bm{N}}_m(D)}}{\bar{\bm{N}}_m(D)!} ,  \quad  \forall \bm{\theta} \in \bm{\Theta} \;.
+\end{equation}
+
+
+In the machine learning literature, the model posterior is of specific interest. A popular use of the distribution is to form a point estimate of the model $\bm{\theta}$ by finding the maximizing value of the distribution - the resultant estimate is known as the Maximum \emph{a posteriori} (MAP) estimate. 
+
+As shown in APPENDIX(bordered hessian)???, the MAP estimator is,
+
+\begin{equation}
+\hat{\bm{\theta}}_{MAP}(D) = \argmax_{\bm{\theta} \in \bm{\Theta}} \text{P}(\bm{\theta} | D) = \frac{\bar{\bm{N}}_m(D)}{N} \;,
+\end{equation}
+
+which is the same empirical distribution seen in equation \eqref{P_y_D}. Additionally, because $\text{P}(\bm{\theta})$ is uniform, the MAP estimator is equivalent to the Maximum Likelihood (ML) estimate $\hat{\bm{\theta}}_{ML}(D) = \argmax_{\bm{\theta} \in \bm{\Theta}} \text{P}(D | \bm{\theta})$, which is commonly used for non-Bayesian treatments of parameter estimation.
+
+
+Next, we will provide the first and second moments of the distribution and give some informative examples to show how the training data ``sharpens'' the non-informative distribution $\text{p}(\bm{\theta})$. By using equation \eqref{P_y_D}, we can compactly display the mean of $\text{p}(\bm{\theta} | D)$ as,
+
+\begin{equation}
+\mu_{\bm{\theta} | D} \equiv \text{E}[\bm{\theta} | D] = \frac{\bar{\bm{N}}(D)+1}{N+M} = \left(\frac{M}{N+M}\right) M^{-1} + \left(\frac{N}{N+M}\right) \frac{\bar{\bm{N}}(D)}{N} \;.
+\end{equation}
+
+The second moments are generated in APPENDIX???; here, we use them to find the covariance matrix of $\bm{\theta}$ given $D$,
+
+\begin{IEEEeqnarray}{rCl}
+\Sigma_{\bm{\theta} | D} & \equiv & \text{E}_{\bm{\theta} | D} \left[ (\bm{\theta} - \mu_{\bm{\theta} | D}) (\bm{\theta} - \mu_{\bm{\theta} | D})^\text{T} \right] \\ 
+& = & \frac{\text{diag}(\bar{\bm{N}}(D) + \bm{1})}{(N+M+1)(N+M)} - \frac{(\bar{\bm{N}}(D) + \bm{1}) (\bar{\bm{N}}(D) + \bm{1})^\text{T}}{(N+M+1)(N+M)^2} \;.
+\end{IEEEeqnarray}
+
+Comparing the numerators and denominators in the above expression, it is clear that as the size of the training set $N$ trends toward infinity, the variance of the model trends to zero. When also considering the limiting forms of $\mu_{\bm{\theta} | D}$, we observe that,
+
+\begin{equation}
+\text{p}(\bm{\theta} | D) \longrightarrow \delta \left( \bm{\theta} - \frac{\bar{\bm{N}}(D)}{N} \right)
+\end{equation}
+
+Thus, with infinite training data, the generative model $\bm{\theta}$ can be determined precisely and used to determine the optimal learning function. 
+
+
+FIGURES???
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.6]{P_theta.pdf}
+\caption{Prior and Posterior Model PMF's}
+\label{fig:pripost}
+\end{figure}
+
+Dat \ref{fig:pripost}
+
+
+\section{Application to Common Loss Functions}
+
+In this section, we will proceed to apply the previous results to determine specific optimal learners and assess performance for two of the most common loss functions in machine learning: the squared error function, common for regression problems, and the 0-1 function, common for classification problems. Noting again the significance of $\text{P}(y|D)$ in finding the optimal learner in equation \eqref{f_opt_general}, and using \eqref{P_y_D}, we have,
+
+\begin{IEEEeqnarray}{rCl}
+\text{E}_{\mathrm{y} | \mathrm{D}} [ \mathcal{L}(h,\mathrm{y}) ] & = & \sum_{m=1}^M \mathcal{L}(h,y_m) \text{P}(y_m | \mathrm{D}) \\
+& = & \left( \frac{M}{N+M} \right) M^{-1} \sum_{m=1}^M \mathcal{L}(h,y_m) +  \left( \frac{N}{N+M} \right) \sum_{m=1}^M \mathcal{L}(h,y_m) \frac{\bar{\bm{N}}_m(D)}{N} \\
+& = & \left( \frac{M}{N+M} \right) M^{-1} \sum_{m=1}^M \mathcal{L}(h,y_m) +  \left( \frac{N}{N+M} \right) N^{-1} \sum_{n=1}^N \mathcal{L}(h,D(n)) \;.
+\end{IEEEeqnarray}
+
+Note that by using the mixed distribution of \eqref{P_y_D}, we split the risk into a convex combination of two expected losses. Furthermore, by using the definition of $\bar{\bm{N}}$, we show the second expectation to be equivalent to the empirical loss.
+
+
+
+
+\subsection{Classification: the 0-1 Loss}
+In this section, we will apply the developed framework to the machine learning problem to which it is most applicable: classification. In classification problems, the hidden variable space is countable and almost always finite. Furthermore, the hypothesis space  is usually identical to the unobserved variable space, that is $\mathcal{H} = \mathcal{Y}$. The 0-1 loss function is the most well known for these problems; it is represented as,
+
+\begin{equation}
+\mathcal{L}(h,y) = 1 - \delta[h,y] \;,
+\end{equation}
+
+where $\delta[\cdot,\cdot]$ is the Kronecker delta function. Combining this with the posterior PMF of equation \eqref{P_y_D_basic}, we simplify to,
+
+\begin{equation}
+\text{E}_{\mathrm{y} | \mathrm{D}} [ \mathcal{L}(h,\mathrm{y}) ] = 1 - \text{P}_{\mathrm{y} | \mathrm{D}}(h | \mathrm{D}) = 
+\end{equation}
+
+\begin{IEEEeqnarray}{rCl}
+f^*(\mathrm{D}) & = & \argmin_{h \in \mathcal{Y}} \text{E}_{\mathrm{y} | \mathrm{D}}\left[ 1 - \delta[h,\mathrm{y}] \right] \\
+& = & \argmax_{h \in \mathcal{Y}} \text{P}_{\mathrm{y} | \mathrm{D}}(h | \mathrm{D}) \;.
+\end{IEEEeqnarray}
+
+\begin{equation}
+f^*(\mathrm{D}) = y_m, \qquad m = \argmax \bar{\bm{N}}_m(\mathrm{D}) \;.
+\end{equation}
+
+We caclulate the minimum risk as,
+
+\begin{IEEEeqnarray}{rCl}
+\mathcal{R}(f^*) & = & \text{E}_{\mathrm{D}} \left[ \text{E}_{\mathrm{y} | \mathrm{D}} [ \mathcal{L}(f^*(\mathrm{D}),\mathrm{y}) ] \right]
+= 1 - \text{E}_{\mathrm{D}} \left[ \max_{y} \text{P}_{\mathrm{y} | \mathrm{D}}(y | \mathrm{D}) \right] \\
+& = & 1 - \text{E}_{\mathrm{D}} \left[ \frac{\max_m \bar{\bm{N}}_m(D) + 1}{N+M} \right] \\\
+& = & 1 - \left( \frac{M}{N+M} \right) M^{-1} - \left( \frac{N}{N+M} \right) \max_m \frac{\bar{\bm{N}}_m(D)}{N} \;.
+\end{IEEEeqnarray}
+
+
+
+\subsection{Regession: the Squared-Error Loss}
+
+The squared-error (SE) loss function is by far the most popular loss function for regression, or in fact any estimation problems where the variable of interest is continuous. This is due to its convexity, which allows easy determination of the minimizing function. We add an important generalization to this problem: we allow the estimate $\hat{y}$ DIFFERENT NOTATION???? to exist in a space that may differ from the space $\Omega$ of unobserved $y$. Such an approach is common in classification and general decision theory; here, we want to allow the variable to exist in a contiuous space to enable the closed-form solution for the minimizing solution.
+
+
+
+\appendix
+
+\section{Hypervolume of $\bar{\bm{\Theta}}$}
+
+\section{PMF of training data}
+
+\section{Model MAP estimate}
+
+\section{Variance of model posterior}
+
+\section{PMF of N max}
+
+\section{Moments of N bar}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

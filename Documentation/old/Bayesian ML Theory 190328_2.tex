@@ -1,0 +1,2452 @@
+
+\documentclass[12pt]{report}
+% \documentclass[journal]{IEEEtran}
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{bm}
+
+\usepackage[retainorgcmds]{IEEEtrantools}
+
+\linespread{1.3}
+
+
+\title{Bayesian Learning using a Dirichlet Prior for Regression and Classification}
+\author{Paul Rademacher}
+%\date{}
+
+
+%\graphicspath{ {C:/Users/Paul/Documents/PhD/Dissertation/Documentation/Figures/} }
+\graphicspath{ {Figures/} }
+
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\DeclareMathOperator{\xrm}{\mathrm{x}}
+\DeclareMathOperator{\Xrm}{\mathrm{X}}
+\DeclareMathOperator{\yrm}{\mathrm{y}}
+\DeclareMathOperator{\Yrm}{\mathrm{Y}}
+\DeclareMathOperator{\Drm}{\mathrm{D}}
+\DeclareMathOperator{\nrm}{\mathrm{n}}
+\DeclareMathOperator{\nbarrm}{\bar{\mathrm{n}}}
+
+\DeclareMathOperator{\Xcal}{\mathcal{X}}
+\DeclareMathOperator{\Ycal}{\mathcal{Y}}
+\DeclareMathOperator{\Dcal}{\mathcal{D}}
+\DeclareMathOperator{\Ncal}{\mathcal{N}}
+\DeclareMathOperator{\Zcal}{\mathcal{Z}}
+\DeclareMathOperator{\Hcal}{\mathcal{H}}
+\DeclareMathOperator{\Fcal}{\mathcal{F}}
+\DeclareMathOperator{\Rcal}{\mathcal{R}}
+\DeclareMathOperator{\Ccal}{\mathcal{C}}
+
+
+
+
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\chapter{Introduction}
+
+\section{Background}
+
+This report details a Bayesian perspective on stastical learning theory when both the input and outputs exist in finite dimensional spaces and a uniform prior distribution is used. To simplify the presentation, the first sections will assume that the predictions are not driven by any observable variable; subsequently, the results will be extended to the more practical case where we want to generate an estimate given observed data.
+
+While the validity of Bayesian methods for statistical signal processing and machine learning has long been contended, the author believes it to be a justified approach that does not necessarily imply that the generative model is `random'; rather, it simply reflects the desire of the user to formulate risk as a weighted sum of learner performance across the space of models. 
+
+The uniform, or `non-informative', prior is of specific interest because it reflects the user's lack of confidence that his/her data was generated using any specific distribution. Integrating a learner's risk with such a prior provides a Bayesian analogy to the ``No Free Lunch'' theorem; however, it will be shown that for a general loss metric, all learning functions \emph{do not} provide the same performance.
+
+After examining the joint and conditional probability mass functions for the unobserved outputs and the training data, the results will be applied to two of the most common loss functions in machine learning: the squared error loss function (common for regression), and the 0-1 loss function (common for classification). Optimal learners will be presented and the loss as a function of space dimensions and volume of training data will be provided. Additionally, asymptotic results for these values will be discussed to provide insight into how well these learners perform for infinite input-output spaces and as the number of training examples increases. 
+
+
+\section{Notation}
+
+PGR: incomplete
+
+PGR: use Ycal for plot theta indexing
+
+PGR: ditch bold vector format?
+
+PGR: real/natural number set convention?
+
+PGR: degenerate domain definition after equations or inside equations via delta function
+
+PGR: multinomial operator C up front? set inputs for C and for beta?
+
+PGR: define Sigma and Mu operators
+
+PGR: subscript index notation for D???
+
+PGR: notation check for figures
+
+where the operator $\text{C}$ is introduced; this operation calculates the variance of a function of a random variable, 
+\begin{equation}
+\text{C}_{\xrm}\big[g(\xrm)\big] = \text{E}_{\xrm} \bigg[ \Big( g(\xrm) - \text{E}_{\xrm}\big[g(\xrm)\big] \Big)^2 \bigg] \;.
+\end{equation}
+
+
+
+\chapter{Finite Dirichlet Model}
+
+
+\section{Objective}
+
+The setup is that there is an observable random varaible (RV) $\xrm \in \Xcal$ and and unobservable RV $\yrm \in \Ycal$ which are jointly distributed according to an unknown probability mass function (PMF). The sets are finite with cardinalities $|\Xcal| \in \mathbb{N}$ and $|\Ycal| \in \mathbb{N}$. The PMF over the set $\Ycal \times \Xcal $ will be represented as
+\begin{equation}
+\bm{\theta} \in \bm{\Theta} = \left\{ \bm{\theta} \in {\mathbb{R}^+}^{\Ycal \times \Xcal}: \sum_{y \in \Ycal} \sum_{x \in \Xcal}  \theta(y,x) = 1 \right\} \;,
+\end{equation}
+such that $\text{P}_{\yrm,\xrm}(y,x | \bm{\theta}) = \text{P}(\yrm = y, \xrm = x | \bm{\theta}) = \theta(y,x)$.
+
+Also observed is a random sequence of $N$ samples from $\theta$, denoted $\Drm = ( \Yrm,\Xrm ) \in \Dcal = \{\Ycal \times \Xcal\}^N$. The cardinality of the set is $|\Dcal| = \big( |\Ycal| |\Xcal| \big)^N$. The $N$ data pairs are conditionally independent from one another and are identically distributed as $\text{P}_{\Drm_n}(y,x | \bm{\theta}) = \text{P}\big( \Yrm_n = y, \Xrm_n = x | \bm{\theta} \big) = \theta(y,x)$. The samples are also conditionally independent from $(\yrm,\xrm)$. Thus,
+\begin{equation}
+\text{P}(\yrm,\xrm,\Drm | \bm{\theta}) = \text{P}(\yrm,\xrm | \bm{\theta}) \prod_{n=1}^N \text{P}\big( \Drm_n | \bm{\theta} \big) \;.
+\end{equation}
+
+The objective is to design a decision functional $f: \Dcal \mapsto \Hcal^{\Xcal}$ from the space of the observed random variables to a decision space $\Hcal$. Define the function space $\Fcal = \left\{ {\Hcal^{\Xcal}} \right\}^{\Dcal}$, such that $f \in \Fcal$. The metric guiding the design is a loss function $\mathcal{L}: \Hcal \times \Ycal \mapsto \mathbb{R}^+$ which penalizes the decision $h \in \Hcal$ based on the value of $\yrm$. 
+
+Next, introduce the conditional expected loss, or conditional ``risk'',
+\begin{equation} \label{eq:risk_cond}
+\Rcal_{\bm{\Theta}}(f | \bm{\theta}) = \text{E}_{\Drm | \bm{\theta}} \bigg[ \text{E}_{\yrm,\xrm | \bm{\theta}} \Big[ \mathcal{L}\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \;.
+\end{equation}
+As the model $\theta$ is also unobserved, $\Rcal_{\bm{\Theta}}: \Fcal \times \Theta \mapsto \mathbb{R}^+$ is not yet a valid objective function for optimization. An operator must be chosen to remove the dependency on $\theta$ and form an objective function $\Fcal \mapsto \mathbb{R}^+$.
+
+One choice is to integrate over $\Theta$; to ensure a non-negative objective value, the weighting function should be non-negative. Also, as scaling the objective function will not change its minimizing argument, the weighting function can be constrained to integrate to one. These are the requirements for a valid probability density function (PDF); as such, the model $\theta$ is treated as a random process and a Bayesian approach can be adopted. 
+
+Define the PDF $\text{p}(\theta): \Theta \mapsto \mathbb{R}^+$. Now using Bayes rule, the risk can be formulated as
+\begin{IEEEeqnarray}{rCl} \label{eq:risk}
+\Rcal(f) & = & \text{E}_{\bm{\theta}}\big[ \Rcal_{\bm{\theta}}(f | \bm{\theta}) \big] \\
+& = & \text{E}_{\yrm,\xrm,\Drm}\big[ \mathcal{L}(f(\xrm;\Drm),\yrm) \big] \nonumber \\
+& = & \text{E}_{\xrm,\Drm}\Big[ \text{E}_{\yrm | \xrm,\Drm} \big[ \mathcal{L}(f(\xrm;\Drm),\yrm) \big] \Big] \nonumber
+\end{IEEEeqnarray}
+and $\yrm$, $\xrm$, and $\Drm$ are jointly distributed random variables.
+
+Finally, express the optimal learning function
+\begin{equation} 
+f^* = \argmin_{f \in \Fcal} \Rcal(f) \;.
+\end{equation}
+The learning functions are non-parametric and there are no restrictions on the set of achievable functions $\Fcal$. Thus, to minimize the risk, the decision expressed by the learning function $f$ for each observed value $\xrm$ and $\Drm$ is determined to be
+\begin{equation} \label{eq:f_opt_xD}
+f^*(\xrm;\Drm) = \argmin_{h \in \Hcal} \text{E}_{\yrm | \xrm,\Drm}\big[ \mathcal{L}(h,\yrm) \big] \;.
+\end{equation}
+The optimal function achieves the minimum risk,
+\begin{equation} \label{eq_risk_min}
+\Rcal(f^*) = \text{E}_{\xrm,\Drm} \left[ \min_{h \in \Hcal} \text{E}_{\yrm | \xrm,\Drm}\big[ \mathcal{L}(h,\yrm) \big] \right] \;.
+\end{equation}
+
+
+
+
+
+
+
+
+
+\section{Probability Distributions}
+
+To determine the optimal decision function, the joint PMF $\text{P}(\yrm,\xrm,\Drm)$ is required. Having already defined the distribution conditioned on the model $\theta$, all that remains is to select a PDF $\text{p}(\theta)$ reflecting the users prior knowledge. In this section, the Dirichlet distribution is used. The Dirichlet distribution possesses the desirable property of being the conjugate prior for the multinomial conditional distribution characterizing the data; as such, it will provide tractable forms for the model posterior distribution and lead to closed form expressions for the data conditional distribution used to design the decision function.
+
+Other distributions of interest will be provided, such as the training data PMF $\text{P}(\Drm)$ and the conditional distribution $\text{P}(\yrm | \xrm,\Drm)$ used to form a decision given specific observations.
+
+
+
+\subsection{Model PDF, $\text{p}(\bm{\theta})$} \label{sec:P_theta}
+
+The Dirichlet PDF for the model $\bm{\theta} \in \Theta$ is 
+\begin{IEEEeqnarray}{rCl}
+\text{p}(\bm{\theta}) & = & \beta(\bm{\alpha})^{-1} \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\alpha(y,x) - 1} \;,
+\end{IEEEeqnarray}
+where the user-selected PDF parameters $\alpha : \Ycal \times \Xcal \mapsto \mathbb{R}_{>0}$ are introduced and $\beta$ is the multivariate beta function,
+\begin{equation}
+\beta(\bm{\alpha}) = \frac{\prod_{y \in \Ycal} \prod_{x \in \Xcal} \Gamma\big( \alpha(y,x) \big)}{\Gamma \left( \sum_{y \in \Ycal} \sum_{x \in \Xcal} \alpha(y,x) \right)} \;.
+\end{equation}
+
+The parameter $\alpha$ controls around which models $\theta$ the PDF concentrates and how strongly. For convenience, introduce the concentration parameter $\alpha_0 \equiv \sum_{y \in \Ycal} \sum_{x \in \Xcal} \alpha(y,x)$. 
+
+The first and second joint moments of the model are 
+\begin{equation}
+\mu_{\theta}(y,x) = \text{E}\big[ \theta(y,x) \big] = \frac{\alpha(y,x)}{\alpha_0}
+\end{equation}
+and
+\begin{IEEEeqnarray}{rCl}
+\text{E}\big[ \theta(y,x) \theta(y',x') \big] & = & \frac{\alpha(y,x) \alpha(y',x') + \alpha(y,x) \delta[y,y'] \delta[x,x']}{\alpha_0 (\alpha_0+1)} \;.
+\end{IEEEeqnarray}
+Observe that $\text{P}(\yrm,\xrm) = \mu_{\theta}(\yrm,\xrm) = \alpha(\yrm,\xrm) / \alpha_0$. The covariance is
+\begin{IEEEeqnarray}{rCl}
+\Sigma_{\theta}(y,x,y',x') & = & \text{E}\Big[ \big(\theta(y,x)-\mu_{\theta}(y,x)\big) \big(\theta(y',x')-\mu_{\theta}(y',x')\big) \Big] \\
+& = & \frac{\mu_{\theta}(y,x) \delta[y,y'] \delta[x,x'] - \mu_{\theta}(y,x) \mu_{\theta}(y',x')}{\alpha_0+1} \nonumber \;.
+\end{IEEEeqnarray}
+Also, for $\alpha(y,x) > 1$, the maximizing value of the distribution is
+\begin{equation}
+\theta_\text{max} = \argmax_{\theta \in \Theta} \text{p}(\theta) = \frac{\alpha - 1}{\alpha_0 - |\Ycal||\Xcal|} \;.
+\end{equation}
+
+
+
+
+PGR: CHECK/PROVE THE FOLLOWING???
+
+For $\alpha_0 \to \infty$, the PDF concentrates at its mean, resulting in
+
+\begin{IEEEeqnarray}{rCl}
+\text{p}(\bm{\theta}) & = & \delta\left( \bm{\theta} - \frac{\bm{\alpha}}{\alpha_0} \right) \\
+& = & \prod_{y \in \Ycal} \prod_{x \in \Xcal} \delta\left( \theta(y,x) - \frac{\alpha(y,x)}{\alpha_0} \right) \nonumber \;.
+\end{IEEEeqnarray}
+
+PGR: valid delta representation for degenerate PDF domain?
+
+Conversely, for $\alpha_0 \to 0$, the PDF trends toward
+\begin{IEEEeqnarray}{rCl}
+\text{p}(\bm{\theta}) & = & \sum_{y \in \Ycal} \sum_{x \in \Xcal} \frac{\alpha(y,x)}{\alpha_0} \delta\big( \bm{\theta} - \bm{e}(y,x) \big) \\
+& = & \sum_{y \in \Ycal} \sum_{x \in \Xcal} \frac{\alpha(y,x)}{\alpha_0} \prod_{y' \in \Ycal} \prod_{x' \in \Xcal} \delta \big( \theta(y',x') - \delta[y,y'] \delta[x,x'] \big) \nonumber \;,
+\end{IEEEeqnarray}
+which distributes its weight among the $|\Ycal| |\Xcal|$ models with an $\ell_0$ norm satisfying $\| \theta \|_0 = 1$.
+
+PGR: define e???
+
+These trends can be visualized with Figure \ref{fig:P_theta}. Note that for $\alpha_0=2.99$, $\alpha < 1$ and the PDF values at the boundaries of the domain trend to infinity; this is not captured by the plot color scale.
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{P_theta.pdf}
+\caption{Model prior PDF $\text{p}(\theta)$ for different concentrations $\alpha_0$}
+\label{fig:P_theta}
+\end{figure}
+
+
+
+\paragraph{Uniform Prior}
+
+When the parameterizing function is $\alpha(y,x) = 1$, the distribution becomes a uniform PDF over the simplex and is represented as
+\begin{equation}
+\text{p}(\bm{\theta}) = \big( |\Ycal||\Xcal|-1 \big)! \cdot \delta \left( 1 - \sum_{y \in \Ycal} \sum_{x \in \Xcal}  \theta(y,x) \right) \;.
+\end{equation}
+Note that the concentration parameter is $\alpha_0 = |\Ycal||\Xcal|$ and $\text{P}(\yrm,\xrm) = \big( |\Ycal||\Xcal| \big)^{-1}$ is also uniform. Figure \ref{fig:P_theta_uniform} shows the uniform distribution amplitude for $|\Ycal| = 3$, $|\Xcal| = 1$.
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{P_theta_uniform.pdf}
+\caption{Uniform model prior PDF, $|\Ycal| = 3$}
+\label{fig:P_theta_uniform}
+\end{figure}
+
+
+
+
+\subsection{Training Set PMF, $\text{P}(\Drm)$}
+
+Next, determine the training data PMF, $\text{P}(\Drm)$. The distribution conditioned on the model can be formulated as
+\begin{IEEEeqnarray}{rCl}
+\text{P}\big( \Drm | \bm{\theta} \big) & = & \prod_{n=1}^N \text{P}\big( \Drm_n | \bm{\theta} \big) \\
+& = & \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\bar{N}(y,x;\Drm)} \nonumber \;,
+\end{IEEEeqnarray}
+where the dependency on the training data $\Drm$ is expressed though a transform functional $\bar{N} : \Dcal \mapsto \bar{\Ncal}$, defined as
+\begin{IEEEeqnarray}{rCl}
+\bar{N}(\yrm,\xrm;\Drm) & = & \sum_{n=1}^N \delta \big[ (\yrm,\xrm),\Drm_n \big] \\
+& = & \sum_{n=1}^N \delta \left[ \yrm,\Yrm_n \right] \delta \left[ \xrm,\Xrm_n \right] \nonumber \;.
+\end{IEEEeqnarray}
+For a given data set $\Drm$, the resulting function $\bar{\bm{N}}(\Drm)$ over $\Ycal \times \Xcal$ effectively counts the number of occurences of each possible pair $(y,x)$ and thus satisfies
+\begin{IEEEeqnarray}{rCl}
+\bar{N}(\cdot,\cdot;\Drm) & \in & \bar{\Ncal}
+= \left\{ \bar{\bm{n}} \in \mathbb{N}^{\Ycal \times \Xcal}: \sum_{y \in \Ycal} \sum_{x \in \Xcal} \bar{n}(y,x) = N \right\} \;.
+\end{IEEEeqnarray}
+The cardinality of this set is $|\bar{\Ncal}| = \binom{N+|\Ycal||\Xcal|-1}{N,|\Ycal||\Xcal|-1}$; note that $|\bar{\Ncal}| \leq |\Dcal|$. 
+
+PGR: stars-and-bars method REF WILLIAM FULLER???
+
+This transform can be used to define a new random function $\nbarrm(\cdot,\cdot) \equiv \bar{N}(\cdot,\cdot;\Drm)$. Conditioned on the model $\theta$, the PMF of $\nbarrm$ is a multinomial distribution
+\begin{IEEEeqnarray}{rCl}
+\text{P}(\nbarrm | \bm{\theta}) & = & \sum_{D : \bar{N}(D) = \nbarrm} \text{P}_{\Drm | \theta}(D | \theta) \\
+& = & \big|\{ D : \bar{N}(D) = \nbarrm \}\big| \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\bar{\nrm}(y,x)} \nonumber \\
+& = & \Ccal(\nbarrm) \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\bar{\nrm}(y,x)} \nonumber \;,
+\end{IEEEeqnarray}
+where the operator $\Ccal$ generalizes the multinomial coefficient for functions with codomain $\mathbb{N}$, such that 
+\begin{equation}
+\Ccal(\bar{\bm{n}}) = \frac{\left( \sum_{y \in \Ycal} \sum_{x \in \Xcal} \bar{n}(y,x) \right)!}{\prod_{y \in \Ycal} \prod_{x \in \Xcal} \bar{n}(y,x)!} \;.
+\end{equation}
+
+For reference, the first and second joint moments of this multinomial distribution are 
+\begin{IEEEeqnarray}{rCl}
+\text{E}\big[ \bar{\nrm}(y,x) | \theta \big] & = & N \theta(y,x)
+\end{IEEEeqnarray}
+and
+\begin{IEEEeqnarray}{L}
+\text{E}\big[ \bar{\nrm}(y,x) \bar{\nrm}(y',x') | \theta \big] \\
+\quad = N \big( \theta(y,x) \delta[y,y'] \delta[x,x'] + (N-1) \theta(y,x) \theta(y',x') \big) \nonumber
+\end{IEEEeqnarray}
+and the covariance function is
+\begin{IEEEeqnarray}{rCl}
+\Sigma_{\nbarrm | \theta}(y,x,y',x')  & = & N \big( \theta(y,x) \delta[y,y'] \delta[x,x'] - \theta(y,x) \theta(y',x') \big) \;.
+\end{IEEEeqnarray}
+
+PGR: reference multinomial moments
+
+As the Dirichlet distribution characterizes the parameters of this multinomial distribution, the PMF of $\nbarrm$ is a Dirichlet-Multinomial distribution parameterized by $\alpha$,
+\begin{IEEEeqnarray}{rCl}
+\text{P}(\nbarrm) & = & \Ccal(\nbarrm) \beta(\bm{\alpha})^{-1} \beta(\bm{\alpha} + \nbarrm) \;.
+\end{IEEEeqnarray}
+
+PGR: DM reference
+
+
+
+
+Thus, the marginal PMF of the training data is
+\begin{IEEEeqnarray}{rCl}
+\text{P}(\Drm) & = & \text{E}_{\bm{\theta}} \left[ \prod_{n=1}^N \text{P}\big( \Drm_n | \bm{\theta} \big) \right] \\
+& = & \text{E}_{\bm{\theta}} \left[ \prod_{y \in \Ycal} \prod_{x \in \Xcal} \bm{\theta}(y,x)^{\bar{N}(y,x;\Drm)} \right] \nonumber \\
+& = & \beta(\bm{\alpha})^{-1} \beta \left(  \bm{\alpha} + \bar{\bm{N}}(\Drm) \right) \nonumber \;.
+\end{IEEEeqnarray}
+This perspective shows values of the PMF $\text{P}(\Drm)$ to be joint moments of the model $\theta$. 
+
+
+
+The first and second joint moments of $\bar{\nrm}$ are
+\begin{IEEEeqnarray}{rCl}
+\mu_{\bar{\nrm}}(y,x) & = & \text{E}[\bar{\nrm}(y,x)] \\
+& = & N \frac{\alpha(y,x)}{\alpha_0} = N \mu_\theta(y,x) \nonumber
+\end{IEEEeqnarray}
+and
+\begin{IEEEeqnarray}{L}
+\text{E}\big[ \bar{\nrm}(y,x) \bar{\nrm}(y',x') \big] \\
+= \frac{N}{\alpha_0 (\alpha_0+1)} \Big( (\alpha_0 + N)\alpha(y,x) \delta[y,y'] \delta[x,x'] + (N-1) \alpha(y,x) \alpha(y',x') \Big) \nonumber \\
+= \frac{N}{\alpha_0+1} \Big( (\alpha_0+N) \mu_\theta(y,x) \delta[y,y'] \delta[x,x'] + \alpha_0(N-1) \mu_\theta(y,x) \mu_\theta(y',x') \Big) \nonumber \;.
+\end{IEEEeqnarray}
+The covariance function is
+\begin{IEEEeqnarray}{rCl}
+\Sigma_{\nbarrm}(y,x,y',x') & = & \text{E}\Big[ \big( \bar{\nrm}(y,x) - \mu_{\bar{\nrm}}(y,x) \big) \big( \bar{\nrm}(y',x') - \mu_{\bar{\nrm}}(y',x') \big) \Big] \\
+& = & \frac{N (\alpha_0+N)}{\alpha_0+1} \big( \mu_\theta(y,x) \delta[y,y'] \delta[x,x'] - \mu_\theta(y,x) \mu_\theta(y',x') \big) \nonumber \\
+& = & N (\alpha_0+N) \Sigma_{\theta}(y,x,y',x') \nonumber \;.
+\end{IEEEeqnarray}
+
+
+
+
+PGR: CHECK/PROVE THE FOLLOWING???
+
+For $\alpha_0 \to \infty$, the model PDF concentrates at its mean and the PMF of interest is a multinomial distribution,
+\begin{IEEEeqnarray}{rCl}
+\text{P}(\nbarrm) & = & \Ccal(\nbarrm) \prod_{y \in \Ycal} \prod_{x \in \Xcal} \left(\frac{\alpha(y,x)}{\alpha_0}\right)^{\bar{\nrm}(y,x)} \;.
+\end{IEEEeqnarray}
+or
+\begin{IEEEeqnarray}{rCl}
+\text{P}(\Drm) & = & \prod_{y \in \Ycal} \prod_{x \in \Xcal} \left(\frac{\alpha(y,x)}{\alpha_0}\right)^{\bar{N}(y,x;\Drm)} \\
+& = & \prod_{n=1}^N \frac{\alpha\big( \Yrm_n,\Xrm_n \big)}{\alpha_0} \nonumber \;.
+\end{IEEEeqnarray}
+
+
+Conversely, for $\alpha_0 \to 0$, the PDF trends toward
+\begin{IEEEeqnarray}{rCl} \label{eq:P_n_lim_zero}
+\text{P}(\nbarrm) & = & \sum_{y \in \Ycal} \sum_{x \in \Xcal} \frac{\alpha(y,x)}{\alpha_0} \delta\big[ \nbarrm , N \bm{e}(y,x) \big] \\
+& = & \sum_{y \in \Ycal} \sum_{x \in \Xcal} \frac{\alpha(y,x)}{\alpha_0} \prod_{y' \in \Ycal} \prod_{x' \in \Xcal} \delta \big[ \bar{\nrm}(y',x') , N \delta[y,y'] \delta[x,x'] \big] \nonumber \;.
+\end{IEEEeqnarray}
+
+PGR: prove zero limit using data conditional?
+
+\begin{IEEEeqnarray}{rCl}
+\text{P}(\Drm) & = & \sum_{y \in \Ycal} \sum_{x \in \Xcal} \frac{\alpha(y,x)}{\alpha_0} \prod_{n=1}^N \delta\big[ (y,x),\Drm_n \big] \;.
+\end{IEEEeqnarray}
+
+
+Figure \ref{fig:P_nbar} displays the distribution of $\nbarrm$ for $N=10$ and different model concentrations $\alpha_0$. Observe that for large $\alpha_0$, the distribution approaches a multinomial distribution $\nbarrm \sim \text{Mult}(\alpha/\alpha_0)$. Figure \ref{fig:P_nbar_N} shows how a specific model prior influences the data PMF differently for different $N$. Observe that as the number of training samples increases, the PMF $\text{P}(\nbarrm)$ visually approximates the corresponding model prior $\text{p}(\theta)$, such that $\text{P}_{\nbarrm}(\nbarrm) \approx N^{1-|\Ycal||\Xcal|}\text{p}_{\theta}(\nbarrm/N)$.
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{P_nbar.pdf}
+\caption{PMF $\text{P}(\nbarrm)$ for different concentrations $\alpha_0$}
+\label{fig:P_nbar}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{P_nbar_N.pdf}
+\caption{PMF $\text{P}(\nbarrm)$ for different training set sizes $N$}
+\label{fig:P_nbar_N}
+\end{figure}
+
+
+
+\paragraph{Uniform Prior}
+
+For the uniform distribution, $\alpha(y,x) = 1$,
+\begin{IEEEeqnarray}{rCl} \label{P_D_io}
+\text{P}(\Drm) & = & \binom{N+|\Ycal||\Xcal|-1}{N,|\Ycal||\Xcal|-1}^{-1} \Ccal\big( \bar{\bm{N}}(\Drm) \big)^{-1} \;.
+\end{IEEEeqnarray}
+and
+\begin{IEEEeqnarray}{rCl} \label{P_D_io}
+\text{P}(\nbarrm) & = & \binom{N+|\Ycal||\Xcal|-1}{N,|\Ycal||\Xcal|-1}^{-1} \;.
+\end{IEEEeqnarray}
+The distribution of $\nbarrm$ is uniform over the set $\bar{\Ncal}$. As such, the PMF for $\Drm$ depends on the training data only through the multinomial coefficient. Consequently, the training sets are more probable when they are more ``concentrated''.
+
+
+
+
+
+
+
+
+
+\subsection{Conditonal PMF $\text{P}(\yrm | \xrm,\Drm)$}
+
+As shown in Equation \eqref{eq:f_opt_xD}, the decision selected by the optimally designed function depends on $\text{P}(\yrm | \xrm,\Drm)$, the distribution of the unobserved $\yrm$ conditioned on all observable random variables.
+
+To determine this distribution, first observe that the model posterior PDF given the training data is
+\begin{IEEEeqnarray}{rCl}
+\text{p}(\bm{\theta} | \Drm) & = & \frac{\text{P}(\Drm | \bm{\theta}) \text{p}(\bm{\theta})}{\text{P}(\Drm)} \\
+& = & \beta \left( \bm{\alpha} + \bar{\bm{N}}(\Drm) \right)^{-1} \prod_{y \in \Ycal} \prod_{x \in \Xcal} 
+\theta(y,x)^{\alpha(y,x) + \bar{N}(y,x;\Drm) - 1} \nonumber \;, 
+\end{IEEEeqnarray}
+a Dirichlet distribution with parameter function $\alpha + \bar{N}(\cdot,\cdot;\Drm)$. 
+
+This posterior distribution is of specific interest in the machine learning literature. While Bayesian techniques are used here, often point estimates of the model $\theta$ are formed; perhaps the most common approach is to form the Maximum a posteriori estimate,
+\begin{IEEEeqnarray}{rCl}
+\theta_\text{MAP}(\Drm) & = & \argmax_{\theta \in \Theta} \text{P}(\theta|\Drm) = \frac{\bar{\bm{N}}(\Drm) + \bm{\alpha} - 1}{N + \alpha_0 - |\Ycal||\Xcal|} \;.
+\end{IEEEeqnarray}
+This maximizing value is only valid when $\bar{N}(\Drm) >1$. For the uniform model prior, the maximizing value of the posterior is the empirical PMF $\bar{\bm{N}}(\Drm) / N$.
+
+Also, as the concentration parameter increases proportionately with increasing volumes of training data, as $N \to \infty$ the posterior converges to $\text{p}(\theta | \Drm) \to \bar{\bm{N}}(\Drm) / N$. Thus, as more data is collected, the model can be more positively identified and used to formulate minimum risk decisions. Conversely, as $\alpha_0 \to \infty$, the prior model certainty is stronger and the posterior trends toward $\text{p}(\theta | \Drm) \to \alpha / \alpha_0$, independent of the training data.
+
+Figure \ref{fig:P_theta_D} shows the influence of the training data on the model distribution; after conditioning on the training data (via $\nbarrm$), the PDF concentration shifts away from the models favored by the prior knowledge and towards other models that better account for the observations.
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{P_theta_post.pdf}
+\caption{Model $\theta$ PDF, prior and posterior}
+\label{fig:P_theta_D}
+\end{figure}
+
+
+
+
+
+Next the joint PMF of $\yrm$ and $\xrm$ conditioned on the training data is expressed as
+\begin{IEEEeqnarray}{rCl}
+\text{P}(\yrm,\xrm | \Drm) & = & \frac{\text{E}_{\bm{\theta}}\big[ \theta(\yrm,\xrm) \text{P}(\Drm | \theta) \big]}{\text{P}(\Drm)} = \text{E}_{\bm{\theta} | \Drm}\big[ \theta(\yrm,\xrm) | \Drm \big] \\
+& = & \frac{\alpha(\yrm,\xrm) + \bar{N}(\yrm,\xrm;\Drm)}{\alpha_0 + N} \nonumber \\
+& = & \left(\frac{\alpha_0}{\alpha_0 + N}\right) \frac{\alpha(\yrm,\xrm)}{\alpha_0} + \left(\frac{N}{\alpha_0 + N}\right) \frac{\bar{N}(\yrm,\xrm;\Drm)}{N} \nonumber \\
+& = & \left(\frac{\alpha_0}{\alpha_0 + N}\right) \text{P}(\yrm,\xrm) + \left(\frac{N}{\alpha_0 + N}\right) \frac{\bar{N}(\yrm,\xrm;\Drm)}{N} \nonumber \;.
+\end{IEEEeqnarray}
+This is a mixture distribution between the prior expectation $\text{E}[\theta] = \alpha/\alpha_0$ and the empirical distribution $\bar{N}(\yrm,\xrm;\Drm)/N$. The more subjective the model prior (i.e. larger $\alpha_0$), the more the prior mean is favored; the more data, the more the empirical PMF is favored.
+
+It is informative to compare the PMF $\text{P}(\yrm,\xrm | \theta)$ with its ``estimate'' $\text{P}(\yrm,\xrm | \Drm)$ and investigate the fit provided by different model priors. Consider a fixed model $\theta$ and user-selected prior PDF parameters $\alpha$. The expected value of the data-conditioned PMF is
+\begin{IEEEeqnarray}{rCl}
+\text{E}_{\Drm|\theta}\big[ \text{P}_{\yrm,\xrm}(y,x | \Drm) \big] & = & \left(\frac{\alpha_0}{\alpha_0 + N}\right) \frac{\alpha(y,x)}{\alpha_0} + \left(\frac{N}{\alpha_0 + N}\right) \theta(y,x) \;,
+\end{IEEEeqnarray}
+a mixture of the prior expectation $\text{E}[\theta] = \alpha/\alpha_0$ and the model $\theta$ itself; observe how as the volume of training data increases relative to the model prior concentration, the expectation trends away from the prior estimate and toward the true model. The expected bias of the model estimate $\text{P}(\yrm,\xrm | \Drm)$ is
+\begin{IEEEeqnarray}{rCl}
+\text{Bias}(y,x ; \alpha,\theta) & = & \text{E}_{\Drm | \theta} \big[ \text{P}_{\yrm,\xrm}(y,x | \Drm) - \theta \big] \\
+& = & \frac{\alpha(y,x) + \text{E}\big[ \bar{\nrm}(y,x) \big]}{\alpha_0+N} - \theta(y,x) \nonumber \\
+& = & \frac{\alpha_0}{\alpha_0+N} \left( \frac{\alpha(y,x)}{\alpha_0} - \theta(y,x) \right) \nonumber \;,
+\end{IEEEeqnarray}
+proportionate to the difference between $\theta$ and the data-independent expectation $\text{E}[\theta]$. The scaling factor depends on the prior concentration and the number of training samples. For a highly subjective prior ($\alpha_0/N \to \infty$), the estimate becomes nearly independent of $\Drm$ and the scaling factor is unity. For an ``uncertain'' prior with low $\alpha_0$, the empirical distribution is used to estimate $\theta$ and the expected bias trends to zero.
+
+The conditional variance of the estimate $\text{P}(\yrm,\xrm | \Drm)$ is
+\begin{IEEEeqnarray}{L}
+\text{C}_{\nbarrm | \theta} \big[ y,x,y',x' ; \text{P}_{\yrm,\xrm | \nbarrm}(\cdot,\cdot | \nbarrm) \big] \\
+\quad = (\alpha_0+N)^{-2} \Sigma_{\nbarrm | \theta}(y,x,y',x') \nonumber \\
+\quad = \frac{N}{(\alpha_0+N)^2} \big( \theta(y,x) \delta[y,y'] \delta[x,x'] - \theta(y,x) \theta(y',x') \big) \nonumber \;,
+\end{IEEEeqnarray}
+proportionate to the conditional variance of $\nbarrm$ given $\theta$. The scaling factor trends to zero with both increasing $\alpha_0$ and $N$.
+
+Finally, consider the expected squared difference between the estimate and the true model,
+\begin{IEEEeqnarray}{L}
+\mathcal{E}(y,x,y',x;\alpha,\theta) \\
+\quad = \text{E}_{\nbarrm | \theta} \Big[ \big( \text{P}_{\yrm,\xrm|\nbarrm}(y,x|\nbarrm) - \theta(y,x) \big) \big( \text{P}_{\yrm,\xrm|\nbarrm}(y',x'|\nbarrm) - \theta(y',x') \big) \Big] \nonumber \\
+\quad = \text{Bias}(y,x;\alpha,\theta) \text{Bias}(y',x';\alpha,\theta) + \text{C}_{\nbarrm | \theta} \big[ y,x,y',x ; \text{P}_{\yrm,\xrm | \nbarrm}(\cdot,\cdot | \nbarrm) \big] \nonumber \;,
+\end{IEEEeqnarray}
+which combines both the bias of the model estimate $\text{P}(\yrm,\xrm | \Drm)$ and its variance. As $N \to \infty$, this function trends to zero and thus the underlying model $\theta$ is determined precisely. A more realistic and interesting case is estimation with a finite volume of training data. Specification of the Dirichlet model prior can be interpreted as providing a hypothesized distribution $\alpha/\alpha_0$ and a confidence level $\alpha_0$. Higher confidence reduces error due to the variance of the estimator, but increases the error due to bias between $\alpha/\alpha_0$ and $\theta$. Low confidence renders the estimate unbiased, but maximizes the estimator variance.
+
+To exemplify how the model estimate $\text{P}(\yrm,\xrm | \Drm)$ approximates $\theta$, consider the model and prior PMF $\alpha/\alpha_0$ shown in Figure \ref{fig:P_yx_error_N_0}. Note the significant mismatch. Figures \ref{fig:P_yx_error_a0_0_1} and \ref{fig:P_yx_error_a0_10} show how the expected value and variance of the estimate (represented by the blue markers and error bars, respectively) change for different values of $N$ and $\alpha_0$ . Each individual plot heading provides the error $\sqrt{\sum_{y \in \Ycal} \sum_{x \in \Xcal} \mathcal{E}(y,x,y,x;\alpha,\theta)}$ to assess the quality of the PMF estimate. Observe that for $N=1$, the high variance of the $\alpha_0 = 0.1$ estimate (favoring the empirical PMF) renders it worse than the $\alpha_0 = 10$ estimate. Conversely, for $N=10$, the confidence of the $\alpha_0 = 10$ estimate leads to high bias and the $\alpha_0 = 0.1$ estimate is superior.
+
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{P_yx_error_N_0.pdf}
+\caption{Model Estimate, no training data}
+\label{fig:P_yx_error_N_0}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.8]{P_yx_error_a0_0_1.pdf}
+\caption{Model Estimates, $\alpha_0 = 0.1$}
+\label{fig:P_yx_error_a0_0_1}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.8]{P_yx_error_a0_10.pdf}
+\caption{Model Estimates, $\alpha_0 = 10$}
+\label{fig:P_yx_error_a0_10}
+\end{figure}
+
+
+Proceeding towards an expression for the conditional estimate $\text{P}(\yrm | \xrm,\Drm)$, the marginal distribution for $\xrm$ given $\Drm$ is
+\begin{IEEEeqnarray}{rCl}
+\text{P}(\xrm | \Drm) & = & \frac{\alpha'(\xrm) + N'(\xrm;\Drm)}{\alpha_0 + N} \\
+& = & \left(\frac{\alpha_0}{\alpha_0 + N}\right) \frac{\alpha'(\xrm)}{\alpha_0} + \left(\frac{N}{\alpha_0 + N}\right) \frac{N'(\xrm;\Drm)}{N} \nonumber \\
+& = & \left(\frac{\alpha_0}{\alpha_0 + N}\right) \text{P}(\xrm) + \left(\frac{N}{\alpha_0 + N}\right) \frac{N'(\xrm;\Drm)}{N} \nonumber \;.
+\end{IEEEeqnarray}
+where ``marginalized'' functions $\alpha'(x) \equiv \sum_{y \in \Ycal} \alpha(y,x)$ and $N'(x;\Drm) \equiv \sum_{y \in \Ycal} \bar{N}(y,x;\Drm) = \sum_{n=1}^N \delta\big[ x,\Xrm_n \big]$ are introduced. Note that $\text{P}(\xrm) = \alpha'(\xrm)/\alpha_0$. Additionally, as $\nbarrm \equiv \bar{\bm{N}}(\Drm) \sim \text{DM}(N,\alpha)$, the aggregation property for Dirichlet-Multinomial random functions ensures $\bm{\mathrm{n}}' \equiv \bm{N}'(\Drm) \sim \text{DM}(N,\alpha')$ is Dirichlet-Multinomial over the set $\Xcal$.
+
+PGR: aggregation reference
+
+PGR: bold function notation???
+
+Finally, the distribution of interest is generated via Bayes rule as
+\begin{IEEEeqnarray}{rCl}
+\text{P}(\yrm | \xrm,\Drm) & = & \frac{\text{P}(\yrm,\xrm | \Drm)}{\text{P}(\xrm | \Drm)} \\
+& = & \frac{\alpha(\yrm,\xrm) + \bar{N}(\yrm,\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \nonumber \\
+& = & \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + N'(\xrm;\Drm)}\right) \frac{\alpha(\yrm,\xrm)}{\alpha'(\xrm)} + \left(\frac{N'(\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)}\right) \frac{\bar{N}(\yrm,\xrm;\Drm)}{N'(\xrm;\Drm)} \nonumber \\
+& = & \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + N'(\xrm;\Drm)}\right) \text{P}(\yrm | \xrm) + \left(\frac{N'(\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)}\right) \frac{\bar{N}(\yrm,\xrm;\Drm)}{N'(\xrm;\Drm)} \nonumber \;,
+\end{IEEEeqnarray}
+
+The last representation views the distribution as a convex combination of two conditional distributions. The first distribution $\text{P}(\yrm | \xrm) = \alpha(\yrm,\xrm) / \alpha'(\xrm)$ is independent of the training data and based on the prior knowledge implied via the model PDF parameter; the second distribution is a ``conditional'' empirical PMF and depends on $\Drm$, not on $\alpha$. For both, only those values $\alpha$ and $\Drm$ corresponding to the observed value $\xrm$ shape the distribution. Note that for a given model $\theta$, the expected value of the conditional empirical distribution is 
+\begin{IEEEeqnarray}{rCl}
+\text{E}_{\Drm | \theta}\left[ \frac{\bar{N}(\yrm,\xrm;\Drm)}{N'(\xrm;\Drm)} \right] & = & \text{E}_{\bar{\nrm} | \theta}\left[ \frac{\bar{\nrm}(\yrm,\xrm)}{\nrm'(\xrm)} \right] = \text{E}_{\nrm' | \theta}\left[ \frac{\text{E}_{\bar{\nrm} | \nrm',\theta}\big[ \bar{\nrm}(\yrm,\xrm) \big]}{\nrm'(\xrm)} \right] \\
+& = & \frac{\theta(\yrm,\xrm)}{\theta'(\xrm)} = \text{P}(\yrm | \xrm,\theta) \nonumber \;,
+\end{IEEEeqnarray}
+where the properties of a multinomial distribution and its aggregation, detailed in Appendix \ref{app:mult}, have been used.
+
+Similarly, the weighting factors are only influenced by these values. As the number of training examples increases or as $\alpha_0 \to 0$, $\text{P}(\yrm | \xrm,\Drm)$ trends towards the empirical conditional distribution. For $N'(\xrm;\Drm) = 0$ or as $\alpha_0 \to \infty$, the PMF trends toward the conditional distribution $\text{P}(\yrm|\xrm)$, which only depends on the model parameter $\alpha$.
+
+
+Athough the distribution of interest has already been expressed, it is informative to introduce a different representation for the conditional PMF,
+\begin{IEEEeqnarray}{rCl}
+\text{P}(\yrm | \xrm,\Drm) & = & \text{E}_{\bm{\theta} | \xrm,\Drm} \big[ \text{P}(\yrm | \xrm,\bm{\theta}) \big] \\
+& = & \text{E}_{\bm{\theta} | \xrm,\Drm} \left[ \frac{\theta(\yrm,\xrm)}{\theta'(\xrm)} \right] \nonumber \;,
+\end{IEEEeqnarray}
+where $\theta'(\xrm) \equiv \sum_{y' \in \Ycal} \theta(y',\xrm)$; this aggregation is a Dirichlet random function parameterized by $\alpha'$. Just as $\text{P}(\yrm,\xrm | \Drm)$ is an expectation of the model $\theta$ posterior conditioned on $\Drm$, $\text{P}(\yrm | \xrm,\Drm)$ is an expectation based on $\theta$ conditioned on both observed random variables. The expectation operates on a function of $\theta$ where each ``slice'' of the function $\theta(\cdot,\xrm)$ is normalized by its aggregation $\theta'(\xrm)$. 
+
+PGR: aggregation reference???
+
+The complete model posterior PDF is represented as
+\begin{IEEEeqnarray}{rCl}
+\text{p}(\bm{\theta} | \xrm, \Drm) & = & \frac{\text{P}(\xrm | \bm{\theta}) \text{p}(\bm{\theta} | \Drm)}{\text{P}(\xrm | \Drm)} = \text{E}_{\yrm | \xrm,\Drm} \big[ \text{p}(\bm{\theta} | \yrm,\xrm,\Drm) \big] \\
+& = & \sum_{y' \in \Ycal} \frac{\alpha(y',\xrm) + \bar{N}(y',\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \text{Dir}\bigg( \bm{\theta} ; \bm{\alpha} + \bar{\bm{N}}\Big( \big( (y',\xrm),\Drm \big) \Big) \bigg) \nonumber \;.
+\end{IEEEeqnarray}
+This is a mixture distribution. The weighting factors are, interestingly, the values of $\text{P}(\yrm | \xrm,\Drm)$ given the observations. The PDF's being combined are Dirichlet distributions with different parameterizing functions $\alpha(y,x) + \bar{N}\Big( y,x;\big( (y',\xrm),\Drm \big) \Big) = \alpha(y,x) + \bar{N}(y,x;\Drm) + \delta[y,y'] \delta[x,\xrm]$; additional emphasis is put on the $|\Ycal|$ different possible pairs $(y,x)$ including the observed value $\xrm$.
+
+This posterior PDF shares the same asymptotic distributions with $\text{p}(\theta|\Drm)$. As $\alpha_0 \to \infty$ or $N \to \infty$, the $|\Ycal|$ Dirichlet mixture PDF's converge to the same impulsive distribution and thus $\text{p}(\theta|\xrm,\Drm)$ again trends toward $\alpha / \alpha_0$ and $\bar{N}/N$, respectively.
+
+To confirm that the expectation produces the same distribution $\text{P}(\yrm | \xrm,\Drm)$ displayed previously, use the distribution of a Dirichlet random function conditioned on its aggregation, proven in Appendix \ref{app:Dir_agg}, to show $\text{E}_{\theta}\big[ \theta(y,x) / \theta'(x) \big] = \alpha(y,x) / \alpha'(x)$. Thus, the PMF is evaulated as
+\begin{IEEEeqnarray}{rCl}
+\text{P}(\yrm | \xrm,\Drm) & = & \sum_{y' \in \Ycal} \frac{\alpha(y',\xrm) + \bar{N}(y',\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \\
+&& \qquad \left( \frac{\alpha(\yrm,\xrm) + \bar{N}(\yrm,\xrm;\Drm) + \delta[y',\yrm] \delta[\xrm,\xrm]}{\alpha'(\xrm) + N'(\xrm;\Drm) + \delta[\xrm,\xrm]} \right) \nonumber \\
+& = & \frac{\alpha(\yrm,\xrm) + \bar{N}(\yrm,\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \nonumber \;.
+\end{IEEEeqnarray}
+
+
+PGR: expectation given theta stuff??
+
+
+
+
+\paragraph{Uniform Prior}
+
+For the uniform model prior PDF, the conditional distribution is
+\begin{IEEEeqnarray}{rCl} \label{P_y_xD_uniform}
+\text{P}(\yrm | \xrm,\Drm) & = & \frac{\bar{N}(\yrm,\xrm;\Drm)+1}{N'(\xrm;\Drm) + |\Ycal|} \\
+& = & \left( \frac{M_y}{N'(\xrm;\Drm) + |\Ycal|} \right) \frac{1}{|\Ycal|} + \nonumber \\
+&& \quad \left( \frac{N'(\xrm;\Drm)}{N'(\xrm;\Drm) + |\Ycal|} \right) \frac{\bar{N}(\yrm,\xrm;\Drm)}{N'(\xrm;\Drm)} \nonumber \;.
+\end{IEEEeqnarray}
+Now the prior PMF contribution $\text{P}(\yrm|\xrm)$ is a uniform distribution over the $|\Ycal|$ possible outputs. The weighting factors are controlled by $\alpha'(\xrm) = |\Ycal|$; the more possible outcomes $|\Ycal|$ there are for a given training set size, the more the conditional distribution trends toward the uniform PMF implied by the model prior.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+
+
+
+\section{Applications to Common Loss Functions MAIN}
+
+PGR: equations, plots for specific theta results? subjective/objective tradeoff??? alpha/theta mismatch results???
+
+In this section, loss functions typical for classification and regression applications, specifically the 0-1 loss function and the squared-error loss function, are adopted. Optimal learners $f^*(\xrm;\Drm)$ are found and the corresponding minimum risk $\Rcal(f^*)$ is assessed.
+
+As shown in Equation \eqref{eq:f_opt_xD}, the decision expressed for a given input $\xrm$ and training set $\Drm$ minimizes the metric
+\begin{IEEEeqnarray}{L} \label{eq:E_y|xD L}
+\text{E}_{\yrm | \xrm,\Drm} \big[ \mathcal{L}(h,\yrm) \big] = \sum_{y \in \Ycal} \mathcal{L}(h,y) \text{P}_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) \\
+= \frac{\sum_{y \in \Ycal} \alpha(y,\xrm) \mathcal{L}(h,y) + \sum_{y \in \Ycal} \bar{N}(y,\xrm;\Drm) \mathcal{L}(h,y)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \nonumber \\
+= \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + N'(\xrm;\Drm)}\right) \sum_{y \in \Ycal} \frac{\alpha(y,\xrm)}{\alpha'(\xrm)} \mathcal{L}(h,y) + \left(\frac{N'(\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)}\right) \sum_{y \in \Ycal} \frac{\bar{N}(y,\xrm;\Drm)}{N} \mathcal{L}(h,y) \nonumber \\
+= \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + N'(\xrm;\Drm)}\right) \text{E}_{\yrm | \xrm}\big[ \mathcal{L}(h,\yrm) \big] + \left(\frac{N'(\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)}\right) \frac{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \mathcal{L}\big( h,\Yrm_n \big)}{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big]} \nonumber \;.
+\end{IEEEeqnarray}
+
+The expectation can be represented as a convex combination of two expected losses. The first expected loss is evaluated with respect to the conditional distribution $\text{P}(\yrm|\xrm)$, which reflects the prior knowledge encapsulated in model parameter $\alpha$. The second term is a conditional emprical loss, or the average loss among samples $\Yrm_n$ whose corresponding values $\Xrm_n$ match the observed value $\xrm$. The weighting factors are inherited from the conditional PMF $\text{P}(\yrm|\xrm,\Drm)$; thus, for a given observation $\xrm$, the model prior concentration $\alpha'$ and the number of matching training samples $N'(\cdot;\Drm)$ dictate which expectations are emphasized.
+
+
+
+
+\subsection{The Squared-Error Loss}
+
+PGR: Use finite hypothesis space instead, wait for continuous DP???
+
+The squared-error (SE) loss function is arguably the most commonly used loss function for regression, or in fact for any estimation problem where the variable of interest is continuous. This can be attributed to its quadratic form, which enables a tractable determination of the minimizing decision function.
+
+It is assumed that both the unobserved random variable $\yrm$ and the observed $\xrm$ take on real numerical values; that is, $\Ycal \subset \mathbb{R}$ and $\Xcal \subset \mathbb{R}$. Additionally, the learning function's decision is a real number; thus, $\Hcal = \mathbb{R} \supset \Ycal$.
+
+The loss function is defined as
+\begin{equation}
+\mathcal{L}(h,y) = (h-y)^2 \;.
+\end{equation}
+Substituting into \eqref{eq:risk_cond}, the conditional risk for a given learning function is 
+\begin{IEEEeqnarray}{rCl}
+\Rcal_{\Theta}(f;\theta) & = & \text{E}_{\Drm | \bm{\theta}} \bigg[ \text{E}_{\yrm,\xrm | \bm{\theta}} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \\
+& = & \text{E}_{\xrm | \bm{\theta}} \Big[ \text{E}_{\yrm | \xrm,\bm{\theta}} \big[ (\yrm - \mu_{\yrm | \xrm,\bm{\theta}})^2 \big] \Big] + \text{E}_{\xrm,\Drm | \bm{\theta}} \Big[ \big( f(\xrm;\Drm) - \mu_{\yrm | \xrm,\bm{\theta}} \big)^2 \Big] \nonumber \\
+& = & \text{E}_{\xrm | \bm{\theta}} \left[ \Sigma_{\yrm | \xrm,\bm{\theta}} \right] + \text{E}_{\xrm,\Drm | \bm{\theta}} \Big[ \big( f(\xrm;\Drm) - \mu_{\yrm | \xrm,\bm{\theta}} \big)^2 \Big] \nonumber \;.
+\end{IEEEeqnarray}
+The Bayes risk is 
+\begin{IEEEeqnarray}{rCl} \label{eq:risk_SE}
+\Rcal(f) & = & \text{E}_{\bm{\theta}} \Bigg[ \text{E}_{\Drm | \bm{\theta}} \bigg[ \text{E}_{\yrm,\xrm | \bm{\theta}} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \Bigg] \\
+& = & \text{E}_{\xrm,\Drm} \bigg[ \text{E}_{\yrm | \xrm,\Drm} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \nonumber \;.
+\end{IEEEeqnarray}
+
+
+
+
+
+\subsubsection{Optimal Estimate: the Posterior Mean}
+
+PGR: plots?
+
+To find the optimal decision function, substitute the squared-error loss into \eqref{eq:f_opt_xD} and note that the objective function is quadratic over the argument $h$. Furthermore, it is easily shown that the second derivative with respect to $h$ is positive and thus the function is convex; as such, the minimizing decision $h$ is the sole stationary point. Setting the first derivative of the function to zero, the optimal estimate is the expected value of $\yrm$ given the training data and the observed value $\xrm$, such that
+\begin{IEEEeqnarray}{rCl} \label{eq:f_opt_SE}
+f^*(\xrm;\Drm) & = & \mu_{\yrm | \xrm,\Drm} = \sum_{y \in \Ycal} y \text{P}_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) \\
+& = & \left( \frac{\alpha'(\xrm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \right) \sum_{y \in \Ycal} y \frac{\alpha(y,\xrm)}{\alpha'(\xrm)} \nonumber \\
+&& \quad + \left( \frac{N'(\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \right) \sum_{y \in \Ycal} y \frac{\bar{N}(y,\xrm;\Drm)}{N'(\xrm;\Drm)} \nonumber \\
+& = & \left( \frac{\alpha'(\xrm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \right) \mu_{\yrm | \xrm} \nonumber \\
+&& \quad + \left( \frac{N'(\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \right) \frac{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Yrm_n}{N'(\xrm;\Drm)} \nonumber \;.
+\end{IEEEeqnarray}
+
+As done for the posterior distribution $\text{P}(\yrm | \xrm,\Drm)$, the estimator is interpreted as a convex combination of two separate estimates - the expected value of $\yrm$ conditioned on the observed $\xrm$ and the mean of the training values $\Yrm_n$ which have a value $\Xrm_n$ matching the observed value $\xrm$. The weighting factors are the same; thus, stronger prior information (larger $\alpha'(\xrm)$) provides more weight to the estimate $\mu_{\yrm|\xrm}$ and more voluminous training data puts emphasis on the empirical conditional mean.
+
+Another interesting form for the optimal estimator is $f^*(\xrm;\Drm) = \text{E}_{\bm{\theta} | \xrm,\Drm} \left[ \mu_{\yrm | \xrm,\bm{\theta}} \right]$. If the model $\theta$ were known, then the expectation $\mu_{\yrm | \xrm,\bm{\theta}}$ would be optimal; instead, all such estimates are weighted and combined via the expectation over the model posterior PDF $\text{P}(\bm{\theta} | \xrm,\Drm)$.
+
+
+\paragraph{Uniform Prior}
+
+The optimal estimator for a uniform prior is
+\begin{IEEEeqnarray}{rCl}
+f^*(\xrm;\Drm) & = & \argmin_{h \in \mathbb{R}} \text{E}_{\yrm | \xrm,\Drm} \left[ (h-\yrm)^2 \right] \\
+& = & \sum_{y \in \Ycal} y \text{P}_{\yrm | \xrm,\Drm}(y | \xrm, \Drm) \equiv \mu_{\yrm | \xrm,\Drm}(\xrm, \Drm) \nonumber \\
+& = & \left( \frac{|\Ycal|}{N'(\xrm;\Drm) + |\Ycal|} \right) \frac{1}{|\Ycal|} \sum_{y \in \Ycal} y + \nonumber \\
+&& \quad \left( \frac{N'(\xrm;\Drm)}{N'(\xrm;\Drm) + |\Ycal|} \right) \sum_{y \in \Ycal} y \frac{\bar{N}(y,\xrm;D)}{N'(\xrm;\Drm)} \nonumber \\
+& = & \left( \frac{|\Ycal|}{N'(\xrm;\Drm) + |\Ycal|} \right) \frac{1}{|\Ycal|} \sum_{y \in \Ycal} y + \nonumber \\
+&& \quad \left( \frac{N'(\xrm;\Drm)}{N'(\xrm;\Drm) + |\Ycal|} \right) \frac{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Yrm_n}{N'(\xrm;\Drm)} \nonumber \;.
+\end{IEEEeqnarray}
+
+Now, the model prior contribution to the weighting factors depends on the cardinality $|\Ycal|$ and the prior expectation is simply the average of the elements of $\Ycal$.
+
+
+
+
+\subsubsection{Minimum Risk: the Expected Posterior Variance}
+
+Substituting the optimal estimator \eqref{eq:f_opt_SE} into Equation \eqref{eq:risk_SE}, the minimum Bayes risk is the expected conditional variance
+\begin{IEEEeqnarray}{rCl}
+\Rcal(f^*) & = & \text{E}_{\xrm,\Drm} \left[ \Sigma_{\yrm | \xrm,\Drm} \right] \\
+& = & \text{E}_{\xrm,\bm{\theta}} \left[ \Sigma_{\yrm | \xrm,\bm{\theta}} \right] + \text{E}_{\xrm,\Drm} \left[ \text{C}_{\bm{\theta} | \xrm,\Drm} \left[ \mu_{\yrm | \xrm,\bm{\theta}} \right] \right] \nonumber \;,
+\end{IEEEeqnarray}
+
+The minimum risk can also be represented as $\text{E}_{\xrm,\mathrm{\nbarrm}} \left[ \Sigma_{\yrm | \xrm,\mathrm{\nbarrm}} \right]$; as such, perform the expectation over $\nbarrm$. Decompose the conditional variance as
+\begin{IEEEeqnarray}{rCl}
+\Sigma_{\yrm | \xrm,\nbarrm} & = & \text{E}_{\yrm | \xrm,\nbarrm}[\yrm^2] - \big( \text{E}_{\yrm | \xrm,\nbarrm}[\yrm] \big)^2 
+\end{IEEEeqnarray}
+and assess the expected values of these terms separately. 
+
+The first term is simply
+\begin{IEEEeqnarray}{L}
+\text{E}_{\xrm,\nbarrm} \left[ \text{E}_{\yrm | \xrm,\nbarrm}[\yrm^2] \right] \\
+\quad = \text{E}_{\yrm}[\yrm^2] = \sum_{y \in \Ycal} y^2 \left( \sum_{x \in \Xcal} \frac{\alpha(y,x)}{\alpha_0} \right) \nonumber \\
+\quad = \text{E}_{\xrm} \big[ \text{E}_{\yrm | \xrm} [ \yrm^2 ] \big] = \sum_{x \in \Xcal} \frac{\alpha'(x)}{\alpha_0} \sum_{y \in \Ycal} y^2 \frac{\alpha(y,x)}{\alpha'(x)} \nonumber \;,
+\end{IEEEeqnarray}
+where the different functions of $\alpha$ are represented by the PMF's of $\yrm$ and $\xrm$. Next, find, 
+\begin{IEEEeqnarray}{L}
+\text{E}_{\xrm,\nbarrm} \left[ \big( \text{E}_{\yrm | \xrm,\nbarrm}[\yrm] \big)^2 \right] =
+\sum_{\bar{\bm{n}} \in \bar{\Ncal}} \sum_{x \in \Xcal} \text{P}_{\xrm,\nbarrm}(x,\bar{\bm{n}}) \left( \sum_{y \in \Ycal} y \text{P}_{\yrm | \xrm,\nbarrm}(y | x,\bar{\bm{n}}) \right)^2 \\
+= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \text{E}_{\nbarrm} \left[ \frac{\big( \alpha(y,x)+\bar{\nrm}(y,x) \big) \big(\alpha(y',x)+\bar{\nrm}(y',x) \big)}{(\alpha_0+N) \big(\alpha'(x) + \nrm'(x) \big)} \right] \nonumber \\
+= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \text{E}_{\nrm'} \left[ \frac{\text{E}_{\nbarrm | \nrm'} \left[ \big( \alpha(y,x)+\bar{\nrm}(y,x) \big) \big(\alpha(y',x)+\bar{\nrm}(y',x) \big) \right]}{(\alpha_0+N) \big(\alpha'(x) + \nrm'(x) \big)} \right] \nonumber \\
+= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \frac{\text{E}_{\nrm'} \Big[ \nrm'(x) \frac{\alpha(y,x)}{\alpha'(x)} \delta[y,y'] + \alpha'(x) \big( \alpha'(x) + \nrm'(x) + 1 \big) \frac{\alpha(y,x)}{\alpha'(x)} \frac{\alpha(y',x)}{\alpha'(x)} \Big]}{(\alpha_0+N) \big(\alpha'(x) + 1 \big)} \nonumber \\
+= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \left(\frac{\alpha'(x)}{\alpha_0}\right)  \frac{N \frac{\alpha(y,x)}{\alpha'(x)} \delta[y,y'] + \big( N \alpha'(x) + \alpha_0 \alpha'(x) + \alpha_0 \big) \frac{\alpha(y,x)}{\alpha'(x)} \frac{\alpha(y',x)}{\alpha'(x)}}{(\alpha_0+N) \big( \alpha'(x)+1 \big)} \nonumber \\
+= \sum_{x \in \Xcal} \left(\frac{\alpha'(x)}{\alpha_0}\right)  \frac{N \left( \sum_{y \in \Ycal} \frac{\alpha(y,x)}{\alpha'(x)} y^2 \right) + \big( N \alpha'(x) + \alpha_0 \alpha'(x) + \alpha_0 \big) \left( \sum_{y \in \Ycal} \frac{\alpha(y,x)}{\alpha'(x)} y \right)^2 }{(\alpha_0+N) \big( \alpha'(x)+1 \big)} \nonumber \;.
+\end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{L}
+%\text{E}_{\xrm,\nbarrm} \left[ \big( \text{E}_{\yrm | \xrm,\nbarrm}[\yrm] \big)^2 \right] =
+%\sum_{\bar{\bm{n}} \in \bar{\Ncal}} \sum_{x \in \Xcal} \text{P}_{\xrm,\nbarrm}(x,\bar{\bm{n}}) \left( \sum_{y \in \Ycal} y \text{P}_{\yrm | \xrm,\nbarrm}(y | x,\bar{\bm{n}}) \right)^2 \\
+%= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \text{E}_{\nbarrm} \left[ \frac{\big( \alpha(y,x)+\bar{\nrm}(y,x) \big) \big(\alpha(y',x)+\bar{\nrm}(y',x) \big)}{(\alpha_0+N) \big(\alpha'(x) + \nrm'(x) \big)} \right] \nonumber \\
+%= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \left(\frac{\alpha'(x)}{\alpha_0}\right)  \frac{N \frac{\alpha(y,x)}{\alpha'(x)} \delta[y,y'] + \big( N \alpha'(x) + \alpha_0 \alpha'(x) + \alpha_0 \big) \frac{\alpha(y,x)}{\alpha'(x)} \frac{\alpha(y',x)}{\alpha'(x)}}{(\alpha_0+N) \big( \alpha'(x)+1 \big)} \nonumber \\
+%= \sum_{x \in \Xcal} \left(\frac{\alpha'(x)}{\alpha_0}\right)  \frac{N \left( \sum_{y \in \Ycal} \frac{\alpha(y,x)}{\alpha'(x)} y^2 \right) + \big( N \alpha'(x) + \alpha_0 \alpha'(x) + \alpha_0 \big) \left( \sum_{y \in \Ycal} \frac{\alpha(y,x)}{\alpha'(x)} y \right)^2 }{(\alpha_0+N) \big( \alpha'(x)+1 \big)} \nonumber
+%\end{IEEEeqnarray}
+The above formulation exploits the statistical characterization of the aggregation, $\nrm' \sim \text{DM}(N,\alpha')$; also used is the property that the Dirichlet-Multinomial random function $\nbarrm$ conditioned on its aggregation $\nrm'$ yields independent  conditional DM functions $\bar{\nrm}(\cdot,x) | \nrm'(x) \sim \text{DM}\big( \nrm'(x),\alpha(\cdot,x) \big)$.
+
+Finally, combine the two formulas to represent the mininum risk,
+\begin{IEEEeqnarray}{L}
+\Rcal(f^*) = \text{E}_{\xrm,\nbarrm} \left[ \text{E}_{\yrm | \xrm,\nbarrm}[\yrm^2] - \big( \text{E}_{\yrm | \xrm,\nbarrm}[\yrm] \big)^2 \right] \\
+= \sum_{x \in \Xcal} \frac{\alpha'(x)}{\alpha_0} \left( \frac{N \alpha'(x) + \alpha_0 \alpha'(x) + \alpha_0}{(\alpha_0+N) \big( \alpha'(x)+1 \big)} \right) \nonumber \\
+\qquad \left[ \left( \sum_{y \in \Ycal} \frac{\alpha(y,x)}{\alpha'(x)} y^2 \right) - \left( \sum_{y \in \Ycal} \frac{\alpha(y,x)}{\alpha'(x)} y \right)^2 \right] \nonumber \\
+= \text{E}_{\xrm} \left[ \frac{N \alpha'(\xrm) + \alpha_0 \alpha'(\xrm) + \alpha_0}{(\alpha_0+N) \big( \alpha'(\xrm)+1 \big)} \Sigma_{\yrm | \xrm} \right] \nonumber \\
+= \text{E}_{\xrm} \left[ \frac{\text{P}(\xrm) + (\alpha_0+N)^{-1}}{\text{P}(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right] \nonumber \;.
+\end{IEEEeqnarray}
+
+The minimum risk is a convex combination of scaled conditional variances for the different PMF's $\text{P}(\yrm | \xrm) = \alpha(\yrm,\xrm)/\alpha'(\xrm)$. The combining weights are values from the prior marginal distribution $\text{P}(\xrm) = \alpha'(\xrm)/\alpha_0$. 
+
+The scaling factors depend on the marginal value $\text{P}(\xrm)$, as well as on the prior concentration $\alpha_0$ and the number of training samples $N$. Observe that with no training data ($N = 0$), the scaling factor becomes unity and the risk is $\Rcal(f^*) = \text{E}_{\xrm} \left[ \Sigma_{\yrm | \xrm} \right]$. Conversely, as $N \to \infty$, the Bayes risk is $\Rcal(f^*) = \text{E}_{\xrm} \left[ \frac{\text{P}(\xrm)}{\text{P}(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right]$; note that this minimal risk is also equivalent to $\text{E}_{\xrm,\bm{\theta}} \left[ \Sigma_{\yrm | \xrm,\bm{\theta}} \right]$. Also, as the model concentration parameter $\alpha_0 \to 0$, the risk trends to zero (for $N > 0$); as $\alpha_0 \to \infty$, the risk trends toward $\text{E}_{\xrm} \left[ \Sigma_{\yrm | \xrm} \right]$.
+
+To illustrate these trends, explicitly define the sets $\Ycal = \{ i/M_y : i = 0,\ldots,M_y-1 \}$ and $\Xcal = \{ i/M_x : i = 0,\ldots,M_x-1 \}$; Figures \ref{fig:Risk_SE_Dir_IO_N_leg_a0} and \ref{fig:Risk_SE_Dir_IO_a0_leg_N} display risk for fixed $\text{P}(\yrm|\xrm)$ and $\text{P}(\xrm)$.
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_SE_Dir_IO_N_leg_a0.pdf}
+\caption{Optimal Squared-Error Risk vs $N$}
+\label{fig:Risk_SE_Dir_IO_N_leg_a0}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_SE_Dir_IO_a0_leg_N.pdf}
+\caption{Optimal Squared-Error Risk vs $\alpha_0$}
+\label{fig:Risk_SE_Dir_IO_a0_leg_N}
+\end{figure}
+
+It may not seem intutitve for the risk to decrease when $\alpha_0$ is smaller -- the variance of the model $\theta$ increases and the prior knowledge is less definitive. This is a result of the Dirichlet PDF weight shifting towards the $|\Ycal||\Xcal|$ models which have $\ell_0$ norms satisfying $\| \theta \|_0 = 1$. Although these PMF's are maximally separated (and uncorrelated), they all lead to zero minimum risk; this is implied by Figure \ref{fig:Risk_SE_Dir_IO_Pyx}. The optimal learner will simply use the empirical distribution supplied via the training data - this allows exact identification of $\theta$ with a single training pair and leads to predictions that match the single class represented in $\Yrm$.
+
+PGR: analyze weighting factors???
+
+PGR: sims, plots for given alpha dist, variable concentration???
+
+It is also informative to visualize how the minimum squared-error changes for fixed volume of training data $N$ and a fixed prior concentration $\alpha_0$. Assume the special case where the conditional variance $\Sigma_{\yrm | \xrm}$ is independent of $\xrm$; in this case, the squared-error becomes the conditional variance scaled by a factor dependent on the marginal distribution $\text{P}(\xrm)$, such that $\Rcal(f^*) = \Sigma_{\yrm | \xrm} \text{E}_{\xrm} \left[ \frac{\text{P}(\xrm) + (\alpha_0+N)^{-1}}{\text{P}(\xrm) + \alpha_0^{-1}} \right]$.
+
+First, consider how the conditional PMF $\text{P}(\yrm | \xrm)$ affects the risk. Figure \ref{fig:Risk_SE_Dir_IO_a0_leg_Px} demonstrates how the risk trends towards zero for PMFs that have $\ell_0$-norm equal to one.
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_SE_Dir_IO_Pyx.pdf}
+\caption{Optimal Squared-Error Risk vs $\mu_{\bm{\theta}}$}
+\label{fig:Risk_SE_Dir_IO_Pyx}
+\end{figure}
+
+Next, consider the effect of the marginal distribution $\text{P}(\xrm)$. Figure \ref{fig:Risk_SE_Dir_IO_Px_N_10_a0_1} demonstrates how the risk changes with this marginal PMF. Observe that the risk is maximal at the distributions satisfying $\| \text{P}_{\xrm} \|_0 = 1$; the scaling factor for the conditional variance $\Sigma_{\yrm | \xrm}$ becomes $\frac{1 + (\alpha_0+N)^{-1}}{1 + \alpha_0^{-1}}$. Conversely, for $\text{P}(\xrm) = 1/|\Xcal|$ the scaling factor becomes $\frac{|\Xcal|^{-1} + (\alpha_0+N)^{-1}}{|\Xcal|^{-1} + \alpha_0^{-1}}$ and the risk is minimal. Figures \ref{fig:Risk_SE_Dir_IO_N_leg_Px} and \ref{fig:Risk_SE_Dir_IO_a0_leg_Px} show how different marginals $\text{P}(\xrm)$ affect the risk as a function of $N$ and $\alpha_0$, respectively.
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_SE_Dir_IO_Px_N_10_a0_1.pdf}
+\caption{Optimal Squared-Error Risk vs $\text{P}(x)$}
+\label{fig:Risk_SE_Dir_IO_Px_N_10_a0_1}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_SE_Dir_IO_N_leg_Px.pdf}
+\caption{Optimal Squared-Error Risk vs $N$}
+\label{fig:Risk_SE_Dir_IO_N_leg_Px}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_SE_Dir_IO_a0_leg_Px.pdf}
+\caption{Optimal Squared-Error Risk vs $\alpha_0$}
+\label{fig:Risk_SE_Dir_IO_a0_leg_Px}
+\end{figure}
+
+
+
+
+\paragraph{Uniform Prior}
+
+For the uniform model prior, the risk reduces to
+\begin{IEEEeqnarray}{rCl}
+\Rcal(f^*) & = & \frac{|\Ycal| \big( N/|\Xcal| + |\Ycal| + 1 \big)}{\big( |\Ycal| + 1 \big) \big( N/|\Xcal| + |\Ycal| \big)} \\
+&& \quad \left[ \left( \frac{1}{|\Ycal|} \sum_{y \in \Ycal} y^2 \right) - \left( \frac{1}{|\Ycal|} \sum_{y \in \Ycal} y \right)^2 \right] \nonumber \\
+& = & \frac{1 + \big( N/|\Xcal| + |\Ycal| \big)^{-1}}{1 + |\Ycal|^{-1}} \left[ \left( \frac{1}{|\Ycal|} \sum_{y \in \Ycal} y^2 \right) - \left( \frac{1}{|\Ycal|} \sum_{y \in \Ycal} y \right)^2 \right] \nonumber \;.
+\end{IEEEeqnarray}
+Since all possible values of $\xrm$ are equally probable and the conditional probability $\text{P}(\yrm|\xrm)$ is uniform and independent of the input, the risk simply becomes the variance of the set $\Ycal$ scaled by a factor dependent on $|\Ycal|$ and on $N/|\Xcal|$. Without training data ($N=0$), the scaling is unity; as $N/|\Xcal| \to \infty$, the scaling factor is $\big( 1 + |\Ycal|^{-1} \big)^{-1}$.
+
+To visualize the performance, use the explicit sets $\Ycal$ and $\Xcal$ defined earlier. The conditional variance becomes
+\begin{equation}
+\Sigma_{\yrm | \xrm} = \frac{|\Ycal|^2 - 1}{12 |\Ycal|^2} = \frac{1 - |\Ycal|^{-2}}{12} 
+\end{equation}
+and the minimum risk is expressed as
+\begin{IEEEeqnarray}{rCl}
+\Rcal(f^*) & = & \frac{\big(1 - |\Ycal|^{-1}\big) \Big(1 + \big(N/|\Xcal| + |\Ycal|\big)^{-1} \Big)}{12} \\
+& = & \left(\frac{|\Ycal|}{N/|\Xcal| + |\Ycal|}\right) \frac{1 - |\Ycal|^{-2}}{12} \nonumber \\
+&& \quad + \left(\frac{N/|\Xcal|}{N/|\Xcal| + |\Ycal|}\right) \frac{1 - |\Ycal|^{-1}}{12} \nonumber \;.
+\end{IEEEeqnarray}
+
+Interestingly, the minimum squared-error for the uniform prior can be represented as a convex combination of two separate risk values with weighting factors dependent on $|\Ycal|$ and $N/|\Xcal|$. Thus, for a uniform prior, the number of training samples depends  on the number of elements in $\Ycal$ and the number of training samples ``per element of $\Xcal$''.
+
+Note the relationship of these weighting factors to those of the conditional PMF $\text{P}(\yrm | \xrm,\Drm)$, which depend on $\alpha'(\xrm)$ and on $N'(\xrm;\Drm)$. For the uniform prior, $\alpha'(\xrm) = |\Ycal|$. Additionally, via the aggregation principle, the random function $N'(\cdot;\Drm)$ is Dirichlet-Multinomial with parameters $\alpha'(\cdot) = |\Ycal|$ and thus $\text{E}\big[ N'(\cdot;\Drm) \big] = N/|\Xcal|$.
+
+PGR: DM agg reference???
+
+The first risk is the conditional variance $\Sigma_{\yrm|\xrm}$ - this is intuitively satisfying as the corresponding weight becomes unity when $N=0$. The second risk is the squared-error with infinite training data. Note that the reduction of the risk between these two extreme cases is modest, and that the attenuating factor increases towards unity for applications with more possible outcomes. Figure \ref{fig:Risk_SE_LB} illustrates the difference between these cases.
+
+PGR: new UB/LB figure???
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_SE_LB.pdf}
+\caption{Squared-Error Risk bounds, Uniform Prior}
+\label{fig:Risk_SE_LB}
+\end{figure}
+
+Figure \ref{fig:Risk_SE_IO_N} displays how the risk increases with $M_x$; Figure \ref{fig:Risk_SE_IO_N-Mx} makes the dependency on $N/M_x$ explicit.
+
+PGR: infinte N risk equal to expecated value of conditional model variance?
+
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_SE_IO_N.pdf}
+\caption{Squared-Error Risk for different $|\Xcal|$, Uniform Prior}
+\label{fig:Risk_SE_IO_N}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_SE_IO_N-Mx.pdf}
+\caption{Optimal Squared-Error Risk vs $N/M_x$, Uniform Prior}
+\label{fig:Risk_SE_IO_N-Mx}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+
+\section{Applications 01 temp}
+
+
+\subsection{0-1 Loss}
+
+In this section, we will apply the developed framework to a common machine learning task: classification. In classification problems, the unobserved variable space is countable and typically finite. Furthermore, the hypothesis space  is usually identical to the unobserved variable space, that is $\Hcal = \Ycal$. The 0-1 loss function is the most well known for these problems; it is represented as
+\begin{equation} \label{loss_01}
+\mathcal{L}(h,y) = 1 - \delta[h,y] \;.
+\end{equation}
+
+Applying this loss function, the conditional risk \eqref{eq:risk_cond} is
+\begin{IEEEeqnarray}{rCl}
+\Rcal_{\Theta}(f | \theta) & = & 1 -  \text{E}_{\Drm | \bm{\theta}} \bigg[ \text{E}_{\yrm,\xrm | \bm{\theta}} \Big[ \delta\big[ f(\xrm;\Drm),\yrm \big] \Big] \bigg] \\
+& = & 1 -  \sum_{x \in \Xcal} \text{E}_{\Drm | \bm{\theta}} \Big[ \theta\big( f(x,\Drm),x \big) \Big] \nonumber \;.
+\end{IEEEeqnarray}
+Evaluated with a Dirichlet prior, the full risk is
+\begin{IEEEeqnarray}{rCl} \label{eq:risk_01}
+\Rcal(f) & = & 1 - \text{E}_{\bm{\theta}} \left[ \sum_{x \in \Xcal} \text{E}_{\Drm | \bm{\theta}} \Big[ \theta\big( f(x,\Drm),x \big) \Big] \right] \\
+& = & 1 - \sum_{x \in \Xcal} \frac{\text{E}_{\Drm} \Big[ \alpha\big( f(x,\Drm),x \big) + \bar{N}\big( f(x,\Drm),x ; \Drm \big) \Big]}{\alpha_0 + N} \nonumber \\
+& = & 1 - \sum_{x \in \Xcal} \frac{\text{E}_{\nbarrm} \Big[ \alpha\big( f(x,\nbarrm),x \big) + \bar{\nrm}\big( f(x,\nbarrm),x \big) \Big]}{\alpha_0 + N} \nonumber \;.
+\end{IEEEeqnarray}
+
+
+
+\subsubsection{Optimal Hypothesis: Conditional Maximum \emph{a posteriori}}
+
+PGR: decision region figures??
+
+To determine the optimal learning function, substitute the 0-1 loss from Equation \eqref{loss_01} into Equation \eqref{eq:E_y|xD L} and Equation \eqref{eq:f_opt_xD} to find
+\begin{IEEEeqnarray}{rCl} \label{eq:f_opt_01}
+f^*(\xrm;\Drm) & = & \argmin_{h \in \Ycal} \frac{\sum_{y \in \Ycal} \big( \alpha(y,\xrm) + \bar{N}(y,\xrm;\Drm) \big) \big( 1 - \delta[h,y] \big)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \\
+& = & \argmax_{h \in \Ycal} \text{P}_{\yrm | \xrm,\Drm}(h | \xrm,\Drm) \nonumber \\
+& = & \argmax_{y \in \Ycal} \left( \alpha(y,\xrm) + \bar{N}(y,\xrm;\Drm) \right) \nonumber \;.
+\end{IEEEeqnarray}
+The optimal classifier chooses the value $\yrm$ that has the maximum value in the conditional PMF for the observed value of $\xrm$; each candidate decision $h \in \Ycal$ is scored by counting the number of training samples that occur with the same observed value as $\xrm$ and weighting with the prior knowledge imparted by the model parameter $\alpha$.
+
+
+\paragraph{Uniform Prior}
+
+When the uniform prior is used, the decision becomes 
+\begin{IEEEeqnarray}{rCl}
+f^*(\xrm;\Drm) & = & \argmax_{y \in \Ycal} \bar{N}(y,\xrm;\Drm) \;,
+\end{IEEEeqnarray}
+a majority decision which simply chooses the class from $\Ycal$ most often found among training set samples $\Drm$ with a matching input value $\xrm$. This is intuitive, as the model PDF parameter $\alpha$ provides no confidence as to which classes may be most likely.
+
+
+\subsubsection{Minimum Risk: Probability of Error}
+
+Substituting the optimal learner \eqref{eq:f_opt_01} into the general risk \eqref{eq:risk_01}, the minimum probability of error is 
+\begin{IEEEeqnarray}{rCl}
+\Rcal(f^*) & = & 1 - \text{E}_{\xrm,\Drm} \left[ \max_{y \in \Ycal} \text{P}_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) \right] \\
+& = & 1 - \sum_{x \in \Xcal} \frac{\text{E}_{\nbarrm} \Big[ \max_{y \in \Ycal} \big( \alpha(y,x) + \bar{\nrm}(y,x) \big) \Big]}{\alpha_0 + N} \nonumber \;.
+\end{IEEEeqnarray}
+
+PGR: missing info for Dir gen graphics? fixed y given x conditional alpha???
+
+PGR: no closed-forms found???
+
+
+PGR: comment on simulation!
+
+For $N = 0$, we have $\Rcal(f^*) = 1 - \sum_{x \in \Xcal} \frac{\max_{y \in \Ycal} \alpha(y,x)}{\alpha_0}$. 
+
+For $N \to \infty$, we have $\Rcal(f^*) = ???$.
+
+For $\alpha_0 \to 0$ and $N > 1$, we have $\Rcal(f^*) = 0$. Refer to \ref{eq:P_n_lim_zero}
+
+For $\alpha_0 \to \infty$, we have $\Rcal(f^*) = 1 - \sum_{x \in \Xcal} \frac{\max_{y \in \Ycal} \alpha(y,x)}{\alpha_0}$.
+
+
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_01_Dir_N.pdf}
+\caption{Optimal 0-1 Risk vs $N$}
+\label{fig:Risk_01_Dir_N}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_01_Dir_alpha0.pdf}
+\caption{Optimal 0-1 Risk vs $\alpha_0$}
+\label{fig:Risk_01_Dir_alpha0}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_01_Dir_muTheta_N_0_a0_3.pdf}
+\caption{Optimal 0-1 Risk vs $\mu_{\bm{\theta}}$}
+\label{fig:Risk_01_Dir_muTheta_N_0_a0_3}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_01_Dir_muTheta_N_1_a0_01.pdf}
+\caption{Optimal 0-1 Risk vs $\mu_{\bm{\theta}}$}
+\label{fig:Risk_01_Dir_muTheta_N_1_a0_01}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_01_Dir_muTheta_N_1000_a0_3.pdf}
+\caption{Optimal 0-1 Risk vs $\mu_{\bm{\theta}}$}
+\label{fig:Risk_01_Dir_muTheta_N_1000_a0_3}
+\end{figure}
+
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_01_Dir_IO_N_leg_Px.pdf}
+\caption{Optimal 0-1 Risk vs $N$}
+\label{fig:Risk_01_Dir_IO_N_leg_Px}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_01_Dir_IO_a0_leg_Px.pdf}
+\caption{Optimal 0-1 Risk vs $\alpha_0$}
+\label{fig:Risk_01_Dir_IO_a0_leg_Px}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_01_Dir_IO_Px_N_10_a0_1.pdf}
+\caption{Optimal 0-1 Risk vs $\text{P}(x)$}
+\label{fig:Risk_01_Dir_IO_Px_N_10_a0_1}
+\end{figure}
+
+
+
+\paragraph{Uniform Prior}
+
+PGR: Can uniform optimal risk be approximated as a function of My and Mx/N, as is for SE loss???
+
+To assess the minimum risk under the general model, we start from equation \eqref{risk_min_IO} and rework the formula to depend on an expectation over $\text{P}(\Drm)$ as performed orginally, resulting in
+\begin{IEEEeqnarray}{rCl}
+\Rcal(f^*) & = & \text{E}_{\xrm,\Drm} \bigg[ \text{E}_{\yrm | \xrm,\Drm} \Big[ \mathcal{L}\big( f^*(\xrm;\Drm),\yrm \big) \Big] \bigg] \\
+& = & 1 - \text{E}_{\xrm,\Drm} \left[ \max_{y} \text{P}_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) \right] \nonumber \\
+& = & 1 - \sum_{x \in \Xcal} \text{E}_{\Drm} \left[ \max_{y} \text{P}_{\yrm,\xrm | \Drm}(y,x | \Drm) \right] \nonumber \\
+& = & 1 - \frac{\sum_{x \in \Xcal} \text{E}_{\Drm} \left[\max_{y} \bar{N}(y,x;\Drm) \right] + 1}{N+M} \nonumber \;.
+\end{IEEEeqnarray}
+
+Now, however, the argument of expectation is the maximum of a subset of $\bar{\bm{N}}(\Drm)$, $M_y$ out of $M_xM_y$, rather than the entire random variable. As shown in Appendix \ref{app:E_N_bar}, all marginal distributions of $\nbarrm$ have the same form; as such, the expectations will be the same regardless of which $M_y$ variables the maximum operator is applied to. 
+
+To evaluate the expectation for an abritrary value $x$, we find a formula for the CMF of the maximum of any $k$ of $M$ entries of random matrix $\nbarrm$. Introduce subset $\Ycal' \subset \Ycal$ with cardinality $k$. Denote the new variable as $\bar{\nrm}_{\text{max}}^k \equiv \max_{y \in \Ycal'} \bar{\nrm}(y)$; we find in Appendix ??? that the CMF is equivalent to
+\begin{IEEEeqnarray}{rCl}
+F_{\bar{\nrm}_{\text{max}}^k}(n) & = & \text{P}\big( \bar{\nrm}_{\text{max}}^k \leq n \big) \\
+& = & \sum_{m=0}^k \binom{k}{m} (-1)^m \prod_{l=1}^{M-1} \left( 1 - \frac{m(n+1)}{N+l} \right) \nonumber \\
+&& \quad  \left[ U(n) - U\left( n+1- \left\lceil \frac{N+M}{m} \right\rceil \right) \right] \nonumber \;.
+\end{IEEEeqnarray}
+Evaluating the expectation, we have
+\begin{IEEEeqnarray}{rCl}
+\text{E}_{\bar{\bm{n}}} \left[ \bar{\nrm}_{\text{max}}^k \right] & = & N+M - \sum_{n=0}^{N+M-1} F_{\bar{\nrm}_{\text{max}}^k}(n) \\
+& = & - \sum_{m=1}^k \binom{k}{m} (-1)^m \left[ \sum_{n=1}^{N+M} \prod_{l=1}^{M-1} \left( 1 - \frac{mn}{N+l} \right) - \sum_{n=\left\lceil \frac{N+M}{m} \right\rceil}^{N+M} \prod_{l=1}^{M-1} \left( 1 - \frac{mn}{N+l} \right) \right] \nonumber \;.
+%& = & sumbounds??? - \sum_{m=1}^k \binom{k}{m} (-1)^m \sum_{n=1}^{\left\lceil \frac{N+M}{m} \right\rceil -1} \prod_{l=1}^{M-1} \left( 1 - \frac{mn}{N+l} \right) \;.
+\end{IEEEeqnarray}
+Making use of the summation identity
+\begin{equation}
+\sum_{m=0}^k \binom{k}{m} (-1)^m = 0 \;,
+\end{equation}
+we substitute in to the formula for minimum risk using $k=M_y$, resulting in
+\begin{IEEEeqnarray}{rCl}
+\Rcal(f^*) & = & 1 + \frac{M_x}{N+M} \sum_{m=1}^{M_y} \binom{M_y}{m} (-1)^m \sum_{n=0}^{\left\lceil \frac{N+M}{m} \right\rceil -1} \prod_{l=1}^{M-1} \left( 1 - \frac{mn}{N+l} \right) \;.
+\end{IEEEeqnarray}
+
+PGR: Proof? CHECK....???
+
+
+
+Figure \ref{fig:Risk_01_IO_N} displays how the optimal risk decreases with increasing training data; the number of outputs is fixed at $M_y = 2$ and multiple series are provided for different input set sizes $M_x$. The plot for $M_x = 1$ is obviously identical to the series shown in Section \ref{sec:uniform_basic_apps_01}. For larger input set sizes, the risk is still $\Rcal(f^*) = 0.5$ when $N = 0$, but the rate of decrease with $N$ suffers. 
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_01_IO_N.pdf}
+\caption{Optimal 0-1 Risk vs training set size for various input set sizes}
+\label{fig:Risk_01_IO_N}
+\end{figure}
+
+Further insight into how $M_x$ affects the risk can be acquired by plotting the risk vs $N/M_x$. In Figure \ref{fig:Risk_01_IO_N-Mx}, it is shown that the optimal risk can be approximated by a function dependent only on $N/M_x$; of the series plotted, only the series for $M_x = 1$ shows notable deviation from the others.
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_01_IO_N-Mx.pdf}
+\caption{Optimal 0-1 Risk vs training set size for various input set sizes}
+\label{fig:Risk_01_IO_N-Mx}
+\end{figure}
+
+
+
+As for the basic model, it is informative to note how the minimum risk trends with increasing volume of training data. Noting that
+\begin{IEEEeqnarray}{rCl}
+\lim_{N \to \infty} (N+M)^{-1} \sum_{n=0}^{\left\lceil \frac{N+M}{m} \right\rceil -1} \prod_{l=1}^{M-1} \left( 1 - \frac{mn}{N+l} \right) & = & \\
+\lim_{N/m \to \infty} m^{-1} \frac{m}{N} \sum_{n=0}^{\left\lceil \frac{N}{m} \right\rceil -1} \left( 1 - \frac{mn}{N} \right)^{M-1} & = & \nonumber \\
+m^{-1} \int_0^1 (1-t)^{M-1} \mathrm{d} t & = & \frac{1}{mM} \nonumber \;,
+\end{IEEEeqnarray}
+and using the same concepts from Appendix \ref{app:E_N_max}, we find
+\begin{IEEEeqnarray}{rCl}
+\Rcal(f^*) & = & 1 + \frac{M_x}{M} \sum_{m=1}^{M_y} \binom{M_y}{m} (-1)^m m^{-1} \\
+& = & 1 - \frac{1}{M_y} \sum_{m=1}^{M_y} \frac{1}{m} \nonumber \;.
+\end{IEEEeqnarray}
+
+%\begin{IEEEeqnarray}{rCl}
+%1 - \Rcal(f^*) & = & -\frac{M_x}{M} \sum_{m=1}^{M_y} \binom{M_y}{m} (-1)^m m^{-1} \\
+%& = & \frac{1}{M_y} \sum_{m=1}^{M_y} \frac{1}{m} \;.
+%\end{IEEEeqnarray}
+
+Again, we have a harmonic number dependent on the number of possible outputs $M_y$. With infinite training data, there will be an infinite number of samples for each possible input $\xrm$; as a result, there is no loss of classification performance regardless of the input dimension $M_x$. This agrees with the notion that optimal 0-1 risk can be approximated as a function of $N/M_x$.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Applications: basic uniform}
+
+
+
+\subsection{Classification: the 0-1 Loss} \label{sec:uniform_basic_apps_01}
+
+\subsubsection{Minimum Risk: the Probability of Error}
+Now, we determine the minimum risk (probability of error for the 0-1 loss). Starting from equation \eqref{risk_min}, we formulate the risk as
+\begin{IEEEeqnarray}{rCl} \label{risk_01_opt}
+\Rcal(f^*) & = & \text{E}_{\Drm} \Big[ \text{E}_{\yrm | \Drm} \big[ \mathcal{L}(f^*(\Drm),\yrm) \big] \Big]
+= 1 - \text{E}_{\Drm} \left[ \max_{y} \text{P}_{\yrm | \Drm}(y | \Drm) \right] \\
+& = & 1 - \text{E}_{\Drm} \left[ \frac{\max_{y \in \Ycal} \bar{N}(y;\Drm) + 1}{N+M} \right] \nonumber \\
+& = & 1 - \left( \frac{M}{N+M} \right) M^{-1} - \left( \frac{N}{N+M} \right) \frac{\text{E}_{\Drm} \left[ \max_{y \in \Ycal} \bar{N}(y;\Drm) \right]}{N} \nonumber \;. 
+\end{IEEEeqnarray}
+
+Before refining this expression, observe how the minimum risk trends as $M$ increases for fixed training set size $N$. Clearly, $\lim_{M \to \infty} \Rcal(f^*) = 1 - M^{-1}$. This should be intuitively satisfying -- the posterior PMF trends toward a discrete uniform distribution, the same as if no data had been observed at all (e.g. $\text{P}(\yrm) = M^{-1}$).
+
+Next, we continue to find a closed-form expression for the optimal risk; to do so, we must evaluate the expectation over all possible training sets $\Drm$. It can be clearly shown that the expectation can instead be performed over random variable $\nbarrm = \bar{\bm{N}}(\Drm)$, that is,
+\begin{equation}
+\text{E}_{\Drm} \left[ \max_y \bar{N}(y;\Drm) \right] = \text{E}_{\nbarrm} \left[ \max_y \bar{\nrm}(y) \right] \;.
+\end{equation}
+
+In Appendix \ref{app:E_N_max}, we determine the cumulative mass function (CMF) of $\bar{\nrm}_{\text{max}} = \max_y \bar{\nrm}(y)$, 
+\begin{IEEEeqnarray}{rCl}
+F_{\bar{\nrm}_{\text{max}}}(n) & = & \text{P}\left( \bar{\nrm}_{\text{max}} \leq n \right) \\
+& = & \binom{N+M-1}{M-1}^{-1} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} \nonumber \\
+&& \quad \binom{m(n+1)-N-1}{M-1} U\left( n+1-\left\lceil\frac{N+M}{m}\right\rceil \right) \nonumber \;,
+\end{IEEEeqnarray}
+where $U: \mathbb{R} \mapsto \{0,1\}$ is the continuous step function. Clearly, the PMF is zero outside of the interval $[0,N+M]$; the expected value is thus
+\begin{IEEEeqnarray}{rCl}
+\text{E}_{\bar{\bm{n}}} \left[ \bar{\nrm}_{\text{max}} \right] & = & \sum_{n=0}^{N+M} n \big( F_{\bar{\nrm}_{\text{max}}}(n) - F_{\bar{\nrm}_{\text{max}}}(n-1) \big) \\
+& = & N + M - \sum_{n=0}^{N+M-1} F_{\bar{\nrm}_{\text{max}}}(n) \nonumber \\
+& = & N + M - \binom{N+M-1}{M-1}^{-1} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} \nonumber \\
+&& \quad \sum_{n = \left\lceil \frac{N+M}{m} \right\rceil}^{N+M} \binom{mn-N-1}{M-1} \nonumber \;.
+\end{IEEEeqnarray}
+
+This general equation has not been reduced to a more tractable form. Using it it conjunction with equation \eqref{risk_01_opt}, we have the expression for the optimal risk,
+\begin{IEEEeqnarray}{rCl}
+\Rcal(f^*) & = & 1 - \text{E}_{\Drm} \left[ \frac{\max_y \bar{N}(y;\Drm) + 1}{N+M} \right] \\
+& = & \frac{1}{N+M} \left[ -1 + \binom{N+M-1}{M-1}^{-1} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} \sum_{n = \left\lceil \frac{N+M}{m} \right\rceil}^{N+M} \binom{mn-N-1}{M-1}  \right] \nonumber \\
+& = & \frac{-1}{N+M} \left[ 1 + \sum_{m=1}^M \binom{M}{m} (-1)^m \sum_{n = \left\lceil \frac{N+M}{m} \right\rceil}^{N+M} \prod_{l=1}^{M-1} \left( 1 - \frac{mn}{N+l} \right) \right] \nonumber \;.
+%& = & \frac{M - 1 +\binom{N+M-1}{M-1}^{-1} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} \sum_{n = \left\lceil \frac{N+M}{m} \right\rceil}^N \binom{mn-N-1}{M-1}}{N+M} \;.
+\end{IEEEeqnarray}
+Figure \ref{fig:Risk_01_vsN} displays the risk as a function of $N$ for select values of $M$. Observe that even for binary classification, the optimal risk asymptotes quickly.
+
+PGR: Havent found closed form for summation over n. Can a bound be found instead???
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_01_vsN.pdf}
+\caption{Optimal 0-1 Risk, vs. Training Set volume $N$}
+\label{fig:Risk_01_vsN}
+\end{figure}
+
+The performance of this optimal decision function in the limit of training set volume $N \to \infty$ is of interest. Fortunately, the expectation $\text{E}_{\bar{\bm{\mathrm{n}}}} \big[ \max_y \bar{\nrm}(y) \big]$ can be represented more compactly in this limit. As detailed in Appendix \ref{app:E_N_max},
+\begin{equation}
+\lim_{N \to \infty} \frac{\text{E}_{\bar{\bm{\mathrm{n}}}} \big[ \max_y \bar{\nrm}(y) \big]}{N} = \frac{1}{M} \sum_{m=1}^M \frac{1}{m} \;.
+\end{equation}
+
+Note that this summation has no closed-form -- it is a Harmonic number. Note also that if the class set is countably infinite, this summation can be represented as
+\begin{IEEEeqnarray}{rCl}
+\lim_{M \to \infty} \frac{1}{M} \sum_{m=1}^M \frac{1}{m} & = & \lim_{M \to \infty} \frac{\text{ln}(M)}{M} \\
+& = & \lim_{M \to \infty} \frac{1}{M} = 0 \nonumber \;.
+\end{IEEEeqnarray}
+
+PGR: harmonic reference???
+
+Substituting the limiting form of the expectation into equation \eqref{risk_01_opt}, we determine the optimal risk
+\begin{equation}
+\lim_{N \to \infty} \Rcal(f^*)  = \lim_{N \to \infty} \left( 1 - \frac{\text{E}_{\Drm} \left[ \max_y \bar{N}(y;\Drm) \right]}{N} \right) = 1 - \frac{1}{M} \sum_{m=1}^M \frac{1}{m} \;,
+\end{equation}
+which provides a lower bound to the risk that any learner can achieve with any volume of training data. Figure \ref{fig:Risk_01_LB} displays this risk, as well as the optimal risk when no training data is available. Note the margin in the probability of error between the optimal $N=0$ and $N \to \infty$ learners. For binary classification (the simplest case), we see a modest reduction from 0.5 to 0.25 error; for higher values of $M$, the probability of error increases towards unity. Clearly, this level of error is unacceptable for most applications. Nonetheless, it is the minimum risk for the problem we have formulated -- this results from our choosing a non-informative prior over $\bm{\Theta}$.
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.0]{Risk_01_LB.pdf}
+\caption{Optimal 0-1 Risk, Upper and Lower bounds}
+\label{fig:Risk_01_LB}
+\end{figure}
+
+PGR: PLOT RISK VS THETA???
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+
+\chapter{Extention to Infinite-Dimensional Spaces - Countably Infinite}
+
+
+\section{Intro}
+
+This chapter extends previous results for applications where the space $\Ycal$ can have an infinite number of elements. Specifically, the model distribution will be determined by using a Dirichlet random process prior. First, we assume that the set is countably infinite, that is $|\Ycal| = |\mathbb{N}|$; the model distribution is thus a discrete random process. 
+
+
+
+
+\section{Basic Model}
+
+
+\subsection{Objective}
+
+PGR: ditto???
+
+
+\subsection{Probability Distributions}
+
+PGR: ???
+
+
+\subsubsection{Model PDF, $\text{p}(\bm{\theta})$}
+
+PGR: Valid model representation? Marginals instead?
+
+
+\begin{IEEEeqnarray}{rCl}
+\text{p}(\bm{\theta}) & = & \beta(\bm{\alpha})^{-1} \prod_{y \in \Ycal} \theta(y)^{\alpha(y) - 1} \;,
+\end{IEEEeqnarray}
+
+\begin{equation}
+\beta(\bm{\alpha}) = \frac{\prod_{y \in \Ycal} \Gamma\big( \alpha(y) \big)}{\Gamma \left( \sum_{y \in \Ycal} \alpha(y) \right)} \;.
+\end{equation}
+
+The first and second joint moments of the model are 
+\begin{equation}
+\mu_{\theta}(y) = \text{E}\big[ \theta(y) \big] = \frac{\alpha(y)}{\alpha_0}
+\end{equation}
+and
+\begin{IEEEeqnarray}{rCl}
+\text{E} \big[ \theta(y) \theta(y') \big] & = & \frac{\alpha(y) \alpha(y') + \alpha(y) \delta[y,y']}{\alpha_0 (\alpha_0+1)} \;.
+\end{IEEEeqnarray}
+
+
+
+
+\subsubsection{Training Data PMF, $\text{P}(\Drm)$}
+
+\begin{equation}
+\text{P}(\Drm | \bm{\theta}) = \prod_{y \in \Ycal} \theta(y)^{\bar{N}(y;\Drm)} \;.
+\end{equation}
+
+\begin{equation}
+\text{P}(\nbarrm | \bm{\theta}) = \Ccal(\nbarrm) \prod_{y \in \Ycal} \theta(y)^{\bar{\nrm}(y)} \;,
+\end{equation}
+
+We extend the notion of the multinomial coefficient for general functions $\Ycal \mapsto \mathbb{N}$, such that 
+\begin{equation}
+\Ccal(\bar{\bm{n}}) = \frac{\left( \sum_{y \in \Ycal} \bar{n}(y) \right)!}{\prod_{y \in \Ycal} \bar{n}(y)!} \;.
+\end{equation}
+
+Thus,
+\begin{IEEEeqnarray}{rCl}
+\text{P}(\nbarrm) & = & \Ccal(\nbarrm) \beta(\bm{\alpha})^{-1} \beta(\bm{\alpha} + \nbarrm) \;.
+\end{IEEEeqnarray}
+
+The first and second joint moments of $\nbarrm$ are
+\begin{equation}
+\text{E}\big[ \bar{\nrm}(y) \big] = N \frac{\alpha(y)}{\alpha_0}
+\end{equation}
+and
+\begin{equation}
+\text{E}\big[ \bar{\nrm}(y) \bar{\nrm}(y') \big] 
+= \frac{N}{\alpha_0 (\alpha_0+1)} \big( (\alpha_0 + N)\alpha(y) \delta[y,y'] + (N-1) \alpha(y) \alpha(y') \big) \;.
+\end{equation}
+
+Also,
+\begin{equation}
+\text{P}(\Drm) = \beta(\bm{\alpha})^{-1} \beta \big( \bm{\alpha} + \bar{\bm{N}}(\Drm) \big) \;.
+\end{equation}
+
+
+
+
+
+
+\subsubsection{Output conditional PMF, $\text{P}(\yrm | \Drm)$}
+
+\begin{IEEEeqnarray}{rCL}
+\text{p}(\bm{\theta} | \Drm) & = & \frac{\text{P}(\Drm | \bm{\theta}) \text{p}(\bm{\theta})}{\text{P}(\Drm)} \\
+& = & \beta \left( \bm{\alpha} + \bar{\bm{N}}(\Drm) \right)^{-1} \prod_{y \in \Ycal} \theta(y)^{\alpha(y) + \bar{N}(y;\Drm) - 1} \nonumber 
+\end{IEEEeqnarray}
+
+\begin{IEEEeqnarray}{rCL}
+\text{p}(\bm{\theta} | \nbarrm) = \beta \left( \bm{\alpha} + \nbarrm \right)^{-1} 
+\prod_{y \in \Ycal} \theta(y)^{\alpha(y) + \bar{\nrm}(y) - 1} \;,
+\end{IEEEeqnarray}
+
+The PMF of interest is
+\begin{IEEEeqnarray}{rCl}
+\text{P}(\yrm | \Drm) & = & \text{E}_{\bm{\theta} | \Drm}\big[ \theta(\yrm) | \Drm \big] \\
+& = & \frac{\alpha(\yrm) + \bar{N}(\yrm;\Drm)}{\alpha_0 + N} \nonumber \\
+& = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \frac{\alpha(\yrm)}{\alpha_0} + \left(\frac{N}{\alpha_0+N}\right) \frac{\bar{N}(\yrm;\Drm)}{N} \nonumber
+\end{IEEEeqnarray}
+
+\begin{IEEEeqnarray}{rCl}
+\text{P}(\yrm | \nbarrm) & = & \text{E}_{\bm{\theta} | \nbarrm} \big[ \theta(\yrm) | \nbarrm \big] \\
+& = & \frac{\alpha(\yrm) + \bar{\nrm}(\yrm)}{\alpha_0 + N} \nonumber \\
+& = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \frac{\alpha(\yrm)}{\alpha_0} + \left(\frac{N}{\alpha_0+N}\right) \frac{\bar{\nrm}(\yrm)}{N} \nonumber
+\end{IEEEeqnarray}
+
+
+
+\section{Application to Common Loss Functions}
+
+PGR: Definitely regression. Classification sensible for countably infinite?
+
+PGR: Results identical to finite Dirichlet
+
+\begin{IEEEeqnarray}{L}
+\text{E}_{\yrm | \Drm} \big[ \mathcal{L}(h,\yrm) \big] = \sum_{y \in \Ycal} \mathcal{L}(h,y) \text{P}_{\yrm | \Drm}(y | \Drm) \\
+= \frac{\sum_{y \in \Ycal} \alpha(y) \mathcal{L}(h,y) + \sum_{y \in \Ycal} \bar{N}(y;\Drm) \mathcal{L}(h,y)}{\alpha_0+N} \nonumber \\
+= \frac{\sum_{y \in \Ycal} \alpha(y) \mathcal{L}(h,y) + \sum_{n=1}^N \mathcal{L}\big( h,\Drm_n \big)}{\alpha_0+N} \nonumber \\
+= \left( \frac{\alpha_0}{\alpha_0+N} \right) \sum_{y \in \Ycal} \mathcal{L}(h,y) \frac{\alpha(y)}{\alpha_0} +  \left( \frac{N}{\alpha_0+N} \right) N^{-1} \sum_{n=1}^N \mathcal{L}\big( h,\Drm_n \big) \nonumber \;.
+\end{IEEEeqnarray}
+
+
+\section{General Model}
+
+Extension to output and input spaces $\Ycal$ and $\Xcal$ can have an infinite number of elements. 
+
+
+\section{Applications: General Model}
+
+PGR: Definitely regression. Classification sensible for countably infinite?
+
+PGR: Results identical to finite Dirichlet
+
+
+
+
+
+
+
+
+
+
+
+
+\chapter{Extention to Infinite-Dimensional Spaces - Uncountably Infinite}
+
+PGR: account for impulsive alpha?
+
+
+\section{Intro}
+
+This chapter extends further to the case where $\Ycal$ is countably infinite, that is $|\Ycal| > |\mathbb{N}|$; the model distribution is thus a continuous random process. 
+
+
+\section{Basic Model}
+
+
+\subsection{Objective}
+
+PGR: ditto???
+
+
+\subsection{Probability Distributions}
+
+PGR: ???
+
+
+\subsubsection{Model $\theta$ Characterization}
+
+The model is now a continuous random process, such that $\theta \sim \text{DP}(\alpha)$. The concentration parameter is $\alpha_0 = \int_{y \in \Ycal} \alpha(y) \mathrm{d} y$. By definition, for any partition of the set $\Ycal$, $\left\{ \ldots,S(z),\ldots \right\}$, $z \in \Zcal$, we can generate a discrete Dirichlet random vector/process $\phi(z) \equiv \int_{S(z)} \theta(y) \mathrm{d} y$ with parameterizing function $\lambda(z) \equiv \int_{S(z)} \alpha(y) \mathrm{d} y$. This is commonly referred to as the aggregation property. The PDF for the aggregation is thus
+\begin{IEEEeqnarray}{rCl}
+\text{p}(\phi) & = & \beta(\lambda)^{-1} \prod_{z \in \Zcal} \phi(z)^{\lambda(z) - 1} \;.
+\end{IEEEeqnarray}
+
+As detailed in Appendix \ref{app:E_DP}, the first and second moments of a Dirichlet process $\text{DP}(\alpha)$ are
+\begin{equation}
+\mu_{\theta}(y) = \text{E}\big[\theta(y)\big] = \frac{\alpha(y)}{\alpha_0}
+\end{equation}
+and
+\begin{IEEEeqnarray}{rCl}
+\text{E} \big[ \theta(y) \theta(y') \big] & = & \frac{\alpha(y) \alpha(y') + \alpha(y) \delta(y-y')}{\alpha_0 (\alpha_0+1)} \;.
+\end{IEEEeqnarray}
+
+
+
+
+
+
+
+\subsubsection{Output conditional PDF, $\text{p}(\yrm | \Drm)$}
+
+In Appendix \ref{app:DP_post}, it was shown that if the model $\theta \sim \text{DP}(\alpha)$ is a Dirichlet process, then the model conditioned on the training data $\Drm$ is also a Dirichlet process with parameterizing function $\alpha(\cdot) + \bar{N}(\cdot;\Drm)$, where $\bar{N}(y;\Drm) = \sum_{n=1}^N \delta\left( y - \Drm_n \right)$ generalizes from the discrete case. Thus, the conditional PDF of interest can be formulated as
+\begin{IEEEeqnarray}{rCl}
+\text{p}(\yrm | \Drm) & = & \text{E}_{\bm{\theta} | \Drm}\big[ \theta(\yrm) | \Drm \big] \\
+& = & \frac{\alpha(\yrm) + \sum_{n=1}^N \delta\big( \yrm - \Drm_n \big)}{\alpha_0 + N} \nonumber \\
+& = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \frac{\alpha(\yrm)}{\alpha_0} + \left(\frac{N}{\alpha_0+N}\right) \frac{\sum_{n=1}^N \delta\big( \yrm - \Drm_n \big)}{N} \nonumber \\
+& = & \frac{\alpha(\yrm) + \bar{N}(\yrm;\Drm)}{\alpha_0 + N} \nonumber \;.
+\end{IEEEeqnarray}
+
+With the generalization to a continuous set $\Ycal$, the training data dependent component of the PDF is formulated with Dirac delta functions. 
+
+
+
+\subsubsection{Training Data PDF, $\text{p}(\Drm)$}
+
+To represent the training data distribution, note that the Dirichlet process conditional model also provides
+\begin{IEEEeqnarray}{rCl}
+\text{p}\big( \Drm(n+1) | \Drm_n,\ldots,\Drm(1) \big) & = & \frac{\alpha\big( \Drm(n+1) \big) + \sum_{n'=1}^N \delta\big( \Drm(n+1) - \Drm(n') \big)}{\alpha_0 + N} \;
+\end{IEEEeqnarray}
+and thus the complete PDF is
+\begin{IEEEeqnarray}{rCl}
+\text{p}(\Drm) & = & \text{p}\big( \Drm(1) \big) \prod_{n=2}^N \text{p}\big( \Drm_n | \Drm(n-1),\ldots,\Drm(1) \big) \\
+& = & \frac{\alpha\big( \Drm(1) \big)}{\alpha_0} \prod_{n=2}^N \frac{\alpha\big( \Drm_n \big) + \sum_{i=1}^{n-1} \delta\big( \Drm_n-\Drm(i) \big)}{\alpha_0+n-1} \nonumber \;.
+\end{IEEEeqnarray}
+
+Additionally, note that since $\text{p}_{\Drm_n | \theta}(y|\theta) = \theta(y)$ is independent of sample index $n$, the PDF does not vary when the input arguments are permuted. Furthermore, all marginal distributions of $\Drm$ will have the same form, regardless of which training samples $\Drm_n$ are used.
+
+Using these properties, the first and second joint moments of $\Drm$ are found to be
+\begin{IEEEeqnarray}{rCl}
+\text{E}\big[ \Drm_n \big] & = & \int_{\Ycal} y \text{p}_{\Drm_n}(y) \mathrm{d} y = \int_{\Ycal} y \text{E}_{\bm{\theta}}\big[ \text{P}_{\Drm_n | \bm{\theta}}(y) \big] \mathrm{d} y \\
+& = & \int_{\Ycal} y \text{E}_{\bm{\theta}}\big[ \theta(y) \big] \mathrm{d}y \nonumber \\
+& = & \int_{\Ycal} y \frac{\alpha(y)}{\alpha_0} \mathrm{d} y \equiv \mu_{\yrm} \nonumber
+\end{IEEEeqnarray}
+and
+\begin{IEEEeqnarray}{rCl}
+\text{E}\big[ \Drm_n^2 \big] & = & \int_{\Ycal} y^2 \text{p}_{\Drm_n}(y) \mathrm{d} y = \int_{\Ycal} y^2 \text{E}_{\bm{\theta}}\big[ \text{P}_{\Drm_n | \bm{\theta}}(y) \big] \mathrm{d}y \\
+& = & \int_{\Ycal} y^2 \text{E}_{\bm{\theta}}\big[ \theta(y) \big] \mathrm{d}y \nonumber \\
+& = & \int_{\Ycal} y^2 \frac{\alpha(y)}{\alpha_0} \mathrm{d}y = \text{E}[\yrm^2] \nonumber \;,
+\end{IEEEeqnarray}
+
+\begin{IEEEeqnarray}{rCl}
+\text{E}\big[ \Drm_n\Drm(n') \big] & = & \int_{\Ycal} \int_{\Ycal} y y' \text{p}_{\Drm_n,\Drm(n')}(y,y') \mathrm{d} y \mathrm{d}y' \\
+& = & \int_{\Ycal} \int_{\Ycal} y y' \text{E}_{\bm{\theta}} \big[ \text{p}_{\Drm_n | \bm{\theta}}(y) \text{p}_{\Drm(n') | \bm{\theta}}(y') \big] \mathrm{d}y \mathrm{d}y' \nonumber \\
+& = & \int_{\Ycal} \int_{\Ycal} y y' \text{E}_{\bm{\theta}}\big[ \theta(y) \theta(y') \big] \mathrm{d}y \mathrm{d}y' \nonumber \\
+& = & \int_{\Ycal} \int_{\Ycal} y y' \frac{\alpha(y) \alpha(y') + \alpha(y) \delta(y-y')}{\alpha_0 (\alpha_0+1)} \mathrm{d}y \mathrm{d}y' \nonumber \\
+& = & \frac{\alpha_0 \mu_{\yrm}^2 + \text{E}[\yrm^2]}{\alpha_0 + 1} \nonumber \;.
+\end{IEEEeqnarray}
+
+Combining,
+\begin{equation}
+\text{E}\big[ \Drm_n\Drm(n') \big] = \text{E}[\yrm^2] - \big(1 - \delta[n,n']\big) \frac{\alpha_0}{\alpha_0+1} \Sigma_{\yrm} \;.
+\end{equation}
+
+PGR: move proofs to appendix???
+
+
+PGR PGR: Dirichlet-Multinomial Process perspective???
+
+Define the Dirichlet-Multinomial process $\bar{\nrm}(\cdot) \equiv \bar{N}(\cdot;\Drm)$. The mean and correlation functions below are found in Appendix \ref{app:DMP}. The mean function is
+\begin{IEEEeqnarray}{rCl}
+\text{E}\big[ \bar{\nrm}(y) \big] & = & N \frac{\alpha(y)}{\alpha_0} 
+\end{IEEEeqnarray}
+and the correlation function is
+\begin{IEEEeqnarray}{rCl}
+\text{E}\big[ \bar{\nrm}(y) \bar{\nrm}(y') \big] & = & \frac{N}{\alpha_0 (\alpha_0+1)} \big[ (N-1)\alpha(y) \alpha(y') + (\alpha_0+N) \alpha(y) \delta(y-y') \big] \;.
+\end{IEEEeqnarray}
+
+
+
+
+\section{Application to Common Loss Functions}
+
+PGR: Discuss continuous notation
+
+\begin{IEEEeqnarray}{L}
+\text{E}_{\yrm | \Drm} \big[ \mathcal{L}(h,\yrm) \big] = \int_{\Ycal} \mathcal{L}(h,y) \text{p}_{\yrm | \Drm}(y | \Drm) \mathrm{d}y \\
+= \frac{\int_{\Ycal} \alpha(y) \mathcal{L}(h,y) \mathrm{d} y + \int_{\Ycal} \sum_{n=1}^N \delta\big( y-\Drm_n \big) \mathcal{L}(h,y) \mathrm{d} y}{\alpha_0+N} \nonumber \\
+= \frac{\int_{\Ycal} \alpha(y) \mathcal{L}(h,y) \mathrm{d} y + \sum_{n=1}^N \mathcal{L}\big( h,\Drm_n \big)}{\alpha_0+N} \nonumber \\
+= \left( \frac{\alpha_0}{\alpha_0+N} \right) \int_{\Ycal} \frac{\alpha(y)}{\alpha_0} \mathcal{L}(h,y) \mathrm{d}y +  \left( \frac{N}{\alpha_0+N} \right) N^{-1} \sum_{n=1}^N \mathcal{L}\big( h,\Drm_n \big) \nonumber 
+\end{IEEEeqnarray}
+
+
+\subsection{Regression: the Squared-Error Loss}
+
+\begin{equation}
+\mathcal{L}(h,y) = (h-y)^2 \;.
+\end{equation}
+
+Now we choose for the regression function to map to $\Hcal = \Ycal = \mathbb{R}$.
+
+\begin{IEEEeqnarray}{rCl}
+\Rcal(f) & = & \text{E}_{\bm{\theta}} \Bigg[ \text{E}_{\Drm | \bm{\theta}} \bigg[ \text{E}_{\yrm | \bm{\theta}} \Big[ \big( f(\Drm)-\yrm \big)^2 \Big] \bigg] \Bigg] \\
+& = & \text{E}_{\bm{\theta}} \Big[ \text{E}_{\yrm | \bm{\theta}} \big[ (\yrm - \mu_{\yrm | \bm{\theta}})^2 \big] \Big] + \text{E}_{\bm{\theta}} \bigg[ \text{E}_{\Drm | \bm{\theta}} \Big[ \big( f(\Drm) - \mu_{\yrm | \bm{\theta}} \big)^2 \Big] \bigg] \nonumber \\
+& = & \text{E}_{\bm{\theta}} \left[ \Sigma_{\yrm | \bm{\theta}} \right] + \text{E}_{\bm{\theta}} \bigg[ \text{E}_{\Drm | \bm{\theta}} \Big[ \big( f(\Drm) - \mu_{\yrm | \bm{\theta}} \big)^2 \Big] \bigg] \nonumber
+\end{IEEEeqnarray}
+
+
+\subsubsection{Optimal Learner}
+
+The optimal function is again the expected value of the output conditional PMF,
+\begin{IEEEeqnarray}{rCl}
+f^*(\Drm) & = & \argmin_{h \in \mathbb{R}} \text{E}_{\yrm | \Drm} \big[ (h-\yrm)^2 \big]  \\
+& = & \mu_{\yrm | \Drm} = \text{E}_{\bm{\theta} | \Drm} [ \mu_{\yrm | \bm{\theta}} ] \nonumber \\
+& = & \left( \frac{\alpha_0}{\alpha_0+N} \right) \int_{\Ycal} \frac{\alpha(y)}{\alpha_0} y \mathrm{d}y +  \left( \frac{N}{\alpha_0+N} \right) \frac{1}{N} \sum_{n=1}^N \Drm_n \nonumber \\
+& = & \left( \frac{\alpha_0}{\alpha_0+N} \right) \text{E}[\yrm] +  \left( \frac{N}{\alpha_0+N} \right) \frac{1}{N} \sum_{n=1}^N \Drm_n \nonumber \\
+& = & \left( \frac{\alpha_0}{\alpha_0+N} \right) \mu_{\yrm} +  \left( \frac{N}{\alpha_0+N} \right) \int_{\Ycal} y \frac{\bar{N}(y;\Drm)}{N} \mathrm{d}y \nonumber \;.
+\end{IEEEeqnarray}
+
+
+
+
+\subsubsection{Minimum Risk}
+
+\begin{IEEEeqnarray}{rCl}
+\Rcal(f^*) & = & \text{E}_{\Drm} \left[ \Sigma_{\yrm | \Drm} \right] \\
+& = & \text{E}_{\bm{\theta}} \left[ \Sigma_{\yrm | \bm{\theta}} \right] + \text{E}_{\Drm} \bigg[ \text{E}_{\bm{\theta} | \Drm} \Big[ \big( \mu_{\yrm | \bm{\theta}} - \text{E}_{\bm{\theta} | \Drm}[\mu_{\yrm | \bm{\theta}}] \big)^2 \Big] \bigg] \nonumber \\
+& = & \text{E}_{\bm{\theta}} \left[ \Sigma_{\yrm | \bm{\theta}} \right] + \text{E}_{\Drm} \big[ \text{C}_{\bm{\theta} | \Drm} [ \mu_{\yrm | \bm{\theta}} ] \big] \nonumber \\
+& = & \text{E}_{\nbarrm} \left[ \Sigma_{\yrm | \nbarrm} \right] \nonumber \;.
+\end{IEEEeqnarray}
+
+
+The conditional variance is expanded as
+\begin{IEEEeqnarray}{rCl}
+\Sigma_{\yrm | \Drm} & = & \text{E}_{\yrm | \Drm}[\yrm^2]
+- \big( \text{E}_{\yrm | \Drm}[\yrm] \big)^2 
+\end{IEEEeqnarray}
+and the expectations of the two terms are evaluated separately.
+
+
+\begin{IEEEeqnarray}{rCl}
+\text{E}_{\Drm}\big[\text{E}_{\yrm | \Drm}[\yrm^2]\big] & = & \text{E}_{\yrm}[\yrm^2]
+\end{IEEEeqnarray}
+
+
+\begin{IEEEeqnarray}{L}
+\text{E}_{\Drm}\Big[ \big( \text{E}_{\yrm | \Drm}[\yrm] \big)^2 \Big] \\
+\quad = \frac{\alpha_0^2 \mu_{\yrm}^2 + 2\alpha_0 \mu_{\yrm} \sum_{n=1}^N \text{E}\big[ \Drm_n \big] + \sum_{n=1}^N \sum_{n'=1}^N \text{E}\big[ \Drm_n\Drm(n') \big]}{(\alpha_0+N)^2} \nonumber \\
+\quad = \frac{\alpha_0^2 \mu_{\yrm}^2 + 2\alpha_0 N \mu_{\yrm}^2 + N^2\text{E}[\yrm^2] - N(N-1)\alpha_0(\alpha_0+1)^{-1} \Sigma_{\yrm}}{(\alpha_0+N)^2} \nonumber \\
+\quad = \mu_{\yrm}^2 + \frac{N^2 - N(N-1)\alpha_0(\alpha_0+1)^{-1}}{(\alpha_0+N)^2} \Sigma_{\yrm} \nonumber
+\end{IEEEeqnarray}
+
+PGR: DMP PERSPECTIVE???
+
+\begin{IEEEeqnarray}{L}
+\text{E}_{\Drm}\Big[ \big( \text{E}_{\yrm | \Drm}[\yrm] \big)^2 \Big] = \text{E}_{\bar{\nrm}}\Big[ \big( \text{E}_{\yrm | \bar{\nrm}}[\yrm] \big)^2 \Big] \\
+\quad = \frac{\alpha_0^2 \mu_{\yrm}^2 + 2\alpha_0 \mu_{\yrm} \int_{\Ycal} y \text{E}\big[ \bar{\nrm}(y) \big] \mathrm{d}y + \int_{\Ycal} \int_{\Ycal} y y'\text{E}\big[ \bar{\nrm}(y)\bar{\nrm}(y') \big] \mathrm{d}y \mathrm{d}y'}{(\alpha_0+N)^2} \nonumber \\
+\quad = \frac{\alpha_0^2 \mu_{\yrm}^2 + 2\alpha_0 N \mu_{\yrm}^2 + N(N-1)\alpha_0(\alpha_0+1)^{-1} \mu_{\yrm}^2 + N(\alpha_0+N)(\alpha_0+1)^{-1}\text{E}[\yrm^2]}{(\alpha_0+N)^2} \nonumber \\
+\quad = \frac{\alpha_0(\alpha_0+N+1)\mu_{\yrm}^2 + N\text{E}[\yrm^2]}{(\alpha_0+1)(\alpha_0+N)} \nonumber
+\end{IEEEeqnarray}
+
+PGR: nicer algebra with DMP!
+
+PGR: DMP
+
+
+The optimal risk is again
+
+\begin{IEEEeqnarray}{rCl}
+\Rcal(f^*) & = & \left( 1 - \frac{N^2 - N(N-1)\alpha_0(\alpha_0+1)^{-1}}{(\alpha_0+N)^2} \right) \Sigma_{\yrm} \\
+& = & \frac{\alpha_0 (\alpha_0+N+1)}{(\alpha_0+1)(\alpha_0+N)} \Sigma_{\yrm} \nonumber \\
+& = & \frac{1+(\alpha_0+N)^{-1}}{1+\alpha_0^{-1}} \Sigma_{\yrm} \nonumber \;.
+\end{IEEEeqnarray}
+
+As for finite Dirichlet models and discrete Dirichlet processes, the optimal risk is dependent on the model only through the concentration parameter $\alpha_0$ and the variance of the expected distribution $\text{P}(\yrm) = \text{E}_{\theta}\big[ \theta(\yrm) ]$.
+
+
+
+
+\section{General Model}
+
+PGR: change dirac deltas to kronecker in fractions, no divide by zero???
+
+\subsection{Model Extension}
+
+This section adds the input space $\Xcal$, now considered to be countably infinite; that is $|\Xcal| > |\mathbb{N}|$. The model distribution is a random process over the space $\Ycal \times \Xcal$.
+
+
+\subsection{General Probability Distributions}
+
+PGR
+
+
+\subsubsection{Model $\theta$ Characterization}
+
+The model random process is now defined over the set $\Ycal \times \Xcal$; this Dirichlet process is defined as $\theta \sim \text{DP}(\alpha)$ with $\alpha : \Ycal \times \Xcal \mapsto \mathbb{R}_{>0}$. The concentration parameter generalizes to $\alpha_0 = \int_{\Ycal} \int_{\Xcal} \alpha(y,x) \mathrm{d} x \mathrm{d} y$. Using the aggregation property, any partition of the set $\Ycal \times \Xcal$, $\left\{ \ldots,S(z),\ldots \right\}$, $z \in \Zcal$ is a discrete Dirichlet random vector/process $\phi(z) = \iint_{S(z)} \theta(y,x) \mathrm{d} x \mathrm{d} y$ with parameterizing function $\lambda(z) = \iint_{S(z)} \alpha(y,x) \mathrm{d} x \mathrm{d} y$. The PDF for the aggregation is
+\begin{IEEEeqnarray}{rCl}
+\text{p}(\phi) & = & \beta(\lambda)^{-1} \prod_{z \in \Zcal} \phi(z)^{\lambda(z) - 1} \;.
+\end{IEEEeqnarray}
+
+The expected value of a Dirichlet process generalizes to $\text{DP}(\alpha)$
+\begin{equation}
+\mu_{\theta}(y,x) = \text{E}\big[ \theta(y,x) \big] = \frac{\alpha(y,x)}{\alpha_0}
+\end{equation}
+and the correlation function is
+\begin{IEEEeqnarray}{rCl}
+\text{E} \big[ \theta(y,x) \theta(y',x') \big] & = & \frac{\alpha(y,x) \alpha(y',x') + \alpha(y,x) \delta(y-y')\delta(x-x')}{\alpha_0 (\alpha_0+1)} \;.
+\end{IEEEeqnarray}
+
+
+
+
+
+
+\subsubsection{Output conditional PDF, $\text{p}(\yrm | \xrm,\Drm)$}
+
+The properties of the Dirichlet distribution proven in Appendix \ref{app:DP_post} generalize, such that the model conditioned on the training data $\Drm$ is Dirichlet with parameterizing function $\alpha(y,x) + \bar{N}(y,x;\Drm)$, where $\bar{N}(y,x;\Drm) = \sum_{n=1}^N \delta\left( y - \Yrm_n \right)\left( x - \Xrm_n \right)$. Recall that $\Drm_n = \big( \Yrm_n,\Xrm_n \big)$ with $Y \in \Ycal^N$ and $X \in \Xcal^N$.
+
+The PDF $\text{p}(\yrm,\xrm | \Drm)$ is thus
+\begin{IEEEeqnarray}{rCl}
+\text{p}(\yrm,\xrm | \Drm) & = & \text{E}_{\bm{\theta} | \Drm}\big[ \theta(\yrm,\xrm) | \Drm \big] \\
+& = & \frac{\alpha(\yrm,\xrm) + \bar{N}(\yrm,\xrm;\Drm)}{\alpha_0 + N} \nonumber \\
+& = & \frac{\alpha(\yrm,\xrm) + \sum_{n=1}^N \delta\big( \yrm - \Yrm_n \big)\delta\big( \xrm - \Xrm_n \big)}{\alpha_0 + N} \nonumber \\
+& = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \frac{\alpha(\yrm,\xrm)}{\alpha_0} + \left(\frac{N}{\alpha_0+N}\right) \frac{\sum_{n=1}^N \delta\big( \yrm - \Yrm_n \big) \delta\big( \xrm - \Xrm_n \big)}{N} \nonumber
+\end{IEEEeqnarray}
+and the conditional PDF of interest is
+\begin{IEEEeqnarray}{rCl}
+\text{p}(\yrm | \xrm,\Drm) & = & \frac{\alpha(\yrm,\xrm) + \bar{N}(\yrm,\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \\
+& = & \frac{\alpha(\yrm,\xrm) + \sum_{n=1}^N \delta\big( \yrm - \Yrm_n \big) \delta\big( \xrm - \Xrm_n \big)}{\alpha'(\xrm) + \sum_{n=1}^N \delta\big( \xrm - X_n \big)} \nonumber \\
+& = & \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm)+N'(\xrm;\Drm)}\right) \frac{\alpha(\yrm,\xrm)}{\alpha'(\xrm)} + \left(\frac{N'(\xrm;\Drm)}{\alpha'(\xrm)+N'(\xrm;\Drm)}\right) \frac{\bar{N}(\yrm,\xrm;\Drm)}{N'(\xrm;\Drm)} \nonumber \;,
+\end{IEEEeqnarray}
+where $\alpha'(x) = \int_{\Ycal} \alpha(y,x) \mathrm{d} y$ and $N'(x;\Drm) = \sum_{n=1}^N \delta\big( x - \Xrm_n \big)$.
+
+The conditional distribution for an uncountalbly infinite set $\Xcal$ has notable differences from its form for a countable input set. Specifically, as $N'(x;\Drm) \in [0,\infty)$, and in fact will either be zero or trend towards infinity, the coefficients dictating the convex combination of distributions will be zero or one (assuming a non-impulsive model parameter $\alpha$). Thus, the distribution for a given observation $\xrm$ will be either strictly dependent on either the training data or the prior knowledge regarding $\theta$.
+
+
+
+\subsubsection{Training Data PDF, $\text{p}(\Drm)$}
+
+By the Dirichlet process properties,
+\begin{IEEEeqnarray}{L}
+\text{p}\big( \Drm(n+1) | \Drm_n,\ldots,\Drm(1) \big) = \\
+\quad \frac{\alpha\big( \Yrm(n+1),\Xrm(n+1) \big) + \sum_{n'=1}^N \delta\big( \Yrm(n+1) - \Yrm(n') \big) \delta\big( \Xrm(n+1) - \Xrm(n') \big)}{\alpha_0 + N} \nonumber
+\end{IEEEeqnarray}
+and thus
+\begin{IEEEeqnarray}{rCl}
+\text{p}(\Drm) & = & \text{p}\big (\Drm(1) \big) \prod_{n=2}^N \text{p}\big( \Drm_n | \Drm(n-1),\ldots,\Drm(1) \big) \\
+& = & \frac{\alpha\big( \Yrm(1),\Xrm(1) \big)}{\alpha_0} \prod_{n=2}^N \frac{\alpha\big( \Yrm_n,\Xrm_n \big) + \sum_{i=1}^{n-1} \delta\big( \Yrm_n-\Yrm(i) \big) \delta\big( \Xrm_n-\Xrm(i) \big)}{\alpha_0+n-1} \nonumber
+\end{IEEEeqnarray}
+
+It is informative to find the PDF's for the training output values $\Yrm$ given the input values $\Xrm$, as well as the marginal PDF for the input values alone. Observe that the PDF for $\Xrm$ can be represented as
+\begin{IEEEeqnarray}{rCl}
+\text{p}(\Xrm) & = & \text{E}_{\theta}\big[ \text{p}(\Xrm | \theta) \big] = \text{E}_{\theta}\left[ \prod_{n=1}^N \theta'\big( \Xrm_n \big) \right] \\
+& = & \frac{\alpha'\big( \Xrm(1) \big)}{\alpha_0} \prod_{n=2}^N \frac{\alpha'\big( \Xrm_n \big) + \sum_{i=1}^{n-1} \delta\big( \Xrm_n-\Xrm(i) \big)}{\alpha_0+n-1} \nonumber
+\end{IEEEeqnarray}
+where, by the aggregation principle, $\theta'(x) = \int_{\Ycal} \theta(y,x) \mathrm{d} y$ is a Dirichlet process with parameter function $\alpha': \Xcal \mapsto \mathbb{R}_{>0}$.
+
+
+%The PDF for $\Xrm$ is
+%\begin{IEEEeqnarray}{rCl}
+%\text{p}(X) & = & \int_{Y(1)} \mathrm{d}Y(1) \ldots \int_{Y(N)} \mathrm{d}Y(N) \frac{\alpha(Y(1),X(1))}{\alpha_0} \\
+%&& \quad \prod_{n=2}^N \frac{\alpha(Y_n,X_n) + \sum_{i=1}^{n-1} \delta(Y_n-Y(i)) \delta(X_n-X(i))}{\alpha_0+n-1} \\
+%& = & \int_{Y(1)} \mathrm{d}Y(1) \ldots \int_{Y(N-1)} \mathrm{d}Y(N-1) \frac{\alpha(Y(1),X(1))}{\alpha_0} \\
+%&& \quad \prod_{n=2}^{N-1} \frac{\alpha(Y_n,X_n) + \sum_{i=1}^{n-1} \delta(Y_n-Y(i)) \delta(X_n-X(i))}{\alpha_0+n-1} \\
+%&& \qquad \frac{\alpha'(X(N)) + \sum_{i=1}^{N-1} \delta(X(N)-X(i))}{\alpha_0+N-1} \\
+%& = & \ldots \\
+%& = & \frac{\alpha'(X(1))}{\alpha_0} \prod_{n=2}^N \frac{\alpha'(X_n) + \sum_{i=1}^{n-1} \delta(X_n-X(i))}{\alpha_0+n-1}
+%\end{IEEEeqnarray}
+
+Additionally, by the invariance principle, the PDF's for the first-degree marginals are
+\begin{IEEEeqnarray}{rCl}
+\text{p}\big( \Xrm_n \big) & = & \frac{\alpha'\big( \Xrm_n \big)}{\alpha_0} \;.
+\end{IEEEeqnarray}
+which necessarily have the same form as the PDF of the observed value $\xrm$.
+
+The conditional distribution of intererest is
+\begin{IEEEeqnarray}{rCl}
+\text{p}(\Yrm | \Xrm) & = & \frac{\text{p}(\Yrm,\Xrm)}{\text{p}(\Xrm)} \\
+& = & \frac{\alpha\big( \Yrm(1),\Xrm(1) \big)}{\alpha'\big( \Xrm(1) \big)} \prod_{n=2}^N \frac{\alpha\big( \Yrm_n,\Xrm_n \big) + \sum_{i=1}^{n-1} \delta\big( \Yrm_n-\Yrm(i) \big) \delta\big( \Xrm_n-\Xrm(i) \big)}{\alpha'\big( \Xrm_n \big) + \sum_{i=1}^{n-1} \delta\big( \Xrm_n-\Xrm(i) \big)} \nonumber
+\end{IEEEeqnarray}
+
+Marginalized conditional PDF's for the first and second samples are found. Observe that the marginal distribution for the first $N-1$ values of $\Yrm$ is
+\begin{IEEEeqnarray}{L}
+\text{p}\big( \Yrm(1),\ldots,\Yrm(N-1) | \Xrm \big) \\
+= \int_{\Ycal} \frac{\alpha\big( \Yrm(1),\Xrm(1) \big)}{\alpha'\big( \Xrm(1) \big)} \nonumber \\
+\quad \prod_{n=2}^N \frac{\alpha
+\big( \Yrm_n,\Xrm_n \big) + \sum_{i=1}^{n-1} \delta\big( \Yrm_n-\Yrm(i) \big) \delta\big( \Xrm_n-\Xrm(i) \big)}{\alpha'\big( \Xrm_n \big) + \sum_{i=1}^{n-1} \delta\big( \Xrm_n-\Xrm(i) \big)} \mathrm{d}\Yrm(N) \nonumber \\
+= \frac{\alpha\big( \Yrm(1),\Xrm(1) \big)}{\alpha'\big( \Xrm(1) \big)} \prod_{n=2}^{N-1} \frac{\alpha\big( \Yrm_n,\Xrm_n \big) + \sum_{i=1}^{n-1} \delta\big( \Yrm_n-\Yrm(i) \big) \delta\big( \Xrm_n-\Xrm(i) \big)}{\alpha'\big( \Xrm_n \big) + \sum_{i=1}^{n-1} \delta\big( \Xrm_n-\Xrm(i) \big)} \nonumber
+\end{IEEEeqnarray}
+which is independent of $\Xrm_n$. Repeated integrations and an application of the permutation invariance principle produce the first and second order conditional distributions
+\begin{IEEEeqnarray}{rCl}
+\text{P}_{\Yrm_n | \Xrm_n} (y | x) & = & \frac{\alpha(y,x)}{\alpha'(x)}
+\end{IEEEeqnarray}
+and
+\begin{IEEEeqnarray}{L}
+\text{P}_{\Yrm_n,\Yrm(n') | \Xrm_n,\Xrm(n')} (y,y' | x,x') \\
+\quad = \frac{\alpha(y,x) \alpha(y',x') + \alpha(y,x) \delta(y-y') \delta(x-x')}{\alpha'(x) \alpha'(x') + \alpha'(x') \delta(x-x')} \nonumber
+\end{IEEEeqnarray}
+and the first and second order moments of interest,
+\begin{equation}
+\text{E}\big[ \Yrm_n | \Xrm \big] = \mu_{\yrm|\xrm}\big( \Xrm_n \big) \;,
+\end{equation}
+\begin{equation}
+\text{E}\big[ \Yrm_n^2 | \Xrm \big] = \text{E}\big[ \yrm^2 | \xrm \big] \big( \Xrm_n \big) \;,
+\end{equation}
+and 
+\begin{IEEEeqnarray}{rCl}
+\text{E}\big[ \Yrm_n \Yrm(n') | \Xrm \big] & = & \frac{\alpha'\big( \Xrm_n \big) \mu_{\yrm|\xrm}\big( \Xrm_n ) \mu_{\yrm|\xrm}\big (\Xrm(n') \big) + \text{E}\big[ \yrm^2 | \xrm \big] \big( \Xrm_n \big) \delta\big( \Xrm_n - \Xrm(n') \big)}{\alpha'\big( \Xrm_n \big) + \delta\big( \Xrm_n - \Xrm(n') \big)} \;.
+\end{IEEEeqnarray}
+
+
+PGR: formalize permutation invariance principle???
+
+PGR: Add Y given X equations (with Betas) for discrete case in previous chapters?
+
+
+
+PGR: Dirichlet-Multinomial Process perspective
+
+We have the DMP $\bar{\nrm}(y,x) \equiv \bar{N}(y,x;\Drm)$ with mean and correlation functions
+\begin{IEEEeqnarray}{rCl}
+\text{E}\big[ \bar{\nrm}(y,x) \big] & = & N \frac{\alpha(y,x)}{\alpha_0} 
+\end{IEEEeqnarray}
+and
+\begin{IEEEeqnarray}{rCl}
+\text{E}\big[ \bar{\nrm}(y,x) \bar{\nrm}(y',x') \big] & = & \frac{N}{\alpha_0 (\alpha_0+1)} \big[ (N-1)\alpha(y,x) \alpha(y',x') + (\alpha_0+N) \alpha(y,x) \delta(y-y') \delta(x-x') \big]
+\end{IEEEeqnarray}
+
+Observe that by the aggregation principle, $\nrm'(x) = \int_{\Ycal} \bar{\nrm}(y,x) \mathrm{d}y \equiv \sum_{n=1}^N \delta\big( x-\Xrm_n \big)$ is a DMP over the set $\Xcal$ with parametrizing function $\alpha' : \Xcal \mapsto \mathbb{R}_{>0}$.
+
+Additionally, the 1-dimensional subsets conditioned on the marginalized DMP are characterized as
+
+\begin{equation}
+\frac{\bar{\nrm}(\cdot,x)}{\delta(0)} \Big| \nrm'(x) \sim \text{DMP}\left( \frac{\nrm'(x)}{\delta(0)},\frac{\alpha(\cdot,x)}{\delta(0)} \right)
+\end{equation}
+
+PGR: add proof???
+
+
+
+
+
+
+
+
+\section{Applications: General Model}
+
+PGR: COPIED, incomplete
+
+\begin{IEEEeqnarray}{L}
+\text{E}_{\yrm | \xrm,\Drm} \big[ \mathcal{L}(h,\yrm) \big] = \int_{\Ycal} \mathcal{L}(h,y) \text{p}_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) \mathrm{d}y \\
+= \frac{\int_{\Ycal} \alpha(y,\xrm) \mathcal{L}(h,y) \mathrm{d}y + \int_{\Ycal} \bar{N}(y,\xrm;\Drm) \mathcal{L}(h,y) \mathrm{d}y}{\alpha'(\xrm)+N'(\xrm;\Drm)} \nonumber \\
+= \frac{\int_{\Ycal} \alpha(y,\xrm) \mathcal{L}(h,y) \mathrm{d}y + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \mathcal{L}\big( h,\Drm_n \big)}{\alpha'(\xrm)+N'(\xrm;\Drm)} \nonumber \\
+= \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + N'(\xrm;\Drm)}\right) \text{E}_{\yrm | \xrm}\big[ \mathcal{L}(h,\yrm) \big] + \left(\frac{N'(\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)}\right) \frac{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \mathcal{L}\big( h,\Yrm_n \big)}{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big)} \nonumber \;.
+\end{IEEEeqnarray}
+
+
+
+\subsection{Regression: the Squared-Error Loss}
+
+\begin{equation}
+\mathcal{L}(h,y) = (h-y)^2 \;.
+\end{equation}
+
+Now we choose for the regression function to map to $\Hcal = \Ycal = \mathbb{R}$.
+
+\begin{IEEEeqnarray}{rCl}
+\Rcal(f) & = & \text{E}_{\bm{\theta}} \Bigg[ \text{E}_{\Drm | \bm{\theta}} \bigg[ \text{E}_{\yrm,\xrm | \bm{\theta}} \Big[ \big( f( xrm,\Drm)-\yrm \big)^2 \Big] \bigg] \Bigg] \\
+& = & \text{E}_{\xrm,\bm{\theta}} \Big[ \text{E}_{\yrm | \xrm,\bm{\theta}} \big[ (\yrm - \mu_{\yrm | \xrm,\bm{\theta}})^2 \big] \Big] + \text{E}_{\bm{\theta}} \bigg[ \text{E}_{\xrm,\Drm | \bm{\theta}} \Big[ \big( f(\xrm;\Drm) - \mu_{\yrm | \xrm,\bm{\theta}} \big)^2 \Big] \bigg] \nonumber \\
+& = & \text{E}_{\xrm,\bm{\theta}} \left[ \Sigma_{\yrm | \xrm,\bm{\theta}} \right] + \text{E}_{\bm{\theta}} \bigg[ \text{E}_{\xrm,\Drm | \bm{\theta}} \Big[ \big( f(\xrm;\Drm) - \mu_{\yrm | \xrm,\bm{\theta}} \big)^2 \Big] \bigg] \nonumber
+\end{IEEEeqnarray}
+
+
+
+\subsubsection{Optimal Learner}
+
+The optimal function is the expected value of the output conditional PDF,
+\begin{IEEEeqnarray}{rCl}
+f^*(\xrm;\Drm) & = & \mu_{\yrm | \xrm,\Drm}  = \text{E}_{\bm{\theta} | \xrm,\Drm} \left[ \mu_{\yrm | \xrm,\bm{\theta}} \right] \\
+& = & \frac{\int_{\Ycal} y \big( \alpha(y,\xrm) + \bar{N}(y,\xrm;\Drm) \big) \mathrm{d}y}{\alpha'(\xrm) + N'(\xrm;\Drm)} \nonumber \\
+& = & \left( \frac{\alpha'(\xrm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \right) \int_{\Ycal} y \frac{\alpha(y,\xrm)}{\alpha'(\xrm)} \mathrm{d}y \nonumber \\
+&& \quad + \left( \frac{N'(\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \right) \frac{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \Yrm_n}{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big)} \nonumber \\
+& = & \left( \frac{\alpha'(\xrm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \right) \mu_{\yrm | \xrm} \nonumber \\
+&& \quad + \left( \frac{N'(\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \right) \frac{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \Yrm_n}{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big)} \nonumber \;.
+\end{IEEEeqnarray}
+
+
+
+\subsubsection{Minimum Risk}
+
+Generalizing from the basic model discussion, we again have
+\begin{IEEEeqnarray}{rCl}
+\Rcal(f^*) & = & \text{E}_{\xrm,\Drm} \left[ \Sigma_{\yrm | \xrm,\Drm} \right]
+= \text{E}_{\xrm,\bar{\nrm}} \left[ \Sigma_{\yrm | \xrm,\bar{\nrm}} \right] \\
+& = & \text{E}_{\xrm,\bm{\theta}} \left[ \Sigma_{\yrm | \xrm,\bm{\theta}} \right] + \text{E}_{\xrm,\Drm} \Big[ \text{C}_{\bm{\theta} | \xrm,\Drm} \big[ \mu_{\yrm | \xrm,\bm{\theta}} \big] \Big] \nonumber \;,
+\end{IEEEeqnarray}
+where we choose to perform the expectation over $\bar{\nrm}$. 
+
+The conditional varance is now
+\begin{IEEEeqnarray}{rCl}
+\Sigma_{\yrm | \xrm,\bar{\nrm}} & = & \text{E}_{\yrm | \xrm,\bar{\nrm}}\big[ \yrm^2 \big]
+- \big( \text{E}_{\yrm | \xrm,\bar{\nrm}}[\yrm] \big)^2 \;.
+\end{IEEEeqnarray}
+and the two terms are independently evaluated.
+
+
+\begin{IEEEeqnarray}{L}
+\text{E}_{\xrm,\Drm}\big[ \text{E}_{\yrm | \xrm,\Drm}\big[ \yrm^2 \big] \big] = \text{E}_{\xrm,\bar{\nrm}}\Big[ \text{E}_{\yrm | \xrm,\bar{\nrm}}\big[ \yrm^2 \big] \Big] \\
+\quad = \text{E}_{\yrm}[\yrm^2] = \int_{\Ycal} y^2 \int_{\Xcal} \frac{\alpha(y,x)}{\alpha_0} \mathrm{d} x \mathrm{d}y \nonumber \\
+\quad = \text{E}_{\xrm}\big[ \text{E}_{\yrm | \xrm}[\yrm^2] \big] = \int_{\Xcal} \frac{\alpha'(x)}{\alpha_0} \int_{\Ycal} y^2 \frac{\alpha(y,x)}{\alpha'(x)} \mathrm{d} y \mathrm{d}x \nonumber \;.
+\end{IEEEeqnarray}
+
+
+
+PGR: D PERSPECTIVE
+
+\begin{IEEEeqnarray}{L}
+\text{E}_{\xrm,\Drm} \left[ \big( \text{E}_{\yrm | \xrm,\Drm}[\yrm] \big)^2 \right] \\
+\quad = \int_{\Xcal} \int_{\Dcal} \text{p}_{\xrm,\Drm}(x,D) \left( \int_{\Ycal} y \text{p}_{\yrm | \xrm,\Drm}(y | x,D) \mathrm{d}y \right)^2 \mathrm{d}D \mathrm{d}x \nonumber \\
+\quad = \int_{\Xcal} \text{E}_{\Drm} \left[ \int_{\Ycal} y \text{p}_{\yrm,\xrm | \Drm}(y,x | \Drm) \mathrm{d} y \int_{\Ycal} y' \text{p}_{\yrm |\xrm,\Drm}(y' | x,\Drm) \mathrm{d} y' \right] \mathrm{d}x \nonumber \\ 
+\quad = \int_{\Xcal} \text{E}_{\Yrm,\Xrm} \left[ \frac{ \left( \alpha'(x) \mu_{\yrm | \xrm}(x) + \sum_{n=1}^N \Yrm_n \delta\big( x - \Xrm_n \big) \right)^2 }{(\alpha_0+N) \left(\alpha'(x) + \sum_{n=1}^N \delta\big( x - \Xrm_n \big) \right)} \right] \mathrm{d}x \nonumber \\ 
+\quad = \int_{\Xcal} \text{E}_{\Xrm} \left[ \frac{ \text{E}_{\Yrm | \Xrm} \left[ \left( \alpha'(x) \mu_{\yrm | \yrm}(x) + \sum_{n=1}^N \Yrm_n \delta\big( x - \Xrm_n \big) \right)^2 \right] }{(\alpha_0+N) \left(\alpha'(x) + \sum_{n=1}^N \delta\big( x - \Xrm_n \big) \right)} \right] \mathrm{d}x \nonumber 
+\end{IEEEeqnarray}
+
+Evaluating the expectation over $\Yrm$ given $\Xrm$, we have
+\begin{IEEEeqnarray}{L}
+\text{E}_{\Yrm | \Xrm} \left[ \left( \alpha'(x) \mu_{\yrm | \xrm}(x) + \sum_{n=1}^N \Yrm_n \delta\big( x - \Xrm_n \big) \right)^2 \right] \\ 
+= \alpha'(x)^2 \mu_{\yrm | \xrm}(x)^2 + 2\alpha'(x) \mu_{\yrm | \xrm}(x) \sum_{n=1}^N \mu_{\yrm | \xrm}\big( \Xrm_n \big) \delta\big( x - \Xrm_n \big) \nonumber \\
+\quad + \sum_{n=1}^N \text{E}\big[ \yrm^2 | \xrm \big]\big( \Xrm_n \big) \delta\big( x - \Xrm_n \big)^2 \nonumber \\
+\quad + \sum_{n \neq n'} \frac{\alpha'\big( \Xrm_n \big) \mu_{\yrm | \xrm}\big(\Xrm_n \big) \alpha'\big( \Xrm(n') \big) \mu_{\yrm | \xrm}\big( \Xrm(n') \big) + \alpha'\big( \Xrm_n \big) \text{E}\big[ \yrm^2 | \xrm \big]\big( \Xrm_n \big) \delta\big( \Xrm_n-\Xrm(n') \big)}{\alpha'\big( \Xrm_n \big) \alpha'\big( \Xrm(n') \big) + \alpha'\big( \Xrm_n \big) \delta\big( \Xrm_n-\Xrm(n') \big)} \nonumber \\
+\qquad \delta\big( x - \Xrm_n \big) \delta\big( x - \Xrm(n') \big) \nonumber \\
+\ldots \nonumber \\
+= \alpha'(x)^2 \mu_{\yrm | \xrm}(x)^2 + 2\alpha'(x) \mu_{\yrm | \xrm}(x)^2 \sum_{n=1}^N \delta\big( x - \Xrm_n \big) + \text{E}\big[ \yrm^2 | \xrm \big](x) \sum_{n=1}^N \delta\big( x - \Xrm_n \big)^2 \nonumber \\
+\quad + \frac{\alpha'(x) \mu_{\yrm | \xrm}(x)^2 + \text{E}\big[ \yrm^2 | \xrm \big](x) \delta(0)}{\alpha'(x) + \delta(0)} \nonumber \\
+\qquad \sum_{n \neq n'} \delta\big( x - \Xrm_n \big) \delta\big( x - \Xrm(n') \big) \nonumber \\
+\ldots \nonumber \\
+= \frac{\alpha'(x) + \sum_{n=1}^N \delta\big( x-\Xrm_n \big)}{\alpha'(x) + \delta(0)} \nonumber \\
+\quad \left( \text{E}\big[ \yrm^2 | \xrm \big](x) \delta(0) \sum_{n=1}^N \delta\big( x-\Xrm_n \big) + \alpha'(x) \mu_{\yrm | \xrm}(x)^2 \left( \alpha'(x) + \delta(0) + \sum_{n=1}^N \delta\big( x-\Xrm_n \big) \right) \right) \nonumber
+\end{IEEEeqnarray}
+
+
+PGR: Y given X PDFs, moments??? In PDF section, or in Appendix?
+
+
+
+
+
+Plugging,
+\begin{IEEEeqnarray}{L}
+\text{E}_{\xrm,\Drm} \Big[ \big( \text{E}_{\yrm | \xrm,\Drm}[\yrm] \big)^2 \Big] \\
+\quad = \int_{\Xcal} \text{E}_{\Xrm} \left[ \frac{ \text{E}_{\Yrm | \Xrm} \left[ \left( \alpha'(x) \mu_{\yrm | \xrm}(x) + \sum_{n=1}^N \Yrm_n \delta\big( x - \Xrm_n \big) \right)^2 \right] }{(\alpha_0+N) \left(\alpha'(x) + \sum_{n=1}^N \delta\big( x - \Xrm_n \big) \right)} \right] \mathrm{d}x \nonumber \\ 
+\quad = \int_{\Xcal} \frac{ \text{E}_{\Xrm} \left[ \text{E}\big[ \yrm^2 | \xrm \big](x) \delta(0) \sum_{n=1}^N \delta\big( x-\Xrm_n \big) + \alpha'(x) \mu_{\yrm | \xrm}(x)^2 \left( \alpha'(x) + \delta(0) + \sum_{n=1}^N \delta\big( x-\Xrm_n \right) \big) \right] }{(\alpha_0+N) \big( \alpha'(x) + \delta(0) \big)} \mathrm{d}x \nonumber 
+\end{IEEEeqnarray}
+
+Evaluating the expectation over $\Xrm$,
+\begin{IEEEeqnarray}{L}
+\text{E}_{\Xrm} \left[ \text{E}\big[ \yrm^2 | \xrm \big](x) \delta(0) \sum_{n=1}^N \delta\big( x-\Xrm_n \big) + \alpha'(x) \mu_{\yrm | \xrm}(x)^2 \left( \alpha'(x) + \delta(0) + \sum_{n=1}^N \delta\big( x-\Xrm_n \big) \right) \right] \nonumber \\
+\quad = \text{E}\big[ \yrm^2 | \xrm \big](x) \delta(0) N \frac{\alpha'(x)}{\alpha_0} + \alpha'(x) \mu_{\yrm | \xrm}(x)^2 \left( \alpha'(x) + \delta(0) + N \frac{\alpha'(x)}{\alpha_0} \right) \nonumber \\
+\quad = \frac{\alpha'(x)}{\alpha_0} \Big( \text{E}\big[ \yrm^2 | \xrm \big](x) \delta(0) N + \mu_{\yrm | \xrm}(x)^2 \big( \alpha_0 \alpha'(x) + \alpha_0 \delta(0) + N \alpha'(x) \big) \Big) \nonumber
+\end{IEEEeqnarray}
+
+Plugging,
+\begin{IEEEeqnarray}{L}
+\text{E}_{\xrm,\Drm} \Big[ \big( \text{E}_{\yrm | \xrm,\Drm}[\yrm] \big)^2 \Big] \\
+\quad = \text{E}_{\xrm} \frac{\text{E}\big[ \yrm^2 | \xrm \big] \delta(0) N + \mu_{\yrm | \xrm}^2 \big( \alpha_0 \alpha'(\xrm) + \alpha_0 \delta(0) + N \alpha'(\xrm) \big)}{(\alpha_0+N) \big( \alpha'(\xrm) + \delta(0) \big)} \nonumber
+\end{IEEEeqnarray}
+
+Combining with the second moment produces the risk,
+\begin{IEEEeqnarray}{L}
+\Rcal(f^*) = \text{E}_{\xrm,\Drm} \left[ \text{E}_{\yrm | \xrm,\Drm}\big[ \yrm^2 \big] - \big( \text{E}_{\yrm | \xrm,\Drm}[\yrm] \big)^2 \right] \\
+= \text{E}_{\xrm} \left[ \frac{\alpha_0 \alpha'(\xrm) + \alpha_0 \delta(0) + N \alpha'(\xrm)}{(\alpha_0+N)(\alpha'(\xrm)+\delta(0))} \Sigma_{\yrm | \xrm} \right] \nonumber \\
+= \text{E}_{\xrm} \left[ \frac{\text{P}(\xrm) + (\alpha_0+N)^{-1} \delta(0)}{\text{P}(\xrm) + \alpha_0^{-1} \delta(0)} \Sigma_{\yrm | \xrm} \right] \nonumber
+\end{IEEEeqnarray}
+
+PGR: subscripts for RVs, bracket for italic values?
+
+PGR: Discuss Dirac deltas!!!
+
+
+PGR: DMP PERSPECTIVE???
+
+To perform the expectation over the Dirichlet-Multinomial process $\bar{\nrm} \sim \text{DMP}(\alpha)$, split the expectation into an expectation over the marginal DMP $\nrm' \sim \text{DMP}(\alpha')$ and a conditional expectation over $\bar{\nrm}$ given $\nrm'$. The characterization of the conditional DMP is found in Appendix \ref{app:DM_agg}.
+
+\begin{IEEEeqnarray}{L}
+\text{E}_{\xrm,\bar{\nrm}} \Big[ \big( \text{E}_{\yrm | \xrm,\bar{\nrm}}[\yrm] \big)^2 \Big] \\
+\quad = \int_{\Xcal} \int_{\bar{\Ncal}} \text{p}_{\xrm,\bar{\nrm}}(x,\bar{n}) \left( \int_{\Ycal} y \text{p}_{\yrm | \xrm,\bar{\nrm}}(y | x,\bar{n}) \mathrm{d}y \right)^2 \mathrm{d}\bar{n} \mathrm{d}x \nonumber \\
+\quad = \int_{\Xcal} \text{E}_{\bar{\nrm}} \left[ \int_{\Ycal} y \text{p}_{\yrm,\xrm | \bar{\nrm}}(y,x | \bar{\nrm}) \mathrm{d}y \int_{\Ycal} y' \text{p}_{\yrm | \xrm,\bar{\nrm}}(y' | x,\bar{\nrm}) \mathrm{d}y' \right] \mathrm{d}x \nonumber \\ 
+\quad = \int_{\Xcal} \text{E}_{\nrm'} \left[ \frac{ \text{E}_{\bar{\nrm} | \nrm'} \left[ \left( \alpha'(x) \mu_{\yrm | \xrm}(x) + \int_{\Ycal} y \bar{\nrm}(y,x) \mathrm{d}y \right)^2 \right] }{(\alpha_0+N) \big(\alpha'(x) + \nrm'(x) \big)} \right] \mathrm{d}x \nonumber
+\end{IEEEeqnarray}
+
+
+Evaluating the conditional expectation,
+\begin{IEEEeqnarray}{L}
+\text{E}_{\bar{\nrm} | \nrm'} \left[ \left( \alpha'(x) \mu_{\yrm | \xrm}(x) + \int_{\Ycal} y \bar{\nrm}(y,x) \mathrm{d}y \right)^2 \right] \\
+\quad = \alpha'(x)^2 \mu_{\yrm | \xrm}(x)^2 + 2 \alpha'(x) \mu_{\yrm | \xrm}(x) \int_{\Ycal} y \delta(0) \frac{\nrm'(x)}{\delta(0)} \frac{\delta(0)^{-1} \alpha(y,x)}{\delta(0)^{-1} \alpha'(x)} \mathrm{d}y \nonumber \\
+\qquad + \delta(0)^2 \frac{\delta(0)^{-1} \nrm'(x)}{\big( \delta(0)^{-1}\alpha'(x) \big) \big( \delta(0)^{-1}\alpha'(x) + 1 \big)} \int_{\Ycal} \int_{\Ycal} y y' \Bigg[ \left( \frac{\nrm'(x)}{\delta(0)} - 1 \right) \frac{\alpha(y,x)}{\delta(0)} \frac{\alpha(y',x)}{\delta(0)} \nonumber \\
+\qquad + \left( \frac{\alpha'(x)}{\delta(0)} + \frac{\nrm'(x)}{\delta(0)} \right) \frac{\alpha(y,x)}{\delta(0)} \delta(y-y') \Bigg] \mathrm{d}y \mathrm{d}y' \nonumber \\
+\quad = \alpha'(x)^2 \mu_{\yrm | \xrm}(x)^2 + 2 \alpha'(x) \nrm'(x) \mu_{\yrm | \xrm}(x)^2 \nonumber \\
+\qquad + \frac{\nrm'(x)}{\alpha'(x)\big( \alpha'(x)+\delta(0) \big)} \Big[ \big( \nrm'(x) - \delta(0) \big) \alpha'(x)^2 \mu_{\yrm | \xrm}(x)^2 + \delta(0) \big( \alpha'(x)+\nrm'(x) \big) \alpha'(x) \text{E}\big[ \yrm^2 | \xrm \big](x) \Big] \nonumber \\
+\quad = \frac{\alpha'(x)+\nrm'(x)}{\alpha'(x)+\delta(0)} \Big[ \mu_{\yrm | \xrm}(x)^2 \alpha'(x) \big( \alpha'(x) + \nrm'(x) + \delta(0) \big) + \text{E}\big[ \yrm^2 | \xrm \big](x) \delta(0) \nrm'(x) \Big] \nonumber
+\end{IEEEeqnarray}
+
+Plugging,
+\begin{IEEEeqnarray}{L}
+\text{E}_{\xrm,\bar{\nrm}} \Big[ \big( \text{E}_{\yrm | \xrm,\bar{\nrm}}[\yrm] \big)^2 \Big] \\
+\quad = \int_{\Xcal} \frac{ \text{E}_{\nrm'} \Big[ \mu_{\yrm | \xrm}(x)^2 \alpha'(x) \big( \alpha'(x) + \nrm'(x) + \delta(0) \big) + \text{E}\big[ \yrm^2 | \xrm \big](x) \delta(0) \nrm'(x) \Big] }{(\alpha_0+N) \big( \alpha'(x)+\delta(0) \big)} \mathrm{d}x \nonumber \\ 
+\quad = \int_{\Xcal} \frac{\mu_{\yrm | \xrm}(x)^2 \alpha'(x) \big( \alpha'(x) + N \alpha_0^{-1} \alpha'(x) + \delta(0) \big) + \text{E}\big[ \yrm^2 | \xrm \big](x) \delta(0) N \alpha_0^{-1} \alpha'(x)}{(\alpha_0+N) \big( \alpha'(x)+\delta(0) \big)} \mathrm{d}x \nonumber \\ 
+\quad = \int_{\Xcal} \frac{\alpha'(x)}{\alpha_0} \frac{\mu_{\yrm | \xrm}(x)^2 \big( \alpha_0 \alpha'(x) + N \alpha'(x) + \delta(0) \alpha_0 \big) + \text{E}\big[ \yrm^2 | \xrm \big](x) \delta(0) N}{(\alpha_0+N) \big( \alpha'(x)+\delta(0) \big)} \mathrm{d}x \nonumber \\
+\quad = \text{E}_{\xrm} \left[ \frac{\mu_{\yrm | \xrm}^2 \big( \alpha_0 \alpha'(\xrm) + N \alpha'(\xrm) + \delta(0) \alpha_0 \big) + \text{E}\big[ \yrm^2 | \xrm \big] \delta(0) N}{(\alpha_0+N) \big( \alpha'(\xrm)+\delta(0) \big)} \right] \nonumber
+\end{IEEEeqnarray}
+
+Combining produces the risk,
+\begin{IEEEeqnarray}{L}
+\Rcal(f^*) = \text{E}_{\xrm} \left[ \frac{\alpha_0 \alpha'(\xrm) + \alpha_0 \delta(0) + N \alpha'(\xrm)}{(\alpha_0+N)\big( \alpha'(\xrm)+\delta(0) \big)} \Sigma_{\yrm | \xrm} \right] \\
+= \text{E}_{\xrm} \left[ \frac{\text{P}(\xrm) + (\alpha_0+N)^{-1} \delta(0)}{\text{P}(\xrm) + \alpha_0^{-1} \delta(0)} \Sigma_{\yrm | \xrm} \right] \nonumber
+\end{IEEEeqnarray}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+
+\appendix
+
+
+
+\chapter{}
+
+PGR: notation/formatting
+
+PGR: references
+
+
+\section{Multinomial Distribution Properties}
+\label{app:mult}
+
+\subsection{Aggregation}
+
+PGR: reference?
+
+A defining characteristic of a Multinomial random function is that its aggregations are also Multinomial. Consider a random function $\bar{\nrm} \sim \text{Mult}(N,\theta)$ over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,S(z),\ldots \right\}$, $z \in \Zcal$; the transformed random process $\nrm'(z) \equiv \sum_{y \in S(z)} \bar{\nrm}(y)$ is neccessarily Multinomial with sum $N$ and parameterizing function $\theta'(z) = \sum_{y \in S(z)} \theta(y)$.
+
+To demonstrate this, observe
+\begin{IEEEeqnarray}{rCl}
+\text{P}_{\bm{\mathrm{n}}'}(\bm{n}') & = & \ldots \sum_{\sum_{y \in S(z)} \bar{n}(y) = n'(z)} \ldots \text{P}_{\nbarrm}(\bm{\bar{n}}) \\
+& = & \Ccal(\bm{n}') \prod_{z \in \Zcal} \sum_{\sum_{y \in S(z)} \bar{n}(y) = n'(z)} \Ccal\big( \{ \bar{n}(y): y \in S(z) \} \big) \prod_{y \in S(z)} \theta(y)^{\bar{n}(y)} \nonumber \\
+& = & \Ccal(\bm{n}') \prod_{z \in \Zcal} \theta'(z)^{n'(z)} \nonumber \;,
+\end{IEEEeqnarray}
+where the multinomial theorem has been used.
+
+PGR: multinomial theorem reference?
+
+
+
+
+\subsection{Conditioned on its Aggregation}
+
+If the multinomial random function $\bar{\nrm}$ is conditioned on its aggregation over the partition $\left\{ \ldots,S(z),\ldots \right\}$, $z \in \Zcal$, the disjoint segements $\bar{\nrm}(y)$, $y \in S(z)$ become independent multinomial random functions,
+\begin{IEEEeqnarray}{rCl}
+\text{P}(\bar{\nrm} | \nrm') & = & \frac{\text{P}(\bar{\nrm}) }{\text{P}(\nrm')} \text{P}(\nrm' | \bar{\nrm}) \\ 
+& = & \frac{\Ccal(\bar{\nrm}) \prod_{y \in \Ycal} \theta(y)^{\bar{\nrm}(y)}}{\Ccal(\nrm') \prod_{z \in \Zcal} \theta'(z)^{n'(z)}} \nonumber \\
+& = & \prod_{z \in \Zcal} \Bigg[ \Ccal\Big( \big\{ \bar{\nrm}(y) : y \in S(z) \big\} \Big) \prod_{y \in S(z)} \frac{\theta(y)}{\theta'(z)}^{\bar{\nrm}(y)} \Bigg] \nonumber \\
+& = & \prod_{z \in \Zcal} \text{Mult}\Big( \big\{ \bar{\nrm}(y) : y \in S(z) \big\} ; \nrm'(z) , \big\{ \theta(y)/\theta'(z) : y \in S(z) \big\} \Big) \nonumber \\
+&& \quad \forall \bar{\nrm} \in \left\{ {\mathbb{N}^+}^{\Ycal} : \sum_{y \in S(z)} \bar{n}(y) = n'(z), \quad \forall z \in \Zcal \right\} \;.
+\end{IEEEeqnarray}
+Observe that the segment over the set $S(z)$ sums to $\nrm'(z)$ and is parameterized by the normalized segment of $\theta$.
+
+
+
+\section{Dirichlet PDF conditioned on its Aggregation}
+\label{app:Dir_agg}
+
+PGR: aggregation reference??? 
+
+PGR: remove beta set arguments by introducing alpha sub z?
+
+This section details an important property of Dirichlet distributed random variables and processes. The following development first considers discrete Dirichlet processes and then extends to continuous processes. 
+
+Let the process $\theta \in \Theta = \left\{ {\mathbb{R}^+}^{\Ycal} : \sum_{y \in \Ycal} \theta(y) = 1 \right\}$ be Dirichlet with parameterizing function $\alpha \in {\mathbb{R}_{> 0}}^{\Ycal}$; its aggregation $\theta' \in \left\{ {\mathbb{R}^+}^{\Zcal} : \sum_{z \in \Zcal} \theta'(z) = 1 \right\}$, $\theta'(z) \equiv \sum_{y \in S(z)} \theta(y)$ is thus also Dirichlet and has a parameterizing function $\alpha' \in {\mathbb{R}_{> 0}}^{\Zcal}$, $\alpha'(z) \equiv \sum_{y \in S(z)} \alpha(y)$.
+
+The PDF of the original process $\theta$ conditioned on its aggregation $\theta'$ can be formulated as
+\begin{IEEEeqnarray}{rCl}
+\text{p}(\theta | \theta') & = & \frac{\text{p}(\theta' | \theta)\text{p}(\theta)}{\text{p}(\theta')} \\
+& = & \frac{\beta(\alpha') \prod_{y \in \Ycal} \theta(y)^{\alpha(y)-1}}{\beta(\alpha) \prod_{z \in \Zcal} \theta'(z)^{\alpha'(z)-1}} \prod_{z \in \Zcal} \delta\left( \theta'(z) - \sum_{y \in S(z)} \theta(y) \right) \nonumber \\
+& = & \prod_{z \in \Zcal} \Bigg[ \beta\Big( \big\{ \alpha(y) : y \in S(z) \big\} \Big)^{-1} \frac{\prod_{y \in S(z)} \theta(y)^{\alpha(y)-1}}{\theta'(z)^{\alpha'(z)-1}} \nonumber \\ 
+&& \qquad \delta\left( \theta'(z) - \sum_{y \in S(z)} \theta(y) \right) \Bigg] \nonumber \\
+& = & \prod_{z \in \Zcal} \Bigg[ \frac{\theta'(z)^{1-|S(z)|}}{\beta\Big( \big\{ \alpha(y) : y \in S(z) \big\} \Big)} \prod_{y \in S(z)} \left(\frac{\theta(y)}{\theta'(z)}\right)^{\alpha(y)-1} \nonumber \\
+&& \qquad \delta\left( \theta'(z) - \sum_{y \in S(z)} \theta(y) \right) \Bigg] \nonumber \;.
+\end{IEEEeqnarray}
+which is defined for $\theta \in \left\{ {\mathbb{R}^+}^{\Ycal} : \sum_{y \in S(z)} \theta(y) = \theta'(z), \quad \forall z \in \Zcal \right\}$. Note that the beta function argument notation has been expanded to allow the interpretation of functions as sets, such that for arbitrary set $A$,
+\begin{IEEEeqnarray}{rCl}
+\beta(A) & = & \frac{\sum_{a \in A} \Gamma(a) }{\Gamma \big( \sum_{a \in A} a \big)} \;.
+\end{IEEEeqnarray} 
+
+Observe that the partitioned segements are conditionally independent; introduce the subscript notation $\theta_z$ to refer to the function segment $\theta_z = \big\{ \theta(y): y \in S(z) \big\}$. The PDF $\text{p}(\theta | \theta')$ can now be decomposed as $\text{p}(\ldots,\theta_z,\ldots | \theta') = \prod_{z \in \Zcal} \text{p}\big( \theta_z | \theta'(z) \big)$
+
+Next, normalize the segments of $\theta$ to form $\tilde{\theta} = (\ldots,\tilde{\theta}_z,\ldots)$, where $\tilde{\theta}_z = \theta_z / \theta'(z)$, and formulate the conditional PDF
+\begin{IEEEeqnarray}{rCl}
+\text{p}\left( \tilde{\theta} | \phi \right) & = & \prod_{z \in \Zcal} \Bigg[ \frac{\prod_{y \in S(z)} \tilde{\theta}_z(y)^{\alpha(y)-1}}{\beta\Big( \big\{ \alpha(y) : y \in S(z) \big\} \Big)} \Bigg] \\
+&& \qquad \forall \tilde{\theta} \in \left\{ {\mathbb{R}^+}^{\Ycal} : \sum_{y \in S(z)} \tilde{\theta}_z(y) = 1, \quad \forall z \in \Zcal \right\} \nonumber \\
+& = & \prod_{z \in \Zcal} \text{Dir}\Big( \tilde{\theta}_z ; \big\{ \alpha(y) : y \in S(z) \big\} \Big) \nonumber \;.
+\end{IEEEeqnarray}
+Thus after conditioning, the normalized segments $\tilde{\theta}_z$ are Dirichlet distributed, independent of one another, and independent of the aggregation $\theta'$. 
+
+This principle holds for continuous Dirichlet processes $\theta$ as well - the segments $\tilde{\theta}_z$ are now continuous Dirichlet processes.
+
+PGR: keep delta notation for set??? DELTA LACKS INEQUALITIES?!
+
+
+
+
+
+\section{Dirichlet-Multinomial conditioned on its Aggregation} 
+\label{app:DM_agg}
+
+PGR: aggregation reference?
+
+A defining characteristic of a Dirichlet-Multinomial random function is that its aggregations are also Dirichlet-Multinomial. Consider a DM random function $\bar{\nrm} \sim \text{DM}(N,\alpha)$ over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,S(z),\ldots \right\}$, $z \in \Zcal$; the transformed random process $\nrm'(z) \equiv \sum_{y \in S(z)} \bar{\nrm}(y)$ is neccessarily Dirichlet-Multinomial with parameterizing function $\alpha'(z) = \sum_{y \in S(z)} \alpha(y)$.
+
+It can be shown that conditioned on the aggregation $\nrm'$, the segments $\big\{ \bar{\nrm}(y) : y \in S(z) \big\}$ of the original random function become independent Dirichlet-Multinomial random functions, such that
+\begin{IEEEeqnarray}{rCl}
+\text{P}(\bar{\nrm} | \nrm') & = & \frac{\text{P}(\bar{\nrm})}{\text{P}(\nrm')} \text{P}(\nrm' | \bar{\nrm}) \\ 
+& = & \frac{\Ccal(\bar{\nrm}) \beta(\alpha)^{-1} \beta(\alpha+\bar{\nrm})}{\Ccal(\nrm') \beta(\alpha')^{-1} \beta(\alpha'+\nrm')} \prod_{z \in \Zcal} \delta\left[ \nrm'(z),\sum_{y \in S(z)} \bar{\nrm}(y) \right] \nonumber \\
+& = & \left( \prod_{z \in \Zcal} \frac{\Gamma\big( \alpha'(z)+\nrm'(z) \big)}{\nrm'(z)! \Gamma\big( \alpha'(z) \big)} \right)^{-1} \left( \prod_{y \in \Ycal} \frac{\Gamma\big( \alpha(y)+\bar{\nrm}(y) \big)}{\bar{\nrm}(y)! \Gamma\big( \alpha(y) \big)} \right) \nonumber \\
+&& \quad \prod_{z \in \Zcal} \delta\left[ \nrm'(z),\sum_{y \in S(z)} \bar{\nrm}(y) \right] \nonumber \\
+& = & \prod_{z \in \Zcal} \left[ \delta\left[ \nrm'(z),\sum_{y \in S(z)} \bar{\nrm}(y) \right] \frac{\nrm'(z)! \Gamma\big( \alpha'(z) \big)}{\Gamma\big( \alpha'(z)+\nrm'(z) \big)} \prod_{y \in S(z)} \frac{\Gamma\big( \alpha(y)+\bar{\nrm}(y) \big)}{\bar{\nrm}(y)! \Gamma\big( \alpha(y) \big)} \right] \nonumber \\
+& = & \prod_{z \in \Zcal} \text{DirMult}\Big( \big\{ \bar{\nrm}(y) : y \in S(z) \big\} ; \nrm'(z), \big\{ \alpha(y) : y \in S(z) \big\} \Big) \nonumber \;,
+\end{IEEEeqnarray}
+where $\Ccal$ is the multinomial coefficient operator defined earlier. 
+
+PGR: delta set definition? or forall? DELTA LACKS INEQUALITIES?!
+
+
+
+
+
+
+\section{First and Second moments of a Dirichlet Process} \label{app:E_DP}
+
+In this section, it is shown that the expected value of a Dirichlet process $\theta \sim \text{DP}(\alpha)$ is 
+\begin{equation}
+\text{E}\big[ \theta(y) \big] = \frac{\alpha(y)}{\alpha_0} \;,
+\end{equation}
+where $\alpha_0 = \int_{\Ycal} \alpha(y) \mathrm{d} y$.
+
+The defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Define the partition of $\Ycal$, $\big\{ S(y),S^c(y) \big\}$ where $S(y) = \{ t \in \Ycal : t \leq y \}$. The transformed random variable $\phi(y) = \text{P}(t \leq y | \theta) = \int_{-\infty}^y \theta(t) \mathrm{d} t$ is thus a Beta random variable with parameters $\lambda = \int_{-\infty}^y \alpha(t) \mathrm{d} t$ and $\lambda^c = \int_y^\infty \alpha(t) \mathrm{d} t$. Using the formula for the expected value of a beta random variable, note that
+\begin{IEEEeqnarray}{rCl}
+\text{E}_\theta\big[ \phi(t) \big] & = & \frac{\lambda}{\lambda+\lambda^c} \\
+& = & \frac{\int_{-\infty}^y \alpha(t) \mathrm{d} t}{\alpha_0} = \int_{-\infty}^y \text{E}\big[ \theta(t) \big] \mathrm{d} t \nonumber \;.
+\end{IEEEeqnarray}
+Differentiating with respect to $y$, we have the expected value of the DP.
+
+PGR: beta RV reference???
+
+Next, the correlation function is shown to be 
+\begin{equation}
+\text{E}\big[ \theta(y_1)\theta(y_2) \big] = \frac{\alpha(y_1)\alpha(y_2) + \alpha(y_1)\delta(y_1-y_2)}{\alpha_0(\alpha_0+1)} \;.
+\end{equation}
+First, assume $y_2 \geq y_1$ and define a new partition of $\Ycal$, $\big\{ (-\infty,y_1], (y_1,y_2], (y_2,\infty) \big\}$. By the aggregation property, the random vector $\left( \int_{-\infty}^{y_1} \theta(t) \mathrm{d} t, \int_{y_1}^{y_2} \theta(t) \mathrm{d} t, \int_{y_2}^{\infty} \theta(t) \mathrm{d} t \right)$ is Dirichlet with parameters $\left( \int_{-\infty}^{y_1} \alpha(t) \mathrm{d} t, \int_{y_1}^{y_2} \alpha(t) \mathrm{d} t, \int_{y_2}^{\infty} \alpha(t) \mathrm{d} t \right)$.
+
+Define the function
+\begin{IEEEeqnarray}{L}
+g(t_1,t_2) = \text{E}\left[ \int_{-\infty}^{y_1} \theta(t_1) \mathrm{d} t_1 \int_{-\infty}^{y_2} \theta(t_2) \mathrm{d} t_2 \right] \\
+\quad = \text{E}\left[ \left( \int_{-\infty}^{y_1} \theta(t_1) \mathrm{d} t_1 \right)^2 + \left( \int_{-\infty}^{y_1} \theta(t_1) \mathrm{d} t_1 \right) \left( \int_{y_1}^{y_2} \theta(t_2) \mathrm{d} t_2 \right) \right] \nonumber \\
+\quad = \frac{\left( \int_{-\infty}^{y_1} \alpha(t_1) \mathrm{d} t_1 \right) \left( 1 + \int_{-\infty}^{y_1} \alpha(t_1) \mathrm{d} t_1 \right) + \left( \int_{-\infty}^{y_1} \alpha(t_1) \mathrm{d} t_1 \right) \left( \int_{y_1}^{y_2} \alpha(t_2) \mathrm{d} t_2 \right)}{\alpha_0(\alpha_0+1)} \nonumber \\
+\quad = \frac{\left( \int_{-\infty}^{y_1} \alpha(t_1) \mathrm{d} t_1 \right) \left( \int_{-\infty}^{y_2} \alpha(t_2) \mathrm{d} t_2 \right) + \left( \int_{-\infty}^{y_1} \alpha(t_1) \mathrm{d} t_1 \right)}{\alpha_0(\alpha_0+1)} \quad \forall y_2 \geq y_1 \nonumber \;.
+\end{IEEEeqnarray}
+Following the same steps provides the values of $g$ for $t_2 \leq t_1$; the combined formula can be given as
+\begin{IEEEeqnarray}{L}
+g(t_1,t_2) = \frac{\left( \int_{-\infty}^{y_1} \alpha(t_1) \mathrm{d} t_1 \right) \left( \int_{-\infty}^{y_2} \alpha(t_2) \mathrm{d} t_2 \right) + \left( \int_{-\infty}^{\min(y_1,y_2)} \alpha(t_1) \mathrm{d} t_1 \right)}{\alpha_0(\alpha_0+1)} \;. 
+\end{IEEEeqnarray}
+Finally,
+\begin{IEEEeqnarray}{L}
+\text{E}\big[ \theta(y_1)\theta(y_2) \big] = \frac{\mathrm{d}^2}{\mathrm{d} t_1 \mathrm{d} t_2} g(t_1,t_2) \\
+\quad = \frac{\frac{\mathrm{d}}{\mathrm{d} t_2} \left[ \alpha(y_1) \left( \int_{-\infty}^{y_2} \alpha(t_2) \mathrm{d} t_2 \right) + u(t_2-t_1) \alpha\big( \min(t_1,t_2) \big) \right]}{\alpha_0(\alpha_0+1)} \nonumber \\
+\quad = \frac{\alpha(y_1)\alpha(y_2) + \alpha(y_1)\delta(y_1-y_2)}{\alpha_0(\alpha_0+1)} \nonumber \;.
+\end{IEEEeqnarray}
+
+
+
+
+
+
+
+
+
+
+\section{Proof: Continuous Model Posterior Distribution is Dirichlet Process} \label{app:DP_post}
+
+In this section, it is shown that if the model $\theta \sim \text{DP}(\alpha)$ is a Dirichlet process, then the model conditioned on the training data $\Drm$ is also a Dirichlet process with parameterizing function $\alpha(y) + \sum_{n=1}^N \delta\big( y - \Drm_n \big)$. 
+
+The defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Consider a DP over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,S(z),\ldots \right\}$, $z \in \Zcal$; the transformed random process $\theta'(z) \equiv \int_{S(z)} \theta(y) \mathrm{d} y$ is neccessarily Dirichlet with parameterizing function $\alpha'(z) \equiv \int_{S(z)} \alpha(y) \mathrm{d} y$.
+
+To prove the hypothesis, it is required that
+\begin{IEEEeqnarray}{rCl}
+\theta' | \Drm & \sim & \text{Dir}\big( \alpha' + \bar{N}(\cdot;\Drm) \big) \;,
+\end{IEEEeqnarray}
+where $\bar{N}(z;\Drm) = \int_{S(z)} \sum_{n=1}^N \delta\big( y - \Drm_n \big) \mathrm{d} y = \sum_{n=1}^N \chi\big( \Drm_n;S(z) \big)$. $\chi$ is the indicator function
+\begin{equation}
+\chi(x;S) = \begin{cases} 1 & \text{if } x \in S, \\ 0 & \text{if } x \notin S.  \end{cases}
+\end{equation}
+
+
+PGR: SUFFICIENT STATISTIC FOR D!!!?
+
+To prove the hypothesis, exploit the results of Appendix \ref{app:Dir_agg} to represent the training data distribution conditioned on the aggregation $\theta'$. The conditional distribution of interest is
+\begin{IEEEeqnarray}{L}
+\text{p}(\Drm | \theta') = \text{E}_{\theta | \theta'}\big[ \text{p}(\Drm | \theta) \big] = \text{E}_{\theta | \theta'}\left[ \prod_{n=1}^N \theta\big( \Drm_n \big) \right] \\
+= \prod_{z \in \Zcal} \text{E}_{\theta_z | \theta'(z)}\left[ \prod_{n=1}^N \theta_z\big( \Drm_n \big)^{\chi\big( \Drm_n;S(z) \big)} \right] \nonumber \\
+= \left( \prod_{z \in \Zcal} \prod_{n=1}^N \theta'(z)^{\chi\big( \Drm_n;S(z) \big)} \right) \prod_{z \in \Zcal} \text{E}_{\tilde{\theta}_z}\left[ \prod_{n=1}^N \tilde{\theta}_z\big( \Drm_n \big)^{\chi\big( \Drm_n;S(z) \big)} \right] \nonumber \\
+= \left( \prod_{z \in \Zcal} \theta'(z)^{\bar{N}(z;\Drm)} \right) \prod_{z \in \Zcal} \text{E}_{\tilde{\theta}_z}\left[ \prod_{n=1}^N \tilde{\theta}_z\big( \Drm_n \big)^{\chi\big( \Drm_n;S(z) \big)} \right] \nonumber \;,
+\end{IEEEeqnarray}
+Observe that the dependency on $\theta'$ is polynomial. The training data marginal distribution is
+\begin{IEEEeqnarray}{rCl}
+\text{p}(\Drm) & = & \text{E}_{\theta'} \left[ \prod_{z \in \Zcal} \theta'(z)^{\bar{N}(z;\Drm)} \right] \prod_{z \in \Zcal} \text{E}_{\tilde{\theta}_z}\left[ \prod_{n=1}^N \tilde{\theta}_z\big( \Drm_n \big)^{\chi\big( \Drm_n;S(z) \big)} \right] \\
+& = & \frac{\beta\big( \alpha' + \bar{N}(\cdot;\Drm) \big)}{\beta(\alpha')} \prod_{z \in \Zcal} \text{E}_{\tilde{\theta}_z}\left[ \prod_{n=1}^N \tilde{\theta}_z\big( \Drm_n \big)^{\chi\big( \Drm_n;S(z) \big)} \right] \nonumber
+\end{IEEEeqnarray}
+and thus the distribution of interest is
+\begin{IEEEeqnarray}{rCl}
+\text{p}(\theta' | \Drm) & = & \frac{\text{p}(\Drm | \theta') \text{p}(\theta')}{\text{p}(\Drm)} \\
+& = & \frac{\prod_{z \in \Zcal} \theta'(z)^{\alpha'(z)+\bar{N}(\cdot;\Drm)-1}}{\beta\big( \alpha' + \bar{N}(z;\Drm) \big)} \nonumber \\
+& = & \text{Dir}\left( \theta' ; \alpha' + \bar{N}(\cdot;\Drm) \right) \nonumber \;.
+\end{IEEEeqnarray}
+This proves the hypothesis.
+
+
+
+
+\section{The Dirichlet-Multinomial Process} \label{app:DMP}
+
+\subsection{Definition}
+
+This section introduces a new random process, referred to as the Dirichlet-Multinomial process (DMP). It is the generalization of the Dirichlet-Multinomial distribution for i.i.d. samples drawn from a continuous distribution; the underlying distribution is characterized by a Dirchlet process with parameter $\alpha$. The Dirichlet-Multinomial process assumes functions from the set $\left\{ \bar{n} \in {\mathbb{R}^+}^{\Ycal} : \int_{\Ycal} \bar{n}(y) \mathrm{d} y = N \right\}$ and is parameterized by a function $\alpha : \Ycal \mapsto \mathbb{R}_{>0}$.
+
+Analagous to the Dirichlet and Dirichlet-Multinomial distributions for discrete spaces, the Dirichlet-Multinomial process inherits the aggregation property from its prior random process. That is, for a Dirichlet-Multinomial process $\bar{\nrm} \in \left\{ \bar{n} \in {\mathbb{R}^+}^{\Ycal} : \int_{\Ycal} \bar{n}(y) \mathrm{d} y = N \right\}$ and a partition of $\Ycal$, $\left\{ \ldots,S(z),\ldots \right\}$, $z \in \Zcal$, the transformed random process $\nrm'(z) \equiv \int_{S(z)} \bar{\nrm}(y) \mathrm{d} y$ is neccessarily Dirichlet-Multinomial with parameterizing function $\alpha'(z) \equiv \int_{S(z)} \alpha(y) \mathrm{d} y$.
+
+PGR: tilde not prime?
+
+\subsection{Proof that $\sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DMP}
+
+Next, it is demonstrated that the random process $\bar{\nrm}(y) \equiv \bar{N}(y;\Drm) = \sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DMP, given that $\text{p}(\Drm|\theta) = \prod_{n=1}^N \theta\big( \Drm_n \big)$ and $\theta \sim \text{DP}(\alpha)$. 
+
+Observe that $\nrm'(z) \equiv \sum_{n=1}^N \chi\big( \Drm_n;S(z) \big)$, where $\chi$ is the indicator function
+\begin{equation}
+\chi(x;S) = \begin{cases} 1 & \text{if } x \in S, \\ 0 & \text{if } x \notin S.  \end{cases}
+\end{equation}
+and note that $\text{P}\Big( \chi\big( \Drm_n;S(z) \big) = 1 \big| \theta \Big) = \int_{S(z)} \theta(y) \mathrm{d} y$. As such, $\nrm'$ conditioned on the model $\theta$ is characterized by a multinomial distribution 
+\begin{equation}
+\text{P}(\nrm' | \theta) = \Ccal(\nrm') \prod_{z \in \Zcal} \left( \int_{S(z)} \theta(y) \mathrm{d} y \right)^{\nrm'(z)} = \text{Mult}\left( \nrm' ; \theta'(z) \right) \;,
+\end{equation}
+where $\theta'(z) \equiv \int_{S(z)} \theta(y) \mathrm{d} y$, $z \in \Zcal$.
+
+By the aggregation property of the Dirichlet process $\theta$, the parameters of this multinomial distribution are characterized as $\theta' \sim \text{Dir}\left( \alpha' \right)$, and thus $\tilde{\nrm}$ is drawn from a Dirichlet-Multinomial PMF with the same parameters $\alpha'$. As this holds for any partition of $\Ycal$, $\bar{\nrm}$ is a Dirichlet-Multinomial Process.
+
+
+\subsection{Mean and Correlation Functions}
+
+In this subsection the mean and correlation functions of a DMP are expressed. The mean function is
+\begin{IEEEeqnarray}{rCl}
+\text{E}\big[ \bar{\nrm}(y) \big] & = & \sum_{n=1}^N \text{E}_{\Drm_n}\Big[\delta\big( y-\Drm_n \big) \Big] \\
+& = & \sum_{n=1}^N \text{P}_{\Drm_n}(y) \nonumber \\
+& = & N \frac{\alpha(y)}{\alpha_0} \nonumber \;.
+\end{IEEEeqnarray}
+
+The correlation function is
+\begin{IEEEeqnarray}{rCl}
+\text{E}\big[ \bar{\nrm}(y) \bar{\nrm}(y') \big] & = & \sum_{n=1}^N \text{E}_{\Drm_n}\Big[\delta\big( y-\Drm_n \big) \Big] \\
+& = & \sum_{n=1}^N \sum_{n'=1}^N \text{E}_{\Drm_n,\Drm(n')}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y-\Drm(n') \big) \Big] \nonumber \\
+& = & \sum_n \text{E}_{\Drm_n}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_n \big) \Big] + \nonumber \\
+&& \quad \sum_{n \neq n'} \text{E}_{\Drm_n,\Drm(n')}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm(n') \big) \Big] \nonumber \\
+& = & \sum_n \int_{\Ycal} \frac{\alpha(\tilde{y})}{\alpha_0} \delta(y-\tilde{y}) \delta(y'-\tilde{y}) + \nonumber \\
+&& \quad \sum_{n \neq n'} \int_{\Ycal} \int_{\Ycal} \frac{\alpha(\tilde{y}) \alpha(\tilde{y}') + \alpha(\tilde{y}) \delta(\tilde{y}-\tilde{y}')}{\alpha_0 (\alpha_0+1)} \delta(y-\tilde{y}) \delta(y-\tilde{y}') \nonumber \\
+& = & N \frac{\alpha(y)}{\alpha_0} \delta(y-y') + N(N-1) \frac{\alpha(y) \alpha(y') + \alpha(y) \delta(y-y')}{\alpha_0 (\alpha_0+1)} \nonumber \\
+& = & \frac{N}{\alpha_0 (\alpha_0+1)} \big[ (N-1)\alpha(y) \alpha(y') + (\alpha_0+N) \alpha(y) \delta(y-y') \big] \nonumber \;.
+\end{IEEEeqnarray}
+
+
+
+\subsection{Continuous aggregation}
+
+If $\bar{\nrm}$ is a Dirichlet-Multinomial process over a continuous space $\Ycal$, then conditioning on its discrete aggregation $\nrm'$ produces independent Dirichlet-Multinomial processes $\big\{ \bar{\nrm}(y) : y \in S(z) \big\} \sim \text{DMP}\Big( \nrm'(z),\big\{ \alpha(y) : y \in S(z) \big\} \Big)$ over the partition spaces $S(z)$.
+
+The previous result can be extended to conditioning on a continuous aggregation. Define $\bar{\nrm} \sim \text{DMP}(N,\alpha)$ over the set $\Ycal \times \Xcal$ and the aggregation DMP $\nrm'(x) = \int_{\Ycal} \bar{\nrm}(y,x) \mathrm{d}y$ over set $\Xcal$ with parameterizing function $\alpha'(x) = \int_{\Ycal} \alpha(y,x) \mathrm{d}y$.
+
+Use the aggregation propery to introduce a Dirichlet-Multinomial random process $\tilde{\nrm}(y,k) = \int_{\Delta k}^{\Delta (k+1)} \bar{\nrm}(y,x) \mathrm{d}x$ with parameter $\tilde{\alpha}(y,k) = \int_{\Delta k}^{\Delta (k+1)} \alpha(y,x) \mathrm{d}x$. Additionally, introduce its own aggregation, a Dirichlet-Multinomial random variable $\dot{n}(k) = \int_{\Ycal} \tilde{n}(y,k) \mathrm{d}y$ with parameter $\dot{\alpha}(k) = \int_{\Ycal} \tilde{\alpha}(y,k) \mathrm{d}y$. By the conditioning property for discrete aggregations demonstrated previously, $\tilde{\nrm}(\cdot,k) | \dot{\nrm}(k) \sim \text{DMP}\big( \dot{\nrm}(k),\tilde{\alpha}(\cdot,k) \big)$ are independent DMP's.
+
+Note that as $\Delta \to 0$, $\tilde{\nrm}(y,k) \approx \Delta \bar{\nrm}(y,\Delta k)$, $\tilde{\alpha}(y,k) \approx \Delta \alpha(y,\Delta k)$, and $\dot{\nrm}(k) \approx \Delta \nrm'(\Delta k)$. Letting $x \equiv \Delta k$, the statistics of the DMP conditioned on its continuous aggregation can be represented as
+\begin{equation}
+\Delta \bar{\nrm}(\cdot,x) | \Delta \nrm'(k) \sim \text{DMP}\big( \Delta \nrm'(k), \Delta \alpha(\cdot,x) \big) \;.
+\end{equation}
+
+
+
+
+
+
+
+\chapter{}
+
+
+PGR: Many sections redundant given Dirichlet perspective...
+
+PGR: needs notation/formatting scrub
+
+
+
+
+
+
+\section{Maximum \emph{a Posteriori} estimate of $\bm{\theta}$ given $D$} \label{app:MAP_theta}
+
+To determine the MAP estimate of the model PMF $\bm{\theta}$ given the training data $D$, 
+
+\begin{equation}
+\hat{\bm{\theta}}_{MAP}(D) = \argmax_{\bm{\theta} \in \bm{\Theta}} \text{P}(\bm{\theta} | D) \;,
+\end{equation}
+
+we perform contrained optimization. Note that the set $\bm{\Theta} = \left\{ \bm{\theta} \in {\mathbb{R}^+}^{M}: \sum_{m=1}^{M} \theta_m = 1 \right\}$ implies both equality and inequality constraints -- to solve for the maximizing value of the model, we assess the Karush-Kuhn-Tucker (KKT) conditions REF BOYD??? using constraints $g_m(\bm{\theta}) = -\theta_m \leq 0, \quad \forall m = 1,\ldots,M$ and $h(\bm{\theta}) = \sum_{m=1}^M \theta_m = 1$. First, we mention that the regularity conditons are met, as all functions $g$ and $h$ are affine. Next we assess the necessary conditions; they are:
+
+\begin{IEEEeqnarray}{C}
+\nabla_{\bm{\theta}} \text{P}(\bm{\theta}^* | D) = \sum_{m=1}^M \mu_m \nabla_{\bm{\theta}} g_m(\bm{\theta}^*) + \lambda \nabla_{\bm{\theta}} h(\bm{\theta}^*) \label{MAP_t_st} \\ 
+g_m(\bm{\theta}^*) = -\theta^*_m \leq 0, \quad \forall m = 1,\ldots,M \label{MAP_t_p_i} \\
+h(\bm{\theta}^*) = \sum_{m=1}^M \theta^*_m = 1  \label{MAP_t_p_e} \\
+\mu_m \geq 0, \quad \forall m = 1,\ldots,M \label{MAP_t_d} \\
+\mu_m g_m(\bm{\theta}^*) = 0, \quad \forall m = 1,\ldots,M \label{MAP_t_cs}
+\end{IEEEeqnarray}
+
+PROOF STYLE??
+
+Note the simplified notation -- dependence of the minimizer and of the KKT multipliers on training data $D$ is suppressed. We assert that $\bm{\theta}^*(D) = \frac{\bar{\bm{N}}(D)}{N}$, the empirical PMF. It is immediately clear that the emprical PMF satisfies the primal feasibility conditions \eqref{MAP_t_p_i} and \eqref{MAP_t_p_e}. Next, we show that the remaining conditions are met using KKT multipliers,
+
+\begin{equation}
+\mu_m(D) = \begin{cases} N \text{P}_{\bm{\theta} | D} \left( \frac{\bar{\bm{N}}(D)}{N} \right) & \text{if } \bar{N}_m(D) = 0, \\ 0 & \text{if } \bar{N}_m(D) > 0. \end{cases}
+\end{equation}
+
+\begin{equation}
+\lambda(D) =  N \text{P}_{\bm{\theta} | D} \left( \frac{\bar{\bm{N}}(D)}{N} \right) \;.
+\end{equation}
+
+The formula for $\mu(D)$ satisfies the dual feasibility conditon \eqref{MAP_t_d} as well as the complementary slackness condition \eqref{MAP_t_cs}. To satisfy the stationarity condition \eqref{MAP_t_st}, note that,
+
+\begin{equation}
+\frac{\partial}{\partial \theta_m} \text{P}(\bm{\theta} | D) = \begin{cases} \bar{N}_m \theta_m^{-1} \text{P}(\bm{\theta} | D) & \text{if } \bar{N}_m(D) > 0, \\ 0 & \text{if } \bar{N}_m(D) = 0. \end{cases}
+\end{equation}
+
+It is straightforward to show that this final necessary conditon is met. Sufficient conditions??? Second order???
+
+%To complete the proof, we mention that this optimization problem meets the requirements such that the necessary conditions are also sufficient. First, the constraint functions $g$ are convex (since they are affine), and $h$ is also affine. Second, $\text{P}(\bm{\theta} | D)$ 
+
+
+
+%To simplify the proof, we will simply find the maximum over a different set $\bm{\Theta}' = \left\{ \bm{\theta} \in \mathbb{R}^M: \sum_{m=1}^{M} \theta_m = 1 \right\} \supset \bm{\Theta}$ and show that the maximimizing value over $\bm{\Theta}'$ is a member of $\bm{\Theta}$.
+%
+%Now with only equality constraints, we substitute in equation \eqref{P_t_D} for the posterior PDF and apply the method of Lagrange multipliers to find stationary points,
+%
+%\begin{IEEEeqnarray}{rCl}
+%0 & = & \left. \frac{\partial}{\partial \theta_m} \left[ \text{P}(\bm{\theta} | D) + \lambda \left( \sum_{m=1}^M \theta_m - 1 \right) \right] \right|_{\bm{\theta} = \bm{\theta}^*} \\
+%& = &  \bar{N}_m(D) {\theta_m^*}^{-1} \text{P}_{\bm{\theta} | D}(\bm{\theta}^* | D) + \lambda , \qquad m = 1,\ldots,M \;.
+%\end{IEEEeqnarray}
+%
+%Rearranging and summing over $m$, we find $\lambda = -N \text{P}(\bm{\theta} | D)$. Finally,
+%
+%\begin{equation}
+%\bm{\theta}^* = \frac{\bar{\bm{N}}}{N} \;.
+%\end{equation}
+%
+%The single stationary point $\bm{\theta}^* \in {\mathbb{R}^+}^M$ and is thus a member of $\bm{\Theta}$ as well. To complete the proof, we must examine the second-order derivatives to confirm that the stationary point is the global maximum. To this effect, we use a bordered Hessian matrix,
+%
+%\begin{equation}
+%\bm{H}(\bm{\theta},\lambda) = ??? = \begin{bmatrix} 0 & \bm{1}_{1 \times M} \\ \bm{1}_{M \times 1} & \text{P}(\bm{\theta}|D) \text{diag}(\bm{\theta})^{-1} \left( \bar{\bm{N}} \bar{\bm{N}}^{\text{T}} - \text{diag}(\bar{\bm{N}}) \right) \text{diag}(\bm{\theta})^{-1} \end{bmatrix} \;.
+%\end{equation}
+%
+%\begin{equation}
+%\left. \bm{H}(\bm{\theta},\lambda) \right|_{\bm{\theta}^*} = \begin{bmatrix} 0 & \bm{1}_{1 \times M} \\ \bm{1}_{M \times 1} & N^2 \text{P}(\bm{\theta}|D) \left( \bm{1}_{M \times M} - \text{diag}(\bar{\bm{N}})^{-1} \right) \end{bmatrix} \;.
+%\end{equation}
+
+
+
+
+
+
+\section{The Expected Value of $\bar{\nrm}_{\text{max}}$} \label{app:E_N_max}
+
+\subsection{The CMF of $\bar{\nrm}_{\text{max}}$}
+
+REAL PROOF???
+
+The cummulative mass function for $\bar{\nrm}_{\text{max}} = \max_y \bar{\nrm}(y)$,
+
+\begin{IEEEeqnarray}{rCl}
+F_{\bar{\nrm}_{\text{max}}}(n) & = & \text{P}\left( \bar{\nrm}_{\text{max}} \leq n \right) \\
+& = & \binom{N+M-1}{M-1}^{-1} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} \\
+&& \quad \binom{m(n+1)-N-1}{M-1} U\left(n+1-\frac{N+M}{m}\right) \;,
+\end{IEEEeqnarray}
+
+has been found via simulation. Although an exhaustive demonstration of conformity between the provided expression and the numerically determined CMF values has not been performed, the CMF has been confirmed for a variety of values $N$ and $M$.
+
+FIGURES???
+
+
+
+\subsection{In the limit $N \to \infty$}
+
+Having established the CMF for $\bar{\nrm}_{\text{max}}$ and provided a general formula for the expected value in equation ???, we seek a more tractable form to avoid the summation over $n=0,\ldots,N$. Although we do not provide the general expression, we do provide a compact formula for the expected value as $N \to \infty$.
+
+First, we note how the CMF of $\bar{\nrm}_{\text{max}}$ simplifies in this limit. Below, observe how the binomial coefficients including $N$ reduce to a power term and that the argument of the step function simplifies, since the function invariant to scaling.
+
+\begin{IEEEeqnarray}{rCl}
+\lim_{N \to \infty} F_{\bar{\nrm}_{\text{max}}}(n) & = & \lim_{N \to \infty} \binom{N+M-1}{M-1}^{-1} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} \\
+&& \quad \binom{m(n+1)-N-1}{M-1} U\left(n+1-\frac{N+M}{m}\right) \\
+& = & \lim_{N \to \infty} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} U\left(\frac{n}{N}+\frac{1}{N}-\frac{1}{m}-\frac{M}{Nm}\right) \\
+&& \quad \prod_{k=1}^M \frac{m(n+1)-N-k}{N+M-k} \\
+& = & \lim_{N \to \infty} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} U\left( \frac{n}{N}-\frac{1}{m} \right) \left( \frac{mn}{N} - 1 \right)^{M-1} \\
+\end{IEEEeqnarray}
+
+Consider the dependency of the above equation on $n$ as well as on the training set size $N$. We define a continuous function over the unit interval,
+
+\begin{equation}
+p(t) = \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} (mt - 1)^{M-1} U\left( t-\frac{1}{m} \right) \;,
+\end{equation}
+
+such that $p(n/N) = \lim_{N \to \infty} F_{\bar{\nrm}_{\text{max}}}(n)$. This will be used in the following, where we use the CMF to determine the first moment. 
+
+THETA PDF???
+
+START from N - int F???
+
+It should be intuitive that as $N$ trends toward infinity, so does $\text{E}_{\bar{\bm{n}}} \left[ \bar{\nrm}_{\text{max}} \right]$. With this in mind, and given the form of equation \eqref{risk_01_opt}, we proceed to determine the ``normalized'' value of the mean,
+
+\begin{IEEEeqnarray}{rCl}
+\lim_{N \to \infty} \frac{\text{E}_{\bar{\bm{n}}} \left[ \bar{\nrm}_{\text{max}} \right]}{N} & = & \lim_{N \to \infty} N^{-1} \sum_{n=0}^N n 
+\left( F_{\bar{\nrm}_{\text{max}}}(n) - F_{\bar{\nrm}_{\text{max}}}(n-1) \right) \\
+& = & \lim_{N^{-1} \to 0} N^{-1} \sum_{n=1}^N \frac{n}{N} \left( \frac{p(n/N) - p(n/N - N^{-1})}{N^{-1}} \right) \\
+& = & \lim_{N^{-1} \to 0} N^{-1} \sum_{n=1}^N \frac{n}{N} \left. \frac{\mathrm{d} p(t)}{\mathrm{d} t} \right|_{t=n/N}  \\
+& \approx & \int_0^1  t \frac{\mathrm{d} p(t)}{\mathrm{d} t} \mathrm{d} t \;,
+\end{IEEEeqnarray}
+
+where we represent the summation as a Riemann approximation of a tractable integration. Performing integration by parts, we have,
+
+\begin{IEEEeqnarray}{rCl}
+\lim_{N \to \infty} \frac{\text{E}_{\bar{\bm{n}}} \left[ \bar{\nrm}_{\text{max}} \right]}{N} & = & p(1) - \int_0^1 p(t) \mathrm{d} t \\
+& = & p(1) - \frac{1}{M} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} m^{-1} (m-1)^M \;.
+\end{IEEEeqnarray}
+
+We evaluate $p(1)$, as,
+
+\begin{IEEEeqnarray}{rCl}
+p(1) & = & \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} (m - 1)^{M-1}  \\
+& = & \sum_{m=0}^M \binom{M}{m} (-1)^{M-m} (m - 1)^{M-1}  - \binom{M}{0} (-1)^M (-1)^{M-1} \\
+& = & 1 \;,
+\end{IEEEeqnarray}
+
+where we have used the identity $\sum_{m=0}^M \binom{M}{m} (-1)^{M-m}  P_{M-1}(m) = 0$, in which $P_{M-1}(m)$ is a polynomial of degree $M-1$.
+
+REFERENCE Knuth????
+
+Next, we assess the second term in equation ???. We seek to re-use the previous identity. To this effect, we expand the final term,
+
+\begin{IEEEeqnarray}{rCl}
+m^{-1} (m-1)^M & = & \sum_{k=0}^M \binom{M}{k} m^{k-1} (-1)^{M-k} \\
+& = & (-1)^M m^{-1} + \sum_{k=0}^{M-1} \binom{M}{k+1} m^{k} (-1)^{M-1-k} \\
+\end{IEEEeqnarray}
+
+Substituting into the summation???, we first complete the alternating sum over the second term in the previous equation, another $M-1$ order polynomial. 
+
+\begin{IEEEeqnarray}{C}
+\frac{1}{M} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} m^{-1} (m-1)^M \\
+= \frac{1}{M} \sum_{m=1}^M \binom{M}{m} (-1)^{m} m^{-1} -  \left. \frac{1}{M} \binom{M}{m} (-1)^{M-m} \sum_{k=0}^{M-1} \binom{M}{k+1} m^{k} (-1)^{M-1-k} \right|_{m=0} \\
+= 1 + \frac{1}{M} \sum_{m=1}^M \binom{M}{m} (-1)^{m} m^{-1} \;.
+\end{IEEEeqnarray}
+
+Finally, we substitute back into equation ??? to find,
+
+\begin{IEEEeqnarray}{rCl}
+\lim_{N \to \infty} \frac{\text{E}_{\bar{\bm{n}}} \left[ \bar{\nrm}_{\text{max}} \right]}{N} & = & - \frac{1}{M} \sum_{m=1}^M \binom{M}{m} (-1)^{m} m^{-1} \\
+& = & \frac{1}{M} \sum_{m=0}^{M-1} \binom{M}{m+1} (-1)^m (m+1)^{-1} \\
+& = & \sum_{m=0}^{M-1} \binom{M-1}{m} (-1)^m (m+1)^{-2} \;.
+\end{IEEEeqnarray}
+
+...??? 
+
+Next we use the finite difference identities,
+
+\begin{equation}
+\Delta^M f(k) = \sum_{m=0}^M (-1)^{M-m} \binom{M}{m} f(k+m) \;,
+\end{equation}
+
+\begin{equation}
+\Delta^M [u(k)v(k)] = \sum_{m=0}^M \binom{M}{m} \Delta^m u(k) \Delta^{M-m} v(k+m) \;,
+\end{equation}
+
+\begin{equation}
+\Delta^m k^{-1} = (-1)^m k^{-1} \binom{k+m}{m}^{-1} \;,
+\end{equation}
+
+from REFERENCE Knuth??? to reform the alternating binomial summation,
+
+
+\begin{IEEEeqnarray}{rCl}
+\lim_{N \to \infty} \frac{\text{E}_{\bar{\bm{n}}} \left[ \bar{\nrm}_{\text{max}} \right]}{N} & = & (-1)^{M-1} \left. \Delta^{M-1} u(k)^2 \right|_{k=1} \\
+& = & (-1)^{M-1}\sum_{m=0}^{M-1} \binom{M-1}{m} \left. \Delta^m k^{-1} \Delta^{M-m} (k+m)^{-1} \right|_{k=1} \\
+& = & \sum_{m=0}^{M-1} \binom{M-1}{m} (m+1)^{-1} \binom{M}{m+1}^{-1} (m+1)^{-1} \\
+& = & M^{-1} \sum_{m=0}^{M-1} (m+1)^{-1} \\
+& = & M^{-1} \sum_{m=1}^M m^{-1} \;.
+\end{IEEEeqnarray}
+
+Finally, we have a scaled harmonic summation based on $M$.
+
+
+
+\subsection{Maximum of subset of values of nbar}
+
+PGR: incomplete
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

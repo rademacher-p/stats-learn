@@ -1,0 +1,429 @@
+\documentclass[conference]{IEEEtran}
+
+\IEEEoverridecommandlockouts % for thanks footnote
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{bm}
+\usepackage{upgreek}
+
+%\usepackage[retainorgcmds]{IEEEtrantools}
+
+%\usepackage{hyperref}
+
+\usepackage[nottoc]{tocbibind}
+
+
+
+
+\title{Predictive Distribution Estimation for Bayesian Machine Learning using a Dirichlet Process Prior}
+
+
+\author{
+\IEEEauthorblockN{Paul Rademacher}
+\IEEEauthorblockA{U.S. Naval Research Laboratory\\Radar Division\\Washington, DC 20375, USA}
+\thanks{This work was supported by U.S. Naval Research Laboratory and Office of Naval Research.}
+\and
+\IEEEauthorblockN{Milo\v{s} Doroslova\v{c}ki}
+\IEEEauthorblockA{The George Washington University\\Department of Electrical and Computer Engineering\\Washington, DC 20052, USA}
+}
+
+
+
+
+%\graphicspath{ {C:/Users/Paul/Documents/PhD/Dissertation/Documentation/Figures/} }
+\graphicspath{ {../Figures/} }
+
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\DeclareMathOperator{\xrm}{\mathrm{x}}
+\DeclareMathOperator{\Xrm}{\mathrm{X}}
+\DeclareMathOperator{\yrm}{\mathrm{y}}
+\DeclareMathOperator{\Yrm}{\mathrm{Y}}
+\DeclareMathOperator{\Drm}{\mathrm{D}}
+\DeclareMathOperator{\nrm}{\mathrm{n}}
+\DeclareMathOperator{\nbarrm}{\bar{\mathrm{n}}}
+\DeclareMathOperator{\zrm}{\mathrm{z}}
+
+\DeclareMathOperator{\Prm}{\mathrm{P}}
+\DeclareMathOperator{\prm}{\mathrm{p}}
+\DeclareMathOperator{\Erm}{\mathrm{E}}
+\DeclareMathOperator{\Crm}{\mathrm{C}}
+
+\DeclareMathOperator{\Xcal}{\mathcal{X}}
+\DeclareMathOperator{\Ycal}{\mathcal{Y}}
+\DeclareMathOperator{\Dcal}{\mathcal{D}}
+\DeclareMathOperator{\Ncal}{\mathcal{N}}
+\DeclareMathOperator{\Zcal}{\mathcal{Z}}
+\DeclareMathOperator{\Hcal}{\mathcal{H}}
+\DeclareMathOperator{\Fcal}{\mathcal{F}}
+\DeclareMathOperator{\Rcal}{\mathcal{R}}
+\DeclareMathOperator{\Mcal}{\mathcal{M}}
+\DeclareMathOperator{\Scal}{\mathcal{S}}
+\DeclareMathOperator{\Pcal}{\mathcal{P}}
+\DeclareMathOperator{\Lcal}{\mathcal{L}}
+
+\DeclareMathOperator{\Rbb}{\mathbb{R}}
+\DeclareMathOperator{\Nbb}{\mathbb{N}}
+\DeclareMathOperator{\Zbb}{\mathbb{Z}}
+
+\DeclareMathOperator{\Dir}{\mathrm{Dir}}
+\DeclareMathOperator{\DM}{\mathrm{DM}}
+\DeclareMathOperator{\Multi}{\mathrm{Multi}}
+\DeclareMathOperator{\DP}{\mathrm{DP}}
+
+
+
+
+
+
+
+
+
+\begin{document}
+
+\maketitle
+
+
+\begin{abstract}
+In Bayesian treatments of machine learning, the success or failure of the estimator/classifier hinges on how well the prior distribution selected by the designer matches the actual data-generating model. This paper assumes that the model distribution is a realization of a Dirichlet process and assesses the mismatch between the true predictive distribution and the predictive distribution approximated using the training data. It is shown that highly localized Dirichlet priors can overcome the burden of a limited training set when the prior mean is well matched to the true distribution, but will degrade the approximation if the match is poor. A bias/variance trade-off will be demonstrated with illustrative examples.
+\end{abstract}
+
+
+\section{Introduction}
+
+This article investigates how a Bayesian perspective influences the predictive distributions used to make decisions in machine learning applications. The efficacy of Bayesian learning methods depends on how well the prior knowledge imparted by the designer matches reality. The chosen prior distribution over the set of data-generating probability mass functions (PMF) reflects the users confidence that different PMF's are responsible for generating the observed/unobserved random elements. If a highly informative prior is chosen that strongly weights the actual data PMF, low risk learning is possible even with a limited amount of training data; however, if the prior is poorly selected, a good solution may not be achieved. Conversely, a non-informative prior with high variance will always be able to adapt with enough training data; if the amount of data is limited, however, the learning function may not deliver the required performance.
+
+This work assumes that the prior distribution is Dirichlet. The class of Dirichlet probability density functions (PDF) has the desirable properties of full support over the set of possible PMF's and a tractable posterior distribution for independently and identically distributed data \cite{ferguson}. The full support is necessary to ensure that the true underlying model can be identified with enough training samples. Also, control of the Dirichlet parameters can enable both non-informative and informative prior distributions. 
+
+Once the Bayesian assumption is used to form the predictive distribution conditioned on the training data, it will be compared to the true predictive distribution given knowledge of the model PMF. Specifically, the mean and covariance functions of the difference between the two PMF's will be determined. Specific attention will be given to various asymptotic cases of the Dirichlet distribution to illustrate the bias/variance trade-off for both non-informative and informative priors.
+
+
+%\section{Notation}
+
+Throughout this article, italic, roman, and calligraphic fonts, e.g. $x$, $\xrm$, and $\Xcal$, are reserved for specific values, random elements, and sets, respectively. The notation $\Ycal^{\Xcal}$ represents the set of functions $g: \Xcal \mapsto \Ycal$. For functions $g: \Xcal \mapsto \Zcal^{\Ycal}$, $g(x) \in \Zcal^{\Ycal}$ is a function and $g(y;x) \in \Zcal$ is a scalar.
+
+
+
+
+
+\section{Objective} \label{sec:objective}
+
+%Consider an observable discrete random element $\xrm \in \Xcal$ and and unobservable discrete random element $\yrm \in \Ycal$ which are jointly distributed according to an unknown PMF $\theta \in \Theta = \left\{ \theta \in {\Rbb_{\geq 0}}^{\Ycal \times \Xcal}: \sum_{y \in \Ycal} \sum_{x \in \Xcal} \theta(y,x) = 1 \right\}$. As such, $\Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) = \theta(y,x)$. Also observed is a random sequence of $N$ samples generated from $\theta$, denoted $\Drm \in \Dcal = \{\Ycal \times \Xcal\}^N$. The $N$ data pairs are conditionally independent from one another and are identically distributed as $\Prm_{\Drm_n | \uptheta}(y,x | \theta) = \theta(y,x)$. The samples are also conditionally independent from $(\yrm,\xrm)$. Thus,
+%\begin{equation}
+%\Prm_{\yrm,\xrm,\Drm | \uptheta}(y,x,D | \theta) = \Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) \prod_{n=1}^N \Prm_{ \Drm_n | \uptheta }\big( D_n | \theta \big) \;.
+%\end{equation}
+
+Consider an observable discrete random element $\xrm \in \Xcal$ and and unobservable discrete random element $\yrm \in \Ycal$ which are jointly distributed according to an unknown PMF $\theta \in \Theta = \left\{ \theta \in {\Rbb_{\geq 0}}^{\Ycal \times \Xcal}: \sum_{y \in \Ycal} \sum_{x \in \Xcal} \theta(y,x) = 1 \right\}$, such that $\Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) = \theta(y,x)$. Also observed is a random sequence of $N$ samples generated from $\theta$, denoted $\Drm \in \Dcal = \{\Ycal \times \Xcal\}^N$. The $N$ data pairs are identically distributed as $\Prm_{\Drm_n | \uptheta}(y,x | \theta) = \theta(y,x)$ and are conditionally independent from $(\yrm,\xrm)$ and from one another, such that
+\begin{equation}
+\Prm_{\yrm,\xrm,\Drm | \uptheta}(y,x,D | \theta) = \Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) \prod_{n=1}^N \Prm_{ \Drm_n | \uptheta }\big( D_n | \theta \big) \;.
+\end{equation}
+
+Define the decision function $f: \Dcal \mapsto \Hcal^{\Xcal}$, where $\Hcal$ is the decision space. The metric guiding the design of $f$ is a loss function $\Lcal: \Hcal \times \Ycal \mapsto \Rbb_{\geq 0}$ which penalizes the decision $h \in \Hcal$ based on the value of $\yrm$. The conditional expected loss, or conditional ``risk'', is
+\begin{equation} \label{eq:risk_cond}
+\Rcal_{\uptheta}(f) = \Erm_{\xrm,\Drm | \uptheta} \bigg[ \Erm_{\yrm | \xrm,\uptheta} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \;.
+\end{equation}
+
+If the model $\theta$ were known, a decision $h = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm,\uptheta}\big[ \Lcal(h,\yrm) \big]$ could be made to minimize the objective for a given set of observations. It can be shown that given the model $\theta$, the unobserved element $\yrm$ is conditionally independent of the training data $\Drm$. As such, a ``clairvoyant'' decision function $f_{\uptheta}: \Theta \mapsto \Hcal^{\Xcal}$ could be designed that is dependent only on the true predictive distribution $\Prm_{\yrm | \xrm,\uptheta}$.
+
+However, as the model $\theta$ is not observed, this predictive PMF is unknown and the conditional risk objective is not feasible for optimization. To remove the dependency on $\theta$, the model is treated as a random process $\uptheta$ with PDF $\prm_\uptheta$ and a Bayesian approach is adopted. The Bayes risk can be formulated as
+\begin{IEEEeqnarray}{L} \label{eq:risk}
+\Rcal(f) = \Erm_{\uptheta}\Big[ \Rcal_{\uptheta}(f) \Big] = \Erm_{\xrm,\Drm}\bigg[ \Erm_{\yrm | \xrm,\Drm} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \quad \; \;
+\end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{rCl} \label{eq:risk}
+%\Rcal(f) & = & \Erm_{\uptheta}\Big[ \Rcal_{\uptheta}(f) \Big] \\
+%& = & \Erm_{\xrm,\Drm}\bigg[ \Erm_{\yrm | \xrm,\Drm} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \nonumber
+%\end{IEEEeqnarray}
+and $\yrm$, $\xrm$, and $\Drm$ are treated as jointly distributed random elements.
+
+For a given set of observations, the Bayes optimal decision is $h = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm}\big[ \Lcal(h,\yrm) \big]$, dependent on the Bayesian predictive PMF $\Prm_{\yrm | \xrm,\Drm}$. Using Bayes theorem, it can be shown that $\Prm_{\yrm | \xrm,\Drm} = \Erm_{\uptheta | \xrm,\Drm} \big[ \Prm_{\yrm | \xrm,\uptheta} \big]$, a combination of the possible predictive PMF's using the model posterior PDF $\prm_{\uptheta | \xrm,\Drm}$. As such, the Bayesian predictive distribution can be interpreted as an estimate of the true predictive distribution $\Prm_{\yrm | \xrm,\uptheta}$.
+
+
+
+
+
+\section{Bayesian Prediction}
+
+This section introduces the Dirichlet prior distribution for the model $\uptheta$ and uses it to formulate the estimated predictive distribution $\Prm_{\yrm | \xrm,\Drm}$.
+
+
+\subsection{Model PDF, $\prm_{\uptheta}$} \label{sec:P_theta}
+
+The Dirichlet PDF for the model $\uptheta \in \Theta$ is \cite{bishop}
+\begin{IEEEeqnarray}{rCl}
+\prm_\uptheta(\theta) & = & \beta(\alpha)^{-1} \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\alpha(y,x) - 1} \;,
+\end{IEEEeqnarray}
+where the user-selected PDF parameters $\alpha : \Ycal \times \Xcal \mapsto \Rbb^+$ are introduced and $\beta$ is the generalized beta function.
+
+The parameter $\alpha$ controls around which models $\theta$ the PDF concentrates and how strongly. For convenience, introduce the concentration parameter $\alpha_0 \equiv \sum_{y \in \Ycal} \sum_{x \in \Xcal} \alpha(y,x)$. 
+
+The mean and covariance functions of the model are \cite{bishop}
+\begin{equation}
+\mu_{\uptheta}(y,x) = \frac{\alpha(y,x)}{\alpha_0}
+\end{equation}
+and
+\begin{IEEEeqnarray}{L}
+\Sigma_{\uptheta}(y,x,y',x') \\
+\quad = \frac{\mu_{\uptheta}(y,x) \delta[y,y'] \delta[x,x'] - \mu_{\uptheta}(y,x) \mu_{\uptheta}(y',x')}{\alpha_0+1} \nonumber \;,
+\end{IEEEeqnarray}
+where $\delta[\cdot,\cdot]$ represents the Kronecker delta function.
+
+
+
+\subsubsection{Aggregation Properties} \label{sec:theta_agg}
+
+As $\xrm$ is observable and $\yrm$ is not, it is important to characterize the marginal model $\uptheta' \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot)$ over the set $\Xcal$ and the conditional models $\tilde{\uptheta}(x) \equiv \uptheta(\cdot,x) / \uptheta'(x), \; \forall x \in \Xcal$ over the set $\Ycal$. 
+
+By the aggregation property \cite{ferguson}, $\uptheta'$ is a Dirichlet random process parameterized by $\alpha' \equiv \sum_{y \in \Ycal} \alpha(y,\cdot)$. Additionally, it can be proven that the conditional PDF of $\tilde{\uptheta}$ given $\uptheta'$ is
+\begin{IEEEeqnarray}{rCl}
+\prm_{\tilde{\uptheta} | \uptheta'}\big( \tilde{\theta} | \theta' \big) & = & \prm_{\tilde{\uptheta}}\big( \tilde{\theta} \big) \\
+& = & \prod_{x \in \Xcal} \Bigg[ \beta\big( \alpha(\cdot,x) \big)^{-1} \prod_{y \in \Ycal} \tilde{\theta}(y;x)^{\alpha(y,x)-1} \Bigg] \nonumber \;,
+\end{IEEEeqnarray}
+a product of Dirichlet distributions defined for $\tilde{\theta} \in \tilde{\Theta}^{\Xcal}$, where $\tilde{\Theta} = \left\{ p \in {\Rbb_{\geq 0}}^{\Ycal} : \sum_{y \in \Ycal} p(y) = 1 \right\}$. As shown, the normalized functions $\tilde{\uptheta}(x)$ are independent of one another and of the aggregation $\uptheta'$. Note that $\Prm_{\yrm | \xrm,\uptheta}(y | x,\theta) \equiv \tilde{\theta}(y;x)$ compactly notates the true predictive distribution. 
+
+Of specific interest is how $\prm_{\tilde{\uptheta}(x)}$ changes as its concentration parameter $\alpha'(x)$ approaches its limiting values. For $\alpha'(x) \to \infty$, the PDF concentrates at its mean, resulting in
+\begin{IEEEeqnarray}{rCl}
+\prm_{\tilde{\uptheta}(x)}\big( \tilde{\theta}(x) \big) & \to & \delta\left( \tilde{\theta}(x) - \frac{\alpha(\cdot,x)}{\alpha'(x)} \right) \;,
+\end{IEEEeqnarray}
+where $\delta(\cdot)$ denotes the Dirac delta function on the set $\tilde{\Theta}$. Conversely, for $\alpha'(x) \to 0$, the PDF tends toward
+\begin{IEEEeqnarray}{rCl}
+\prm_{\tilde{\uptheta}(x)}\big( \tilde{\theta}(x) \big) & \to & \sum_{y \in \Ycal} \frac{\alpha(y,x)}{\alpha'(x)} \delta\Big( \tilde{\theta}(x) - \delta[\cdot,y] \Big) \;,
+\end{IEEEeqnarray}
+which distributes its weight among the $|\Ycal|$ models $\delta[\cdot,y] \in \tilde{\Theta}$, each having an $\ell_0$ norm equal to one. These trends are demonstrated in Figure \ref{fig:P_theta}. 
+\begin{figure}
+\centering
+\includegraphics[width=0.9\linewidth]{P_theta_tilde.pdf}
+\caption{Model prior PDF for different concentrations $\alpha'(x)$}
+\label{fig:P_theta}
+\end{figure}
+
+
+
+
+\subsection{Training Set conditional PMF, $\Prm_{\Drm | \uptheta}$}
+
+Next, properties of the conditional distribution $\Prm_{\Drm | \uptheta}$ will be discussed. The distribution of $\Drm$ conditioned on the model can be formulated as
+\begin{IEEEeqnarray}{rCl}
+\Prm_{\Drm | \uptheta}\big( D | \theta \big) & = & \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\bar{N}(y,x;D)} \;,
+\end{IEEEeqnarray}
+where the dependency on the training data $\Drm$ is expressed though a transform function $\bar{N}(y,x;D) = \sum_{n=1}^N \delta \big[ (y,x),D_n \big]$ which counts the number of occurrences of each pair $(y,x)$ in the training set $D$. 
+
+Note that $\Prm_{\Drm | \uptheta}$ depends on the training data $\Drm$ only through the transform $\bar{N}$; consequently, $\bar{N}(\Drm)$ is a sufficient statistic for the model $\uptheta$. As such, it is useful to define a new random process $\nbarrm \equiv \bar{N}(\Drm)$. 
+
+Conditioned on the model $\uptheta$, the PMF of $\nbarrm$ is a multinomial distribution
+\begin{IEEEeqnarray}{rCl}
+\Prm_{\nbarrm | \uptheta}(\bar{n} | \theta) & = & \sum_{D : \bar{N}(D) = \bar{n}} \Prm_{\Drm | \uptheta}(D | \theta) \\
+& = & \Mcal(\bar{n}) \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\bar{n}(y,x)} \nonumber \;,
+\end{IEEEeqnarray}
+where the multinomial operator $\Mcal$ is used. The mean and covariance functions of this multinomial distribution are \cite{theodoridis-ML}
+\begin{IEEEeqnarray}{rCl}
+\mu_{\bar{\nrm} | \uptheta}(y,x | \theta) & = & N \theta(y,x)
+\end{IEEEeqnarray}
+and
+\begin{IEEEeqnarray}{L}
+\Sigma_{\nbarrm | \uptheta}(y,x,y',x' | \theta)  \\
+\quad = N \big( \theta(y,x) \delta[y,y'] \delta[x,x'] - \theta(y,x) \theta(y',x') \big) \nonumber \;.
+\end{IEEEeqnarray}
+
+
+
+
+
+
+
+\subsubsection{Aggregation Properties}
+
+As performed for the model $\uptheta$, a characterization of the function $\nbarrm$ integrated over the set $\Ycal$ will be performed. Introduce the function $N'(x;D) = \sum_{y \in \Ycal} \bar{N}(y,x;D)$ and define the ``marginalized'' random process $\nrm' \equiv \sum_{y \in \Ycal} \nbarrm(y,\cdot) \equiv N'(\Drm)$ over the set $\Xcal$. By the aggregation property of Multinomial random processes \cite{johnson}, the aggregation conditioned on the model is only dependent on $\uptheta$ via the marginal process $\uptheta'$ and is distributed as $\nrm' | \uptheta' \sim \Multi(N,\uptheta')$. 
+
+Also of interest is the distribution of $\nbarrm$ conditioned on its aggregation $\nrm'$. It can be shown that when conditioned on the model $\uptheta$ as well, the dependency of the distribution on $\uptheta$ is only expressed through the true predictive models $\tilde{\uptheta}(x)$. The PMF of interest is thus
+\begin{equation}
+\Prm_{\bar{\nrm} | \nrm' , \tilde{\uptheta}}\big(\bar{n} | n' , \tilde{\theta}\big) = \prod_{x \in \Xcal} \Bigg[ \Mcal\big( \bar{n}(\cdot,x) \big) \prod_{y \in \Ycal} \tilde{\theta}(y;x)^{\bar{n}(y,x)} \Bigg] 
+\end{equation}
+for $\left\{ \bar{n} \in {\Zbb_{\geq 0}}^{\Ycal \times \Xcal} : \sum_{y \in \Ycal} \bar{n}(y,x) = n'(x), \quad \forall x \in \Xcal \right\}$. Observe that conditioning on the aggregation process $\nrm'$ renders the function segments $\nbarrm(\cdot,x)$ independent of one another and that they are also Multinomial, such that $\nbarrm(\cdot,x) | \nrm'(x),\tilde{\uptheta} \sim \Multi\big( \nrm'(x),\tilde{\uptheta}(x) \big)$.
+
+
+
+
+
+
+
+
+
+\subsection{Predictive PMF, $\Prm_{\yrm | \xrm,\Drm}$}
+
+In this section, the Bayesian predictive PMF $\Prm_{\yrm | \xrm,\Drm}$ is provided. As $\bar{N}(\Drm)$ is a sufficient statistic for the training data, $\Prm_{\yrm | \xrm,\nbarrm}$ will be derived instead, simplifying the analysis. Note that $\Prm_{\yrm | \xrm,\Drm}(y | x,D) = \Prm_{\yrm | \xrm,\nbarrm}\big( y | x,\bar{N}(D) \big)$.
+
+As mentioned in Section \ref{sec:objective}, the Bayesian predictive PMF can be interpreted as the expectation of the true predictive PMF with respect to the model posterior distribution $\prm_{\uptheta | \xrm,\Drm}$. Using the notation detailed in Section \ref{sec:theta_agg}, the PMF is now expressed as $\Prm_{\yrm | \xrm,\nbarrm} = \Erm_{\uptheta | \xrm,\nbarrm}\big[ \Prm_{\yrm | \xrm,\uptheta} \big] = \mu_{\tilde{\uptheta}(\xrm) | \xrm,\nbarrm}$, the conditional expectation of the predictive model $\tilde{\uptheta}(\xrm)$.
+
+It can be shown that since the conditional models $\tilde{\uptheta}(x)$ are independent of the marginal model $\uptheta'$, they are also conditionally independent of $\xrm$ given the statistic $\nbarrm$. Thus, the conditional model posterior PDF is represented as
+\begin{IEEEeqnarray}{L}
+\prm_{\tilde{\uptheta} | \xrm,\nbarrm}\big( \tilde{\theta} | x,\bar{n} \big) = \prm_{\tilde{\uptheta} | \nbarrm}\big( \tilde{\theta} | \bar{n} \big) \\
+= \frac{\Prm_{\nbarrm | \nrm',\tilde{\uptheta}}\big( \bar{n} | \sum_y \bar{n}(y,\cdot),\tilde{\theta} \big)}{\Prm_{\nbarrm | \nrm'}\big( \bar{n} | \sum_y \bar{n}(y,\cdot) \big)} \prm_{\tilde{\uptheta}}\big( \tilde{\theta} \big) \nonumber \\
+= \prod_{x' \in \Xcal} \left[ \beta \big( \alpha(\cdot,x') + \bar{n}(\cdot,x') \big)^{-1} \prod_{y \in \Ycal} \tilde{\uptheta}(y;x')^{\alpha(y,x') + \bar{n}(y,x') - 1} \right] \nonumber \;.
+\end{IEEEeqnarray}
+As the $|\Xcal|$ Multinomial components of $\Prm_{\nbarrm | \nrm',\tilde{\uptheta}}$ have exponential form, the corresponding Dirichlet components of the conditional model PDF $\prm_{\tilde{\uptheta}}$ are their conjugate priors \cite{murphy}, \cite{theodoridis-ML}. Thus, the posterior is a product of Dirichlet distributions $\tilde{\uptheta}(x) | \xrm,\nbarrm \sim \Dir\big(\alpha(\cdot,x) + \nbarrm(\cdot,x)\big)$, with each model $\tilde{\uptheta}(x)$ dependent solely on the sufficient statistic elements $\nbarrm(\cdot,x)$.
+
+The concentration parameters increase proportionately with the volume of training data. Thus as each $n'(x) \to \infty$, the posteriors converges to $\prm_{\tilde{\uptheta}(x) | \nbarrm(\cdot,x)}\big(\tilde{\theta}(x) | \bar{n}(\cdot,x) \big) \to \delta\big( \tilde{\theta}(x) - \bar{n}(\cdot,x) / \sum_y \bar{n}(y,x) \big)$ and the conditional models are identified. Conversely, as $\alpha'(x) \to \infty$, the confidence in the prior model increases and the posterior tends toward $\prm_{\tilde{\uptheta}(x) | \nbarrm(\cdot,x)}\big(\tilde{\theta}(x) | \bar{n}(\cdot,x) \big) \to \delta\big( \tilde{\theta}(x) - \alpha(\cdot,x) / \alpha'(x)\big)$, independent of the training data.
+
+Figure \ref{fig:P_theta_D} shows the influence of the training data on the model distribution; after conditioning on the training data (via $\nbarrm$), the PDF concentration shifts away from the models favored by the prior knowledge and towards other models that better account for the observations.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.9\linewidth]{P_theta_post_tilde.pdf}
+\caption{Model $\tilde{\uptheta}(x)$ PDF, prior and posterior}
+\label{fig:P_theta_D}
+\end{figure}
+
+Taking the mean with respect to the conditional model posterior, the Bayesian predictive PMF is
+\begin{IEEEeqnarray}{rCl}
+\Prm_{\yrm | \xrm,\nbarrm} & = & \mu_{\tilde{\uptheta}(\xrm) | \xrm,\nbarrm} = \mu_{\tilde{\uptheta}(\xrm) | \nbarrm(\cdot,\xrm)} \\
+%& = & \frac{\alpha(\cdot,\xrm) + \nbarrm(\cdot,\xrm)}{\alpha'(\xrm) + \sum_y \nbarrm(y,\xrm)} \nonumber \\
+& = & \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + \sum_y \nbarrm(y,\xrm)}\right) \frac{\alpha(\cdot,\xrm)}{\alpha'(\xrm)} \nonumber \\
+&& \quad + \left(\frac{\sum_y \nbarrm(y,\xrm)}{\alpha'(\xrm) + \sum_y \nbarrm(y,\xrm)}\right) \frac{\nbarrm(\cdot,\xrm)}{\sum_y \nbarrm(y,\xrm)} \nonumber \;.
+\end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{rCl}
+%\Prm_{\yrm | \xrm,\nbarrm}(x,\bar{n}) & = & \mu_{\tilde{\uptheta}(x) | \xrm,\nbarrm}(x,\bar{n}) = \mu_{\tilde{\uptheta}(x) | \nbarrm(\cdot,x)}\big(\bar{n}(\cdot,x)\big) \\
+%& = & \frac{\alpha(\cdot,x) + \bar{n}(\cdot,x)}{\alpha'(x) + \sum_y \bar{n}(y,x)} \nonumber \\
+%& = & \left(\frac{\alpha'(x)}{\alpha'(x) + \sum_y \bar{n}(y,x)}\right) \frac{\alpha(\cdot,x)}{\alpha'(x)} \nonumber \\
+%&& \quad + \left(\frac{\sum_y \bar{n}(y,x)}{\alpha'(x) + \sum_y \bar{n}(y,x)}\right) \frac{\bar{n}(\cdot,x)}{\sum_y \bar{n}(y,x)} \nonumber \;.
+%\end{IEEEeqnarray}
+The last representation views the distribution as a convex combination of two conditional distributions. The first distribution $\alpha(\cdot,\xrm) / \alpha'(\xrm)$ is independent of the training data and based on the prior knowledge implied via the model PDF parameter; the second distribution is the conditional empirical PMF and depends on $\nbarrm$, not on $\alpha$. For both, only those values $\alpha$ and $\nbarrm$ corresponding to the observed value $\xrm$ influence the distribution. 
+
+The weighting factors are dependent on these values as well. As $n'(x) / \alpha'(x) \to 0$, the PMF tends toward the data-independent distribution; as $n'(x) / \alpha'(x) \to \infty$, $\Prm_{\yrm | \xrm,\nbarrm}$ tends towards the empirical conditional distribution. 
+
+
+
+
+
+
+
+
+
+\section{Density Estimation Perspective}
+
+This section compares the Bayesian predictive distribution $\Prm_{\yrm | \xrm,\nbarrm}$ to the true predictive PMF $\Prm_{\yrm | \xrm,\uptheta}$ and investigates the effects of prior knowledge. For a given $\xrm$ and corresponding number of training samples $\nrm'(\xrm)$, the expected value of the estimate conditioned on the true model $\uptheta$ is
+\begin{IEEEeqnarray}{L}
+\Erm_{\nbarrm | \nrm',\uptheta}\big[ \Prm_{\yrm | \xrm,\nbarrm} \big] \\ 
+\quad = \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + \nrm'(\xrm)}\right) \frac{\alpha(\cdot,\xrm)}{\alpha'(\xrm)} + \left(\frac{\nrm'(\xrm)}{\alpha'(\xrm) + \nrm'(\xrm)}\right) \tilde{\uptheta}(\xrm) \nonumber \;,
+\end{IEEEeqnarray}
+where the properties of a multinomial distribution conditioned on its aggregation have been used. The result is a convex combination of the conditional data-independent distribution $\alpha(\cdot,x) / \alpha'(x)$ and the true conditional distribution $\tilde{\uptheta}(x)$. The convex coefficients are inherited from $\Prm_{\yrm | \xrm,\nbarrm}$; note that as the number of matching training samples $\nrm'(x)$ increases relative to $\alpha'(x)$, the estimate tends towards the true conditional PMF. 
+
+To aid characterization of the predictive PMF estimator, define the random process $\Delta(\xrm,\nbarrm,\uptheta) \equiv \Prm_{\yrm | \xrm,\nbarrm} - \Prm_{\yrm | \xrm,\uptheta} \in \Rbb^{\Ycal}$. For a given $\xrm$ and corresponding number of training samples $\nrm'(\xrm)$, the bias of the conditional PMF estimate is
+\begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias}
+\mathrm{Bias}(\xrm,\nrm',\uptheta) & = & \Erm_{\nbarrm | \nrm',\uptheta}\big[ \Delta(\xrm,\nbarrm,\uptheta) \big] \\
+& = & \frac{\alpha'(\xrm)}{\alpha'(\xrm) + \nrm'(\xrm)} \left( \frac{\alpha(\cdot,\xrm)}{\alpha'(\xrm)} - \tilde{\uptheta}(\xrm) \right) \nonumber 
+\end{IEEEeqnarray}
+and its covariance function is 
+\begin{IEEEeqnarray}{L} \label{eq:predictive_cov}
+\mathrm{Cov}(y,y';\xrm,\nrm',\uptheta) = \Crm_{\nbarrm | \nrm',\uptheta} \big[\Prm_{\yrm | \xrm,\nbarrm}(\cdot | \xrm,\nbarrm) \big](y,y') \\
+\quad = \frac{\Sigma_{\nbarrm(\cdot,\xrm) | \nrm'(\xrm),\tilde{\uptheta}(\xrm)}(y,y')}{\big( \alpha'(\xrm) + \nrm'(\xrm) \big)^2} \nonumber \\
+\quad = \frac{\nrm'(\xrm)}{\big( \alpha'(\xrm) + \nrm'(\xrm) \big)^2} \left( \tilde{\uptheta}(y;\xrm) \delta[y,y'] - \tilde{\uptheta}(y;\xrm) \tilde{\uptheta}(y';\xrm) \right) \nonumber \;,
+\end{IEEEeqnarray}
+where the properties of multinomial random processes have been used. Note that the bias is proportionate to the difference between the true conditional model and the data-independent estimate. The scaling factor tends to zero as $\nrm'(x)/\alpha'(x) \to \infty$; as such, more informative priors (large $\alpha'(x)$) will lead to PMF estimates that are prone to bias. Conversely, the variance of the PMF estimate decreases with increasing $\alpha'(x)$. 
+
+
+Combining the estimator bias and variance, the conditional second moments of $\Delta(\xrm,\nbarrm,\uptheta)$ are
+\begin{IEEEeqnarray}{L} \label{eq:predictive_del_sq}
+\mathcal{E}(y,y' ; \xrm,\nrm',\uptheta) = \Erm_{\nbarrm | \nrm',\uptheta} \Big[ \Delta(y;\xrm,\nbarrm,\uptheta) \Delta(y';\xrm,\nbarrm,\uptheta) \Big] \\
+\quad = \mathrm{Bias}(y;\xrm,\nrm',\uptheta) \mathrm{Bias}(y';\xrm,\nrm',\uptheta) + \mathrm{Cov}(y,y';\xrm,\nrm',\uptheta) \nonumber \;.
+\end{IEEEeqnarray}
+As $\nrm'(x) \to \infty$, this function tends to zero and thus the underlying model $\tilde{\uptheta}(x)$ is determined exactly. A more practical case is estimation with a finite volume of training data. Specification of the Dirichlet model prior can be interpreted as providing a distribution estimate $\alpha(\cdot,x)/\alpha'(x)$ and a degree of confidence $\alpha'(x)$. Higher confidence reduces error due to the variance of the estimator, but increases the error due to bias between the true model and its estimate; low confidence renders the estimate unbiased, but increases the estimator variance. 
+
+
+
+To exemplify how the model estimate $\Prm_{\yrm | \xrm,\Drm}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 10$. The data-independent PMF $\alpha(\cdot,x)/\alpha'(x)$ and true model $\tilde{\uptheta}(x)$ are shown in Figure \ref{fig:P_yx_error_N_0} - note the significant mismatch. 
+
+\begin{figure}
+\centering
+\includegraphics[width=0.9\linewidth]{P_yx_error_N_0.pdf}
+\caption{Model $\tilde{\uptheta}(x)$ estimate, no training data}
+\label{fig:P_yx_error_N_0}
+\end{figure}
+
+Figures \ref{fig:P_yx_error_a0_0_1} and \ref{fig:P_yx_error_a0_10} show how the bias and variance of the estimate change for different values of $\nrm'(x)$ and $\alpha'(x)$. The blue markers indicate the conditional mean of the estimator, $\Erm_{\nbarrm | \nrm',\uptheta}\big[ \Prm_{\yrm | \xrm,\nbarrm}(y | \xrm,\nbarrm) \big]$; the upper and lower error bars indicate the square-root of the expected squared deviation above and below the conditional mean, respectively. Each individual plot heading provides the error $\sqrt{\sum_{y \in \Ycal} \mathcal{E}(y,y ; \xrm,\nrm',\uptheta)}$ to assess the quality of the PMF estimate. 
+
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth]{P_yx_error_a0_0_1.pdf}
+\caption{Model $\tilde{\uptheta}(x)$ estimates, $\alpha'(x) = 0.1$}
+\label{fig:P_yx_error_a0_0_1}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth]{P_yx_error_a0_10.pdf}
+\caption{Model $\tilde{\uptheta}(x)$ estimates, $\alpha'(x) = 10$}
+\label{fig:P_yx_error_a0_10}
+\end{figure}
+
+Observe that for $\nrm'(x) = 1$, the high variance of the $\alpha'(x) = 0.1$ estimate (favoring the empirical PMF) renders it worse than the $\alpha'(x) = 10$ estimate; in fact, the variance is so high that the error exceeds that of the data-independent estimate $\alpha(\cdot,x) / \alpha'(x)$ (Figure \ref{fig:P_yx_error_N_0}). Conversely, for $\nrm'(x) = 10$, the confidence in the $\alpha'(x) = 10$ estimate leads to high bias and the $\alpha'(x) = 0.1$ estimate is superior. For $\nrm'(x) = 100$, both the $\alpha'(x) = 0.1$ and $\alpha'(x) = 10$ estimates begin converging to the true distribution - this is guaranteed due to the full support of the Dirichlet prior.
+
+
+
+
+
+
+
+
+
+
+\section{Conclusions}
+
+This article has shown how a Dirichlet prior distribution may be used for a Bayesian approach to machine learning prediction. An analysis of how well the Bayesian predictive distributions match the true predictive distributions has been performed for a variety of different non-informative and informative priors.
+
+The conditional second moments of the difference between the two predictive PMF's have important applications for Bayesian regression, specifically for determining the expected squared-error loss. This will be a primary focus of future work.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\bibliographystyle{IEEEtran}
+%\bibliographystyle{plain}
+\bibliography{{../References/phd_bib}}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
