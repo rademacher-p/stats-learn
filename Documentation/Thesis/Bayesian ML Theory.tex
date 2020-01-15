@@ -1,16 +1,7 @@
 \documentclass[12pt]{report}
 
-
 \linespread{1.5}
 \usepackage[margin=1.0in]{geometry}
-
-
-%\usepackage{cite}
-\usepackage[style=numeric]{biblatex}
-\addbibresource{{../References/phd_bib.bib}}
-%\addbibresource{{C:/Users/paulg/Documents/PhD/Dissertation/Documentation/References/phd_bib.bib}}
-%\addbibresource{{C:/Users/rademacherp/Documents/Dissertation/Documentation/References/phd_bib.bib}}
-
 
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithmic}
@@ -22,8 +13,7 @@
 \usepackage[retainorgcmds]{IEEEtrantools}
 
 \usepackage{hyperref}
-\usepackage{todonotes}
-
+\usepackage[colorinlistoftodos,backgroundcolor=yellow]{todonotes}
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -33,15 +23,9 @@
 \renewcommand{\headrulewidth}{2pt}
 %\renewcommand{\footrulewidth}{1pt}
 
-
-
 \usepackage[nottoc]{tocbibind}
 \setcounter{secnumdepth}{3}
 
-
-
-%\graphicspath{ {C:/Users/paulg/Documents/PhD/Dissertation/Documentation/Figures/} }
-\graphicspath{ {../Figures/} }
 
 
 \DeclareMathOperator*{\argmin}{arg\,min}
@@ -88,6 +72,14 @@
 
 
 
+
+%\usepackage{cite}
+\usepackage[style=numeric]{biblatex}
+\addbibresource{{../References/phd_bib.bib}}
+%\addbibresource{{C:/Users/paulg/Documents/PhD/Dissertation/Documentation/References/phd_bib.bib}}
+%\addbibresource{{C:/Users/rademacherp/Documents/Dissertation/Documentation/References/phd_bib.bib}}
+
+\graphicspath{ {../Figures/} }
 
 
 \title{Bayesian Learning using a Dirichlet Prior for Regression and Classification}
