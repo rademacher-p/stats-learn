@@ -229,15 +229,16 @@ Random elements are denoted with roman font (e.g. $\xrm$), while specific values
 
 Consider a random element $\xrm \in \Xcal$. If $\Xcal$ is countable, either finite with $|\Xcal| \in \Nbb$ or countably infinite with $|\Xcal| = \aleph_0$, then $\xrm$ is a discrete random element and is characterized by a probability mass function (PMF) \cite {papoulis}, denoted $\Prm_{\xrm} \in \Pcal(\Xcal)$. If $\Xcal$ is a Euclidean space and is thus uncountable with $|\Xcal| \geq \aleph_1$, then $\xrm$ is a continuous random variable/process characterized by a probability density function (PDF), denoted $\prm_{\xrm} \in \Pcal(\Xcal)$.
 
-PGR: explicit PMF/PDF formula with P of events?
+\todolo{explicit PMF/PDF formula with P of events?}
 
 For notational simplicity, probability distributions are occasionally represented as $\Prm(\xrm)$; in such instances, the formal notation can be recovered by replacing the distribution with $\Prm_{\xrm}(x)$ and all instances of the roman symbol $\xrm$ with the italic symbol $x$. 
 
 Consider $\xrm$ conditioned on another random element $\zrm \in \Zcal$. The conditional distribution is represented as $\Prm_{\xrm | \zrm} : \Zcal \mapsto \Pcal(\Xcal)$, such that $\Prm_{\xrm | \zrm}(z)$ is a PMF over $\Xcal$ and $\Prm_{\xrm | \zrm}(x|z)$ is a specific value of that PMF. These distributions may be compactly represented as $\Prm(\xrm|\zrm)$. 
 
-Often, the dependency on the conditional variable $\zrm$ will not be expressed in terms of a specific value $z$, but will be left in terms of the random element itself; in this case, the more compact notation $\Prm_{\xrm | \zrm}$ is used and the distribution is implied to be $\Prm_{\xrm | \zrm}(\zrm)$, a function of $\zrm$.
+Often, the dependency on the conditional variable $\zrm$ will not be expressed in terms of a specific value $z$, but will be left in terms of the random element itself; in this case, the more compact notation $\Prm_{\xrm | \zrm}$ is used to imply $\Prm_{\xrm | \zrm}(\zrm)$, a function of $\zrm$.
 
-PGR: reconsider conditional argument suppression, etc. ALWAYS random function? Can't do both preceeding paragraph styles. Fixed?
+\todohi{Ever need the full functional?}
+\todolo{Remove subscript suppression convention?} 
 
 Many distributions will be repeatedly used and thus special functions will be defined for the PDF's and PMF's of interest. For example, consider a random process $\xrm \in \Xcal$ characterized by a Dirichlet distribution with parameters $\alpha \in \mathcal{A}$; the PDF will be notated as $\Dir : \mathcal{A} \mapsto \Pcal(\Xcal)$, where the range is the set of valid PDF's. More compactly, the notation $\xrm \sim \Dir(\alpha)$ implies that $\Prm_{\xrm} = \Dir(\cdot ; \alpha)$. Other distribution functions repeatedly used include $\Multi$, $\DM$, $\DP$, and $\DMP$, representing the multinomial distribution, the Dirichlet-multinomial distribution, the Dirichlet process, and the Dirichlet-Multinomial process.
 
@@ -253,7 +254,7 @@ where the argument $g$ is an arbitrary scalar function of $\xrm$ with range $\Rb
 \begin{equation}
 \Crm_{\xrm}\big[g(\xrm)\big] = \Erm_{\xrm} \bigg[ \Big( g(\xrm) - \Erm_{\xrm}\big[g(\xrm)\big] \Big)^2 \bigg] \;.
 \end{equation}
-When $\xrm$ is a random variable and the function $g$ is the identity operator, such that $g(\xrm) = \xrm$, the mean and variance are represented by $\mu_{\xrm}$ and $\Sigma_{\xrm}$, respectively.
+When $\xrm$ is a random variable and the function $g$ is the identity operator, such that $g(\xrm) = \xrm$, the mean and variance are compactly represented as $\mu_{\xrm}$ and $\Sigma_{\xrm}$, respectively.
 
 These operations can be performed with respect to a condtional distribution as well. In this case, the expectation operator is a function of the observed value of $\zrm$, such that
 \begin{equation}
@@ -278,7 +279,7 @@ If the expectations are evaluated with respect to a conditional distribution $\P
 
 Again, it is common for the conditional random element $\zrm$ to be left as a random quantity instead of being explicitly defined. In such cases, the italic $z$ is dropped from the arguments and the formulae $\Erm_{\xrm|\zrm}\big[ g(\xrm) \big](y)$, $\Crm_{\xrm|\zrm}\big[g(\xrm)\big](y,y')$, $\mu_{\xrm|\zrm}(y)$, and $\Sigma_{\xrm|\zrm}(y,y')$ imply dependence on $\zrm$.
 
-PGR: ABOVE NOTATION CREATES AMBIGUITY !!!!!!!
+\todohi{ABOVE NOTATION CREATES AMBIGUITY!!!!!!! Check for uses...}
 
 As for probability distributions, the subscript notation of these operators may be suppressed. In such cases, the expectations are to be performed with respect to the joint distribution of all random elements (roman font) found in the argument. For example, $\Erm\big[f(\yrm,\xrm) | \zrm \big]$ compactly represents $\Erm_{\yrm,\xrm | \zrm}\big[f(\yrm,\xrm)\big]$.
 
@@ -312,7 +313,7 @@ Similarly, the beta function $\beta$ operates on functions $g : \Xcal \mapsto \R
 \end{equation}
 Note that the countable domains of the input functions may have an infinite number of elements. These functions will also be used to operate on a subset of a functions' domain $\Scal \subset \Xcal$ and its corresponding image. Set notation for a function is used to express the argument, so that $\Mcal\Big( \big\{ g(x) : x \in S \big\} \Big)$ and $\beta\Big( \big\{ g(x) : x \in S \big\} \Big)$.
 
-PGR: define subset functions, ditch set inputs? appendix?
+\todolo{define subset functions, ditch set inputs? appendix?}
 
 
 
@@ -328,7 +329,7 @@ PGR: define subset functions, ditch set inputs? appendix?
 
 \section{Data Model and Objective}
 
-PGR: italic theta font before Bayes?
+\todolo{italic theta font before Bayes?}
 
 Consider an observable random element $\xrm \in \Xcal$ and and unobservable random element $\yrm \in \Ycal$ which are jointly distributed according to an unknown probability distribution $\uptheta \in \Theta = \Pcal(\Ycal \times \Xcal)$, such that $\Prm_{\yrm,\xrm | \uptheta} = \uptheta$. Note that the uppercase PMF notation used throughout this section implies that the random elements are discrete; PDF's are used when $\xrm$ and/or $\yrm$ are continuous random variables/processes.
 
