@@ -16,7 +16,12 @@
 \usepackage[retainorgcmds]{IEEEtrantools}
 
 \usepackage{hyperref}
-\usepackage[colorinlistoftodos,backgroundcolor=yellow,linecolor=red]{todonotes}
+
+\usepackage[colorinlistoftodos,color=yellow!50,linecolor=red]{todonotes}
+\newcommand{\todolo}[1]{\todo[inline,color=green!50,linecolor=red]{#1}}
+\newcommand{\todomid}[1]{\todo[inline,color=yellow!50,linecolor=red]{#1}}
+\newcommand{\todohi}[1]{\todo[inline,color=red!50,linecolor=red]{#1}}
+
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -91,66 +96,70 @@
 
 \listoftodos
 
-PGR: equation numbers to final line!
-
-\todo[inline]{PGR: use todonotes package instead of my initials?}
 
 
+\todolo{use todonotes package instead of my initials?}
 
-PGR: multinomial random process?
+\todolo{equation numbers to final line!}
 
-PGR: change from nbar to emprical RV???
+\todolo{brackets for expectation ops?}
 
-PGR: investigate N lim for nbar given theta, bayes risk vs model support
+\todolo{line break symbol format, before/after?}
 
-PGR: SEMI-SUPERVISED - generalize to joint decisions!!! training/test!
+\todomid{learners (full) or decision functions (range)?}
 
-PGR: priors = sparse conditionals; w/ sufficient statistics
+\todomid{likelihood function terminology}
 
-PGR: NFLT investigation? try matlab examples
+\todomid{Dirichlet localization or concentration?}
 
+\todomid{fix arguments for theta, nbar dists.}
 
+\todomid{suppress arguments where sensible? eg Pd = theta}
 
-PGR: fix arguments for theta, nbar dists.
+\todomid{introduce tilde alpha to match tilde theta?}
 
-PGR: suppress arguments where sensible? eg Pd = theta
+\todohi{use x,y subs instead of prime/tilde?}
 
-PGR: introduce tilde alpha to match tilde theta?
+\todohi{ALL figure notation: theta font + Ycal indexing. use R,f opt?}
 
-PGR: use x,y subs instead of prime/tilde?
-
-PGR: is $\Theta$ redundant given $\Pcal$?
+\todolo{is $\Theta$ redundant given $\Pcal$?}
 
 
 
-PGR: ALL figure notation: theta font + Ycal indexing. use R,f opt?
 
-PGR: use clairvoyant/irreducible terms and symbols 
+\todohi{multinomial random process?}
 
-PGR: check notation throughout for expectation/variance operators
+\todohi{change from nbar to emprical RV???}
 
-PGR: check for remaining random function terminology
+\todohi{investigate N lim for nbar given theta, bayes risk vs model support}
 
-PGR: empirical risk terms/discussion?
+\todohi{SEMI-SUPERVISED - generalize to joint decisions!!! training/test!}
 
+\todohi{priors = sparse conditionals; w/ sufficient statistics}
 
-PGR: learners (full) or decision functions (range)?
-
-PGR: likelihood function terminology
-
-PGR: Dirichlet localization or concentration?
-
-PGR: Informative or Subjective?
-
-PGR: brackets for expectation ops?
-
-PGR: line break symbol format?
+\todolo{NFLT investigation? try matlab examples}
 
 
 
-PGR: generalize y,x,h from scalars to functions!!!
 
-PGR: jeffrey prior, fisher info?
+\todomid{use clairvoyant/irreducible terms and symbols}
+
+\todomid{empirical risk terms/discussion?}
+
+\todomid{check notation throughout for expectation/variance operators, proper arguments}
+
+
+
+
+
+
+
+
+
+
+\todolo{generalize y,x,h from scalars to functions!!!}
+
+\todolo{jeffrey prior, fisher info?}
 
 
 
@@ -184,13 +193,11 @@ PGR: complete rework
 
 This report details a Bayesian perspective on stastical learning theory for when both the observations and unobserved quantities are jointly distributed according to an unknown probability distribution function. While the validity of Bayesian methods for statistical signal processing and machine learning has long been contended, the author believes it to be a justified approach that does not necessarily imply that the distribution model is `random'; rather, it simply reflects the desire of the user to formulate risk as a weighted sum of learner performance across the space of distributions. 
 
-The success or failure of Bayesian learning methods hinge on how well the prior knowledge imparted by the designer matches reality. The chosen prior distribution over the set of data-generating probability distributions reflects the users confidence that different distributions are responsible for generating the observed/unobserved random elements. If a highly subjective prior \cite{box} is chosen that is localized around the actual data probability distribution, low risk learning functions are possible even with limited training data; however, if the subjective prior is poorly designed, a good solution may not be achieved. Conversely, a non-informative prior that weights the different distributions without preference provides a more robust solution for all models, but may underperform relative to learners based on well-selected subjective priors.
+The success or failure of Bayesian learning methods hinge on how well the prior knowledge imparted by the designer matches reality. The chosen prior distribution over the set of data-generating probability distributions reflects the users confidence that different distributions are responsible for generating the observed/unobserved random elements. If a highly informative prior \cite{box} is chosen that is concentrated around the actual data probability distribution, low risk learning functions are possible even with limited training data; however, if the informative prior is poorly designed, a good solution may not be achieved. Conversely, a non-informative prior that weights the different distributions without preference provides a more robust solution for all models, but may underperform relative to learners based on well-selected informative priors.
 
-will always be able to adapt will enough training data; if data is limited, however, the learning function may not deliver the required performance.
+This work assumes that the prior distribution is Dirichlet. The class of Dirichlet probability density functions (PDF) and processes have the desirable properties of full support over the set of possible data-generating distributions and an analytic posterior distribution for independently and identically distributed data \cite{ferguson}. Furthermore, control of the Dirichlet parameters can enable both non-informative and informative prior knowledge. Special cases including the uniform prior will be given specific attention.
 
-This work assumes that the prior distribution is Dirichlet. The class of Dirichlet probability density functions (PDF) and processes have the desirable properties of full support over the set of possible data-generating distributions and an analytic posterior distribution for independently and identically distributed data \cite{ferguson}. Furthermore, control of the Dirichlet parameters can enable both objective and subjective prior knowledge. Special cases including the uniform prior will be given specific attention.
-
-After introducing the problem and discussing the relevant data probability distributions, the Bayesian framework will be applied to two of the most common loss functions in machine learning: the squared error loss function (common for regression), and the 0-1 loss function \cite{berger} (common for classification). Optimal estimators/classifiers and their corresponding minimum risk will be presented for different Dirichlet prior distributions. Specific attention will be given to various asymptotic cases to show the differing performance for objective and subjective Dirichlet priors.
+After introducing the problem and discussing the relevant data probability distributions, the Bayesian framework will be applied to two of the most common loss functions in machine learning: the squared error loss function (common for regression), and the 0-1 loss function \cite{berger} (common for classification). Optimal estimators/classifiers and their corresponding minimum risk will be presented for different Dirichlet prior distributions. Specific attention will be given to various asymptotic cases to show the differing performance for non-informative and informative Dirichlet priors.
 
 
 
@@ -204,15 +211,15 @@ This section details the mathematical notation and typesetting conventions used 
 
 Sets will typically be typeset with a calligraphic font, such as $\Xcal$. Exceptions include common number sets such as the real numbers, which are typeset using blackboard bold $\Rbb$. Function spaces such as the set of functions $\Xcal \mapsto \Ycal$ are compactly represented as $\Ycal^{\Xcal}$.
 
-Various mappings will be defined for which the domain and/or the range are function spaces. The set of functions $\Xcal \mapsto \Ycal$ is denoted $\Ycal^{\Xcal}$. For a mapping $g : \Zcal \mapsto \Ycal^{\Xcal}$, the argument notation $g(z) \in \Ycal^{\Xcal}$ denotes a function, while $g(x;z) \in \Ycal$ is a specific value of that function. Semicolons are used to distinguish between the different groups of arguments. A set of finite sequences $\{1,\ldots,N\} \mapsto \Scal$ will be represented as $\Scal^N$ for brevity.
+Various mappings will be defined for which the domain and/or the range \cite{rudin} are function spaces. The set of functions $\Xcal \mapsto \Ycal$ is denoted $\Ycal^{\Xcal}$. For a mapping $g : \Zcal \mapsto \Ycal^{\Xcal}$, the argument notation $g(z) \in \Ycal^{\Xcal}$ denotes a function, while $g(x;z) \in \Ycal$ is a specific value of that function. Semicolons are used to distinguish between the different groups of arguments. A set of finite sequences $\{1,\ldots,N\} \mapsto \Scal$ will be represented as $\Scal^N$ for brevity.
 
 The convention adopted for natural numbers is $\Nbb = \{1,2,\ldots\}$; the set of non-negative integers is denoted $\Zbb_{\geq 0} = \Nbb \cup \{0\}$. The set of positive real numbers $\Rbb^+$ excludes zero, while non-negative real numbers are represented as $\Rbb_{\geq 0} = \Rbb^+ \cup \{0\}$. The cardinality of countably infinite sets, including the set of natural numbers, is denoted $\aleph_0 = |\Nbb|$; the cardinality of uncountable sets such as $\Rbb$ is at least $\aleph_1$.
 
 Numerous probability distribution functions will be defined over different domains. As such, for a given set $\Xcal$, define a set function $\Pcal$ such that $\Pcal(\Xcal)$ is the set of distributions over $\Xcal$. If $\Xcal$ is countable, the set is defined as $\Pcal(\Xcal) = \left\{ p \in {\Rbb_{\geq 0}}^{\Xcal}: \sum_{x \in \Xcal} p(x) = 1 \right\}$; if $\Xcal$ is a Euclidean space, the set is defined as $\Pcal(\Xcal) = \left\{ p \in {\Rbb_{\geq 0}}^{\Xcal}: \int_{\Xcal} p(x) \mathrm{d}x = 1 \right\}$.
 
-PGR: aleph reference?
+\todolo{aleph reference?}
 
-PGR: ref Rudin for range?
+
 
 
 
@@ -228,7 +235,7 @@ For notational simplicity, probability distributions are occasionally represente
 
 Consider $\xrm$ conditioned on another random element $\zrm \in \Zcal$. The conditional distribution is represented as $\Prm_{\xrm | \zrm} : \Zcal \mapsto \Pcal(\Xcal)$, such that $\Prm_{\xrm | \zrm}(z)$ is a PMF over $\Xcal$ and $\Prm_{\xrm | \zrm}(x|z)$ is a specific value of that PMF. These distributions may be compactly represented as $\Prm(\xrm|\zrm)$. 
 
-Often, the dependency on the conditional variable $\zrm$ will not be expressed in terms of a specific value $z$, but will be left in terms of the random element itself; in this case, the more compact notation $\Prm_{\xrm | \zrm}$ is used and the distribution is implied to be a function of $\zrm$.
+Often, the dependency on the conditional variable $\zrm$ will not be expressed in terms of a specific value $z$, but will be left in terms of the random element itself; in this case, the more compact notation $\Prm_{\xrm | \zrm}$ is used and the distribution is implied to be $\Prm_{\xrm | \zrm}(\zrm)$, a function of $\zrm$.
 
 PGR: reconsider conditional argument suppression, etc. ALWAYS random function? Can't do both preceeding paragraph styles. Fixed?
 
@@ -356,11 +363,11 @@ PGR: subscript Theta? Use theta sub and remove argument like a cond dist?
 
 PGR: use marginal/conditional thetas?
 
-It is informative to formulate the optimal decision function assuming the model $\uptheta$ was in fact observed; it will be referred to as the ``clairvoyant'' function, following terminology used in \cite{kay-det}. This clairvoyant decision function $f_{\Theta}: \Theta \mapsto \Fcal$ is represented by
+It is instructive to formulate the optimal decision function assuming the model $\uptheta$ was in fact observed; it will be referred to as the ``clairvoyant'' function, following terminology used in \cite{kay-det}. This clairvoyant decision function $f_{\Theta}: \Theta \mapsto \Fcal$ is represented by
 \begin{equation}
 f_{\Theta}(\uptheta) = \argmin_{f \in \Fcal} \Rcal_{\Theta}(f ; \uptheta) \;.
 \end{equation}
-For a given set of observations $\xrm$ and $\Drm$, the function $f_{\Theta}(\uptheta) \in \Fcal$ selects the decision $h = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big]$. Note the conditional independence of $\yrm$ from $\Drm$ in \eqref{eq:risk_cond} - the knowledge of $\uptheta$ renders the training data $\Drm$ uninformative. As such, the range of the clairvoyant function is recast as $f_{\Theta} : \Theta \mapsto \Hcal^{\Xcal}$ and the decisions are
+For a given set of observations $\xrm$ and $\Drm$, the function $f_{\Theta}(\uptheta) \in \Fcal$ selects the decision $h = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big]$. Note the conditional independence of $\yrm$ from $\Drm$ in \eqref{eq:risk_cond} - the knowledge of $\uptheta$ renders the training data $\Drm$ useless. As such, the range of the clairvoyant function is recast as $f_{\Theta} : \Theta \mapsto \Hcal^{\Xcal}$ and the decisions are
 \begin{equation} \label{eq:f_clv_x}
 f_{\Theta}(\xrm;\uptheta) = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \;.
 \end{equation}
@@ -947,7 +954,7 @@ As the conditional distribution $\Prm_{\Drm | \uptheta}$ is of exponential form,
 \end{IEEEeqnarray}
 Note that values of the PMF $\Prm_{\Drm}$ are equivalent to joint moments of the model $\uptheta$. 
 
-It is informative to consider the limiting forms of this distribution for the extreme values of the model concentration parameter $\alpha_0$. As $\alpha_0 \to \infty$, the model concetrates at its mean and the training data $\Drm$ distribution is
+It is instructive to consider the limiting forms of this distribution for the extreme values of the model concentration parameter $\alpha_0$. As $\alpha_0 \to \infty$, the model concetrates at its mean and the training data $\Drm$ distribution is
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\Drm}(D) & \to & \Erm_{\uptheta}\left[ \prod_{n=1}^N \uptheta(Y_n,X_n) \right] \\
 & = & \prod_{n=1}^N \frac{\alpha\big( Y_n,X_n \big)}{\alpha_0} \nonumber \;.
@@ -1104,7 +1111,7 @@ The joint PMF of $\yrm$ and $\xrm$ conditioned on the training data is expressed
 & = & \left(\frac{\alpha_0}{\alpha_0 + N}\right) \frac{\alpha}{\alpha_0} + \left(\frac{N}{\alpha_0 + N}\right) \frac{\bar{N}(\Drm)}{N} \nonumber \\
 & = & \left(\frac{\alpha_0}{\alpha_0 + N}\right) \Prm_{\yrm,\xrm} + \left(\frac{N}{\alpha_0 + N}\right) \frac{\bar{N}(\Drm)}{N} \nonumber \;.
 \end{IEEEeqnarray}
-This is a mixture distribution of the prior expectation $\mu_{\uptheta} = \alpha/\alpha_0$ and the empirical distribution $\bar{N}(\Drm)/N$. The more subjective the model prior (i.e. larger $\alpha_0$), the more the prior mean is favored; the more data, the more the empirical PMF is favored. The marginal distribution for $\xrm$ given $\Drm$ is
+This is a mixture distribution of the prior expectation $\mu_{\uptheta} = \alpha/\alpha_0$ and the empirical distribution $\bar{N}(\Drm)/N$. The more informative the model prior (i.e. larger $\alpha_0$), the more the prior mean is favored; the more data, the more the empirical PMF is favored. The marginal distribution for $\xrm$ given $\Drm$ is
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\xrm | \Drm} & = & \frac{\alpha' + N'(\Drm)}{\alpha_0 + N} \\
 & = & \left(\frac{\alpha_0}{\alpha_0 + N}\right) \frac{\alpha'}{\alpha_0} + \left(\frac{N}{\alpha_0 + N}\right) \frac{N'(\Drm)}{N} \nonumber \\
@@ -1199,7 +1206,7 @@ PGR: generalize, move before Dirichlet?
 PGR: use poster table??
 
 
-It is informative to treat the distribution $\Prm_{\yrm | \xrm,\nbarrm}$ as an estimate of the unknown conditional PMF $\Prm_{\yrm | \xrm,\uptheta} \equiv \tilde{\uptheta}(\xrm)$ and investigate the effects of subjective prior knowledge. For a given $\xrm$ and corresponding number of training samples $\nrm'(\xrm)$, the expected value of the estimate condtioned on the true model $\uptheta$ is
+It is instructive to treat the distribution $\Prm_{\yrm | \xrm,\nbarrm}$ as an estimate of the unknown conditional PMF $\Prm_{\yrm | \xrm,\uptheta} \equiv \tilde{\uptheta}(\xrm)$ and investigate the effects of informative prior knowledge. For a given $\xrm$ and corresponding number of training samples $\nrm'(\xrm)$, the expected value of the estimate condtioned on the true model $\uptheta$ is
 \begin{IEEEeqnarray}{L}
 \Erm_{\nbarrm | \nrm',\uptheta}\big[ \Prm_{\yrm | \xrm,\nbarrm} \big] 
 = \Erm_{\nbarrm(\cdot,\xrm) | \nrm'(\xrm),\tilde{\uptheta}(\xrm)}\big[ \Prm_{\yrm | \xrm,\nbarrm(\cdot,\xrm)} \big] \\ 
@@ -1220,7 +1227,7 @@ and its covariance function is
 \quad = \frac{\Sigma_{\nbarrm(\cdot,\xrm) | \nrm'(\xrm),\tilde{\uptheta}(\xrm)}(y,y')}{\big( \alpha'(\xrm) + \nrm'(\xrm) \big)^2} \nonumber \\
 \quad = \frac{\nrm'(\xrm)}{\big( \alpha'(\xrm) + \nrm'(\xrm) \big)^2} \left( \tilde{\uptheta}(y;\xrm) \delta[y,y'] - \tilde{\uptheta}(y;\xrm) \tilde{\uptheta}(y';\xrm) \right) \nonumber \;,
 \end{IEEEeqnarray}
-where the properties of multinomial random processes have been used. Note that the bias is proportionate to the difference between the true conditional model and the data-independent estimate. The scaling factor tends from one to zero as $\nrm'(x)/\alpha'(x)$ tends from zero to infinity; as such, more subjective priors (large $\alpha'(x)$) will lead to PMF estimates that are prone to bias. Conversely, the variance of the PMF estimate tends to zero as $\alpha'(x) \to \infty$. 
+where the properties of multinomial random processes have been used. Note that the bias is proportionate to the difference between the true conditional model and the data-independent estimate. The scaling factor tends from one to zero as $\nrm'(x)/\alpha'(x)$ tends from zero to infinity; as such, more informative priors (large $\alpha'(x)$) will lead to PMF estimates that are prone to bias. Conversely, the variance of the PMF estimate tends to zero as $\alpha'(x) \to \infty$. 
 
 
 Combining the estimator bias and variance, the conditional second moments of $\Delta(\xrm,\nbarrm,\uptheta)$ are
@@ -1303,13 +1310,13 @@ PGR: full support discussion?
 
 PGR: REMOVE GENERAL, RELOCATED MATERIAL!
 
-PGR: equations, plots for specific theta results? subjective/objective tradeoff??? alpha/theta mismatch results???
+PGR: equations, plots for specific theta results? informative/non-informative tradeoff??? alpha/theta mismatch results???
 
 In this section, the Dirichlet prior is applied to the regression and classification applications. Optimal learners $f^*$ are found,  the corresponding minimum Bayes risk $\Rcal^*$ is assessed, and the conditional risk $\Rcal_{\Theta}(f^*;\theta)$ is analyzed.
 
 PGR: add formula for f(D)??? EMPIRICAL RISK DISCUSS, REGULARIZING weight
 
-It is informative to substitute the Bayes predictive distribution using the Dirichlet prior \eqref{eq:P_y_xD_dir} into Equation \eqref{eq:f_opt_xD}, expressing the decision for a given input $\xrm$ and training set $\Drm$ as
+It is useful to substitute the Bayes predictive distribution using the Dirichlet prior \eqref{eq:P_y_xD_dir} into Equation \eqref{eq:f_opt_xD}, expressing the decision for a given input $\xrm$ and training set $\Drm$ as
 \begin{IEEEeqnarray}{L} \label{eq:E_y|xD L}
 f^*(\xrm;\Drm) = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm} \big[ \Lcal(h,\yrm) \big] \\
 = \argmin_{h \in \Hcal} \frac{\sum_{y \in \Ycal} \alpha(y,\xrm) \Lcal(h,y) + \sum_{y \in \Ycal} \bar{N}(y,\xrm;\Drm) \Lcal(h,y)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \nonumber \\
@@ -1453,7 +1460,7 @@ To illustrate these trends, explicitly define the sets $\Ycal = \{ i/M_{\yrm} : 
 
 It may not seem intutitve for the risk to decrease when $\alpha_0$ is smaller -- the variance of the model $\uptheta$ increases and the prior knowledge is less definitive. This is a result of the Dirichlet PDF weight shifting towards the $|\Ycal||\Xcal|$ models which have $\ell_0$ norms satisfying $\| \theta \|_0 = 1$. Although these PMF's are maximally separated (and uncorrelated), they all have zero variance. The optimal learner \eqref{eq:f_opt_SE_dir} will simply use the empirical distribution supplied via the training data - this allows exact identification of $\uptheta$ with a single training pair.
 
-It is also informative to visualize how the minimum squared-error changes for fixed volume of training data $N$ and a fixed prior concentration $\alpha_0$. First, consider how the risk changes with the conditional PMF $\Prm_{\yrm | \xrm}$. Figure \ref{fig:Risk_SE_Dir_IO_Pyx} demonstrates how the squared-error tends towards zero for PMFs that have $\ell_0$-norm equal to one.
+It is also instructional to visualize how the minimum squared-error changes for fixed volume of training data $N$ and a fixed prior concentration $\alpha_0$. First, consider how the risk changes with the conditional PMF $\Prm_{\yrm | \xrm}$. Figure \ref{fig:Risk_SE_Dir_IO_Pyx} demonstrates how the squared-error tends towards zero for PMFs that have $\ell_0$-norm equal to one.
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_SE_Dir_IO_Pyx.pdf}
@@ -1541,7 +1548,7 @@ PGR: additional figures for uniform case?
 
 \subsubsection{Conditional Squared-Error for a Dirichlet-based Estimator}
 
-Having derived the optimal estimator based on a Dirichlet model prior, it is informative to consider the conditional risk $\Rcal_{\Theta}(f^* ; \uptheta)$ and analyze how different prior parametrizations $\alpha$ influence the squared-error for different models $\theta$. Starting from the conditional squared-error risk \eqref{eq:risk_cond_SE} and substituting the Bayesian estimator \eqref{eq:f_opt_SE}, the formula simplifies to
+Having derived the optimal estimator based on a Dirichlet model prior, it is important to consider the conditional risk $\Rcal_{\Theta}(f^* ; \uptheta)$ and analyze how different prior parametrizations $\alpha$ influence the squared-error for different models $\theta$. Starting from the conditional squared-error risk \eqref{eq:risk_cond_SE} and substituting the Bayesian estimator \eqref{eq:f_opt_SE}, the formula simplifies to
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond_SE_dir}
 \Rcal_{\Theta}(f^* ; \uptheta) & = & \Rcal_{\Theta}^*(\uptheta) + \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( f^*(\xrm;\Drm) - f_{\Theta}(\xrm;\uptheta) \big)^2 \Big] \\
 & = & \Erm_{\xrm | \uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right] + \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \nonumber \;.
@@ -1564,13 +1571,13 @@ Evaluation of the excess risk for an estimator based on the Dirichlet prior will
 \end{IEEEeqnarray}
 where the function $\mathcal{E}$ is defined in \eqref{eq:predictive_del_sq}. 
 
-The excess conditional risk can thus be represented as the conditional expectation (with respect to $\Prm_{\xrm | \uptheta}$) of a sum of two random functions of $\xrm$. The first function measures the additional variance beyond that of the clairvoyant estimator (i.e. the clairvoyant squared-error); like the clairvoyant risk, it depends on $\Sigma_{\yrm | \xrm,\uptheta}$, the conditional variance of the clairvoyant estimate for a given observation of $\xrm$. The second function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\uptheta}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. This term alone is influenced by the data-independent Bayes predictive distribution $\Prm_{\yrm | \xrm} = \alpha(\cdot,\xrm) / \alpha'(\xrm)$.
+The excess conditional risk can thus be represented as the conditional expectation (with respect to $\Prm_{\xrm | \uptheta}$) of a sum of two functions of $\xrm$. The first function measures the additional variance beyond that of the clairvoyant estimator (i.e. the clairvoyant squared-error); like the clairvoyant risk, it depends on $\Sigma_{\yrm | \xrm,\uptheta}$, the conditional variance of the clairvoyant estimate for a given observation of $\xrm$. The second function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\uptheta}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. This term alone is influenced by the data-independent Bayes predictive distribution $\Prm_{\yrm | \xrm} = \alpha(\cdot,\xrm) / \alpha'(\xrm)$.
 
 The two second-order (in terms of $y$) terms are scaled by factors dependent on the prior concentrations $\alpha'(x)$ and on $\uptheta'(x)$ and $N$ via conditional expectations with respect to $\nrm'(x)$. Note that by the aggregation property of multinomial distributions, the random variable $\nrm'(x) | \uptheta'(x) \sim \Bi \big(N,\uptheta'(x)\big)$. Closed-forms have not been found for the function expectations of binomial random variables above.
 
 PGR: binomial citations?
 
-It is informative to consider the trends in the conditional squared-error risk \eqref{eq:risk_cond_SE_dir_ex} for different volumes of training data $N$ and for different selections of $\alpha$.
+It is instructional to consider the trends in the conditional squared-error risk \eqref{eq:risk_cond_SE_dir_ex} for different volumes of training data $N$ and for different selections of $\alpha$.
 
 
 First consider how the excess risk changes with the training volume $N$. For $N=0$, it is evident that the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$,  the expected squared bias between the clairvoyant and data-independent estimators. As $N$ tends to infinity, the binomial distribution controlling the scaling factors  concentrates at $\nrm'(x) \approx N \theta'(x)$; as such, the two expectations of interest tend to zero and thus $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable property of the estimator is a consequence of the full support of the Dirichlet prior, ensuring that the model posterior concentrates at the empirical PMF.
@@ -1579,7 +1586,7 @@ Another interesting point regarding the depedency of the excess conditional risk
 \begin{equation}
 N \equiv \alpha'(x) \left( 1 - 2 \alpha'(x) \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2}{\Sigma_{\yrm | \xrm,\uptheta}} \right) \;.
 \end{equation}
-Note that as the squared-difference between the prior mean and true mean increases, the maximizing value decreases (even below zero). Thus, the worse the prior estimate, the more likely the excess squared-error will decrease monotonically with $N$. Conversely, if the prior estimate is accurate, a local maximum may occur and additional training data may (temporarily) compromize the estimator performance. Also consider the effect of prior concentration; subjective priors with sufficiently high $\alpha'(x)$ will not have the local maxima.
+Note that as the squared-difference between the prior mean and true mean increases, the maximizing value decreases (even below zero). Thus, the worse the prior estimate, the more likely the excess squared-error will decrease monotonically with $N$. Conversely, if the prior estimate is accurate, a local maximum may occur and additional training data may (temporarily) compromize the estimator performance. Also consider the effect of prior concentration; informative priors with sufficiently high $\alpha'(x)$ will not have the local maxima.
 
 The excess risk at this potentially non-integral value would be 
 \begin{equation}
@@ -1858,7 +1865,7 @@ and the minimum 0-1 risk is
 
 
 
-It is informative to express the risk for minimal and maximal volumes of training data. Using the binomial summation identity 
+It is instructional to express the risk for minimal and maximal volumes of training data. Using the binomial summation identity 
 \begin{equation}
 \sum_{m=0}^M \binom{M}{m} (-1)^m g(m) = 0 \; ,
 \end{equation}
@@ -1911,7 +1918,7 @@ Further insight into how $|\Xcal|$ affects the risk can be acquired by plotting 
 \end{figure}
 
 
-It is also informative to graph the $N=0$ and $N \to \infty$ minimum risk as a function of $|\Ycal|$; both formulas are independent of $|\Xcal|$. Figure \ref{fig:Risk_01_uni_N_bounds} displays these bounds; note the margin in the probability of error between the optimal $N=0$ and $N \to \infty$ classifiers. For $|\Ycal| = 2$ binary classification, both sequences are at their minimum and infinite training data provides a reduction in expected probability of error from 0.5 to 0.25. As $|\Ycal|$ increases, the classification risk for both the $N=0$ and $N \to \infty$ cases tend to unity and the error reduction for $N \to \infty$ decreases. 
+It is also useful to graph the $N=0$ and $N \to \infty$ minimum risk as a function of $|\Ycal|$; both formulas are independent of $|\Xcal|$. Figure \ref{fig:Risk_01_uni_N_bounds} displays these bounds; note the margin in the probability of error between the optimal $N=0$ and $N \to \infty$ classifiers. For $|\Ycal| = 2$ binary classification, both sequences are at their minimum and infinite training data provides a reduction in expected probability of error from 0.5 to 0.25. As $|\Ycal|$ increases, the classification risk for both the $N=0$ and $N \to \infty$ cases tend to unity and the error reduction for $N \to \infty$ decreases. 
 
 
 
@@ -2428,7 +2435,7 @@ and thus
 & = & \frac{\alpha\big( Y_1,X_1 \big)}{\alpha_0} \prod_{n=2}^N \frac{\alpha\big( Y_n,X_n \big) + \sum_{i=1}^{n-1} \delta\big( Y_n -  Y_i \big) \delta\big( X_n - X_i \big)}{\alpha_0+n-1} \nonumber
 \end{IEEEeqnarray}
 
-It is informative to find the PDF's for the training output values $\Yrm$ given the input values $\Xrm$, as well as the marginal PDF for the input values alone. Observe that the PDF for $\Xrm$ can be represented as
+It is instructional to find the PDF's for the training output values $\Yrm$ given the input values $\Xrm$, as well as the marginal PDF for the input values alone. Observe that the PDF for $\Xrm$ can be represented as
 \begin{IEEEeqnarray}{rCl}
 \prm_{\Xrm}(X) & = & \Erm_{\uptheta}\big[ \prm_{\Xrm | \uptheta}(X | \uptheta) \big] = \Erm_{\uptheta}\left[ \prod_{n=1}^N \uptheta'\big( X_n \big) \right] \\
 & = & \frac{\alpha'\big( X_1 \big)}{\alpha_0} \prod_{n=2}^N \frac{\alpha'\big( X_n \big) + \sum_{i=1}^{n-1} \delta\big( X_n-X_i \big)}{\alpha_0+n-1} \nonumber
