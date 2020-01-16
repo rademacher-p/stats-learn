@@ -1,3 +1,2 @@
 # Dissertation
-Ph.D
-laptop desktop test
+Ph.D @ GWU
