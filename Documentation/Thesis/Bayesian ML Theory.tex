@@ -1,8 +1,10 @@
 \documentclass[12pt]{report}
-%\documentclass[12pt,nocenter,bold]{thesis}
 
 \linespread{1.5}
 \usepackage[margin=1.0in]{geometry}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
 
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithmic}
@@ -16,16 +18,13 @@
 \usepackage{hyperref}
 \usepackage[colorinlistoftodos,backgroundcolor=yellow,linecolor=red]{todonotes}
 
-%\usepackage{fancyhdr}
-%\pagestyle{fancy}
-%\fancyhf{}
-%\lhead{\leftmark}
-%\rfoot{\thepage}
-%\renewcommand{\headrulewidth}{2pt}
-%%\renewcommand{\footrulewidth}{1pt}
-
-\usepackage[nottoc]{tocbibind}
-\setcounter{secnumdepth}{3}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\leftmark}
+\rhead{\thepage}
+\renewcommand{\headrulewidth}{2pt}
+%\renewcommand{\footrulewidth}{1pt}
 
 
 
@@ -75,9 +74,7 @@
 \usepackage[backend=biber,style=numeric]{biblatex}
 \addbibresource{{../References/phd_bib.bib}}
 
-
 \graphicspath{ {../Figures/} }
-
 
 \title{Bayesian Learning using a Dirichlet Prior for Regression and Classification}
 \author{Paul Rademacher}
@@ -1016,11 +1013,11 @@ Figure \ref{fig:P_nbar_a0} displays the distribution of $\nbarrm$ for $N=10$ and
 \paragraph{Uniform Prior}
 
 For the uniform distribution, $\alpha(y,x) = 1$,
-\begin{IEEEeqnarray}{rCl} \label{P_D_io}
+\begin{IEEEeqnarray}{rCl} 
 \Prm_{\Drm}(D) & = & \Mcal\big( \{N,|\Ycal||\Xcal|-1\} \big)^{-1} \Mcal\big( \bar{N}(D) \big)^{-1}
 \end{IEEEeqnarray}
 and
-\begin{IEEEeqnarray}{rCl} \label{P_D_io}
+\begin{IEEEeqnarray}{rCl}
 \Prm_{\nbarrm} & = & |\bar{\Ncal}|^{-1} = \Mcal\big( \{N,|\Ycal||\Xcal|-1\} \big)^{-1} \;.
 \end{IEEEeqnarray}
 The distribution of $\nbarrm$ is uniform over the set $\bar{\Ncal}$. The PMF for $\Drm$ depends on the training data only through the multinomial coefficient; consequently, more ``concentrated''  training sets are more probable.
@@ -3246,7 +3243,7 @@ we perform contrained optimization. Note that the set $\Theta = \left\{ \theta \
 
 %\bibliographystyle{plain}
 %\bibliography{{../References/phd_bib}}
-\printbibliography
+\printbibliography[heading=bibintoc]
 
 
 
