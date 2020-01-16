@@ -1,3 +1,2 @@
 # Dissertation
 Ph.D @ GWU
-:)
