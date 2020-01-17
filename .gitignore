@@ -1,5 +1,5 @@
 
-Documentation\Thesis\*.pdf
+Documentation/Thesis/Bayesian ML Theory.pdf
 
 ##### ABOVE: PGR additions
 ##### BELOW: github/gitignore Tex template file
@@ -280,3 +280,4 @@ TSWLatexianTemp*
 
 # Makeindex log files
 *.lpz
+
