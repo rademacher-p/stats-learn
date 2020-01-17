@@ -878,21 +878,18 @@ Note that the concentration parameter is $\alpha_0 = |\Ycal||\Xcal|$ and $\Prm_{
 
 \subsubsection{Marginal and Conditional Distributions}
 
-PGR: move/add Dir figs here? 
+PGR: move/add Dir figs here?
 
-\todohigh{ALPHA REWORK}
+The marginal distribution $\uptheta'$ and the conditional distribution $\tilde{\uptheta}$ will also be of interest. By the aggregation property \cite{ferguson}, $\uptheta'$ is a Dirichlet random process parameterized by $\alpha' : \Xcal \mapsto \Rbb^+$, where $\alpha' \equiv \sum_{y \in \Ycal} \alpha(y,\cdot)$. Note that $\Prm_{\xrm} = \mu_{\uptheta'} = \alpha' / \alpha_0$.
 
-The marginal distribution $\upthetam$ and the conditional distribution $\upthetac$ will also be of interest. To keep notation simple, it is helpful to introduce the bijection $\alpha \Leftrightarrow \big( \alpha_0,\alpham,\alphac \big)$, where $\alpha_0$ has been defined previously, $\alpham \equiv \sum_{y \in \Ycal} \alpha(y,\cdot) / \alpha_0$, and $\alphac(x) = \alpha(\cdot,x) / \big( \alpha_0 \alpham(x) \big)$ for each $x \in \Xcal$. Observe that $\alpham \in \Pcal(\Xcal)$ and $\alphac \in \Pcal(\Ycal)^{\Xcal}$.
+PGR: introduce tilde alpha to match tilde theta?
 
-
-By the aggregation property \cite{ferguson}, $\upthetam$ is a Dirichlet random process parameterized by $\alpha_0 \alpham$. Note that $\Prm_{\xrm} = \mu_{\upthetam} = \alpham$.
-
-Also of interest is the distribution of the predictive model $\upthetac$ conditioned on the marginal $\upthetam$. As demonstrated in Appendix \ref{app:Dir_agg}, these random processes are jointly distributed as
+Also of interest is the distribution of the predictive model $\tilde{\uptheta}$ conditioned on the marginal $\uptheta'$. As demonstrated in Appendix \ref{app:Dir_agg}, these random processes are jointly distributed as
 \begin{IEEEeqnarray}{rCl}
-\prm_{\upthetac | \upthetam}\Big( \thetac | \thetam \Big) & = & \prod_{x \in \Xcal} \Bigg[ \beta\big( \alpha(\cdot,x) \big)^{-1} \prod_{y \in \Ycal} \thetac(y;x)^{\alpha(y,x)-1} \Bigg] \\
-& = & \prod_{x \in \Xcal} \Dir\Big( \thetac(x) ; \alpha(\cdot,x) \Big) \nonumber \;,
+\prm_{\tilde{\uptheta} | \uptheta'}\Big( \tilde{\theta} | \theta' \Big) & = & \prod_{x \in \Xcal} \Bigg[ \beta\big( \alpha(\cdot,x) \big)^{-1} \prod_{y \in \Ycal} \tilde{\theta}(y;x)^{\alpha(y,x)-1} \Bigg] \\
+& = & \prod_{x \in \Xcal} \Dir\Big( \tilde{\theta}(x) ; \alpha(\cdot,x) \Big) \nonumber \;,
 \end{IEEEeqnarray}
-a product of Dirichlet distributions defined on $\thetac \in \Pcal(\Ycal)^{\Xcal}$. As shown, the processes $\upthetac(x)$ are Dirichlet with parameterizing functions $\alpha(\cdot,x)$, independent of one another, and independent of the marginal distribution $\upthetam$. Observe that the values $\alpha_0 \alpham(x)$ represent the concentration parameters for the individual Dirichlet processes; also, note that $\Prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$. 
+a product of Dirichlet distributions defined on $\tilde{\theta} \in \Pcal(\Ycal)^{\Xcal}$. As shown, the processes $\tilde{\uptheta}(x)$ are Dirichlet with parameterizing functions $\alpha(\cdot,x)$, independent of one another, and independent of the marginal distribution $\uptheta'$. Observe that the values $\alpha'(x)$ represent the concentration parameters for the individual Dirichlet processes; also, note that $\Prm_{\yrm | \xrm} = \mu_{\tilde{\uptheta}(\xrm)} = \alpha(\cdot,\xrm) / \alpha'(\xrm)$. 
 
 
 PGR: use conditional independence property to simplify throughout?!? In loss app sections?!?!
@@ -1013,21 +1010,21 @@ The distribution of $\nbarrm$ is uniform over the set $\bar{\Ncal}$. The PMF for
 
 \subsubsection{Marginal and Conditional Distributions}
 
-It is also useful to express the marginal and conditional distributions for the training data given the Dirichlet prior. As $\Prm_{\Xrm | \uptheta}$ is of exponential form with respect to the marginal model $\upthetam$, the marginal distribution of $\Xrm$ can be expressed as 
+It is also useful to express the marginal and conditional distributions for the training data given the Dirichlet prior. As $\Prm_{\Xrm | \uptheta}$ is of exponential form with respect to the marginal model $\uptheta'$, the marginal distribution of $\Xrm$ can be expressed as 
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\Xrm}(X) & = & \Erm_{\upthetam} \big[ \Prm_{\Xrm | \upthetam} \big](X) \\
+\Prm_{\Xrm}(X) & = & \Erm_{\uptheta'} \big[ \Prm_{\Xrm | \uptheta'} \big](X) \\
 & = & \Erm_{\uptheta} \left[ \prod_{n=1}^N \Prm_{\Xrm_n | \uptheta}\big( X_n | \uptheta \big) \right] \nonumber \\
-& = & \Erm_{\upthetam} \left[ \prod_{x \in \Xcal} \upthetam(x)^{N'(x;X)} \right] \nonumber \\
-& = & \beta(\alpha_0 \alpham)^{-1} \beta\big( \alpha_0 \alpham + N'(X) \big) \nonumber \;.
+& = & \Erm_{\uptheta'} \left[ \prod_{x \in \Xcal} \uptheta'(x)^{N'(x;X)} \right] \nonumber \\
+& = & \beta(\alpha')^{-1} \beta\big( \alpha' + N'(X) \big) \nonumber \;.
 \end{IEEEeqnarray}
-As the model marginal $\upthetam$ and conditional $\upthetac$ are independent, the distribution $\Prm_{\Yrm | \Xrm}$ can be represented as
+As the model marginal $\uptheta'$ and conditional $\tilde{\uptheta}$ are independent, the distribution $\Prm_{\Yrm | \Xrm}$ can be represented as
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\Yrm | \Xrm}(Y | X) & = & \Erm_{\upthetac}\big[ \Prm_{\Yrm | \Xrm,\upthetac} \big](Y | X) \\
-& = & \prod_{x \in \Xcal} \Erm_{\upthetac(x)}\left[ \prod_{y \in \Ycal} \upthetac(y;x)^{\bar{N}(y,x;Y,X)} \right] \nonumber \\
+\Prm_{\Yrm | \Xrm}(Y | X) & = & \Erm_{\tilde{\uptheta}}\big[ \Prm_{\Yrm | \Xrm,\tilde{\uptheta}} \big](Y | X) \\
+& = & \prod_{x \in \Xcal} \Erm_{\tilde{\uptheta}(x)}\left[ \prod_{y \in \Ycal} \tilde{\uptheta}(y;x)^{\bar{N}(y,x;Y,X)} \right] \nonumber \\
 & = & \prod_{x \in \Xcal} \beta\big(\alpha(\cdot,x)\big)^{-1} \beta\big( \alpha(\cdot,x) + \bar{N}(\cdot,x;Y,X) \big) \nonumber \;.
 \end{IEEEeqnarray}
 
-The corresponding distributions for the sufficient statistics will be expressed as well. Recall that $\nrm' | \uptheta \sim \Multi(N,\upthetam)$; by the aggregation property of Dirichlet-Multinomial functions \cite{johnson}, the random process is distributed as $\nrm' \sim \DM(N,\alpha')$.
+The corresponding distributions for the sufficient statistics will be expressed as well. Recall that $\nrm' | \uptheta \sim \Multi(N,\uptheta')$; by the aggregation property of Dirichlet-Multinomial functions \cite{johnson}, the random process is distributed as $\nrm' \sim \DM(N,\alpha')$.
 
 Also of interest is the distribution of $\nbarrm$ conditioned on its aggregation $\nrm'$. Using the Dirichlet-Multinomial properties presented in Appendix \ref{app:DM_agg}, it can be shown that
 \begin{IEEEeqnarray}{rCl}
