@@ -885,11 +885,11 @@ PGR: move/add Dir figs here?
 The marginal distribution $\upthetam$ and the conditional distribution $\upthetac$ will also be of interest. To keep notation simple, it is helpful to introduce the bijection $\alpha \Leftrightarrow \big( \alpha_0,\alpham,\alphac \big)$, where $\alpha_0$ has been defined previously, $\alpham \equiv \sum_{y \in \Ycal} \alpha(y,\cdot) / \alpha_0$, and $\alphac(x) = \alpha(\cdot,x) / \big( \alpha_0 \alpham(x) \big)$ for each $x \in \Xcal$. Observe that $\alpham \in \Pcal(\Xcal)$ and $\alphac \in \Pcal(\Ycal)^{\Xcal}$.
 
 
-By the aggregation property \cite{ferguson}, $\upthetam$ is a Dirichlet random process parameterized by $\alpha_0 \alpham$. Note that $\Prm_{\xrm} = \mu_{\upthetam} = \alpham$.
+By the aggregation property \cite{ferguson}, $\upthetam$ is a Dirichlet random process parameterized by $\alpha_0 \alpham$. Note that the concentration parameter is $\alpha_0$ and that $\Prm_{\xrm} = \mu_{\upthetam} = \alpham$.
 
 Also of interest is the distribution of the predictive model $\upthetac$ conditioned on the marginal $\upthetam$. As demonstrated in Appendix \ref{app:Dir_agg}, these random processes are jointly distributed as
 \begin{IEEEeqnarray}{rCl}
-\prm_{\upthetac | \upthetam}\Big( \thetac | \thetam \Big) & = & \prod_{x \in \Xcal} \Bigg[ \beta\big( \alpha(\cdot,x) \big)^{-1} \prod_{y \in \Ycal} \thetac(y;x)^{\alpha(y,x)-1} \Bigg] \\
+\prm_{\upthetac | \upthetam}\big( \thetac | \thetam \big) & = & \prod_{x \in \Xcal} \Bigg[ \beta\big( \alpha(\cdot,x) \big)^{-1} \prod_{y \in \Ycal} \thetac(y;x)^{\alpha(y,x)-1} \Bigg] \\
 & = & \prod_{x \in \Xcal} \Dir\Big( \thetac(x) ; \alpha(\cdot,x) \Big) \nonumber \;,
 \end{IEEEeqnarray}
 a product of Dirichlet distributions defined on $\thetac \in \Pcal(\Ycal)^{\Xcal}$. As shown, the processes $\upthetac(x)$ are Dirichlet with parameterizing functions $\alpha(\cdot,x)$, independent of one another, and independent of the marginal distribution $\upthetam$. Observe that the values $\alpha_0 \alpham(x)$ represent the concentration parameters for the individual Dirichlet processes; also, note that $\Prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$. 
