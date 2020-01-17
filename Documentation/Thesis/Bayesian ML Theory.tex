@@ -108,11 +108,12 @@
 
 \todolow{line break symbol format, before/after?}
 
-\todomid{learners (full) or decision functions (range)?}
-
-\todomid{likelihood function terminology}
+\todolo{likelihood function terminology}
 
 \todohi{Dirichlet localization or concentration?}
+
+\todolow{DIM and PR operator from AMS?}
+
 
 \todohi{fix arguments for theta, nbar dists.}
 
@@ -120,9 +121,7 @@
 
 \todohigh{ALL figure notation: theta font + Ycal indexing. use R,f opt?}
 
-\todolow{is $\Theta$ redundant given $\Pcal$?}
 
-\todolo{DIM and PR operator from AMS?}
 
 
 
@@ -135,7 +134,7 @@
 
 \todohigh{change from nbar to emprical RV???}
 
-\todohi{investigate N lim for nbar given theta, bayes risk vs model support}
+\todohi{Investigate N lim for nbar given theta, risks. Model support, bounded prior?}
 
 \todohi{SEMI-SUPERVISED - generalize to joint decisions!!! training/test!}
 
@@ -145,8 +144,9 @@
 
 
 
+\todomid{reconsider irreducible terminology}
 
-\todohi{use clairvoyant/irreducible terms and symbols}
+\todolo{use clairvoyant/irreducible terms and symbols $\Rcal$}
 
 \todohi{empirical risk terms/discussion?}
 
@@ -328,16 +328,14 @@ Note that the countable domains of the input functions may have an infinite numb
 
 \todolo{italic theta font before Bayes?}
 
-Consider an observable random element $\xrm \in \Xcal$ and and unobservable random element $\yrm \in \Ycal$ which are jointly distributed according to an unknown probability distribution $\uptheta \in \Theta = \Pcal(\Ycal \times \Xcal)$, such that $\Prm_{\yrm,\xrm | \uptheta} = \uptheta$. Note that the uppercase PMF notation used throughout this section implies that the random elements are discrete; PDF's are used when $\xrm$ and/or $\yrm$ are continuous random variables/processes.
+Consider an observable random element $\xrm \in \Xcal$ and and unobservable random element $\yrm \in \Ycal$ which are jointly distributed according to an unknown probability distribution $\uptheta \in \Theta \equiv \Pcal(\Ycal \times \Xcal)$, such that $\Prm_{\yrm,\xrm | \uptheta} = \uptheta$. Note that the uppercase PMF notation used throughout this section implies that the random elements are discrete; PDF's are used when $\xrm$ and/or $\yrm$ are continuous random variables/processes.
 
-PGR: consider definition/equivalence of D and Y,X. Think indexing.
-
-Also observed is a random sequence of $N$ samples from $\uptheta$, denoted $\Drm \in \Dcal = \{\Ycal \times \Xcal\}^N$; an alternative representation that can be used is $\Drm \equiv ( \Yrm,\Xrm )$. The $N$ data pairs are conditionally independent from one another and are identically distributed as $\Prm_{\Drm_n | \uptheta} = \uptheta$. The samples are also conditionally independent from $(\yrm,\xrm)$. Thus,
+Also observed is a random sequence of $N$ samples from $\uptheta$, denoted $\Drm \in \Dcal = \{\Ycal \times \Xcal\}^N$; an alternative representation that can be used is $\Drm \Leftrightarrow \big( (\Yrm_1,\Xrm_1),\ldots,(\Yrm_N,\Xrm_N) \big)$, where $\Yrm \in \Ycal^N$ and $\Xrm \in \Xcal^N$. The $N$ data pairs are conditionally independent from one another and are identically distributed as $\Prm_{\Drm_n | \uptheta} = \uptheta$. The samples are also conditionally independent from $(\yrm,\xrm)$. Thus,  
 \begin{equation}
 \Prm_{\yrm,\xrm,\Drm | \uptheta}(y,x,D | \theta) = \Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) \prod_{n=1}^N \Prm_{\Drm_n | \uptheta}\big(Y_n,X_n | \theta\big) \;.
 \end{equation}
 
-The task in supervised machine learning is to design a decision function $f: \Dcal \mapsto \Hcal^{\Xcal}$ which produces a mapping from the space of the observed random elements to a decision space $\Hcal$. Define the function space $\Fcal = \left\{ {\Hcal^{\Xcal}} \right\}^{\Dcal}$, such that $f \in \Fcal$. The learning functions are non-parametric and there are no restrictions on the set of achievable functions $\Fcal$.
+The task in supervised machine learning is to design a learning function $f: \Dcal \mapsto \Hcal^{\Xcal}$ which produces a mapping from the space of the observed random elements to a decision space $\Hcal$. Define the function space $\Fcal = \left\{ {\Hcal^{\Xcal}} \right\}^{\Dcal}$, such that $f \in \Fcal$. The learning functions are non-parametric and there are no restrictions on the set of achievable functions $\Fcal$.
 
 The metric guiding the design is a loss function $\Lcal: \Hcal \times \Ycal \mapsto \Rbb_{\geq 0}$ which penalizes the decision $h \in \Hcal$ based on the value of $\yrm$. The objective is to minimize the conditional expected loss, or conditional ``risk'',
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond}
@@ -345,7 +343,7 @@ The metric guiding the design is a loss function $\Lcal: \Hcal \times \Ycal \map
 & = & \Erm_{\xrm,\Drm | \uptheta} \bigg[ \Erm_{\yrm | \xrm,\uptheta} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \nonumber \\
 & = & \Erm_{\Drm | \uptheta}\Bigg[ \Erm_{\xrm | \uptheta}\bigg[ \Erm_{\yrm | \xrm,\uptheta}\Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \Bigg] \nonumber \;.
 \end{IEEEeqnarray}
-where the conditional independence of random element $\yrm$ from the training data $\Drm$ given the model $\uptheta$ is used. As the model $\uptheta$ is not observed, $\Rcal_{\Theta}: \Theta \mapsto {\Rbb_{\geq 0}}^{\Fcal}$ is not a feasible objective function for optimization. This is the fundamental challenge of supervised learning: the true risk objective is unknown and the designer can never be precisely sure how well any decision function performs. 
+where the conditional independence of random element $\yrm$ from the training data $\Drm$ given the model $\uptheta$ is used. As the model $\uptheta$ is not observed, $\Rcal_{\Theta}: \Theta \mapsto {\Rbb_{\geq 0}}^{\Fcal}$ is not a feasible objective function for optimization. This is the fundamental challenge of supervised learning: the true risk objective cannot be evaluated and the designer can never be precisely sure how well any learning function performs. 
 
 
 
@@ -355,9 +353,7 @@ where the conditional independence of random element $\yrm$ from the training da
 
 \subsection{Clairvoyant Decision}
 
-PGR: subscript Theta? Use theta sub and remove argument like a cond dist?
-
-PGR: use marginal/conditional thetas?
+\todolow{subscript Theta? Use theta sub and remove argument like a cond dist?}
 
 It is instructive to formulate the optimal decision function assuming the model $\uptheta$ was in fact observed; it will be referred to as the ``clairvoyant'' function, following terminology used in \cite{kay-det}. This clairvoyant decision function $f_{\Theta}: \Theta \mapsto \Fcal$ is represented by
 \begin{equation}
@@ -379,7 +375,7 @@ The corresponding clairvoyant risk for a given model $\uptheta$ is
 
 \subsection{Bayes Decision}
 
-To design an optimal decision function $f \in \Fcal$, an operator must be chosen to remove the dependency of the conditional risk on $\uptheta$ and form an objective function $\Fcal \mapsto \Rbb_{\geq 0}$. One choice is to integrate over $\Theta$; to ensure a non-negative objective value, the weighting function should be non-negative. Also, as scaling the objective function will not change its minimizing argument, the weighting function can be constrained to integrate to one. These are the requirements for a valid probability density function (PDF); as such, the model $\uptheta$ is treated as a random process and a Bayesian approach can be adopted. 
+To design an optimal learning function $f \in \Fcal$, an operator must be chosen to remove the dependency of the conditional risk on $\uptheta$ and form an objective function $\Fcal \mapsto \Rbb_{\geq 0}$. One choice is to integrate over $\Theta$; to ensure a non-negative objective value, the weighting function should be non-negative. Also, as scaling the objective function will not change its minimizing argument, the weighting function can be constrained to integrate to one. These are the requirements for a valid probability density function (PDF); as such, the model $\uptheta$ is treated as a random process and a Bayesian approach can be adopted. 
 
 Define the PDF $\prm_{\uptheta} \in \Pcal(\Theta)$. Now the Bayes risk can be formulated as
 \begin{IEEEeqnarray}{rCl} \label{eq:risk}
@@ -390,7 +386,7 @@ Define the PDF $\prm_{\uptheta} \in \Pcal(\Theta)$. Now the Bayes risk can be fo
 \end{IEEEeqnarray}
 and $\yrm$, $\xrm$, and $\Drm$ are treated as jointly distributed random elements. Observe that the Bayesian predictive distributions can be represented as $\Prm_{\xrm | \Drm} = \Erm_{\uptheta | \Drm}\big[ \Prm_{\xrm | \uptheta} \big]$ and $\Prm_{\yrm | \xrm,\Drm} = \Erm_{\uptheta | \xrm,\Drm}\big[ \Prm_{\yrm | \xrm,\uptheta} \big]$, the expected values of the corresponding clairvoyant distributions with respect to the model posteriors $\prm_{\uptheta | \Drm}$ and $\prm_{\uptheta | \xrm,\Drm}$, respectively.
 
-PGR: BELOW, add forumla for f(D)?
+\todolo{BELOW, add forumla for f(D)?}
 
 Finally, express the optimal learning function
 \begin{equation} 
@@ -413,9 +409,7 @@ Thus, the Bayesian approach uses the model posterior $\prm_{\uptheta | \xrm,\Drm
 
 \subsubsection{Irreducible Risk}
 
-PGR: RECONSIDER IRREDUCIBLE TERMINOLOGY!!!!!!
-
-PGR: bound met in limit of N? full support? bounded prior? change/move to clairvoyant discussion?
+\todomid{location? terminology?}
 
 The clairvoyant risk \eqref{eq:risk_clv} for a given model satisfies $\Rcal_{\Theta}^*(\theta) \leq \Rcal_{\Theta}(f;\theta) \quad \forall f \in \Fcal, \ \theta \in \Theta$. Consequently, the Bayes risk satisfies $\Erm_{\uptheta} \big[ \Rcal_{\Theta}^*(\uptheta) \big] \leq \Rcal(f) \quad \forall f \in \Fcal$; the expected value of the clairvoyant risk will thus be referred to as the ``irreducible'' risk. 
 
@@ -430,13 +424,9 @@ It is important to note that this inequality holds for any number of training sa
 
 \section{Sufficient Statistic: the Empirical PMF}
 
-PGR: MOVE SECTION before Bayesian approach??
+\todohigh{MOVE SECTION??}
 
-PGR: continuous? DMP?
-
-PGR: change to emp PMF RP $\psi$?
-
-PGR: trends in limit of N, use mean/cov?? EMPIRICAL RISK, bounded prior
+\todohigh{continuous? empirical process?}
 
 For countable sets $\Ycal$ and $\Xcal$, the distribution of $\Drm$ conditioned on the model can be formulated as
 \begin{IEEEeqnarray}{rCl}
@@ -454,15 +444,15 @@ and the function is defined as
 \end{IEEEeqnarray}
 This function counts the number of occurrences of the pair $(y,x)$ in the training set $D$. 
 
-PGR: show SS via Kay, data likelihood??!!
-
 Note that $\Prm_{\Drm | \uptheta}$ depends on the training data $\Drm$ only through the transform $\bar{N}$; $\bar{N}(\Drm)$ is thus a sufficient statistic \cite{bernardo} for the model $\uptheta$. Consequently, other distributions of interest $\Prm_{\Drm}$, $\Prm_{\xrm | \Drm}$, and $\Prm_{\yrm | \xrm,\Drm}$ will also depend on $\Drm$ via $\bar{N}(\Drm)$. As such, it is useful to define a new random process $\nbarrm \equiv \bar{N}(\Drm) \in \bar{\Ncal}$. 
 
-Frequently, the corresponding distributions $\Prm_{\nbarrm}$, $\Prm_{\xrm | \nbarrm}$, and $\Prm_{\yrm | \xrm,\nbarrm}$ will be used to find the optimal decision functions and the minimum risk. Note that $\Mcal\big( \bar{N}(D) \big) \Prm_{\Drm | \uptheta}(D | \theta) = \Prm_{\nbarrm | \uptheta}\big( \bar{N}(D) | \theta \big)$, where $\Mcal$ is the multinomial operator. Also note that $\Prm_{\xrm | \Drm}(D) = \Prm_{\xrm | \nbarrm}\big( \bar{N}(D) \big)$ and $\Prm_{\yrm | \xrm,\Drm}(x,D) = \Prm_{\yrm | \xrm,\nbarrm}\big( x,\bar{N}(D) \big)$.
+\todomid{show SS via Kay, data likelihood??!!}
+
+Frequently, the corresponding distributions $\Prm_{\nbarrm}$, $\Prm_{\xrm | \nbarrm}$, and $\Prm_{\yrm | \xrm,\nbarrm}$ will be used to find the optimal learning functions and the minimum risk. Note that $\Mcal\big( \bar{N}(D) \big) \Prm_{\Drm | \uptheta}(D | \theta) = \Prm_{\nbarrm | \uptheta}\big( \bar{N}(D) | \theta \big)$, where $\Mcal$ is the multinomial operator. Also note that $\Prm_{\xrm | \Drm}(D) = \Prm_{\xrm | \nbarrm}\big( \bar{N}(D) \big)$ and $\Prm_{\yrm | \xrm,\Drm}(x,D) = \Prm_{\yrm | \xrm,\nbarrm}\big( x,\bar{N}(D) \big)$.
 
 The cardinality of the random process' domain is $|\bar{\Ncal}| = \Mcal\big( \{N,|\Ycal||\Xcal|-1\} \big)$; this can be shown using the stars-and-bars method \cite{feller}. The cardinality of original set is $|\Dcal| = \big( |\Ycal| |\Xcal| \big)^N$; thus $|\bar{\Ncal}| \leq |\Dcal|$ and the sufficient statistic compactly represents the valuable information in the training data. Also, observe that the set $\{ \bar{n}/N : \bar{n} \in \bar{\Ncal} \} \subset \Theta$ and thus that the empirical distribution $\bar{N}(\Drm)/N$ assumes one of a finite number of the elements from $\Theta$.
 
-PGR: sufficient statistic savings in memory bits???
+\todolo{sufficient statistic savings in memory bits?}
 
 Conditioned on the model $\uptheta$, the PMF of $\nbarrm$ is a multinomial distribution
 \begin{IEEEeqnarray}{rCl}
@@ -487,7 +477,7 @@ and the covariance function is
 \Sigma_{\nbarrm | \uptheta}(y,x,y',x')  & = & N \big( \uptheta(y,x) \delta[y,y'] \delta[x,x'] - \uptheta(y,x) \uptheta(y',x') \big) \;.
 \end{IEEEeqnarray}
 
-PGR: trends with N? delta? Figures??
+\todolo{trends with N? Figures??}
 
 Also, observe that the maximum likelihood estimate of $\theta$ given the training statistic is \cite{rao},
 \begin{IEEEeqnarray}{rCl}
@@ -500,23 +490,14 @@ the empirical distribution.
 
 \section{Marginal/Conditional Distributions for Observed/Unobserved Elements}
 
-PGR: move section?
-
-PGR: clean up
+\todohigh{move section? Before Risk??}
+\todomid{clean up}
 
 \subsection{Marginal and Conditional Distributions of $\uptheta$}
 
-PGR: are they independent??? No?!
-
-PGR: bijection!!
-
-As only $\yrm$ is unobservable, it will be useful to decompose the model distribution as $\uptheta \equiv (\uptheta',\tilde{\uptheta})$. First, introduce the marginal distribution $\uptheta' \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) \in \Pcal(\Xcal)$; note that the summation is replaced by an integral when $\yrm$ is a continuous random variable. Next, introduce the conditional distributions $\tilde{\uptheta} \in \Pcal(\Ycal)^{\Xcal}$ defined as $\tilde{\uptheta}(x) \equiv \uptheta(\cdot,x) / \uptheta'(x)$. 
+As only $\yrm$ is unobservable, it will be useful to decompose the model distribution as $\uptheta \Leftrightarrow (\uptheta',\tilde{\uptheta})$. First, introduce the marginal distribution $\uptheta' \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) \in \Pcal(\Xcal)$; note that the summation is replaced by an integral when $\yrm$ is a continuous random variable. Next, introduce the conditional distributions $\tilde{\uptheta} \in \Pcal(\Ycal)^{\Xcal}$ defined as $\tilde{\uptheta}(x) \equiv \uptheta(\cdot,x) / \uptheta'(x)$. Note that the mapping between the two representations is a bijection.
 
 This decomposition enables the clairvoyant distributions to be represented as $\Prm_{\xrm | \uptheta} = \Prm_{\xrm | \uptheta'} = \uptheta'$ and $\Prm_{\yrm | \xrm,\uptheta} = \Prm_{\yrm | \xrm,\tilde{\uptheta}} = \tilde{\uptheta}(\xrm)$; these distributions will be of recurring importance. 
-
-PGR: conditional theta condition on x necessary above? Yes?!
-
-PGR: marginal theta conditional on X, not full D above???? No!?
 
 
 
@@ -558,12 +539,7 @@ over the domain $\left\{ \bar{n} \in {\Zbb_{\geq 0}}^{\Ycal \times \Xcal} : \sum
 
 \subsection{Model Posteriors}
 
-PGR: clean, discuss
-
 The Bayesian predicitive distributions analagous to the clairvoyant distributions can now be simplified as $\Prm_{\xrm | \Drm} = \mu_{\uptheta' | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm} = \mu_{\tilde{\uptheta}(\xrm) | \xrm,\Drm}$.
-
-PGR: use $\Prm_{\yrm | \xrm,\Drm} = \Erm_{\tilde{\uptheta} | \xrm,\Drm}\big[ \tilde{\uptheta}(\xrm) \big]$ instead???
-
 
 \begin{IEEEeqnarray}{rCl}
 \prm_{\uptheta',\tilde{\uptheta} | \Yrm,\Xrm}(\theta',\tilde{\theta} | Y,X) & = & \frac{\Prm_{\Yrm | \Xrm,\tilde{\uptheta}}(Y | X,\tilde{\theta})}{\Prm_{\Yrm | \Xrm}(Y | X)} 
@@ -618,25 +594,19 @@ Note that $\Prm_{\Yrm | \Xrm,\xrm} = \Erm_{\uptheta' | \Xrm,\xrm} \Big[ \Erm_{\t
 
 \section{Applications to Common Loss Functions}
 
-PGR: equation label conflicts??
+\todohi{MOVE SECTION??}
 
-PGR: marginal/condtitional???
-
-PGR: sum vs int???
-
-PGR: move before nbar, keep D?
+\todohi{marginal/condtitional??? D or nbar?}
 
 
-
-In this section, loss functions typical for classification and regression applications, specifically the 0-1 loss function and the squared-error loss function, are adopted. The conditional risk \eqref{eq:risk_cond} is assessed, clairvoyant learners \eqref{eq:f_clv_x} are found, and the clairvoyant risk \eqref{eq:risk_clv} is expressed.
-
+In this section, loss functions typical for classification and regression applications, specifically the 0-1 loss function and the squared-error loss function, are adopted. The conditional risk \eqref{eq:risk_cond} is assessed, clairvoyant decision functions \eqref{eq:f_clv_x} are found, and the clairvoyant risk \eqref{eq:risk_clv} is expressed.
 
 
 \subsection{Regression: the Squared-Error Loss}
 
 The squared-error (SE) loss function is arguably the most commonly used loss function for regression, or in fact for any estimation problem. This can be attributed to its quadratic form, which enables a closed-form expression of the minimizing estimation function.
 
-It is assumed that the unobserved random element $\yrm$ is a scalar random variable; that is, $\Ycal \subseteq \Rbb$. Additionally, the learning function's estimate is allowed to assume real numbers; thus, $\Hcal = \Rbb \supseteq \Ycal$.
+It is assumed that the unobserved random element $\yrm$ is a scalar random variable; that is, $\Ycal \subseteq \Rbb$. Additionally, the estimator's output is allowed to assume real numbers; thus, $\Hcal = \Rbb \supseteq \Ycal$.
 
 The loss function is defined as
 \begin{equation}
@@ -660,7 +630,7 @@ a sum of two terms. The first term is the expected conditional variance of the t
 To find the clairvoyant estimator, the squared-error loss is substituted into \eqref{eq:f_clv_x}; note that the objective function is quadratic over the argument $h \in \Hcal = \Rbb$. It is easily shown that the function over $h$ is positive-definite; as such, the minimizing decision $h$ is the sole stationary point. Setting the first derivative of the function to zero, the clairvoyant estimate is the expected value of $\yrm$ given the model $\uptheta$ and the observed value $\xrm$, such that
 \begin{IEEEeqnarray}{rCl} \label{eq:f_clv_SE}
 f_{\Theta}(\xrm;\uptheta) & = & \argmin_{h \in \Rbb} \Erm_{\yrm | \xrm,\uptheta} \left[ (h-\yrm)^2 \right] \\
-& = &  \mu_{\yrm | \xrm,\uptheta} = \sum_{y \in \Ycal} y \tilde{\uptheta}(y;\xrm) \nonumber \;.
+& = &  \mu_{\yrm | \xrm,\uptheta} \nonumber \;. %= \sum_{y \in \Ycal} y \tilde{\uptheta}(y;\xrm) 
 \end{IEEEeqnarray}
 Substituting the loss and clairvoyant function into \eqref{eq:risk_clv}, the resulting clairvoyant risk is
 \begin{IEEEeqnarray}{rCl}
@@ -687,7 +657,7 @@ Figure \ref{fig:Risk_clv_SE_tilde} displays the clairvoyant risk for predictive 
 
 \paragraph{Optimal Estimate: the Posterior Mean}
 
-PGR: plots?
+\todolow{plots?}
 
 To find the optimal estimator, the squared-error loss is substituted into \eqref{eq:f_opt_xD}. Again, the function over $h$ is positive-definite; as such, the minimizing decision $h$ is the sole stationary point. Setting the first derivative of the function to zero, the optimal estimate is the expected value of $\yrm$ given the training data and the observed value $\xrm$, such that
 \begin{IEEEeqnarray}{rCl} \label{eq:f_opt_SE}
@@ -722,9 +692,6 @@ Substituting the optimal estimator \eqref{eq:f_opt_SE} into Equation \eqref{eq:r
 The first term is the irreducible risk. The second term is the expected variance of the clairvoyant estimate $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$ with respect to the model posterior PDF $\prm_{\uptheta | \xrm,\Drm}$
 
 
-PGR: assess irreducible risk by performing theta agg conditioning???
-
-
 
 
 
@@ -737,10 +704,9 @@ In this section, the developed framework is applied to a common machine learning
 \end{equation}
 Applying the 0-1 loss, the conditional risk \eqref{eq:risk_cond} for a general classifier is
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond_01}
-\Rcal_{\Theta}(f ; \uptheta) & = & 1 - \Erm_{\Drm | \uptheta} \bigg[ \Erm_{\yrm,\xrm | \uptheta} \Big[ \delta\big[ f(\xrm;\Drm),\yrm \big] \Big] \bigg] \\
-& = & 1 - \sum_{x \in \Xcal} \Erm_{\Drm | \uptheta} \Big[ \uptheta\big( f(x;\Drm),x \big) \Big] \nonumber \\
-& = & 1 - \Erm_{\xrm | \uptheta} \bigg[ \Erm_{\Drm | \uptheta} \Big[ \Prm_{\yrm | \xrm,\uptheta}\big( f(\xrm;\Drm) | \xrm,\uptheta \big) \Big] \bigg] \nonumber \\
-& = & 1 - \sum_{x \in \Xcal} \uptheta'(x) \Erm_{\Drm | \uptheta} \Big[ \tilde{\uptheta}\big( f(x;\Drm);x \big) \Big] \nonumber \;.
+\Rcal_{\Theta}(f ; \uptheta) & = & 1 - \Erm_{\Drm | \uptheta} \bigg[ \Erm_{\xrm | \uptheta} \Big[ \Prm_{\yrm | \xrm,\uptheta}\big( f(\xrm;\Drm) | \xrm,\uptheta \big) \Big] \bigg] \;.
+% & = & 1 - \sum_{x \in \Xcal} \Erm_{\Drm | \uptheta} \Big[ \uptheta\big( f(x;\Drm),x \big) \Big] \nonumber \\
+% & = & 1 - \sum_{x \in \Xcal} \uptheta'(x) \Erm_{\Drm | \uptheta} \Big[ \tilde{\uptheta}\big( f(x;\Drm);x \big) \Big] \nonumber \;.
 \end{IEEEeqnarray}
 
 
@@ -756,9 +722,9 @@ f_{\Theta}(\xrm;\uptheta) & = & \argmin_{h \in \Ycal} \Erm_{\yrm | \xrm,\uptheta
 \end{IEEEeqnarray}
 Substituting the 0-1 loss and clairvoyant hypothesis into \eqref{eq:risk_clv}, the resulting clairvoyant risk is
 \begin{IEEEeqnarray}{rCl}
-\Rcal_{\Theta}^*(\uptheta) & = & 1 - \Erm_{\xrm | \uptheta} \Big[ \max_{y \in \Ycal} \Prm_{\yrm | \xrm,\uptheta}(y | \xrm,\uptheta) \Big] \\
-& = & 1 - \sum_{x \in \Xcal} \uptheta'(x) \max_{y \in \Ycal} \tilde{\uptheta}(y;x) \nonumber \\
-& = & 1 - \sum_{x \in \Xcal} \max_{y \in \Ycal} \uptheta(y,x) \nonumber \;.
+\Rcal_{\Theta}^*(\uptheta) & = & 1 - \Erm_{\xrm | \uptheta} \Big[ \max_{y \in \Ycal} \Prm_{\yrm | \xrm,\uptheta}(y | \xrm,\uptheta) \Big] \;.
+%& = & 1 - \sum_{x \in \Xcal} \uptheta'(x) \max_{y \in \Ycal} \tilde{\uptheta}(y;x) \nonumber \\
+%& = & 1 - \sum_{x \in \Xcal} \max_{y \in \Ycal} \uptheta(y,x) \nonumber \;.
 \end{IEEEeqnarray}
 
 Figure \ref{fig:Risk_clv_01_tilde} displays the clairvoyant risk for predictive models $\tilde{\theta}(x)$ independent of $x$. Intuitively, the models that are more concentrated lead to lower probability of error.
@@ -775,7 +741,7 @@ Figure \ref{fig:Risk_clv_01_tilde} displays the clairvoyant risk for predictive 
 
 \paragraph{Optimal Hypothesis: Conditional Maximum \emph{a posteriori}}
 
-PGR: decision region figures??
+\todomid{decision region figures??}
 
 To determine the optimal learning function, the 0-1 loss from Equation \eqref{eq:loss_01} is substituted into Equation \eqref{eq:f_opt_xD} to find
 \begin{IEEEeqnarray}{rCl} \label{eq:f_opt_01}
@@ -793,7 +759,7 @@ Using the 0-1 loss, the Bayes probability of error \eqref{eq:risk_min} is
 \Rcal(f) & = & 1 - \Erm_{\xrm,\Drm} \left[ \Prm_{\yrm | \xrm,\Drm}\big( f(\xrm;\Drm) | \xrm,\Drm \big) \right] \;.
 \end{IEEEeqnarray}
 
-Substituting the optimal learner \eqref{eq:f_opt_01} into the general risk \eqref{eq:risk_01}, the minimum probability of error is 
+Substituting the optimal learning function \eqref{eq:f_opt_01} into the general risk \eqref{eq:risk_01}, the minimum probability of error is 
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_min_01}
 \Rcal^* & = & 1 - \Erm_{\xrm,\Drm} \left[ \max_{y \in \Ycal} \Prm_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) \right] \;.
 \end{IEEEeqnarray}
@@ -819,12 +785,12 @@ Substituting the optimal learner \eqref{eq:f_opt_01} into the general risk \eqre
 
 \chapter{Finite Dirichlet Model}
 
-This chapter demonstrates the optimal decision functions when the sets $\Ycal$ and $\Xcal$ have a finite number of elements and the model $\uptheta$ is characterized by a Dirichlet distribution.
+This chapter determines the optimal learning functions when the sets $\Ycal$ and $\Xcal$ have a finite number of elements and the model $\uptheta$ is characterized by a Dirichlet distribution.
 
 
 \section{Probability Distributions}
 
-To determine the optimal decision function, the joint PMF $\Prm_{\yrm,\xrm,\Drm}$ is required. Having already defined the distribution conditioned on the model $\uptheta$, all that remains is to select a PDF $\prm_{\uptheta}$ reflecting the user's prior knowledge. In this section, the Dirichlet distribution is used. The Dirichlet distribution possesses the desirable property of being the conjugate prior for the multinomial conditional distribution characterizing the data; as such, it will provide analytic forms for the model posterior distribution and lead to closed form expressions for the data conditional distribution used to design the decision function.
+To determine the optimal learning function, the joint PMF $\Prm_{\yrm,\xrm,\Drm}$ is required. Having already defined the distribution conditioned on the model $\uptheta$, all that remains is to select a PDF $\prm_{\uptheta}$ reflecting the user's prior knowledge. In this section, the Dirichlet distribution is used. The Dirichlet distribution possesses the desirable property of being the conjugate prior for the multinomial conditional distribution characterizing the data; as such, it will provide analytic forms for the model posterior distribution and lead to closed form expressions for the data conditional distribution used to design the learning function.
 
 Other distributions of interest will be provided, such as the training data PMF $\Prm_{\Drm}$ and the conditional distribution $\Prm_{\yrm | \xrm,\Drm}$ used to form a decision given specific observations.
 
@@ -1644,7 +1610,7 @@ Calculation of the second derivative confirms that this value is a local minimum
 \end{equation}
 which can be easily shown to be less than both the asymptotic values for $\alpha'(x) \to 0$ and $\alpha'(x) \to \infty$. Thus the concentation values \eqref{eq:alpha_x_min_Rex} provide the minimum excess risk for the given prior conditional distributions.
 
-Note that the minimizing concentration values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible; the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low concentrations are preferable when the model has low conditional variance; these models can be quickly identified with learners prioritizing the emprical PMF estimate over the prior estimate. Additionally, note that these values $\alpha'(x)$ do not depend on the training volume $N$.
+Note that the minimizing concentration values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible; the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low concentrations are preferable when the model has low conditional variance; these models can be quickly identified with learners that prioritize the emprical PMF estimate over the prior estimate. Additionally, note that these values $\alpha'(x)$ do not depend on the training volume $N$.
 
 
 
@@ -1834,7 +1800,7 @@ To evaluate this expectation, new random variables $\nbarrm_{\max}(x) \equiv \ma
 \end{IEEEeqnarray}
 where $H: \Zbb \mapsto \{0,1\}$ is the discrete Heaviside step function. For $n < 0$, the cardinality is equivalent to $|\bar{\Ncal}|$. 
 
-For $0 \leq n < N$, the cardinality is an alternating binomial summation where the $m^\mathrm{th}$ term accounts for the different intersections of $m$ of the $|\Ycal|$ individual sets $\{ \bar{n} : \bar{n}(y,x) \geq n \}$. Observe that the cardinality of the intersections is only dependent on the number of contributing sets $m$ and not on which sets intersect. Furthermore, note the dependency of the intersection cardinalities on the argument $n$. The step function contributes such that if $n > \big\lfloor\frac{N}{m}\big\rfloor$, only up to $m-1$ individual sets will intersect. The binomial coefficient $\Mcal\big( \{N-mn,|\Ycal||\Xcal|-1\} \big)$ provides the intersection cardinality for a given $m$; note the similarity to the cardinality $|\bar{\Ncal}|$ - the only difference is the number of points characterizing the $|\Ycal||\Xcal|-1$ dimensional region.
+For $0 \leq n < N$, the cardinality is an alternating binomial summation where the $m^\mathrm{th}$ term accounts for the different intersections of $m$ of the $|\Ycal|$ individual sets $\{ \bar{n} : \bar{n}(y,x) \geq n \}$. Observe that the cardinality of the intersections is only dependent on the number of contributing sets $m$ and not on which sets intersect. Furthermore, note the dependency of the intersection cardinalities on the argument $n$. The step function contributes such that if $n > \big\lfloor\frac{N}{m}\big\rfloor$, only up to $m-1$ individual sets will intersect. The binomial coefficient $\Mcal\big( \{N-mn,|\Ycal||\Xcal|-1\} \big)$ provides the intersection cardinality for a given $m$; note the similarity to the cardinality $|\bar{\Ncal}|$ - the only difference is the number of points that grid the $|\Ycal||\Xcal|-1$ dimensional region.
 
 The probability of interest can thus be expressed as
 \begin{IEEEeqnarray}{L}
