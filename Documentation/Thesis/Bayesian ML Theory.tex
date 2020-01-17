@@ -18,9 +18,11 @@
 \usepackage{hyperref}
 
 \usepackage[colorinlistoftodos,color=yellow!50,linecolor=red]{todonotes}
+\newcommand{\todolow}[1]{\todo[inline,color=blue!50,linecolor=red]{#1}}
 \newcommand{\todolo}[1]{\todo[inline,color=green!50,linecolor=red]{#1}}
 \newcommand{\todomid}[1]{\todo[inline,color=yellow!50,linecolor=red]{#1}}
-\newcommand{\todohi}[1]{\todo[inline,color=red!50,linecolor=red]{#1}}
+\newcommand{\todohi}[1]{\todo[inline,color=orange!50,linecolor=red]{#1}}
+\newcommand{\todohigh}[1]{\todo[inline,color=red!50,linecolor=red]{#1}}
 
 
 \usepackage{fancyhdr}
@@ -98,38 +100,40 @@
 
 
 
-\todolo{use todonotes package instead of my initials?}
+\todolow{use todonotes package instead of my initials?}
 
-\todolo{equation numbers to final line!}
+\todolow{equation numbers to final line!}
 
-\todolo{brackets for expectation ops?}
+\todolow{brackets for expectation ops?}
 
-\todolo{line break symbol format, before/after?}
+\todolow{line break symbol format, before/after?}
 
 \todomid{learners (full) or decision functions (range)?}
 
 \todomid{likelihood function terminology}
 
-\todomid{Dirichlet localization or concentration?}
+\todohi{Dirichlet localization or concentration?}
 
-\todomid{fix arguments for theta, nbar dists.}
+\todohi{fix arguments for theta, nbar dists.}
 
 \todomid{suppress arguments where sensible? eg Pd = theta}
 
-\todomid{introduce tilde alpha to match tilde theta?}
+\todohigh{ALL figure notation: theta font + Ycal indexing. use R,f opt?}
 
-\todohi{use x,y subs instead of prime/tilde?}
+\todolow{is $\Theta$ redundant given $\Pcal$?}
 
-\todohi{ALL figure notation: theta font + Ycal indexing. use R,f opt?}
-
-\todolo{is $\Theta$ redundant given $\Pcal$?}
+\todolo{DIM and PR operator from AMS?}
 
 
 
 
 \todohi{multinomial random process?}
 
-\todohi{change from nbar to emprical RV???}
+\todohigh{introduce tilde alpha to match tilde theta?}
+
+\todohigh{use x,y subs instead of prime/tilde?}
+
+\todohigh{change from nbar to emprical RV???}
 
 \todohi{investigate N lim for nbar given theta, bayes risk vs model support}
 
@@ -137,29 +141,22 @@
 
 \todohi{priors = sparse conditionals; w/ sufficient statistics}
 
-\todolo{NFLT investigation? try matlab examples}
+\todolow{NFLT investigation? try matlab examples}
 
 
 
 
-\todomid{use clairvoyant/irreducible terms and symbols}
+\todohi{use clairvoyant/irreducible terms and symbols}
 
-\todomid{empirical risk terms/discussion?}
+\todohi{empirical risk terms/discussion?}
 
 \todomid{check notation throughout for expectation/variance operators, proper arguments}
 
 
 
+\todolow{generalize y,x,h from scalars to functions!!!}
 
-
-
-
-
-
-
-\todolo{generalize y,x,h from scalars to functions!!!}
-
-\todolo{jeffrey prior, fisher info?}
+\todolow{jeffrey prior, fisher info?}
 
 
 
@@ -332,8 +329,6 @@ Note that the countable domains of the input functions may have an infinite numb
 \todolo{italic theta font before Bayes?}
 
 Consider an observable random element $\xrm \in \Xcal$ and and unobservable random element $\yrm \in \Ycal$ which are jointly distributed according to an unknown probability distribution $\uptheta \in \Theta = \Pcal(\Ycal \times \Xcal)$, such that $\Prm_{\yrm,\xrm | \uptheta} = \uptheta$. Note that the uppercase PMF notation used throughout this section implies that the random elements are discrete; PDF's are used when $\xrm$ and/or $\yrm$ are continuous random variables/processes.
-
-PGR: DIM operator? in notation section?
 
 PGR: consider definition/equivalence of D and Y,X. Think indexing.
 
