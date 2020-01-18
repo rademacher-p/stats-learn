@@ -274,4 +274,8 @@ TSWLatexianTemp*
 
 # Makeindex log files
 *.lpz
+
+
+
+# PGR below
 Documentation/Thesis/Bayesian ML Theory.pdf
