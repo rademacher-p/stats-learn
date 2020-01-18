@@ -76,6 +76,14 @@
 \DeclareMathOperator{\DP}{\mathrm{DP}}
 \DeclareMathOperator{\DMP}{\mathrm{DMP}}
 
+\DeclareMathOperator{\thetam}{\theta_\text{m}}
+\DeclareMathOperator{\upthetam}{\uptheta_\text{m}}
+\DeclareMathOperator{\thetac}{\theta_\text{c}}
+\DeclareMathOperator{\upthetac}{\uptheta_\text{c}}
+
+\DeclareMathOperator{\alpham}{\alpha_\text{m}}
+\DeclareMathOperator{\alphac}{\alpha_\text{c}}
+
 
 
 \usepackage[backend=biber,style=numeric]{biblatex}
@@ -115,18 +123,24 @@
 \todolow{DIM and PR operator from AMS?}
 
 
-\todohi{fix arguments for theta, nbar dists.}
 
-\todomid{suppress arguments where sensible? eg Pd = theta}
 
 \todohigh{ALL figure notation: theta font + Ycal indexing. use R,f opt?}
 
+\todohi{fix arguments for theta, nbar dists.}
+
+\todomid{check notation throughout for expectation/variance operators, proper arguments}
+
+\todolo{use clairvoyant/irreducible terms and symbols $\Rcal$}
+
+\todomid{suppress arguments where sensible? eg Pd = theta}
+
+\todomid{reconsider irreducible terminology}
+
+\todomid{empirical risk terms/discussion?}
 
 
 
-
-
-\todohi{multinomial random process?}
 
 \todohigh{introduce tilde alpha to match tilde theta?}
 
@@ -134,25 +148,16 @@
 
 \todohigh{change from nbar to emprical RV???}
 
+\todohi{multinomial random process?}
+
 \todohi{Investigate N lim for nbar given theta, risks. Model support, bounded prior?}
 
 \todohi{SEMI-SUPERVISED - generalize to joint decisions!!! training/test!}
 
 \todohi{priors = sparse conditionals; w/ sufficient statistics}
 
+
 \todolow{NFLT investigation? try matlab examples}
-
-
-
-\todomid{reconsider irreducible terminology}
-
-\todolo{use clairvoyant/irreducible terms and symbols $\Rcal$}
-
-\todohi{empirical risk terms/discussion?}
-
-\todomid{check notation throughout for expectation/variance operators, proper arguments}
-
-
 
 \todolow{generalize y,x,h from scalars to functions!!!}
 
@@ -336,8 +341,11 @@ Also observed is a random sequence of $N$ samples from $\uptheta$, denoted $\Drm
 \end{equation}
 
 
+\subsection{Marginal and Conditional Model Distributions}
 
+As only $\yrm$ is unobservable, it will be useful to decompose the model distribution as $\uptheta \Leftrightarrow (\upthetam,\upthetac)$. First, introduce the marginal distribution $\upthetam \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) \in \Pcal(\Xcal)$; note that the summation is replaced by an integral when $\yrm$ is a continuous random variable. Next, introduce the conditional distributions $\upthetac \in \Pcal(\Ycal)^{\Xcal}$ defined as $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x)$. Note that the mapping between the two representations is a bijection.
 
+This decomposition enables the clairvoyant distributions to be represented as $\Prm_{\xrm | \uptheta} = \Prm_{\xrm | \upthetam} = \upthetam$ and $\Prm_{\yrm | \xrm,\uptheta} = \Prm_{\yrm | \xrm,\upthetac} = \upthetac(\xrm)$; these distributions will be of recurring importance. 
 
 
 
@@ -345,7 +353,7 @@ Also observed is a random sequence of $N$ samples from $\uptheta$, denoted $\Drm
 
 \section{Sufficient Statistic: the Empirical PMF}
 
-\todohigh{MOVE SECTION??}
+\todohi{Move??}
 
 \todohigh{continuous? empirical process?}
 
@@ -412,28 +420,14 @@ the empirical distribution.
 
 
 
-
-\section{Marginal/Conditional Distributions for Observed/Unobserved Elements}
-
-\todohigh{move section? Before Risk??}
-\todomid{clean up}
-
-\subsection{Marginal and Conditional Distributions of $\uptheta$}
-
-As only $\yrm$ is unobservable, it will be useful to decompose the model distribution as $\uptheta \Leftrightarrow (\uptheta',\tilde{\uptheta})$. First, introduce the marginal distribution $\uptheta' \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) \in \Pcal(\Xcal)$; note that the summation is replaced by an integral when $\yrm$ is a continuous random variable. Next, introduce the conditional distributions $\tilde{\uptheta} \in \Pcal(\Ycal)^{\Xcal}$ defined as $\tilde{\uptheta}(x) \equiv \uptheta(\cdot,x) / \uptheta'(x)$. Note that the mapping between the two representations is a bijection.
-
-This decomposition enables the clairvoyant distributions to be represented as $\Prm_{\xrm | \uptheta} = \Prm_{\xrm | \uptheta'} = \uptheta'$ and $\Prm_{\yrm | \xrm,\uptheta} = \Prm_{\yrm | \xrm,\tilde{\uptheta}} = \tilde{\uptheta}(\xrm)$; these distributions will be of recurring importance. 
-
-
-
-\subsection{Marginal and Conditional Distributions of Training Data}
+\subsection{Marginal and Conditional Data Distributions}
 
 Also of interest are the marginal and conditional distributions of the joint training data partitions $\Yrm$ and $\Xrm$. The marginal distribution given $\uptheta$ for the observations $\Xrm$ alone is
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\Xrm | \uptheta}\big( X | \theta \big) & = & \prod_{n=1}^N \Prm_{\Xrm_n | \uptheta}\big( X_n | \theta \big) \\
-& = & \prod_{x \in \Xcal} \theta'(x)^{N'(x;X)} \nonumber \;,
+& = & \prod_{x \in \Xcal} \thetam(x)^{N'(x;X)} \nonumber \;,
 \end{IEEEeqnarray}
-where the dependency on $\uptheta$ is only through the marginal model $\uptheta'$. Additionally, note that the dependency on the training observations $\Xrm$ is expressed though a ``marginal'' counting function $N' : \Xcal \mapsto \Ncal'$ with range
+where the dependency on $\uptheta$ is only through the marginal model $\upthetam$. Additionally, note that the dependency on the training observations $\Xrm$ is expressed though a ``marginal'' counting function $N' : \Xcal \mapsto \Ncal'$ with range
 \begin{IEEEeqnarray}{rCl}
 \Ncal' & = & \left\{ n' \in {\Zbb_{\geq 0}}^{\Xcal}: \sum_{x \in \Xcal} n'(x) = N \right\} \;,
 \end{IEEEeqnarray}
@@ -444,74 +438,163 @@ N'(X) & = & \sum_{n=1}^N \delta\big[ \cdot,X_n \big] \equiv \sum_{y \in \Ycal} \
 The conditional distribution of the values $\Yrm$ given the corresponding $\Xrm$ can be found using Bayes theorem as
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\Yrm | \Xrm,\uptheta}\big( Y | X,\theta \big) & = & \prod_{n=1}^N \frac{\Prm_{\Yrm_n,\Xrm_n | \uptheta}\big( Y_n,X_n | \theta \big)}{\Prm_{\Xrm_n | \uptheta}\big( X_n | \theta \big)} \\
-& = & \prod_{x \in \Xcal} \left[ \prod_{y \in \Ycal} \tilde{\theta}(y;x)^{\bar{N}(y,x;Y,X)} \right] \nonumber \;,
+& = & \prod_{x \in \Xcal} \left[ \prod_{y \in \Ycal} \thetac(y;x)^{\bar{N}(y,x;Y,X)} \right] \nonumber \;,
 \end{IEEEeqnarray}
-which is dependent on the model $\uptheta$ only through the conditional models $\tilde{\uptheta}(x)$.
+which is dependent on the model $\uptheta$ only through the conditional models $\upthetac(x)$.
 
 
-As before, the dependency on the training data can be simplified using a sufficient statistic. Introduce the ``marginalized'' random process $\nrm'$ over the set $\Xcal$, defined as $\nrm' \equiv \sum_{y \in \Ycal} \nbarrm(y,\cdot) \equiv N'(\Xrm) \in \Ncal'$. By the aggregation property of Multinomial random processes \cite{johnson}, the aggregation conditioned on the model $\uptheta$ is distributed as $\nrm' | \uptheta \sim \Multi(N,\uptheta')$. 
+As before, the dependency on the training data can be simplified using a sufficient statistic. Introduce the ``marginalized'' random process $\nrm'$ over the set $\Xcal$, defined as $\nrm' \equiv \sum_{y \in \Ycal} \nbarrm(y,\cdot) \equiv N'(\Xrm) \in \Ncal'$. By the aggregation property of Multinomial random processes \cite{johnson}, the aggregation conditioned on the model $\uptheta$ is distributed as $\nrm' | \uptheta \sim \Multi(N,\upthetam)$. 
 
 Also of interest is the distribution of $\nbarrm$ conditioned on its aggregation $\nrm'$. Using the multinomial distribution properties proven in Appendix \ref{app:mult}, it can be shown that when conditioned on the model $\uptheta$ as well, the PMF of $\nbarrm$ is
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\bar{\nrm} | \nrm' , \uptheta}(\bar{n} | n' , \theta) & = & \prod_{x \in \Xcal} \Bigg[ \Mcal\big( \bar{n}(\cdot,x) \big) \prod_{y \in \Ycal} \tilde{\theta}(y;x)^{\bar{n}(y,x)} \Bigg] \\
-& = & \prod_{x \in \Xcal} \Multi\Big( \bar{n}(\cdot,x) ; n'(x) , \tilde{\theta}(x) \Big) \nonumber \;,
+\Prm_{\bar{\nrm} | \nrm' , \uptheta}(\bar{n} | n' , \theta) & \equiv & \prod_{x \in \Xcal} \Bigg[ \Mcal\big( \bar{n}(\cdot,x) \big) \prod_{y \in \Ycal} \thetac(y;x)^{\bar{n}(y,x)} \Bigg] \\
+& = & \prod_{x \in \Xcal} \Multi\Big( \bar{n}(\cdot,x) ; n'(x) , \thetac(x) \Big) \nonumber \;,
 \end{IEEEeqnarray}
-over the domain $\left\{ \bar{n} \in {\Zbb_{\geq 0}}^{\Ycal \times \Xcal} : \sum_{y \in \Ycal} \bar{n}(y,\cdot) = n' \right\}$. Observe that conditioning on the aggregation renders the function segments $\nbarrm(\cdot,x)$ independent of one another and that they are also Multinomial, such that $\nbarrm(\cdot,x) | \nrm'(x),\uptheta \sim \Multi\big( \nrm'(x),\tilde{\uptheta}(x) \big)$. Furthermore, the dependency on $\uptheta$ is expressed through the conditional model $\tilde{\uptheta}$.
+over the domain $\left\{ \bar{n} \in {\Zbb_{\geq 0}}^{\Ycal \times \Xcal} : \sum_{y \in \Ycal} \bar{n}(y,\cdot) = n' \right\}$. Observe that conditioning on the aggregation renders the function segments $\nbarrm(\cdot,x)$ independent of one another and that they are also Multinomial, such that $\nbarrm(\cdot,x) | \nrm'(x),\uptheta \sim \Multi\big( \nrm'(x),\upthetac(x) \big)$. Furthermore, the dependency on $\uptheta$ is expressed through the conditional model $\upthetac$
 
+
+
+
+
+
+
+
+
+
+
+\section{Learning Objective}
+
+\todomid{use marginal/conditional model? D or nbar?}
+
+The task in supervised machine learning is to design a learning function $f: \Dcal \mapsto \Hcal^{\Xcal}$ which produces a mapping from the space of the observed random elements to a decision space $\Hcal$. Define the function space $\Fcal = \left\{ {\Hcal^{\Xcal}} \right\}^{\Dcal}$, such that $f \in \Fcal$. The learning functions are non-parametric and there are no restrictions on the set of achievable functions $\Fcal$.
+
+The metric guiding the design is a loss function $\Lcal: \Hcal \times \Ycal \mapsto \Rbb_{\geq 0}$ which penalizes the decision $h \in \Hcal$ based on the value of $\yrm$. The objective is to minimize the conditional expected loss, or conditional ``risk'',
+\begin{IEEEeqnarray}{rCl} \label{eq:risk_cond}
+\Rcal_{\Theta}(f ; \uptheta) & = &  \Erm_{\yrm,\xrm,\Drm | \uptheta} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \\
+& = & \Erm_{\xrm,\Drm | \uptheta} \bigg[ \Erm_{\yrm | \xrm,\uptheta} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \nonumber \\
+& = & \Erm_{\Drm | \uptheta}\Bigg[ \Erm_{\xrm | \uptheta}\bigg[ \Erm_{\yrm | \xrm,\uptheta}\Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \Bigg] \nonumber \;.
+\end{IEEEeqnarray}
+where the conditional independence of random element $\yrm$ from the training data $\Drm$ given the model $\uptheta$ is used. As the model $\uptheta$ is not observed, $\Rcal_{\Theta}: \Theta \mapsto {\Rbb_{\geq 0}}^{\Fcal}$ is not a feasible objective function for optimization. This is the fundamental challenge of supervised learning: the true risk objective cannot be evaluated and the designer can never be precisely sure how well any learning function performs. 
+
+
+
+\subsection{Clairvoyant Decision}
+
+\todolow{subscript Theta? Use theta sub and remove argument like a cond dist?}
+
+It is instructive to formulate the optimal decision function assuming the model $\uptheta$ was in fact observed; it will be referred to as the ``clairvoyant'' function, following terminology used in \cite{kay-det}. This clairvoyant decision function $f_{\Theta}: \Theta \mapsto \Fcal$ is represented by
+\begin{equation}
+f_{\Theta}(\uptheta) = \argmin_{f \in \Fcal} \Rcal_{\Theta}(f ; \uptheta) \;.
+\end{equation}
+For a given set of observations $\xrm$ and $\Drm$, the function $f_{\Theta}(\uptheta) \in \Fcal$ selects the decision $h = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big]$. Note the conditional independence of $\yrm$ from $\Drm$ in \eqref{eq:risk_cond} - the knowledge of $\uptheta$ renders the training data $\Drm$ useless. As such, the range of the clairvoyant function is recast as $f_{\Theta} : \Theta \mapsto \Hcal^{\Xcal}$ and the decisions are
+\begin{equation} \label{eq:f_clv_x}
+f_{\Theta}(\xrm;\uptheta) = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \;.
+\end{equation}
+The corresponding clairvoyant risk for a given model $\uptheta$ is
+\begin{IEEEeqnarray}{rCl} \label{eq:risk_clv}
+\Rcal_{\Theta}^*(\uptheta) & \equiv & \Rcal_{\Theta}\big( f_{\Theta}(\uptheta) ; \uptheta \big) \\
+& = & \min_{f \in \Fcal} \Rcal_{\Theta}(f ; \uptheta) \nonumber \\
+& = & \Erm_{\xrm | \uptheta} \left[ \min_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \right] \nonumber \;.
+\end{IEEEeqnarray}
+
+
+
+
+\subsection{Bayes Decision}
+
+To design an optimal learning function $f \in \Fcal$, an operator must be chosen to remove the dependency of the conditional risk on $\uptheta$ and form an objective function $\Fcal \mapsto \Rbb_{\geq 0}$. One choice is to integrate over $\Theta$; to ensure a non-negative objective value, the weighting function should be non-negative. Also, as scaling the objective function will not change its minimizing argument, the weighting function can be constrained to integrate to one. These are the requirements for a valid probability density function (PDF); as such, the model $\uptheta$ is treated as a random process and a Bayesian approach can be adopted. 
+
+Define the PDF $\prm_{\uptheta} \in \Pcal(\Theta)$. Now the Bayes risk can be formulated as
+\begin{IEEEeqnarray}{rCl} \label{eq:risk}
+\Rcal(f) & = & \Erm_{\uptheta}\big[ \Rcal_{\Theta}(f ; \uptheta) \big] \\
+& = & \Erm_{\yrm,\xrm,\Drm}\big[ \Lcal(f(\xrm;\Drm),\yrm) \big] \nonumber \\
+& = & \Erm_{\xrm,\Drm}\bigg[ \Erm_{\yrm | \xrm,\Drm} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \nonumber \\
+& = & \Erm_{\Drm}\Bigg[ \Erm_{\xrm | \Drm}\bigg[ \Erm_{\yrm | \xrm,\Drm} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \Bigg] \nonumber
+\end{IEEEeqnarray}
+and $\yrm$, $\xrm$, and $\Drm$ are treated as jointly distributed random elements. Observe that the Bayesian predictive distributions can be represented as $\Prm_{\xrm | \Drm} = \Erm_{\uptheta | \Drm}\big[ \Prm_{\xrm | \uptheta} \big]$ and $\Prm_{\yrm | \xrm,\Drm} = \Erm_{\uptheta | \xrm,\Drm}\big[ \Prm_{\yrm | \xrm,\uptheta} \big]$, the expected values of the corresponding clairvoyant distributions with respect to the model posteriors $\prm_{\uptheta | \Drm}$ and $\prm_{\uptheta | \xrm,\Drm}$, respectively.
+
+\todolo{BELOW, add forumla for f(D)?}
+
+Finally, express the optimal learning function
+\begin{equation} 
+f^* = \argmin_{f \in \Fcal} \Rcal(f) \;.
+\end{equation}
+The decision expressed by the learning function $f^*$ given observed values of $\xrm$ and $\Drm$ is
+\begin{IEEEeqnarray}{rCl} \label{eq:f_opt_xD}
+f^*(\xrm;\Drm) & = & \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm}\big[ \Lcal(h,\yrm) \big] \\
+& = & \argmin_{h \in \Hcal} \Erm_{\uptheta | \xrm,\Drm}\bigg[ \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \bigg] \nonumber \;.
+\end{IEEEeqnarray}
+Thus, the Bayesian approach uses the model posterior $\prm_{\uptheta | \xrm,\Drm}$ to integrate out the dependency on the model given the observable random elements. The minimum Bayes risk is
+\begin{IEEEeqnarray}{rCl} \label{eq:risk_min}
+\Rcal^* & \equiv & \Rcal(f^*) \\
+ & = & \min_{f \in \Fcal} \Rcal(f) \nonumber \\
+& = & \Erm_{\xrm,\Drm} \left[ \min_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm}\big[ \Lcal(h,\yrm) \big] \right] \nonumber \\
+& = & \Erm_{\Drm} \Bigg[ \Erm_{\xrm | \Drm} \bigg[ \min_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm}\big[ \Lcal(h,\yrm) \big] \bigg] \Bigg] \nonumber \;.
+\end{IEEEeqnarray}
+
+
+
+\subsubsection{Irreducible Risk}
+
+\todomid{location? terminology?}
+
+The clairvoyant risk \eqref{eq:risk_clv} for a given model satisfies $\Rcal_{\Theta}^*(\theta) \leq \Rcal_{\Theta}(f;\theta) \quad \forall f \in \Fcal, \ \theta \in \Theta$. Consequently, the Bayes risk satisfies $\Erm_{\uptheta} \big[ \Rcal_{\Theta}^*(\uptheta) \big] \leq \Rcal(f) \quad \forall f \in \Fcal$; the expected value of the clairvoyant risk will thus be referred to as the ``irreducible'' risk. 
+
+It is important to note that this inequality holds for any number of training samples $N$ and that the irreducible risk does not depend on $N$. Thus, even with unlimited training data, no learning function can provide a Bayes risk lower than this value.
 
 
 
 
 \subsection{Model Posteriors}
 
-The Bayesian predicitive distributions analagous to the clairvoyant distributions can now be simplified as $\Prm_{\xrm | \Drm} = \mu_{\uptheta' | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm} = \mu_{\tilde{\uptheta}(\xrm) | \xrm,\Drm}$.
+\todomid{clean up}
+
+\todohi{Continuous? sums, PMFs...}
+
+Using the marginal and conditional model representations, the Bayesian predicitive distributions analagous to the clairvoyant distributions can now be simplified as $\Prm_{\xrm | \Drm} = \mu_{\upthetam | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm} = \mu_{\upthetac(\xrm) | \xrm,\Drm}$.
 
 \begin{IEEEeqnarray}{rCl}
-\prm_{\uptheta',\tilde{\uptheta} | \Yrm,\Xrm}(\theta',\tilde{\theta} | Y,X) & = & \frac{\Prm_{\Yrm | \Xrm,\tilde{\uptheta}}(Y | X,\tilde{\theta})}{\Prm_{\Yrm | \Xrm}(Y | X)} 
-\frac{\Prm_{\Xrm | \uptheta'}(X | \theta')}{\Prm_{\Xrm}(X)} \prm_{\uptheta',\tilde{\uptheta}}(\theta',\tilde{\theta}) \\
-& = & \prm_{\tilde{\uptheta} | \Yrm,\Xrm}(\tilde{\theta} | Y,X) \prm_{\uptheta' | \Xrm}(\theta' | X) 
-\frac{\prm_{\tilde{\uptheta} | \uptheta'}(\tilde{\theta} | \theta')}{\prm_{\tilde{\uptheta} | \Xrm}(\tilde{\theta} | X)} \nonumber
+\prm_{\upthetam,\upthetac | \Yrm,\Xrm}(\thetam,\thetac | Y,X) & = & \frac{\Prm_{\Yrm | \Xrm,\upthetac}(Y | X,\thetac)}{\Prm_{\Yrm | \Xrm}(Y | X)} 
+\frac{\Prm_{\Xrm | \upthetam}(X | \thetam)}{\Prm_{\Xrm}(X)} \prm_{\upthetam,\upthetac}(\thetam,\thetac) \\
+& = & \prm_{\upthetac | \Yrm,\Xrm}(\thetac | Y,X) \prm_{\upthetam | \Xrm}(\thetam | X) 
+\frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \Xrm}(\thetac | X)} \nonumber
 \end{IEEEeqnarray}
 
 %\begin{IEEEeqnarray}{rCl}
-%\prm_{\uptheta' | \Yrm,\Xrm}(\theta' | Y,X) & = & \frac{\Erm_{\tilde{\uptheta} | \uptheta'} \left[ \Prm_{\Yrm | \Xrm,\tilde{\uptheta}}(Y | X,\tilde{\theta}) \right]}{\Prm_{\Yrm | \Xrm}(Y | X)} 
-%\frac{\Prm_{\Xrm | \uptheta'}(X | \theta')}{\Prm_{\Xrm}(X)} \prm_{\uptheta'}(\theta') \\
-%& = & \prm_{\uptheta' | \Xrm}(\theta' | X) 
-%\Erm_{\tilde{\uptheta} | \uptheta'} \left[ \frac{\prm_{\tilde{\uptheta} | \Yrm,\Xrm}(\tilde{\theta} | Y,X)}{\prm_{\tilde{\uptheta} | \Xrm}(\tilde{\theta} | X)} \right] \nonumber
+%\prm_{\upthetam | \Yrm,\Xrm}(\thetam | Y,X) & = & \frac{\Erm_{\upthetac | \upthetam} \left[ \Prm_{\Yrm | \Xrm,\upthetac}(Y | X,\thetac) \right]}{\Prm_{\Yrm | \Xrm}(Y | X)} 
+%\frac{\Prm_{\Xrm | \upthetam}(X | \thetam)}{\Prm_{\Xrm}(X)} \prm_{\upthetam}(\thetam) \\
+%& = & \prm_{\upthetam | \Xrm}(\thetam | X) 
+%\Erm_{\upthetac | \upthetam} \left[ \frac{\prm_{\upthetac | \Yrm,\Xrm}(\thetac | Y,X)}{\prm_{\upthetac | \Xrm}(\thetac | X)} \right] \nonumber
 %\end{IEEEeqnarray}
 
 \begin{IEEEeqnarray}{rCl}
-\prm_{\uptheta',\tilde{\uptheta} | \nbarrm}(\theta',\tilde{\theta} | \bar{n}) & = & \frac{\Prm_{\nbarrm | \nrm',\tilde{\uptheta}}\big( \bar{n} | \sum_y \bar{n}(y,\cdot),\tilde{\theta} \big)}{\Prm_{\nbarrm | \nrm'}\big( \bar{n} | \sum_y \bar{n}(y,\cdot) \big)} 
-\frac{\Prm_{\nrm' | \uptheta'}\big( \sum_y \bar{n}(y,\cdot) | \theta' \big)}{\Prm_{\nrm'}\big( \sum_y \bar{n}(y,\cdot) \big)} \prm_{\uptheta',\tilde{\uptheta}}(\theta',\tilde{\theta}) \\
-& = & \prm_{\tilde{\uptheta} | \nbarrm,\nrm'}\Big( \tilde{\theta} | \bar{n},\sum_y \bar{n}(y,\cdot) \Big) \prm_{\uptheta' | \nrm'}\Big( \theta' | \sum_y \bar{n}(y,\cdot) \Big) 
-\frac{\prm_{\tilde{\uptheta} | \uptheta'}(\tilde{\theta} | \theta')}{\prm_{\tilde{\uptheta} | \nrm'}\big( \tilde{\theta} | \sum_y \bar{n}(y,\cdot) \big)} \nonumber
+\prm_{\upthetam,\upthetac | \nbarrm}(\thetam,\thetac | \bar{n}) & = & \frac{\Prm_{\nbarrm | \nrm',\upthetac}\big( \bar{n} | \sum_y \bar{n}(y,\cdot),\thetac \big)}{\Prm_{\nbarrm | \nrm'}\big( \bar{n} | \sum_y \bar{n}(y,\cdot) \big)} 
+\frac{\Prm_{\nrm' | \upthetam}\big( \sum_y \bar{n}(y,\cdot) | \thetam \big)}{\Prm_{\nrm'}\big( \sum_y \bar{n}(y,\cdot) \big)} \prm_{\upthetam,\upthetac}(\thetam,\thetac) \\
+& = & \prm_{\upthetac | \nbarrm,\nrm'}\Big( \thetac | \bar{n},\sum_y \bar{n}(y,\cdot) \Big) \prm_{\upthetam | \nrm'}\Big( \thetam | \sum_y \bar{n}(y,\cdot) \Big) 
+\frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \nrm'}\big( \thetac | \sum_y \bar{n}(y,\cdot) \big)} \nonumber
 \end{IEEEeqnarray}
 
-% Note that $\prm_{\tilde{\uptheta} | \Xrm}(X) = \prm_{\tilde{\uptheta} | \nrm'}\big( N'(X) \big) = \Erm_{\uptheta' | \Xrm}\big[ \prm_{\tilde{\uptheta} | \uptheta'} \big](X)$.
+% Note that $\prm_{\upthetac | \Xrm}(X) = \prm_{\upthetac | \nrm'}\big( N'(X) \big) = \Erm_{\upthetam | \Xrm}\big[ \prm_{\upthetac | \upthetam} \big](X)$.
 
-Note that $\prm_{\tilde{\uptheta} | \Xrm} = \Erm_{\uptheta' | \Xrm}\big[ \prm_{\tilde{\uptheta} | \uptheta'} \big]$ and $\prm_{\tilde{\uptheta} | \nrm'} = \Erm_{\uptheta' | \nrm'}\big[ \prm_{\tilde{\uptheta} | \uptheta'} \big]$. Also, note that $\Prm_{\Yrm | \Xrm} = \Erm_{\uptheta' | \Xrm} \Big[ \Erm_{\tilde{\uptheta} | \uptheta'} \big[ \Prm_{\Yrm | \Xrm,\tilde{\uptheta}} \big] \Big]$ and $\Prm_{\nbarrm | \nrm'} = \Erm_{\uptheta' | \nrm'} \Big[ \Erm_{\tilde{\uptheta} | \uptheta'} \big[ \Prm_{\nbarrm | \nrm',\tilde{\uptheta}} \big] \Big]$.
+Note that $\prm_{\upthetac | \Xrm} = \Erm_{\upthetam | \Xrm}\big[ \prm_{\upthetac | \upthetam} \big]$ and $\prm_{\upthetac | \nrm'} = \Erm_{\upthetam | \nrm'}\big[ \prm_{\upthetac | \upthetam} \big]$. Also, note that $\Prm_{\Yrm | \Xrm} = \Erm_{\upthetam | \Xrm} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\Yrm | \Xrm,\upthetac} \big] \Big]$ and $\Prm_{\nbarrm | \nrm'} = \Erm_{\upthetam | \nrm'} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\nbarrm | \nrm',\upthetac} \big] \Big]$.
 
 
 \begin{IEEEeqnarray}{rCl}
-\prm_{\uptheta',\tilde{\uptheta} | \Yrm,\Xrm,\xrm}(\theta',\tilde{\theta} | Y,X,x) & = & \frac{\Prm_{\Yrm | \Xrm,\tilde{\uptheta}}(Y | X,\tilde{\theta})}{\Prm_{\Yrm | \Xrm,\xrm}(Y | X,x)} 
-\frac{\Prm_{\Xrm,\xrm | \uptheta'}(X,x | \theta')}{\Prm_{\Xrm,\xrm}(X,x)} \prm_{\uptheta',\tilde{\uptheta}}(\theta',\tilde{\theta}) \\
-& = & \prm_{\tilde{\uptheta} | \Yrm,\Xrm}(\tilde{\theta} | Y,X) \prm_{\uptheta' | \Xrm,\xrm}(\theta' | X,x) 
+\prm_{\upthetam,\upthetac | \Yrm,\Xrm,\xrm}(\thetam,\thetac | Y,X,x) & = & \frac{\Prm_{\Yrm | \Xrm,\upthetac}(Y | X,\thetac)}{\Prm_{\Yrm | \Xrm,\xrm}(Y | X,x)} 
+\frac{\Prm_{\Xrm,\xrm | \upthetam}(X,x | \thetam)}{\Prm_{\Xrm,\xrm}(X,x)} \prm_{\upthetam,\upthetac}(\thetam,\thetac) \\
+& = & \prm_{\upthetac | \Yrm,\Xrm}(\thetac | Y,X) \prm_{\upthetam | \Xrm,\xrm}(\thetam | X,x) 
 \frac{\Prm_{\Yrm | \Xrm}(Y | X)}{\Prm_{\Yrm | \Xrm,\xrm}(Y | X,x)}
-\frac{\prm_{\tilde{\uptheta} | \uptheta'}(\tilde{\theta} | \theta')}{\prm_{\tilde{\uptheta} | \Xrm}(\tilde{\theta} | X)} \nonumber
+\frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \Xrm}(\thetac | X)} \nonumber
 \end{IEEEeqnarray}
 
 \begin{IEEEeqnarray}{rCl}
-\prm_{\uptheta',\tilde{\uptheta} | \nbarrm,\xrm}(\theta',\tilde{\theta} | \bar{n},x) & = & \frac{\Prm_{\nbarrm | \nrm',\tilde{\uptheta}}\big( \bar{n} | \sum_y \bar{n}(y,\cdot),\tilde{\theta} \big)}{\Prm_{\nbarrm | \nrm',\xrm}\big( \bar{n} | \sum_y \bar{n}(y,\cdot),x \big)} 
-\frac{\Prm_{\nrm',\xrm | \uptheta'}\big( \sum_y \bar{n}(y,\cdot),x | \theta' \big)}{\Prm_{\nrm',\xrm}\big( \sum_y \bar{n}(y,\cdot),x \big)} \prm_{\uptheta',\tilde{\uptheta}}(\theta',\tilde{\theta}) \\
-& = & \prm_{\tilde{\uptheta} | \nbarrm,\nrm'}\Big( \tilde{\theta} | \bar{n},\sum_y \bar{n}(y,\cdot) \Big) \prm_{\uptheta' | \nrm',\xrm}\Big( \theta' | \sum_y \bar{n}(y,\cdot),x \Big) \nonumber \\
-&& \quad \frac{\Prm_{\nbarrm | \nrm'}\big( \bar{n} | \sum_y \bar{n}(y,\cdot) \big)}{\Prm_{\nbarrm | \nrm',\xrm}\big( \bar{n} | \sum_y \bar{n}(y,\cdot),x \big)} \frac{\prm_{\tilde{\uptheta} | \uptheta'}(\tilde{\theta} | \theta')}{\prm_{\tilde{\uptheta} | \nrm'}\big( \tilde{\theta} | \sum_y \bar{n}(y,\cdot) \big)} \nonumber
+\prm_{\upthetam,\upthetac | \nbarrm,\xrm}(\thetam,\thetac | \bar{n},x) & = & \frac{\Prm_{\nbarrm | \nrm',\upthetac}\big( \bar{n} | \sum_y \bar{n}(y,\cdot),\thetac \big)}{\Prm_{\nbarrm | \nrm',\xrm}\big( \bar{n} | \sum_y \bar{n}(y,\cdot),x \big)} 
+\frac{\Prm_{\nrm',\xrm | \upthetam}\big( \sum_y \bar{n}(y,\cdot),x | \thetam \big)}{\Prm_{\nrm',\xrm}\big( \sum_y \bar{n}(y,\cdot),x \big)} \prm_{\upthetam,\upthetac}(\thetam,\thetac) \\
+& = & \prm_{\upthetac | \nbarrm,\nrm'}\Big( \thetac | \bar{n},\sum_y \bar{n}(y,\cdot) \Big) \prm_{\upthetam | \nrm',\xrm}\Big( \thetam | \sum_y \bar{n}(y,\cdot),x \Big) \nonumber \\
+&& \quad \frac{\Prm_{\nbarrm | \nrm'}\big( \bar{n} | \sum_y \bar{n}(y,\cdot) \big)}{\Prm_{\nbarrm | \nrm',\xrm}\big( \bar{n} | \sum_y \bar{n}(y,\cdot),x \big)} \frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \nrm'}\big( \thetac | \sum_y \bar{n}(y,\cdot) \big)} \nonumber
 \end{IEEEeqnarray}
 
-Note that $\Prm_{\Yrm | \Xrm,\xrm} = \Erm_{\uptheta' | \Xrm,\xrm} \Big[ \Erm_{\tilde{\uptheta} | \uptheta'} \big[ \Prm_{\Yrm | \Xrm,\tilde{\uptheta}} \big] \Big]$ and also that $\Prm_{\nbarrm | \nrm',\xrm} = \Erm_{\uptheta' | \nrm',\xrm} \Big[ \Erm_{\tilde{\uptheta} | \uptheta'} \big[ \Prm_{\nbarrm | \nrm',\tilde{\uptheta}} \big] \Big]$.
-
-
-
-
+Note that $\Prm_{\Yrm | \Xrm,\xrm} = \Erm_{\upthetam | \Xrm,\xrm} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\Yrm | \Xrm,\upthetac} \big] \Big]$ and also that $\Prm_{\nbarrm | \nrm',\xrm} = \Erm_{\upthetam | \nrm',\xrm} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\nbarrm | \nrm',\upthetac} \big] \Big]$.
 
 
 \section{Learning Objective}
@@ -636,7 +719,7 @@ a sum of two terms. The first term is the expected conditional variance of the t
 To find the clairvoyant estimator, the squared-error loss is substituted into \eqref{eq:f_clv_x}; note that the objective function is quadratic over the argument $h \in \Hcal = \Rbb$. It is easily shown that the function over $h$ is positive-definite; as such, the minimizing decision $h$ is the sole stationary point. Setting the first derivative of the function to zero, the clairvoyant estimate is the expected value of $\yrm$ given the model $\uptheta$ and the observed value $\xrm$, such that
 \begin{IEEEeqnarray}{rCl} \label{eq:f_clv_SE}
 f_{\Theta}(\xrm;\uptheta) & = & \argmin_{h \in \Rbb} \Erm_{\yrm | \xrm,\uptheta} \left[ (h-\yrm)^2 \right] \\
-& = &  \mu_{\yrm | \xrm,\uptheta} \nonumber \;. %= \sum_{y \in \Ycal} y \tilde{\uptheta}(y;\xrm) 
+& = &  \mu_{\yrm | \xrm,\uptheta} \nonumber \;. %= \sum_{y \in \Ycal} y \upthetac(y;\xrm) 
 \end{IEEEeqnarray}
 Substituting the loss and clairvoyant function into \eqref{eq:risk_clv}, the resulting clairvoyant risk is
 \begin{IEEEeqnarray}{rCl}
@@ -647,11 +730,11 @@ Substituting the loss and clairvoyant function into \eqref{eq:risk_clv}, the res
 Observe that the general conditional risk \eqref{eq:risk_cond_SE} can be represented as $\Rcal_{\Theta}(f ; \uptheta) = \Rcal_{\Theta}^*(\uptheta) + \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( f(\xrm;\Drm) - f_{\Theta}(\xrm;\uptheta) \big)^2 \Big]$. The first summand is equal to the clairvoyant squared-error; the second term is dependent on the difference between the general estimate and the clairvoyant estimate. 
 
 
-Figure \ref{fig:Risk_clv_SE_tilde} displays the clairvoyant risk for predictive models $\tilde{\theta}(x)$ independent of $x$. 
+Figure \ref{fig:Risk_clv_SE_tilde} displays the clairvoyant risk for predictive models $\thetac(x)$ independent of $x$. 
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_clv_SE_tilde.pdf}
-\caption{Clairvoyant Risk for the Squared-Error Loss Function, constant $\tilde{\theta}(x)$}
+\caption{Clairvoyant Risk for the Squared-Error Loss Function, constant $\thetac(x)$}
 \label{fig:Risk_clv_SE_tilde}
 \end{figure}
 
@@ -712,32 +795,32 @@ Applying the 0-1 loss, the conditional risk \eqref{eq:risk_cond} for a general c
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond_01}
 \Rcal_{\Theta}(f ; \uptheta) & = & 1 - \Erm_{\Drm | \uptheta} \bigg[ \Erm_{\xrm | \uptheta} \Big[ \Prm_{\yrm | \xrm,\uptheta}\big( f(\xrm;\Drm) | \xrm,\uptheta \big) \Big] \bigg] \;.
 % & = & 1 - \sum_{x \in \Xcal} \Erm_{\Drm | \uptheta} \Big[ \uptheta\big( f(x;\Drm),x \big) \Big] \nonumber \\
-% & = & 1 - \sum_{x \in \Xcal} \uptheta'(x) \Erm_{\Drm | \uptheta} \Big[ \tilde{\uptheta}\big( f(x;\Drm);x \big) \Big] \nonumber \;.
+% & = & 1 - \sum_{x \in \Xcal} \upthetam(x) \Erm_{\Drm | \uptheta} \Big[ \upthetac\big( f(x;\Drm);x \big) \Big] \nonumber \;.
 \end{IEEEeqnarray}
 
 
 
 \subsubsection{Clairvoyant Hypothesis}
 
-To find the clairvoyant classifier, the 0-1 loss is substituted into \eqref{eq:f_clv_x}; given an observation $x$, the optimum hypothesis is simply the value $y$ that maximizes the conditional model $\tilde{\uptheta}(x)$,
+To find the clairvoyant classifier, the 0-1 loss is substituted into \eqref{eq:f_clv_x}; given an observation $x$, the optimum hypothesis is simply the value $y$ that maximizes the conditional model $\upthetac(x)$,
 \begin{IEEEeqnarray}{rCl} \label{eq:f_clv_01}
 f_{\Theta}(\xrm;\uptheta) & = & \argmin_{h \in \Ycal} \Erm_{\yrm | \xrm,\uptheta} \left[ 1 - \delta[h,y] \right] \\
 & = & \argmax_{h \in \Ycal} \Prm_{\yrm | \xrm,\uptheta}(h | \xrm,\uptheta) \nonumber \\
-& = & \argmax_{y \in \Ycal} \tilde{\uptheta}(y;\xrm) \nonumber \\
+& = & \argmax_{y \in \Ycal} \upthetac(y;\xrm) \nonumber \\
 & = & \argmax_{y \in \Ycal} \uptheta(y,\xrm) \nonumber \;.
 \end{IEEEeqnarray}
 Substituting the 0-1 loss and clairvoyant hypothesis into \eqref{eq:risk_clv}, the resulting clairvoyant risk is
 \begin{IEEEeqnarray}{rCl}
 \Rcal_{\Theta}^*(\uptheta) & = & 1 - \Erm_{\xrm | \uptheta} \Big[ \max_{y \in \Ycal} \Prm_{\yrm | \xrm,\uptheta}(y | \xrm,\uptheta) \Big] \;.
-%& = & 1 - \sum_{x \in \Xcal} \uptheta'(x) \max_{y \in \Ycal} \tilde{\uptheta}(y;x) \nonumber \\
+%& = & 1 - \sum_{x \in \Xcal} \upthetam(x) \max_{y \in \Ycal} \upthetac(y;x) \nonumber \\
 %& = & 1 - \sum_{x \in \Xcal} \max_{y \in \Ycal} \uptheta(y,x) \nonumber \;.
 \end{IEEEeqnarray}
 
-Figure \ref{fig:Risk_clv_01_tilde} displays the clairvoyant risk for predictive models $\tilde{\theta}(x)$ independent of $x$. Intuitively, the models that are more concentrated lead to lower probability of error.
+Figure \ref{fig:Risk_clv_01_tilde} displays the clairvoyant risk for predictive models $\thetac(x)$ independent of $x$. Intuitively, the models that are more concentrated lead to lower probability of error.
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_clv_01_tilde.pdf}
-\caption{Clairvoyant Risk for the 0--1 Loss Function, constant $\tilde{\theta}(x)$}
+\caption{Clairvoyant Risk for the 0--1 Loss Function, constant $\thetac(x)$}
 \label{fig:Risk_clv_01_tilde}
 \end{figure}
 
@@ -1094,7 +1177,7 @@ Finally, the predictive distribution of interest is generated via Bayes rule as
 \end{IEEEeqnarray}
 The last representation views the distribution as a convex combination of two conditional distributions. The first distribution $\Prm_{\yrm | \xrm} = \alpha(\cdot,\xrm) / \alpha'(\xrm)$ is independent of the training data and based on the prior knowledge implied via the model PDF parameter; the second distribution is the conditional empirical PMF and depends on $\Drm$, not on $\alpha$.
 
-The weighting factors $\alpha'(x)$ and $N'(\xrm;\Drm)$ are the concentration of the conditional prior $\tilde{\uptheta}(x)$ and the number of training samples satisfying $X_n = \xrm$. As $N'(\xrm;\Drm) / \alpha'(x) \to 0$, the PMF tends toward the conditional distribution $\Prm_{\yrm | \xrm}$, which only depends on the model parameter $\alpha$. As $N'(\xrm;\Drm) / \alpha'(x) \to \infty$, $\Prm_{\yrm | \xrm,\Drm}$ tends towards the empirical conditional distribution. 
+The weighting factors $\alpha'(x)$ and $N'(\xrm;\Drm)$ are the concentration of the conditional prior $\upthetac(x)$ and the number of training samples satisfying $X_n = \xrm$. As $N'(\xrm;\Drm) / \alpha'(x) \to 0$, the PMF tends toward the conditional distribution $\Prm_{\yrm | \xrm}$, which only depends on the model parameter $\alpha$. As $N'(\xrm;\Drm) / \alpha'(x) \to \infty$, $\Prm_{\yrm | \xrm,\Drm}$ tends towards the empirical conditional distribution. 
 
 
 
@@ -1118,41 +1201,41 @@ PGR: reference posterior equations!
 PGR: DIR FIGS? for PDF asymptotics?
 
 
-The Bayesian distributions $\Prm_{\xrm | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm}$ can also be found from the posterior distributions $\prm_{\uptheta' | \Drm}$ and $\prm_{\tilde{\uptheta} | \xrm,\Drm}$, respectively. As the Dirichlet assumption renders $\uptheta'$ and $\tilde{\uptheta}$ independent, it can be shown that $\Prm_{\Yrm | \Xrm} = \Erm_{\tilde{\uptheta}}\big[ \Prm_{\Yrm | \Xrm,\tilde{\uptheta}} \big]$ and thus that $\uptheta'$ is conditionally independent of $\Yrm$ given $\Xrm$. Furthermore, the Dirichlet distribution $\prm_{\uptheta'}$ is the conjugate prior for $\Prm_{\Xrm | \uptheta'}$. As a result, $\uptheta' | \Drm \sim \Dir(\alpha' + N'(\Xrm))$ and
+The Bayesian distributions $\Prm_{\xrm | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm}$ can also be found from the posterior distributions $\prm_{\upthetam | \Drm}$ and $\prm_{\upthetac | \xrm,\Drm}$, respectively. As the Dirichlet assumption renders $\upthetam$ and $\upthetac$ independent, it can be shown that $\Prm_{\Yrm | \Xrm} = \Erm_{\upthetac}\big[ \Prm_{\Yrm | \Xrm,\upthetac} \big]$ and thus that $\upthetam$ is conditionally independent of $\Yrm$ given $\Xrm$. Furthermore, the Dirichlet distribution $\prm_{\upthetam}$ is the conjugate prior for $\Prm_{\Xrm | \upthetam}$. As a result, $\upthetam | \Drm \sim \Dir(\alpha' + N'(\Xrm))$ and
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\xrm | \Drm}(D) & = & \mu_{\uptheta' | \Drm}(D) = \mu_{\uptheta' | \Xrm}(X) \\
+\Prm_{\xrm | \Drm}(D) & = & \mu_{\upthetam | \Drm}(D) = \mu_{\upthetam | \Xrm}(X) \\
 & = & \frac{\alpha' + N'(X)}{\alpha_0 + N} \nonumber \;.
 \end{IEEEeqnarray}
 Similarly, the distribution can be expressed in terms of the empirical PMF sufficient statistic as
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\xrm | \nbarrm}(\bar{n}) & = & \mu_{\uptheta' | \nbarrm}(\bar{n}) = \mu_{\uptheta' | \nrm'}\left( \sum_y \bar{n}(y,\cdot) \right) \\
+\Prm_{\xrm | \nbarrm}(\bar{n}) & = & \mu_{\upthetam | \nbarrm}(\bar{n}) = \mu_{\upthetam | \nrm'}\left( \sum_y \bar{n}(y,\cdot) \right) \\
 & = & \frac{\alpha' + \sum_y \bar{n}(y,\cdot)}{\alpha_0 + N} \nonumber \;,
 \end{IEEEeqnarray}
 where the dependency on $\nbarrm$ is expressed only through the marginal random process $\nrm'$.
 
-The posterior $\prm_{\tilde{\uptheta} | \xrm,\Drm}$ can be simplified by noting that the independence of $\uptheta'$ and $\tilde{\uptheta}$ implies $\Prm_{\Yrm | \Xrm,\xrm} = \Erm_{\tilde{\uptheta}}\big[ \Prm_{\Yrm | \Xrm,\tilde{\uptheta}} \big] = \Prm_{\Yrm | \Xrm}$. Consequently, $\tilde{\uptheta}$ is conditionally independent of $\xrm$ given $\Drm$. Thus, as $\prm_{\tilde{\uptheta}}$ is a conjugate prior for $\Prm_{\Yrm | \Xrm,\tilde{\uptheta}}$ the posterior distribution is
+The posterior $\prm_{\upthetac | \xrm,\Drm}$ can be simplified by noting that the independence of $\upthetam$ and $\upthetac$ implies $\Prm_{\Yrm | \Xrm,\xrm} = \Erm_{\upthetac}\big[ \Prm_{\Yrm | \Xrm,\upthetac} \big] = \Prm_{\Yrm | \Xrm}$. Consequently, $\upthetac$ is conditionally independent of $\xrm$ given $\Drm$. Thus, as $\prm_{\upthetac}$ is a conjugate prior for $\Prm_{\Yrm | \Xrm,\upthetac}$ the posterior distribution is
 \begin{IEEEeqnarray}{rCl}
-\prm_{\tilde{\uptheta} | \Drm,\xrm}\big( \tilde{\theta} | D,x \big) & = & \prm_{\tilde{\uptheta} | \Drm}\big( \tilde{\theta} | D \big) = \prod_{x' \in \Xcal} \prm_{\tilde{\uptheta}(x') | \Drm}\big(\tilde{\theta}(x') | D \big) \\
-& = & \prod_{x' \in \Xcal} \Dir\big( \tilde{\theta}(x') ; \alpha(\cdot,x') + \bar{N}(\cdot,x';D) \big) \nonumber
+\prm_{\upthetac | \Drm,\xrm}\big( \thetac | D,x \big) & = & \prm_{\upthetac | \Drm}\big( \thetac | D \big) = \prod_{x' \in \Xcal} \prm_{\upthetac(x') | \Drm}\big(\thetac(x') | D \big) \\
+& = & \prod_{x' \in \Xcal} \Dir\big( \thetac(x') ; \alpha(\cdot,x') + \bar{N}(\cdot,x';D) \big) \nonumber
 \end{IEEEeqnarray}
 and the distinct model conditional PMF's are independent from one another. A similar treatment demonstrates that
 \begin{IEEEeqnarray}{rCl}
-\prm_{\tilde{\uptheta} | \nbarrm,\xrm}\big( \tilde{\theta} | \bar{n},x \big) & = & \prm_{\tilde{\uptheta} | \nbarrm}\big( \tilde{\theta} | \bar{n} \big) = \prod_{x' \in \Xcal} \prm_{\tilde{\uptheta}(x') | \nbarrm(\cdot,x')}\big(\tilde{\theta}(x') | \bar{n}(\cdot,x') \big) \\
-& = & \prod_{x' \in \Xcal} \Dir\big( \tilde{\theta}(x') ; \alpha(\cdot,x') + \bar{n}(\cdot,x') \big) \nonumber \;.
+\prm_{\upthetac | \nbarrm,\xrm}\big( \thetac | \bar{n},x \big) & = & \prm_{\upthetac | \nbarrm}\big( \thetac | \bar{n} \big) = \prod_{x' \in \Xcal} \prm_{\upthetac(x') | \nbarrm(\cdot,x')}\big(\thetac(x') | \bar{n}(\cdot,x') \big) \\
+& = & \prod_{x' \in \Xcal} \Dir\big( \thetac(x') ; \alpha(\cdot,x') + \bar{n}(\cdot,x') \big) \nonumber \;.
 \end{IEEEeqnarray}
-Observe that when the conditioning is performed using the sufficient statistic, the independent conditional models $\tilde{\uptheta}(x)$ are only dependent on their corresponding subset of the  empirical PMF, $\nbarrm(\cdot,x)$.
+Observe that when the conditioning is performed using the sufficient statistic, the independent conditional models $\upthetac(x)$ are only dependent on their corresponding subset of the  empirical PMF, $\nbarrm(\cdot,x)$.
 
 The Bayes predictive PMF can thus be expressed as
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\yrm | \xrm,\Drm}(x,D) & = & \mu_{\tilde{\uptheta}(x) | \xrm,\Drm}(x,D) = \mu_{\tilde{\uptheta}(x) | \Drm}(D) \\
+\Prm_{\yrm | \xrm,\Drm}(x,D) & = & \mu_{\upthetac(x) | \xrm,\Drm}(x,D) = \mu_{\upthetac(x) | \Drm}(D) \\
 & = & \frac{\alpha(\cdot,x) + \bar{N}(\cdot,x;D)}{\alpha'(x) + N'(x;D)} \nonumber
 \end{IEEEeqnarray}
 or, via the sufficient statistic,
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\yrm | \xrm,\nbarrm}(x,\bar{n}) & = & \mu_{\tilde{\uptheta}(x) | \xrm,\nbarrm}(x,\bar{n}) = \mu_{\tilde{\uptheta}(x) | \nbarrm(\cdot,x)}\big(\bar{n}(\cdot,x)\big) \\
+\Prm_{\yrm | \xrm,\nbarrm}(x,\bar{n}) & = & \mu_{\upthetac(x) | \xrm,\nbarrm}(x,\bar{n}) = \mu_{\upthetac(x) | \nbarrm(\cdot,x)}\big(\bar{n}(\cdot,x)\big) \\
 & = & \frac{\alpha(\cdot,x) + \bar{n}(\cdot,x)}{\alpha'(x) + \sum_y \bar{n}(y,x)} \nonumber \;.
 \end{IEEEeqnarray}
-A consequence of the Dirichlet prior is that the predictive PMF for a given value of $\xrm$ only depends on the corresponding training data $\nbarrm(\cdot,\xrm)$, such that $\Prm_{\yrm | \xrm,\nbarrm}(x,\bar{n}) = \Prm_{\yrm | \xrm,\nbarrm(\cdot,\xrm)}\big( x,\bar{n}(\cdot,x) \big)$. This is intuitive considering the independence of the conditional models $\tilde{\theta}(x)$ from one another.
+A consequence of the Dirichlet prior is that the predictive PMF for a given value of $\xrm$ only depends on the corresponding training data $\nbarrm(\cdot,\xrm)$, such that $\Prm_{\yrm | \xrm,\nbarrm}(x,\bar{n}) = \Prm_{\yrm | \xrm,\nbarrm(\cdot,\xrm)}\big( x,\bar{n}(\cdot,x) \big)$. This is intuitive considering the independence of the conditional models $\thetac(x)$ from one another.
 
 
 
@@ -1174,26 +1257,26 @@ PGR: generalize, move before Dirichlet?
 PGR: use poster table??
 
 
-It is instructive to treat the distribution $\Prm_{\yrm | \xrm,\nbarrm}$ as an estimate of the unknown conditional PMF $\Prm_{\yrm | \xrm,\uptheta} \equiv \tilde{\uptheta}(\xrm)$ and investigate the effects of informative prior knowledge. For a given $\xrm$ and corresponding number of training samples $\nrm'(\xrm)$, the expected value of the estimate condtioned on the true model $\uptheta$ is
+It is instructive to treat the distribution $\Prm_{\yrm | \xrm,\nbarrm}$ as an estimate of the unknown conditional PMF $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$ and investigate the effects of informative prior knowledge. For a given $\xrm$ and corresponding number of training samples $\nrm'(\xrm)$, the expected value of the estimate condtioned on the true model $\uptheta$ is
 \begin{IEEEeqnarray}{L}
 \Erm_{\nbarrm | \nrm',\uptheta}\big[ \Prm_{\yrm | \xrm,\nbarrm} \big] 
-= \Erm_{\nbarrm(\cdot,\xrm) | \nrm'(\xrm),\tilde{\uptheta}(\xrm)}\big[ \Prm_{\yrm | \xrm,\nbarrm(\cdot,\xrm)} \big] \\ 
-\quad = \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + \nrm'(\xrm)}\right) \frac{\alpha(\cdot,\xrm)}{\alpha'(\xrm)} + \left(\frac{\nrm'(\xrm)}{\alpha'(\xrm) + \nrm'(\xrm)}\right) \tilde{\uptheta}(\xrm) \nonumber \;,
+= \Erm_{\nbarrm(\cdot,\xrm) | \nrm'(\xrm),\upthetac(\xrm)}\big[ \Prm_{\yrm | \xrm,\nbarrm(\cdot,\xrm)} \big] \\ 
+\quad = \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + \nrm'(\xrm)}\right) \frac{\alpha(\cdot,\xrm)}{\alpha'(\xrm)} + \left(\frac{\nrm'(\xrm)}{\alpha'(\xrm) + \nrm'(\xrm)}\right) \upthetac(\xrm) \nonumber \;,
 \end{IEEEeqnarray}
-where the properties of a multinomial distribution conditioned on its aggregation have been used. The result is a convex combination of the conditional data-independent distribution $\alpha(\cdot,x) / \alpha'(x)$ and the true conditional distribution $\tilde{\uptheta}(\xrm)$. The convex coefficients are dependent on the ``marginal'' values $\alpha'$ and $\nrm'$; note that as the number of matching training samples $\nrm'(x)$ increases relative to $\alpha'(x)$, the estimate tends towards the true conditional PMF. 
+where the properties of a multinomial distribution conditioned on its aggregation have been used. The result is a convex combination of the conditional data-independent distribution $\alpha(\cdot,x) / \alpha'(x)$ and the true conditional distribution $\upthetac(\xrm)$. The convex coefficients are dependent on the ``marginal'' values $\alpha'$ and $\nrm'$; note that as the number of matching training samples $\nrm'(x)$ increases relative to $\alpha'(x)$, the estimate tends towards the true conditional PMF. 
 
 PGR: suppress delta dependency on nbar and theta?
 
 To aid characterization of the estimator, define the random process $\Delta(\xrm,\nbarrm,\uptheta) \equiv \Prm_{\yrm | \xrm,\nbarrm} - \Prm_{\yrm | \xrm,\uptheta} \in \Rbb^{\Ycal}$. For a given $\xrm$ and corresponding number of training samples $\nrm'(\xrm)$, the bias of the conditional PMF estimate is
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias}
 \mathrm{Bias}(\xrm,\nrm',\uptheta) & = & \Erm_{\nbarrm | \nrm',\uptheta}\big[ \Delta(\xrm,\nbarrm,\uptheta) \big] \\
-& = & \frac{\alpha'(\xrm)}{\alpha'(\xrm) + \nrm'(\xrm)} \left( \frac{\alpha(\cdot,\xrm)}{\alpha'(\xrm)} - \tilde{\uptheta}(\xrm) \right) \nonumber 
+& = & \frac{\alpha'(\xrm)}{\alpha'(\xrm) + \nrm'(\xrm)} \left( \frac{\alpha(\cdot,\xrm)}{\alpha'(\xrm)} - \upthetac(\xrm) \right) \nonumber 
 \end{IEEEeqnarray}
 and its covariance function is 
 \begin{IEEEeqnarray}{L} \label{eq:predictive_cov}
 \mathrm{Cov}(y,y';\xrm,\nrm',\uptheta) = \Crm_{\nbarrm | \nrm',\uptheta} \big[\Prm_{\yrm | \xrm,\nbarrm}(\cdot | \xrm,\nbarrm) \big](y,y') \\
-\quad = \frac{\Sigma_{\nbarrm(\cdot,\xrm) | \nrm'(\xrm),\tilde{\uptheta}(\xrm)}(y,y')}{\big( \alpha'(\xrm) + \nrm'(\xrm) \big)^2} \nonumber \\
-\quad = \frac{\nrm'(\xrm)}{\big( \alpha'(\xrm) + \nrm'(\xrm) \big)^2} \left( \tilde{\uptheta}(y;\xrm) \delta[y,y'] - \tilde{\uptheta}(y;\xrm) \tilde{\uptheta}(y';\xrm) \right) \nonumber \;,
+\quad = \frac{\Sigma_{\nbarrm(\cdot,\xrm) | \nrm'(\xrm),\upthetac(\xrm)}(y,y')}{\big( \alpha'(\xrm) + \nrm'(\xrm) \big)^2} \nonumber \\
+\quad = \frac{\nrm'(\xrm)}{\big( \alpha'(\xrm) + \nrm'(\xrm) \big)^2} \left( \upthetac(y;\xrm) \delta[y,y'] - \upthetac(y;\xrm) \upthetac(y';\xrm) \right) \nonumber \;,
 \end{IEEEeqnarray}
 where the properties of multinomial random processes have been used. Note that the bias is proportionate to the difference between the true conditional model and the data-independent estimate. The scaling factor tends from one to zero as $\nrm'(x)/\alpha'(x)$ tends from zero to infinity; as such, more informative priors (large $\alpha'(x)$) will lead to PMF estimates that are prone to bias. Conversely, the variance of the PMF estimate tends to zero as $\alpha'(x) \to \infty$. 
 
@@ -1203,20 +1286,20 @@ Combining the estimator bias and variance, the conditional second moments of $\D
 \mathcal{E}(y,y' ; \xrm,\nrm',\uptheta) & = & \Erm_{\nbarrm | \nrm',\uptheta} \Big[ \Delta(y;\xrm,\nbarrm,\uptheta) \Delta(y';\xrm,\nbarrm,\uptheta) \Big] \\
 & = & \mathrm{Bias}(y;\xrm,\nrm',\uptheta) \mathrm{Bias}(y';\xrm,\nrm',\uptheta) + \mathrm{Cov}(y,y';\xrm,\nrm',\uptheta) \nonumber \;.
 \end{IEEEeqnarray}
-As $\nrm'(x) \to \infty$, this function tends to zero and thus the underlying model $\tilde{\uptheta}(x)$ is determined precisely. A more practical case is estimation with a finite volume of training data. Specification of the Dirichlet model prior can be interpreted as providing a distribution estimate $\alpha(\cdot,x)/\alpha'(x)$ and a confidence level $\alpha'(x)$. Higher confidence reduces error due to the variance of the estimator, but increases the error due to bias between the true model and its estimate; low confidence renders the estimate unbiased, but maximizes the estimator variance. 
+As $\nrm'(x) \to \infty$, this function tends to zero and thus the underlying model $\upthetac(x)$ is determined precisely. A more practical case is estimation with a finite volume of training data. Specification of the Dirichlet model prior can be interpreted as providing a distribution estimate $\alpha(\cdot,x)/\alpha'(x)$ and a confidence level $\alpha'(x)$. Higher confidence reduces error due to the variance of the estimator, but increases the error due to bias between the true model and its estimate; low confidence renders the estimate unbiased, but maximizes the estimator variance. 
 
 
 
 Also of interest, the conditional expectation of $\mathcal{E}(\cdot,\cdot;\xrm,\nrm',\uptheta)$ is
 \begin{IEEEeqnarray}{L} \label{eq:predictive_E_del_sq}
 \Erm_{\xrm,\nrm' | \uptheta}\Big[ \mathcal{E}(y,y' ; \xrm,\nrm',\uptheta) \Big] \\
-\quad = \Erm_{\xrm | \uptheta}\left[ \Erm_{\nrm'(\xrm) | \uptheta}\left[ \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + \nrm'(\xrm)}\right)^2 \right] \left( \frac{\alpha(y,\xrm)}{\alpha'(\xrm)} - \tilde{\uptheta}(y;\xrm) \right) \left( \frac{\alpha(y',\xrm)}{\alpha'(\xrm)} - \tilde{\uptheta}(y';\xrm) \right) \right] \nonumber \\
-\qquad + \Erm_{\xrm | \uptheta}\left[ \Erm_{\nrm'(\xrm) | \uptheta}\left[ \frac{\nrm'(\xrm)}{\big( \alpha'(\xrm) + \nrm'(\xrm) \big)^2} \right] \left( \tilde{\uptheta}(y;\xrm) \delta[y,y'] - \tilde{\uptheta}(y;\xrm) \tilde{\uptheta}(y';\xrm) \right) \right] \nonumber \;.
+\quad = \Erm_{\xrm | \uptheta}\left[ \Erm_{\nrm'(\xrm) | \uptheta}\left[ \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + \nrm'(\xrm)}\right)^2 \right] \left( \frac{\alpha(y,\xrm)}{\alpha'(\xrm)} - \upthetac(y;\xrm) \right) \left( \frac{\alpha(y',\xrm)}{\alpha'(\xrm)} - \upthetac(y';\xrm) \right) \right] \nonumber \\
+\qquad + \Erm_{\xrm | \uptheta}\left[ \Erm_{\nrm'(\xrm) | \uptheta}\left[ \frac{\nrm'(\xrm)}{\big( \alpha'(\xrm) + \nrm'(\xrm) \big)^2} \right] \left( \upthetac(y;\xrm) \delta[y,y'] - \upthetac(y;\xrm) \upthetac(y';\xrm) \right) \right] \nonumber \;.
 \end{IEEEeqnarray}
 
 
 
-To exemplify how the model estimate $\Prm_{\yrm | \xrm,\nbarrm}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 10$. The data-independent PMF $\alpha(\cdot,x) / \alpha'(x)$ and true model $\tilde{\uptheta}(x)$ are shown in Figure \ref{fig:P_yx_error_N_0} - note the significant mismatch. 
+To exemplify how the model estimate $\Prm_{\yrm | \xrm,\nbarrm}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 10$. The data-independent PMF $\alpha(\cdot,x) / \alpha'(x)$ and true model $\upthetac(x)$ are shown in Figure \ref{fig:P_yx_error_N_0} - note the significant mismatch. 
 
 PGR: ABOVE - STATE XCAL cardinality = 1
 
@@ -1532,8 +1615,8 @@ Evaluation of the excess risk for an estimator based on the Dirichlet prior will
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
 \quad = \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm,\nbarrm | \uptheta} \Big[ \Delta(y;\xrm,\nbarrm,\uptheta) \Delta(y';\xrm,\nbarrm,\uptheta) \Big] \nonumber \\
 \quad = \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm,\nrm' | \uptheta}\Big[ \mathcal{E}(y,y' ; \xrm,\nrm',\uptheta) \Big] \nonumber \\
-\quad = \Erm_{\xrm | \uptheta}\left[ \Sigma_{\yrm | \xrm,\uptheta} \Erm_{\nrm'(\xrm) | \uptheta'(\xrm)}\left[ \frac{\nrm'(\xrm)}{\big( \alpha'(\xrm) + \nrm'(\xrm) \big)^2} \right] \right] \nonumber \\
-\qquad \qquad + \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \Erm_{\nrm'(\xrm) | \uptheta'(\xrm)}\left[ \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + \nrm'(\xrm)}\right)^2 \right] \right] \nonumber \;,
+\quad = \Erm_{\xrm | \uptheta}\left[ \Sigma_{\yrm | \xrm,\uptheta} \Erm_{\nrm'(\xrm) | \upthetam(\xrm)}\left[ \frac{\nrm'(\xrm)}{\big( \alpha'(\xrm) + \nrm'(\xrm) \big)^2} \right] \right] \nonumber \\
+\qquad \qquad + \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \Erm_{\nrm'(\xrm) | \upthetam(\xrm)}\left[ \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + \nrm'(\xrm)}\right)^2 \right] \right] \nonumber \;,
 %\quad = \Erm_{\xrm | \uptheta}\left[ \Sigma_{\yrm | \xrm,\uptheta} \Erm_{\nrm'(\xrm) | \uptheta}\left[ \frac{\alpha_0^{-2} \nrm'(\xrm)}{\big( \Prm_{\xrm}(\xrm) + \alpha_0^{-1} \nrm'(\xrm) \big)^2} \right] \right] \nonumber \\
 %\qquad \qquad + \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \Erm_{\nrm'(\xrm) | \uptheta}\left[ \left(\frac{\Prm_{\xrm}(\xrm)}{\Prm_{\xrm}(\xrm) + \alpha_0^{-1} \nrm'(\xrm)}\right)^2 \right] \right] \nonumber \;,
 \end{IEEEeqnarray}
@@ -1541,14 +1624,14 @@ where the function $\mathcal{E}$ is defined in \eqref{eq:predictive_del_sq}.
 
 The excess conditional risk can thus be represented as the conditional expectation (with respect to $\Prm_{\xrm | \uptheta}$) of a sum of two functions of $\xrm$. The first function measures the additional variance beyond that of the clairvoyant estimator (i.e. the clairvoyant squared-error); like the clairvoyant risk, it depends on $\Sigma_{\yrm | \xrm,\uptheta}$, the conditional variance of the clairvoyant estimate for a given observation of $\xrm$. The second function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\uptheta}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. This term alone is influenced by the data-independent Bayes predictive distribution $\Prm_{\yrm | \xrm} = \alpha(\cdot,\xrm) / \alpha'(\xrm)$.
 
-The two second-order (in terms of $y$) terms are scaled by factors dependent on the prior concentrations $\alpha'(x)$ and on $\uptheta'(x)$ and $N$ via conditional expectations with respect to $\nrm'(x)$. Note that by the aggregation property of multinomial distributions, the random variable $\nrm'(x) | \uptheta'(x) \sim \Bi \big(N,\uptheta'(x)\big)$. Closed-forms have not been found for the function expectations of binomial random variables above.
+The two second-order (in terms of $y$) terms are scaled by factors dependent on the prior concentrations $\alpha'(x)$ and on $\upthetam(x)$ and $N$ via conditional expectations with respect to $\nrm'(x)$. Note that by the aggregation property of multinomial distributions, the random variable $\nrm'(x) | \upthetam(x) \sim \Bi \big(N,\upthetam(x)\big)$. Closed-forms have not been found for the function expectations of binomial random variables above.
 
 PGR: binomial citations?
 
 It is instructional to consider the trends in the conditional squared-error risk \eqref{eq:risk_cond_SE_dir_ex} for different volumes of training data $N$ and for different selections of $\alpha$.
 
 
-First consider how the excess risk changes with the training volume $N$. For $N=0$, it is evident that the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$,  the expected squared bias between the clairvoyant and data-independent estimators. As $N$ tends to infinity, the binomial distribution controlling the scaling factors  concentrates at $\nrm'(x) \approx N \theta'(x)$; as such, the two expectations of interest tend to zero and thus $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable property of the estimator is a consequence of the full support of the Dirichlet prior, ensuring that the model posterior concentrates at the empirical PMF.
+First consider how the excess risk changes with the training volume $N$. For $N=0$, it is evident that the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$,  the expected squared bias between the clairvoyant and data-independent estimators. As $N$ tends to infinity, the binomial distribution controlling the scaling factors  concentrates at $\nrm'(x) \approx N \thetam(x)$; as such, the two expectations of interest tend to zero and thus $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable property of the estimator is a consequence of the full support of the Dirichlet prior, ensuring that the model posterior concentrates at the empirical PMF.
 
 Another interesting point regarding the depedency of the excess conditional risk on $N$ is that, depending on the learner parameterization, there may be a local maximum. Consider the trivial case of $|\Xcal| = 1$ - treating $N$ as a real number, there would be a maximum at 
 \begin{equation}
@@ -1595,10 +1678,10 @@ Consider how the excess risk tends as the priors become maximally concentrated. 
 
 Conversely, if concentrations $\alpha'(x) \to 0$ are chosen, the Bayesian estimate tends to the empirical mean, independent of $\alpha(\cdot,\xrm) / \alpha'(\xrm)$, and the excess risk tends to
 \begin{IEEEeqnarray}{rCl}
-\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) & \to & \Erm_{\xrm | \uptheta}\left[ \Sigma_{\yrm | \xrm,\uptheta} \sum_{n=1}^N \binom{N}{n} \uptheta'(\xrm)^n \big( 1 - \uptheta'(\xrm) \big)^{N-n} \frac{1}{n} \right] \nonumber \\
-&& \qquad + \Erm_{\xrm | \uptheta}\left[ \big( 1 - \uptheta'(\xrm) \big)^N \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right] \nonumber \;.
+\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) & \to & \Erm_{\xrm | \uptheta}\left[ \Sigma_{\yrm | \xrm,\uptheta} \sum_{n=1}^N \binom{N}{n} \upthetam(\xrm)^n \big( 1 - \upthetam(\xrm) \big)^{N-n} \frac{1}{n} \right] \nonumber \\
+&& \qquad + \Erm_{\xrm | \uptheta}\left[ \big( 1 - \upthetam(\xrm) \big)^N \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right] \nonumber \;.
 \end{IEEEeqnarray}
-Note that the first term's scaling factor is proportionate to the first inverse moment of a positive binomial random variable \cite{stephan}. The second term's scaling factor tends to $\Prm_{\nrm'(\xrm) | \uptheta'(\xrm)}\big( 0 | \theta'(x) \big)$, the probability that no training samples are observed matching the value $\xrm$. As $N$ increases, this term tends to zero, the risk due to the prior estimate bias decreases, and the excess risk becomes a function of $\uptheta$ only.
+Note that the first term's scaling factor is proportionate to the first inverse moment of a positive binomial random variable \cite{stephan}. The second term's scaling factor tends to $\Prm_{\nrm'(\xrm) | \upthetam(\xrm)}\big( 0 | \thetam(x) \big)$, the probability that no training samples are observed matching the value $\xrm$. As $N$ increases, this term tends to zero, the risk due to the prior estimate bias decreases, and the excess risk becomes a function of $\uptheta$ only.
 
 
 
@@ -1606,13 +1689,13 @@ Of further interest are the values $\alpha'(x)$ that minimize the excesss square
 
 PGR: add the derivative details below???
 
-Calculating the first derivative with respect to $\alpha'(x)$, it can be shown that for $N > 0$ and $\theta'(x) > 0$, only one stationary point exists, at 
+Calculating the first derivative with respect to $\alpha'(x)$, it can be shown that for $N > 0$ and $\thetam(x) > 0$, only one stationary point exists, at 
 \begin{equation} \label{eq:alpha_x_min_Rex}
 \alpha'(x) \equiv \frac{\Sigma_{\yrm | \xrm,\uptheta}}{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2} \;.
 \end{equation}
 Calculation of the second derivative confirms that this value is a local minimum. Furthermore, the excess risk evaluated at these values is 
 \begin{equation}
-\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm | \uptheta}\left[ \Erm_{\nrm'(\xrm) | \uptheta'(\xrm)}\left[ \frac{1}{\nrm'(\xrm)\Sigma_{\yrm | \xrm,\uptheta}^{-1} + \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^{-2}} \right] \right] \;,
+\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm | \uptheta}\left[ \Erm_{\nrm'(\xrm) | \upthetam(\xrm)}\left[ \frac{1}{\nrm'(\xrm)\Sigma_{\yrm | \xrm,\uptheta}^{-1} + \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^{-2}} \right] \right] \;,
 \end{equation}
 which can be easily shown to be less than both the asymptotic values for $\alpha'(x) \to 0$ and $\alpha'(x) \to \infty$. Thus the concentation values \eqref{eq:alpha_x_min_Rex} provide the minimum excess risk for the given prior conditional distributions.
 
@@ -1620,8 +1703,8 @@ Note that the minimizing concentration values $\alpha'(x)$ are inversely proport
 
 
 
-%\Erm_{\xrm | \uptheta}\left[ \Sigma_{\yrm | \xrm,\uptheta} \Erm_{\nrm'(\xrm) | \uptheta'(\xrm)}\left[ \frac{\nrm'(\xrm)}{\big( \alpha'(\xrm) + \nrm'(\xrm) \big)^2} \right] \right] \nonumber \\
-%\qquad \qquad + \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \Erm_{\nrm'(\xrm) | \uptheta'(\xrm)}\left[ \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + \nrm'(\xrm)}\right)^2 \right] \right] \nonumber
+%\Erm_{\xrm | \uptheta}\left[ \Sigma_{\yrm | \xrm,\uptheta} \Erm_{\nrm'(\xrm) | \upthetam(\xrm)}\left[ \frac{\nrm'(\xrm)}{\big( \alpha'(\xrm) + \nrm'(\xrm) \big)^2} \right] \right] \nonumber \\
+%\qquad \qquad + \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \Erm_{\nrm'(\xrm) | \upthetam(\xrm)}\left[ \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + \nrm'(\xrm)}\right)^2 \right] \right] \nonumber
 
 
 Figures \ref{fig:Risk_cond_SE_Dir_a0_leg_N_unbiased} and \ref{fig:Risk_cond_SE_Dir_a0_leg_N_biased} show how the excess conditional squared-error trends as a function of the Dirichlet learner concentration. Note that the latter is based on a biased prior estimate and thus the optimal Dirichlet concentration value is lower.
@@ -1693,11 +1776,7 @@ a conditional majority decision which chooses the class from $\Ycal$ most often 
 
 \subsubsection{Minimum Risk: Probability of Error}
 
-PGR: GENERATE NON-SIM FIGS!!!!!!!
-
-PGR: DIR SIM FIGS COMMENTED!!!
-
-PGR: no closed-forms found???
+\todohigh{no closed-forms found??? Find closed-form BOUNDS???}
 
 
 Evaluating the minimum risk \eqref{eq:risk_min_01} using the distributions derived from the Dirichlet prior, the Bayes minimum probability of error is 
@@ -1860,7 +1939,7 @@ providing a lower bound for the achievable 0-1 Bayes risk. The above formulation
 PGR: harmonic reference?
 
 
-Figure \ref{fig:Risk_01_uni_N_leg_My} demonstrates how the minimum 0-1 risk decreases with training volume $N$; observe that the risk is more severe for sequences corresponding to higher $|\Ycal|$. It is sensible that the probability of error should increase when more classes have to be considered. Figure \ref{fig:Risk_01_uni_N_leg_Mx} illustrates the minimum risk with multiple sequences for different cardinalities $|\Xcal|$. Note that risk increases with $|\Xcal|$. Considering $\Erm_{\Drm}\big[N'(\Drm)\big] = \mu_{\nrm'} = N/|\Xcal|$, this should be intuitive - each conditional empirical distribution $\bar{N}(\cdot,x;D) / N'(x;D)$ is forced to approximate $\tilde{\uptheta}(x)$ with less data.
+Figure \ref{fig:Risk_01_uni_N_leg_My} demonstrates how the minimum 0-1 risk decreases with training volume $N$; observe that the risk is more severe for sequences corresponding to higher $|\Ycal|$. It is sensible that the probability of error should increase when more classes have to be considered. Figure \ref{fig:Risk_01_uni_N_leg_Mx} illustrates the minimum risk with multiple sequences for different cardinalities $|\Xcal|$. Note that risk increases with $|\Xcal|$. Considering $\Erm_{\Drm}\big[N'(\Drm)\big] = \mu_{\nrm'} = N/|\Xcal|$, this should be intuitive - each conditional empirical distribution $\bar{N}(\cdot,x;D) / N'(x;D)$ is forced to approximate $\upthetac(x)$ with less data.
 
 \begin{figure}
 \centering
@@ -1914,9 +1993,9 @@ PGR: comment on alpha0 versus alphax simplification
 
 Substituting the optimal Dirichlet-based classifier into the formula for the conditional probability of error \ref{eq:risk_cond_01}, the risk is
 \begin{IEEEeqnarray}{rCl}
-\Rcal_{\Theta}(f ; \uptheta) & = & 1 - \sum_{x \in \Xcal} \uptheta'(x) \Erm_{\nbarrm | \uptheta} \bigg[ \tilde{\uptheta}\Big( \argmax_{y \in \Ycal} \big( \nbarrm(y,x) + \alpha(y,x) \big) ;x \Big) \bigg] \;.
+\Rcal_{\Theta}(f ; \uptheta) & = & 1 - \sum_{x \in \Xcal} \upthetam(x) \Erm_{\nbarrm | \uptheta} \bigg[ \upthetac\Big( \argmax_{y \in \Ycal} \big( \nbarrm(y,x) + \alpha(y,x) \big) ;x \Big) \bigg] \;.
 \end{IEEEeqnarray}
-Figures \ref{fig:Risk_cond_01_Dir_N_leg_a0__subj_good} and \ref{fig:Risk_cond_01_Dir_N_leg_a0__subj_bad} show how the conditional risk trends for classifiers based on well-matched and poorly-matched informative Dirichlet priors, respectively. Note that the well-matched prior does better with higher prior concentrations $\alpha_0$; this is reflective of the fact that the maximizing arguments $y \in \Ycal$ of both the true model $\tilde{\theta}(x)$ and the prior mean $\alpha(\cdot,x) / \alpha'(x)$ are the same.
+Figures \ref{fig:Risk_cond_01_Dir_N_leg_a0__subj_good} and \ref{fig:Risk_cond_01_Dir_N_leg_a0__subj_bad} show how the conditional risk trends for classifiers based on well-matched and poorly-matched informative Dirichlet priors, respectively. Note that the well-matched prior does better with higher prior concentrations $\alpha_0$; this is reflective of the fact that the maximizing arguments $y \in \Ycal$ of both the true model $\thetac(x)$ and the prior mean $\alpha(\cdot,x) / \alpha'(x)$ are the same.
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_cond_01_Dir_N_leg_a0__subj_good.pdf}
@@ -2405,10 +2484,10 @@ and thus
 
 It is instructional to find the PDF's for the training output values $\Yrm$ given the input values $\Xrm$, as well as the marginal PDF for the input values alone. Observe that the PDF for $\Xrm$ can be represented as
 \begin{IEEEeqnarray}{rCl}
-\prm_{\Xrm}(X) & = & \Erm_{\uptheta}\big[ \prm_{\Xrm | \uptheta}(X | \uptheta) \big] = \Erm_{\uptheta}\left[ \prod_{n=1}^N \uptheta'\big( X_n \big) \right] \\
+\prm_{\Xrm}(X) & = & \Erm_{\uptheta}\big[ \prm_{\Xrm | \uptheta}(X | \uptheta) \big] = \Erm_{\uptheta}\left[ \prod_{n=1}^N \upthetam\big( X_n \big) \right] \\
 & = & \frac{\alpha'\big( X_1 \big)}{\alpha_0} \prod_{n=2}^N \frac{\alpha'\big( X_n \big) + \sum_{i=1}^{n-1} \delta\big( X_n-X_i \big)}{\alpha_0+n-1} \nonumber
 \end{IEEEeqnarray}
-since, by the aggregation principle, $\uptheta' = \int_{\Ycal} \uptheta(y,\cdot) \mathrm{d} y$ is a Dirichlet process with parameter function $\alpha': \Xcal \mapsto \Rbb^+$.
+since, by the aggregation principle, $\upthetam = \int_{\Ycal} \uptheta(y,\cdot) \mathrm{d} y$ is a Dirichlet process with parameter function $\alpha': \Xcal \mapsto \Rbb^+$.
 
 
 %The PDF for $\Xrm$ is
@@ -2791,28 +2870,28 @@ PGR: remove beta set arguments by introducing alpha sub z?
 
 This section details an important property of Dirichlet distributed random processes. The following development first considers Dirichlet random processes over a countable domain and then generalizes for continuous-domain Dirichlet processes. 
 
-First, define the PDF of a Dirichlet aggregation \cite{ferguson}. Let the random process $\uptheta \in \Theta = \Pcal(\Ycal)$ be Dirichlet over the countable set $\Ycal$ with parameterizing function $\alpha \in {\Rbb^+}^{\Ycal}$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$; the aggregation $\uptheta' \in \Pcal(\Zcal)$, $\uptheta'(z) \equiv \sum_{y \in \Scal(z)} \uptheta(y)$ is thus also Dirichlet and has a parameterizing function $\alpha' \in {\Rbb^+}^{\Zcal}$, $\alpha'(z) \equiv \sum_{y \in \Scal(z)} \alpha(y)$.
+First, define the PDF of a Dirichlet aggregation \cite{ferguson}. Let the random process $\uptheta \in \Theta = \Pcal(\Ycal)$ be Dirichlet over the countable set $\Ycal$ with parameterizing function $\alpha \in {\Rbb^+}^{\Ycal}$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$; the aggregation $\upthetam \in \Pcal(\Zcal)$, $\upthetam(z) \equiv \sum_{y \in \Scal(z)} \uptheta(y)$ is thus also Dirichlet and has a parameterizing function $\alpha' \in {\Rbb^+}^{\Zcal}$, $\alpha'(z) \equiv \sum_{y \in \Scal(z)} \alpha(y)$.
 
-The PDF of the original random process $\uptheta$ conditioned on its aggregation $\uptheta'$ can be formulated as
+The PDF of the original random process $\uptheta$ conditioned on its aggregation $\upthetam$ can be formulated as
 \begin{IEEEeqnarray}{rCl}
-\prm_{\uptheta | \uptheta'}(\theta | \theta') & = & \frac{\beta(\alpha') \prod_{y \in \Ycal} \theta(y)^{\alpha(y)-1}}{\beta(\alpha) \prod_{z \in \Zcal} \theta'(z)^{\alpha'(z)-1}} \\
-& = & \prod_{z \in \Zcal} \Bigg[ \beta\Big( \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big)^{-1} \frac{\prod_{y \in \Scal(z)} \theta(y)^{\alpha(y)-1}}{\theta'(z)^{\alpha'(z)-1}} \Bigg] \nonumber \\ 
-& = & \prod_{z \in \Zcal} \Bigg[ \frac{\theta'(z)^{1-|\Scal(z)|}}{\beta\Big( \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big)} \prod_{y \in \Scal(z)} \left(\frac{\theta(y)}{\theta'(z)}\right)^{\alpha(y)-1} \Bigg] \nonumber \;,
+\prm_{\uptheta | \upthetam}(\theta | \thetam) & = & \frac{\beta(\alpha') \prod_{y \in \Ycal} \theta(y)^{\alpha(y)-1}}{\beta(\alpha) \prod_{z \in \Zcal} \thetam(z)^{\alpha'(z)-1}} \\
+& = & \prod_{z \in \Zcal} \Bigg[ \beta\Big( \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big)^{-1} \frac{\prod_{y \in \Scal(z)} \theta(y)^{\alpha(y)-1}}{\thetam(z)^{\alpha'(z)-1}} \Bigg] \nonumber \\ 
+& = & \prod_{z \in \Zcal} \Bigg[ \frac{\thetam(z)^{1-|\Scal(z)|}}{\beta\Big( \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big)} \prod_{y \in \Scal(z)} \left(\frac{\theta(y)}{\thetam(z)}\right)^{\alpha(y)-1} \Bigg] \nonumber \;,
 \end{IEEEeqnarray}
-which is defined for $\left\{ \theta \in {\Rbb_{\geq 0}}^{\Ycal} : \sum_{y \in \Scal(z)} \theta(y) = \theta'(z), \quad \forall z \in \Zcal \right\}$.
+which is defined for $\left\{ \theta \in {\Rbb_{\geq 0}}^{\Ycal} : \sum_{y \in \Scal(z)} \theta(y) = \thetam(z), \quad \forall z \in \Zcal \right\}$.
 
-Observe that the partitioned segements are conditionally independent; introduce subscript notation to refer to the function segment $\uptheta_z = \big\{ \uptheta(y): y \in \Scal(z) \big\}$. The PDF $\prm_{\uptheta | \uptheta'}$ can now be decomposed as $\prm_{\uptheta | \uptheta'}(\ldots,\theta_z,\ldots | \theta') = \prod_{z \in \Zcal} \prm_{\uptheta_z | \uptheta'(z)}\big( \theta_z | \theta'(z) \big)$
+Observe that the partitioned segements are conditionally independent; introduce subscript notation to refer to the function segment $\uptheta_z = \big\{ \uptheta(y): y \in \Scal(z) \big\}$. The PDF $\prm_{\uptheta | \upthetam}$ can now be decomposed as $\prm_{\uptheta | \upthetam}(\ldots,\theta_z,\ldots | \thetam) = \prod_{z \in \Zcal} \prm_{\uptheta_z | \upthetam(z)}\big( \theta_z | \thetam(z) \big)$
 
-Next, normalize the segments of $\uptheta$ to form $\tilde{\uptheta} = \big( \ldots,\tilde{\uptheta}_z,\ldots \big)$, where $\tilde{\uptheta}_z \equiv \uptheta_z / \uptheta'(z)$, and formulate the conditional PDF
+Next, normalize the segments of $\uptheta$ to form $\upthetac = \big( \ldots,\upthetac_z,\ldots \big)$, where $\upthetac_z \equiv \uptheta_z / \upthetam(z)$, and formulate the conditional PDF
 \begin{IEEEeqnarray}{rCl}
-\prm_{\tilde{\uptheta} | \uptheta'}\left( \tilde{\theta} | \theta' \right) & = & \prod_{z \in \Zcal} \Bigg[ \frac{\prod_{y \in \Scal(z)} \tilde{\theta}_z(y)^{\alpha(y)-1}}{\beta\Big( \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big)} \Bigg] \\
-& = & \prod_{z \in \Zcal} \Dir\Big( \tilde{\theta}_z ; \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big) \nonumber \;.
+\prm_{\upthetac | \upthetam}\left( \thetac | \thetam \right) & = & \prod_{z \in \Zcal} \Bigg[ \frac{\prod_{y \in \Scal(z)} \thetac_z(y)^{\alpha(y)-1}}{\beta\Big( \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big)} \Bigg] \\
+& = & \prod_{z \in \Zcal} \Dir\Big( \thetac_z ; \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big) \nonumber \;.
 \end{IEEEeqnarray}
-which is defined for $\tilde{\theta} \in \prod_{z \in \Zcal} \left\{ \tilde{\theta}_z \in \Pcal\big(\Scal(z)\big) \right\}$. Thus after conditioning, the normalized segments $\tilde{\uptheta}_z$ are Dirichlet distributed, independent of one another, and independent of the aggregation $\uptheta'$. 
+which is defined for $\thetac \in \prod_{z \in \Zcal} \left\{ \thetac_z \in \Pcal\big(\Scal(z)\big) \right\}$. Thus after conditioning, the normalized segments $\upthetac_z$ are Dirichlet distributed, independent of one another, and independent of the aggregation $\upthetam$. 
 
 PGR: discuss transform Jacobian and dimensionality? 
 
-This principle holds for continuous-domain Dirichlet processes $\uptheta$ as well - the segments $\tilde{\uptheta}_z$ are now continuous-domain Dirichlet processes.
+This principle holds for continuous-domain Dirichlet processes $\uptheta$ as well - the segments $\upthetac_z$ are now continuous-domain Dirichlet processes.
 
 
 
@@ -2826,13 +2905,13 @@ This principle holds for continuous-domain Dirichlet processes $\uptheta$ as wel
 
 \subsection{Aggregation}
 
-A characteristic of a Multinomial random process is that its aggregations are also Multinomial \cite{johnson}. Consider a random process $\bar{\nrm} \sim \Multi(N,\theta)$ over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$; the transformed random process $\nrm'(z) \equiv \sum_{y \in \Scal(z)} \bar{\nrm}(y)$ is distributed as $\nrm' \sim \Multi(N,\theta')$ with parameterizing function $\theta'(z) = \sum_{y \in \Scal(z)} \theta(y)$.
+A characteristic of a Multinomial random process is that its aggregations are also Multinomial \cite{johnson}. Consider a random process $\bar{\nrm} \sim \Multi(N,\theta)$ over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$; the transformed random process $\nrm'(z) \equiv \sum_{y \in \Scal(z)} \bar{\nrm}(y)$ is distributed as $\nrm' \sim \Multi(N,\thetam)$ with parameterizing function $\thetam(z) = \sum_{y \in \Scal(z)} \theta(y)$.
 
 To prove this principle, define the subset $\tilde{\Ncal} = \big\{ \bar{n} \in \Ncal : \sum_{y \in \Scal(z)} \bar{n}(y) = n'(z), \quad \forall z \in \Zcal \big\} \subseteq \bar{\Ncal}$, where the original random process $\bar{\nrm} \in \bar{\Ncal}$. Next, observe
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\mathrm{n}'}(n') & = & \sum_{\bar{n} \in \tilde{\Ncal}} \Prm_{\nbarrm}(\bar{n}) \\
 & = & \Mcal(n') \prod_{z \in \Zcal} \sum_{\substack{n'(z) = \\ \sum_{y \in \Scal(z)} \bar{n}(y)}} \Mcal\big( \{ \bar{n}(y): y \in \Scal(z) \} \big) \prod_{y \in \Scal(z)} \theta(y)^{\bar{n}(y)} \nonumber \\
-& = & \Mcal(n') \prod_{z \in \Zcal} \theta'(z)^{n'(z)} = \Multi(n' ; N,\theta') \nonumber \;,
+& = & \Mcal(n') \prod_{z \in \Zcal} \thetam(z)^{n'(z)} = \Multi(n' ; N,\thetam) \nonumber \;,
 \end{IEEEeqnarray}
 where the multinomial theorem \cite{graham} has been used.
 
@@ -2843,12 +2922,12 @@ where the multinomial theorem \cite{graham} has been used.
 
 If the multinomial random process $\bar{\nrm}$ is conditioned on its aggregation over the partition $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$, the distinct segements $\bar{\nrm}(y)$, $y \in \Scal(z)$ become independent multinomial random processes,
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\bar{\nrm} | \nrm'}(\bar{n} | n') & = & \frac{\Mcal(\bar{n}) \prod_{y \in \Ycal} \theta(y)^{\bar{n}(y)}}{\Mcal(n') \prod_{z \in \Zcal} \theta'(z)^{n'(z)}} \\
-& = & \prod_{z \in \Zcal} \Bigg[ \Mcal\Big( \big\{ \bar{n}(y) : y \in \Scal(z) \big\} \Big) \prod_{y \in \Scal(z)} \left(\frac{\theta(y)}{\theta'(z)}\right)^{\bar{n}(y)} \Bigg] \nonumber \\
-& = & \prod_{z \in \Zcal} \Bigg[ \Mcal\Big( \big\{ \bar{n}(y) : y \in \Scal(z) \big\} \Big) \prod_{y \in \Scal(z)} \tilde{\theta}_z(y)^{\bar{n}(y)} \Bigg] \nonumber \\
-& = & \prod_{z \in \Zcal} \Multi\Big( \big\{ \bar{n}(y) : y \in \Scal(z) \big\} ; n'(z) , \big\{ \tilde{\theta}_z(y) : y \in \Scal(z) \big\} \Big) \nonumber \;,
+\Prm_{\bar{\nrm} | \nrm'}(\bar{n} | n') & = & \frac{\Mcal(\bar{n}) \prod_{y \in \Ycal} \theta(y)^{\bar{n}(y)}}{\Mcal(n') \prod_{z \in \Zcal} \thetam(z)^{n'(z)}} \\
+& = & \prod_{z \in \Zcal} \Bigg[ \Mcal\Big( \big\{ \bar{n}(y) : y \in \Scal(z) \big\} \Big) \prod_{y \in \Scal(z)} \left(\frac{\theta(y)}{\thetam(z)}\right)^{\bar{n}(y)} \Bigg] \nonumber \\
+& = & \prod_{z \in \Zcal} \Bigg[ \Mcal\Big( \big\{ \bar{n}(y) : y \in \Scal(z) \big\} \Big) \prod_{y \in \Scal(z)} \thetac_z(y)^{\bar{n}(y)} \Bigg] \nonumber \\
+& = & \prod_{z \in \Zcal} \Multi\Big( \big\{ \bar{n}(y) : y \in \Scal(z) \big\} ; n'(z) , \big\{ \thetac_z(y) : y \in \Scal(z) \big\} \Big) \nonumber \;,
 \end{IEEEeqnarray}
-on the domain $\left\{ \bar{n} \in {\Zbb_{\geq 0}}^{\Ycal} : \sum_{y \in \Scal(z)} \bar{n}(y) = n'(z), \quad \forall z \in \Zcal \right\}$. Observe that the segment over the set $\Scal(z)$ sums to $\nrm'(z)$ and is parameterized by the normalized segment $\tilde{\theta}_z \equiv \big\{ \theta(y)/\theta'(z) : y \in \Scal(z) \big\}$.
+on the domain $\left\{ \bar{n} \in {\Zbb_{\geq 0}}^{\Ycal} : \sum_{y \in \Scal(z)} \bar{n}(y) = n'(z), \quad \forall z \in \Zcal \right\}$. Observe that the segment over the set $\Scal(z)$ sums to $\nrm'(z)$ and is parameterized by the normalized segment $\thetac_z \equiv \big\{ \theta(y)/\thetam(z) : y \in \Scal(z) \big\}$.
 
 
 
@@ -2891,9 +2970,9 @@ In this section, it is shown that the expected value of a Dirichlet process $\up
 \end{equation}
 where $\alpha_0 = \int_{\Ycal} \alpha(y) \mathrm{d} y$.
 
-The defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Define the partition of $\Ycal$, $\big\{ \Scal(y),S^c(y) \big\}$ where $\Scal(y) = \{ t \in \Ycal : t \leq y \}$. The transform random variable $\uptheta'(y) \equiv \int_{-\infty}^y \uptheta(t) \mathrm{d} t$ is thus a Beta random variable with parameters $\lambda = \int_{-\infty}^y \alpha(t) \mathrm{d} t$ and $\lambda^c = \int_y^\infty \alpha(t) \mathrm{d} t$. Using the formula for the expected value of a beta random variable \cite{papoulis}, note that
+The defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Define the partition of $\Ycal$, $\big\{ \Scal(y),S^c(y) \big\}$ where $\Scal(y) = \{ t \in \Ycal : t \leq y \}$. The transform random variable $\upthetam(y) \equiv \int_{-\infty}^y \uptheta(t) \mathrm{d} t$ is thus a Beta random variable with parameters $\lambda = \int_{-\infty}^y \alpha(t) \mathrm{d} t$ and $\lambda^c = \int_y^\infty \alpha(t) \mathrm{d} t$. Using the formula for the expected value of a beta random variable \cite{papoulis}, note that
 \begin{IEEEeqnarray}{rCl}
-\mu_{\uptheta'} & = & \frac{\lambda}{\lambda+\lambda^c} \\
+\mu_{\upthetam} & = & \frac{\lambda}{\lambda+\lambda^c} \\
 & = & \frac{\int_{-\infty}^y \alpha(t) \mathrm{d} t}{\alpha_0} = \int_{-\infty}^y \mu_{\uptheta}(t) \mathrm{d} t \nonumber \;.
 \end{IEEEeqnarray}
 Differentiating with respect to $y$, we have the expected value of the DP.
@@ -2935,11 +3014,11 @@ Finally,
 
 In this section, it is shown that if the model $\uptheta \sim \DP(\alpha)$ is a Dirichlet process, then the model conditioned on the training data $\Drm$ is also a Dirichlet process with parameterizing function $\alpha + \sum_{n=1}^N \delta\big( \cdot - \Drm_n \big)$. 
 
-The defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Consider a DP over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$; the transformed random process $\uptheta'(z) \equiv \int_{\Scal(z)} \uptheta(y) \mathrm{d} y$ is neccessarily Dirichlet with parameterizing function $\alpha'(z) \equiv \int_{\Scal(z)} \alpha(y) \mathrm{d} y$.
+The defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Consider a DP over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$; the transformed random process $\upthetam(z) \equiv \int_{\Scal(z)} \uptheta(y) \mathrm{d} y$ is neccessarily Dirichlet with parameterizing function $\alpha'(z) \equiv \int_{\Scal(z)} \alpha(y) \mathrm{d} y$.
 
 To prove the hypothesis, it is required that
 \begin{IEEEeqnarray}{rCl}
-\uptheta' | \Drm & \sim & \Dir\big( \alpha' + \bar{N}(\Drm) \big) \;,
+\upthetam | \Drm & \sim & \Dir\big( \alpha' + \bar{N}(\Drm) \big) \;,
 \end{IEEEeqnarray}
 where $\bar{N}(z;\Drm) = \int_{\Scal(z)} \sum_{n=1}^N \delta\big( y - \Drm_n \big) \mathrm{d} y = \sum_{n=1}^N \chi\big( \Drm_n;\Scal(z) \big)$. $\chi$ is the indicator function
 \begin{equation}
@@ -2949,22 +3028,22 @@ where $\bar{N}(z;\Drm) = \int_{\Scal(z)} \sum_{n=1}^N \delta\big( y - \Drm_n \bi
 
 PGR: SUFFICIENT STATISTIC FOR D!!!?
 
-To prove the hypothesis, exploit the results of Appendix \ref{app:Dir_agg} to represent the training data distribution conditioned on the aggregation $\uptheta'$. The conditional distribution of interest is
+To prove the hypothesis, exploit the results of Appendix \ref{app:Dir_agg} to represent the training data distribution conditioned on the aggregation $\upthetam$. The conditional distribution of interest is
 \begin{IEEEeqnarray}{L}
-\prm_{\Drm | \uptheta'}(D | \uptheta') = \Erm_{\uptheta | \uptheta'}\big[ \prm_{\Drm | \uptheta}(D | \uptheta) \big] = \Erm_{\uptheta | \uptheta'}\left[ \prod_{n=1}^N \uptheta\big( D_n \big) \right] \\
-= \prod_{z \in \Zcal} \Erm_{\uptheta_z | \uptheta'(z)}\left[ \prod_{n=1}^N \uptheta_z\big( D_n \big)^{\chi\big( D_n;\Scal(z) \big)} \right] \nonumber \\
-= \left( \prod_{z \in \Zcal} \prod_{n=1}^N \uptheta'(z)^{\chi\big( D_n;\Scal(z) \big)} \right) \prod_{z \in \Zcal} \Erm_{\tilde{\uptheta}_z}\left[ \prod_{n=1}^N \tilde{\uptheta}_z\big( D_n \big)^{\chi\big( D_n;\Scal(z) \big)} \right] \nonumber \\
-= \left( \prod_{z \in \Zcal} \uptheta'(z)^{\bar{N}(z;D)} \right) \prod_{z \in \Zcal} \Erm_{\tilde{\uptheta}_z}\left[ \prod_{n=1}^N \tilde{\uptheta}_z\big( D_n \big)^{\chi\big( D_n;\Scal(z) \big)} \right] \nonumber \;,
+\prm_{\Drm | \upthetam}(D | \upthetam) = \Erm_{\uptheta | \upthetam}\big[ \prm_{\Drm | \uptheta}(D | \uptheta) \big] = \Erm_{\uptheta | \upthetam}\left[ \prod_{n=1}^N \uptheta\big( D_n \big) \right] \\
+= \prod_{z \in \Zcal} \Erm_{\uptheta_z | \upthetam(z)}\left[ \prod_{n=1}^N \uptheta_z\big( D_n \big)^{\chi\big( D_n;\Scal(z) \big)} \right] \nonumber \\
+= \left( \prod_{z \in \Zcal} \prod_{n=1}^N \upthetam(z)^{\chi\big( D_n;\Scal(z) \big)} \right) \prod_{z \in \Zcal} \Erm_{\upthetac_z}\left[ \prod_{n=1}^N \upthetac_z\big( D_n \big)^{\chi\big( D_n;\Scal(z) \big)} \right] \nonumber \\
+= \left( \prod_{z \in \Zcal} \upthetam(z)^{\bar{N}(z;D)} \right) \prod_{z \in \Zcal} \Erm_{\upthetac_z}\left[ \prod_{n=1}^N \upthetac_z\big( D_n \big)^{\chi\big( D_n;\Scal(z) \big)} \right] \nonumber \;,
 \end{IEEEeqnarray}
-Observe that the dependency on $\uptheta'$ is polynomial. The training data marginal distribution is
+Observe that the dependency on $\upthetam$ is polynomial. The training data marginal distribution is
 \begin{IEEEeqnarray}{rCl}
-\prm_{\Drm}(D) & = & \Erm_{\uptheta'} \left[ \prod_{z \in \Zcal} \uptheta'(z)^{\bar{N}(z;D)} \right] \prod_{z \in \Zcal} \Erm_{\tilde{\uptheta}_z}\left[ \prod_{n=1}^N \tilde{\uptheta}_z\big( D_n \big)^{\chi\big( D_n;\Scal(z) \big)} \right] \\
-& = & \frac{\beta\big( \alpha' + \bar{N}(D) \big)}{\beta(\alpha')} \prod_{z \in \Zcal} \Erm_{\tilde{\uptheta}_z}\left[ \prod_{n=1}^N \tilde{\uptheta}_z\big( D_n \big)^{\chi\big( D_n;\Scal(z) \big)} \right] \nonumber
+\prm_{\Drm}(D) & = & \Erm_{\upthetam} \left[ \prod_{z \in \Zcal} \upthetam(z)^{\bar{N}(z;D)} \right] \prod_{z \in \Zcal} \Erm_{\upthetac_z}\left[ \prod_{n=1}^N \upthetac_z\big( D_n \big)^{\chi\big( D_n;\Scal(z) \big)} \right] \\
+& = & \frac{\beta\big( \alpha' + \bar{N}(D) \big)}{\beta(\alpha')} \prod_{z \in \Zcal} \Erm_{\upthetac_z}\left[ \prod_{n=1}^N \upthetac_z\big( D_n \big)^{\chi\big( D_n;\Scal(z) \big)} \right] \nonumber
 \end{IEEEeqnarray}
 and thus the distribution of interest is
 \begin{IEEEeqnarray}{rCl}
-\prm_{\uptheta' | \Drm}(\theta' | D) & = & \frac{\prod_{z \in \Zcal} \theta'(z)^{\alpha'(z)+\bar{N}(z;D)-1}}{\beta\big( \alpha' + \bar{N}(D) \big)} \\
-& = & \Dir\left( \uptheta' ; \alpha' + \bar{N}(\cdot;\Drm) \right) \nonumber \;.
+\prm_{\upthetam | \Drm}(\thetam | D) & = & \frac{\prod_{z \in \Zcal} \thetam(z)^{\alpha'(z)+\bar{N}(z;D)-1}}{\beta\big( \alpha' + \bar{N}(D) \big)} \\
+& = & \Dir\left( \upthetam ; \alpha' + \bar{N}(\cdot;\Drm) \right) \nonumber \;.
 \end{IEEEeqnarray}
 This proves the hypothesis.
 
@@ -2993,11 +3072,11 @@ Observe that $\nrm'(z) \equiv \sum_{n=1}^N \chi\big( \Drm_n;\Scal(z) \big)$, whe
 \end{equation}
 and note that $\Prm\Big( \chi\big( \Drm_n;\Scal(z) \big) = 1 \big| \uptheta \Big) = \int_{\Scal(z)} \uptheta(y) \mathrm{d} y$. As such, $\nrm'$ conditioned on the model $\uptheta$ is characterized by a multinomial distribution 
 \begin{equation}
-\Prm_{\nrm' | \uptheta}(n' | \theta) = \Mcal(n') \prod_{z \in \Zcal} \left( \int_{\Scal(z)} \theta(y) \mathrm{d} y \right)^{n'(z)} = \Multi\left( n' ; N,\theta'(z) \right) \;,
+\Prm_{\nrm' | \uptheta}(n' | \theta) = \Mcal(n') \prod_{z \in \Zcal} \left( \int_{\Scal(z)} \theta(y) \mathrm{d} y \right)^{n'(z)} = \Multi\left( n' ; N,\thetam(z) \right) \;,
 \end{equation}
-where $\uptheta'(z) \equiv \int_{\Scal(z)} \uptheta(y) \mathrm{d} y$, $z \in \Zcal$.
+where $\upthetam(z) \equiv \int_{\Scal(z)} \uptheta(y) \mathrm{d} y$, $z \in \Zcal$.
 
-By the aggregation property of the Dirichlet process $\uptheta$, the parameters of this multinomial distribution are characterized as $\uptheta' \sim \Dir\left( \alpha' \right)$, and thus $\tilde{\nrm}$ is drawn from a Dirichlet-Multinomial PMF with the same parameters $\alpha'$. As this holds for any partition of $\Ycal$, $\bar{\nrm}$ is a Dirichlet-Multinomial Process.
+By the aggregation property of the Dirichlet process $\uptheta$, the parameters of this multinomial distribution are characterized as $\upthetam \sim \Dir\left( \alpha' \right)$, and thus $\tilde{\nrm}$ is drawn from a Dirichlet-Multinomial PMF with the same parameters $\alpha'$. As this holds for any partition of $\Ycal$, $\bar{\nrm}$ is a Dirichlet-Multinomial Process.
 
 
 \subsection{Mean and Correlation Functions}
