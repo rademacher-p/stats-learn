@@ -597,6 +597,87 @@ Note that $\prm_{\upthetac | \Xrm} = \Erm_{\upthetam | \Xrm}\big[ \prm_{\uptheta
 Note that $\Prm_{\Yrm | \Xrm,\xrm} = \Erm_{\upthetam | \Xrm,\xrm} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\Yrm | \Xrm,\upthetac} \big] \Big]$ and also that $\Prm_{\nbarrm | \nrm',\xrm} = \Erm_{\upthetam | \nrm',\xrm} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\nbarrm | \nrm',\upthetac} \big] \Big]$.
 
 
+\section{Learning Objective}
+
+The task in supervised machine learning is to design a learning function $f: \Dcal \mapsto \Hcal^{\Xcal}$ which produces a mapping from the space of the observed random elements to a decision space $\Hcal$. Define the function space $\Fcal = \left\{ {\Hcal^{\Xcal}} \right\}^{\Dcal}$, such that $f \in \Fcal$. The learning functions are non-parametric and there are no restrictions on the set of achievable functions $\Fcal$.
+
+The metric guiding the design is a loss function $\Lcal: \Hcal \times \Ycal \mapsto \Rbb_{\geq 0}$ which penalizes the decision $h \in \Hcal$ based on the value of $\yrm$. The objective is to minimize the conditional expected loss, or conditional ``risk'',
+\begin{IEEEeqnarray}{rCl} \label{eq:risk_cond}
+\Rcal_{\Theta}(f ; \uptheta) & = &  \Erm_{\yrm,\xrm,\Drm | \uptheta} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \\
+& = & \Erm_{\xrm,\Drm | \uptheta} \bigg[ \Erm_{\yrm | \xrm,\uptheta} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \nonumber \\
+& = & \Erm_{\Drm | \uptheta}\Bigg[ \Erm_{\xrm | \uptheta}\bigg[ \Erm_{\yrm | \xrm,\uptheta}\Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \Bigg] \nonumber \;.
+\end{IEEEeqnarray}
+where the conditional independence of random element $\yrm$ from the training data $\Drm$ given the model $\uptheta$ is used. As the model $\uptheta$ is not observed, $\Rcal_{\Theta}: \Theta \mapsto {\Rbb_{\geq 0}}^{\Fcal}$ is not a feasible objective function for optimization. This is the fundamental challenge of supervised learning: the true risk objective cannot be evaluated and the designer can never be precisely sure how well any learning function performs. 
+
+
+
+\subsection{Clairvoyant Decision}
+
+\todolow{subscript Theta? Use theta sub and remove argument like a cond dist?}
+
+It is instructive to formulate the optimal decision function assuming the model $\uptheta$ was in fact observed; it will be referred to as the ``clairvoyant'' function, following terminology used in \cite{kay-det}. This clairvoyant decision function $f_{\Theta}: \Theta \mapsto \Fcal$ is represented by
+\begin{equation}
+f_{\Theta}(\uptheta) = \argmin_{f \in \Fcal} \Rcal_{\Theta}(f ; \uptheta) \;.
+\end{equation}
+For a given set of observations $\xrm$ and $\Drm$, the function $f_{\Theta}(\uptheta) \in \Fcal$ selects the decision $h = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big]$. Note the conditional independence of $\yrm$ from $\Drm$ in \eqref{eq:risk_cond} - the knowledge of $\uptheta$ renders the training data $\Drm$ useless. As such, the range of the clairvoyant function is recast as $f_{\Theta} : \Theta \mapsto \Hcal^{\Xcal}$ and the decisions are
+\begin{equation} \label{eq:f_clv_x}
+f_{\Theta}(\xrm;\uptheta) = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \;.
+\end{equation}
+The corresponding clairvoyant risk for a given model $\uptheta$ is
+\begin{IEEEeqnarray}{rCl} \label{eq:risk_clv}
+\Rcal_{\Theta}^*(\uptheta) & \equiv & \Rcal_{\Theta}\big( f_{\Theta}(\uptheta) ; \uptheta \big) \\
+& = & \min_{f \in \Fcal} \Rcal_{\Theta}(f ; \uptheta) \nonumber \\
+& = & \Erm_{\xrm | \uptheta} \left[ \min_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \right] \nonumber \;.
+\end{IEEEeqnarray}
+
+
+
+
+\subsection{Bayes Decision}
+
+To design an optimal learning function $f \in \Fcal$, an operator must be chosen to remove the dependency of the conditional risk on $\uptheta$ and form an objective function $\Fcal \mapsto \Rbb_{\geq 0}$. One choice is to integrate over $\Theta$; to ensure a non-negative objective value, the weighting function should be non-negative. Also, as scaling the objective function will not change its minimizing argument, the weighting function can be constrained to integrate to one. These are the requirements for a valid probability density function (PDF); as such, the model $\uptheta$ is treated as a random process and a Bayesian approach can be adopted. 
+
+Define the PDF $\prm_{\uptheta} \in \Pcal(\Theta)$. Now the Bayes risk can be formulated as
+\begin{IEEEeqnarray}{rCl} \label{eq:risk}
+\Rcal(f) & = & \Erm_{\uptheta}\big[ \Rcal_{\Theta}(f ; \uptheta) \big] \\
+& = & \Erm_{\yrm,\xrm,\Drm}\big[ \Lcal(f(\xrm;\Drm),\yrm) \big] \nonumber \\
+& = & \Erm_{\xrm,\Drm}\bigg[ \Erm_{\yrm | \xrm,\Drm} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \nonumber \\
+& = & \Erm_{\Drm}\Bigg[ \Erm_{\xrm | \Drm}\bigg[ \Erm_{\yrm | \xrm,\Drm} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \Bigg] \nonumber
+\end{IEEEeqnarray}
+and $\yrm$, $\xrm$, and $\Drm$ are treated as jointly distributed random elements. Observe that the Bayesian predictive distributions can be represented as $\Prm_{\xrm | \Drm} = \Erm_{\uptheta | \Drm}\big[ \Prm_{\xrm | \uptheta} \big]$ and $\Prm_{\yrm | \xrm,\Drm} = \Erm_{\uptheta | \xrm,\Drm}\big[ \Prm_{\yrm | \xrm,\uptheta} \big]$, the expected values of the corresponding clairvoyant distributions with respect to the model posteriors $\prm_{\uptheta | \Drm}$ and $\prm_{\uptheta | \xrm,\Drm}$, respectively.
+
+\todolo{BELOW, add forumla for f(D)?}
+
+Finally, express the optimal learning function
+\begin{equation} 
+f^* = \argmin_{f \in \Fcal} \Rcal(f) \;.
+\end{equation}
+The decision expressed by the learning function $f^*$ given observed values of $\xrm$ and $\Drm$ is
+\begin{IEEEeqnarray}{rCl} \label{eq:f_opt_xD}
+f^*(\xrm;\Drm) & = & \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm}\big[ \Lcal(h,\yrm) \big] \\
+& = & \argmin_{h \in \Hcal} \Erm_{\uptheta | \xrm,\Drm}\bigg[ \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \bigg] \nonumber \;.
+\end{IEEEeqnarray}
+Thus, the Bayesian approach uses the model posterior $\prm_{\uptheta | \xrm,\Drm}$ to integrate out the dependency on the model given the observable random elements. The minimum Bayes risk is
+\begin{IEEEeqnarray}{rCl} \label{eq:risk_min}
+\Rcal^* & \equiv & \Rcal(f^*) \\
+ & = & \min_{f \in \Fcal} \Rcal(f) \nonumber \\
+& = & \Erm_{\xrm,\Drm} \left[ \min_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm}\big[ \Lcal(h,\yrm) \big] \right] \nonumber \\
+& = & \Erm_{\Drm} \Bigg[ \Erm_{\xrm | \Drm} \bigg[ \min_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm}\big[ \Lcal(h,\yrm) \big] \bigg] \Bigg] \nonumber \;.
+\end{IEEEeqnarray}
+
+
+
+\subsubsection{Irreducible Risk}
+
+\todomid{location? terminology?}
+
+The clairvoyant risk \eqref{eq:risk_clv} for a given model satisfies $\Rcal_{\Theta}^*(\theta) \leq \Rcal_{\Theta}(f;\theta) \quad \forall f \in \Fcal, \ \theta \in \Theta$. Consequently, the Bayes risk satisfies $\Erm_{\uptheta} \big[ \Rcal_{\Theta}^*(\uptheta) \big] \leq \Rcal(f) \quad \forall f \in \Fcal$; the expected value of the clairvoyant risk will thus be referred to as the ``irreducible'' risk. 
+
+It is important to note that this inequality holds for any number of training samples $N$ and that the irreducible risk does not depend on $N$. Thus, even with unlimited training data, no learning function can provide a Bayes risk lower than this value.
+
+
+
+
 
 
 
