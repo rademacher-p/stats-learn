@@ -1,3 +1,8 @@
+
+Documentation/Thesis/Bayesian ML Theory.pdf
+
+## PGR above
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
@@ -275,7 +280,3 @@ TSWLatexianTemp*
 # Makeindex log files
 *.lpz
 
-
-
-# PGR below
-Documentation/Thesis/Bayesian ML Theory.pdf
