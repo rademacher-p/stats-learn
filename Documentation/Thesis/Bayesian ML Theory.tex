@@ -469,7 +469,7 @@ The conditional distribution of the values $\Yrm$ given the corresponding $\Xrm$
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\Yrm | \Xrm,\uptheta}\big( Y | X,\theta \big) & = & \prod_{n=1}^N \frac{\Prm_{\Yrm_n,\Xrm_n | \uptheta}\big( Y_n,X_n | \theta \big)}{\Prm_{\Xrm_n | \uptheta}\big( X_n | \theta \big)} \\
 & \equiv & \prod_{x \in \Xcal} \left[ \prod_{y \in \Ycal} \thetac(y;x)^{N \Psi(y,x;Y,X)} \right] \nonumber \\
-& \equiv & \left( \prod_{x \in \Xcal} \left( \prod_{y \in \Ycal} \thetac(y;x)^{\Psic(y;x;Y,X)} \right)^{\Psim(x;X)} \right)^N \nonumber \;,
+& \equiv & \prod_{x \in \Xcal} \left( \prod_{y \in \Ycal} \thetac(y;x)^{\Psic(y;x;Y,X)} \right)^{N \Psim(x;X)} \nonumber \;,
 \end{IEEEeqnarray}
 where the function $\Psic : \{\Ycal \times \Xcal\}^N \mapsto \Uppsic \subset \Pcal(\Ycal)^{\Xcal}$ with range
 \begin{equation}
@@ -484,12 +484,13 @@ Note that the dependency of the conditional distribution on the model $\uptheta$
 
 
 
+Analagous to the decomposition of the model $\uptheta$ into its marginal and conditional models, the empirical process $\uppsi$ can be decomposed into marginal and conditional empirical processes. Introduce the ``marginalized'' random process $\uppsim$ over the set $\Xcal$, defined as $\uppsim \equiv \sum_{y \in \Ycal} \uppsi(y,\cdot) \equiv \Psim(\Xrm) \in \Uppsim$. Similar to the Multinomial random processes \cite{johnson}, the Empirical random process has an aggregation property (Appendix \ref{app:emp}) - using this principle, it can be shown that conditioned on the model $\uptheta$, the marginal model is distributed as $\uppsim | \upthetam,\upthetac = \uppsim | \upthetam \sim \Emp(N,\upthetam)$. 
 
-As before, the dependency on the training data can be simplified using a sufficient statistic. Introduce the ``marginalized'' random process $\uppsim$ over the set $\Xcal$, defined as $\uppsim \equiv \sum_{y \in \Ycal} \uppsi(y,\cdot) \equiv \Psim(\Xrm) \in \Uppsim$. Similar to the aggregation property of Multinomial random processes \cite{johnson}, the aggregation of an Empirical random process (Appendix \ref{app:emp}) conditioned on the model $\uptheta$ is distributed as $\uppsim | \upthetam,\upthetac = \uppsim | \upthetam \sim \Emp(N,\upthetam)$. 
+\todohigh{EDIT HERE}
 
-Also of interest is the distribution of $\uppsi$ conditioned on its aggregation $\uppsim$. Using the Empirical process properties proven in Appendix \ref{app:emp}, it can be shown that when conditioned on the model $\uptheta$ as well, the PMF of $\uppsi$ is
+Also of interest is the distribution of $\uppsic \equiv$ conditioned on its aggregation $\uppsim$. Using the Empirical process properties proven in Appendix \ref{app:emp}, it can be shown that when conditioned on the model $\uptheta$ as well, the PMF of $\uppsi$ is
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\uppsi | \uppsim , \uptheta}(\psi | n' , \theta) & \equiv & \prod_{x \in \Xcal} \Bigg[ \Mcal\big( \psi(\cdot,x) \big) \prod_{y \in \Ycal} \thetac(y;x)^{\psi(y,x)} \Bigg] \\
+\Prm_{\uppsi | \uppsim , \uptheta}(\psi | \psim , \theta) & \equiv & \prod_{x \in \Xcal} \Bigg[ \Mcal\big( \psi(\cdot,x) \big) \prod_{y \in \Ycal} \thetac(y;x)^{\psi(y,x)} \Bigg] \\
 & = & \prod_{x \in \Xcal} \Multi\Big( \psi(\cdot,x) ; n'(x) , \thetac(x) \Big) \nonumber \;,
 \end{IEEEeqnarray}
 over the domain $\left\{ \psi \in {\Zbbgeq}^{\Ycal \times \Xcal} : \sum_{y \in \Ycal} \psi(y,\cdot) = n' \right\}$. Observe that conditioning on the aggregation renders the function segments $\uppsi(\cdot,x)$ independent of one another and that they are also Multinomial, such that $\uppsi(\cdot,x) | \uppsim(x),\uptheta \sim \Multi\big( \uppsim(x),\upthetac(x) \big)$. Furthermore, the dependency on $\uptheta$ is expressed through the conditional model $\upthetac$
@@ -1072,7 +1073,7 @@ The corresponding distributions for the sufficient statistics will be expressed 
 
 Also of interest is the distribution of $\uppsi$ conditioned on its aggregation $\uppsim$. Using the Dirichlet-Multinomial properties presented in Appendix \ref{app:DM_agg}, it can be shown that
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\uppsi | \uppsim}(\psi | n') & = & \prod_{x \in \Xcal} \left[ \Mcal\big( \psi(\cdot,x) \big) \beta\big( \alpha(\cdot,x) \big)^{-1} \beta\big( \alpha(\cdot,x) + \psi(\cdot,x) \big) \right] \\
+\Prm_{\uppsi | \uppsim}(\psi | \psim) & = & \prod_{x \in \Xcal} \left[ \Mcal\big( \psi(\cdot,x) \big) \beta\big( \alpha(\cdot,x) \big)^{-1} \beta\big( \alpha(\cdot,x) + \psi(\cdot,x) \big) \right] \\
 & = & \prod_{x \in \Xcal} \DM\Big( \psi(\cdot,x) ; n'(x) , \alpha(\cdot,x) \Big) \nonumber
 \end{IEEEeqnarray}
 over the domain $\left\{ \psi \in {\Zbbgeq}^{\Ycal \times \Xcal} : \sum_{y \in \Ycal} \psi(y,\cdot) = n' \right\}$. Observe that conditioning on the aggregation renders the function segments $\uppsi(\cdot,x)$ independent of one another and that they are also Dirichlet-Multinomial, such that $\uppsi(\cdot,x) | \uppsim(x) \sim \DM\big( \uppsim(x),\alpha(\cdot,x) \big)$.
@@ -2186,7 +2187,7 @@ PGR: ???
 
 \subsubsection{Model $\uptheta$ Characterization}
 
-The model is now a continuous-domain Dirichlet process $\uptheta \sim \DP(\alpha_0 \alpha)$. The concentration parameter is $\alpha_0 \equiv \int_{y \in \Ycal} \alpha(y) \mathrm{d} y$. By definition, for any partition of the set $\Ycal$, $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$, we can generate a Dirichlet random process $\upphi(z) \equiv \int_{\Scal(z)} \uptheta(y) \mathrm{d} y$ with parameterizing function $\lambda(z) \equiv \int_{\Scal(z)} \alpha(y) \mathrm{d} y$. This is commonly referred to as the aggregation property. The PDF for the aggregation is thus
+The model is now a continuous-domain Dirichlet process $\uptheta \sim \DP(\alpha_0 \alpha)$. The concentration parameter is $\alpha_0 \equiv \int_{y \in \Ycal} \alpha(y) \mathrm{d} y$. By definition, for any partition of the set $\Ycal$, $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, we can generate a Dirichlet random process $\upphi(z) \equiv \int_{\Scal_z} \uptheta(y) \mathrm{d} y$ with parameterizing function $\lambda(z) \equiv \int_{\Scal_z} \alpha(y) \mathrm{d} y$. This is commonly referred to as the aggregation property. The PDF for the aggregation is thus
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\upphi}(\phi) & = & \beta(\lambda)^{-1} \prod_{z \in \Zcal} \phi(z)^{\lambda(z) - 1} \;.
 \end{IEEEeqnarray}
@@ -2390,7 +2391,7 @@ PGR
 
 \subsubsection{Model $\uptheta$ Characterization}
 
-The model is characterized by a Dirichlet process $\uptheta \sim \DP(\alpha_0 \alpha)$ with parameter function $\alpha : \Ycal \times \Xcal \mapsto \Rbb^+$. The concentration parameter generalizes to $\alpha_0 = \int_{\Ycal} \int_{\Xcal} \alpha(y,x) \mathrm{d} x \mathrm{d} y$. Using the aggregation property, any partition of the set $\Ycal \times \Xcal$, $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$ is a Dirichlet random process $\upphi(z) = \iint_{\Scal(z)} \uptheta(y,x) \mathrm{d} x \mathrm{d} y$ with parameterizing function $\lambda(z) = \iint_{\Scal(z)} \alpha(y,x) \mathrm{d} x \mathrm{d} y$. The PDF for the aggregation is
+The model is characterized by a Dirichlet process $\uptheta \sim \DP(\alpha_0 \alpha)$ with parameter function $\alpha : \Ycal \times \Xcal \mapsto \Rbb^+$. The concentration parameter generalizes to $\alpha_0 = \int_{\Ycal} \int_{\Xcal} \alpha(y,x) \mathrm{d} x \mathrm{d} y$. Using the aggregation property, any partition of the set $\Ycal \times \Xcal$, $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$ is a Dirichlet random process $\upphi(z) = \iint_{\Scal_z} \uptheta(y,x) \mathrm{d} x \mathrm{d} y$ with parameterizing function $\lambda(z) = \iint_{\Scal_z} \alpha(y,x) \mathrm{d} x \mathrm{d} y$. The PDF for the aggregation is
 \begin{IEEEeqnarray}{rCl}
 \prm_{\upphi}(\phi) & = & \beta(\lambda)^{-1} \prod_{z \in \Zcal} \phi(z)^{\lambda(z) - 1} \;.
 \end{IEEEeqnarray}
@@ -2837,15 +2838,13 @@ PGR: notation/formatting
 
 \todohi{INCOMPLETE}
 
-A characteristic of an Empirical random process is that its aggregations are also Empirical processes. Consider a random process $\uppsi \sim \Emp(N,\theta) \in \Uppsi \subset \Pcal(\Ycal)$ over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$; the transformed random process $\uppsim(z) \equiv \sum_{y \in \Scal(z)} \uppsi(y)$ is distributed as $\uppsim \sim \Emp(N,\thetam)$ with a parameterizing distribution defined as $\thetam(z) = \sum_{y \in \Scal(z)} \theta(y)$.
+A characteristic of an Empirical random process is that its aggregations are also Empirical processes. Consider a random process $\uppsi \sim \Emp(N,\theta) \in \Uppsi \subset \Pcal(\Ycal)$ over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$ and the corresponding function partitions $\uppsi_z \in \Rbbgeq^{\Scal_z}$, such that $\uppsi = \left\{ \ldots,\uppsi_z,\ldots \right\}$ and $\theta_z \in \Rbbgeq^{\Scal_z}$, such that $\theta = \left\{ \ldots,\theta_z,\ldots \right\}$. The transformed random process $\uppsim(z) \equiv \sum_{y \in \Scal_z} \uppsi_z(y)$ is distributed as $\uppsim \sim \Emp(N,\thetam)$ with a parameterizing distribution defined as $\thetam(z) = \sum_{y \in \Scal_z} \theta_z(y)$.
 
-partitioned functions $\uppsi_z \in \Rbbgeq^{S(z)}$, such that $\uppsi = \left\{ \ldots,\uppsi_z,\ldots \right\}$
-
-To prove this principle, define the subset $\Uppsim(\psim) = \big\{ \psi \in \Uppsi : \sum_{y \in \Scal(z)} \psi(y) = \psim(z), \ \forall z \in \Zcal \big\} \subseteq \Uppsi$. Next, observe that
+To prove this principle, define the subset $\Uppsim(\psim) = \big\{ \psi \in \Uppsi : \sum_{y \in \Scal_z} \psi_z(y) = \psim(z), \ \forall z \in \Zcal \big\} \subseteq \Uppsi$. Next, observe that
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\uppsim}(\psim) & = & \sum_{\psi \in \Uppsim(\psim)} \Prm_{\uppsi}(\psi) 
 = \sum_{\psi \in \Uppsim(\psim)} \Mcal(N \psi) \left( \prod_{y \in \Ycal} \theta(y)^{\psi(y)} \right)^N \\
-& = & \Mcal(N \psim) \prod_{z \in \Zcal} \sum_{\substack{\psi(y) : \psim(z) = \\ \sum_{y \in \Scal(z)} \psi(y)}} \Mcal\big( \{ N \psi(y): y \in \Scal(z) \} \big) \left( \prod_{y \in \Scal(z)} \theta(y)^{\psi(y)} \right)^N \nonumber \\
+& = & \Mcal(N \psim) \prod_{z \in \Zcal} \sum_{\substack{\sum_{y \in \Scal_z} \psi_z(y) \\ = \psim(z)}} \Mcal\big( N \psi_z \big) \left( \prod_{y \in \Scal_z} \theta_z(y)^{\psi_z(y)} \right)^N \nonumber \\
 & = & \Mcal(N \psim) \left( \prod_{z \in \Zcal} \thetam(z)^{\psim(z)} \right)^N = \Emp(\psim ; N,\thetam) \nonumber \;,
 \end{IEEEeqnarray}
 where the multinomial theorem \cite{graham} has been used.
@@ -2854,14 +2853,21 @@ where the multinomial theorem \cite{graham} has been used.
 
 \subsection{Conditioned on its Aggregation}
 
-If the multinomial random process $\uppsi$ is conditioned on its aggregation over the partition $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$, the distinct segements $\uppsi(y)$, $y \in \Scal(z)$ become independent multinomial random processes,
+If the empirical random process $\uppsi$ is conditioned on its aggregation $\uppsim$ over the partition $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, the distinct segements $\uppsi_z$ become independent random processes, such that for $\psi \in \Uppsim(\psim)$,
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\uppsi | \uppsim}(\psi | n') & = & \frac{\Mcal(N \psi) \prod_{y \in \Ycal} \theta(y)^{N \psi(y)}}{\Mcal(N \psim) \prod_{z \in \Zcal} \thetam(z)^{N \psim(z)}} \\
-& = & \prod_{z \in \Zcal} \Bigg[ \Mcal\Big( \big\{ \psi(y) : y \in \Scal(z) \big\} \Big) \prod_{y \in \Scal(z)} \left(\frac{\theta(y)}{\thetam(z)}\right)^{\psi(y)} \Bigg] \nonumber \\
-& = & \prod_{z \in \Zcal} \Bigg[ \Mcal\Big( \big\{ \psi(y) : y \in \Scal(z) \big\} \Big) \prod_{y \in \Scal(z)} \thetac_z(y)^{\psi(y)} \Bigg] \nonumber \\
-& = & \prod_{z \in \Zcal} \Multi\Big( \big\{ \psi(y) : y \in \Scal(z) \big\} ; \psim(z) , \big\{ \thetac_z(y) : y \in \Scal(z) \big\} \Big) \nonumber \;,
+\Prm_{\uppsi | \uppsim}(\psi | \psim) & = & \frac{\Prm_{\uppsi,\uppsim}(\psi,\psim)}{\Prm_{\uppsim}(\psim)} = \frac{\Mcal(N \psi)}{\Mcal(N \psim)} \left( \frac{\prod_{y \in \Ycal} \theta(y)^{\psi(y)}}{\prod_{z \in \Zcal} \thetam(z)^{\psim(z)}} \right)^N \\
+& \equiv & \prod_{z \in \Zcal} \Bigg[ \Mcal(N \psi_z) \left(\frac{\prod_{y \in \Scal_z} \theta(y)^{\psi_z(y)}}{\thetam(z)^{\psim(z)}} \right)^N \Bigg] \nonumber \\
+& = & \prod_{z \in \Zcal} \Bigg[ \Mcal(N \psi_z) \left( \prod_{y \in \Scal_z} \left(\frac{\theta(y)}{\thetam(z)}\right)^{\psi_z(y)} \right)^N \Bigg] \nonumber \;.
 \end{IEEEeqnarray}
-on the domain $\left\{ \psi \in {\Zbbgeq}^{\Ycal} : \sum_{y \in \Scal(z)} \psi(y) = \psim(z), \quad \forall z \in \Zcal \right\}$. Observe that the segment over the set $\Scal(z)$ sums to $\uppsim(z)$ and is parameterized by the normalized segment $\thetac_z \equiv \big\{ \theta(y)/\thetam(z) : y \in \Scal(z) \big\}$.
+
+While these function segments are independent, they are not Empirical processes. Introducing the conditional distributions $\thetac(z) \equiv \theta / \thetam(z) \in \Pcal(\Scal_z)$ and the normalized segments $\uppsic(z) \equiv \uppsi / \uppsim(z)$, it can be shown that
+\begin{IEEEeqnarray}{rCl}
+\Prm_{\uppsic | \uppsim}(\psic | \psim) & = & \prod_{z \in \Zcal} \Bigg[ \Mcal(N \psim(z) \psic(z)) \left( \prod_{y \in \Scal_z} \thetac(y;z)^{\psic(y;z)} \right)^{N \psim(z)} \Bigg] \nonumber \\
+& = & \prod_{z \in \Zcal} \Emp\Big( \psic(z) ; N \psim(z), \thetac(z) \Big) \;.
+\end{IEEEeqnarray}
+Thus, when conditioned on the aggregation $\uppsim$, the individual segments of the random process $\uppsic \in \Pcal(\Scal_z)^{\Zcal}$ are independent empirical processes of $N \uppsim(z)$ samples, parameterized by the individual segments of $\upthetac \in \Pcal(\Scal_z)^{\Zcal}$.
+
+
 
 
 
@@ -2872,32 +2878,37 @@ on the domain $\left\{ \psi \in {\Zbbgeq}^{\Ycal} : \sum_{y \in \Scal(z)} \psi(y
 \section{Multinomial Distribution Properties}
 \label{app:multi}
 
+\todohigh{Even needed in addition to EMP proofs?}
+
 \subsection{Aggregation}
 
 \todomid{Redundant given citation??}
 
-A characteristic of a Multinomial random process is that its aggregations are also Multinomial \cite{johnson}. Consider a random process $\uppsi \sim \Multi(N,\theta)$ over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$; the transformed random process $\uppsim(z) \equiv \sum_{y \in \Scal(z)} \uppsi(y)$ is distributed as $\uppsim \sim \Multi(N,\thetam)$ with parameterizing function $\thetam(z) = \sum_{y \in \Scal(z)} \theta(y)$.
+A characteristic of a Multinomial random process is that its aggregations are also Multinomial \cite{johnson}. Consider a random process $\uppsi \sim \Multi(N,\theta)$ over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$; the transformed random process $\uppsim(z) \equiv \sum_{y \in \Scal_z} \uppsi(y)$ is distributed as $\uppsim \sim \Multi(N,\thetam)$ with parameterizing function $\thetam(z) = \sum_{y \in \Scal_z} \theta(y)$.
 
-To prove this principle, define the subset $\tilde{\Ncal} = \big\{ \psi \in \Ncal : \sum_{y \in \Scal(z)} \psi(y) = \psim(z), \quad \forall z \in \Zcal \big\} \subseteq \Uppsi$, where the original random process $\uppsi \in \Uppsi$. Next, observe
+To prove this principle, define the subset $\tilde{\Ncal} = \big\{ \psi \in \Ncal : \sum_{y \in \Scal_z} \psi(y) = \psim(z), \quad \forall z \in \Zcal \big\} \subseteq \Uppsi$, where the original random process $\uppsi \in \Uppsi$. Next, observe
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\uppsim}(n') & = & \sum_{\psi \in \tilde{\Ncal}} \Prm_{\uppsi}(\psi) \\
-& = & \Mcal(N \psim) \prod_{z \in \Zcal} \sum_{\substack{\psim(z) = \\ \sum_{y \in \Scal(z)} \psi(y)}} \Mcal\big( \{ \psi(y): y \in \Scal(z) \} \big) \prod_{y \in \Scal(z)} \theta(y)^{N \psi(y)} \nonumber \\
+& = & \Mcal(N \psim) \prod_{z \in \Zcal} \sum_{\substack{\psim(z) = \\ \sum_{y \in \Scal_z} \psi(y)}} \Mcal\big( \{ \psi(y): y \in \Scal_z \} \big) \prod_{y \in \Scal_z} \theta(y)^{N \psi(y)} \nonumber \\
 & = & \Mcal(N \psim) \prod_{z \in \Zcal} \thetam(z)^{N \psim(z)} = \Multi(n' ; N,\thetam) \nonumber \;,
 \end{IEEEeqnarray}
 where the multinomial theorem \cite{graham} has been used.
 
 
 
+
+
+
 \subsection{Conditioned on its Aggregation}
 
-If the multinomial random process $\uppsi$ is conditioned on its aggregation over the partition $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$, the distinct segements $\uppsi(y)$, $y \in \Scal(z)$ become independent multinomial random processes,
+If the multinomial random process $\uppsi$ is conditioned on its aggregation over the partition $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, the distinct segements $\uppsi(y)$, $y \in \Scal_z$ become independent multinomial random processes,
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\uppsi | \uppsim}(\psi | n') & = & \frac{\Mcal(N \psi) \prod_{y \in \Ycal} \theta(y)^{N \psi(y)}}{\Mcal(N \psim) \prod_{z \in \Zcal} \thetam(z)^{N \psim(z)}} \\
-& = & \prod_{z \in \Zcal} \Bigg[ \Mcal\Big( \big\{ \psi(y) : y \in \Scal(z) \big\} \Big) \prod_{y \in \Scal(z)} \left(\frac{\theta(y)}{\thetam(z)}\right)^{\psi(y)} \Bigg] \nonumber \\
-& = & \prod_{z \in \Zcal} \Bigg[ \Mcal\Big( \big\{ \psi(y) : y \in \Scal(z) \big\} \Big) \prod_{y \in \Scal(z)} \thetac_z(y)^{\psi(y)} \Bigg] \nonumber \\
-& = & \prod_{z \in \Zcal} \Multi\Big( \big\{ \psi(y) : y \in \Scal(z) \big\} ; \psim(z) , \big\{ \thetac_z(y) : y \in \Scal(z) \big\} \Big) \nonumber \;,
+\Prm_{\uppsi | \uppsim}(\psi | \psim) & = & \frac{\Mcal(N \psi) \prod_{y \in \Ycal} \theta(y)^{N \psi(y)}}{\Mcal(N \psim) \prod_{z \in \Zcal} \thetam(z)^{N \psim(z)}} \\
+& = & \prod_{z \in \Zcal} \Bigg[ \Mcal\Big( \big\{ \psi(y) : y \in \Scal_z \big\} \Big) \prod_{y \in \Scal_z} \left(\frac{\theta(y)}{\thetam(z)}\right)^{\psi(y)} \Bigg] \nonumber \\
+& = & \prod_{z \in \Zcal} \Bigg[ \Mcal\Big( \big\{ \psi(y) : y \in \Scal_z \big\} \Big) \prod_{y \in \Scal_z} \thetac(y;z)^{\psi(y)} \Bigg] \nonumber \\
+& = & \prod_{z \in \Zcal} \Multi\Big( \big\{ \psi(y) : y \in \Scal_z \big\} ; \psim(z) , \big\{ \thetac(y;z) : y \in \Scal_z \big\} \Big) \nonumber \;,
 \end{IEEEeqnarray}
-on the domain $\left\{ \psi \in {\Zbbgeq}^{\Ycal} : \sum_{y \in \Scal(z)} \psi(y) = \psim(z), \quad \forall z \in \Zcal \right\}$. Observe that the segment over the set $\Scal(z)$ sums to $\uppsim(z)$ and is parameterized by the normalized segment $\thetac_z \equiv \big\{ \theta(y)/\thetam(z) : y \in \Scal(z) \big\}$.
+on the domain $\left\{ \psi \in {\Zbbgeq}^{\Ycal} : \sum_{y \in \Scal_z} \psi(y) = \psim(z), \quad \forall z \in \Zcal \right\}$. Observe that the segment over the set $\Scal_z$ sums to $\uppsim(z)$ and is parameterized by the normalized segment $\thetac_z \equiv \big\{ \theta(y)/\thetam(z) : y \in \Scal_z \big\}$.
 
 
 
@@ -2911,24 +2922,24 @@ on the domain $\left\{ \psi \in {\Zbbgeq}^{\Ycal} : \sum_{y \in \Scal(z)} \psi(y
 
 This section details an important property of Dirichlet distributed random processes. The following development first considers Dirichlet random processes over a countable domain and then generalizes for continuous-domain Dirichlet processes. 
 
-First, define the PDF of a Dirichlet aggregation \cite{ferguson}. Let the random process $\uptheta \in \Uptheta = \Pcal(\Ycal)$ be Dirichlet over the countable set $\Ycal$ with parameterizing function $\alpha \in {\Rbb^+}^{\Ycal}$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$; the aggregation $\upthetam \in \Pcal(\Zcal)$, $\upthetam(z) \equiv \sum_{y \in \Scal(z)} \uptheta(y)$ is thus also Dirichlet and has a parameterizing function $\alpha' \in {\Rbb^+}^{\Zcal}$, $\alpha'(z) \equiv \sum_{y \in \Scal(z)} \alpha(y)$.
+First, define the PDF of a Dirichlet aggregation \cite{ferguson}. Let the random process $\uptheta \in \Uptheta = \Pcal(\Ycal)$ be Dirichlet over the countable set $\Ycal$ with parameterizing function $\alpha \in {\Rbb^+}^{\Ycal}$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$; the aggregation $\upthetam \in \Pcal(\Zcal)$, $\upthetam(z) \equiv \sum_{y \in \Scal_z} \uptheta(y)$ is thus also Dirichlet and has a parameterizing function $\alpha' \in {\Rbb^+}^{\Zcal}$, $\alpha'(z) \equiv \sum_{y \in \Scal_z} \alpha(y)$.
 
 The PDF of the original random process $\uptheta$ conditioned on its aggregation $\upthetam$ can be formulated as
 \begin{IEEEeqnarray}{rCl}
 \prm_{\uptheta | \upthetam}(\theta | \thetam) & = & \frac{\beta(\alpha') \prod_{y \in \Ycal} \theta(y)^{\alpha(y)-1}}{\beta(\alpha_0 \alpha) \prod_{z \in \Zcal} \thetam(z)^{\alpha'(z)-1}} \\
-& = & \prod_{z \in \Zcal} \Bigg[ \beta\Big( \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big)^{-1} \frac{\prod_{y \in \Scal(z)} \theta(y)^{\alpha(y)-1}}{\thetam(z)^{\alpha'(z)-1}} \Bigg] \nonumber \\ 
-& = & \prod_{z \in \Zcal} \Bigg[ \frac{\thetam(z)^{1-|\Scal(z)|}}{\beta\Big( \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big)} \prod_{y \in \Scal(z)} \left(\frac{\theta(y)}{\thetam(z)}\right)^{\alpha(y)-1} \Bigg] \nonumber \;,
+& = & \prod_{z \in \Zcal} \Bigg[ \beta\Big( \big\{ \alpha(y) : y \in \Scal_z \big\} \Big)^{-1} \frac{\prod_{y \in \Scal_z} \theta(y)^{\alpha(y)-1}}{\thetam(z)^{\alpha'(z)-1}} \Bigg] \nonumber \\ 
+& = & \prod_{z \in \Zcal} \Bigg[ \frac{\thetam(z)^{1-|\Scal_z|}}{\beta\Big( \big\{ \alpha(y) : y \in \Scal_z \big\} \Big)} \prod_{y \in \Scal_z} \left(\frac{\theta(y)}{\thetam(z)}\right)^{\alpha(y)-1} \Bigg] \nonumber \;,
 \end{IEEEeqnarray}
-which is defined for $\left\{ \theta \in {\Rbbgeq}^{\Ycal} : \sum_{y \in \Scal(z)} \theta(y) = \thetam(z), \quad \forall z \in \Zcal \right\}$.
+which is defined for $\left\{ \theta \in {\Rbbgeq}^{\Ycal} : \sum_{y \in \Scal_z} \theta(y) = \thetam(z), \quad \forall z \in \Zcal \right\}$.
 
-Observe that the partitioned segements are conditionally independent; introduce subscript notation to refer to the function segment $\uptheta_z = \big\{ \uptheta(y): y \in \Scal(z) \big\}$. The PDF $\prm_{\uptheta | \upthetam}$ can now be decomposed as $\prm_{\uptheta | \upthetam}(\ldots,\theta_z,\ldots | \thetam) = \prod_{z \in \Zcal} \prm_{\uptheta_z | \upthetam(z)}\big( \theta_z | \thetam(z) \big)$
+Observe that the partitioned segements are conditionally independent; introduce subscript notation to refer to the function segment $\uptheta_z = \big\{ \uptheta(y): y \in \Scal_z \big\}$. The PDF $\prm_{\uptheta | \upthetam}$ can now be decomposed as $\prm_{\uptheta | \upthetam}(\ldots,\theta_z,\ldots | \thetam) = \prod_{z \in \Zcal} \prm_{\uptheta_z | \upthetam(z)}\big( \theta_z | \thetam(z) \big)$
 
 Next, normalize the segments of $\uptheta$ to form $\upthetac = \big( \ldots,\upthetac_z,\ldots \big)$, where $\upthetac_z \equiv \uptheta_z / \upthetam(z)$, and formulate the conditional PDF
 \begin{IEEEeqnarray}{rCl}
-\prm_{\upthetac | \upthetam}\left( \thetac | \thetam \right) & = & \prod_{z \in \Zcal} \Bigg[ \frac{\prod_{y \in \Scal(z)} \thetac_z(y)^{\alpha(y)-1}}{\beta\Big( \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big)} \Bigg] \\
-& = & \prod_{z \in \Zcal} \Dir\Big( \thetac_z ; \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big) \nonumber \;.
+\prm_{\upthetac | \upthetam}\left( \thetac | \thetam \right) & = & \prod_{z \in \Zcal} \Bigg[ \frac{\prod_{y \in \Scal_z} \thetac(y;z)^{\alpha(y)-1}}{\beta\Big( \big\{ \alpha(y) : y \in \Scal_z \big\} \Big)} \Bigg] \\
+& = & \prod_{z \in \Zcal} \Dir\Big( \thetac_z ; \big\{ \alpha(y) : y \in \Scal_z \big\} \Big) \nonumber \;.
 \end{IEEEeqnarray}
-which is defined for $\thetac \in \prod_{z \in \Zcal} \left\{ \thetac_z \in \Pcal\big(\Scal(z)\big) \right\}$. Thus after conditioning, the normalized segments $\upthetac_z$ are Dirichlet distributed, independent of one another, and independent of the aggregation $\upthetam$. 
+which is defined for $\thetac \in \prod_{z \in \Zcal} \left\{ \thetac_z \in \Pcal\big(\Scal_z\big) \right\}$. Thus after conditioning, the normalized segments $\upthetac_z$ are Dirichlet distributed, independent of one another, and independent of the aggregation $\upthetam$. 
 
 PGR: discuss transform Jacobian and dimensionality? 
 
@@ -2942,24 +2953,24 @@ This principle holds for continuous-domain Dirichlet processes $\uptheta$ as wel
 \section{Dirichlet-Multinomial random process conditioned on its aggregation} 
 \label{app:DM_agg}
 
-A defining characteristic of a Dirichlet-Multinomial random process is that its aggregations are also Dirichlet-Multinomial \cite{johnson}. Consider a DM random process $\uppsi \sim \DM(N,\alpha)$ over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$; the transformed random process $\uppsim(z) \equiv \sum_{y \in \Scal(z)} \uppsi(y)$ is neccessarily Dirichlet-Multinomial with parameterizing function $\alpha'(z) = \sum_{y \in \Scal(z)} \alpha(y)$.
+A defining characteristic of a Dirichlet-Multinomial random process is that its aggregations are also Dirichlet-Multinomial \cite{johnson}. Consider a DM random process $\uppsi \sim \DM(N,\alpha)$ over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$; the transformed random process $\uppsim(z) \equiv \sum_{y \in \Scal_z} \uppsi(y)$ is neccessarily Dirichlet-Multinomial with parameterizing function $\alpha'(z) = \sum_{y \in \Scal_z} \alpha(y)$.
 
-It can be shown that conditioned on the aggregation $\uppsim$, the segments $\big\{ \uppsi(y) : y \in \Scal(z) \big\}$ of the original random process become independent Dirichlet-Multinomial random processes, such that
+It can be shown that conditioned on the aggregation $\uppsim$, the segments $\big\{ \uppsi(y) : y \in \Scal_z \big\}$ of the original random process become independent Dirichlet-Multinomial random processes, such that
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\uppsi | \uppsim}(\psi | n') & = & \frac{\Mcal(N \psi) \beta(\alpha_0 \alpha)^{-1} \beta(\alpha+\psi)}{\Mcal(N \psim) \beta(\alpha')^{-1} \beta(\alpha'+n')} \\
+\Prm_{\uppsi | \uppsim}(\psi | \psim) & = & \frac{\Mcal(N \psi) \beta(\alpha_0 \alpha)^{-1} \beta(\alpha+\psi)}{\Mcal(N \psim) \beta(\alpha')^{-1} \beta(\alpha'+n')} \\
 & = & \left( \prod_{z \in \Zcal} \frac{\Gamma\big( \alpha'(z)+\psim(z) \big)}{\psim(z)! \Gamma\big( \alpha'(z) \big)} \right)^{-1} \left( \prod_{y \in \Ycal} \frac{\Gamma\big( \alpha(y)+\psi(y) \big)}{\psi(y)! \Gamma\big( \alpha(y) \big)} \right) \nonumber \\
-& = & \prod_{z \in \Zcal} \left[ \frac{\psim(z)! \Gamma\big( \alpha'(z) \big)}{\Gamma\big( \alpha'(z)+\psim(z) \big)} \prod_{y \in \Scal(z)} \frac{\Gamma\big( \alpha(y)+\psi(y) \big)}{\psi(y)! \Gamma\big( \alpha(y) \big)} \right] \nonumber \\
-& = & \prod_{z \in \Zcal} \DM\Big( \big\{ \psi(y) : y \in \Scal(z) \big\} ; \psim(z), \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big) \nonumber \;,
+& = & \prod_{z \in \Zcal} \left[ \frac{\psim(z)! \Gamma\big( \alpha'(z) \big)}{\Gamma\big( \alpha'(z)+\psim(z) \big)} \prod_{y \in \Scal_z} \frac{\Gamma\big( \alpha(y)+\psi(y) \big)}{\psi(y)! \Gamma\big( \alpha(y) \big)} \right] \nonumber \\
+& = & \prod_{z \in \Zcal} \DM\Big( \big\{ \psi(y) : y \in \Scal_z \big\} ; \psim(z), \big\{ \alpha(y) : y \in \Scal_z \big\} \Big) \nonumber \;,
 \end{IEEEeqnarray}
 %\begin{IEEEeqnarray}{rCl}
 %\Prm(\uppsi | \uppsim) & = & \frac{\Prm(\uppsi)}{\Prm(\uppsim)} \Prm(\uppsim | \uppsi) \\ 
-%& = & \frac{\Mcal(\uppsi) \beta(\alpha_0 \alpha)^{-1} \beta(\alpha+\uppsi)}{\Mcal(\uppsim) \beta(\alpha')^{-1} \beta(\alpha'+\uppsim)} \prod_{z \in \Zcal} \delta\left[ \uppsim(z),\sum_{y \in \Scal(z)} \uppsi(y) \right] \nonumber \\
+%& = & \frac{\Mcal(\uppsi) \beta(\alpha_0 \alpha)^{-1} \beta(\alpha+\uppsi)}{\Mcal(\uppsim) \beta(\alpha')^{-1} \beta(\alpha'+\uppsim)} \prod_{z \in \Zcal} \delta\left[ \uppsim(z),\sum_{y \in \Scal_z} \uppsi(y) \right] \nonumber \\
 %& = & \left( \prod_{z \in \Zcal} \frac{\Gamma\big( \alpha'(z)+\uppsim(z) \big)}{\uppsim(z)! \Gamma\big( \alpha'(z) \big)} \right)^{-1} \left( \prod_{y \in \Ycal} \frac{\Gamma\big( \alpha(y)+\uppsi(y) \big)}{\uppsi(y)! \Gamma\big( \alpha(y) \big)} \right) \nonumber \\
-%&& \quad \prod_{z \in \Zcal} \delta\left[ \uppsim(z),\sum_{y \in \Scal(z)} \uppsi(y) \right] \nonumber \\
-%& = & \prod_{z \in \Zcal} \left[ \delta\left[ \uppsim(z),\sum_{y \in \Scal(z)} \uppsi(y) \right] \frac{\uppsim(z)! \Gamma\big( \alpha'(z) \big)}{\Gamma\big( \alpha'(z)+\uppsim(z) \big)} \prod_{y \in \Scal(z)} \frac{\Gamma\big( \alpha(y)+\uppsi(y) \big)}{\uppsi(y)! \Gamma\big( \alpha(y) \big)} \right] \nonumber \\
-%& = & \prod_{z \in \Zcal} \DM\Big( \big\{ \uppsi(y) : y \in \Scal(z) \big\} ; \uppsim(z), \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big) \nonumber \;,
+%&& \quad \prod_{z \in \Zcal} \delta\left[ \uppsim(z),\sum_{y \in \Scal_z} \uppsi(y) \right] \nonumber \\
+%& = & \prod_{z \in \Zcal} \left[ \delta\left[ \uppsim(z),\sum_{y \in \Scal_z} \uppsi(y) \right] \frac{\uppsim(z)! \Gamma\big( \alpha'(z) \big)}{\Gamma\big( \alpha'(z)+\uppsim(z) \big)} \prod_{y \in \Scal_z} \frac{\Gamma\big( \alpha(y)+\uppsi(y) \big)}{\uppsi(y)! \Gamma\big( \alpha(y) \big)} \right] \nonumber \\
+%& = & \prod_{z \in \Zcal} \DM\Big( \big\{ \uppsi(y) : y \in \Scal_z \big\} ; \uppsim(z), \big\{ \alpha(y) : y \in \Scal_z \big\} \Big) \nonumber \;,
 %\end{IEEEeqnarray}
-on the domain $\left\{ \psi \in {\Zbbgeq}^{\Ycal} : \sum_{y \in \Scal(z)} \psi(y) = \psim(z), \quad \forall z \in \Zcal \right\}$. 
+on the domain $\left\{ \psi \in {\Zbbgeq}^{\Ycal} : \sum_{y \in \Scal_z} \psi(y) = \psim(z), \quad \forall z \in \Zcal \right\}$. 
 
 
 
@@ -3019,13 +3030,13 @@ Finally,
 
 In this section, it is shown that if the model $\uptheta \sim \DP(\alpha_0 \alpha)$ is a Dirichlet process, then the model conditioned on the training data $\Drm$ is also a Dirichlet process with parameterizing function $\alpha + \sum_{n=1}^N \delta\big( \cdot - \Drm_n \big)$. 
 
-The defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Consider a DP over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$; the transformed random process $\upthetam(z) \equiv \int_{\Scal(z)} \uptheta(y) \mathrm{d} y$ is neccessarily Dirichlet with parameterizing function $\alpha'(z) \equiv \int_{\Scal(z)} \alpha(y) \mathrm{d} y$.
+The defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Consider a DP over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$; the transformed random process $\upthetam(z) \equiv \int_{\Scal_z} \uptheta(y) \mathrm{d} y$ is neccessarily Dirichlet with parameterizing function $\alpha'(z) \equiv \int_{\Scal_z} \alpha(y) \mathrm{d} y$.
 
 To prove the hypothesis, it is required that
 \begin{IEEEeqnarray}{rCl}
 \upthetam | \Drm & \sim & \Dir\big( \alpha' + \Psi(\Drm) \big) \;,
 \end{IEEEeqnarray}
-where $\Psi(z;\Drm) = \int_{\Scal(z)} \sum_{n=1}^N \delta\big( y - \Drm_n \big) \mathrm{d} y = \sum_{n=1}^N \chi\big( \Drm_n;\Scal(z) \big)$. $\chi$ is the indicator function
+where $\Psi(z;\Drm) = \int_{\Scal_z} \sum_{n=1}^N \delta\big( y - \Drm_n \big) \mathrm{d} y = \sum_{n=1}^N \chi\big( \Drm_n;\Scal_z \big)$. $\chi$ is the indicator function
 \begin{equation}
 \chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S.  \end{cases}
 \end{equation}
@@ -3036,14 +3047,14 @@ PGR: SUFFICIENT STATISTIC FOR D!!!?
 To prove the hypothesis, exploit the results of Appendix \ref{app:Dir_agg} to represent the training data distribution conditioned on the aggregation $\upthetam$. The conditional distribution of interest is
 \begin{IEEEeqnarray}{L}
 \prm_{\Drm | \upthetam}(D | \upthetam) = \Erm_{\uptheta | \upthetam}\big[ \prm_{\Drm | \uptheta}(D | \uptheta) \big] = \Erm_{\uptheta | \upthetam}\left[ \prod_{n=1}^N \uptheta\big( D_n \big) \right] \\
-= \prod_{z \in \Zcal} \Erm_{\uptheta_z | \upthetam(z)}\left[ \prod_{n=1}^N \uptheta_z\big( D_n \big)^{\chi\big( D_n;\Scal(z) \big)} \right] \nonumber \\
-= \left( \prod_{z \in \Zcal} \prod_{n=1}^N \upthetam(z)^{\chi\big( D_n;\Scal(z) \big)} \right) \prod_{z \in \Zcal} \Erm_{\upthetac_z}\left[ \prod_{n=1}^N \upthetac_z\big( D_n \big)^{\chi\big( D_n;\Scal(z) \big)} \right] \nonumber \\
-= \left( \prod_{z \in \Zcal} \upthetam(z)^{\Psi(z;D)} \right) \prod_{z \in \Zcal} \Erm_{\upthetac_z}\left[ \prod_{n=1}^N \upthetac_z\big( D_n \big)^{\chi\big( D_n;\Scal(z) \big)} \right] \nonumber \;,
+= \prod_{z \in \Zcal} \Erm_{\uptheta_z | \upthetam(z)}\left[ \prod_{n=1}^N \uptheta_z\big( D_n \big)^{\chi\big( D_n;\Scal_z \big)} \right] \nonumber \\
+= \left( \prod_{z \in \Zcal} \prod_{n=1}^N \upthetam(z)^{\chi\big( D_n;\Scal_z \big)} \right) \prod_{z \in \Zcal} \Erm_{\upthetac_z}\left[ \prod_{n=1}^N \upthetac_z\big( D_n \big)^{\chi\big( D_n;\Scal_z \big)} \right] \nonumber \\
+= \left( \prod_{z \in \Zcal} \upthetam(z)^{\Psi(z;D)} \right) \prod_{z \in \Zcal} \Erm_{\upthetac_z}\left[ \prod_{n=1}^N \upthetac_z\big( D_n \big)^{\chi\big( D_n;\Scal_z \big)} \right] \nonumber \;,
 \end{IEEEeqnarray}
 Observe that the dependency on $\upthetam$ is polynomial. The training data marginal distribution is
 \begin{IEEEeqnarray}{rCl}
-\prm_{\Drm}(D) & = & \Erm_{\upthetam} \left[ \prod_{z \in \Zcal} \upthetam(z)^{\Psi(z;D)} \right] \prod_{z \in \Zcal} \Erm_{\upthetac_z}\left[ \prod_{n=1}^N \upthetac_z\big( D_n \big)^{\chi\big( D_n;\Scal(z) \big)} \right] \\
-& = & \frac{\beta\big( \alpha' + \Psi(D) \big)}{\beta(\alpha')} \prod_{z \in \Zcal} \Erm_{\upthetac_z}\left[ \prod_{n=1}^N \upthetac_z\big( D_n \big)^{\chi\big( D_n;\Scal(z) \big)} \right] \nonumber
+\prm_{\Drm}(D) & = & \Erm_{\upthetam} \left[ \prod_{z \in \Zcal} \upthetam(z)^{\Psi(z;D)} \right] \prod_{z \in \Zcal} \Erm_{\upthetac_z}\left[ \prod_{n=1}^N \upthetac_z\big( D_n \big)^{\chi\big( D_n;\Scal_z \big)} \right] \\
+& = & \frac{\beta\big( \alpha' + \Psi(D) \big)}{\beta(\alpha')} \prod_{z \in \Zcal} \Erm_{\upthetac_z}\left[ \prod_{n=1}^N \upthetac_z\big( D_n \big)^{\chi\big( D_n;\Scal_z \big)} \right] \nonumber
 \end{IEEEeqnarray}
 and thus the distribution of interest is
 \begin{IEEEeqnarray}{rCl}
@@ -3063,7 +3074,7 @@ PGR: multinomial process too???
 
 This section introduces a new random process, referred to as the Dirichlet-Multinomial process (DMP). It is the generalization of the Dirichlet-Multinomial distribution for i.i.d. samples drawn from a PDF; the underlying distribution is characterized by a Dirchlet process with parameter $\alpha$. The Dirichlet-Multinomial process assumes functions from the set $\left\{ \psi \in {\Rbbgeq}^{\Ycal} : \int_{\Ycal} \psi(y) \mathrm{d} y = N \right\}$ and is parameterized by a function $\alpha : \Ycal \mapsto \Rbb^+$.
 
-Analagous to the Dirichlet and Dirichlet-Multinomial distributions for countable spaces, the Dirichlet-Multinomial process inherits the aggregation property from the Dirichlet process prior. That is, for a Dirichlet-Multinomial process $\uppsi \in \left\{ \psi \in {\Rbbgeq}^{\Ycal} : \int_{\Ycal} \psi(y) \mathrm{d} y = N \right\}$ and a partition of $\Ycal$, $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$, the transformed random process $\uppsim(z) \equiv \int_{\Scal(z)} \uppsi(y) \mathrm{d} y$ is neccessarily Dirichlet-Multinomial with parameterizing function $\alpha'(z) \equiv \int_{\Scal(z)} \alpha(y) \mathrm{d} y$.
+Analagous to the Dirichlet and Dirichlet-Multinomial distributions for countable spaces, the Dirichlet-Multinomial process inherits the aggregation property from the Dirichlet process prior. That is, for a Dirichlet-Multinomial process $\uppsi \in \left\{ \psi \in {\Rbbgeq}^{\Ycal} : \int_{\Ycal} \psi(y) \mathrm{d} y = N \right\}$ and a partition of $\Ycal$, $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, the transformed random process $\uppsim(z) \equiv \int_{\Scal_z} \uppsi(y) \mathrm{d} y$ is neccessarily Dirichlet-Multinomial with parameterizing function $\alpha'(z) \equiv \int_{\Scal_z} \alpha(y) \mathrm{d} y$.
 
 PGR: tilde not prime?
 
@@ -3071,15 +3082,15 @@ PGR: tilde not prime?
 
 Next, it is demonstrated that the random process $\uppsi(y) \equiv \Psi(y;\Drm) = \sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DMP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta\big( D_n \big)$ and $\uptheta \sim \DP(\alpha_0 \alpha)$. 
 
-Observe that $\uppsim(z) \equiv \sum_{n=1}^N \chi\big( \Drm_n;\Scal(z) \big)$, where $\chi$ is the indicator function
+Observe that $\uppsim(z) \equiv \sum_{n=1}^N \chi\big( \Drm_n;\Scal_z \big)$, where $\chi$ is the indicator function
 \begin{equation}
 \chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S.  \end{cases}
 \end{equation}
-and note that $\Prm\Big( \chi\big( \Drm_n;\Scal(z) \big) = 1 \big| \uptheta \Big) = \int_{\Scal(z)} \uptheta(y) \mathrm{d} y$. As such, $\uppsim$ conditioned on the model $\uptheta$ is characterized by a multinomial distribution 
+and note that $\Prm\Big( \chi\big( \Drm_n;\Scal_z \big) = 1 \big| \uptheta \Big) = \int_{\Scal_z} \uptheta(y) \mathrm{d} y$. As such, $\uppsim$ conditioned on the model $\uptheta$ is characterized by a multinomial distribution 
 \begin{equation}
-\Prm_{\uppsim | \uptheta}(n' | \theta) = \Mcal(N \psim) \prod_{z \in \Zcal} \left( \int_{\Scal(z)} \theta(y) \mathrm{d} y \right)^{N \psim(z)} = \Multi\left( n' ; N,\thetam(z) \right) \;,
+\Prm_{\uppsim | \uptheta}(n' | \theta) = \Mcal(N \psim) \prod_{z \in \Zcal} \left( \int_{\Scal_z} \theta(y) \mathrm{d} y \right)^{N \psim(z)} = \Multi\left( n' ; N,\thetam(z) \right) \;,
 \end{equation}
-where $\upthetam(z) \equiv \int_{\Scal(z)} \uptheta(y) \mathrm{d} y$, $z \in \Zcal$.
+where $\upthetam(z) \equiv \int_{\Scal_z} \uptheta(y) \mathrm{d} y$, $z \in \Zcal$.
 
 By the aggregation property of the Dirichlet process $\uptheta$, the parameters of this multinomial distribution are characterized as $\upthetam \sim \Dir\left( \alpha' \right)$, and thus $\tilde{\nrm}$ is drawn from a Dirichlet-Multinomial PMF with the same parameters $\alpha'$. As this holds for any partition of $\Ycal$, $\uppsi$ is a Dirichlet-Multinomial Process.
 
@@ -3109,7 +3120,7 @@ The correlation function is
 
 \subsection{Continuous aggregation}
 
-If $\uppsi$ is a Dirichlet-Multinomial process over a Euclidean space $\Ycal$, then conditioning on its discrete aggregation $\uppsim$ produces independent Dirichlet-Multinomial processes $\big\{ \uppsi(y) : y \in \Scal(z) \big\} \sim \DMP\Big( \uppsim(z),\big\{ \alpha(y) : y \in \Scal(z) \big\} \Big)$ over the partition spaces $\Scal(z)$.
+If $\uppsi$ is a Dirichlet-Multinomial process over a Euclidean space $\Ycal$, then conditioning on its discrete aggregation $\uppsim$ produces independent Dirichlet-Multinomial processes $\big\{ \uppsi(y) : y \in \Scal_z \big\} \sim \DMP\Big( \uppsim(z),\big\{ \alpha(y) : y \in \Scal_z \big\} \Big)$ over the partition spaces $\Scal_z$.
 
 The previous result can be extended to conditioning on a continuous aggregation. Define $\uppsi \sim \DMP(N,\alpha)$ over the set $\Ycal \times \Xcal$ and the aggregation DMP $\uppsim = \int_{\Ycal} \uppsi(y,\cdot) \mathrm{d}y$ over set $\Xcal$ with parameterizing function $\alpha' = \int_{\Ycal} \alpha(y,\cdot) \mathrm{d}y$.
 
