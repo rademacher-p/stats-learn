@@ -242,7 +242,9 @@ Often, the dependency on the conditional variable $\zrm$ will not be expressed i
 \todohi{Ever need the full functional?}
 \todolo{Remove subscript suppression convention?} 
 
-Many distributions will be repeatedly used and thus special functions will be defined for the PDF's and PMF's of interest. For example, consider a random process $\xrm \in \Xcal$ characterized by a Dirichlet distribution with parameters $\alpha \in \mathcal{A}$; the PDF will be notated as $\Dir : \mathcal{A} \mapsto \Pcal(\Xcal)$, where the range is the set of valid PDF's. More compactly, the notation $\xrm \sim \Dir(\alpha)$ implies that $\Prm_{\xrm} = \Dir(\cdot ; \alpha)$. Other distribution functions repeatedly used include $\Multi$, $\DM$, $\DP$, and $\DMP$, representing the multinomial distribution, the Dirichlet-multinomial distribution, the Dirichlet process, and the Dirichlet-Multinomial process.
+Many distributions will be repeatedly used and thus special functions will be defined for the PDF's and PMF's of interest. For example, consider a random process $\xrm \in \Xcal$ characterized by a Dirichlet distribution with parameters $\alpha \in \mathcal{A}$; the PDF will be notated as $\Dir : \mathcal{A} \mapsto \Pcal(\Xcal)$, where the range is the set of valid PDF's. More compactly, the notation $\xrm \sim \Dir(\alpha_0 \alpha)$ implies that $\Prm_{\xrm} = \Dir(\cdot ; \alpha)$. Other distribution functions repeatedly used include $\Multi$, $\DM$, $\DP$, and $\DMP$, representing the multinomial distribution, the Dirichlet-multinomial distribution, the Dirichlet process, and the Dirichlet-Multinomial process.
+
+\todohigh{alpha update??}
 
 
 
@@ -368,60 +370,62 @@ For countable sets $\Ycal$ and $\Xcal$, the distribution of $\Drm$ conditioned o
 \Prm_{\Drm | \uptheta}\big( D | \theta \big) & = & \prod_{n=1}^N \Prm_{\Drm_n | \uptheta}\big( D_n | \theta \big) \\
 & = & \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\Psi(y,x;D)} \nonumber \;,
 \end{IEEEeqnarray}
-where the dependency on the training data $\Drm$ is expressed though a transform function $\Psi : \Dcal \mapsto \Theta_\uppsi$, where the range is 
+where the dependency on the training data $\Drm$ is expressed though a transform function $\Psi : \Dcal \mapsto \Theta_\uppsi \subset \Theta$, where the range is 
 \begin{IEEEeqnarray}{rCl}
-\Theta_\uppsi & = & \left\{ \frac{\bar{n}}{N} : \bar{n} \in {\Zbb_{\geq 0}}^{\Ycal \times \Xcal}, \ \sum_{y \in \Ycal} \sum_{x \in \Xcal} \bar{n}(y,x) = N \right\} 
+\Theta_\uppsi & = & \left\{ \frac{\psi}{N} : \psi \in {\Zbb_{\geq 0}}^{\Ycal \times \Xcal}, \ \sum_{y \in \Ycal} \sum_{x \in \Xcal} \psi(y,x) = N \right\} 
 \end{IEEEeqnarray}
 and the function is defined as
 \begin{IEEEeqnarray}{rCl}
 \Psi(y,x;D) & = & \frac{1}{N} \sum_{n=1}^N \delta \big[ (y,x),D_n \big] \\
 & \equiv & \frac{1}{N} \sum_{n=1}^N \delta \left[ y,Y_n \right] \delta \left[ x,X_n \right] \nonumber \;.
 \end{IEEEeqnarray}
-This function counts the number of occurrences of the pair $(y,x)$ in the training set $D$. 
+This function determines the empirical probability of the pair $(y,x)$. Note that the set $\Theta_\uppsi$ is a finite subset of $\Theta$ and thus that the empirical distribution $\Psi(\Drm)$ assumes one of a finite number of the elements from $\Theta$.
+
 
 Note that $\Prm_{\Drm | \uptheta}$ depends on the training data $\Drm$ only through the transform $\Psi$; $\Psi(\Drm)$ is thus a sufficient statistic \cite{bernardo} for the model $\uptheta$. Consequently, other distributions of interest $\Prm_{\Drm}$, $\Prm_{\xrm | \Drm}$, and $\Prm_{\yrm | \xrm,\Drm}$ will also depend on $\Drm$ via $\Psi(\Drm)$. As such, it is useful to define a new random process $\uppsi \equiv \Psi(\Drm) \in \Theta_\uppsi$. 
 
 \todomid{show SS via Kay, data likelihood??!!}
 
-Frequently, the corresponding distributions $\Prm_{\uppsi}$, $\Prm_{\xrm | \uppsi}$, and $\Prm_{\yrm | \xrm,\uppsi}$ will be used to find the optimal learning functions and the minimum risk. Note that $\Mcal\big( \Psi(D) \big) \Prm_{\Drm | \uptheta}(D | \theta) = \Prm_{\uppsi | \uptheta}\big( \Psi(D) | \theta \big)$, where $\Mcal$ is the multinomial operator. Also note that $\Prm_{\xrm | \Drm}(D) = \Prm_{\xrm | \uppsi}\big( \Psi(D) \big)$ and $\Prm_{\yrm | \xrm,\Drm}(x,D) = \Prm_{\yrm | \xrm,\uppsi}\big( x,\Psi(D) \big)$.
+Frequently, the corresponding distributions $\Prm_{\uppsi}$, $\Prm_{\xrm | \uppsi}$, and $\Prm_{\yrm | \xrm,\uppsi}$ will be used to find the optimal learning functions and the minimum risk. Note that $\Mcal\big( N \Psi(D) \big) \Prm_{\Drm | \uptheta}(D | \theta) = \Prm_{\uppsi | \uptheta}\big( \Psi(D) | \theta \big)$, where $\Mcal$ is the multinomial operator. Also note that $\Prm_{\xrm | \Drm}(D) = \Prm_{\xrm | \uppsi}\big( \Psi(D) \big)$ and $\Prm_{\yrm | \xrm,\Drm}(x,D) = \Prm_{\yrm | \xrm,\uppsi}\big( x,\Psi(D) \big)$.
 
 \todomid{move above paragraph?}
 
-The cardinality of the random process' domain is $|\Theta_\uppsi| = \Mcal\big( \{N,|\Ycal||\Xcal|-1\} \big)$; this can be shown using the stars-and-bars method \cite{feller}. The cardinality of original set is $|\Dcal| = \big( |\Ycal| |\Xcal| \big)^N$; thus $|\Theta_\uppsi| \leq |\Dcal|$ and the sufficient statistic compactly represents the valuable information in the training data. Also, observe that the set $\{ \bar{n}/N : \bar{n} \in \Theta_\uppsi \} \subset \Theta$ and thus that the empirical distribution $\Psi(\Drm)/N$ assumes one of a finite number of the elements from $\Theta$.
+The cardinality of the random process' domain is $|\Theta_\uppsi| = \Mcal\big( \{N,|\Ycal||\Xcal|-1\} \big)$; this can be shown using the stars-and-bars method \cite{feller}. The cardinality of original set is $|\Dcal| = \big( |\Ycal| |\Xcal| \big)^N$; thus $|\Theta_\uppsi| \leq |\Dcal|$ and the sufficient statistic compactly represents the valuable information in the training data. 
 
 \todolo{sufficient statistic savings in memory bits?}
 
-Conditioned on the model $\uptheta$, the PMF of $\uppsi$ is a multinomial distribution
+Conditioned on the model $\uptheta$, the PMF of $\uppsi$ is 
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\uppsi | \uptheta}(\bar{n} | \theta) & = & \sum_{D : \Psi(D) = \bar{n}} \Prm_{\Drm | \uptheta}(D | \theta) \\
-& = & \big|\{ D : \Psi(D) = \bar{n} \}\big| \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\bar{n}(y,x)} \nonumber \\
-& = & \Mcal(\bar{n}) \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\bar{n}(y,x)} \nonumber \\
-& = & \Multi\big( \bar{n};N,\theta \big) \nonumber \;,
+\Prm_{\uppsi | \uptheta}(\psi | \theta) & = & \sum_{D \in \{\Psi(D) = \psi\}} \Prm_{\Drm | \uptheta}(D | \theta) \\
+& = & \big|\{ D : \Psi(D) = \psi \}\big| \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{N \psi(y,x)} \nonumber \\
+& = & \Mcal(N \psi) \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{N \psi(y,x)} \nonumber \\
+& = & \Multi\big( N \psi;N,\theta \big) \nonumber \;,
 \end{IEEEeqnarray}
-where the multinomial operator $\Mcal$ is used.  
+where the multinomial operator $\Mcal$ is used. Observe that the empirical process is equivalent to a multinomial process within a scale factor.
 
-The first and second joint moments of this multinomial distribution are \cite{theodoridis-ML}
+The first and second joint moments of the conditional empirical distribution are \cite{theodoridis-ML}
 \begin{IEEEeqnarray}{rCl}
-\mu_{\bar{\nrm} | \uptheta} & = & N \uptheta
+\mu_{\uppsi | \uptheta} & = & \uptheta
 \end{IEEEeqnarray}
 and
 \begin{IEEEeqnarray}{L}
-\Erm_{\bar{\nrm} | \uptheta}\big[ \bar{\nrm}(y,x) \bar{\nrm}(y',x') \big] \\
-\quad = N \big( \uptheta(y,x) \delta[y,y'] \delta[x,x'] + (N-1) \uptheta(y,x) \uptheta(y',x') \big) \nonumber
+\Erm_{\uppsi | \uptheta}\big[ \uppsi(y,x) \uppsi(y',x') \big] \\
+\quad = \frac{1}{N} \uptheta(y,x) \delta[y,y'] \delta[x,x'] + \left(1 - \frac{1}{N}\right) \uptheta(y,x) \uptheta(y',x') \nonumber
 \end{IEEEeqnarray}
 and the covariance function is
 \begin{IEEEeqnarray}{rCl}
-\Sigma_{\uppsi | \uptheta}(y,x,y',x')  & = & N \big( \uptheta(y,x) \delta[y,y'] \delta[x,x'] - \uptheta(y,x) \uptheta(y',x') \big) \;.
+\Sigma_{\uppsi | \uptheta}(y,x,y',x')  & = & \frac{1}{N} \big( \uptheta(y,x) \delta[y,y'] \delta[x,x'] - \uptheta(y,x) \uptheta(y',x') \big) \;.
 \end{IEEEeqnarray}
+This can be easily determined using the first and second moments of the Multinomial distribution.
 
 \todolo{trends with N? Figures??}
 
-Also, observe that the maximum likelihood estimate of $\theta$ given the training statistic is \cite{rao},
+Also, using the maximum likelihood estimate of a Multinomial distribution \cite{rao}, the maximum likelihood estimate of $\theta$ given the training data empirical distribution is simply
 \begin{IEEEeqnarray}{rCl}
-\theta_\mathrm{ML}\big( \bar{n} \big) & = & \argmax_{\theta \in \Theta} \Prm_{\uppsi | \uptheta}(\bar{n} | \theta) \\ \nonumber
-& = & \frac{\bar{n}}{N} \;,
+\theta_\mathrm{ML}\big( \psi \big) & = & \argmax_{\theta \in \Theta} \Prm_{\uppsi | \uptheta}(\psi | \theta) \\ \nonumber
+& = & \psi \;.
 \end{IEEEeqnarray}
-the empirical distribution.
+
 
 
 
@@ -453,10 +457,10 @@ As before, the dependency on the training data can be simplified using a suffici
 
 Also of interest is the distribution of $\uppsi$ conditioned on its aggregation $\nrm'$. Using the multinomial distribution properties proven in Appendix \ref{app:mult}, it can be shown that when conditioned on the model $\uptheta$ as well, the PMF of $\uppsi$ is
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\bar{\nrm} | \nrm' , \uptheta}(\bar{n} | n' , \theta) & \equiv & \prod_{x \in \Xcal} \Bigg[ \Mcal\big( \bar{n}(\cdot,x) \big) \prod_{y \in \Ycal} \thetac(y;x)^{\bar{n}(y,x)} \Bigg] \\
-& = & \prod_{x \in \Xcal} \Multi\Big( \bar{n}(\cdot,x) ; n'(x) , \thetac(x) \Big) \nonumber \;,
+\Prm_{\uppsi | \nrm' , \uptheta}(\psi | n' , \theta) & \equiv & \prod_{x \in \Xcal} \Bigg[ \Mcal\big( \psi(\cdot,x) \big) \prod_{y \in \Ycal} \thetac(y;x)^{\psi(y,x)} \Bigg] \\
+& = & \prod_{x \in \Xcal} \Multi\Big( \psi(\cdot,x) ; n'(x) , \thetac(x) \Big) \nonumber \;,
 \end{IEEEeqnarray}
-over the domain $\left\{ \bar{n} \in {\Zbb_{\geq 0}}^{\Ycal \times \Xcal} : \sum_{y \in \Ycal} \bar{n}(y,\cdot) = n' \right\}$. Observe that conditioning on the aggregation renders the function segments $\uppsi(\cdot,x)$ independent of one another and that they are also Multinomial, such that $\uppsi(\cdot,x) | \nrm'(x),\uptheta \sim \Multi\big( \nrm'(x),\upthetac(x) \big)$. Furthermore, the dependency on $\uptheta$ is expressed through the conditional model $\upthetac$
+over the domain $\left\{ \psi \in {\Zbb_{\geq 0}}^{\Ycal \times \Xcal} : \sum_{y \in \Ycal} \psi(y,\cdot) = n' \right\}$. Observe that conditioning on the aggregation renders the function segments $\uppsi(\cdot,x)$ independent of one another and that they are also Multinomial, such that $\uppsi(\cdot,x) | \nrm'(x),\uptheta \sim \Multi\big( \nrm'(x),\upthetac(x) \big)$. Furthermore, the dependency on $\uptheta$ is expressed through the conditional model $\upthetac$
 
 
 
@@ -574,10 +578,10 @@ Using the marginal and conditional model representations, the Bayesian prediciti
 %\end{IEEEeqnarray}
 
 \begin{IEEEeqnarray}{rCl}
-\prm_{\upthetam,\upthetac | \uppsi}(\thetam,\thetac | \bar{n}) & = & \frac{\Prm_{\uppsi | \nrm',\upthetac}\big( \bar{n} | \sum_y \bar{n}(y,\cdot),\thetac \big)}{\Prm_{\uppsi | \nrm'}\big( \bar{n} | \sum_y \bar{n}(y,\cdot) \big)} 
-\frac{\Prm_{\nrm' | \upthetam}\big( \sum_y \bar{n}(y,\cdot) | \thetam \big)}{\Prm_{\nrm'}\big( \sum_y \bar{n}(y,\cdot) \big)} \prm_{\upthetam,\upthetac}(\thetam,\thetac) \\
-& = & \prm_{\upthetac | \uppsi,\nrm'}\Big( \thetac | \bar{n},\sum_y \bar{n}(y,\cdot) \Big) \prm_{\upthetam | \nrm'}\Big( \thetam | \sum_y \bar{n}(y,\cdot) \Big) 
-\frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \nrm'}\big( \thetac | \sum_y \bar{n}(y,\cdot) \big)} \nonumber
+\prm_{\upthetam,\upthetac | \uppsi}(\thetam,\thetac | \psi) & = & \frac{\Prm_{\uppsi | \nrm',\upthetac}\big( \psi | \sum_y \psi(y,\cdot),\thetac \big)}{\Prm_{\uppsi | \nrm'}\big( \psi | \sum_y \psi(y,\cdot) \big)} 
+\frac{\Prm_{\nrm' | \upthetam}\big( \sum_y \psi(y,\cdot) | \thetam \big)}{\Prm_{\nrm'}\big( \sum_y \psi(y,\cdot) \big)} \prm_{\upthetam,\upthetac}(\thetam,\thetac) \\
+& = & \prm_{\upthetac | \uppsi,\nrm'}\Big( \thetac | \psi,\sum_y \psi(y,\cdot) \Big) \prm_{\upthetam | \nrm'}\Big( \thetam | \sum_y \psi(y,\cdot) \Big) 
+\frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \nrm'}\big( \thetac | \sum_y \psi(y,\cdot) \big)} \nonumber
 \end{IEEEeqnarray}
 
 % Note that $\prm_{\upthetac | \Xrm}(X) = \prm_{\upthetac | \nrm'}\big( N'(X) \big) = \Erm_{\upthetam | \Xrm}\big[ \prm_{\upthetac | \upthetam} \big](X)$.
@@ -594,10 +598,10 @@ Note that $\prm_{\upthetac | \Xrm} = \Erm_{\upthetam | \Xrm}\big[ \prm_{\uptheta
 \end{IEEEeqnarray}
 
 \begin{IEEEeqnarray}{rCl}
-\prm_{\upthetam,\upthetac | \uppsi,\xrm}(\thetam,\thetac | \bar{n},x) & = & \frac{\Prm_{\uppsi | \nrm',\upthetac}\big( \bar{n} | \sum_y \bar{n}(y,\cdot),\thetac \big)}{\Prm_{\uppsi | \nrm',\xrm}\big( \bar{n} | \sum_y \bar{n}(y,\cdot),x \big)} 
-\frac{\Prm_{\nrm',\xrm | \upthetam}\big( \sum_y \bar{n}(y,\cdot),x | \thetam \big)}{\Prm_{\nrm',\xrm}\big( \sum_y \bar{n}(y,\cdot),x \big)} \prm_{\upthetam,\upthetac}(\thetam,\thetac) \\
-& = & \prm_{\upthetac | \uppsi,\nrm'}\Big( \thetac | \bar{n},\sum_y \bar{n}(y,\cdot) \Big) \prm_{\upthetam | \nrm',\xrm}\Big( \thetam | \sum_y \bar{n}(y,\cdot),x \Big) \nonumber \\
-&& \quad \frac{\Prm_{\uppsi | \nrm'}\big( \bar{n} | \sum_y \bar{n}(y,\cdot) \big)}{\Prm_{\uppsi | \nrm',\xrm}\big( \bar{n} | \sum_y \bar{n}(y,\cdot),x \big)} \frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \nrm'}\big( \thetac | \sum_y \bar{n}(y,\cdot) \big)} \nonumber
+\prm_{\upthetam,\upthetac | \uppsi,\xrm}(\thetam,\thetac | \psi,x) & = & \frac{\Prm_{\uppsi | \nrm',\upthetac}\big( \psi | \sum_y \psi(y,\cdot),\thetac \big)}{\Prm_{\uppsi | \nrm',\xrm}\big( \psi | \sum_y \psi(y,\cdot),x \big)} 
+\frac{\Prm_{\nrm',\xrm | \upthetam}\big( \sum_y \psi(y,\cdot),x | \thetam \big)}{\Prm_{\nrm',\xrm}\big( \sum_y \psi(y,\cdot),x \big)} \prm_{\upthetam,\upthetac}(\thetam,\thetac) \\
+& = & \prm_{\upthetac | \uppsi,\nrm'}\Big( \thetac | \psi,\sum_y \psi(y,\cdot) \Big) \prm_{\upthetam | \nrm',\xrm}\Big( \thetam | \sum_y \psi(y,\cdot),x \Big) \nonumber \\
+&& \quad \frac{\Prm_{\uppsi | \nrm'}\big( \psi | \sum_y \psi(y,\cdot) \big)}{\Prm_{\uppsi | \nrm',\xrm}\big( \psi | \sum_y \psi(y,\cdot),x \big)} \frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \nrm'}\big( \thetac | \sum_y \psi(y,\cdot) \big)} \nonumber
 \end{IEEEeqnarray}
 
 Note that $\Prm_{\Yrm | \Xrm,\xrm} = \Erm_{\upthetam | \Xrm,\xrm} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\Yrm | \Xrm,\upthetac} \big] \Big]$ and also that $\Prm_{\uppsi | \nrm',\xrm} = \Erm_{\upthetam | \nrm',\xrm} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\uppsi | \nrm',\upthetac} \big] \Big]$.
@@ -801,6 +805,7 @@ Substituting the optimal learning function \eqref{eq:f_opt_01} into the general 
 
 This chapter determines the optimal learning functions when the sets $\Ycal$ and $\Xcal$ have a finite number of elements and the model $\uptheta$ is characterized by a Dirichlet distribution.
 
+\todohigh{Figs BROKEN from alpha changes}
 
 \section{Probability Distributions}
 
@@ -814,45 +819,43 @@ Other distributions of interest will be provided, such as the training data PMF 
 
 The Dirichlet PDF for the model random process $\uptheta \in \Theta$ is \cite{bishop}
 \begin{IEEEeqnarray}{rCl}
-\prm_{\uptheta}(\theta) & = & \beta(\alpha)^{-1} \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\alpha(y,x) - 1} \nonumber \\
-& = & \Dir\big( \theta ; \alpha \big) \;,
+\prm_{\uptheta}(\theta) & = & \beta(\alpha_0 \alpha)^{-1} \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\alpha_0 \alpha(y,x) - 1} \nonumber \\
+& = & \Dir\big( \theta ; \alpha_0,\alpha \big) \;,
 \end{IEEEeqnarray}
-where the user-selected PDF parameters $\alpha : \Ycal \times \Xcal \mapsto \Rbb^+$ are introduced and $\beta$ is the generalized beta function.
-
-The parameter $\alpha$ controls around which models $\uptheta$ the PDF concentrates and how strongly. For convenience, introduce the concentration parameter $\alpha_0 \equiv \sum_{y \in \Ycal} \sum_{x \in \Xcal} \alpha(y,x)$. 
+where the user-selected parameterizing distribution $\alpha \in \left\{ {\Rbb^+}^{\Ycal \times \Xcal} : \sum_{y,x} \alpha(y,x) = 1 \right\} \subset \Theta$ and concentration parameter $\alpha_0 \in \Rbb^+$ are introduced. Note that $\beta$ is the generalized beta function.
 
 The first and second joint moments of the model are 
 \begin{equation}
-\mu_{\uptheta} = \frac{\alpha}{\alpha_0}
+\mu_{\uptheta} = \alpha
 \end{equation}
 and
 \begin{IEEEeqnarray}{rCl}
-\Erm_{\uptheta}\big[ \uptheta(y,x) \uptheta(y',x') \big] & = & \frac{\alpha(y,x) \alpha(y',x') + \alpha(y,x) \delta[y,y'] \delta[x,x']}{\alpha_0 (\alpha_0+1)} \;.
+\Erm_{\uptheta}\big[ \uptheta(y,x) \uptheta(y',x') \big] & = & \frac{\alpha(y,x) \delta[y,y'] \delta[x,x'] + \alpha_0 \alpha(y,x) \alpha(y',x')}{\alpha_0+1} \;.
 \end{IEEEeqnarray}
-Observe that $\Prm_{\yrm,\xrm}  = \mu_{\uptheta} = \alpha / \alpha_0$. The covariance is
+Observe that $\Prm_{\yrm,\xrm}  = \mu_{\uptheta} = \alpha$. The covariance is
 \begin{IEEEeqnarray}{rCl}
 \Sigma_{\uptheta}(y,x,y',x') & = & \Erm_{\uptheta}\Big[ \big(\uptheta(y,x)-\mu_{\uptheta}(y,x)\big) \big(\uptheta(y',x')-\mu_{\uptheta}(y',x')\big) \Big] \\
-& = & \frac{\mu_{\uptheta}(y,x) \delta[y,y'] \delta[x,x'] - \mu_{\uptheta}(y,x) \mu_{\uptheta}(y',x')}{\alpha_0+1} \nonumber \;.
+& = & \frac{\alpha(y,x) \delta[y,y'] \delta[x,x'] - \alpha(y,x) \alpha(y',x')}{\alpha_0+1} \nonumber \;.
 \end{IEEEeqnarray}
-Also, for $\alpha(y,x) > 1$, the maximizing value of the distribution is
+Also, for $\alpha_0 \alpha(y,x) > 1$, the maximizing value of the distribution is
 \begin{equation}
-\theta_\mathrm{max} = \argmax_{\theta \in \Theta} \prm_{\uptheta}(\theta) = \frac{\alpha - 1}{\alpha_0 - |\Ycal||\Xcal|} \;.
+\theta_\mathrm{max} = \argmax_{\theta \in \Theta} \prm_{\uptheta}(\theta) = \frac{\alpha_0 \alpha - 1}{\alpha_0 - |\Ycal||\Xcal|} \;.
 \end{equation}
 This can be easily shown by maximizing the logarithm of the distribution using the method of Lagrange multipliers, as demonstrated in \ref{app:MAP_theta}.
 
 Of specific interest is how $\prm_{\uptheta}$ changes as the concentration parameter approaches its limiting values. For $\alpha_0 \to \infty$, the PDF concentrates at its mean, resulting in
 \begin{IEEEeqnarray}{rCl}
-\prm_{\uptheta}(\theta) & \to & \delta\left( \theta - \frac{\alpha}{\alpha_0} \right) \;.
+\prm_{\uptheta}(\theta) & \to & \delta\left( \theta - \alpha \right) \;.
 \end{IEEEeqnarray}
 Conversely, for $\alpha_0 \to 0$, the PDF tends toward
 \begin{IEEEeqnarray}{rCl}
-\prm_{\uptheta}(\theta) & \to & \sum_{y \in \Ycal} \sum_{x \in \Xcal} \frac{\alpha(y,x)}{\alpha_0} \delta\big( \theta - \delta[\cdot,y] \delta[\cdot,x] \big) \;,
+\prm_{\uptheta}(\theta) & \to & \sum_{y \in \Ycal} \sum_{x \in \Xcal} \alpha(y,x) \delta\big( \theta - \delta[\cdot,y] \delta[\cdot,x] \big) \;,
 \end{IEEEeqnarray}
 which distributes its weight among the $|\Ycal| |\Xcal|$ models with an $\ell_0$ norm satisfying $\| \theta \|_0 = 1$. Note that the Dirac delta for these formulas is defined on the set $\Theta$, such that $\int_{\Theta} \delta(\theta) \mathrm{d}\theta = 1$.
 
-PGR: formal proof for limiting PDFs??? stirling/gautschi?
+\todohi{formal proof for limiting PDFs??? stirling/gautschi?}
 
-These trends are demonstrated with Figure \ref{fig:P_theta}. The cardinalities $|\Ycal| = 3$ and $|\Xcal| = 1$ are chosen to enable visualization, despite the implication that $\xrm$ is deterministic; these cardinalities will be used for many subsequent figures as well. Note that for $\alpha_0=2.99$, $\alpha < 1$ and the PDF values at the boundaries of the domain tend to infinity; this is not captured by the plot color scale.
+These trends are demonstrated with Figure \ref{fig:P_theta}. The cardinalities $|\Ycal| = 3$ and $|\Xcal| = 1$ are chosen to enable visualization, despite the implication that $\xrm$ is deterministic; these cardinalities will be used for many subsequent figures as well. Note that for $\alpha_0=2.99 < |\Ycal||\Xcal|$, the PDF values at the boundaries of the domain tend to infinity; this is not captured by the plot color scale.
 
 \begin{figure}
 \centering
@@ -867,11 +870,11 @@ These trends are demonstrated with Figure \ref{fig:P_theta}. The cardinalities $
 
 \paragraph{Uniform Prior}
 
-When the parameterizing function is $\alpha(y,x) = 1$, the distribution becomes a uniform PDF and is represented as
+When the Dirichlet parameters are $\alpha(y,x) = \big( |\Ycal||\Xcal| \big)^{-1}$ and $\alpha_0 = |\Ycal||\Xcal|$, the distribution becomes a uniform PDF and is represented as
 \begin{equation}
 \prm_{\uptheta} = \big( |\Ycal||\Xcal|-1 \big)! \;.
 \end{equation}
-Note that the concentration parameter is $\alpha_0 = |\Ycal||\Xcal|$ and $\Prm_{\yrm,\xrm} = \big( |\Ycal||\Xcal| \big)^{-1}$ is also uniform. Figure \ref{fig:P_theta_uniform} shows the uniform distribution amplitude for $|\Ycal| = 3$ and $|\Xcal| = 1$.
+Figure \ref{fig:P_theta_uniform} shows the uniform distribution amplitude for $|\Ycal| = 3$ and $|\Xcal| = 1$.
 
 \begin{figure}
 \centering
@@ -886,19 +889,17 @@ Note that the concentration parameter is $\alpha_0 = |\Ycal||\Xcal|$ and $\Prm_{
 
 PGR: move/add Dir figs here? 
 
-\todohigh{ALPHA REWORK!!!}
-
-The marginal distribution $\upthetam$ and the conditional distribution $\upthetac$ will also be of interest. To keep notation simple, it is helpful to introduce the bijection $\alpha \Leftrightarrow \big( \alpha_0,\alpham,\alphac \big)$, where $\alpha_0$ has been defined previously, $\alpham \equiv \sum_{y \in \Ycal} \alpha(y,\cdot) / \alpha_0$, and $\alphac(x) = \alpha(\cdot,x) / \big( \alpha_0 \alpham(x) \big)$ for each $x \in \Xcal$. Observe that $\alpham \in \Pcal(\Xcal)$ and $\alphac \in \Pcal(\Ycal)^{\Xcal}$.
+The marginal distribution $\upthetam$ and the conditional distribution $\upthetac$ will also be of interest. To keep notation simple, it is helpful to introduce the bijection $\alpha \Leftrightarrow (\alpham,\alphac)$, where $\alpham \equiv \sum_{y \in \Ycal} \alpha(y,\cdot)$, and $\alphac(x) = \alpha(\cdot,x) / \alpham(x)$ for each $x \in \Xcal$. Observe that $\alpham \in \Pcal(\Xcal)$ and $\alphac \in \Pcal(\Ycal)^{\Xcal}$.
 
 
-By the aggregation property \cite{ferguson}, $\upthetam$ is a Dirichlet random process parameterized by $\alpha_0 \alpham$; thus, the concentration parameter is $\alpha_0$ and that $\Prm_{\xrm} = \mu_{\upthetam} = \alpham$.
+By the aggregation property \cite{ferguson}, $\upthetam \sim \Dir(\alpha_0,\alpham)$ is a Dirichlet random process parameterized by concentation $\alpha_0$ and distribution $\alpham$; observe that $\Prm_{\xrm} = \mu_{\upthetam} = \alpham$.
 
 Also of interest is the distribution of the predictive model $\upthetac$ conditioned on the marginal $\upthetam$. As demonstrated in Appendix \ref{app:Dir_agg}, these random processes are jointly distributed as
 \begin{IEEEeqnarray}{rCl}
-\prm_{\upthetac | \upthetam}\big( \thetac | \thetam \big) & = & \prod_{x \in \Xcal} \Bigg[ \beta\big( \alpha_0 \alpham(x) \alphac(x) \big)^{-1} \prod_{y \in \Ycal} \thetac(y;x)^{\alpha_0 \alpham(x) \alphac(y;x) - 1} \Bigg] \\
-& = & \prod_{x \in \Xcal} \Dir\Big( \thetac(x) ; \alpha_0 \alpham(x) \alphac(x) \Big) \nonumber \;,
+\prm_{\upthetac | \upthetam}(\thetac | \thetam) & = & \prod_{x \in \Xcal} \Bigg[ \beta\big( \alpha_0 \alpham(x) \alphac(x) \big)^{-1} \prod_{y \in \Ycal} \thetac(y;x)^{\alpha_0 \alpham(x) \alphac(y;x) - 1} \Bigg] \\
+& = & \prod_{x \in \Xcal} \Dir\Big( \thetac(x) ; \alpha_0 \alpham(x), \alphac(x) \Big) \nonumber \;,
 \end{IEEEeqnarray}
-a product of Dirichlet distributions defined on $\thetac \in \Pcal(\Ycal)^{\Xcal}$. As shown, the processes $\upthetac(x)$ are Dirichlet with parameterizing functions $\alpha(\cdot,x)$, independent of one another, and independent of the marginal distribution $\upthetam$. Observe that the values $\alpha_0 \alpham(x)$ represent the concentration parameters for the individual Dirichlet processes; also, note that $\Prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$. 
+a product of Dirichlet distributions defined on $\thetac \in \Pcal(\Ycal)^{\Xcal}$. As shown, the processes $\upthetac(x)$ are Dirichlet with parameterizing distributions $\alphac(x)$ and concentrations $\alpha_0 \alpham(x)$, independent of one another, and independent of the marginal distribution $\upthetam$. Note that $\Prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$. 
 
 
 PGR: use conditional independence property to simplify throughout?!? In loss app sections?!?!
@@ -929,7 +930,7 @@ As the conditional distribution $\Prm_{\Drm | \uptheta}$ is of exponential form,
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\Drm}(D) & = & \Erm_{\uptheta} \left[ \prod_{n=1}^N \Prm_{\Drm_n | \uptheta}\big( D_n | \uptheta \big) \right] \\
 & = & \Erm_{\uptheta} \left[ \prod_{y \in \Ycal} \prod_{x \in \Xcal} \uptheta(y,x)^{\Psi(y,x;D)} \right] \nonumber \\
-& = & \beta(\alpha)^{-1} \beta \left(  \alpha + \Psi(D) \right) \nonumber \;.
+& = & \beta(\alpha_0 \alpha)^{-1} \beta \left(  \alpha + \Psi(D) \right) \nonumber \;.
 \end{IEEEeqnarray}
 Note that values of the PMF $\Prm_{\Drm}$ are equivalent to joint moments of the model $\uptheta$. 
 
@@ -940,24 +941,24 @@ It is instructive to consider the limiting forms of this distribution for the ex
 \end{IEEEeqnarray}
 Conversely, as $\alpha_0 \to 0$, the distribution becomes
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\Drm}(D) & \to & \sum_{y \in \Ycal} \sum_{x \in \Xcal} \frac{\alpha(y,x)}{\alpha_0} \prod_{n=1}^N \delta\big[ D_n,(y,x) \big] 
+\Prm_{\Drm}(D) & \to & \sum_{y \in \Ycal} \sum_{x \in \Xcal} \alpha(y,x) \prod_{n=1}^N \delta\big[ D_n,(y,x) \big] 
 \end{IEEEeqnarray}
 and the training data are identical.
 
 
 Next, the distribution of the sufficient statistic $\uppsi$ will be represented. As a Dirichlet distribution characterizes the parameters of the multinomial distribution $\Prm_{\Drm | \uptheta}$, the marginal PMF of $\uppsi$ is a Dirichlet-Multinomial distribution \cite{johnson} parameterized by $\alpha$,
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\uppsi}(\bar{n}) & = & \Mcal(\bar{n}) \beta(\alpha)^{-1} \beta(\alpha + \bar{n}) \\
-& = & \DM\big( \bar{n}; N,\alpha \big) \nonumber \;.
+\Prm_{\uppsi}(\psi) & = & \Mcal(N \psi) \beta(\alpha_0 \alpha)^{-1} \beta(\alpha + \psi) \\
+& = & \DM\big( \psi; N,\alpha \big) \nonumber \;.
 \end{IEEEeqnarray}
 
-The first and second joint moments of $\bar{\nrm}$ are
+The first and second joint moments of $\uppsi$ are
 \begin{IEEEeqnarray}{rCl}
-\mu_{\bar{\nrm}} & = & N \frac{\alpha}{\alpha_0} = N \mu_\uptheta 
+\mu_{\uppsi} & = & N \alpha = N \mu_\uptheta 
 \end{IEEEeqnarray}
 and
 \begin{IEEEeqnarray}{L}
-\Erm_{\uppsi}\big[ \bar{\nrm}(y,x) \bar{\nrm}(y',x') \big] \\
+\Erm_{\uppsi}\big[ \uppsi(y,x) \uppsi(y',x') \big] \\
 \qquad = \frac{N}{\alpha_0 (\alpha_0+1)} \Big( (\alpha_0 + N)\alpha(y,x) \delta[y,y'] \delta[x,x'] + (N-1) \alpha(y,x) \alpha(y',x') \Big) \nonumber \\
 \qquad = \frac{N}{\alpha_0+1} \Big( (\alpha_0+N) \mu_\uptheta(y,x) \delta[y,y'] \delta[x,x'] + \alpha_0(N-1) \mu_\uptheta(y,x) \mu_\uptheta(y',x') \Big) \nonumber \;.
 \end{IEEEeqnarray}
@@ -968,18 +969,18 @@ The covariance function is
 \end{IEEEeqnarray}
 
 
-Again, the data PMF's for minimal and maximal concentration $\alpha_0$ are relevant. For $\alpha_0 \to \infty$, the model PDF $\prm_{\uptheta}$ concentrates at its mean and thus $\bar{\nrm}$ is characterized by a multinomial distribution,
+Again, the data PMF's for minimal and maximal concentration $\alpha_0$ are relevant. For $\alpha_0 \to \infty$, the model PDF $\prm_{\uptheta}$ concentrates at its mean and thus $\uppsi$ is characterized by a multinomial distribution,
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\uppsi}(\bar{n}) & \to & \Mcal(\bar{n}) \prod_{y \in \Ycal} \prod_{x \in \Xcal} \left(\frac{\alpha(y,x)}{\alpha_0}\right)^{\bar{n}(y,x)}
+\Prm_{\uppsi}(\psi) & \to & \Mcal(N \psi) \prod_{y \in \Ycal} \prod_{x \in \Xcal} \left(\alpha(y,x)\right)^{N \psi(y,x)}
 \end{IEEEeqnarray}
 Conversely, for $\alpha_0 \to 0$, the PMF tends toward
 \begin{IEEEeqnarray}{rCl} \label{eq:P_n_lim_zero}
-\Prm_{\uppsi}(\bar{n}) & \to & \sum_{y \in \Ycal} \sum_{x \in \Xcal} \frac{\alpha(y,x)}{\alpha_0} \delta\big[ \bar{n} , N \delta[\cdot,y] \delta[\cdot,x] \big] \;.
+\Prm_{\uppsi}(\psi) & \to & \sum_{y \in \Ycal} \sum_{x \in \Xcal} \alpha(y,x) \delta\big[ \psi , N \delta[\cdot,y] \delta[\cdot,x] \big] \;.
 \end{IEEEeqnarray}
 
 PGR: formal proofs for limiting PMFs? stirling/gautschi?
 
-Figure \ref{fig:P_nbar_a0} displays the distribution of $\uppsi$ for $N=10$ and different model concentrations $\alpha_0$. Observe that for large $\alpha_0$, the distribution approaches a multinomial distribution $\uppsi \sim \Multi(N,\alpha/\alpha_0)$. Figure \ref{fig:P_nbar_N} shows how a specific model prior influences the data PMF differently for different $N$. Observe that as the number of training samples increases, the PMF $\Prm_{\uppsi}$ tends toward $\Prm_{\uppsi}(\bar{n}) \approx N^{1-|\Ycal||\Xcal|}\prm_{\uptheta}(\bar{n}/N)$; this can be proven using Gautschi's inequality \cite{wendel}.
+Figure \ref{fig:P_nbar_a0} displays the distribution of $\uppsi$ for $N=10$ and different model concentrations $\alpha_0$. Observe that for large $\alpha_0$, the distribution approaches a multinomial distribution $\uppsi \sim \Multi(N,\alpha/\alpha_0)$. Figure \ref{fig:P_nbar_N} shows how a specific model prior influences the data PMF differently for different $N$. Observe that as the number of training samples increases, the PMF $\Prm_{\uppsi}$ tends toward $\Prm_{\uppsi}(\psi) \approx N^{1-|\Ycal||\Xcal|}\prm_{\uptheta}(\psi/N)$; this can be proven using Gautschi's inequality \cite{wendel}.
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{P_nbar_a0.pdf}
@@ -1037,10 +1038,10 @@ The corresponding distributions for the sufficient statistics will be expressed 
 
 Also of interest is the distribution of $\uppsi$ conditioned on its aggregation $\nrm'$. Using the Dirichlet-Multinomial properties presented in Appendix \ref{app:DM_agg}, it can be shown that
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\bar{\nrm} | \nrm'}(\bar{n} | n') & = & \prod_{x \in \Xcal} \left[ \Mcal\big( \bar{n}(\cdot,x) \big) \beta\big( \alpha(\cdot,x) \big)^{-1} \beta\big( \alpha(\cdot,x) + \bar{n}(\cdot,x) \big) \right] \\
-& = & \prod_{x \in \Xcal} \DM\Big( \bar{n}(\cdot,x) ; n'(x) , \alpha(\cdot,x) \Big) \nonumber
+\Prm_{\uppsi | \nrm'}(\psi | n') & = & \prod_{x \in \Xcal} \left[ \Mcal\big( \psi(\cdot,x) \big) \beta\big( \alpha(\cdot,x) \big)^{-1} \beta\big( \alpha(\cdot,x) + \psi(\cdot,x) \big) \right] \\
+& = & \prod_{x \in \Xcal} \DM\Big( \psi(\cdot,x) ; n'(x) , \alpha(\cdot,x) \Big) \nonumber
 \end{IEEEeqnarray}
-over the domain $\left\{ \bar{n} \in {\Zbb_{\geq 0}}^{\Ycal \times \Xcal} : \sum_{y \in \Ycal} \bar{n}(y,\cdot) = n' \right\}$. Observe that conditioning on the aggregation renders the function segments $\uppsi(\cdot,x)$ independent of one another and that they are also Dirichlet-Multinomial, such that $\uppsi(\cdot,x) | \nrm'(x) \sim \DM\big( \nrm'(x),\alpha(\cdot,x) \big)$.
+over the domain $\left\{ \psi \in {\Zbb_{\geq 0}}^{\Ycal \times \Xcal} : \sum_{y \in \Ycal} \psi(y,\cdot) = n' \right\}$. Observe that conditioning on the aggregation renders the function segments $\uppsi(\cdot,x)$ independent of one another and that they are also Dirichlet-Multinomial, such that $\uppsi(\cdot,x) | \nrm'(x) \sim \DM\big( \nrm'(x),\alpha(\cdot,x) \big)$.
 
 
 
@@ -1087,7 +1088,7 @@ Figure \ref{fig:P_theta_D} shows the influence of the training data on the model
 The joint PMF of $\yrm$ and $\xrm$ conditioned on the training data is expressed as \cite{murphy}
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\yrm,\xrm | \Drm} & = & \mu_{\uptheta | \Drm} = \frac{\alpha + \Psi(\Drm)}{\alpha_0 + N} \\
-& = & \left(\frac{\alpha_0}{\alpha_0 + N}\right) \frac{\alpha}{\alpha_0} + \left(\frac{N}{\alpha_0 + N}\right) \frac{\Psi(\Drm)}{N} \nonumber \\
+& = & \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpha + \left(\frac{N}{\alpha_0 + N}\right) \frac{\Psi(\Drm)}{N} \nonumber \\
 & = & \left(\frac{\alpha_0}{\alpha_0 + N}\right) \Prm_{\yrm,\xrm} + \left(\frac{N}{\alpha_0 + N}\right) \frac{\Psi(\Drm)}{N} \nonumber \;.
 \end{IEEEeqnarray}
 This is a mixture distribution of the prior expectation $\mu_{\uptheta} = \alpha/\alpha_0$ and the empirical distribution $\Psi(\Drm)/N$. The more informative the model prior (i.e. larger $\alpha_0$), the more the prior mean is favored; the more data, the more the empirical PMF is favored. The marginal distribution for $\xrm$ given $\Drm$ is
@@ -1136,8 +1137,8 @@ The Bayesian distributions $\Prm_{\xrm | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm}$ ca
 \end{IEEEeqnarray}
 Similarly, the distribution can be expressed in terms of the empirical PMF sufficient statistic as
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\xrm | \uppsi}(\bar{n}) & = & \mu_{\upthetam | \uppsi}(\bar{n}) = \mu_{\upthetam | \nrm'}\left( \sum_y \bar{n}(y,\cdot) \right) \\
-& = & \frac{\alpha' + \sum_y \bar{n}(y,\cdot)}{\alpha_0 + N} \nonumber \;,
+\Prm_{\xrm | \uppsi}(\psi) & = & \mu_{\upthetam | \uppsi}(\psi) = \mu_{\upthetam | \nrm'}\left( \sum_y \psi(y,\cdot) \right) \\
+& = & \frac{\alpha' + \sum_y \psi(y,\cdot)}{\alpha_0 + N} \nonumber \;,
 \end{IEEEeqnarray}
 where the dependency on $\uppsi$ is expressed only through the marginal random process $\nrm'$.
 
@@ -1148,8 +1149,8 @@ The posterior $\prm_{\upthetac | \xrm,\Drm}$ can be simplified by noting that th
 \end{IEEEeqnarray}
 and the distinct model conditional PMF's are independent from one another. A similar treatment demonstrates that
 \begin{IEEEeqnarray}{rCl}
-\prm_{\upthetac | \uppsi,\xrm}\big( \thetac | \bar{n},x \big) & = & \prm_{\upthetac | \uppsi}\big( \thetac | \bar{n} \big) = \prod_{x' \in \Xcal} \prm_{\upthetac(x') | \uppsi(\cdot,x')}\big(\thetac(x') | \bar{n}(\cdot,x') \big) \\
-& = & \prod_{x' \in \Xcal} \Dir\big( \thetac(x') ; \alpha(\cdot,x') + \bar{n}(\cdot,x') \big) \nonumber \;.
+\prm_{\upthetac | \uppsi,\xrm}\big( \thetac | \psi,x \big) & = & \prm_{\upthetac | \uppsi}\big( \thetac | \psi \big) = \prod_{x' \in \Xcal} \prm_{\upthetac(x') | \uppsi(\cdot,x')}\big(\thetac(x') | \psi(\cdot,x') \big) \\
+& = & \prod_{x' \in \Xcal} \Dir\big( \thetac(x') ; \alpha(\cdot,x') + \psi(\cdot,x') \big) \nonumber \;.
 \end{IEEEeqnarray}
 Observe that when the conditioning is performed using the sufficient statistic, the independent conditional models $\upthetac(x)$ are only dependent on their corresponding subset of the  empirical PMF, $\uppsi(\cdot,x)$.
 
@@ -1160,10 +1161,10 @@ The Bayes predictive PMF can thus be expressed as
 \end{IEEEeqnarray}
 or, via the sufficient statistic,
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\yrm | \xrm,\uppsi}(x,\bar{n}) & = & \mu_{\upthetac(x) | \xrm,\uppsi}(x,\bar{n}) = \mu_{\upthetac(x) | \uppsi(\cdot,x)}\big(\bar{n}(\cdot,x)\big) \\
-& = & \frac{\alpha(\cdot,x) + \bar{n}(\cdot,x)}{\alpha'(x) + \sum_y \bar{n}(y,x)} \nonumber \;.
+\Prm_{\yrm | \xrm,\uppsi}(x,\psi) & = & \mu_{\upthetac(x) | \xrm,\uppsi}(x,\psi) = \mu_{\upthetac(x) | \uppsi(\cdot,x)}\big(\psi(\cdot,x)\big) \\
+& = & \frac{\alpha(\cdot,x) + \psi(\cdot,x)}{\alpha'(x) + \sum_y \psi(y,x)} \nonumber \;.
 \end{IEEEeqnarray}
-A consequence of the Dirichlet prior is that the predictive PMF for a given value of $\xrm$ only depends on the corresponding training data $\uppsi(\cdot,\xrm)$, such that $\Prm_{\yrm | \xrm,\uppsi}(x,\bar{n}) = \Prm_{\yrm | \xrm,\uppsi(\cdot,\xrm)}\big( x,\bar{n}(\cdot,x) \big)$. This is intuitive considering the independence of the conditional models $\thetac(x)$ from one another.
+A consequence of the Dirichlet prior is that the predictive PMF for a given value of $\xrm$ only depends on the corresponding training data $\uppsi(\cdot,\xrm)$, such that $\Prm_{\yrm | \xrm,\uppsi}(x,\psi) = \Prm_{\yrm | \xrm,\uppsi(\cdot,\xrm)}\big( x,\psi(\cdot,x) \big)$. This is intuitive considering the independence of the conditional models $\thetac(x)$ from one another.
 
 
 
@@ -1361,14 +1362,14 @@ The minimum Bayes squared-error is $\Rcal^* = \Erm_{\xrm,\Drm} \left[ \Sigma_{\y
 \end{IEEEeqnarray}
 and assess the expected values of these terms separately using distributions derived from the Dirichlet prior. The first term is simply
 \begin{IEEEeqnarray}{rCl}
-\Erm_{\xrm,\uppsi} \left[ \Erm_{\yrm | \xrm,\uppsi}[\yrm^2] \right] & = & \Erm_{\yrm}[\yrm^2] = \sum_{y \in \Ycal} y^2 \left( \sum_{x \in \Xcal} \frac{\alpha(y,x)}{\alpha_0} \right) \nonumber \\
+\Erm_{\xrm,\uppsi} \left[ \Erm_{\yrm | \xrm,\uppsi}[\yrm^2] \right] & = & \Erm_{\yrm}[\yrm^2] = \sum_{y \in \Ycal} y^2 \left( \sum_{x \in \Xcal} \alpha(y,x) \right) \nonumber \\
 & = & \Erm_{\xrm} \big[ \Erm_{\yrm | \xrm} [ \yrm^2 ] \big] = \sum_{x \in \Xcal} \frac{\alpha'(x)}{\alpha_0} \sum_{y \in \Ycal} y^2 \frac{\alpha(y,x)}{\alpha'(x)} \nonumber \;,
 \end{IEEEeqnarray}
 where the different functions of $\alpha$ are represented by the PMF's of $\yrm$ and $\xrm$. Next, find, 
 \begin{IEEEeqnarray}{rCl}
-\Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] & = & \Erm_{\xrm} \left[ \Erm_{\uppsi | \xrm} \left[ \frac{\big( \alpha'(\xrm) \mu_{\yrm|\xrm} + \sum_{y \in \Ycal} y \bar{\nrm}(y,\xrm) \big)^2}{\alpha'(\xrm) \big(\alpha'(\xrm) + \nrm'(\xrm) \big)^2} \right] \right] \\
-& = & \Erm_{\xrm} \left[ \Erm_{\uppsi} \left[ \frac{\alpha_0 \big( \alpha'(\xrm) \mu_{\yrm|\xrm} + \sum_{y \in \Ycal} y \bar{\nrm}(y,\xrm) \big)^2}{\alpha'(\xrm) \big(\alpha'(\xrm) + \nrm'(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber \\
-& = & \Erm_{\xrm} \left[ \Erm_{\nrm'} \left[ \frac{\alpha_0 \Erm_{\uppsi | \nrm'} \left[ \big( \alpha'(\xrm) \mu_{\yrm|\xrm} + \sum_{y \in \Ycal} y \bar{\nrm}(y,\xrm) \big)^2 \right]}{\alpha'(\xrm) \big(\alpha'(\xrm) + \nrm'(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber \\
+\Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] & = & \Erm_{\xrm} \left[ \Erm_{\uppsi | \xrm} \left[ \frac{\big( \alpha'(\xrm) \mu_{\yrm|\xrm} + \sum_{y \in \Ycal} y \uppsi(y,\xrm) \big)^2}{\alpha'(\xrm) \big(\alpha'(\xrm) + \nrm'(\xrm) \big)^2} \right] \right] \\
+& = & \Erm_{\xrm} \left[ \Erm_{\uppsi} \left[ \frac{\alpha_0 \big( \alpha'(\xrm) \mu_{\yrm|\xrm} + \sum_{y \in \Ycal} y \uppsi(y,\xrm) \big)^2}{\alpha'(\xrm) \big(\alpha'(\xrm) + \nrm'(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber \\
+& = & \Erm_{\xrm} \left[ \Erm_{\nrm'} \left[ \frac{\alpha_0 \Erm_{\uppsi | \nrm'} \left[ \big( \alpha'(\xrm) \mu_{\yrm|\xrm} + \sum_{y \in \Ycal} y \uppsi(y,\xrm) \big)^2 \right]}{\alpha'(\xrm) \big(\alpha'(\xrm) + \nrm'(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber \\
 & = & \ldots \nonumber \\
 & = & \Erm_{\xrm} \left[ \frac{\alpha_0 \Erm_{\nrm'} \Big[ \nrm'(\xrm) \Erm_{\yrm|\xrm}[\yrm^2] + \big( \alpha'(\xrm) + \nrm'(\xrm) + 1 \big) \alpha'(\xrm) \mu_{\yrm|\xrm}^2 \Big]}{\alpha'(\xrm) \big(\alpha'(\xrm) + 1 \big) (\alpha_0+N)} \right] \nonumber \\
 & = & \Erm_{\xrm} \left[ \frac{N \Erm_{\yrm|\xrm}[\yrm^2] + \big( \alpha_0 \alpha'(\xrm) + N \alpha'(\xrm) + \alpha_0 \big) \mu_{\yrm|\xrm}^2 }{\big( \alpha'(\xrm)+1 \big) (\alpha_0+N)} \right] \nonumber \;.
@@ -1379,8 +1380,8 @@ PGR: provide additional steps?
 %\begin{IEEEeqnarray}{L}
 %\Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] =
 %\sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm} \Big[ \Erm_{\uppsi | \xrm} \big[ \Prm_{\yrm | \xrm,\uppsi}(y | \xrm,\uppsi) \Prm_{\yrm | \xrm,\uppsi}(y' | \xrm,\uppsi) \big] \Big] \\
-%= \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm} \left[ \Erm_{\uppsi} \left[ \frac{\alpha_0 \big( \alpha(y,\xrm)+\bar{\nrm}(y,\xrm) \big) \big(\alpha(y',\xrm) + \bar{\nrm}(y',\xrm) \big)}{\alpha'(\xrm) \big(\alpha'(\xrm) + \nrm'(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber \\
-%= \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm} \left[ \Erm_{\nrm'} \left[ \frac{\alpha_0 \Erm_{\uppsi | \nrm'} \left[ \big( \alpha(y,\xrm)+\bar{\nrm}(y,\xrm) \big) \big(\alpha(y',\xrm)+\bar{\nrm}(y',\xrm) \big) \right]}{\alpha'(\xrm) \big(\alpha'(\xrm) + \nrm'(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber \\
+%= \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm} \left[ \Erm_{\uppsi} \left[ \frac{\alpha_0 \big( \alpha(y,\xrm)+\uppsi(y,\xrm) \big) \big(\alpha(y',\xrm) + \uppsi(y',\xrm) \big)}{\alpha'(\xrm) \big(\alpha'(\xrm) + \nrm'(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber \\
+%= \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm} \left[ \Erm_{\nrm'} \left[ \frac{\alpha_0 \Erm_{\uppsi | \nrm'} \left[ \big( \alpha(y,\xrm)+\uppsi(y,\xrm) \big) \big(\alpha(y',\xrm)+\uppsi(y',\xrm) \big) \right]}{\alpha'(\xrm) \big(\alpha'(\xrm) + \nrm'(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber \\
 %= \ldots \nonumber \\
 %= \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm} \left[ \frac{\alpha_0 \Erm_{\nrm'} \Big[ \nrm'(\xrm) \alpha(y,\xrm) \delta[y,y'] + \big( \alpha'(\xrm) + \nrm'(\xrm) + 1 \big) \alpha(y,\xrm) \alpha(y',\xrm) \Big]}{\alpha'(\xrm)^2 \big(\alpha'(\xrm) + 1 \big) (\alpha_0+N)} \right] \nonumber \\
 %= \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm} \left[ \frac{ N \alpha'(\xrm) \alpha(y,\xrm) \delta[y,y'] + \big( \alpha_0 \alpha'(\xrm) + N \alpha'(\xrm) + \alpha_0 \big) \alpha(y,\xrm) \alpha(y',\xrm)}{\alpha'(\xrm)^2 \big(\alpha'(\xrm) + 1 \big) (\alpha_0+N)} \right] \nonumber \\
@@ -1388,9 +1389,9 @@ PGR: provide additional steps?
 %\end{IEEEeqnarray}
 %\begin{IEEEeqnarray}{L}
 %\Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] =
-%\sum_{\bar{n} \in \Theta_\uppsi} \sum_{x \in \Xcal} \Prm_{\xrm,\uppsi}(x,\bar{n}) \left( \sum_{y \in \Ycal} y \Prm_{\yrm | \xrm,\uppsi}(y | x,\bar{n}) \right)^2 \\
-%= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\uppsi} \left[ \frac{\big( \alpha(y,x)+\bar{\nrm}(y,x) \big) \big(\alpha(y',x)+\bar{\nrm}(y',x) \big)}{(\alpha_0+N) \big(\alpha'(x) + \nrm'(x) \big)} \right] \nonumber \\
-%= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\nrm'} \left[ \frac{\Erm_{\uppsi | \nrm'} \left[ \big( \alpha(y,x)+\bar{\nrm}(y,x) \big) \big(\alpha(y',x)+\bar{\nrm}(y',x) \big) \right]}{(\alpha_0+N) \big(\alpha'(x) + \nrm'(x) \big)} \right] \nonumber \\
+%\sum_{\psi \in \Theta_\uppsi} \sum_{x \in \Xcal} \Prm_{\xrm,\uppsi}(x,\psi) \left( \sum_{y \in \Ycal} y \Prm_{\yrm | \xrm,\uppsi}(y | x,\psi) \right)^2 \\
+%= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\uppsi} \left[ \frac{\big( \alpha(y,x)+\uppsi(y,x) \big) \big(\alpha(y',x)+\uppsi(y',x) \big)}{(\alpha_0+N) \big(\alpha'(x) + \nrm'(x) \big)} \right] \nonumber \\
+%= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\nrm'} \left[ \frac{\Erm_{\uppsi | \nrm'} \left[ \big( \alpha(y,x)+\uppsi(y,x) \big) \big(\alpha(y',x)+\uppsi(y',x) \big) \right]}{(\alpha_0+N) \big(\alpha'(x) + \nrm'(x) \big)} \right] \nonumber \\
 %= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \frac{\Erm_{\nrm'} \Big[ \nrm'(x) \alpha'(x) \alpha(y,x) \delta[y,y'] + \alpha'(x) \big( \alpha'(x) + \nrm'(x) + 1 \big) \alpha(y,x) \alpha(y',x) \Big]}{(\alpha_0+N) \big(\alpha'(x) + 1 \big) \alpha'(x)^2} \nonumber \\
 %= \sum_{x \in \Xcal} \frac{\Erm_{\nrm'} \Big[ \nrm'(x) \Erm_{\yrm|\xrm}[\yrm^2](x) + \alpha'(x) \big( \alpha'(x) + \nrm'(x) + 1 \big) \mu_{\yrm | \xrm}^2(x) \Big]}{(\alpha_0+N) \big(\alpha'(x) + 1 \big)} \nonumber \\
 %= \sum_{x \in \Xcal} \frac{N \alpha'(x) \Erm_{\yrm|\xrm}[\yrm^2](x) + \alpha'(x) \big( \alpha_0 \alpha'(x) + N \alpha'(x) + 1 \big) \mu_{\yrm | \xrm}^2(x) }{\alpha_0 (\alpha_0+N) \big(\alpha'(x) + 1 \big)} \nonumber \\
@@ -1398,14 +1399,14 @@ PGR: provide additional steps?
 %\end{IEEEeqnarray}
 %\begin{IEEEeqnarray}{L}
 %\Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] =
-%\sum_{\bar{n} \in \Theta_\uppsi} \sum_{x \in \Xcal} \Prm_{\xrm,\uppsi}(x,\bar{n}) \left( \sum_{y \in \Ycal} y \Prm_{\yrm | \xrm,\uppsi}(y | x,\bar{n}) \right)^2 \\
-%= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\uppsi} \left[ \frac{\big( \alpha(y,x)+\bar{\nrm}(y,x) \big) \big(\alpha(y',x)+\bar{\nrm}(y',x) \big)}{(\alpha_0+N) \big(\alpha'(x) + \nrm'(x) \big)} \right] \nonumber \\
-%= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\nrm'} \left[ \frac{\Erm_{\uppsi | \nrm'} \left[ \big( \alpha(y,x)+\bar{\nrm}(y,x) \big) \big(\alpha(y',x)+\bar{\nrm}(y',x) \big) \right]}{(\alpha_0+N) \big(\alpha'(x) + \nrm'(x) \big)} \right] \nonumber \\
+%\sum_{\psi \in \Theta_\uppsi} \sum_{x \in \Xcal} \Prm_{\xrm,\uppsi}(x,\psi) \left( \sum_{y \in \Ycal} y \Prm_{\yrm | \xrm,\uppsi}(y | x,\psi) \right)^2 \\
+%= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\uppsi} \left[ \frac{\big( \alpha(y,x)+\uppsi(y,x) \big) \big(\alpha(y',x)+\uppsi(y',x) \big)}{(\alpha_0+N) \big(\alpha'(x) + \nrm'(x) \big)} \right] \nonumber \\
+%= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\nrm'} \left[ \frac{\Erm_{\uppsi | \nrm'} \left[ \big( \alpha(y,x)+\uppsi(y,x) \big) \big(\alpha(y',x)+\uppsi(y',x) \big) \right]}{(\alpha_0+N) \big(\alpha'(x) + \nrm'(x) \big)} \right] \nonumber \\
 %= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \frac{\Erm_{\nrm'} \Big[ \nrm'(x) \frac{\alpha(y,x)}{\alpha'(x)} \delta[y,y'] + \alpha'(x) \big( \alpha'(x) + \nrm'(x) + 1 \big) \frac{\alpha(y,x)}{\alpha'(x)} \frac{\alpha(y',x)}{\alpha'(x)} \Big]}{(\alpha_0+N) \big(\alpha'(x) + 1 \big)} \nonumber \\
 %= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \left(\frac{\alpha'(x)}{\alpha_0}\right)  \frac{N \frac{\alpha(y,x)}{\alpha'(x)} \delta[y,y'] + \big( N \alpha'(x) + \alpha_0 \alpha'(x) + \alpha_0 \big) \frac{\alpha(y,x)}{\alpha'(x)} \frac{\alpha(y',x)}{\alpha'(x)}}{(\alpha_0+N) \big( \alpha'(x)+1 \big)} \nonumber \\
 %= \sum_{x \in \Xcal} \left(\frac{\alpha'(x)}{\alpha_0}\right)  \frac{N \left( \sum_{y \in \Ycal} \frac{\alpha(y,x)}{\alpha'(x)} y^2 \right) + \big( N \alpha'(x) + \alpha_0 \alpha'(x) + \alpha_0 \big) \left( \sum_{y \in \Ycal} \frac{\alpha(y,x)}{\alpha'(x)} y \right)^2 }{(\alpha_0+N) \big( \alpha'(x)+1 \big)} \nonumber \;.
 %\end{IEEEeqnarray}
-The above formulation exploits the statistical characterization of the aggregation, $\nrm' \sim \DM(N,\alpha')$; also used is the property that the Dirichlet-Multinomial random process $\uppsi$ conditioned on its aggregation $\nrm'$ yields independent  conditional DM functions $\bar{\nrm}(\cdot,x) | \nrm'(x) \sim \DM\big( \nrm'(x),\alpha(\cdot,x) \big)$.
+The above formulation exploits the statistical characterization of the aggregation, $\nrm' \sim \DM(N,\alpha')$; also used is the property that the Dirichlet-Multinomial random process $\uppsi$ conditioned on its aggregation $\nrm'$ yields independent  conditional DM functions $\uppsi(\cdot,x) | \nrm'(x) \sim \DM\big( \nrm'(x),\alpha(\cdot,x) \big)$.
 
 PGR: move to appendix???
 
@@ -1710,8 +1711,8 @@ a conditional majority decision which chooses the class from $\Ycal$ most often 
 Evaluating the minimum risk \eqref{eq:risk_min_01} using the distributions derived from the Dirichlet prior, the Bayes minimum probability of error is 
 \begin{IEEEeqnarray}{rCl}
 \Rcal^* & = & 1 - \Erm_{\xrm,\Drm} \left[ \max_{y \in \Ycal} \Prm_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) \right] \\
-& = & 1 - \Erm_{\xrm,\uppsi} \left[ \frac{ \max_{y \in \Ycal} \big( \alpha(y,x) + \bar{\nrm}(y,x) \big)}{\alpha'(x) + \nrm'(x)} \right] \nonumber \\
-& = & 1 - \sum_{x \in \Xcal} \frac{\Erm_{\uppsi} \Big[ \max_{y \in \Ycal} \big( \alpha(y,x) + \bar{\nrm}(y,x) \big) \Big]}{\alpha_0 + N} \nonumber \;.
+& = & 1 - \Erm_{\xrm,\uppsi} \left[ \frac{ \max_{y \in \Ycal} \big( \alpha(y,x) + \uppsi(y,x) \big)}{\alpha'(x) + \nrm'(x)} \right] \nonumber \\
+& = & 1 - \sum_{x \in \Xcal} \frac{\Erm_{\uppsi} \Big[ \max_{y \in \Ycal} \big( \alpha(y,x) + \uppsi(y,x) \big) \Big]}{\alpha_0 + N} \nonumber \;.
 \end{IEEEeqnarray}
 Figures \ref{fig:Risk_01_Dir_N_leg_a0} and \ref{fig:Risk_01_Dir_a0_leg_N} plot the minimum Bayes probability of error against training data volume $N$ and prior concentration $\alpha_0$, respectively. Note that for $N = 0$, the Bayes risk is $\Rcal^* = 1 - \sum_{x \in \Xcal} \frac{\max_{y \in \Ycal} \alpha(y,x)}{\alpha_0}$. Additionally, consider the risk for maximal/minimal values of the Dirichlet concentration. For $\alpha_0 \to 0$ (and $N > 1$), the risk is $\Rcal^* = 0$; conversely, for $\alpha_0 \to \infty$, the risk tends to $\Rcal^* \to 1 - \sum_{x \in \Xcal} \frac{\max_{y \in \Ycal} \alpha(y,x)}{\alpha_0}$. These trends can be visualized in Figures \ref{fig:Risk_01_Dir_Pyx__a0_high} and \ref{fig:Risk_01_Dir_Pyx__a0_low}.
 
@@ -1801,23 +1802,23 @@ PGR: add nmax CDF fig!
 Using the uniform prior, the minimum Bayes 0-1 risk is 
 \begin{IEEEeqnarray}{rCl}
 \Rcal^* & = & 1 - \Erm_{\xrm,\Drm} \left[ \max_{y \in \Ycal} \Prm_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) \right] \\
-& = & 1 - \sum_{x \in \Xcal} \frac{\Erm_{\uppsi} \big[ \max_{y \in \Ycal} \bar{\nrm}(y,x) \big] + 1}{|\Ycal||\Xcal| + N} \nonumber \\
-& = & 1 - \frac{1 + |\Xcal|^{-1} \sum_{x \in \Xcal} \Erm_{\uppsi} \big[ \max_{y \in \Ycal} \bar{\nrm}(y,x) \big]}{|\Ycal| + N/|\Xcal|} \nonumber \;.
+& = & 1 - \sum_{x \in \Xcal} \frac{\Erm_{\uppsi} \big[ \max_{y \in \Ycal} \uppsi(y,x) \big] + 1}{|\Ycal||\Xcal| + N} \nonumber \\
+& = & 1 - \frac{1 + |\Xcal|^{-1} \sum_{x \in \Xcal} \Erm_{\uppsi} \big[ \max_{y \in \Ycal} \uppsi(y,x) \big]}{|\Ycal| + N/|\Xcal|} \nonumber \;.
 \end{IEEEeqnarray}
 The expectation operates on the maximum value from a subset of a uniform Dirichlet-Multinomial random process. Via the Dirichlet-Multinomial aggregation property \cite{johnson}, a consequence of the the uniform PMF $\Prm_{\uppsi}$ is that the individual segments $\uppsi(\cdot,x)$ are identically distributed; thus, the expectation will be same for every value $x$.
 
-To evaluate this expectation, new random variables $\uppsi_{\max}(x) \equiv \max_{y \in \Ycal} \uppsi(y,x)$ are introduced and characterized by their identical PMF. To this end, the probability of the event $\Prm\big( \uppsi_{\max}(x) \geq n \big) = \Prm\big( \cup_{y \in \Ycal} \{ \uppsi(y,x) \geq n \} \big)$ will be determined. As the distribution of $\uppsi$ is uniform, the event probability is proportionate to the cardinality of the set $\cup_{y \in \Ycal} \{ \bar{n}: \bar{n}(y,x) \geq n \}$. Using the inclusion-exclusion principle \cite{brualdi}, the cardinality is represented as
+To evaluate this expectation, new random variables $\uppsi_{\max}(x) \equiv \max_{y \in \Ycal} \uppsi(y,x)$ are introduced and characterized by their identical PMF. To this end, the probability of the event $\Prm\big( \uppsi_{\max}(x) \geq n \big) = \Prm\big( \cup_{y \in \Ycal} \{ \uppsi(y,x) \geq n \} \big)$ will be determined. As the distribution of $\uppsi$ is uniform, the event probability is proportionate to the cardinality of the set $\cup_{y \in \Ycal} \{ \psi: \psi(y,x) \geq n \}$. Using the inclusion-exclusion principle \cite{brualdi}, the cardinality is represented as
 \begin{IEEEeqnarray}{L}
-\big| \cup_{y \in \Ycal} \{ \bar{n} : \bar{n}(y,x) \geq n \} \big| \\
+\big| \cup_{y \in \Ycal} \{ \psi : \psi(y,x) \geq n \} \big| \\
 \quad = \begin{cases} \binom{N+|\Ycal||\Xcal|-1}{|\Ycal||\Xcal|-1} & \mathrm{if} \ n < 0, \\ \sum_{m=1}^{|\Ycal|} \binom{|\Ycal|}{m} (-1)^{m-1} \binom{N-mn+|\Ycal||\Xcal|-1}{|\Ycal||\Xcal|-1} H\Big( \big\lfloor\frac{N}{m}\big\rfloor - n \Big) & \mathrm{if} \ 0 \leq n \leq N, \\ 0 & \mathrm{if} \ n > N, \end{cases} \nonumber
 \end{IEEEeqnarray}
 where $H: \Zbb \mapsto \{0,1\}$ is the discrete Heaviside step function. For $n < 0$, the cardinality is equivalent to $|\Theta_\uppsi|$. 
 
-For $0 \leq n < N$, the cardinality is an alternating binomial summation where the $m^\mathrm{th}$ term accounts for the different intersections of $m$ of the $|\Ycal|$ individual sets $\{ \bar{n} : \bar{n}(y,x) \geq n \}$. Observe that the cardinality of the intersections is only dependent on the number of contributing sets $m$ and not on which sets intersect. Furthermore, note the dependency of the intersection cardinalities on the argument $n$. The step function contributes such that if $n > \big\lfloor\frac{N}{m}\big\rfloor$, only up to $m-1$ individual sets will intersect. The binomial coefficient $\Mcal\big( \{N-mn,|\Ycal||\Xcal|-1\} \big)$ provides the intersection cardinality for a given $m$; note the similarity to the cardinality $|\Theta_\uppsi|$ - the only difference is the number of points that grid the $|\Ycal||\Xcal|-1$ dimensional region.
+For $0 \leq n < N$, the cardinality is an alternating binomial summation where the $m^\mathrm{th}$ term accounts for the different intersections of $m$ of the $|\Ycal|$ individual sets $\{ \psi : \psi(y,x) \geq n \}$. Observe that the cardinality of the intersections is only dependent on the number of contributing sets $m$ and not on which sets intersect. Furthermore, note the dependency of the intersection cardinalities on the argument $n$. The step function contributes such that if $n > \big\lfloor\frac{N}{m}\big\rfloor$, only up to $m-1$ individual sets will intersect. The binomial coefficient $\Mcal\big( \{N-mn,|\Ycal||\Xcal|-1\} \big)$ provides the intersection cardinality for a given $m$; note the similarity to the cardinality $|\Theta_\uppsi|$ - the only difference is the number of points that grid the $|\Ycal||\Xcal|-1$ dimensional region.
 
 The probability of interest can thus be expressed as
 \begin{IEEEeqnarray}{L}
-\Prm\big( \uppsi_{\max}(x) \geq n \big) = \binom{N+|\Ycal||\Xcal|-1}{|\Ycal||\Xcal|-1}^{-1} \big| \cup_{y \in \Ycal} \{ \bar{n} : \bar{n}(y,x) \geq n \} \big| \\
+\Prm\big( \uppsi_{\max}(x) \geq n \big) = \binom{N+|\Ycal||\Xcal|-1}{|\Ycal||\Xcal|-1}^{-1} \big| \cup_{y \in \Ycal} \{ \psi : \psi(y,x) \geq n \} \big| \\
 \quad = \begin{cases} 1 & \mathrm{if} \ n < 0, \\ \sum_{m=1}^{|\Ycal|} \binom{|\Ycal|}{m} (-1)^{m-1} \prod_{l=1}^{|\Ycal||\Xcal|-1} \Big( 1-\frac{mn}{N+l} \Big) H\Big( \big\lfloor\frac{N}{m}\big\rfloor - n \Big) & \mathrm{if} \ 0 \leq n \leq N, \\ 0 & \mathrm{if} \ n > N. \end{cases} \nonumber
 \end{IEEEeqnarray}
 
@@ -2008,11 +2009,11 @@ PGR: Valid model representation? Marginals instead?
 
 
 \begin{IEEEeqnarray}{rCl}
-\prm(\uptheta) & = & \beta(\alpha)^{-1} \prod_{y \in \Ycal} \uptheta(y)^{\alpha(y) - 1} \;,
+\prm(\uptheta) & = & \beta(\alpha_0 \alpha)^{-1} \prod_{y \in \Ycal} \uptheta(y)^{\alpha(y) - 1} \;,
 \end{IEEEeqnarray}
 
 \begin{equation}
-\beta(\alpha) = \frac{\prod_{y \in \Ycal} \Gamma\big( \alpha(y) \big)}{\Gamma \left( \sum_{y \in \Ycal} \alpha(y) \right)} \;.
+\beta(\alpha_0 \alpha) = \frac{\prod_{y \in \Ycal} \Gamma\big( \alpha(y) \big)}{\Gamma \left( \sum_{y \in \Ycal} \alpha(y) \right)} \;.
 \end{equation}
 
 The first and second joint moments of the model are 
@@ -2034,27 +2035,27 @@ and
 \end{equation}
 
 \begin{equation}
-\Prm(\uppsi | \uptheta) = \Mcal(\uppsi) \prod_{y \in \Ycal} \uptheta(y)^{\bar{\nrm}(y)} \;,
+\Prm(\uppsi | \uptheta) = \Mcal(\uppsi) \prod_{y \in \Ycal} \uptheta(y)^{\uppsi(y)} \;,
 \end{equation}
 
 Thus,
 \begin{IEEEeqnarray}{rCl}
-\Prm(\uppsi) & = & \Mcal(\uppsi) \beta(\alpha)^{-1} \beta(\alpha + \uppsi) \;.
+\Prm(\uppsi) & = & \Mcal(\uppsi) \beta(\alpha_0 \alpha)^{-1} \beta(\alpha + \uppsi) \;.
 \end{IEEEeqnarray}
 
 The first and second joint moments of $\uppsi$ are
 \begin{equation}
-\Erm_{\bar{\nrm}}\big[ \bar{\nrm}(y) \big] = N \frac{\alpha(y)}{\alpha_0}
+\Erm_{\uppsi}\big[ \uppsi(y) \big] = N \frac{\alpha(y)}{\alpha_0}
 \end{equation}
 and
 \begin{equation}
-\Erm_{\bar{\nrm}}\big[ \bar{\nrm}(y) \bar{\nrm}(y') \big] 
+\Erm_{\uppsi}\big[ \uppsi(y) \uppsi(y') \big] 
 = \frac{N}{\alpha_0 (\alpha_0+1)} \big( (\alpha_0 + N)\alpha(y) \delta[y,y'] + (N-1) \alpha(y) \alpha(y') \big) \;.
 \end{equation}
 
 Also,
 \begin{equation}
-\Prm(\Drm) = \beta(\alpha)^{-1} \beta \big( \alpha + \Psi(\Drm) \big) \;.
+\Prm(\Drm) = \beta(\alpha_0 \alpha)^{-1} \beta \big( \alpha + \Psi(\Drm) \big) \;.
 \end{equation}
 
 
@@ -2071,7 +2072,7 @@ Also,
 
 \begin{IEEEeqnarray}{rCL}
 \prm(\theta | \uppsi) = \beta \left( \alpha + \uppsi \right)^{-1} 
-\prod_{y \in \Ycal} \uptheta(y)^{\alpha(y) + \bar{\nrm}(y) - 1} \;,
+\prod_{y \in \Ycal} \uptheta(y)^{\alpha(y) + \uppsi(y) - 1} \;,
 \end{IEEEeqnarray}
 
 The PMF of interest is
@@ -2083,8 +2084,8 @@ The PMF of interest is
 
 \begin{IEEEeqnarray}{rCl}
 \Prm(\yrm | \uppsi) & = & \Erm_{\theta | \uppsi} \big[ \theta(\yrm) | \uppsi \big] \\
-& = & \frac{\alpha(\yrm) + \bar{\nrm}(\yrm)}{\alpha_0 + N} \nonumber \\
-& = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \frac{\alpha(\yrm)}{\alpha_0} + \left(\frac{N}{\alpha_0+N}\right) \frac{\bar{\nrm}(\yrm)}{N} \nonumber
+& = & \frac{\alpha(\yrm) + \uppsi(\yrm)}{\alpha_0 + N} \nonumber \\
+& = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \frac{\alpha(\yrm)}{\alpha_0} + \left(\frac{N}{\alpha_0+N}\right) \frac{\uppsi(\yrm)}{N} \nonumber
 \end{IEEEeqnarray}
 
 
@@ -2151,14 +2152,14 @@ PGR: ???
 
 \subsubsection{Model $\uptheta$ Characterization}
 
-The model is now a continuous-domain Dirichlet process $\uptheta \sim \DP(\alpha)$. The concentration parameter is $\alpha_0 \equiv \int_{y \in \Ycal} \alpha(y) \mathrm{d} y$. By definition, for any partition of the set $\Ycal$, $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$, we can generate a Dirichlet random process $\upphi(z) \equiv \int_{\Scal(z)} \uptheta(y) \mathrm{d} y$ with parameterizing function $\lambda(z) \equiv \int_{\Scal(z)} \alpha(y) \mathrm{d} y$. This is commonly referred to as the aggregation property. The PDF for the aggregation is thus
+The model is now a continuous-domain Dirichlet process $\uptheta \sim \DP(\alpha_0 \alpha)$. The concentration parameter is $\alpha_0 \equiv \int_{y \in \Ycal} \alpha(y) \mathrm{d} y$. By definition, for any partition of the set $\Ycal$, $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$, we can generate a Dirichlet random process $\upphi(z) \equiv \int_{\Scal(z)} \uptheta(y) \mathrm{d} y$ with parameterizing function $\lambda(z) \equiv \int_{\Scal(z)} \alpha(y) \mathrm{d} y$. This is commonly referred to as the aggregation property. The PDF for the aggregation is thus
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\upphi}(\phi) & = & \beta(\lambda)^{-1} \prod_{z \in \Zcal} \phi(z)^{\lambda(z) - 1} \;.
 \end{IEEEeqnarray}
 
 As detailed in Appendix \ref{app:E_DP}, the first and second moments of the Dirichlet process $\uptheta$ are
 \begin{equation}
-\mu_{\uptheta} = \frac{\alpha}{\alpha_0}
+\mu_{\uptheta} = \alpha
 \end{equation}
 and
 \begin{IEEEeqnarray}{rCl}
@@ -2173,11 +2174,11 @@ Again, $\prm_{\yrm} = \prm_{\Drm_n} = \mu_{\uptheta}$ for all $n$.
 
 \subsubsection{Output conditional PDF, $\prm_{\yrm | \Drm}$}
 
-In Appendix \ref{app:DP_post}, it was shown that if the model $\uptheta \sim \DP(\alpha)$ is a Dirichlet process, then the model conditioned on the training data $\Drm$ is also a Dirichlet process with parameterizing function $\alpha + \Psi(\Drm)$, where $\Psi(y;\Drm) = \sum_{n=1}^N \delta\left( y - \Drm_n \right)$ generalizes for a continuous domain. Thus, the conditional PDF of interest can be formulated as
+In Appendix \ref{app:DP_post}, it was shown that if the model $\uptheta \sim \DP(\alpha_0 \alpha)$ is a Dirichlet process, then the model conditioned on the training data $\Drm$ is also a Dirichlet process with parameterizing function $\alpha + \Psi(\Drm)$, where $\Psi(y;\Drm) = \sum_{n=1}^N \delta\left( y - \Drm_n \right)$ generalizes for a continuous domain. Thus, the conditional PDF of interest can be formulated as
 \begin{IEEEeqnarray}{rCl}
 \prm_{\yrm | \Drm} & = & \mu_{\uptheta | \Drm} \\
 & = & \frac{\alpha + \Psi(\Drm)}{\alpha_0 + N} = \frac{\alpha + \sum_{n=1}^N \delta\big( \cdot - \Drm_n \big)}{\alpha_0 + N} \nonumber \\
-& = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \frac{\alpha}{\alpha_0} + \left(\frac{N}{\alpha_0+N}\right) \frac{\sum_{n=1}^N \delta\big( \cdot - \Drm_n \big)}{N} \nonumber \\
+& = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \alpha + \left(\frac{N}{\alpha_0+N}\right) \frac{\sum_{n=1}^N \delta\big( \cdot - \Drm_n \big)}{N} \nonumber \\
 & = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \prm_{\yrm} + \left(\frac{N}{\alpha_0+N}\right) \frac{\sum_{n=1}^N \delta\big( \cdot - \Drm_n \big)}{N} \nonumber \;.
 \end{IEEEeqnarray}
 With the generalization to a Euclidean space $\Ycal$, the training data dependent component of the PDF is formulated with Dirac delta functions. 
@@ -2229,13 +2230,13 @@ PGR: move proofs to appendix???
 
 PGR PGR: Dirichlet-Multinomial Process perspective???
 
-Define the Dirichlet-Multinomial process $\bar{\nrm} \equiv \Psi(\Drm)$. The mean and correlation functions below are found in Appendix \ref{app:DMP}. The mean function is
+Define the Dirichlet-Multinomial process $\uppsi \equiv \Psi(\Drm)$. The mean and correlation functions below are found in Appendix \ref{app:DMP}. The mean function is
 \begin{IEEEeqnarray}{rCl}
-\mu_{\uppsi} & = & N \frac{\alpha}{\alpha_0} 
+\mu_{\uppsi} & = & N \alpha 
 \end{IEEEeqnarray}
 and the correlation function is
 \begin{IEEEeqnarray}{rCl}
-\Erm_{\uppsi}\big[ \bar{\nrm}(y) \bar{\nrm}(y') \big] & = & \frac{N}{\alpha_0 (\alpha_0+1)} \big[ (N-1)\alpha(y) \alpha(y') + (\alpha_0+N) \alpha(y) \delta(y-y') \big] \;.
+\Erm_{\uppsi}\big[ \uppsi(y) \uppsi(y') \big] & = & \frac{N}{\alpha_0 (\alpha_0+1)} \big[ (N-1)\alpha(y) \alpha(y') + (\alpha_0+N) \alpha(y) \delta(y-y') \big] \;.
 \end{IEEEeqnarray}
 
 
@@ -2315,8 +2316,8 @@ and the expectations of the two terms are evaluated separately.
 PGR: DMP PERSPECTIVE???
 
 \begin{IEEEeqnarray}{L}
-\Erm_{\Drm}\big[ \mu_{\yrm | \Drm}^2 \big] = \Erm_{\bar{\nrm}}\big[ \mu_{\yrm | \bar{\nrm}}^2 \big] \\
-\quad = \frac{\alpha_0^2 \mu_{\yrm}^2 + 2\alpha_0 \mu_{\yrm} \int_{\Ycal} y \mu_{\bar{\nrm}}(y) \big] \mathrm{d}y + \int_{\Ycal} \int_{\Ycal} y y'\Erm_{\uppsi}\big[ \bar{\nrm}(y)\bar{\nrm}(y') \big] \mathrm{d}y \mathrm{d}y'}{(\alpha_0+N)^2} \nonumber \\
+\Erm_{\Drm}\big[ \mu_{\yrm | \Drm}^2 \big] = \Erm_{\uppsi}\big[ \mu_{\yrm | \uppsi}^2 \big] \\
+\quad = \frac{\alpha_0^2 \mu_{\yrm}^2 + 2\alpha_0 \mu_{\yrm} \int_{\Ycal} y \mu_{\uppsi}(y) \big] \mathrm{d}y + \int_{\Ycal} \int_{\Ycal} y y'\Erm_{\uppsi}\big[ \uppsi(y)\uppsi(y') \big] \mathrm{d}y \mathrm{d}y'}{(\alpha_0+N)^2} \nonumber \\
 \quad = \frac{\alpha_0^2 \mu_{\yrm}^2 + 2\alpha_0 N \mu_{\yrm}^2 + N(N-1)\alpha_0(\alpha_0+1)^{-1} \mu_{\yrm}^2 + N(\alpha_0+N)(\alpha_0+1)^{-1}\Erm_{\yrm}[\yrm^2]}{(\alpha_0+N)^2} \nonumber \\
 \quad = \frac{\alpha_0(\alpha_0+N+1)\mu_{\yrm}^2 + N\Erm_{\yrm}[\yrm^2]}{(\alpha_0+1)(\alpha_0+N)} \nonumber
 \end{IEEEeqnarray}
@@ -2355,14 +2356,14 @@ PGR
 
 \subsubsection{Model $\uptheta$ Characterization}
 
-The model is characterized by a Dirichlet process $\uptheta \sim \DP(\alpha)$ with parameter function $\alpha : \Ycal \times \Xcal \mapsto \Rbb^+$. The concentration parameter generalizes to $\alpha_0 = \int_{\Ycal} \int_{\Xcal} \alpha(y,x) \mathrm{d} x \mathrm{d} y$. Using the aggregation property, any partition of the set $\Ycal \times \Xcal$, $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$ is a Dirichlet random process $\upphi(z) = \iint_{\Scal(z)} \uptheta(y,x) \mathrm{d} x \mathrm{d} y$ with parameterizing function $\lambda(z) = \iint_{\Scal(z)} \alpha(y,x) \mathrm{d} x \mathrm{d} y$. The PDF for the aggregation is
+The model is characterized by a Dirichlet process $\uptheta \sim \DP(\alpha_0 \alpha)$ with parameter function $\alpha : \Ycal \times \Xcal \mapsto \Rbb^+$. The concentration parameter generalizes to $\alpha_0 = \int_{\Ycal} \int_{\Xcal} \alpha(y,x) \mathrm{d} x \mathrm{d} y$. Using the aggregation property, any partition of the set $\Ycal \times \Xcal$, $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$ is a Dirichlet random process $\upphi(z) = \iint_{\Scal(z)} \uptheta(y,x) \mathrm{d} x \mathrm{d} y$ with parameterizing function $\lambda(z) = \iint_{\Scal(z)} \alpha(y,x) \mathrm{d} x \mathrm{d} y$. The PDF for the aggregation is
 \begin{IEEEeqnarray}{rCl}
 \prm_{\upphi}(\phi) & = & \beta(\lambda)^{-1} \prod_{z \in \Zcal} \phi(z)^{\lambda(z) - 1} \;.
 \end{IEEEeqnarray}
 
-The expected value of a Dirichlet process generalizes to $\DP(\alpha)$
+The expected value of a Dirichlet process generalizes to $\DP(\alpha_0 \alpha)$
 \begin{equation}
-\mu_{\uptheta} = \frac{\alpha}{\alpha_0}
+\mu_{\uptheta} = \alpha
 \end{equation}
 and the correlation function is
 \begin{IEEEeqnarray}{rCl}
@@ -2383,7 +2384,7 @@ The PDF $\prm_{\yrm,\xrm | \Drm}$ is thus
 \prm_{\yrm,\xrm | \Drm} & = & \mu_{\uptheta | \Drm} \\
 & = & \frac{\alpha + \Psi(\Drm)}{\alpha_0 + N} \nonumber \\
 & = & \frac{\alpha + \sum_{n=1}^N \delta\big( \cdot - \Yrm_n \big)\delta\big( \cdot - \Xrm_n \big)}{\alpha_0 + N} \nonumber \\
-& = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \frac{\alpha}{\alpha_0} + \left(\frac{N}{\alpha_0+N}\right) \frac{\sum_{n=1}^N \delta\big( \cdot - \Yrm_n \big) \delta\big( \cdot - \Xrm_n \big)}{N} \nonumber
+& = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \alpha + \left(\frac{N}{\alpha_0+N}\right) \frac{\sum_{n=1}^N \delta\big( \cdot - \Yrm_n \big) \delta\big( \cdot - \Xrm_n \big)}{N} \nonumber
 \end{IEEEeqnarray}
 and the conditional PDF of interest is
 \begin{IEEEeqnarray}{rCl}
@@ -2479,22 +2480,22 @@ PGR: Add Y given X equations (with Betas) for discrete case in previous chapters
 
 PGR: Dirichlet-Multinomial Process perspective
 
-We have the DMP $\bar{\nrm} \equiv \Psi(\Drm)$ with mean and correlation functions
+We have the DMP $\uppsi \equiv \Psi(\Drm)$ with mean and correlation functions
 \begin{IEEEeqnarray}{rCl}
-\mu_{\bar{\nrm}} & = & N \frac{\alpha}{\alpha_0} 
+\mu_{\uppsi} & = & N \alpha 
 \end{IEEEeqnarray}
 and
 \begin{IEEEeqnarray}{L}
-\Erm_{\uppsi}\big[ \bar{\nrm}(y,x) \bar{\nrm}(y',x') \big] \\
+\Erm_{\uppsi}\big[ \uppsi(y,x) \uppsi(y',x') \big] \\
 \quad = \frac{N}{\alpha_0 (\alpha_0+1)} \big[ (N-1)\alpha(y,x) \alpha(y',x') + (\alpha_0+N) \alpha(y,x) \delta(y-y') \delta(x-x') \big] \nonumber \;.
 \end{IEEEeqnarray}
 
-Observe that by the aggregation principle, $\nrm' = \int_{\Ycal} \bar{\nrm}(y,\cdot) \mathrm{d}y \equiv \sum_{n=1}^N \delta\big( \cdot - \Xrm_n \big)$ is a DMP over the set $\Xcal$ with parametrizing function $\alpha' : \Xcal \mapsto \Rbb^+$.
+Observe that by the aggregation principle, $\nrm' = \int_{\Ycal} \uppsi(y,\cdot) \mathrm{d}y \equiv \sum_{n=1}^N \delta\big( \cdot - \Xrm_n \big)$ is a DMP over the set $\Xcal$ with parametrizing function $\alpha' : \Xcal \mapsto \Rbb^+$.
 
 Additionally, the 1-dimensional subsets conditioned on the marginalized DMP are characterized as
 
 \begin{equation}
-\frac{\bar{\nrm}(\cdot,x)}{\delta(0)} \Big| \nrm'(x) \sim \DMP\left( \frac{\nrm'(x)}{\delta(0)},\frac{\alpha(\cdot,x)}{\delta(0)} \right)
+\frac{\uppsi(\cdot,x)}{\delta(0)} \Big| \nrm'(x) \sim \DMP\left( \frac{\nrm'(x)}{\delta(0)},\frac{\alpha(\cdot,x)}{\delta(0)} \right)
 \end{equation}
 
 PGR: add proof???
@@ -2554,22 +2555,22 @@ f^*(\xrm;\Drm) & = & \mu_{\yrm | \xrm,\Drm}  = \Erm_{\uptheta | \xrm,\Drm} \left
 Generalizing from the basic model discussion, we again have
 \begin{IEEEeqnarray}{rCl}
 \Rcal^* & = & \Erm_{\xrm,\Drm} \left[ \Sigma_{\yrm | \xrm,\Drm} \right]
-= \Erm_{\xrm,\bar{\nrm}} \left[ \Sigma_{\yrm | \xrm,\bar{\nrm}} \right] \\
+= \Erm_{\xrm,\uppsi} \left[ \Sigma_{\yrm | \xrm,\uppsi} \right] \\
 & = & \Erm_{\xrm,\uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right] + \Erm_{\xrm,\Drm} \Big[ \Crm_{\uptheta | \xrm,\Drm} \big[ \mu_{\yrm | \xrm,\uptheta} \big] \Big] \nonumber \;,
 \end{IEEEeqnarray}
-where we choose to perform the expectation over $\bar{\nrm}$. 
+where we choose to perform the expectation over $\uppsi$. 
 
 The conditional varance is now
 \begin{IEEEeqnarray}{rCl}
-\Sigma_{\yrm | \xrm,\bar{\nrm}} & = & \Erm_{\yrm | \xrm,\bar{\nrm}}\big[ \yrm^2 \big]
-- \mu_{\yrm | \xrm,\bar{\nrm}}^2 \;.
+\Sigma_{\yrm | \xrm,\uppsi} & = & \Erm_{\yrm | \xrm,\uppsi}\big[ \yrm^2 \big]
+- \mu_{\yrm | \xrm,\uppsi}^2 \;.
 \end{IEEEeqnarray}
 and the two terms are independently evaluated.
 
 
 \begin{IEEEeqnarray}{L}
-\Erm_{\xrm,\Drm}\big[ \Erm_{\yrm | \xrm,\Drm}\big[ \yrm^2 \big] \big] = \Erm_{\xrm,\bar{\nrm}}\Big[ \Erm_{\yrm | \xrm,\bar{\nrm}}\big[ \yrm^2 \big] \Big] \\
-\quad = \Erm_{\yrm}[\yrm^2] = \int_{\Ycal} y^2 \int_{\Xcal} \frac{\alpha(y,x)}{\alpha_0} \mathrm{d} x \mathrm{d}y \nonumber \\
+\Erm_{\xrm,\Drm}\big[ \Erm_{\yrm | \xrm,\Drm}\big[ \yrm^2 \big] \big] = \Erm_{\xrm,\uppsi}\Big[ \Erm_{\yrm | \xrm,\uppsi}\big[ \yrm^2 \big] \Big] \\
+\quad = \Erm_{\yrm}[\yrm^2] = \int_{\Ycal} y^2 \int_{\Xcal} \alpha(y,x) \mathrm{d} x \mathrm{d}y \nonumber \\
 \quad = \Erm_{\xrm}\big[ \Erm_{\yrm | \xrm}[\yrm^2] \big] = \int_{\Xcal} \frac{\alpha'(x)}{\alpha_0} \int_{\Ycal} y^2 \frac{\alpha(y,x)}{\alpha'(x)} \mathrm{d} y \mathrm{d}x \nonumber \;.
 \end{IEEEeqnarray}
 
@@ -2696,18 +2697,18 @@ PGR: Discuss Dirac deltas!!!
 
 PGR: DMP PERSPECTIVE???
 
-To perform the expectation over the Dirichlet-Multinomial process $\bar{\nrm} \sim \DMP(\alpha)$, split the expectation into an expectation over the marginal DMP $\nrm' \sim \DMP(\alpha')$ and a conditional expectation over $\bar{\nrm}$ given $\nrm'$. The characterization of the conditional DMP is found in Appendix \ref{app:DM_agg}.
+To perform the expectation over the Dirichlet-Multinomial process $\uppsi \sim \DMP(\alpha_0 \alpha)$, split the expectation into an expectation over the marginal DMP $\nrm' \sim \DMP(\alpha')$ and a conditional expectation over $\uppsi$ given $\nrm'$. The characterization of the conditional DMP is found in Appendix \ref{app:DM_agg}.
 
 \begin{IEEEeqnarray}{L}
-\Erm_{\xrm,\bar{\nrm}} \Big[ \mu_{\yrm | \xrm,\bar{\nrm}}^2 \Big] \\
-\quad = \Erm_{\xrm} \left[ \Erm_{\uppsi | \xrm} \left[ \left( \frac{\alpha'(\xrm) \mu_{\yrm | \xrm} + \int_{\Ycal} y \bar{\nrm}(y,\xrm) \mathrm{d}y}{\alpha'(\xrm) + \nrm'(\xrm)} \right)^2 \right] \right] \nonumber \\
-\quad = \Erm_{\xrm} \Erm_{\nrm'} \left[ \frac{\alpha_0 \Erm_{\bar{\nrm} | \nrm'} \left[ \left( \alpha'(\xrm) \mu_{\yrm | \xrm} + \int_{\Ycal} y \bar{\nrm}(y,\xrm) \mathrm{d}y \right)^2 \right] }{\alpha'(\xrm)\big(\alpha'(x) + \nrm'(x) \big) (\alpha_0+N)} \right] \nonumber
+\Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] \\
+\quad = \Erm_{\xrm} \left[ \Erm_{\uppsi | \xrm} \left[ \left( \frac{\alpha'(\xrm) \mu_{\yrm | \xrm} + \int_{\Ycal} y \uppsi(y,\xrm) \mathrm{d}y}{\alpha'(\xrm) + \nrm'(\xrm)} \right)^2 \right] \right] \nonumber \\
+\quad = \Erm_{\xrm} \Erm_{\nrm'} \left[ \frac{\alpha_0 \Erm_{\uppsi | \nrm'} \left[ \left( \alpha'(\xrm) \mu_{\yrm | \xrm} + \int_{\Ycal} y \uppsi(y,\xrm) \mathrm{d}y \right)^2 \right] }{\alpha'(\xrm)\big(\alpha'(x) + \nrm'(x) \big) (\alpha_0+N)} \right] \nonumber
 \end{IEEEeqnarray}
 
 
 Evaluating the conditional expectation,
 \begin{IEEEeqnarray}{L}
-\Erm_{\bar{\nrm} | \nrm'} \left[ \left( \alpha'(\xrm) \mu_{\yrm | \xrm} + \int_{\Ycal} y \bar{\nrm}(y,\xrm) \mathrm{d}y \right)^2 \right] \\
+\Erm_{\uppsi | \nrm'} \left[ \left( \alpha'(\xrm) \mu_{\yrm | \xrm} + \int_{\Ycal} y \uppsi(y,\xrm) \mathrm{d}y \right)^2 \right] \\
 \quad = \alpha'(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2 \alpha'(\xrm) \mu_{\yrm | \xrm} \int_{\Ycal} y \delta(0) \frac{\nrm'(\xrm)}{\delta(0)} \frac{\delta(0)^{-1} \alpha(y,\xrm)}{\delta(0)^{-1} \alpha'(\xrm)} \mathrm{d}y \nonumber \\
 \qquad + \delta(0)^2 \frac{\delta(0)^{-1} \nrm'(\xrm)}{\big( \delta(0)^{-1}\alpha'(\xrm) \big) \big( \delta(0)^{-1}\alpha'(\xrm) + 1 \big)} \int_{\Ycal} \int_{\Ycal} y y' \Bigg[ \left( \frac{\nrm'(\xrm)}{\delta(0)} - 1 \right) \frac{\alpha(y,\xrm)}{\delta(0)} \frac{\alpha(y',\xrm)}{\delta(0)} \nonumber \\
 \qquad + \left( \frac{\alpha'(\xrm)}{\delta(0)} + \frac{\nrm'(\xrm)}{\delta(0)} \right) \frac{\alpha(y,\xrm)}{\delta(0)} \delta(y-y') \Bigg] \mathrm{d}y \mathrm{d}y' \nonumber \\
@@ -2718,7 +2719,7 @@ Evaluating the conditional expectation,
 
 Plugging,
 \begin{IEEEeqnarray}{L}
-\Erm_{\xrm,\bar{\nrm}} \Big[ \mu_{\yrm | \xrm,\bar{\nrm}}^2 \Big] \\
+\Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] \\
 \quad = \Erm_{\xrm} \left[ \frac{\alpha_0 \Erm_{\nrm'} \Big[ \mu_{\yrm | \xrm}^2 \alpha'(\xrm) \big( \alpha'(\xrm) + \nrm'(\xrm) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) \nrm'(\xrm) \Big] }{\alpha'(\xrm) \big( \alpha'(\xrm)+\delta(0) \big) (\alpha_0+N)} \right] \nonumber \\ 
 \quad = \Erm_{\xrm} \left[ \frac{\mu_{\yrm | \xrm}^2 \big( \alpha_0 \alpha'(\xrm) + N \alpha'(\xrm) + \delta(0) \alpha_0 \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N}{(\alpha_0+N) \big( \alpha'(\xrm)+\delta(0) \big)} \right] \nonumber
 \end{IEEEeqnarray}
@@ -2731,16 +2732,16 @@ Combining produces the risk,
 
 
 %\begin{IEEEeqnarray}{L}
-%\Erm_{\xrm,\bar{\nrm}} \Big[ \mu_{\yrm | \xrm,\bar{\nrm}}^2 \Big] \\
-%\quad = \Erm_{\xrm,\bar{\nrm}} \Bigg[ \left( \int_{\Ycal} y \prm_{\yrm | \xrm,\bar{\nrm}}(y | \xrm,\bar{\nrm}) \mathrm{d}y \right)^2 \Bigg] \nonumber \\
-%\quad = \int_{\Xcal} \Erm_{\bar{\nrm}} \left[ \int_{\Ycal} y \prm_{\yrm,\xrm | \bar{\nrm}}(y,x | \bar{\nrm}) \mathrm{d}y \int_{\Ycal} y' \prm_{\yrm | \xrm,\bar{\nrm}}(y' | x,\bar{\nrm}) \mathrm{d}y' \right] \mathrm{d}x \nonumber \\ 
-%\quad = \int_{\Xcal} \Erm_{\nrm'} \left[ \frac{ \Erm_{\bar{\nrm} | \nrm'} \left[ \left( \alpha'(x) \mu_{\yrm | \xrm}(x) + \int_{\Ycal} y \bar{\nrm}(y,x) \mathrm{d}y \right)^2 \right] }{(\alpha_0+N) \big(\alpha'(x) + \nrm'(x) \big)} \right] \mathrm{d}x \nonumber
+%\Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] \\
+%\quad = \Erm_{\xrm,\uppsi} \Bigg[ \left( \int_{\Ycal} y \prm_{\yrm | \xrm,\uppsi}(y | \xrm,\uppsi) \mathrm{d}y \right)^2 \Bigg] \nonumber \\
+%\quad = \int_{\Xcal} \Erm_{\uppsi} \left[ \int_{\Ycal} y \prm_{\yrm,\xrm | \uppsi}(y,x | \uppsi) \mathrm{d}y \int_{\Ycal} y' \prm_{\yrm | \xrm,\uppsi}(y' | x,\uppsi) \mathrm{d}y' \right] \mathrm{d}x \nonumber \\ 
+%\quad = \int_{\Xcal} \Erm_{\nrm'} \left[ \frac{ \Erm_{\uppsi | \nrm'} \left[ \left( \alpha'(x) \mu_{\yrm | \xrm}(x) + \int_{\Ycal} y \uppsi(y,x) \mathrm{d}y \right)^2 \right] }{(\alpha_0+N) \big(\alpha'(x) + \nrm'(x) \big)} \right] \mathrm{d}x \nonumber
 %\end{IEEEeqnarray}
 %
 %
 %Evaluating the conditional expectation,
 %\begin{IEEEeqnarray}{L}
-%\Erm_{\bar{\nrm} | \nrm'} \left[ \left( \alpha'(x) \mu_{\yrm | \xrm}(x) + \int_{\Ycal} y \bar{\nrm}(y,x) \mathrm{d}y \right)^2 \right] \\
+%\Erm_{\uppsi | \nrm'} \left[ \left( \alpha'(x) \mu_{\yrm | \xrm}(x) + \int_{\Ycal} y \uppsi(y,x) \mathrm{d}y \right)^2 \right] \\
 %\quad = \alpha'(x)^2 \mu_{\yrm | \xrm}^2(x) + 2 \alpha'(x) \mu_{\yrm | \xrm}(x) \int_{\Ycal} y \delta(0) \frac{\nrm'(x)}{\delta(0)} \frac{\delta(0)^{-1} \alpha(y,x)}{\delta(0)^{-1} \alpha'(x)} \mathrm{d}y \nonumber \\
 %\qquad + \delta(0)^2 \frac{\delta(0)^{-1} \nrm'(x)}{\big( \delta(0)^{-1}\alpha'(x) \big) \big( \delta(0)^{-1}\alpha'(x) + 1 \big)} \int_{\Ycal} \int_{\Ycal} y y' \Bigg[ \left( \frac{\nrm'(x)}{\delta(0)} - 1 \right) \frac{\alpha(y,x)}{\delta(0)} \frac{\alpha(y',x)}{\delta(0)} \nonumber \\
 %\qquad + \left( \frac{\alpha'(x)}{\delta(0)} + \frac{\nrm'(x)}{\delta(0)} \right) \frac{\alpha(y,x)}{\delta(0)} \delta(y-y') \Bigg] \mathrm{d}y \mathrm{d}y' \nonumber \\
@@ -2751,7 +2752,7 @@ Combining produces the risk,
 %
 %Plugging,
 %\begin{IEEEeqnarray}{L}
-%\Erm_{\xrm,\bar{\nrm}} \Big[ \mu_{\yrm | \xrm,\bar{\nrm}}^2 \Big] \\
+%\Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] \\
 %\quad = \int_{\Xcal} \frac{ \Erm_{\nrm'} \Big[ \mu_{\yrm | \xrm}^2(x) \alpha'(x) \big( \alpha'(x) + \nrm'(x) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big](x) \delta(0) \nrm'(x) \Big] }{(\alpha_0+N) \big( \alpha'(x)+\delta(0) \big)} \mathrm{d}x \nonumber \\ 
 %\quad = \int_{\Xcal} \frac{\mu_{\yrm | \xrm}^2(x) \alpha'(x) \big( \alpha'(x) + N \alpha_0^{-1} \alpha'(x) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big](x) \delta(0) N \alpha_0^{-1} \alpha'(x)}{(\alpha_0+N) \big( \alpha'(x)+\delta(0) \big)} \mathrm{d}x \nonumber \\ 
 %\quad = \int_{\Xcal} \frac{\alpha'(x)}{\alpha_0} \frac{\mu_{\yrm | \xrm}^2(x) \big( \alpha_0 \alpha'(x) + N \alpha'(x) + \delta(0) \alpha_0 \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big](x) \delta(0) N}{(\alpha_0+N) \big( \alpha'(x)+\delta(0) \big)} \mathrm{d}x \nonumber \\
@@ -2805,7 +2806,7 @@ First, define the PDF of a Dirichlet aggregation \cite{ferguson}. Let the random
 
 The PDF of the original random process $\uptheta$ conditioned on its aggregation $\upthetam$ can be formulated as
 \begin{IEEEeqnarray}{rCl}
-\prm_{\uptheta | \upthetam}(\theta | \thetam) & = & \frac{\beta(\alpha') \prod_{y \in \Ycal} \theta(y)^{\alpha(y)-1}}{\beta(\alpha) \prod_{z \in \Zcal} \thetam(z)^{\alpha'(z)-1}} \\
+\prm_{\uptheta | \upthetam}(\theta | \thetam) & = & \frac{\beta(\alpha') \prod_{y \in \Ycal} \theta(y)^{\alpha(y)-1}}{\beta(\alpha_0 \alpha) \prod_{z \in \Zcal} \thetam(z)^{\alpha'(z)-1}} \\
 & = & \prod_{z \in \Zcal} \Bigg[ \beta\Big( \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big)^{-1} \frac{\prod_{y \in \Scal(z)} \theta(y)^{\alpha(y)-1}}{\thetam(z)^{\alpha'(z)-1}} \Bigg] \nonumber \\ 
 & = & \prod_{z \in \Zcal} \Bigg[ \frac{\thetam(z)^{1-|\Scal(z)|}}{\beta\Big( \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big)} \prod_{y \in \Scal(z)} \left(\frac{\theta(y)}{\thetam(z)}\right)^{\alpha(y)-1} \Bigg] \nonumber \;,
 \end{IEEEeqnarray}
@@ -2836,12 +2837,12 @@ This principle holds for continuous-domain Dirichlet processes $\uptheta$ as wel
 
 \subsection{Aggregation}
 
-A characteristic of a Multinomial random process is that its aggregations are also Multinomial \cite{johnson}. Consider a random process $\bar{\nrm} \sim \Multi(N,\theta)$ over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$; the transformed random process $\nrm'(z) \equiv \sum_{y \in \Scal(z)} \bar{\nrm}(y)$ is distributed as $\nrm' \sim \Multi(N,\thetam)$ with parameterizing function $\thetam(z) = \sum_{y \in \Scal(z)} \theta(y)$.
+A characteristic of a Multinomial random process is that its aggregations are also Multinomial \cite{johnson}. Consider a random process $\uppsi \sim \Multi(N,\theta)$ over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$; the transformed random process $\nrm'(z) \equiv \sum_{y \in \Scal(z)} \uppsi(y)$ is distributed as $\nrm' \sim \Multi(N,\thetam)$ with parameterizing function $\thetam(z) = \sum_{y \in \Scal(z)} \theta(y)$.
 
-To prove this principle, define the subset $\tilde{\Ncal} = \big\{ \bar{n} \in \Ncal : \sum_{y \in \Scal(z)} \bar{n}(y) = n'(z), \quad \forall z \in \Zcal \big\} \subseteq \Theta_\uppsi$, where the original random process $\bar{\nrm} \in \Theta_\uppsi$. Next, observe
+To prove this principle, define the subset $\tilde{\Ncal} = \big\{ \psi \in \Ncal : \sum_{y \in \Scal(z)} \psi(y) = n'(z), \quad \forall z \in \Zcal \big\} \subseteq \Theta_\uppsi$, where the original random process $\uppsi \in \Theta_\uppsi$. Next, observe
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\mathrm{n}'}(n') & = & \sum_{\bar{n} \in \tilde{\Ncal}} \Prm_{\uppsi}(\bar{n}) \\
-& = & \Mcal(n') \prod_{z \in \Zcal} \sum_{\substack{n'(z) = \\ \sum_{y \in \Scal(z)} \bar{n}(y)}} \Mcal\big( \{ \bar{n}(y): y \in \Scal(z) \} \big) \prod_{y \in \Scal(z)} \theta(y)^{\bar{n}(y)} \nonumber \\
+\Prm_{\mathrm{n}'}(n') & = & \sum_{\psi \in \tilde{\Ncal}} \Prm_{\uppsi}(\psi) \\
+& = & \Mcal(n') \prod_{z \in \Zcal} \sum_{\substack{n'(z) = \\ \sum_{y \in \Scal(z)} \psi(y)}} \Mcal\big( \{ \psi(y): y \in \Scal(z) \} \big) \prod_{y \in \Scal(z)} \theta(y)^{\psi(y)} \nonumber \\
 & = & \Mcal(n') \prod_{z \in \Zcal} \thetam(z)^{n'(z)} = \Multi(n' ; N,\thetam) \nonumber \;,
 \end{IEEEeqnarray}
 where the multinomial theorem \cite{graham} has been used.
@@ -2851,14 +2852,14 @@ where the multinomial theorem \cite{graham} has been used.
 
 \subsection{Conditioned on its Aggregation}
 
-If the multinomial random process $\bar{\nrm}$ is conditioned on its aggregation over the partition $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$, the distinct segements $\bar{\nrm}(y)$, $y \in \Scal(z)$ become independent multinomial random processes,
+If the multinomial random process $\uppsi$ is conditioned on its aggregation over the partition $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$, the distinct segements $\uppsi(y)$, $y \in \Scal(z)$ become independent multinomial random processes,
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\bar{\nrm} | \nrm'}(\bar{n} | n') & = & \frac{\Mcal(\bar{n}) \prod_{y \in \Ycal} \theta(y)^{\bar{n}(y)}}{\Mcal(n') \prod_{z \in \Zcal} \thetam(z)^{n'(z)}} \\
-& = & \prod_{z \in \Zcal} \Bigg[ \Mcal\Big( \big\{ \bar{n}(y) : y \in \Scal(z) \big\} \Big) \prod_{y \in \Scal(z)} \left(\frac{\theta(y)}{\thetam(z)}\right)^{\bar{n}(y)} \Bigg] \nonumber \\
-& = & \prod_{z \in \Zcal} \Bigg[ \Mcal\Big( \big\{ \bar{n}(y) : y \in \Scal(z) \big\} \Big) \prod_{y \in \Scal(z)} \thetac_z(y)^{\bar{n}(y)} \Bigg] \nonumber \\
-& = & \prod_{z \in \Zcal} \Multi\Big( \big\{ \bar{n}(y) : y \in \Scal(z) \big\} ; n'(z) , \big\{ \thetac_z(y) : y \in \Scal(z) \big\} \Big) \nonumber \;,
+\Prm_{\uppsi | \nrm'}(\psi | n') & = & \frac{\Mcal(N \psi) \prod_{y \in \Ycal} \theta(y)^{\psi(y)}}{\Mcal(n') \prod_{z \in \Zcal} \thetam(z)^{n'(z)}} \\
+& = & \prod_{z \in \Zcal} \Bigg[ \Mcal\Big( \big\{ \psi(y) : y \in \Scal(z) \big\} \Big) \prod_{y \in \Scal(z)} \left(\frac{\theta(y)}{\thetam(z)}\right)^{\psi(y)} \Bigg] \nonumber \\
+& = & \prod_{z \in \Zcal} \Bigg[ \Mcal\Big( \big\{ \psi(y) : y \in \Scal(z) \big\} \Big) \prod_{y \in \Scal(z)} \thetac_z(y)^{\psi(y)} \Bigg] \nonumber \\
+& = & \prod_{z \in \Zcal} \Multi\Big( \big\{ \psi(y) : y \in \Scal(z) \big\} ; n'(z) , \big\{ \thetac_z(y) : y \in \Scal(z) \big\} \Big) \nonumber \;,
 \end{IEEEeqnarray}
-on the domain $\left\{ \bar{n} \in {\Zbb_{\geq 0}}^{\Ycal} : \sum_{y \in \Scal(z)} \bar{n}(y) = n'(z), \quad \forall z \in \Zcal \right\}$. Observe that the segment over the set $\Scal(z)$ sums to $\nrm'(z)$ and is parameterized by the normalized segment $\thetac_z \equiv \big\{ \theta(y)/\thetam(z) : y \in \Scal(z) \big\}$.
+on the domain $\left\{ \psi \in {\Zbb_{\geq 0}}^{\Ycal} : \sum_{y \in \Scal(z)} \psi(y) = n'(z), \quad \forall z \in \Zcal \right\}$. Observe that the segment over the set $\Scal(z)$ sums to $\nrm'(z)$ and is parameterized by the normalized segment $\thetac_z \equiv \big\{ \theta(y)/\thetam(z) : y \in \Scal(z) \big\}$.
 
 
 
@@ -2868,24 +2869,24 @@ on the domain $\left\{ \bar{n} \in {\Zbb_{\geq 0}}^{\Ycal} : \sum_{y \in \Scal(z
 \section{Dirichlet-Multinomial random process conditioned on its aggregation} 
 \label{app:DM_agg}
 
-A defining characteristic of a Dirichlet-Multinomial random process is that its aggregations are also Dirichlet-Multinomial \cite{johnson}. Consider a DM random process $\bar{\nrm} \sim \DM(N,\alpha)$ over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$; the transformed random process $\nrm'(z) \equiv \sum_{y \in \Scal(z)} \bar{\nrm}(y)$ is neccessarily Dirichlet-Multinomial with parameterizing function $\alpha'(z) = \sum_{y \in \Scal(z)} \alpha(y)$.
+A defining characteristic of a Dirichlet-Multinomial random process is that its aggregations are also Dirichlet-Multinomial \cite{johnson}. Consider a DM random process $\uppsi \sim \DM(N,\alpha)$ over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$; the transformed random process $\nrm'(z) \equiv \sum_{y \in \Scal(z)} \uppsi(y)$ is neccessarily Dirichlet-Multinomial with parameterizing function $\alpha'(z) = \sum_{y \in \Scal(z)} \alpha(y)$.
 
-It can be shown that conditioned on the aggregation $\nrm'$, the segments $\big\{ \bar{\nrm}(y) : y \in \Scal(z) \big\}$ of the original random process become independent Dirichlet-Multinomial random processes, such that
+It can be shown that conditioned on the aggregation $\nrm'$, the segments $\big\{ \uppsi(y) : y \in \Scal(z) \big\}$ of the original random process become independent Dirichlet-Multinomial random processes, such that
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\bar{\nrm} | \nrm'}(\bar{n} | n') & = & \frac{\Mcal(\bar{n}) \beta(\alpha)^{-1} \beta(\alpha+\bar{n})}{\Mcal(n') \beta(\alpha')^{-1} \beta(\alpha'+n')} \\
-& = & \left( \prod_{z \in \Zcal} \frac{\Gamma\big( \alpha'(z)+n'(z) \big)}{n'(z)! \Gamma\big( \alpha'(z) \big)} \right)^{-1} \left( \prod_{y \in \Ycal} \frac{\Gamma\big( \alpha(y)+\bar{n}(y) \big)}{\bar{n}(y)! \Gamma\big( \alpha(y) \big)} \right) \nonumber \\
-& = & \prod_{z \in \Zcal} \left[ \frac{n'(z)! \Gamma\big( \alpha'(z) \big)}{\Gamma\big( \alpha'(z)+n'(z) \big)} \prod_{y \in \Scal(z)} \frac{\Gamma\big( \alpha(y)+\bar{n}(y) \big)}{\bar{n}(y)! \Gamma\big( \alpha(y) \big)} \right] \nonumber \\
-& = & \prod_{z \in \Zcal} \DM\Big( \big\{ \bar{n}(y) : y \in \Scal(z) \big\} ; n'(z), \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big) \nonumber \;,
+\Prm_{\uppsi | \nrm'}(\psi | n') & = & \frac{\Mcal(N \psi) \beta(\alpha_0 \alpha)^{-1} \beta(\alpha+\psi)}{\Mcal(n') \beta(\alpha')^{-1} \beta(\alpha'+n')} \\
+& = & \left( \prod_{z \in \Zcal} \frac{\Gamma\big( \alpha'(z)+n'(z) \big)}{n'(z)! \Gamma\big( \alpha'(z) \big)} \right)^{-1} \left( \prod_{y \in \Ycal} \frac{\Gamma\big( \alpha(y)+\psi(y) \big)}{\psi(y)! \Gamma\big( \alpha(y) \big)} \right) \nonumber \\
+& = & \prod_{z \in \Zcal} \left[ \frac{n'(z)! \Gamma\big( \alpha'(z) \big)}{\Gamma\big( \alpha'(z)+n'(z) \big)} \prod_{y \in \Scal(z)} \frac{\Gamma\big( \alpha(y)+\psi(y) \big)}{\psi(y)! \Gamma\big( \alpha(y) \big)} \right] \nonumber \\
+& = & \prod_{z \in \Zcal} \DM\Big( \big\{ \psi(y) : y \in \Scal(z) \big\} ; n'(z), \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big) \nonumber \;,
 \end{IEEEeqnarray}
 %\begin{IEEEeqnarray}{rCl}
-%\Prm(\bar{\nrm} | \nrm') & = & \frac{\Prm(\bar{\nrm})}{\Prm(\nrm')} \Prm(\nrm' | \bar{\nrm}) \\ 
-%& = & \frac{\Mcal(\bar{\nrm}) \beta(\alpha)^{-1} \beta(\alpha+\bar{\nrm})}{\Mcal(\nrm') \beta(\alpha')^{-1} \beta(\alpha'+\nrm')} \prod_{z \in \Zcal} \delta\left[ \nrm'(z),\sum_{y \in \Scal(z)} \bar{\nrm}(y) \right] \nonumber \\
-%& = & \left( \prod_{z \in \Zcal} \frac{\Gamma\big( \alpha'(z)+\nrm'(z) \big)}{\nrm'(z)! \Gamma\big( \alpha'(z) \big)} \right)^{-1} \left( \prod_{y \in \Ycal} \frac{\Gamma\big( \alpha(y)+\bar{\nrm}(y) \big)}{\bar{\nrm}(y)! \Gamma\big( \alpha(y) \big)} \right) \nonumber \\
-%&& \quad \prod_{z \in \Zcal} \delta\left[ \nrm'(z),\sum_{y \in \Scal(z)} \bar{\nrm}(y) \right] \nonumber \\
-%& = & \prod_{z \in \Zcal} \left[ \delta\left[ \nrm'(z),\sum_{y \in \Scal(z)} \bar{\nrm}(y) \right] \frac{\nrm'(z)! \Gamma\big( \alpha'(z) \big)}{\Gamma\big( \alpha'(z)+\nrm'(z) \big)} \prod_{y \in \Scal(z)} \frac{\Gamma\big( \alpha(y)+\bar{\nrm}(y) \big)}{\bar{\nrm}(y)! \Gamma\big( \alpha(y) \big)} \right] \nonumber \\
-%& = & \prod_{z \in \Zcal} \DM\Big( \big\{ \bar{\nrm}(y) : y \in \Scal(z) \big\} ; \nrm'(z), \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big) \nonumber \;,
+%\Prm(\uppsi | \nrm') & = & \frac{\Prm(\uppsi)}{\Prm(\nrm')} \Prm(\nrm' | \uppsi) \\ 
+%& = & \frac{\Mcal(\uppsi) \beta(\alpha_0 \alpha)^{-1} \beta(\alpha+\uppsi)}{\Mcal(\nrm') \beta(\alpha')^{-1} \beta(\alpha'+\nrm')} \prod_{z \in \Zcal} \delta\left[ \nrm'(z),\sum_{y \in \Scal(z)} \uppsi(y) \right] \nonumber \\
+%& = & \left( \prod_{z \in \Zcal} \frac{\Gamma\big( \alpha'(z)+\nrm'(z) \big)}{\nrm'(z)! \Gamma\big( \alpha'(z) \big)} \right)^{-1} \left( \prod_{y \in \Ycal} \frac{\Gamma\big( \alpha(y)+\uppsi(y) \big)}{\uppsi(y)! \Gamma\big( \alpha(y) \big)} \right) \nonumber \\
+%&& \quad \prod_{z \in \Zcal} \delta\left[ \nrm'(z),\sum_{y \in \Scal(z)} \uppsi(y) \right] \nonumber \\
+%& = & \prod_{z \in \Zcal} \left[ \delta\left[ \nrm'(z),\sum_{y \in \Scal(z)} \uppsi(y) \right] \frac{\nrm'(z)! \Gamma\big( \alpha'(z) \big)}{\Gamma\big( \alpha'(z)+\nrm'(z) \big)} \prod_{y \in \Scal(z)} \frac{\Gamma\big( \alpha(y)+\uppsi(y) \big)}{\uppsi(y)! \Gamma\big( \alpha(y) \big)} \right] \nonumber \\
+%& = & \prod_{z \in \Zcal} \DM\Big( \big\{ \uppsi(y) : y \in \Scal(z) \big\} ; \nrm'(z), \big\{ \alpha(y) : y \in \Scal(z) \big\} \Big) \nonumber \;,
 %\end{IEEEeqnarray}
-on the domain $\left\{ \bar{n} \in {\Zbb_{\geq 0}}^{\Ycal} : \sum_{y \in \Scal(z)} \bar{n}(y) = n'(z), \quad \forall z \in \Zcal \right\}$. 
+on the domain $\left\{ \psi \in {\Zbb_{\geq 0}}^{\Ycal} : \sum_{y \in \Scal(z)} \psi(y) = n'(z), \quad \forall z \in \Zcal \right\}$. 
 
 
 
@@ -2895,9 +2896,9 @@ on the domain $\left\{ \bar{n} \in {\Zbb_{\geq 0}}^{\Ycal} : \sum_{y \in \Scal(z
 
 \section{First and Second moments of a Dirichlet Process} \label{app:E_DP}
 
-In this section, it is shown that the expected value of a Dirichlet process $\uptheta \sim \DP(\alpha)$ is 
+In this section, it is shown that the expected value of a Dirichlet process $\uptheta \sim \DP(\alpha_0 \alpha)$ is 
 \begin{equation}
-\mu_{\uptheta} = \frac{\alpha}{\alpha_0} \;,
+\mu_{\uptheta} = \alpha \;,
 \end{equation}
 where $\alpha_0 = \int_{\Ycal} \alpha(y) \mathrm{d} y$.
 
@@ -2943,7 +2944,7 @@ Finally,
 
 \section{Proof: Continuous Model Posterior Distribution is Dirichlet Process} \label{app:DP_post}
 
-In this section, it is shown that if the model $\uptheta \sim \DP(\alpha)$ is a Dirichlet process, then the model conditioned on the training data $\Drm$ is also a Dirichlet process with parameterizing function $\alpha + \sum_{n=1}^N \delta\big( \cdot - \Drm_n \big)$. 
+In this section, it is shown that if the model $\uptheta \sim \DP(\alpha_0 \alpha)$ is a Dirichlet process, then the model conditioned on the training data $\Drm$ is also a Dirichlet process with parameterizing function $\alpha + \sum_{n=1}^N \delta\big( \cdot - \Drm_n \big)$. 
 
 The defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Consider a DP over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$; the transformed random process $\upthetam(z) \equiv \int_{\Scal(z)} \uptheta(y) \mathrm{d} y$ is neccessarily Dirichlet with parameterizing function $\alpha'(z) \equiv \int_{\Scal(z)} \alpha(y) \mathrm{d} y$.
 
@@ -2987,15 +2988,15 @@ PGR: multinomial process too???
 
 \subsection{Definition}
 
-This section introduces a new random process, referred to as the Dirichlet-Multinomial process (DMP). It is the generalization of the Dirichlet-Multinomial distribution for i.i.d. samples drawn from a PDF; the underlying distribution is characterized by a Dirchlet process with parameter $\alpha$. The Dirichlet-Multinomial process assumes functions from the set $\left\{ \bar{n} \in {\Rbb_{\geq 0}}^{\Ycal} : \int_{\Ycal} \bar{n}(y) \mathrm{d} y = N \right\}$ and is parameterized by a function $\alpha : \Ycal \mapsto \Rbb^+$.
+This section introduces a new random process, referred to as the Dirichlet-Multinomial process (DMP). It is the generalization of the Dirichlet-Multinomial distribution for i.i.d. samples drawn from a PDF; the underlying distribution is characterized by a Dirchlet process with parameter $\alpha$. The Dirichlet-Multinomial process assumes functions from the set $\left\{ \psi \in {\Rbb_{\geq 0}}^{\Ycal} : \int_{\Ycal} \psi(y) \mathrm{d} y = N \right\}$ and is parameterized by a function $\alpha : \Ycal \mapsto \Rbb^+$.
 
-Analagous to the Dirichlet and Dirichlet-Multinomial distributions for countable spaces, the Dirichlet-Multinomial process inherits the aggregation property from the Dirichlet process prior. That is, for a Dirichlet-Multinomial process $\bar{\nrm} \in \left\{ \bar{n} \in {\Rbb_{\geq 0}}^{\Ycal} : \int_{\Ycal} \bar{n}(y) \mathrm{d} y = N \right\}$ and a partition of $\Ycal$, $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$, the transformed random process $\nrm'(z) \equiv \int_{\Scal(z)} \bar{\nrm}(y) \mathrm{d} y$ is neccessarily Dirichlet-Multinomial with parameterizing function $\alpha'(z) \equiv \int_{\Scal(z)} \alpha(y) \mathrm{d} y$.
+Analagous to the Dirichlet and Dirichlet-Multinomial distributions for countable spaces, the Dirichlet-Multinomial process inherits the aggregation property from the Dirichlet process prior. That is, for a Dirichlet-Multinomial process $\uppsi \in \left\{ \psi \in {\Rbb_{\geq 0}}^{\Ycal} : \int_{\Ycal} \psi(y) \mathrm{d} y = N \right\}$ and a partition of $\Ycal$, $\left\{ \ldots,\Scal(z),\ldots \right\}$, $z \in \Zcal$, the transformed random process $\nrm'(z) \equiv \int_{\Scal(z)} \uppsi(y) \mathrm{d} y$ is neccessarily Dirichlet-Multinomial with parameterizing function $\alpha'(z) \equiv \int_{\Scal(z)} \alpha(y) \mathrm{d} y$.
 
 PGR: tilde not prime?
 
 \subsection{Proof that $\sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DMP}
 
-Next, it is demonstrated that the random process $\bar{\nrm}(y) \equiv \Psi(y;\Drm) = \sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DMP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta\big( D_n \big)$ and $\uptheta \sim \DP(\alpha)$. 
+Next, it is demonstrated that the random process $\uppsi(y) \equiv \Psi(y;\Drm) = \sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DMP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta\big( D_n \big)$ and $\uptheta \sim \DP(\alpha_0 \alpha)$. 
 
 Observe that $\nrm'(z) \equiv \sum_{n=1}^N \chi\big( \Drm_n;\Scal(z) \big)$, where $\chi$ is the indicator function
 \begin{equation}
@@ -3007,21 +3008,21 @@ and note that $\Prm\Big( \chi\big( \Drm_n;\Scal(z) \big) = 1 \big| \uptheta \Big
 \end{equation}
 where $\upthetam(z) \equiv \int_{\Scal(z)} \uptheta(y) \mathrm{d} y$, $z \in \Zcal$.
 
-By the aggregation property of the Dirichlet process $\uptheta$, the parameters of this multinomial distribution are characterized as $\upthetam \sim \Dir\left( \alpha' \right)$, and thus $\tilde{\nrm}$ is drawn from a Dirichlet-Multinomial PMF with the same parameters $\alpha'$. As this holds for any partition of $\Ycal$, $\bar{\nrm}$ is a Dirichlet-Multinomial Process.
+By the aggregation property of the Dirichlet process $\uptheta$, the parameters of this multinomial distribution are characterized as $\upthetam \sim \Dir\left( \alpha' \right)$, and thus $\tilde{\nrm}$ is drawn from a Dirichlet-Multinomial PMF with the same parameters $\alpha'$. As this holds for any partition of $\Ycal$, $\uppsi$ is a Dirichlet-Multinomial Process.
 
 
 \subsection{Mean and Correlation Functions}
 
 In this subsection the mean and correlation functions of a DMP are expressed. The mean function is
 \begin{IEEEeqnarray}{rCl}
-\mu_{\bar{\nrm}}(y) & = & \sum_{n=1}^N \Erm_{\Drm_n}\Big[\delta\big( y-\Drm_n \big) \Big] \\
+\mu_{\uppsi}(y) & = & \sum_{n=1}^N \Erm_{\Drm_n}\Big[\delta\big( y-\Drm_n \big) \Big] \\
 & = & \sum_{n=1}^N \Prm_{\Drm_n}(y) \nonumber \\
 & = & N \frac{\alpha(y)}{\alpha_0} \nonumber \;.
 \end{IEEEeqnarray}
 
 The correlation function is
 \begin{IEEEeqnarray}{rCl}
-\Erm_{\uppsi}\big[ \bar{\nrm}(y) \bar{\nrm}(y') \big] & = & \sum_{n=1}^N \Erm_{\Drm_n}\Big[\delta\big( y-\Drm_n \big) \Big] \\
+\Erm_{\uppsi}\big[ \uppsi(y) \uppsi(y') \big] & = & \sum_{n=1}^N \Erm_{\Drm_n}\Big[\delta\big( y-\Drm_n \big) \Big] \\
 & = & \sum_{n=1}^N \sum_{n'=1}^N \Erm_{\Drm_n,\Drm_{n'}}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y-\Drm_{n'} \big) \Big] \nonumber \\
 & = & \sum_n \Erm_{\Drm_n}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_n \big) \Big] + \nonumber \\
 && \quad \sum_{n \neq n'} \Erm_{\Drm_n,\Drm_{n'}}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_{n'} \big) \Big] \nonumber \\
@@ -3035,15 +3036,15 @@ The correlation function is
 
 \subsection{Continuous aggregation}
 
-If $\bar{\nrm}$ is a Dirichlet-Multinomial process over a Euclidean space $\Ycal$, then conditioning on its discrete aggregation $\nrm'$ produces independent Dirichlet-Multinomial processes $\big\{ \bar{\nrm}(y) : y \in \Scal(z) \big\} \sim \DMP\Big( \nrm'(z),\big\{ \alpha(y) : y \in \Scal(z) \big\} \Big)$ over the partition spaces $\Scal(z)$.
+If $\uppsi$ is a Dirichlet-Multinomial process over a Euclidean space $\Ycal$, then conditioning on its discrete aggregation $\nrm'$ produces independent Dirichlet-Multinomial processes $\big\{ \uppsi(y) : y \in \Scal(z) \big\} \sim \DMP\Big( \nrm'(z),\big\{ \alpha(y) : y \in \Scal(z) \big\} \Big)$ over the partition spaces $\Scal(z)$.
 
-The previous result can be extended to conditioning on a continuous aggregation. Define $\bar{\nrm} \sim \DMP(N,\alpha)$ over the set $\Ycal \times \Xcal$ and the aggregation DMP $\nrm' = \int_{\Ycal} \bar{\nrm}(y,\cdot) \mathrm{d}y$ over set $\Xcal$ with parameterizing function $\alpha' = \int_{\Ycal} \alpha(y,\cdot) \mathrm{d}y$.
+The previous result can be extended to conditioning on a continuous aggregation. Define $\uppsi \sim \DMP(N,\alpha)$ over the set $\Ycal \times \Xcal$ and the aggregation DMP $\nrm' = \int_{\Ycal} \uppsi(y,\cdot) \mathrm{d}y$ over set $\Xcal$ with parameterizing function $\alpha' = \int_{\Ycal} \alpha(y,\cdot) \mathrm{d}y$.
 
-Use the aggregation propery to introduce a Dirichlet-Multinomial process $\tilde{\nrm}(y;k) = \int_{\Delta k}^{\Delta (k+1)} \bar{\nrm}(y,x) \mathrm{d}x$ with parameter $\tilde{\alpha}(y;k) = \int_{\Delta k}^{\Delta (k+1)} \alpha(y,x) \mathrm{d}x$. Additionally, introduce its own aggregation, a Dirichlet-Multinomial random process $\dot{n}(k) = \int_{\Ycal} \tilde{n}(y,k) \mathrm{d}y$ with parameter $\dot{\alpha}(k) = \int_{\Ycal} \tilde{\alpha}(y,k) \mathrm{d}y$. By the conditioning property for discrete aggregations demonstrated previously, $\tilde{\nrm}(\cdot,k) | \dot{\nrm}(k) \sim \DMP\big( \dot{\nrm}(k),\tilde{\alpha}(\cdot,k) \big)$ are independent DMP's.
+Use the aggregation propery to introduce a Dirichlet-Multinomial process $\tilde{\nrm}(y;k) = \int_{\Delta k}^{\Delta (k+1)} \uppsi(y,x) \mathrm{d}x$ with parameter $\tilde{\alpha}(y;k) = \int_{\Delta k}^{\Delta (k+1)} \alpha(y,x) \mathrm{d}x$. Additionally, introduce its own aggregation, a Dirichlet-Multinomial random process $\dot{n}(k) = \int_{\Ycal} \tilde{n}(y,k) \mathrm{d}y$ with parameter $\dot{\alpha}(k) = \int_{\Ycal} \tilde{\alpha}(y,k) \mathrm{d}y$. By the conditioning property for discrete aggregations demonstrated previously, $\tilde{\nrm}(\cdot,k) | \dot{\nrm}(k) \sim \DMP\big( \dot{\nrm}(k),\tilde{\alpha}(\cdot,k) \big)$ are independent DMP's.
 
-Note that as $\Delta \to 0$, $\tilde{\nrm}(y,k) \approx \Delta \bar{\nrm}(y,\Delta k)$, $\tilde{\alpha}(y,k) \approx \Delta \alpha(y,\Delta k)$, and $\dot{\nrm}(k) \approx \Delta \nrm'(\Delta k)$. Letting $x \equiv \Delta k$, the statistics of the DMP conditioned on its continuous aggregation can be represented as
+Note that as $\Delta \to 0$, $\tilde{\nrm}(y,k) \approx \Delta \uppsi(y,\Delta k)$, $\tilde{\alpha}(y,k) \approx \Delta \alpha(y,\Delta k)$, and $\dot{\nrm}(k) \approx \Delta \nrm'(\Delta k)$. Letting $x \equiv \Delta k$, the statistics of the DMP conditioned on its continuous aggregation can be represented as
 \begin{equation}
-\Delta \bar{\nrm}(\cdot,x) | \Delta \nrm'(k) \sim \DMP\big( \Delta \nrm'(k), \Delta \alpha(\cdot,x) \big) \;.
+\Delta \uppsi(\cdot,x) | \Delta \nrm'(k) \sim \DMP\big( \Delta \nrm'(k), \Delta \alpha(\cdot,x) \big) \;.
 \end{equation}
 
 
@@ -3083,16 +3084,16 @@ we perform contrained optimization. Note that the set $\Theta = \left\{ \theta \
 
 
 
-%\section{The Expected Value of $\bar{\nrm}_{\mathrm{max}}$} \label{app:E_N_max}
+%\section{The Expected Value of $\uppsi_{\mathrm{max}}$} \label{app:E_N_max}
 %
-%\subsection{The CMF of $\bar{\nrm}_{\mathrm{max}}$}
+%\subsection{The CMF of $\uppsi_{\mathrm{max}}$}
 %
 %REAL PROOF???
 %
-%The cummulative mass function for $\bar{\nrm}_{\mathrm{max}} = \max_y \bar{\nrm}(y)$,
+%The cummulative mass function for $\uppsi_{\mathrm{max}} = \max_y \uppsi(y)$,
 %
 %\begin{IEEEeqnarray}{rCl}
-%F_{\bar{\nrm}_{\mathrm{max}}}(n) & = & \Prm\left( \bar{\nrm}_{\mathrm{max}} \leq n \right) \\
+%F_{\uppsi_{\mathrm{max}}}(n) & = & \Prm\left( \uppsi_{\mathrm{max}} \leq n \right) \\
 %& = & \binom{N+M-1}{M-1}^{-1} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} \\
 %&& \quad \binom{m(n+1)-N-1}{M-1} U\left(n+1-\frac{N+M}{m}\right) \;,
 %\end{IEEEeqnarray}
@@ -3105,12 +3106,12 @@ we perform contrained optimization. Note that the set $\Theta = \left\{ \theta \
 %
 %\subsection{In the limit $N \to \infty$}
 %
-%Having established the CMF for $\bar{\nrm}_{\mathrm{max}}$ and provided a general formula for the expected value in equation ???, we seek a more compact form to avoid the summation over $n=0,\ldots,N$. Although we do not provide the general expression, we do provide a compact formula for the expected value as $N \to \infty$.
+%Having established the CMF for $\uppsi_{\mathrm{max}}$ and provided a general formula for the expected value in equation ???, we seek a more compact form to avoid the summation over $n=0,\ldots,N$. Although we do not provide the general expression, we do provide a compact formula for the expected value as $N \to \infty$.
 %
-%First, we note how the CMF of $\bar{\nrm}_{\mathrm{max}}$ simplifies in this limit. Below, observe how the binomial coefficients including $N$ reduce to a power term and that the argument of the step function simplifies, since the function invariant to scaling.
+%First, we note how the CMF of $\uppsi_{\mathrm{max}}$ simplifies in this limit. Below, observe how the binomial coefficients including $N$ reduce to a power term and that the argument of the step function simplifies, since the function invariant to scaling.
 %
 %\begin{IEEEeqnarray}{rCl}
-%\lim_{N \to \infty} F_{\bar{\nrm}_{\mathrm{max}}}(n) & = & \lim_{N \to \infty} \binom{N+M-1}{M-1}^{-1} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} \\
+%\lim_{N \to \infty} F_{\uppsi_{\mathrm{max}}}(n) & = & \lim_{N \to \infty} \binom{N+M-1}{M-1}^{-1} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} \\
 %&& \quad \binom{m(n+1)-N-1}{M-1} U\left(n+1-\frac{N+M}{m}\right) \\
 %& = & \lim_{N \to \infty} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} U\left(\frac{n}{N}+\frac{1}{N}-\frac{1}{m}-\frac{M}{Nm}\right) \\
 %&& \quad \prod_{k=1}^M \frac{m(n+1)-N-k}{N+M-k} \\
@@ -3123,17 +3124,17 @@ we perform contrained optimization. Note that the set $\Theta = \left\{ \theta \
 %p(t) = \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} (mt - 1)^{M-1} U\left( t-\frac{1}{m} \right) \;,
 %\end{equation}
 %
-%such that $p(n/N) = \lim_{N \to \infty} F_{\bar{\nrm}_{\mathrm{max}}}(n)$. This will be used in the following, where we use the CMF to determine the first moment. 
+%such that $p(n/N) = \lim_{N \to \infty} F_{\uppsi_{\mathrm{max}}}(n)$. This will be used in the following, where we use the CMF to determine the first moment. 
 %
 %THETA PDF???
 %
 %START from N - int F???
 %
-%It should be intuitive that as $N$ tends toward infinity, so does $\Erm_{\bar{n}} \left[ \bar{\nrm}_{\mathrm{max}} \right]$. With this in mind, and given the form of equation \eqref{risk_01_opt}, we proceed to determine the ``normalized'' value of the mean,
+%It should be intuitive that as $N$ tends toward infinity, so does $\Erm_{\psi} \left[ \uppsi_{\mathrm{max}} \right]$. With this in mind, and given the form of equation \eqref{risk_01_opt}, we proceed to determine the ``normalized'' value of the mean,
 %
 %\begin{IEEEeqnarray}{rCl}
-%\lim_{N \to \infty} \frac{\Erm_{\bar{n}} \left[ \bar{\nrm}_{\mathrm{max}} \right]}{N} & = & \lim_{N \to \infty} N^{-1} \sum_{n=0}^N n 
-%\left( F_{\bar{\nrm}_{\mathrm{max}}}(n) - F_{\bar{\nrm}_{\mathrm{max}}}(n-1) \right) \\
+%\lim_{N \to \infty} \frac{\Erm_{\psi} \left[ \uppsi_{\mathrm{max}} \right]}{N} & = & \lim_{N \to \infty} N^{-1} \sum_{n=0}^N n 
+%\left( F_{\uppsi_{\mathrm{max}}}(n) - F_{\uppsi_{\mathrm{max}}}(n-1) \right) \\
 %& = & \lim_{N^{-1} \to 0} N^{-1} \sum_{n=1}^N \frac{n}{N} \left( \frac{p(n/N) - p(n/N - N^{-1})}{N^{-1}} \right) \\
 %& = & \lim_{N^{-1} \to 0} N^{-1} \sum_{n=1}^N \frac{n}{N} \left. \frac{\mathrm{d} p(t)}{\mathrm{d} t} \right|_{t=n/N}  \\
 %& \approx & \int_0^1  t \frac{\mathrm{d} p(t)}{\mathrm{d} t} \mathrm{d} t \;,
@@ -3144,7 +3145,7 @@ we perform contrained optimization. Note that the set $\Theta = \left\{ \theta \
 %PGR: riemann reference
 %
 %\begin{IEEEeqnarray}{rCl}
-%\lim_{N \to \infty} \frac{\Erm_{\bar{n}} \left[ \bar{\nrm}_{\mathrm{max}} \right]}{N} & = & p(1) - \int_0^1 p(t) \mathrm{d} t \\
+%\lim_{N \to \infty} \frac{\Erm_{\psi} \left[ \uppsi_{\mathrm{max}} \right]}{N} & = & p(1) - \int_0^1 p(t) \mathrm{d} t \\
 %& = & p(1) - \frac{1}{M} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} m^{-1} (m-1)^M \;.
 %\end{IEEEeqnarray}
 %
@@ -3176,7 +3177,7 @@ we perform contrained optimization. Note that the set $\Theta = \left\{ \theta \
 %Finally, we substitute back into equation ??? to find,
 %
 %\begin{IEEEeqnarray}{rCl}
-%\lim_{N \to \infty} \frac{\Erm_{\bar{n}} \left[ \bar{\nrm}_{\mathrm{max}} \right]}{N} & = & - \frac{1}{M} \sum_{m=1}^M \binom{M}{m} (-1)^{m} m^{-1} \\
+%\lim_{N \to \infty} \frac{\Erm_{\psi} \left[ \uppsi_{\mathrm{max}} \right]}{N} & = & - \frac{1}{M} \sum_{m=1}^M \binom{M}{m} (-1)^{m} m^{-1} \\
 %& = & \frac{1}{M} \sum_{m=0}^{M-1} \binom{M}{m+1} (-1)^m (m+1)^{-1} \\
 %& = & \sum_{m=0}^{M-1} \binom{M-1}{m} (-1)^m (m+1)^{-2} \;.
 %\end{IEEEeqnarray}
@@ -3201,7 +3202,7 @@ we perform contrained optimization. Note that the set $\Theta = \left\{ \theta \
 %
 %
 %\begin{IEEEeqnarray}{rCl}
-%\lim_{N \to \infty} \frac{\Erm_{\bar{n}} \left[ \bar{\nrm}_{\mathrm{max}} \right]}{N} & = & (-1)^{M-1} \left. \Delta^{M-1} u(k)^2 \right|_{k=1} \\
+%\lim_{N \to \infty} \frac{\Erm_{\psi} \left[ \uppsi_{\mathrm{max}} \right]}{N} & = & (-1)^{M-1} \left. \Delta^{M-1} u(k)^2 \right|_{k=1} \\
 %& = & (-1)^{M-1}\sum_{m=0}^{M-1} \binom{M-1}{m} \left. \Delta^m k^{-1} \Delta^{M-m} (k+m)^{-1} \right|_{k=1} \\
 %& = & \sum_{m=0}^{M-1} \binom{M-1}{m} (m+1)^{-1} \binom{M}{m+1}^{-1} (m+1)^{-1} \\
 %& = & M^{-1} \sum_{m=0}^{M-1} (m+1)^{-1} \\
