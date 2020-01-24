@@ -457,7 +457,7 @@ Also of interest are the marginal and conditional distributions of the joint tra
 & \equiv & \prod_{x \in \Xcal} \thetam(x)^{N \Psim(x;X)} \nonumber \\
 & = & \left( \prod_{x \in \Xcal} \thetam(x)^{\Psim(x;X)} \right)^N \nonumber \;,
 \end{IEEEeqnarray}
-where the dependency on $\uptheta$ is only through the marginal model $\upthetam$. Additionally, note that the dependency on the training observations $\Xrm$ is expressed though a ``marginal'' counting function $\Psim : \Xcal^N \mapsto \Uppsim \subset \Pcal(\Xcal)$ with range
+where the dependency on $\uptheta$ is only through the marginal model $\upthetam$. Additionally, note that the dependency on the training observations $\Xrm$ is expressed though a ``marginal'' distribution function $\Psim : \Xcal^N \mapsto \Uppsim \subset \Pcal(\Xcal)$ with range
 \begin{IEEEeqnarray}{rCl}
 \Uppsim & = & \left\{ \frac{n}{N} : n \in {\Zbbgeq}^{\Xcal}, \ \sum_{x \in \Xcal} n(x) = N \right\} \;,
 \end{IEEEeqnarray}
@@ -486,14 +486,16 @@ Note that the dependency of the conditional distribution on the model $\uptheta$
 
 Analagous to the decomposition of the model $\uptheta$ into its marginal and conditional models, the empirical process $\uppsi$ can be decomposed into marginal and conditional empirical processes. Introduce the ``marginalized'' random process $\uppsim$ over the set $\Xcal$, defined as $\uppsim \equiv \sum_{y \in \Ycal} \uppsi(y,\cdot) \equiv \Psim(\Xrm) \in \Uppsim$. Similar to the Multinomial random processes \cite{johnson}, the Empirical random process has an aggregation property (Appendix \ref{app:emp}) - using this principle, it can be shown that conditioned on the model $\uptheta$, the marginal model is distributed as $\uppsim | \upthetam,\upthetac = \uppsim | \upthetam \sim \Emp(N,\upthetam)$. 
 
-\todohigh{EDIT HERE}
-
-Also of interest is the distribution of $\uppsic \equiv$ conditioned on its aggregation $\uppsim$. Using the Empirical process properties proven in Appendix \ref{app:emp}, it can be shown that when conditioned on the model $\uptheta$ as well, the PMF of $\uppsi$ is
+Also of interest is the distribution of $\uppsic \in \Uppsic$ conditioned on its aggregation $\uppsim$, where $\uppsic(x) \equiv \uppsi(\cdot,x) / \uppsim(x)$. Using the Empirical process properties proven in Appendix \ref{app:emp}, it can be shown that when conditioned on the model $\uptheta$ as well, the PMF of $\uppsic$ is
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\uppsi | \uppsim , \uptheta}(\psi | \psim , \theta) & \equiv & \prod_{x \in \Xcal} \Bigg[ \Mcal\big( \psi(\cdot,x) \big) \prod_{y \in \Ycal} \thetac(y;x)^{\psi(y,x)} \Bigg] \\
-& = & \prod_{x \in \Xcal} \Multi\Big( \psi(\cdot,x) ; n'(x) , \thetac(x) \Big) \nonumber \;,
+\Prm_{\uppsi | \uppsim , \uptheta}(\psi | \psim , \theta) & \equiv & \Prm_{\uppsi | \uppsim , \upthetac}(\psi | \psim , \thetac) \\
+& = & \prod_{x \in \Xcal} \Bigg[ \Mcal\big( N \psim(x) \psic(x) \big) \left( \prod_{y \in \Ycal} \thetac(y;x)^{\psic(y;x)} \right)^{N \psim(x)} \Bigg] \\
+& = & \prod_{x \in \Xcal} \Emp\Big( \psic(x) ; N \psim(x) , \thetac(x) \Big) \nonumber \;,
 \end{IEEEeqnarray}
-over the domain $\left\{ \psi \in {\Zbbgeq}^{\Ycal \times \Xcal} : \sum_{y \in \Ycal} \psi(y,\cdot) = n' \right\}$. Observe that conditioning on the aggregation renders the function segments $\uppsi(\cdot,x)$ independent of one another and that they are also Multinomial, such that $\uppsi(\cdot,x) | \uppsim(x),\uptheta \sim \Multi\big( \uppsim(x),\upthetac(x) \big)$. Furthermore, the dependency on $\uptheta$ is expressed through the conditional model $\upthetac$
+over the domain $\prod_{x \in \Xcal} \left\{ \frac{n}{N \psim(x)}: n \in {\Zbbgeq}^{\Ycal}, \ \sum_{y \in \Ycal} n(y) = N \psim(x) \right\}$.
+\todohigh{Set notation above?}
+
+Observe that conditioning on the marginal empirical process renders the conditional processes $\uppsic(x)$ independent of one another and that they are also Empirically distributed, such that $\uppsic(x) | \uppsim(x),\upthetam,\upthetac = \uppsic(x) | \uppsim(x),\upthetac \sim \Emp\big( N \uppsim(x),\upthetac(x) \big)$. Furthermore, the dependency on $\uptheta$ is expressed only through the conditional model $\upthetac$
 
 
 
@@ -2856,11 +2858,11 @@ where the multinomial theorem \cite{graham} has been used.
 If the empirical random process $\uppsi$ is conditioned on its aggregation $\uppsim$ over the partition $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, the distinct segements $\uppsi_z$ become independent random processes, such that for $\psi \in \Uppsim(\psim)$,
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\uppsi | \uppsim}(\psi | \psim) & = & \frac{\Prm_{\uppsi,\uppsim}(\psi,\psim)}{\Prm_{\uppsim}(\psim)} = \frac{\Mcal(N \psi)}{\Mcal(N \psim)} \left( \frac{\prod_{y \in \Ycal} \theta(y)^{\psi(y)}}{\prod_{z \in \Zcal} \thetam(z)^{\psim(z)}} \right)^N \\
-& \equiv & \prod_{z \in \Zcal} \Bigg[ \Mcal(N \psi_z) \left(\frac{\prod_{y \in \Scal_z} \theta(y)^{\psi_z(y)}}{\thetam(z)^{\psim(z)}} \right)^N \Bigg] \nonumber \\
-& = & \prod_{z \in \Zcal} \Bigg[ \Mcal(N \psi_z) \left( \prod_{y \in \Scal_z} \left(\frac{\theta(y)}{\thetam(z)}\right)^{\psi_z(y)} \right)^N \Bigg] \nonumber \;.
+& \equiv & \prod_{z \in \Zcal} \Bigg[ \Mcal(N \psi_z) \left(\frac{\prod_{y \in \Scal_z} \theta_z(y)^{\psi_z(y)}}{\thetam(z)^{\psim(z)}} \right)^N \Bigg] \nonumber \\
+& = & \prod_{z \in \Zcal} \Bigg[ \Mcal(N \psi_z) \left( \prod_{y \in \Scal_z} \left(\frac{\theta_z(y)}{\thetam(z)}\right)^{\psi_z(y)} \right)^N \Bigg] \nonumber \;.
 \end{IEEEeqnarray}
 
-While these function segments are independent, they are not Empirical processes. Introducing the conditional distributions $\thetac(z) \equiv \theta / \thetam(z) \in \Pcal(\Scal_z)$ and the normalized segments $\uppsic(z) \equiv \uppsi / \uppsim(z)$, it can be shown that
+While these function segments are independent, they are not Empirical processes. Introducing the conditional distributions $\thetac(z) \equiv \theta_z / \thetam(z) \in \Pcal(\Scal_z)$ and the normalized segments $\uppsic(z) \equiv \uppsi_z / \uppsim(z)$, it can be shown that
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\uppsic | \uppsim}(\psic | \psim) & = & \prod_{z \in \Zcal} \Bigg[ \Mcal(N \psim(z) \psic(z)) \left( \prod_{y \in \Scal_z} \thetac(y;z)^{\psic(y;z)} \right)^{N \psim(z)} \Bigg] \nonumber \\
 & = & \prod_{z \in \Zcal} \Emp\Big( \psic(z) ; N \psim(z), \thetac(z) \Big) \;.
