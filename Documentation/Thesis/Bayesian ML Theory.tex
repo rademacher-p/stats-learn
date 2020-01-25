@@ -3,6 +3,10 @@
 \linespread{1.5}
 \usepackage[margin=1.0in]{geometry}
 
+%\interdisplaylinepenalty=2500
+%\pretolerance=150
+
+
 \setcounter{secnumdepth}{3}
 \setcounter{tocdepth}{3}
 
@@ -394,8 +398,6 @@ Observe that $\Prm_{\Drm | \uptheta}$ depends on the training data $\Drm$ only t
 
 \todomid{show SS via Kay, data likelihood?! D AND x?}
 
-
-
 The cardinality of the random process' domain is $|\Uppsi| = \Mcal\big( (N,|\Ycal||\Xcal|-1) \big)$; this can be shown using the stars-and-bars method \cite{feller}. The cardinality of original set is $|\Dcal| = \big( |\Ycal| |\Xcal| \big)^N$; thus $|\Uppsi| \leq |\Dcal|$ and the sufficient statistic compactly represents the valuable information in the training data. 
 
 \todolo{sufficient statistic savings in memory bits?}
@@ -409,7 +411,7 @@ Conditioned on the model $\uptheta$, the PMF of $\uppsi$ is
 & = & \Mcal(N \psi) \left( \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\psi(y,x)} \right)^N \nonumber \\
 & = & \Emp\big( \psi;N,\theta \big) \nonumber \;,
 \end{IEEEeqnarray}
-where the multinomial operator $\Mcal$ is used. Observe that the empirical process is equivalent to a multinomial process within a scale factor.
+where the multinomial operator $\Mcal$ is used. Observe that the Empirical process is equivalent to a Multinomial process within a scale factor.
 
 The first and second joint moments of this Empirical distribution are \cite{theodoridis-ML}
 \begin{IEEEeqnarray}{rCl}
@@ -426,7 +428,17 @@ and the covariance function is
 \end{IEEEeqnarray}
 The first and second moments of the Empirical distribution are proportionate to those of the Multinomial distribution.
 
-\todohi{N TRENDS? See Glivenko–Cantelli theorem. Figs?}
+Observe that for larger traning data volumes $N$, the set $\Uppsi$ becomes a denser grid of samples from the set $\Uptheta$ and the covariance tends to zero, concentrating the Empirical PMF around the model $\uptheta$. Thus, as $N \to \infty$, 
+\begin{equation}
+\Prm_{\uppsi | \uptheta}(\psi | \theta) \to \delta[\psi, \theta] \;.
+\end{equation}
+This trend underscores the identifiability of the model $\theta$.
+
+\todohigh{CHECK!???? SCALING FACTOR???}
+
+\todohi{FIGS!}
+
+\todomid{Cite Glivenko–Cantelli theorem?}
 
 Also, using the maximum likelihood estimate of a Multinomial distribution \cite{rao}, the maximum likelihood estimate of $\theta$ given the training data empirical model is simply
 \begin{IEEEeqnarray}{rCl}
@@ -458,7 +470,7 @@ The conditional distribution of the values $\Yrm$ given the corresponding $\Xrm$
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\Yrm | \Xrm,\uptheta}\big( Y | X,\theta \big) & = & \prod_{n=1}^N \frac{\Prm_{\Yrm_n,\Xrm_n | \uptheta}\big( Y_n,X_n | \theta \big)}{\Prm_{\Xrm_n | \uptheta}\big( X_n | \theta \big)} \\
 & \equiv & \prod_{x \in \Xcal} \left[ \prod_{y \in \Ycal} \thetac(y;x)^{N \Psi(y,x;Y,X)} \right] \nonumber \\
-& \equiv & \left( \prod_{x \in \Xcal} \left( \prod_{y \in \Ycal} \thetac(y;x)^{\Psic(y;x;Y,X)} \right)^{\Psim(x;X)} \right)^N \nonumber \;,
+& \equiv & \prod_{x \in \Xcal} \left( \prod_{y \in \Ycal} \thetac(y;x)^{\Psic(y;x;Y,X)} \right)^{N \Psim(x;X)} \nonumber \;,
 \end{IEEEeqnarray}
 where the function $\Psic : \{\Ycal \times \Xcal\}^N \mapsto \Uppsic \subset \Pcal(\Ycal)^{\Xcal}$ with range
 \begin{equation}
@@ -572,14 +584,32 @@ and the minimum Bayes risk is
 
 Observe that the Bayesian distributions can be represented as $\Prm_{\xrm | \Drm} = \Erm_{\uptheta | \Drm}\big[ \Prm_{\xrm | \uptheta} \big] \equiv \mu_{\upthetam | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm} = \Erm_{\uptheta | \xrm,\Drm}\big[ \Prm_{\yrm | \xrm,\uptheta} \big] \equiv \mu_{\upthetac(\xrm) | \xrm,\Drm}$, the expected values of the corresponding clairvoyant distributions with respect to the model posteriors $\prm_{\upthetam | \Drm}$ and $\prm_{\upthetac(\xrm) | \xrm,\Drm}$, respectively. Thus, the Bayesian approach to prediction uses the model posterior given the observable random elements to integrate out the model dependency of the risk $\Rcal_{\Theta}(f ; \uptheta)$.
 
-Additionally, since $\Psi(\Drm)$ is a sufficient statistic for the model $\uptheta$, the Bayesian distributions of interest $\Prm_{\Drm}$, $\Prm_{\xrm | \Drm}$, and $\Prm_{\yrm | \xrm,\Drm}$ will also depend on $\Drm$ via $\Psi(\Drm)$; as such, the training data can be transformed into the empirical process $\uppsi$ for Bayesian prediction without incurring any additional risk. For this approach, the distributions $\Prm_{\uppsi}$, $\Prm_{\xrm | \uppsi}$, and $\Prm_{\yrm | \xrm,\uppsi}$ are required - note that $\Mcal\big( N \Psi(D) \big) \Prm_{\Drm | \uptheta}(D | \theta) = \Prm_{\uppsi | \uptheta}\big( \Psi(D) | \theta \big)$, $\Prm_{\xrm | \Drm}(D) = \Prm_{\xrm | \uppsi}\big( \Psi(D) \big)$, and $\Prm_{\yrm | \xrm,\Drm}(x,D) = \Prm_{\yrm | \xrm,\uppsi}\big( x,\Psi(D) \big)$.
+Additionally, since $\Psi(\Drm)$ is a sufficient statistic for the model $\uptheta$, the Bayesian distributions of interest $\Prm_{\Drm}$, $\Prm_{\xrm | \Drm}$, and $\Prm_{\yrm | \xrm,\Drm}$ will also depend on $\Drm$ via $\Psi(\Drm)$; as such, the training data can be transformed into the empirical process $\uppsi$ for Bayesian prediction without incurring any additional risk. 
+
+For this approach, the distributions $\Prm_{\uppsi}$, $\Prm_{\xrm | \uppsi}$, and $\Prm_{\yrm | \xrm,\uppsi}$ are required. Note that $\Mcal\big( N \Psi(D) \big) \Prm_{\Drm | \uptheta}(D | \theta) = \Prm_{\uppsi | \uptheta}\big( \Psi(D) | \theta \big)$. Also, observe that the relevant posterior distributions satisfy $\prm_{\upthetam | \Drm}(D) = \prm_{\upthetam | \uppsi}\big( \Psi(D) \big)$ and $\prm_{\upthetac(x) | \xrm,\Drm}(x,D) = \prm_{\upthetac(x) | \xrm,\uppsi}\big( x,\Psi(D) \big)$; consequently, $\Prm_{\xrm | \Drm}(D) = \Prm_{\xrm | \uppsi}\big( \Psi(D) \big)$, and $\Prm_{\yrm | \xrm,\Drm}(x,D) = \Prm_{\yrm | \xrm,\uppsi}\big( x,\Psi(D) \big)$.
+
+
 
 
 
 
 \subsubsection{Irreducible Risk}
 
-\todohi{location? terminology?}
+\todohigh{Location???}
+
+\todohigh{Prior support?}
+
+The trends in Bayesian risk as $N \to \infty$ are of specific interest. For priors with full support, observe that as the number of training samples increases, the statistic PMF tends toward $\Prm_{\uppsi}(\psi) \approx N^{1-|\Ycal||\Xcal|}\prm_{\uptheta}(\psi)$; this can be proven using Gautschi's inequality \cite{wendel}. Thus,
+\begin{IEEEeqnarray}{rCl}
+\prm_{\uptheta | \uppsi}(\theta | \psi) & = & \frac{\Prm_{\uppsi | \uptheta}(\psi | \theta)}{\Prm_{\uppsi}(\psi)} \prm_{\uptheta}(\theta) \nonumber \\
+& \to & 
+\end{IEEEeqnarray}
+
+\todohigh{FIXXXXXX}
+
+
+
+\todohi{terminology?}
 
 The clairvoyant risk \eqref{eq:risk_clv} for a given model satisfies $\Rcal_{\Theta}^*(\theta) \leq \Rcal_{\Theta}(f;\theta) \quad \forall f \in \Fcal, \ \theta \in \Uptheta$. Consequently, the Bayes risk satisfies $\Erm_{\uptheta} \big[ \Rcal_{\Theta}^*(\uptheta) \big] \leq \Rcal(f) \quad \forall f \in \Fcal$; the expected value of the clairvoyant risk will thus be referred to as the ``irreducible'' risk. 
 
@@ -593,6 +623,8 @@ It is important to note that this inequality holds for any number of training sa
 \todohi{Location? Clean up...}
 
 \todohi{Continuous? sums, PMFs...}
+
+\todohi{marginal/conditional independence discuss? x independence!}
 
 %Using the marginal and conditional model representations, the Bayesian predicitive distributions analagous to the clairvoyant distributions can now be simplified as $\Prm_{\xrm | \Drm} = \mu_{\upthetam | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm} = \mu_{\upthetac(\xrm) | \xrm,\Drm}$.
 
@@ -924,24 +956,25 @@ Figure \ref{fig:P_theta_uniform} shows the uniform distribution amplitude for $|
 
 PGR: move/add Dir figs here? 
 
-The marginal distribution $\upthetam$ and the conditional distribution $\upthetac$ are also of interest. To keep notation simple, it is helpful to introduce the bijection $\alpha \Leftrightarrow (\alpham,\alphac)$, where $\alpham \equiv \sum_{y \in \Ycal} \alpha(y,\cdot)$, and $\alphac(x) = \alpha(\cdot,x) / \alpham(x)$ for each $x \in \Xcal$. Observe that $\alpham \in \Pcal(\Xcal)$ and $\alphac \in \Pcal(\Ycal)^{\Xcal}$.
+The marginal distribution $\upthetam$ and the conditional distribution $\upthetac$ are also of interest. For brevity, introduce the bijection $\alpha \Leftrightarrow (\alpham,\alphac)$, where $\alpham \equiv \sum_{y \in \Ycal} \alpha(y,\cdot)$, and $\alphac(x) = \alpha(\cdot,x) / \alpham(x)$ for each $x \in \Xcal$. Observe that $\alpham \in \Pcal(\Xcal)$ and $\alphac \in \Pcal(\Ycal)^{\Xcal}$.
 
 
 By the aggregation property \cite{ferguson}, $\upthetam \sim \Dir(\alpha_0,\alpham)$ is a Dirichlet random process parameterized by concentation $\alpha_0$ and distribution $\alpham$; observe that $\Prm_{\xrm} = \mu_{\upthetam} = \alpham$.
 
 Also of interest is the distribution of the predictive model $\upthetac$ conditioned on the marginal $\upthetam$. As demonstrated in Appendix \ref{app:Dir_agg}, these random processes are jointly distributed as
 \begin{IEEEeqnarray}{rCl}
-\prm_{\upthetac | \upthetam}(\thetac | \thetam) & = & \prod_{x \in \Xcal} \Bigg[ \beta\big( \alpha_0 \alpham(x) \alphac(x) \big)^{-1} \prod_{y \in \Ycal} \thetac(y;x)^{\alpha_0 \alpham(x) \alphac(y;x) - 1} \Bigg] \\
+\prm_{\upthetac | \upthetam}(\thetac | \thetam) & = & \prm_{\upthetac}(\thetac) \\
+& = & \prod_{x \in \Xcal} \Bigg[ \beta\big( \alpha_0 \alpham(x) \alphac(x) \big)^{-1} \prod_{y \in \Ycal} \thetac(y;x)^{\alpha_0 \alpham(x) \alphac(y;x) - 1} \Bigg] \nonumber \\
 & = & \prod_{x \in \Xcal} \Dir\Big( \thetac(x) ; \alpha_0 \alpham(x), \alphac(x) \Big) \nonumber \;,
 \end{IEEEeqnarray}
 a product of Dirichlet distributions defined on $\thetac \in \Pcal(\Ycal)^{\Xcal}$. As shown, the processes $\upthetac(x)$ are Dirichlet with parameterizing distributions $\alphac(x)$ and concentrations $\alpha_0 \alpham(x)$, independent of one another, and independent of the marginal distribution $\upthetam$. Note that $\Prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$. 
 
-\todohi{Keep normal alpha in exponents above??}
+\todolo{Keep normal alpha in exponents above??}
 
 
-PGR: use conditional independence property to simplify throughout?!? In loss app sections?!?!
+\todomid{use conditional independence property to simplify throughout?!? In loss app sections?!?!}
 
-PGR: implications of independence for posterior learning?
+
 
 
 \begin{figure}
@@ -958,7 +991,7 @@ PGR: implications of independence for posterior learning?
 
 \subsection{Training Set PMF, $\Prm_{\Drm}$}
 
-\todomid{EVIDENCE TERMINOLOGY??}
+\todolo{EVIDENCE TERMINOLOGY??}
 
 Next, the conditional distribution $\Prm_{\Drm | \uptheta}$ will be used to determine the marginal PMF, $\Prm_{\Drm}$ and properties will be discussed.
 
@@ -982,15 +1015,15 @@ Conversely, as $\alpha_0 \to 0$, the distribution becomes
 \end{IEEEeqnarray}
 and the training data are identical.
 
-\todohigh{DEFINE}
 
-Next, the distribution of the sufficient statistic $\uppsi$ will be represented. As a Dirichlet distribution characterizes the parameters of the Empirical distribution $\Prm_{\uppsim | \uptheta}$, the PMF of $\uppsi$ is a Dirichlet-Empirical distribution (related to the Dirichlet-Multinomial distribution \cite{johnson}) for $N$ samples, concentration $\alpha_0$, and parameter distribution $\alpha$,
+
+Next, the distribution of the sufficient statistic $\uppsi$ will be represented. As a Dirichlet distribution characterizes the parameters of the Empirical distribution $\Prm_{\uppsim | \uptheta}$, the PMF of $\uppsi$ is a Dirichlet-Empirical distribution (related to the Dirichlet-Multinomial distribution \cite{johnson}) for $N$ samples, concentration $\alpha_0$, and parameter distribution $\alpha$, such that
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\uppsi}(\psi) & = & \Mcal(N \psi) \frac{\beta(\alpha_0 \alpha + N \psi)}{\beta(\alpha_0 \alpha)} \\
 & = & \DE\big( \psi; N,\alpha_0, \alpha \big) \nonumber \;.
 \end{IEEEeqnarray}
 
-The first and second joint moments of $\uppsi$ are
+The first and second joint moments of the empirical model $\uppsi$ are
 \begin{IEEEeqnarray}{rCl}
 \mu_{\uppsi} & = & \alpha = \mu_\uptheta 
 \end{IEEEeqnarray}
@@ -1004,6 +1037,17 @@ The covariance function is
 \Sigma_{\uppsi}(y,x,y',x') & = & \frac{\alpha_0^{-1} + N^{-1}}{1 + \alpha_0^{-1}} \big( \alpha(y,x) \delta[y,y'] \delta[x,x'] - \alpha(y,x) \alpha(y',x') \big) \\
 & = & \left(1 + \frac{\alpha_0}{N}\right) \Sigma_{\uptheta}(y,x,y',x') \nonumber \;.
 \end{IEEEeqnarray}
+Observe that as $N \to \infty$, the variance $\Sigma_{\uppsi} \to \Sigma_{\uptheta}$.
+
+
+Observe that as the number of training samples increases, the statistic PMF tends toward $\Prm_{\uppsi}(\psi) \approx N^{1-|\Ycal||\Xcal|}\prm_{\uptheta}(\psi)$; this can be proven using Gautschi's inequality \cite{wendel}. Figure \ref{fig:P_nbar_N} shows how a specific model prior influences the data PMF differently for different $N$.
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{P_nbar_N.pdf}
+\caption{$\Prm(\uppsi)$ for different training set sizes $N$}
+\label{fig:P_nbar_N}
+\end{figure}
+
 
 
 Again, the data PMF's for minimal and maximal concentration $\alpha_0$ are relevant. For $\alpha_0 \to \infty$, the model PDF $\prm_{\uptheta}$ concentrates at its mean, $\alpha$, and thus $\uppsi$ is characterized by an Empirical distribution,
@@ -1017,19 +1061,15 @@ Conversely, for $\alpha_0 \to 0$, the PMF tends toward
 
 \todohi{formal proofs for limiting PMFs? stirling/gautschi?}
 
-Figure \ref{fig:P_nbar_a0} displays example distributions of $\uppsi$ for $N=10$ and different model concentrations $\alpha_0$. Observe that for large $\alpha_0$, the distribution approaches an Empirical distribution $\uppsi \sim \Emp(N,\alpha)$. Figure \ref{fig:P_nbar_N} shows how a specific model prior influences the data PMF differently for different $N$. Observe that as the number of training samples increases, the statistic PMF tends toward $\Prm_{\uppsi}(\psi) \approx N^{1-|\Ycal||\Xcal|}\prm_{\uptheta}(\psi)$; this can be proven using Gautschi's inequality \cite{wendel}.
+Figure \ref{fig:P_nbar_a0} displays example distributions of $\uppsi$ for $N=10$ and different model concentrations $\alpha_0$. Observe that for large $\alpha_0$, the distribution approaches an Empirical distribution $\uppsi \sim \Emp(N,\alpha)$. 
+
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{P_nbar_a0.pdf}
 \caption{$\Prm(\uppsi)$ for different prior concentrations $\alpha_0$}
 \label{fig:P_nbar_a0}
 \end{figure}
-\begin{figure}
-\centering
-\includegraphics[width=0.7\linewidth]{P_nbar_N.pdf}
-\caption{$\Prm(\uppsi)$ for different training set sizes $N$}
-\label{fig:P_nbar_N}
-\end{figure}
+
 
 
 
@@ -1068,22 +1108,22 @@ As the model marginal $\upthetam$ and conditional $\upthetac$ are independent, t
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\Yrm | \Xrm}(Y | X) & = & \Erm_{\upthetac}\big[ \Prm_{\Yrm | \Xrm,\upthetac} \big](Y ; X) \\
 & = & \prod_{x \in \Xcal} \Erm_{\upthetac(x)}\left[ \prod_{y \in \Ycal} \upthetac(y;x)^{N \Psim(x;X) \Psic(y;x;Y,X)} \right] \nonumber \\
-& = & \prod_{x \in \Xcal} \frac{\beta\big( \alpha_0 \alpham(x) \alphac(x) + N \Psim(x;X) \Psic(y;x;Y,X) \big)}{\beta\big( \alpha_0 \alpham(x) \alphac(x) \big)} \nonumber \;.
+& = & \prod_{x \in \Xcal} \frac{\beta\big( \alpha_0 \alpham(x) \alphac(x) + N \Psim(x;X) \Psic(x;Y,X) \big)}{\beta\big( \alpha_0 \alpham(x) \alphac(x) \big)} \nonumber \;.
 \end{IEEEeqnarray}
+
+
+
+The corresponding distributions for the sufficient statistics will be expressed as well. Recall that $\uppsim | \uptheta \sim \Emp(N,\upthetam)$; by the aggregation property of Dirichlet-Empirical functions (inherited from the Dirichlet-Multinomial properties \cite{johnson}), the random process is distributed as $\uppsim \sim \DE(N,\alpha_0,\alpham)$.
+
+Also of interest is the distribution of $\uppsic$ conditioned on its aggregation $\uppsim$. Using the Dirichlet-Empirical properties presented in Appendix \ref{app:DE}, it can be shown that
+\begin{IEEEeqnarray}{rCl}
+\Prm_{\uppsic | \uppsim}(\psic | \psim) & = & \prod_{x \in \Xcal} \left[ \Mcal\big( N \psim(x) \psic(x) \big) \frac{\beta\big( \alpha_0 \alpham(x) \alphac(x) + N \psim(x) \psic(x) \big)}{\beta\big( \alpha_0 \alpham(x) \alphac(x) \big)} \right] \\
+& = & \prod_{x \in \Xcal} \DE\Big( \psic(x) ; N \psim(x), \alpha_0 \alpham(x), \alphac(x) \Big) \nonumber
+\end{IEEEeqnarray}
+over the domain $\prod_{x \in \Xcal} \left\{ \frac{n}{N \psim(x)}: n \in {\Zbbgeq}^{\Ycal} : \sum_{y \in \Ycal} n(y) = N \psim(x) \right\}$. Observe that conditioning on the marginal empirical process renders the conditional processes $\uppsic(x)$ independent of one another and that they are also Dirichlet-Empirical, such that $\uppsic(x) | \uppsim(x) \sim \DE\big( N \uppsim(x),\alpha_0 \alpham(x), \alphac(x) \big)$.
+
 
 \todohigh{EDIT PROGRESS}
-
-The corresponding distributions for the sufficient statistics will be expressed as well. Recall that $\uppsim | \uptheta \sim \Multi(N,\upthetam)$; by the aggregation property of Dirichlet-Multinomial functions \cite{johnson}, the random process is distributed as $\uppsim \sim \DM(N,\alpha')$.
-
-Also of interest is the distribution of $\uppsi$ conditioned on its aggregation $\uppsim$. Using the Dirichlet-Multinomial properties presented in Appendix \ref{app:DM_agg}, it can be shown that
-\begin{IEEEeqnarray}{rCl}
-\Prm_{\uppsi | \uppsim}(\psi | \psim) & = & \prod_{x \in \Xcal} \left[ \Mcal\big( \psi(\cdot,x) \big) \frac{\beta\big( \alpha(\cdot,x) + \psi(\cdot,x) \big)}{\beta\big( \alpha(\cdot,x) \big)} \right] \\
-& = & \prod_{x \in \Xcal} \DM\Big( \psi(\cdot,x) ; n'(x) , \alpha(\cdot,x) \Big) \nonumber
-\end{IEEEeqnarray}
-over the domain $\left\{ \psi \in {\Zbbgeq}^{\Ycal \times \Xcal} : \sum_{y \in \Ycal} \psi(y,\cdot) = n' \right\}$. Observe that conditioning on the aggregation renders the function segments $\uppsi(\cdot,x)$ independent of one another and that they are also Dirichlet-Multinomial, such that $\uppsi(\cdot,x) | \uppsim(x) \sim \DM\big( \uppsim(x),\alpha(\cdot,x) \big)$.
-
-
-
 
 
 
@@ -1445,7 +1485,7 @@ PGR: provide additional steps?
 %= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \left(\frac{\alpha'(x)}{\alpha_0}\right)  \frac{N \frac{\alpha(y,x)}{\alpha'(x)} \delta[y,y'] + \big( N \alpha'(x) + \alpha_0 \alpha'(x) + \alpha_0 \big) \frac{\alpha(y,x)}{\alpha'(x)} \frac{\alpha(y',x)}{\alpha'(x)}}{(\alpha_0+N) \big( \alpha'(x)+1 \big)} \nonumber \\
 %= \sum_{x \in \Xcal} \left(\frac{\alpha'(x)}{\alpha_0}\right)  \frac{N \left( \sum_{y \in \Ycal} \frac{\alpha(y,x)}{\alpha'(x)} y^2 \right) + \big( N \alpha'(x) + \alpha_0 \alpha'(x) + \alpha_0 \big) \left( \sum_{y \in \Ycal} \frac{\alpha(y,x)}{\alpha'(x)} y \right)^2 }{(\alpha_0+N) \big( \alpha'(x)+1 \big)} \nonumber \;.
 %\end{IEEEeqnarray}
-The above formulation exploits the statistical characterization of the aggregation, $\uppsim \sim \DM(N,\alpha')$; also used is the property that the Dirichlet-Multinomial random process $\uppsi$ conditioned on its aggregation $\uppsim$ yields independent  conditional DM functions $\uppsi(\cdot,x) | \uppsim(x) \sim \DM\big( \uppsim(x),\alpha(\cdot,x) \big)$.
+The above formulation exploits the statistical characterization of the aggregation, $\uppsim \sim \DE(N,\alpha_0,\alpham)$; also used is the property that the Dirichlet-Multinomial random process $\uppsi$ conditioned on its aggregation $\uppsim$ yields independent  conditional DM functions $\uppsi(\cdot,x) | \uppsim(x) \sim \DM\big( \uppsim(x),\alpha(\cdot,x) \big)$.
 
 PGR: move to appendix???
 
@@ -1667,7 +1707,7 @@ Calculation of the second derivative confirms that this value is a local minimum
 \end{equation}
 which can be easily shown to be less than both the asymptotic values for $\alpha'(x) \to 0$ and $\alpha'(x) \to \infty$. Thus the concentation values \eqref{eq:alpha_x_min_Rex} provide the minimum excess risk for the given prior conditional distributions.
 
-Note that the minimizing concentration values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible; the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low concentrations are preferable when the model has low conditional variance; these models can be quickly identified with learners that prioritize the emprical PMF estimate over the prior estimate. Additionally, note that these values $\alpha'(x)$ do not depend on the training volume $N$.
+Note that the minimizing concentration values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible; the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low concentrations are preferable when the model has low conditional variance; these models can be quickly identified by learners that prioritize the emprical PMF estimate over the prior estimate. Additionally, note that these values $\alpha'(x)$ do not depend on the training volume $N$.
 
 
 
@@ -2867,7 +2907,7 @@ where the multinomial theorem \cite{graham} has been used.
 
 If the Empirical random process $\uppsi$ is conditioned on its aggregation $\uppsim$ over the partition $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, the distinct segements $\uppsi_z$ become independent random processes, such that for $\psi \in \Uppsim(\psim)$,
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\uppsi | \uppsim}(\psi | \psim) & = & \frac{\Prm_{\uppsi,\uppsim}(\psi,\psim)}{\Prm_{\uppsim}(\psim)} = \frac{\Mcal(N \psi)}{\Mcal(N \psim)} \left( \frac{\prod_{y \in \Ycal} \theta(y)^{\psi(y)}}{\prod_{z \in \Zcal} \thetam(z)^{\psim(z)}} \right)^N \\
+\Prm_{\uppsic | \uppsim}(\psic | \psim) & = & \frac{\Prm_{\uppsi,\uppsim}(\psi,\psim)}{\Prm_{\uppsim}(\psim)} = \frac{\Mcal(N \psi)}{\Mcal(N \psim)} \left( \frac{\prod_{y \in \Ycal} \theta(y)^{\psi(y)}}{\prod_{z \in \Zcal} \thetam(z)^{\psim(z)}} \right)^N \\
 & \equiv & \prod_{z \in \Zcal} \Bigg[ \Mcal(N \psi_z) \left(\frac{\prod_{y \in \Scal_z} \theta_z(y)^{\psi_z(y)}}{\thetam(z)^{\psim(z)}} \right)^N \Bigg] \nonumber \\
 & = & \prod_{z \in \Zcal} \Bigg[ \Mcal(N \psi_z) \left( \prod_{y \in \Scal_z} \left(\frac{\theta_z(y)}{\thetam(z)}\right)^{\psi_z(y)} \right)^N \Bigg] \nonumber \;.
 \end{IEEEeqnarray}
@@ -2920,7 +2960,7 @@ If the multinomial random process $\uppsi$ is conditioned on its aggregation $\u
 
 If the multinomial random process $\uppsi$ is conditioned on its aggregation over the partition $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, the distinct segements $\uppsi(y)$, $y \in \Scal_z$ become independent multinomial random processes
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\uppsi | \uppsim}(\psi | \psim) & = & \frac{\Mcal(\psi) \prod_{y \in \Ycal} \theta(y)^{\psi(y)}}{\Mcal(\psim) \prod_{z \in \Zcal} \thetam(z)^{\psim(z)}} \\
+\Prm_{\uppsic | \uppsim}(\psic | \psim) & = & \frac{\Mcal(\psi) \prod_{y \in \Ycal} \theta(y)^{\psi(y)}}{\Mcal(\psim) \prod_{z \in \Zcal} \thetam(z)^{\psim(z)}} \\
 & = & \prod_{z \in \Zcal} \Bigg[ \Mcal(\psi_z) \prod_{y \in \Scal_z} \left(\frac{\theta_z(y)}{\thetam(z)}\right)^{\psi_z(y)} \Bigg] \nonumber \\
 & = & \prod_{z \in \Zcal} \Bigg[ \Mcal(\psi_z) \prod_{y \in \Scal_z} \thetac(y;z)^{\psi_z(y)} \Bigg] \nonumber \\
 & = & \prod_{z \in \Zcal} \Multi\big( \psi_z ; \psim(z) , \thetac(z) \big) \nonumber \;,
@@ -2970,7 +3010,7 @@ This principle holds for continuous-domain Dirichlet processes $\uptheta$ as wel
 
 
 \section{Dirichlet-Empirical random process conditioned on its aggregation} 
-\label{app:emp_dir}
+\label{app:DE}
 
 \subsection{Aggregation}
 
@@ -3003,7 +3043,7 @@ has been used.
 
 If the Dirichlet-Empirical random process $\uppsi$ is conditioned on its aggregation $\uppsim$ over the partition $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, the distinct segements $\uppsi_z$ become independent random processes, such that for $\psi \in \Uppsim(\psim)$,
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\uppsi | \uppsim}(\psi | \psim) & = & \frac{\Mcal(N \psi) \beta(\alpha_0 \alpha)^{-1} \beta(\alpha_0 \alpha + N \psi)}{\Mcal(N \psim) \beta(\alpha_0 \alpham)^{-1} \beta(\alpha_0 \alpham + N \psim)} \\
+\Prm_{\uppsic | \uppsim}(\psic | \psim) & = & \frac{\Mcal(N \psi) \beta(\alpha_0 \alpha)^{-1} \beta(\alpha_0 \alpha + N \psi)}{\Mcal(N \psim) \beta(\alpha_0 \alpham)^{-1} \beta(\alpha_0 \alpham + N \psim)} \\
 & = & \left( \prod_{z \in \Zcal} \frac{\Gamma\big( \alpha_0 \alpham(z)+N \psim(z) \big)}{\big(N \psim(z)\big)! \ \Gamma\big( \alpham(z) \big)} \right)^{-1} \left( \prod_{y \in \Ycal} \frac{\Gamma\big( \alpha_0 \alpha(y) + N \psi(y) \big)}{\big(N \psi(y)\big)! \ \Gamma\big( \alpha_0 \alpha(y) \big)} \right) \nonumber \\
 & = & \prod_{z \in \Zcal} \left[ \frac{\big(N \psim(z)\big)! \ \Gamma\big( \alpham(z) \big)}{\Gamma\big( \alpha_0 \alpham(z)+N \psim(z) \big)} \prod_{y \in \Scal_z} \frac{\Gamma\big( \alpha_0 \alpha_z(y) + N \psi_z(y) \big)}{\big(N \psi_z(y)\big)! \ \Gamma\big( \alpha_0 \alpha_z(y) \big)} \right] \nonumber \\
 & = & \prod_{z \in \Zcal} \Mcal(N \psi_z) \frac{\beta(\alpha_0 \alpha_z + N \psi_z)}{\beta(\alpha_0 \alpha_z)} \nonumber
@@ -3037,7 +3077,7 @@ A defining characteristic of a Dirichlet-Multinomial random process is that its 
 
 It can be shown that conditioned on the aggregation $\uppsim$, the segments $\big\{ \uppsi(y) : y \in \Scal_z \big\}$ of the original random process become independent Dirichlet-Multinomial random processes, such that
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\uppsi | \uppsim}(\psi | \psim) & = & \frac{\Mcal(N \psi) \beta(\alpha_0 \alpha)^{-1} \beta(\alpha_0 \alpha + N \psi)}{\Mcal(N \psim) \beta(\alpha_0 \alpham)^{-1} \beta(\alpha_0 \alpham + N \psim)} \\
+\Prm_{\uppsic | \uppsim}(\psic | \psim) & = & \frac{\Mcal(N \psi) \beta(\alpha_0 \alpha)^{-1} \beta(\alpha_0 \alpha + N \psi)}{\Mcal(N \psim) \beta(\alpha_0 \alpham)^{-1} \beta(\alpha_0 \alpham + N \psim)} \\
 & = & \left( \prod_{z \in \Zcal} \frac{\Gamma\big( \alpha_0 \alpham(z)+N \psim(z) \big)}{\big(N \psim(z)\big)! \ \Gamma\big( \alpham(z) \big)} \right)^{-1} \left( \prod_{y \in \Ycal} \frac{\Gamma\big( \alpha_0 \alpha(y) + N \psi(y) \big)}{\big(N \psi(y)\big)! \ \Gamma\big( \alpha_0 \alpha(y) \big)} \right) \nonumber \\
 & = & \prod_{z \in \Zcal} \left[ \frac{\big(N \psim(z)\big)! \ \Gamma\big( \alpham(z) \big)}{\Gamma\big( \alpha_0 \alpham(z)+N \psim(z) \big)} \prod_{y \in \Scal_z} \frac{\Gamma\big( \alpha_0 \alpha(y) + N \psi(y) \big)}{\big(N \psi(y)\big)! \ \Gamma\big( \alpha_0 \alpha(y) \big)} \right] \nonumber \\
 & = & \prod_{z \in \Zcal} \DM\Big( \big\{ \psi(y) : y \in \Scal_z \big\} ; \psim(z), \big\{ \alpha(y) : y \in \Scal_z \big\} \Big) \nonumber \;,
