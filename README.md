@@ -1,4 +1,4 @@
 # Dissertation
 Ph.D @ GWU
 
-Post-DQE Branching!!!
+Post-DQE Branching!
