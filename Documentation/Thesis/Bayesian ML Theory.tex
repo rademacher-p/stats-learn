@@ -470,7 +470,7 @@ The conditional distribution of the values $\Yrm$ given the corresponding $\Xrm$
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\Yrm | \Xrm,\uptheta}\big( Y | X,\theta \big) & = & \prod_{n=1}^N \frac{\Prm_{\Yrm_n,\Xrm_n | \uptheta}\big( Y_n,X_n | \theta \big)}{\Prm_{\Xrm_n | \uptheta}\big( X_n | \theta \big)} \\
 & \equiv & \prod_{x \in \Xcal} \left[ \prod_{y \in \Ycal} \thetac(y;x)^{N \Psi(y,x;Y,X)} \right] \nonumber \\
-& \equiv & \prod_{x \in \Xcal} \left( \prod_{y \in \Ycal} \thetac(y;x)^{\Psic(y;x;Y,X)} \right)^{N \Psim(x;X)} \nonumber \;,
+& = & \prod_{x \in \Xcal} \left( \prod_{y \in \Ycal} \thetac(y;x)^{\Psic(y;x;Y,X)} \right)^{N \Psim(x;X)} \nonumber \;,
 \end{IEEEeqnarray}
 where the function $\Psic : \{\Ycal \times \Xcal\}^N \mapsto \Uppsic \subset \Pcal(\Ycal)^{\Xcal}$ with range
 \begin{equation}
@@ -1187,7 +1187,7 @@ Finally, the predictive distribution of interest is generated via Bayes rule as
 \end{IEEEeqnarray}
 The last representation views the distribution as a convex combination of two conditional distributions. The first distribution $\Prm_{\yrm | \xrm} = \alphac(\xrm)$ is independent of the training data and based on the prior knowledge implied via the model PDF parameter; the second distribution is the conditional empirical model and depends on $\Drm$, not on $\alpha$.
 
-Recall that the weighting factors $\alpha_0 \alpham(x)$ and $N \Psim(x;\Drm)$ are the concentration of the conditional prior $\upthetac(x)$ and the number of training samples characterizing the conditional empirical model $\uppsic(x)$ (samples satisfying $X_n = \xrm$). As $\frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm)} \to 0$, the PMF tends toward the conditional distribution $\alphac(\xrm)$. As $\frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm)} \to \infty$, $\Prm_{\yrm | \xrm,\Drm}$ tends towards the empirical conditional distribution $\Psic(\xrm)$. 
+Recall that the weighting factors $\alpha_0 \alpham(x)$ and $N \Psim(x;\Drm)$ are the concentration of the conditional prior $\upthetac(x)$ and the number of training samples characterizing the conditional empirical model $\uppsic(x)$ (samples satisfying $X_n = \xrm$), respectively. As $\frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm)} \to 0$, the PMF tends toward the conditional distribution $\alphac(\xrm)$. As $\frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm)} \to \infty$, $\Prm_{\yrm | \xrm,\Drm}$ tends towards the empirical conditional distribution $\Psic(\xrm)$. 
 
 
 
@@ -1209,13 +1209,13 @@ PGR: reference posterior equations!
 
 PGR: DIR FIGS? for PDF asymptotics?
 
-\todohigh{EDIT PROGRESS}
+\todohigh{EDIT PROGRESS!}
 
 
-The Bayesian distributions $\Prm_{\xrm | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm}$ can also be found from the posterior distributions $\prm_{\upthetam | \Drm}$ and $\prm_{\upthetac | \xrm,\Drm}$, respectively. As the Dirichlet assumption renders $\upthetam$ and $\upthetac$ independent, it can be shown that $\Prm_{\Yrm | \Xrm} = \Erm_{\upthetac}\big[ \Prm_{\Yrm | \Xrm,\upthetac} \big]$ and thus that $\upthetam$ is conditionally independent of $\Yrm$ given $\Xrm$. Furthermore, the Dirichlet distribution $\prm_{\upthetam}$ is the conjugate prior for $\Prm_{\Xrm | \upthetam}$. As a result, $\upthetam | \Drm \sim \Dir(\alpha' + \Psim(\Xrm))$ and
+The Bayesian distributions $\Prm_{\xrm | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm}$ can also be found from the posterior distributions $\prm_{\upthetam | \Drm}$ and $\prm_{\upthetac | \xrm,\Drm}$, respectively. As the Dirichlet assumption renders $\upthetam$ and $\upthetac$ independent, it can be shown that $\Prm_{\Yrm | \Xrm} = \Erm_{\upthetac}\big[ \Prm_{\Yrm | \Xrm,\upthetac} \big]$ and thus that $\upthetam$ is conditionally independent of $\Yrm$ given $\Xrm$. Furthermore, the Dirichlet distribution $\prm_{\upthetam}$ is a conjugate prior for $\Prm_{\Xrm | \upthetam}$. As a result, $\upthetam | \Drm \sim \Dir\big (\alpha_0 + N, \mu_{\upthetam | \Xrm} \big)$, where
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\xrm | \Drm}(D) & = & \mu_{\upthetam | \Drm}(D) = \mu_{\upthetam | \Xrm}(X) \\
-& = & \frac{\alpha' + \Psim(X)}{\alpha_0 + N} \nonumber \;.
+\Prm_{\xrm | \Drm}(D) & = & \mu_{\upthetam | \Drm}(D) \\
+& = & \mu_{\upthetam | \Xrm}(X) = \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpham + \left(\frac{N}{\alpha_0 + N}\right) \Psim(\Drm) \nonumber \;.
 \end{IEEEeqnarray}
 Similarly, the distribution can be expressed in terms of the empirical PMF sufficient statistic as
 \begin{IEEEeqnarray}{rCl}
