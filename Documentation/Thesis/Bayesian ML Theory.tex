@@ -1284,46 +1284,48 @@ PGR: use poster table??
 
 \todohigh{EDIT PROGRESS!}
 
-It is instructive to treat the distribution $\Prm_{\yrm | \xrm,\uppsi}$ as an estimate of the unknown conditional PMF $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$ and investigate the effects of informative prior knowledge. For a given $\xrm$ and corresponding number of training samples $\uppsim(\xrm)$, the expected value of the estimate condtioned on the true model $\uptheta$ is
+It is instructive to treat the distribution $\Prm_{\yrm | \xrm,\uppsi}$ as an estimate of the unknown conditional PMF $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$ and investigate the effects of informative prior knowledge. For a given $\xrm$ and marginal empirical probability $\uppsim(\xrm)$, the expected value of the estimate condtioned on the true model $\upthetac(\xrm)$ is
 \begin{IEEEeqnarray}{L}
-\Erm_{\uppsi | \uppsim,\uptheta}\big[ \Prm_{\yrm | \xrm,\uppsi} \big] 
-= \Erm_{\uppsi(\cdot,\xrm) | \uppsim(\xrm),\upthetac(\xrm)}\big[ \Prm_{\yrm | \xrm,\uppsi(\cdot,\xrm)} \big] \\ 
-\quad = \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + \uppsim(\xrm)}\right) \frac{\alpha(\cdot,\xrm)}{\alpha'(\xrm)} + \left(\frac{\uppsim(\xrm)}{\alpha'(\xrm) + \uppsim(\xrm)}\right) \upthetac(\xrm) \nonumber \;,
+\Erm_{\uppsic | \uppsim,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] 
+\equiv \Erm_{\uppsic(\xrm) | \uppsim(\xrm),\upthetac(\xrm)}\big[ \Prm_{\yrm | \xrm,\uppsim(\xrm),\uppsic(\xrm)} \big] \\ 
+\quad = \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right) \alphac(\xrm) + \left(\frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right) \upthetac(\xrm) \nonumber \;,
 \end{IEEEeqnarray}
-where the properties of a multinomial distribution conditioned on its aggregation have been used. The result is a convex combination of the conditional data-independent distribution $\alpha(\cdot,x) / \alpha'(x)$ and the true conditional distribution $\upthetac(\xrm)$. The convex coefficients are dependent on the ``marginal'' values $\alpha'$ and $\uppsim$; note that as the number of matching training samples $\uppsim(x)$ increases relative to $\alpha'(x)$, the estimate tends towards the true conditional PMF. 
+where the properties of an Empirical distribution conditioned on its aggregation have been used. The result is a convex combination of the conditional data-independent distribution $\alphac(\xrm)$ and the true conditional distribution $\upthetac(\xrm)$. The convex coefficients are dependent on the ``marginal'' values $\alpham(\xrm)$ and $\uppsim(\xrm)$; note that as the number of matching training samples $N \uppsim(x)$ increases relative to prior concentration $\alpha_0 \alpham(x)$, the estimate tends towards the true conditional PMF. 
 
-PGR: suppress delta dependency on nbar and theta?
+PGR: suppress delta dependency on psi and theta?
 
-To aid characterization of the estimator, define the random process $\Delta(\xrm,\uppsi,\uptheta) \equiv \Prm_{\yrm | \xrm,\uppsi} - \Prm_{\yrm | \xrm,\uptheta} \in \Rbb^{\Ycal}$. For a given $\xrm$ and corresponding number of training samples $\uppsim(\xrm)$, the bias of the conditional PMF estimate is
+To aid characterization of the estimator, define the random process $\Delta(\xrm,\uppsim,\uppsic,\upthetac) \equiv \Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$. For a given $\xrm$ and corresponding empirical model value $\uppsim(\xrm)$, the bias of the conditional PMF estimate is
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias}
-\mathrm{Bias}(\xrm,\uppsim,\uptheta) & = & \Erm_{\uppsi | \uppsim,\uptheta}\big[ \Delta(\xrm,\uppsi,\uptheta) \big] \\
-& = & \frac{\alpha'(\xrm)}{\alpha'(\xrm) + \uppsim(\xrm)} \left( \frac{\alpha(\cdot,\xrm)}{\alpha'(\xrm)} - \upthetac(\xrm) \right) \nonumber 
+\mathrm{Bias}(\xrm,\uppsim,\upthetac) & = & \Erm_{\uppsic | \uppsim,\upthetac}\big[ \Delta(\xrm,\uppsim,\uppsic,\upthetac) \big] \\
+& = & \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)} \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
+& = & \left( 1 + \frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm)} \right)^{-1} \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber 
 \end{IEEEeqnarray}
 and its covariance function is 
 \begin{IEEEeqnarray}{L} \label{eq:predictive_cov}
-\mathrm{Cov}(y,y';\xrm,\uppsim,\uptheta) = \Crm_{\uppsi | \uppsim,\uptheta} \big[\Prm_{\yrm | \xrm,\uppsi}(\cdot | \xrm,\uppsi) \big](y,y') \\
-\quad = \frac{\Sigma_{\uppsi(\cdot,\xrm) | \uppsim(\xrm),\upthetac(\xrm)}(y,y')}{\big( \alpha'(\xrm) + \uppsim(\xrm) \big)^2} \nonumber \\
-\quad = \frac{\uppsim(\xrm)}{\big( \alpha'(\xrm) + \uppsim(\xrm) \big)^2} \left( \upthetac(y;\xrm) \delta[y,y'] - \upthetac(y;\xrm) \upthetac(y';\xrm) \right) \nonumber \;,
+\mathrm{Cov}(y,y';\xrm,\uppsim,\upthetac) = \Crm_{\uppsic | \uppsim,\upthetac} \big[\Prm_{\yrm | \xrm,\uppsim,\uppsic}(\xrm,\uppsim,\uppsic) \big](y,y') \\
+\quad = \left( \frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)} \right)^2 \Sigma_{\uppsic(\xrm) | \uppsim(\xrm),\upthetac(\xrm)}(y,y') \nonumber \\
+\quad = \left( 1 + \frac{\alpha_0 \alpham(\xrm)}{N \uppsim(\xrm)} \right)^{-2} \Sigma_{\uppsic(\xrm) | \uppsim(\xrm),\upthetac(\xrm)}(y,y') \nonumber \\
+\quad = \frac{N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \big( \upthetac(y;\xrm) \delta[y,y'] - \upthetac(y;\xrm) \upthetac(y';\xrm) \big) \nonumber \;,
 \end{IEEEeqnarray}
-where the properties of multinomial random processes have been used. Note that the bias is proportionate to the difference between the true conditional model and the data-independent estimate. The scaling factor tends from one to zero as $\uppsim(x)/\alpha'(x)$ tends from zero to infinity; as such, more informative priors (large $\alpha'(x)$) will lead to PMF estimates that are prone to bias. Conversely, the variance of the PMF estimate tends to zero as $\alpha'(x) \to \infty$. 
+where the properties of multinomial random processes have been used. Note that the bias is proportionate to the difference between the true conditional model and the data-independent estimate. The scaling factor tends from one to zero as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)}$ tends from zero to infinity; as such, more informative priors (large $\alpha_0$) will lead to PMF estimates that are prone to bias. Conversely, the variance of the PMF estimate tends to zero as $\alpha_0 \to \infty$. 
 
 
-Combining the estimator bias and variance, the conditional second moments of $\Delta(\xrm,\uppsi,\uptheta)$ are
+Combining the estimator bias and variance, the conditional second moments of $\Delta(\xrm,\uppsim,\uppsic,\upthetac)$ are
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_del_sq}
-\mathcal{E}(y,y' ; \xrm,\uppsim,\uptheta) & = & \Erm_{\uppsi | \uppsim,\uptheta} \Big[ \Delta(y;\xrm,\uppsi,\uptheta) \Delta(y';\xrm,\uppsi,\uptheta) \Big] \\
-& = & \mathrm{Bias}(y;\xrm,\uppsim,\uptheta) \mathrm{Bias}(y';\xrm,\uppsim,\uptheta) + \mathrm{Cov}(y,y';\xrm,\uppsim,\uptheta) \nonumber \;.
+\mathcal{E}(y,y' ; \xrm,\uppsim,\upthetac) & = & \Erm_{\uppsic | \uppsim,\uptheta} \Big[ \Delta(y;\xrm,\uppsim,\uppsic,\upthetac) \Delta(y';\xrm,\uppsim,\uppsic,\upthetac) \Big] \\
+& = & \mathrm{Bias}(y;\xrm,\uppsim,\upthetac) \mathrm{Bias}(y';\xrm,\uppsim,\upthetac) + \mathrm{Cov}(y,y';\xrm,\uppsim,\upthetac) \nonumber \;.
 \end{IEEEeqnarray}
-As $\uppsim(x) \to \infty$, this function tends to zero and thus the underlying model $\upthetac(x)$ is determined precisely. A more practical case is estimation with a finite volume of training data. Specification of the Dirichlet model prior can be interpreted as providing a distribution estimate $\alpha(\cdot,x)/\alpha'(x)$ and a confidence level $\alpha'(x)$. Higher confidence reduces error due to the variance of the estimator, but increases the error due to bias between the true model and its estimate; low confidence renders the estimate unbiased, but maximizes the estimator variance. 
+As $N \uppsim(x) \to \infty$, this function tends to zero and thus the underlying model $\upthetac(x)$ is determined precisely. A more practical case is estimation with a finite volume of training data. Specification of the Dirichlet model prior can be interpreted as providing a distribution estimate $\alphac(x)$ and a confidence level $\alpha_0 \alpham(x)$. Higher confidence reduces error due to the variance of the estimator, but increases the error due to bias between the true model and its estimate; low confidence renders the estimate unbiased, but maximizes the estimator variance. 
 
 
 
 Also of interest, the conditional expectation of $\mathcal{E}(\cdot,\cdot;\xrm,\uppsim,\uptheta)$ is
 \begin{IEEEeqnarray}{L} \label{eq:predictive_E_del_sq}
-\Erm_{\xrm,\uppsim | \uptheta}\Big[ \mathcal{E}(y,y' ; \xrm,\uppsim,\uptheta) \Big] \\
-\quad = \Erm_{\xrm | \uptheta}\left[ \Erm_{\uppsim(\xrm) | \uptheta}\left[ \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + \uppsim(\xrm)}\right)^2 \right] \left( \frac{\alpha(y,\xrm)}{\alpha'(\xrm)} - \upthetac(y;\xrm) \right) \left( \frac{\alpha(y',\xrm)}{\alpha'(\xrm)} - \upthetac(y';\xrm) \right) \right] \nonumber \\
-\qquad + \Erm_{\xrm | \uptheta}\left[ \Erm_{\uppsim(\xrm) | \uptheta}\left[ \frac{\uppsim(\xrm)}{\big( \alpha'(\xrm) + \uppsim(\xrm) \big)^2} \right] \left( \upthetac(y;\xrm) \delta[y,y'] - \upthetac(y;\xrm) \upthetac(y';\xrm) \right) \right] \nonumber \;.
+\Erm_{\xrm,\uppsim | \upthetam}\Big[ \mathcal{E}(y,y' ; \xrm,\uppsim,\upthetac) \Big] \\
+\quad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right)^2 \right] \left( \frac{\alpha(y,\xrm)}{\alpha_0 \alpham(\xrm)} - \upthetac(y;\xrm) \right) \left( \frac{\alpha(y',\xrm)}{\alpha_0 \alpham(\xrm)} - \upthetac(y';\xrm) \right) \right] \nonumber \\
+\qquad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \right] \big( \upthetac(y;\xrm) \delta[y,y'] - \upthetac(y;\xrm) \upthetac(y';\xrm) \big) \right] \nonumber \;.
 \end{IEEEeqnarray}
-
+Note that by the aggregation property of multinomial distributions, the random variable $\uppsim(x) | \upthetam(x) \sim \Bi \big(N,\upthetam(x)\big)$.
 
 
 To exemplify how the model estimate $\Prm_{\yrm | \xrm,\uppsi}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 10$. The data-independent PMF $\alpha(\cdot,x) / \alpha'(x)$ and true model $\upthetac(x)$ are shown in Figure \ref{fig:P_yx_error_N_0} - note the significant mismatch. 
@@ -1397,12 +1399,12 @@ PGR: add formula for f(D)??? EMPIRICAL RISK DISCUSS, REGULARIZING weight
 It is useful to substitute the Bayes predictive distribution using the Dirichlet prior \eqref{eq:P_y_xD_dir} into Equation \eqref{eq:f_opt_xD}, expressing the decision for a given input $\xrm$ and training set $\Drm$ as
 \begin{IEEEeqnarray}{L} \label{eq:E_y|xD L}
 f^*(\xrm;\Drm) = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm} \big[ \Lcal(h,\yrm) \big] \\
-= \argmin_{h \in \Hcal} \frac{\sum_{y \in \Ycal} \alpha(y,\xrm) \Lcal(h,y) + \sum_{y \in \Ycal} \Psi(y,\xrm;\Drm) \Lcal(h,y)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \nonumber \\
-= \argmin_{h \in \Hcal} \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + N'(\xrm;\Drm)}\right) \sum_{y \in \Ycal} \frac{\alpha(y,\xrm)}{\alpha'(\xrm)} \Lcal(h,y) + \left(\frac{N'(\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)}\right) \sum_{y \in \Ycal} \frac{\Psi(y,\xrm;\Drm)}{N'(\xrm;\Drm)} \Lcal(h,y) \nonumber \\
-= \argmin_{h \in \Hcal} \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + N'(\xrm;\Drm)}\right) \Erm_{\yrm | \xrm}\big[ \Lcal(h,\yrm) \big] + \left(\frac{N'(\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)}\right) \frac{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Lcal\big( h,\Yrm_n \big)}{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big]} \nonumber \;.
+= \argmin_{h \in \Hcal} \frac{\sum_{y \in \Ycal} \alpha(y,\xrm) \Lcal(h,y) + \sum_{y \in \Ycal} \Psi(y,\xrm;\Drm) \Lcal(h,y)}{\alpha_0 \alpham(\xrm) + N'(\xrm;\Drm)} \nonumber \\
+= \argmin_{h \in \Hcal} \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N'(\xrm;\Drm)}\right) \sum_{y \in \Ycal} \frac{\alpha(y,\xrm)}{\alpha_0 \alpham(\xrm)} \Lcal(h,y) + \left(\frac{N'(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N'(\xrm;\Drm)}\right) \sum_{y \in \Ycal} \frac{\Psi(y,\xrm;\Drm)}{N'(\xrm;\Drm)} \Lcal(h,y) \nonumber \\
+= \argmin_{h \in \Hcal} \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N'(\xrm;\Drm)}\right) \Erm_{\yrm | \xrm}\big[ \Lcal(h,\yrm) \big] + \left(\frac{N'(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N'(\xrm;\Drm)}\right) \frac{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Lcal\big( h,\Yrm_n \big)}{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big]} \nonumber \;.
 \end{IEEEeqnarray}
 
-The metric to be minimized can be represented as a convex combination of two expected losses. The first expected loss is evaluated with respect to the conditional distribution $\Prm_{\yrm | \xrm} = \alpha(\cdot,\xrm) / \alpha'(\xrm)$, which reflects the prior knowledge imparted by the model parameter $\alpha$. The second term is the conditional empirical risk, or the average loss among samples $\Yrm_n$ whose corresponding values $\Xrm_n$ match the observed value $\xrm$. The convex weights are inherited from the conditional distribution $\Prm_{\yrm | \xrm,\Drm}$; thus, for a given observation $\xrm$, the model prior parameter $\alpha'(\xrm)$ and the number of matching training samples $N'(\xrm;\Drm)$ dictate which of the two expectations are emphasized.
+The metric to be minimized can be represented as a convex combination of two expected losses. The first expected loss is evaluated with respect to the conditional distribution $\Prm_{\yrm | \xrm} = \alpha(\cdot,\xrm) / \alpha_0 \alpham(\xrm)$, which reflects the prior knowledge imparted by the model parameter $\alpha$. The second term is the conditional empirical risk, or the average loss among samples $\Yrm_n$ whose corresponding values $\Xrm_n$ match the observed value $\xrm$. The convex weights are inherited from the conditional distribution $\Prm_{\yrm | \xrm,\Drm}$; thus, for a given observation $\xrm$, the model prior parameter $\alpha_0 \alpham(\xrm)$ and the number of matching training samples $N'(\xrm;\Drm)$ dictate which of the two expectations are emphasized.
 
 
 
@@ -1427,11 +1429,11 @@ PGR: plots?
 Substituting in the Bayes predictive distribution for a Dirichlet prior \eqref{eq:P_y_xD_dir} into \eqref{eq:f_opt_SE}, the optimal Bayesian estimate is
 \begin{IEEEeqnarray}{rCl} \label{eq:f_opt_SE_dir}
 f^*(\xrm;\Drm) & = & \mu_{\yrm | \xrm,\Drm} \\
-& = & \left( \frac{\alpha'(\xrm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \right) \sum_{y \in \Ycal} y \frac{\alpha(y,\xrm)}{\alpha'(\xrm)} + \left( \frac{N'(\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \right) \sum_{y \in \Ycal} y \frac{\Psi(y,\xrm;\Drm)}{N'(\xrm;\Drm)} \nonumber \\
-& = & \left( \frac{\alpha'(\xrm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \right) \mu_{\yrm | \xrm} + \left( \frac{N'(\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \right) \frac{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Yrm_n}{N'(\xrm;\Drm)} \nonumber \;.
+& = & \left( \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N'(\xrm;\Drm)} \right) \sum_{y \in \Ycal} y \frac{\alpha(y,\xrm)}{\alpha_0 \alpham(\xrm)} + \left( \frac{N'(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N'(\xrm;\Drm)} \right) \sum_{y \in \Ycal} y \frac{\Psi(y,\xrm;\Drm)}{N'(\xrm;\Drm)} \nonumber \\
+& = & \left( \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N'(\xrm;\Drm)} \right) \mu_{\yrm | \xrm} + \left( \frac{N'(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N'(\xrm;\Drm)} \right) \frac{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Yrm_n}{N'(\xrm;\Drm)} \nonumber \;.
 \end{IEEEeqnarray}
 
-The optimal estimate is interpreted as a convex combination of two separate estimates - the expected value of $\yrm$ conditioned on the observed $\xrm$ and the mean of the training values $\Yrm_n$ which have a value $\Xrm_n$ matching the observed value $\xrm$. The weighting factors are the same as those of $\Prm_{\yrm | \xrm,\Drm}$; thus, stronger prior information (larger $\alpha'(\xrm)$) provides more weight to the estimate $\mu_{\yrm|\xrm}$ and more voluminous training data puts emphasis on the empirical conditional mean.
+The optimal estimate is interpreted as a convex combination of two separate estimates - the expected value of $\yrm$ conditioned on the observed $\xrm$ and the mean of the training values $\Yrm_n$ which have a value $\Xrm_n$ matching the observed value $\xrm$. The weighting factors are the same as those of $\Prm_{\yrm | \xrm,\Drm}$; thus, stronger prior information (larger $\alpha_0 \alpham(\xrm)$) provides more weight to the estimate $\mu_{\yrm|\xrm}$ and more voluminous training data puts emphasis on the empirical conditional mean.
 
 
 
@@ -1465,12 +1467,12 @@ and assess the expected values of these terms separately using distributions der
 \end{IEEEeqnarray}
 where the different functions of $\alpha$ are represented by the PMF's of $\yrm$ and $\xrm$. Next, find, 
 \begin{IEEEeqnarray}{rCl}
-\Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] & = & \Erm_{\xrm} \left[ \Erm_{\uppsi | \xrm} \left[ \frac{\big( \alpha'(\xrm) \mu_{\yrm|\xrm} + \sum_{y \in \Ycal} y \uppsi(y,\xrm) \big)^2}{\alpha'(\xrm) \big(\alpha'(\xrm) + \uppsim(\xrm) \big)^2} \right] \right] \\
-& = & \Erm_{\xrm} \left[ \Erm_{\uppsi} \left[ \frac{\alpha_0 \big( \alpha'(\xrm) \mu_{\yrm|\xrm} + \sum_{y \in \Ycal} y \uppsi(y,\xrm) \big)^2}{\alpha'(\xrm) \big(\alpha'(\xrm) + \uppsim(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber \\
-& = & \Erm_{\xrm} \left[ \Erm_{\uppsim} \left[ \frac{\alpha_0 \Erm_{\uppsi | \uppsim} \left[ \big( \alpha'(\xrm) \mu_{\yrm|\xrm} + \sum_{y \in \Ycal} y \uppsi(y,\xrm) \big)^2 \right]}{\alpha'(\xrm) \big(\alpha'(\xrm) + \uppsim(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber \\
+\Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] & = & \Erm_{\xrm} \left[ \Erm_{\uppsi | \xrm} \left[ \frac{\big( \alpha_0 \alpham(\xrm) \mu_{\yrm|\xrm} + \sum_{y \in \Ycal} y \uppsi(y,\xrm) \big)^2}{\alpha_0 \alpham(\xrm) \big(\alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \right] \right] \\
+& = & \Erm_{\xrm} \left[ \Erm_{\uppsi} \left[ \frac{\alpha_0 \big( \alpha_0 \alpham(\xrm) \mu_{\yrm|\xrm} + \sum_{y \in \Ycal} y \uppsi(y,\xrm) \big)^2}{\alpha_0 \alpham(\xrm) \big(\alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber \\
+& = & \Erm_{\xrm} \left[ \Erm_{\uppsim} \left[ \frac{\alpha_0 \Erm_{\uppsi | \uppsim} \left[ \big( \alpha_0 \alpham(\xrm) \mu_{\yrm|\xrm} + \sum_{y \in \Ycal} y \uppsi(y,\xrm) \big)^2 \right]}{\alpha_0 \alpham(\xrm) \big(\alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber \\
 & = & \ldots \nonumber \\
-& = & \Erm_{\xrm} \left[ \frac{\alpha_0 \Erm_{\uppsim} \Big[ \uppsim(\xrm) \Erm_{\yrm|\xrm}[\yrm^2] + \big( \alpha'(\xrm) + \uppsim(\xrm) + 1 \big) \alpha'(\xrm) \mu_{\yrm|\xrm}^2 \Big]}{\alpha'(\xrm) \big(\alpha'(\xrm) + 1 \big) (\alpha_0+N)} \right] \nonumber \\
-& = & \Erm_{\xrm} \left[ \frac{N \Erm_{\yrm|\xrm}[\yrm^2] + \big( \alpha_0 \alpha'(\xrm) + N \alpha'(\xrm) + \alpha_0 \big) \mu_{\yrm|\xrm}^2 }{\big( \alpha'(\xrm)+1 \big) (\alpha_0+N)} \right] \nonumber \;.
+& = & \Erm_{\xrm} \left[ \frac{\alpha_0 \Erm_{\uppsim} \Big[ \uppsim(\xrm) \Erm_{\yrm|\xrm}[\yrm^2] + \big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) + 1 \big) \alpha_0 \alpham(\xrm) \mu_{\yrm|\xrm}^2 \Big]}{\alpha_0 \alpham(\xrm) \big(\alpha_0 \alpham(\xrm) + 1 \big) (\alpha_0+N)} \right] \nonumber \\
+& = & \Erm_{\xrm} \left[ \frac{N \Erm_{\yrm|\xrm}[\yrm^2] + \big( \alpha_0 \alpha_0 \alpham(\xrm) + N \alpha_0 \alpham(\xrm) + \alpha_0 \big) \mu_{\yrm|\xrm}^2 }{\big( \alpha_0 \alpham(\xrm)+1 \big) (\alpha_0+N)} \right] \nonumber \;.
 \end{IEEEeqnarray}
 
 PGR: provide additional steps?
@@ -1478,12 +1480,12 @@ PGR: provide additional steps?
 %\begin{IEEEeqnarray}{L}
 %\Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] =
 %\sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm} \Big[ \Erm_{\uppsi | \xrm} \big[ \Prm_{\yrm | \xrm,\uppsi}(y | \xrm,\uppsi) \Prm_{\yrm | \xrm,\uppsi}(y' | \xrm,\uppsi) \big] \Big] \\
-%= \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm} \left[ \Erm_{\uppsi} \left[ \frac{\alpha_0 \big( \alpha(y,\xrm)+\uppsi(y,\xrm) \big) \big(\alpha(y',\xrm) + \uppsi(y',\xrm) \big)}{\alpha'(\xrm) \big(\alpha'(\xrm) + \uppsim(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber \\
-%= \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm} \left[ \Erm_{\uppsim} \left[ \frac{\alpha_0 \Erm_{\uppsi | \uppsim} \left[ \big( \alpha(y,\xrm)+\uppsi(y,\xrm) \big) \big(\alpha(y',\xrm)+\uppsi(y',\xrm) \big) \right]}{\alpha'(\xrm) \big(\alpha'(\xrm) + \uppsim(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber \\
+%= \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm} \left[ \Erm_{\uppsi} \left[ \frac{\alpha_0 \big( \alpha(y,\xrm)+\uppsi(y,\xrm) \big) \big(\alpha(y',\xrm) + \uppsi(y',\xrm) \big)}{\alpha_0 \alpham(\xrm) \big(\alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber \\
+%= \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm} \left[ \Erm_{\uppsim} \left[ \frac{\alpha_0 \Erm_{\uppsi | \uppsim} \left[ \big( \alpha(y,\xrm)+\uppsi(y,\xrm) \big) \big(\alpha(y',\xrm)+\uppsi(y',\xrm) \big) \right]}{\alpha_0 \alpham(\xrm) \big(\alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber \\
 %= \ldots \nonumber \\
-%= \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm} \left[ \frac{\alpha_0 \Erm_{\uppsim} \Big[ \uppsim(\xrm) \alpha(y,\xrm) \delta[y,y'] + \big( \alpha'(\xrm) + \uppsim(\xrm) + 1 \big) \alpha(y,\xrm) \alpha(y',\xrm) \Big]}{\alpha'(\xrm)^2 \big(\alpha'(\xrm) + 1 \big) (\alpha_0+N)} \right] \nonumber \\
-%= \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm} \left[ \frac{ N \alpha'(\xrm) \alpha(y,\xrm) \delta[y,y'] + \big( \alpha_0 \alpha'(\xrm) + N \alpha'(\xrm) + \alpha_0 \big) \alpha(y,\xrm) \alpha(y',\xrm)}{\alpha'(\xrm)^2 \big(\alpha'(\xrm) + 1 \big) (\alpha_0+N)} \right] \nonumber \\
-%= \Erm_{\xrm} \left[ \frac{N \Erm_{\yrm|\xrm}[\yrm^2] + \big( \alpha_0 \alpha'(\xrm) + N \alpha'(\xrm) + \alpha_0 \big) \mu_{\yrm|\xrm}^2 }{\big( \alpha'(\xrm)+1 \big) (\alpha_0+N)} \right] \nonumber \;.
+%= \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm} \left[ \frac{\alpha_0 \Erm_{\uppsim} \Big[ \uppsim(\xrm) \alpha(y,\xrm) \delta[y,y'] + \big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) + 1 \big) \alpha(y,\xrm) \alpha(y',\xrm) \Big]}{\alpha_0 \alpham(\xrm)^2 \big(\alpha_0 \alpham(\xrm) + 1 \big) (\alpha_0+N)} \right] \nonumber \\
+%= \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm} \left[ \frac{ N \alpha_0 \alpham(\xrm) \alpha(y,\xrm) \delta[y,y'] + \big( \alpha_0 \alpha_0 \alpham(\xrm) + N \alpha_0 \alpham(\xrm) + \alpha_0 \big) \alpha(y,\xrm) \alpha(y',\xrm)}{\alpha_0 \alpham(\xrm)^2 \big(\alpha_0 \alpham(\xrm) + 1 \big) (\alpha_0+N)} \right] \nonumber \\
+%= \Erm_{\xrm} \left[ \frac{N \Erm_{\yrm|\xrm}[\yrm^2] + \big( \alpha_0 \alpha_0 \alpham(\xrm) + N \alpha_0 \alpham(\xrm) + \alpha_0 \big) \mu_{\yrm|\xrm}^2 }{\big( \alpha_0 \alpham(\xrm)+1 \big) (\alpha_0+N)} \right] \nonumber \;.
 %\end{IEEEeqnarray}
 %\begin{IEEEeqnarray}{L}
 %\Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] =
@@ -1493,7 +1495,7 @@ PGR: provide additional steps?
 %= \sum_{x \in \Xcal} \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \frac{\Erm_{\uppsim} \Big[ \uppsim(x) \alpha'(x) \alpha(y,x) \delta[y,y'] + \alpha'(x) \big( \alpha'(x) + \uppsim(x) + 1 \big) \alpha(y,x) \alpha(y',x) \Big]}{(\alpha_0+N) \big(\alpha'(x) + 1 \big) \alpha'(x)^2} \nonumber \\
 %= \sum_{x \in \Xcal} \frac{\Erm_{\uppsim} \Big[ \uppsim(x) \Erm_{\yrm|\xrm}[\yrm^2](x) + \alpha'(x) \big( \alpha'(x) + \uppsim(x) + 1 \big) \mu_{\yrm | \xrm}^2(x) \Big]}{(\alpha_0+N) \big(\alpha'(x) + 1 \big)} \nonumber \\
 %= \sum_{x \in \Xcal} \frac{N \alpha'(x) \Erm_{\yrm|\xrm}[\yrm^2](x) + \alpha'(x) \big( \alpha_0 \alpha'(x) + N \alpha'(x) + 1 \big) \mu_{\yrm | \xrm}^2(x) }{\alpha_0 (\alpha_0+N) \big(\alpha'(x) + 1 \big)} \nonumber \\
-%= \Erm_{\xrm} \left[ \frac{N \Erm_{\yrm|\xrm}[\yrm^2] + \big( \alpha_0 \alpha'(\xrm) + N \alpha'(\xrm) + \alpha_0 \big) \mu_{\yrm|\xrm}^2 }{(\alpha_0+N) \big( \alpha'(\xrm)+1 \big)} \right] \nonumber \;.
+%= \Erm_{\xrm} \left[ \frac{N \Erm_{\yrm|\xrm}[\yrm^2] + \big( \alpha_0 \alpha_0 \alpham(\xrm) + N \alpha_0 \alpham(\xrm) + \alpha_0 \big) \mu_{\yrm|\xrm}^2 }{(\alpha_0+N) \big( \alpha_0 \alpham(\xrm)+1 \big)} \right] \nonumber \;.
 %\end{IEEEeqnarray}
 %\begin{IEEEeqnarray}{L}
 %\Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] =
@@ -1511,10 +1513,10 @@ PGR: move to appendix???
 Finally, combine the two formulas to represent the mininum Bayes risk,
 \begin{IEEEeqnarray}{L}
 \Rcal^* = \Erm_{\xrm,\uppsi} \left[ \Erm_{\yrm | \xrm,\uppsi}[\yrm^2] - \mu_{\yrm | \xrm,\uppsi}^2 \right] \\
-= \Erm_{\xrm} \left[ \frac{\alpha_0 \alpha'(\xrm) + N \alpha'(\xrm) + \alpha_0}{\big( \alpha'(\xrm)+1 \big) (\alpha_0+N)} \Sigma_{\yrm | \xrm} \right] \nonumber \\
+= \Erm_{\xrm} \left[ \frac{\alpha_0 \alpha_0 \alpham(\xrm) + N \alpha_0 \alpham(\xrm) + \alpha_0}{\big( \alpha_0 \alpham(\xrm)+1 \big) (\alpha_0+N)} \Sigma_{\yrm | \xrm} \right] \nonumber \\
 = \Erm_{\xrm} \left[ \frac{\Prm_{\xrm}(\xrm) + (\alpha_0+N)^{-1}}{\Prm_{\xrm}(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right] \nonumber \;.
 \end{IEEEeqnarray}
-The minimum risk is the expected value of the scaled conditional variance with respect to $\Prm_{\yrm | \xrm} = \alpha(\cdot,\xrm)/\alpha'(\xrm)$. The expectation is taken with respect to the prior marginal distribution $\Prm_{\xrm} = \alpha'/\alpha_0$. 
+The minimum risk is the expected value of the scaled conditional variance with respect to $\Prm_{\yrm | \xrm} = \alpha(\cdot,\xrm)/\alpha_0 \alpham(\xrm)$. The expectation is taken with respect to the prior marginal distribution $\Prm_{\xrm} = \alpha'/\alpha_0$. 
 
 The scaling factor for each term $\Sigma_{\yrm | \xrm}$ depends on the marginal $\Prm_{\xrm}$, as well as on the prior concentration $\alpha_0$ and the number of training samples $N$. Observe that with no training data ($N = 0$), the scaling factor becomes unity and the risk is $\Rcal^* = \Erm_{\xrm} \left[ \Sigma_{\yrm | \xrm} \right]$. Conversely, as $N \to \infty$, the Bayes risk is $\Rcal^* \to \Erm_{\xrm} \left[ \frac{\Prm_{\xrm}(\xrm)}{\Prm_{\xrm}(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right]$; note that this is equivalent to the irreducible risk $\Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] = \Erm_{\xrm,\uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right]$. Also, as the model concentration parameter $\alpha_0 \to 0$, the risk tends to zero (for $N > 0$); as $\alpha_0 \to \infty$, the risk tends toward $\Erm_{\xrm} \left[ \Sigma_{\yrm | \xrm} \right]$.
 
@@ -1591,7 +1593,7 @@ and the minimum risk is expressed as
 & = & \left(\frac{|\Ycal|}{N/|\Xcal| + |\Ycal|}\right) \frac{1 - |\Ycal|^{-2}}{12} + \left(\frac{N/|\Xcal|}{N/|\Xcal| + |\Ycal|}\right) \frac{1 - |\Ycal|^{-1}}{12} \nonumber \;.
 \end{IEEEeqnarray}
 
-Interestingly, the minimum squared-error for the uniform prior can be represented as a convex combination of two separate risk values with weighting factors dependent on $|\Ycal|$ and $N/|\Xcal|$. Thus for a uniform prior, the risk depends on the number of elements in $\Ycal$ and the number of training samples ``per element of $\Xcal$''. Note the relationship of these weighting factors to those of the conditional PMF $\Prm_{\yrm | \xrm,\Drm}$, which depend on $\alpha'(\xrm)$ and on $N'(\xrm;\Drm)$. For the uniform prior, $\alpha'(\xrm) = |\Ycal|$ and $\Erm_{\Drm}\big[ N'(\Drm) \big] = N/|\Xcal|$.
+Interestingly, the minimum squared-error for the uniform prior can be represented as a convex combination of two separate risk values with weighting factors dependent on $|\Ycal|$ and $N/|\Xcal|$. Thus for a uniform prior, the risk depends on the number of elements in $\Ycal$ and the number of training samples ``per element of $\Xcal$''. Note the relationship of these weighting factors to those of the conditional PMF $\Prm_{\yrm | \xrm,\Drm}$, which depend on $\alpha_0 \alpham(\xrm)$ and on $N'(\xrm;\Drm)$. For the uniform prior, $\alpha_0 \alpham(\xrm) = |\Ycal|$ and $\Erm_{\Drm}\big[ N'(\Drm) \big] = N/|\Xcal|$.
 
 The first risk is the conditional variance $\Sigma_{\yrm|\xrm}$ - this is intuitively satisfying as the corresponding weight becomes unity when $N=0$. The second risk is the squared-error with infinite training data. Note that the reduction of the risk between these two extreme cases is modest, and that the attenuating factor increases towards unity for applications with more possible outcomes. Figure \ref{fig:Risk_SE_uniform_N_lim} illustrates the difference between these cases.
 
@@ -1642,16 +1644,16 @@ Evaluation of the excess risk for an estimator based on the Dirichlet prior will
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
 \quad = \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm,\uppsi | \uptheta} \Big[ \Delta(y;\xrm,\uppsi,\uptheta) \Delta(y';\xrm,\uppsi,\uptheta) \Big] \nonumber \\
 \quad = \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm,\uppsim | \uptheta}\Big[ \mathcal{E}(y,y' ; \xrm,\uppsim,\uptheta) \Big] \nonumber \\
-\quad = \Erm_{\xrm | \uptheta}\left[ \Sigma_{\yrm | \xrm,\uptheta} \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\uppsim(\xrm)}{\big( \alpha'(\xrm) + \uppsim(\xrm) \big)^2} \right] \right] \nonumber \\
-\qquad \qquad + \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + \uppsim(\xrm)}\right)^2 \right] \right] \nonumber \;,
+\quad = \Erm_{\xrm | \uptheta}\left[ \Sigma_{\yrm | \xrm,\uptheta} \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \right] \right] \nonumber \\
+\qquad \qquad + \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right)^2 \right] \right] \nonumber \;,
 %\quad = \Erm_{\xrm | \uptheta}\left[ \Sigma_{\yrm | \xrm,\uptheta} \Erm_{\uppsim(\xrm) | \uptheta}\left[ \frac{\alpha_0^{-2} \uppsim(\xrm)}{\big( \Prm_{\xrm}(\xrm) + \alpha_0^{-1} \uppsim(\xrm) \big)^2} \right] \right] \nonumber \\
 %\qquad \qquad + \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \Erm_{\uppsim(\xrm) | \uptheta}\left[ \left(\frac{\Prm_{\xrm}(\xrm)}{\Prm_{\xrm}(\xrm) + \alpha_0^{-1} \uppsim(\xrm)}\right)^2 \right] \right] \nonumber \;,
 \end{IEEEeqnarray}
 where the function $\mathcal{E}$ is defined in \eqref{eq:predictive_del_sq}. 
 
-The excess conditional risk can thus be represented as the conditional expectation (with respect to $\Prm_{\xrm | \uptheta}$) of a sum of two functions of $\xrm$. The first function measures the additional variance beyond that of the clairvoyant estimator (i.e. the clairvoyant squared-error); like the clairvoyant risk, it depends on $\Sigma_{\yrm | \xrm,\uptheta}$, the conditional variance of the clairvoyant estimate for a given observation of $\xrm$. The second function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\uptheta}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. This term alone is influenced by the data-independent Bayes predictive distribution $\Prm_{\yrm | \xrm} = \alpha(\cdot,\xrm) / \alpha'(\xrm)$.
+The excess conditional risk can thus be represented as the conditional expectation (with respect to $\Prm_{\xrm | \uptheta}$) of a sum of two functions of $\xrm$. The first function measures the additional variance beyond that of the clairvoyant estimator (i.e. the clairvoyant squared-error); like the clairvoyant risk, it depends on $\Sigma_{\yrm | \xrm,\uptheta}$, the conditional variance of the clairvoyant estimate for a given observation of $\xrm$. The second function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\uptheta}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. This term alone is influenced by the data-independent Bayes predictive distribution $\Prm_{\yrm | \xrm} = \alpha(\cdot,\xrm) / \alpha_0 \alpham(\xrm)$.
 
-The two second-order (in terms of $y$) terms are scaled by factors dependent on the prior concentrations $\alpha'(x)$ and on $\upthetam(x)$ and $N$ via conditional expectations with respect to $\uppsim(x)$. Note that by the aggregation property of multinomial distributions, the random variable $\uppsim(x) | \upthetam(x) \sim \Bi \big(N,\upthetam(x)\big)$. Closed-forms have not been found for the function expectations of binomial random variables above.
+The two second-order (in terms of $y$) terms are scaled by factors dependent on the prior concentrations $\alpha'(x)$ and on $\upthetam(x)$ and $N$ via conditional expectations with respect to $\uppsim(x)$. Recall that by the aggregation property of multinomial distributions, the random variable $\uppsim(x) | \upthetam(x) \sim \Bi \big(N,\upthetam(x)\big)$. Closed-forms have not been found for the function expectations of binomial random variables above.
 
 PGR: binomial citations?
 
@@ -1668,7 +1670,7 @@ Note that as the squared-difference between the prior mean and true mean increas
 
 The excess risk at this potentially non-integral value would be 
 \begin{equation}
-\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \frac{\frac{1}{\alpha'(\xrm)} - \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2}{\Sigma_{\yrm | \xrm,\uptheta}}}{4\left( 1 - \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2}{\Sigma_{\yrm | \xrm,\uptheta}} \right)} \Sigma_{\yrm | \xrm,\uptheta} \right] \;.
+\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \frac{\frac{1}{\alpha_0 \alpham(\xrm)} - \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2}{\Sigma_{\yrm | \xrm,\uptheta}}}{4\left( 1 - \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2}{\Sigma_{\yrm | \xrm,\uptheta}} \right)} \Sigma_{\yrm | \xrm,\uptheta} \right] \;.
 \end{equation}
 
 PGR: better form above???
@@ -1703,7 +1705,7 @@ The other user-selected Dirichlet parameters $\alpha'(x)$ are the concentration 
 
 Consider how the excess risk tends as the priors become maximally concentrated. As the parameters $\alpha'(x) \to \infty$, the excess risk tends to $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, the expected conditional squared-error between the means of the Bayesian predicitve PMF and the clairvoyant predictive PMF. This is intuitive given that the estimator tends toward a data-independent solution; analagous to the discussion in Section \ref{sec:predictive_est}, the estimator may be biased, but will have no variance due to the training data statistics.
 
-Conversely, if concentrations $\alpha'(x) \to 0$ are chosen, the Bayesian estimate tends to the empirical mean, independent of $\alpha(\cdot,\xrm) / \alpha'(\xrm)$, and the excess risk tends to
+Conversely, if concentrations $\alpha'(x) \to 0$ are chosen, the Bayesian estimate tends to the empirical mean, independent of $\alpha(\cdot,\xrm) / \alpha_0 \alpham(\xrm)$, and the excess risk tends to
 \begin{IEEEeqnarray}{rCl}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) & \to & \Erm_{\xrm | \uptheta}\left[ \Sigma_{\yrm | \xrm,\uptheta} \sum_{n=1}^N \binom{N}{n} \upthetam(\xrm)^n \big( 1 - \upthetam(\xrm) \big)^{N-n} \frac{1}{n} \right] \nonumber \\
 && \qquad + \Erm_{\xrm | \uptheta}\left[ \big( 1 - \upthetam(\xrm) \big)^N \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right] \nonumber \;.
@@ -1730,8 +1732,8 @@ Note that the minimizing concentration values $\alpha'(x)$ are inversely proport
 
 
 
-%\Erm_{\xrm | \uptheta}\left[ \Sigma_{\yrm | \xrm,\uptheta} \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\uppsim(\xrm)}{\big( \alpha'(\xrm) + \uppsim(\xrm) \big)^2} \right] \right] \nonumber \\
-%\qquad \qquad + \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + \uppsim(\xrm)}\right)^2 \right] \right] \nonumber
+%\Erm_{\xrm | \uptheta}\left[ \Sigma_{\yrm | \xrm,\uptheta} \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \right] \right] \nonumber \\
+%\qquad \qquad + \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right)^2 \right] \right] \nonumber
 
 
 Figures \ref{fig:Risk_cond_SE_Dir_a0_leg_N_unbiased} and \ref{fig:Risk_cond_SE_Dir_a0_leg_N_biased} show how the excess conditional squared-error trends as a function of the Dirichlet learner concentration. Note that the latter is based on a biased prior estimate and thus the optimal Dirichlet concentration value is lower.
@@ -2490,9 +2492,9 @@ The PDF $\prm_{\yrm,\xrm | \Drm}$ is thus
 \end{IEEEeqnarray}
 and the conditional PDF of interest is
 \begin{IEEEeqnarray}{rCl}
-\prm_{\yrm | \xrm,\Drm} & = & \frac{\alpha(\cdot,\xrm) + \Psi(\cdot,\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \\
-& = & \frac{\alpha(\cdot,\xrm) + \sum_{n=1}^N \delta\big( \cdot - \Yrm_n \big) \delta\big( \xrm - \Xrm_n \big)}{\alpha'(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big)} \nonumber \\
-& = & \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm)+N'(\xrm;\Drm)}\right) \frac{\alpha(\cdot,\xrm)}{\alpha'(\xrm)} + \left(\frac{N'(\xrm;\Drm)}{\alpha'(\xrm)+N'(\xrm;\Drm)}\right) \frac{\Psi(\cdot,\xrm;\Drm)}{N'(\xrm;\Drm)} \nonumber \;,
+\prm_{\yrm | \xrm,\Drm} & = & \frac{\alpha(\cdot,\xrm) + \Psi(\cdot,\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N'(\xrm;\Drm)} \\
+& = & \frac{\alpha(\cdot,\xrm) + \sum_{n=1}^N \delta\big( \cdot - \Yrm_n \big) \delta\big( \xrm - \Xrm_n \big)}{\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big)} \nonumber \\
+& = & \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm)+N'(\xrm;\Drm)}\right) \frac{\alpha(\cdot,\xrm)}{\alpha_0 \alpham(\xrm)} + \left(\frac{N'(\xrm;\Drm)}{\alpha_0 \alpham(\xrm)+N'(\xrm;\Drm)}\right) \frac{\Psi(\cdot,\xrm;\Drm)}{N'(\xrm;\Drm)} \nonumber \;,
 \end{IEEEeqnarray}
 where $\alpha'(x) = \int_{\Ycal} \alpha(y,x) \mathrm{d} y$ and $N'(x;\Drm) = \sum_{n=1}^N \delta\big( x - \Xrm_n \big)$.
 
@@ -2615,9 +2617,9 @@ PGR: COPIED, incomplete
 
 \begin{IEEEeqnarray}{L}
 \Erm_{\yrm | \xrm,\Drm} \big[ \Lcal(h,\yrm) \big] = \int_{\Ycal} \Lcal(h,y) \prm_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) \mathrm{d}y \\
-= \frac{\int_{\Ycal} \alpha(y,\xrm) \Lcal(h,y) \mathrm{d}y + \int_{\Ycal} \Psi(y,\xrm;\Drm) \Lcal(h,y) \mathrm{d}y}{\alpha'(\xrm)+N'(\xrm;\Drm)} \nonumber \\
-= \frac{\int_{\Ycal} \alpha(y,\xrm) \Lcal(h,y) \mathrm{d}y + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \Lcal\big( h,\Drm_n \big)}{\alpha'(\xrm)+N'(\xrm;\Drm)} \nonumber \\
-= \left(\frac{\alpha'(\xrm)}{\alpha'(\xrm) + N'(\xrm;\Drm)}\right) \Erm_{\yrm | \xrm}\big[ \Lcal(h,\yrm) \big] + \left(\frac{N'(\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)}\right) \frac{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \Lcal\big( h,\Yrm_n \big)}{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big)} \nonumber \;.
+= \frac{\int_{\Ycal} \alpha(y,\xrm) \Lcal(h,y) \mathrm{d}y + \int_{\Ycal} \Psi(y,\xrm;\Drm) \Lcal(h,y) \mathrm{d}y}{\alpha_0 \alpham(\xrm)+N'(\xrm;\Drm)} \nonumber \\
+= \frac{\int_{\Ycal} \alpha(y,\xrm) \Lcal(h,y) \mathrm{d}y + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \Lcal\big( h,\Drm_n \big)}{\alpha_0 \alpham(\xrm)+N'(\xrm;\Drm)} \nonumber \\
+= \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N'(\xrm;\Drm)}\right) \Erm_{\yrm | \xrm}\big[ \Lcal(h,\yrm) \big] + \left(\frac{N'(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N'(\xrm;\Drm)}\right) \frac{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \Lcal\big( h,\Yrm_n \big)}{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big)} \nonumber \;.
 \end{IEEEeqnarray}
 
 
@@ -2643,11 +2645,11 @@ Now we choose for the regression function to map to $\Hcal = \Ycal = \Rbb$.
 The optimal function is the expected value of the output conditional PDF,
 \begin{IEEEeqnarray}{rCl}
 f^*(\xrm;\Drm) & = & \mu_{\yrm | \xrm,\Drm}  = \Erm_{\uptheta | \xrm,\Drm} \left[ \mu_{\yrm | \xrm,\uptheta} \right] \\
-& = & \frac{\int_{\Ycal} y \big( \alpha(y,\xrm) + \Psi(y,\xrm;\Drm) \big) \mathrm{d}y}{\alpha'(\xrm) + N'(\xrm;\Drm)} \nonumber \\
-& = & \left( \frac{\alpha'(\xrm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \right) \int_{\Ycal} y \frac{\alpha(y,\xrm)}{\alpha'(\xrm)} \mathrm{d}y \nonumber \\
-&& \quad + \left( \frac{N'(\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \right) \frac{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \Yrm_n}{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big)} \nonumber \\
-& = & \left( \frac{\alpha'(\xrm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \right) \mu_{\yrm | \xrm} \nonumber \\
-&& \quad + \left( \frac{N'(\xrm;\Drm)}{\alpha'(\xrm) + N'(\xrm;\Drm)} \right) \frac{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \Yrm_n}{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big)} \nonumber \;.
+& = & \frac{\int_{\Ycal} y \big( \alpha(y,\xrm) + \Psi(y,\xrm;\Drm) \big) \mathrm{d}y}{\alpha_0 \alpham(\xrm) + N'(\xrm;\Drm)} \nonumber \\
+& = & \left( \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N'(\xrm;\Drm)} \right) \int_{\Ycal} y \frac{\alpha(y,\xrm)}{\alpha_0 \alpham(\xrm)} \mathrm{d}y \nonumber \\
+&& \quad + \left( \frac{N'(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N'(\xrm;\Drm)} \right) \frac{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \Yrm_n}{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big)} \nonumber \\
+& = & \left( \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N'(\xrm;\Drm)} \right) \mu_{\yrm | \xrm} \nonumber \\
+&& \quad + \left( \frac{N'(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N'(\xrm;\Drm)} \right) \frac{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \Yrm_n}{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big)} \nonumber \;.
 \end{IEEEeqnarray}
 
 
@@ -2682,24 +2684,24 @@ PGR: D PERSPECTIVE
 
 \begin{IEEEeqnarray}{L}
 \Erm_{\xrm,\Drm} \left[ \mu_{\yrm | \xrm,\Drm}^2 \right] = \Erm_{\xrm} \Erm_{\Drm | \xrm} \left[ \mu_{\yrm | \xrm,\Drm}^2 \right] \\
-\quad = \Erm_{\xrm} \left[ \Erm_{\Drm | \xrm} \left[ \left( \frac{\alpha'(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big)}{\alpha'(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big)} \right)^2 \right] \right] \nonumber \\
-\quad = \Erm_{\xrm} \left[ \Erm_{\Drm} \left[ \frac{ \alpha_0 \left( \alpha'(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 }{\alpha'(\xrm) \left(\alpha'(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0 + N)} \right] \right] \nonumber \\
-\quad = \Erm_{\xrm} \left[ \Erm_{\Xrm} \left[ \frac{\alpha_0 \Erm_{\Yrm | \Xrm} \left[ \left( \alpha'(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 \right] }{\alpha'(\xrm) \left(\alpha'(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0+N)} \right] \right] \nonumber 
+\quad = \Erm_{\xrm} \left[ \Erm_{\Drm | \xrm} \left[ \left( \frac{\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big)}{\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big)} \right)^2 \right] \right] \nonumber \\
+\quad = \Erm_{\xrm} \left[ \Erm_{\Drm} \left[ \frac{ \alpha_0 \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 }{\alpha_0 \alpham(\xrm) \left(\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0 + N)} \right] \right] \nonumber \\
+\quad = \Erm_{\xrm} \left[ \Erm_{\Xrm} \left[ \frac{\alpha_0 \Erm_{\Yrm | \Xrm} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 \right] }{\alpha_0 \alpham(\xrm) \left(\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0+N)} \right] \right] \nonumber 
 \end{IEEEeqnarray}
 
 Evaluating the expectation over $\Yrm$ given $\Xrm$, we have
 \begin{IEEEeqnarray}{L}
-\Erm_{\Yrm | \Xrm} \left[ \left( \alpha'(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 \right] \\ 
-= \alpha'(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2\alpha'(\xrm) \mu_{\yrm | \xrm} \sum_{n=1}^N \mu_{\yrm | \xrm}\big( \Xrm_n \big) \delta\big( \xrm - \Xrm_n \big) \nonumber \\
+\Erm_{\Yrm | \Xrm} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 \right] \\ 
+= \alpha_0 \alpham(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} \sum_{n=1}^N \mu_{\yrm | \xrm}\big( \Xrm_n \big) \delta\big( \xrm - \Xrm_n \big) \nonumber \\
 \quad + \sum_{n=1}^N \Erm_{\yrm|\xrm}\big[ \yrm^2 \big]\big( \Xrm_n \big) \delta\big( \xrm - \Xrm_n \big)^2 \nonumber \\
 \quad + \sum_{n \neq n'} \frac{\alpha'\big( \Xrm_n \big) \mu_{\yrm | \xrm}\big(\Xrm_n \big) \alpha'\big( \Xrm_{n'} \big) \mu_{\yrm | \xrm}\big( \Xrm_{n'} \big) + \alpha'\big( \Xrm_n \big) \Erm_{\yrm|\xrm}\big[ \yrm^2 \big]\big( \Xrm_n \big) \delta\big( \Xrm_n-\Xrm_{n'} \big)}{\alpha'\big( \Xrm_n \big) \alpha'\big( \Xrm_{n'} \big) + \alpha'\big( \Xrm_n \big) \delta\big( \Xrm_n-\Xrm_{n'} \big)} \nonumber \\
 \qquad \quad \delta\big( \xrm - \Xrm_n \big) \delta\big( \xrm - \Xrm_{n'} \big) \nonumber \\
 = \ldots \nonumber \\
-= \alpha'(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2\alpha'(\xrm) \mu_{\yrm | \xrm}^2 \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big)^2 \nonumber \\
-\quad + \frac{\alpha'(\xrm) \mu_{\yrm | \xrm}^2 + \Erm_{\yrm|\xrm}\big[ \yrm^2  \big] \delta(0)}{\alpha'(\xrm) + \delta(0)} \sum_{n \neq n'} \delta\big( \xrm - \Xrm_n \big) \delta\big( \xrm - \Xrm_{n'} \big) \nonumber \\
+= \alpha_0 \alpham(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big)^2 \nonumber \\
+\quad + \frac{\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 + \Erm_{\yrm|\xrm}\big[ \yrm^2  \big] \delta(0)}{\alpha_0 \alpham(\xrm) + \delta(0)} \sum_{n \neq n'} \delta\big( \xrm - \Xrm_n \big) \delta\big( \xrm - \Xrm_{n'} \big) \nonumber \\
 \ldots \nonumber \\
-= \frac{\alpha'(\xrm) + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big)}{\alpha'(\xrm) + \delta(0)} \nonumber \\
-\quad \left( \Erm_{\yrm|\xrm}\big[ \yrm^2  \big] \delta(0) \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) + \alpha'(\xrm) \mu_{\yrm | \xrm}^2 \left( \alpha'(\xrm) + \delta(0) + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \right) \right) \nonumber
+= \frac{\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big)}{\alpha_0 \alpham(\xrm) + \delta(0)} \nonumber \\
+\quad \left( \Erm_{\yrm|\xrm}\big[ \yrm^2  \big] \delta(0) \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) + \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \left( \alpha_0 \alpham(\xrm) + \delta(0) + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \right) \right) \nonumber
 \end{IEEEeqnarray}
 
 
@@ -2712,27 +2714,27 @@ PGR: Y given X PDFs, moments??? In PDF section, or in Appendix?
 Plugging,
 \begin{IEEEeqnarray}{L}
 \Erm_{\xrm,\Drm} \Big[ \mu_{\yrm | \xrm,\Drm}^2 \Big] \\
-\quad = \Erm_{\xrm} \left[ \Erm_{\Xrm} \left[ \frac{\alpha_0 \Erm_{\Yrm | \Xrm} \left[ \left( \alpha'(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 \right] }{\alpha'(\xrm) \left(\alpha'(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0+N)} \right] \right] \nonumber \\
-\quad = \Erm_{\xrm} \left[ \frac{\alpha_0 \Erm_{\Xrm} \left[ \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) + \alpha'(\xrm) \mu_{\yrm | \xrm}^2 \left( \alpha'(\xrm) + \delta(0) + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \right) \right] }{\alpha'(\xrm) \big( \alpha'(\xrm) + \delta(0) \big) (\alpha_0+N)} \right] \nonumber 
+\quad = \Erm_{\xrm} \left[ \Erm_{\Xrm} \left[ \frac{\alpha_0 \Erm_{\Yrm | \Xrm} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 \right] }{\alpha_0 \alpham(\xrm) \left(\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0+N)} \right] \right] \nonumber \\
+\quad = \Erm_{\xrm} \left[ \frac{\alpha_0 \Erm_{\Xrm} \left[ \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) + \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \left( \alpha_0 \alpham(\xrm) + \delta(0) + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \right) \right] }{\alpha_0 \alpham(\xrm) \big( \alpha_0 \alpham(\xrm) + \delta(0) \big) (\alpha_0+N)} \right] \nonumber 
 \end{IEEEeqnarray}
 
 Evaluating the expectation over $\Xrm$,
 \begin{IEEEeqnarray}{L}
-\Erm_{\Xrm} \left[ \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) + \alpha'(\xrm) \mu_{\yrm | \xrm}^2 \left( \alpha'(\xrm) + \delta(0) + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \right) \right] \nonumber \\
-\quad = \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N \frac{\alpha'(\xrm)}{\alpha_0} + \alpha'(\xrm) \mu_{\yrm | \xrm}^2 \left( \alpha'(\xrm) + \delta(0) + N \frac{\alpha'(\xrm)}{\alpha_0} \right) \nonumber \\
-\quad = \frac{\alpha'(\xrm)}{\alpha_0} \Big( \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N + \mu_{\yrm | \xrm}^2 \big( \alpha_0 \alpha'(\xrm) + \alpha_0 \delta(0) + N \alpha'(\xrm) \big) \Big) \nonumber
+\Erm_{\Xrm} \left[ \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) + \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \left( \alpha_0 \alpham(\xrm) + \delta(0) + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \right) \right] \nonumber \\
+\quad = \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N \frac{\alpha_0 \alpham(\xrm)}{\alpha_0} + \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \left( \alpha_0 \alpham(\xrm) + \delta(0) + N \frac{\alpha_0 \alpham(\xrm)}{\alpha_0} \right) \nonumber \\
+\quad = \frac{\alpha_0 \alpham(\xrm)}{\alpha_0} \Big( \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N + \mu_{\yrm | \xrm}^2 \big( \alpha_0 \alpha_0 \alpham(\xrm) + \alpha_0 \delta(0) + N \alpha_0 \alpham(\xrm) \big) \Big) \nonumber
 \end{IEEEeqnarray}
 
 Plugging,
 \begin{IEEEeqnarray}{L}
 \Erm_{\xrm,\Drm} \Big[ \mu_{\yrm | \xrm,\Drm}^2 \Big] \\
-\quad = \Erm_{\xrm} \left[ \frac{\Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N + \mu_{\yrm | \xrm}^2 \big( \alpha_0 \alpha'(\xrm) + \alpha_0 \delta(0) + N \alpha'(\xrm) \big)}{ \big( \alpha'(\xrm) + \delta(0) \big) (\alpha_0+N)} \right] \nonumber
+\quad = \Erm_{\xrm} \left[ \frac{\Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N + \mu_{\yrm | \xrm}^2 \big( \alpha_0 \alpha_0 \alpham(\xrm) + \alpha_0 \delta(0) + N \alpha_0 \alpham(\xrm) \big)}{ \big( \alpha_0 \alpham(\xrm) + \delta(0) \big) (\alpha_0+N)} \right] \nonumber
 \end{IEEEeqnarray}
 
 Combining with the second moment produces the risk,
 \begin{IEEEeqnarray}{L}
 \Rcal^* = \Erm_{\xrm,\Drm} \Big[ \Erm_{\yrm | \xrm,\Drm}\big[ \yrm^2 \big] - \mu_{\yrm | \xrm,\Drm}^2 \Big] \\
-= \Erm_{\xrm} \left[ \frac{\alpha_0 \alpha'(\xrm) + \alpha_0 \delta(0) + N \alpha'(\xrm)}{(\alpha_0+N) \big( \alpha'(\xrm)+\delta(0) \big)} \Sigma_{\yrm | \xrm} \right] \nonumber \\
+= \Erm_{\xrm} \left[ \frac{\alpha_0 \alpha_0 \alpham(\xrm) + \alpha_0 \delta(0) + N \alpha_0 \alpham(\xrm)}{(\alpha_0+N) \big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \Sigma_{\yrm | \xrm} \right] \nonumber \\
 = \Erm_{\xrm} \left[ \frac{\Prm_{\xrm}(\xrm) + (\alpha_0+N)^{-1} \delta(0)}{\Prm_{\xrm}(\xrm) + \alpha_0^{-1} \delta(0)} \Sigma_{\yrm | \xrm} \right] \nonumber
 \end{IEEEeqnarray}
 
@@ -2784,13 +2786,13 @@ Combining with the second moment produces the risk,
 %Plugging,
 %\begin{IEEEeqnarray}{L}
 %\Erm_{\xrm,\Drm} \Big[ \mu_{\yrm | \xrm,\Drm}^2 \Big] \\
-%\quad = \Erm_{\xrm} \frac{\Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N + \mu_{\yrm | \xrm}^2 \big( \alpha_0 \alpha'(\xrm) + \alpha_0 \delta(0) + N \alpha'(\xrm) \big)}{(\alpha_0+N) \big( \alpha'(\xrm) + \delta(0) \big)} \nonumber
+%\quad = \Erm_{\xrm} \frac{\Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N + \mu_{\yrm | \xrm}^2 \big( \alpha_0 \alpha_0 \alpham(\xrm) + \alpha_0 \delta(0) + N \alpha_0 \alpham(\xrm) \big)}{(\alpha_0+N) \big( \alpha_0 \alpham(\xrm) + \delta(0) \big)} \nonumber
 %\end{IEEEeqnarray}
 %
 %Combining with the second moment produces the risk,
 %\begin{IEEEeqnarray}{L}
 %\Rcal^* = \Erm_{\xrm,\Drm} \left[ \Erm_{\yrm | \xrm,\Drm}\big[ \yrm^2 \big] - \mu_{\yrm | \xrm,\Drm}^2 \right] \\
-%= \Erm_{\xrm} \left[ \frac{\alpha_0 \alpha'(\xrm) + \alpha_0 \delta(0) + N \alpha'(\xrm)}{(\alpha_0+N)(\alpha'(\xrm)+\delta(0))} \Sigma_{\yrm | \xrm} \right] \nonumber \\
+%= \Erm_{\xrm} \left[ \frac{\alpha_0 \alpha_0 \alpham(\xrm) + \alpha_0 \delta(0) + N \alpha_0 \alpham(\xrm)}{(\alpha_0+N)(\alpha_0 \alpham(\xrm)+\delta(0))} \Sigma_{\yrm | \xrm} \right] \nonumber \\
 %= \Erm_{\xrm} \left[ \frac{\Prm(\xrm) + (\alpha_0+N)^{-1} \delta(0)}{\Prm(\xrm) + \alpha_0^{-1} \delta(0)} \Sigma_{\yrm | \xrm} \right] \nonumber
 %\end{IEEEeqnarray}
 
@@ -2803,32 +2805,32 @@ To perform the expectation over the Dirichlet-Multinomial process $\uppsi \sim \
 
 \begin{IEEEeqnarray}{L}
 \Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] \\
-\quad = \Erm_{\xrm} \left[ \Erm_{\uppsi | \xrm} \left[ \left( \frac{\alpha'(\xrm) \mu_{\yrm | \xrm} + \int_{\Ycal} y \uppsi(y,\xrm) \mathrm{d}y}{\alpha'(\xrm) + \uppsim(\xrm)} \right)^2 \right] \right] \nonumber \\
-\quad = \Erm_{\xrm} \Erm_{\uppsim} \left[ \frac{\alpha_0 \Erm_{\uppsi | \uppsim} \left[ \left( \alpha'(\xrm) \mu_{\yrm | \xrm} + \int_{\Ycal} y \uppsi(y,\xrm) \mathrm{d}y \right)^2 \right] }{\alpha'(\xrm)\big(\alpha'(x) + \uppsim(x) \big) (\alpha_0+N)} \right] \nonumber
+\quad = \Erm_{\xrm} \left[ \Erm_{\uppsi | \xrm} \left[ \left( \frac{\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \int_{\Ycal} y \uppsi(y,\xrm) \mathrm{d}y}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)} \right)^2 \right] \right] \nonumber \\
+\quad = \Erm_{\xrm} \Erm_{\uppsim} \left[ \frac{\alpha_0 \Erm_{\uppsi | \uppsim} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \int_{\Ycal} y \uppsi(y,\xrm) \mathrm{d}y \right)^2 \right] }{\alpha_0 \alpham(\xrm)\big(\alpha'(x) + \uppsim(x) \big) (\alpha_0+N)} \right] \nonumber
 \end{IEEEeqnarray}
 
 
 Evaluating the conditional expectation,
 \begin{IEEEeqnarray}{L}
-\Erm_{\uppsi | \uppsim} \left[ \left( \alpha'(\xrm) \mu_{\yrm | \xrm} + \int_{\Ycal} y \uppsi(y,\xrm) \mathrm{d}y \right)^2 \right] \\
-\quad = \alpha'(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2 \alpha'(\xrm) \mu_{\yrm | \xrm} \int_{\Ycal} y \delta(0) \frac{\uppsim(\xrm)}{\delta(0)} \frac{\delta(0)^{-1} \alpha(y,\xrm)}{\delta(0)^{-1} \alpha'(\xrm)} \mathrm{d}y \nonumber \\
-\qquad + \delta(0)^2 \frac{\delta(0)^{-1} \uppsim(\xrm)}{\big( \delta(0)^{-1}\alpha'(\xrm) \big) \big( \delta(0)^{-1}\alpha'(\xrm) + 1 \big)} \int_{\Ycal} \int_{\Ycal} y y' \Bigg[ \left( \frac{\uppsim(\xrm)}{\delta(0)} - 1 \right) \frac{\alpha(y,\xrm)}{\delta(0)} \frac{\alpha(y',\xrm)}{\delta(0)} \nonumber \\
-\qquad + \left( \frac{\alpha'(\xrm)}{\delta(0)} + \frac{\uppsim(\xrm)}{\delta(0)} \right) \frac{\alpha(y,\xrm)}{\delta(0)} \delta(y-y') \Bigg] \mathrm{d}y \mathrm{d}y' \nonumber \\
-\quad = \alpha'(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2 \alpha'(\xrm) \uppsim(\xrm) \mu_{\yrm | \xrm}^2 \nonumber \\
-\qquad + \frac{\uppsim(\xrm)}{\alpha'(\xrm)\big( \alpha'(\xrm)+\delta(0) \big)} \Big[ \big( \uppsim(\xrm) - \delta(0) \big) \alpha'(\xrm)^2 \mu_{\yrm | \xrm}^2 + \delta(0) \big( \alpha'(\xrm)+\uppsim(\xrm) \big) \alpha'(\xrm) \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \Big] \nonumber \\
-\quad = \frac{\alpha'(\xrm)+\uppsim(\xrm)}{\alpha'(\xrm)+\delta(0)} \Big[ \mu_{\yrm | \xrm}^2 \alpha'(\xrm) \big( \alpha'(\xrm) + \uppsim(\xrm) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) \uppsim(\xrm) \Big] \nonumber
+\Erm_{\uppsi | \uppsim} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \int_{\Ycal} y \uppsi(y,\xrm) \mathrm{d}y \right)^2 \right] \\
+\quad = \alpha_0 \alpham(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2 \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} \int_{\Ycal} y \delta(0) \frac{\uppsim(\xrm)}{\delta(0)} \frac{\delta(0)^{-1} \alpha(y,\xrm)}{\delta(0)^{-1} \alpha_0 \alpham(\xrm)} \mathrm{d}y \nonumber \\
+\qquad + \delta(0)^2 \frac{\delta(0)^{-1} \uppsim(\xrm)}{\big( \delta(0)^{-1}\alpha_0 \alpham(\xrm) \big) \big( \delta(0)^{-1}\alpha_0 \alpham(\xrm) + 1 \big)} \int_{\Ycal} \int_{\Ycal} y y' \Bigg[ \left( \frac{\uppsim(\xrm)}{\delta(0)} - 1 \right) \frac{\alpha(y,\xrm)}{\delta(0)} \frac{\alpha(y',\xrm)}{\delta(0)} \nonumber \\
+\qquad + \left( \frac{\alpha_0 \alpham(\xrm)}{\delta(0)} + \frac{\uppsim(\xrm)}{\delta(0)} \right) \frac{\alpha(y,\xrm)}{\delta(0)} \delta(y-y') \Bigg] \mathrm{d}y \mathrm{d}y' \nonumber \\
+\quad = \alpha_0 \alpham(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2 \alpha_0 \alpham(\xrm) \uppsim(\xrm) \mu_{\yrm | \xrm}^2 \nonumber \\
+\qquad + \frac{\uppsim(\xrm)}{\alpha_0 \alpham(\xrm)\big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \Big[ \big( \uppsim(\xrm) - \delta(0) \big) \alpha_0 \alpham(\xrm)^2 \mu_{\yrm | \xrm}^2 + \delta(0) \big( \alpha_0 \alpham(\xrm)+\uppsim(\xrm) \big) \alpha_0 \alpham(\xrm) \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \Big] \nonumber \\
+\quad = \frac{\alpha_0 \alpham(\xrm)+\uppsim(\xrm)}{\alpha_0 \alpham(\xrm)+\delta(0)} \Big[ \mu_{\yrm | \xrm}^2 \alpha_0 \alpham(\xrm) \big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) \uppsim(\xrm) \Big] \nonumber
 \end{IEEEeqnarray}
 
 Plugging,
 \begin{IEEEeqnarray}{L}
 \Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] \\
-\quad = \Erm_{\xrm} \left[ \frac{\alpha_0 \Erm_{\uppsim} \Big[ \mu_{\yrm | \xrm}^2 \alpha'(\xrm) \big( \alpha'(\xrm) + \uppsim(\xrm) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) \uppsim(\xrm) \Big] }{\alpha'(\xrm) \big( \alpha'(\xrm)+\delta(0) \big) (\alpha_0+N)} \right] \nonumber \\ 
-\quad = \Erm_{\xrm} \left[ \frac{\mu_{\yrm | \xrm}^2 \big( \alpha_0 \alpha'(\xrm) + N \alpha'(\xrm) + \delta(0) \alpha_0 \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N}{(\alpha_0+N) \big( \alpha'(\xrm)+\delta(0) \big)} \right] \nonumber
+\quad = \Erm_{\xrm} \left[ \frac{\alpha_0 \Erm_{\uppsim} \Big[ \mu_{\yrm | \xrm}^2 \alpha_0 \alpham(\xrm) \big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) \uppsim(\xrm) \Big] }{\alpha_0 \alpham(\xrm) \big( \alpha_0 \alpham(\xrm)+\delta(0) \big) (\alpha_0+N)} \right] \nonumber \\ 
+\quad = \Erm_{\xrm} \left[ \frac{\mu_{\yrm | \xrm}^2 \big( \alpha_0 \alpha_0 \alpham(\xrm) + N \alpha_0 \alpham(\xrm) + \delta(0) \alpha_0 \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N}{(\alpha_0+N) \big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \right] \nonumber
 \end{IEEEeqnarray}
 
 Combining produces the risk,
 \begin{IEEEeqnarray}{L}
-\Rcal^* = \Erm_{\xrm} \left[ \frac{\alpha_0 \alpha'(\xrm) + \alpha_0 \delta(0) + N \alpha'(\xrm)}{(\alpha_0+N)\big( \alpha'(\xrm)+\delta(0) \big)} \Sigma_{\yrm | \xrm} \right] \\
+\Rcal^* = \Erm_{\xrm} \left[ \frac{\alpha_0 \alpha_0 \alpham(\xrm) + \alpha_0 \delta(0) + N \alpha_0 \alpham(\xrm)}{(\alpha_0+N)\big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \Sigma_{\yrm | \xrm} \right] \\
 = \Erm_{\xrm} \left[ \frac{\Prm(\xrm) + (\alpha_0+N)^{-1} \delta(0)}{\Prm(\xrm) + \alpha_0^{-1} \delta(0)} \Sigma_{\yrm | \xrm} \right] \nonumber
 \end{IEEEeqnarray}
 
@@ -2858,12 +2860,12 @@ Combining produces the risk,
 %\quad = \int_{\Xcal} \frac{ \Erm_{\uppsim} \Big[ \mu_{\yrm | \xrm}^2(x) \alpha'(x) \big( \alpha'(x) + \uppsim(x) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big](x) \delta(0) \uppsim(x) \Big] }{(\alpha_0+N) \big( \alpha'(x)+\delta(0) \big)} \mathrm{d}x \nonumber \\ 
 %\quad = \int_{\Xcal} \frac{\mu_{\yrm | \xrm}^2(x) \alpha'(x) \big( \alpha'(x) + N \alpha_0^{-1} \alpha'(x) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big](x) \delta(0) N \alpha_0^{-1} \alpha'(x)}{(\alpha_0+N) \big( \alpha'(x)+\delta(0) \big)} \mathrm{d}x \nonumber \\ 
 %\quad = \int_{\Xcal} \frac{\alpha'(x)}{\alpha_0} \frac{\mu_{\yrm | \xrm}^2(x) \big( \alpha_0 \alpha'(x) + N \alpha'(x) + \delta(0) \alpha_0 \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big](x) \delta(0) N}{(\alpha_0+N) \big( \alpha'(x)+\delta(0) \big)} \mathrm{d}x \nonumber \\
-%\quad = \Erm_{\xrm} \left[ \frac{\mu_{\yrm | \xrm}^2 \big( \alpha_0 \alpha'(\xrm) + N \alpha'(\xrm) + \delta(0) \alpha_0 \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N}{(\alpha_0+N) \big( \alpha'(\xrm)+\delta(0) \big)} \right] \nonumber
+%\quad = \Erm_{\xrm} \left[ \frac{\mu_{\yrm | \xrm}^2 \big( \alpha_0 \alpha_0 \alpham(\xrm) + N \alpha_0 \alpham(\xrm) + \delta(0) \alpha_0 \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N}{(\alpha_0+N) \big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \right] \nonumber
 %\end{IEEEeqnarray}
 %
 %Combining produces the risk,
 %\begin{IEEEeqnarray}{L}
-%\Rcal^* = \Erm_{\xrm} \left[ \frac{\alpha_0 \alpha'(\xrm) + \alpha_0 \delta(0) + N \alpha'(\xrm)}{(\alpha_0+N)\big( \alpha'(\xrm)+\delta(0) \big)} \Sigma_{\yrm | \xrm} \right] \\
+%\Rcal^* = \Erm_{\xrm} \left[ \frac{\alpha_0 \alpha_0 \alpham(\xrm) + \alpha_0 \delta(0) + N \alpha_0 \alpham(\xrm)}{(\alpha_0+N)\big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \Sigma_{\yrm | \xrm} \right] \\
 %= \Erm_{\xrm} \left[ \frac{\Prm(\xrm) + (\alpha_0+N)^{-1} \delta(0)}{\Prm(\xrm) + \alpha_0^{-1} \delta(0)} \Sigma_{\yrm | \xrm} \right] \nonumber
 %\end{IEEEeqnarray}
 
