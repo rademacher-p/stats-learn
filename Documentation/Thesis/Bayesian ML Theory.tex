@@ -1211,7 +1211,7 @@ PGR: reference posterior equations!
 
 PGR: DIR FIGS? for PDF asymptotics?
 
-\todohigh{EDIT PROGRESS!}
+
 
 
 The Bayesian distributions $\Prm_{\xrm | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm}$ can also be found from the posterior distributions $\prm_{\upthetam | \Drm}$ and $\prm_{\upthetac | \xrm,\Drm}$, respectively. As the Dirichlet assumption renders $\upthetam$ and $\upthetac$ independent, it can be shown that $\Prm_{\Yrm | \Xrm} = \Erm_{\upthetac}\big[ \Prm_{\Yrm | \Xrm,\upthetac} \big]$ and thus that $\upthetam$ is conditionally independent of $\Yrm$ given $\Xrm$. Furthermore, the Dirichlet distribution $\prm_{\upthetam}$ is a conjugate prior for $\Prm_{\Xrm | \upthetam}$. As a result, $\upthetam | \Drm \sim \Dir\big (\alpha_0 + N, \mu_{\upthetam | \Xrm} \big)$, where
@@ -1282,6 +1282,7 @@ PGR: generalize, move before Dirichlet?
 
 PGR: use poster table??
 
+\todohigh{EDIT PROGRESS!}
 
 It is instructive to treat the distribution $\Prm_{\yrm | \xrm,\uppsi}$ as an estimate of the unknown conditional PMF $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$ and investigate the effects of informative prior knowledge. For a given $\xrm$ and corresponding number of training samples $\uppsim(\xrm)$, the expected value of the estimate condtioned on the true model $\uptheta$ is
 \begin{IEEEeqnarray}{L}
