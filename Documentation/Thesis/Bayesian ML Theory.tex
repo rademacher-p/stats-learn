@@ -492,7 +492,7 @@ Also of interest is the conditional distribution of $\uppsic \in \Uppsic$, where
 & = & \prod_{x \in \Xcal} \Bigg[ \Mcal\big( N \psim(x) \psic(x) \big) \left( \prod_{y \in \Ycal} \thetac(y;x)^{\psic(y;x)} \right)^{N \psim(x)} \Bigg] \\
 & = & \prod_{x \in \Xcal} \Emp\Big( \psic(x) ; N \psim(x) , \thetac(x) \Big) \nonumber \;,
 \end{IEEEeqnarray}
-over the domain $\prod_{x \in \Xcal} \left\{ \frac{n}{N \psim(x)}: n \in {\Zbbgeq}^{\Ycal}, \ \sum_{y \in \Ycal} n(y) = N \psim(x) \right\}$. Observe that conditioning on the marginal empirical process renders the conditional processes $\uppsic(x)$ independent of one another and that they are also Empirically distributed, such that $\uppsic(x) | \uppsim(x),\upthetac \sim \Emp\big( N \uppsim(x),\upthetac(x) \big)$. 
+over the domain $\prod_{x \in \Xcal} \left\{ \frac{n}{N \psim(x)}: n \in {\Zbbgeq}^{\Ycal}, \ \sum_{y \in \Ycal} n(y) = N \psim(x) \right\}$. Observe that conditioning on the marginal empirical process renders the conditional processes $\uppsic(x)$ independent of one another and that they are also Empirically distributed, such that $\uppsic(x) | \uppsim(x),\upthetac(x) \sim \Emp\big( N \uppsim(x),\upthetac(x) \big)$. 
 
 
 
@@ -583,6 +583,8 @@ and the minimum Bayes risk is
 
 
 Observe that the Bayesian distributions can be represented as $\Prm_{\xrm | \Drm} = \Erm_{\uptheta | \Drm}\big[ \Prm_{\xrm | \uptheta} \big] \equiv \mu_{\upthetam | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm} = \Erm_{\uptheta | \xrm,\Drm}\big[ \Prm_{\yrm | \xrm,\uptheta} \big] \equiv \mu_{\upthetac(\xrm) | \xrm,\Drm}$, the expected values of the corresponding clairvoyant distributions with respect to the model posteriors $\prm_{\upthetam | \Drm}$ and $\prm_{\upthetac(\xrm) | \xrm,\Drm}$, respectively. Also, $\Prm_{\yrm,\xrm | \Drm} = \Erm_{\uptheta | \Drm}\big[ \Prm_{\yrm,\xrm | \uptheta} \big] \equiv \mu_{\uptheta | \Drm}$. Thus, the Bayesian approach to prediction uses the model posterior given the observable random elements to integrate out the model dependency of the risk $\Rcal_{\Theta}(f ; \uptheta)$.
+
+\todomid{Consider notation $\mu_{\upthetac | \xrm,\Drm}(\xrm; \xrm,\Drm)$ !?!?}
 
 Additionally, since $\Psi(\Drm)$ is a sufficient statistic for the model $\uptheta$, the Bayesian distributions of interest $\Prm_{\Drm}$, $\Prm_{\xrm | \Drm}$, and $\Prm_{\yrm | \xrm,\Drm}$ will also depend on $\Drm$ via $\Psi(\Drm)$; as such, the training data can be transformed into the empirical process $\uppsi$ for Bayesian prediction without incurring any additional risk. 
 
@@ -1217,36 +1219,49 @@ The Bayesian distributions $\Prm_{\xrm | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm}$ ca
 \Prm_{\xrm | \Drm}(D) & = & \mu_{\upthetam | \Drm}(D) \\
 & = & \mu_{\upthetam | \Xrm}(X) = \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpham + \left(\frac{N}{\alpha_0 + N}\right) \Psim(\Drm) \nonumber \;.
 \end{IEEEeqnarray}
-Similarly, the distribution can be expressed in terms of the empirical PMF sufficient statistic as
+Similarly, the distribution can be expressed in terms of the empirical model sufficient statistic as
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\xrm | \uppsi}(\psi) & = & \mu_{\upthetam | \uppsi}(\psi) = \mu_{\upthetam | \uppsim}\left( \sum_y \psi(y,\cdot) \right) \\
-& = & \frac{\alpha' + \sum_y \psi(y,\cdot)}{\alpha_0 + N} \nonumber \;,
+\Prm_{\xrm | \uppsi}(\psi) & = & \mu_{\upthetam | \uppsi}(\psi) \\
+& \equiv & \mu_{\upthetam | \uppsim}\left( \psim \right) = \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpham + \left(\frac{N}{\alpha_0 + N}\right) \psim \nonumber \;,
 \end{IEEEeqnarray}
 where the dependency on $\uppsi$ is expressed only through the marginal random process $\uppsim$.
 
 The posterior $\prm_{\upthetac | \xrm,\Drm}$ can be simplified by noting that the independence of $\upthetam$ and $\upthetac$ implies $\Prm_{\Yrm | \Xrm,\xrm} = \Erm_{\upthetac}\big[ \Prm_{\Yrm | \Xrm,\upthetac} \big] = \Prm_{\Yrm | \Xrm}$. Consequently, $\upthetac$ is conditionally independent of $\xrm$ given $\Drm$. Thus, as $\prm_{\upthetac}$ is a conjugate prior for $\Prm_{\Yrm | \Xrm,\upthetac}$ the posterior distribution is
 \begin{IEEEeqnarray}{rCl}
-\prm_{\upthetac | \Drm,\xrm}\big( \thetac | D,x \big) & = & \prm_{\upthetac | \Drm}\big( \thetac | D \big) = \prod_{x' \in \Xcal} \prm_{\upthetac(x') | \Drm}\big(\thetac(x') | D \big) \\
-& = & \prod_{x' \in \Xcal} \Dir\big( \thetac(x') ; \alpha(\cdot,x') + \Psi(\cdot,x';D) \big) \nonumber
+\prm_{\upthetac | \xrm,\Drm}(\thetac | x,D) & = & \prm_{\upthetac | \Drm}(\thetac | D) = \prod_{x' \in \Xcal} \prm_{\upthetac(x') | \Drm}\big(\thetac(x') | D \big) \\
+& = & \prod_{x' \in \Xcal} \Dir\big( \thetac(x') ; \alpha_0 \alpham(x') + N \Psim(x';D), \mu_{\upthetac(x') | \Drm}(D) \big) \nonumber \;,
 \end{IEEEeqnarray}
-and the distinct model conditional PMF's are independent from one another. A similar treatment demonstrates that
+where
 \begin{IEEEeqnarray}{rCl}
-\prm_{\upthetac | \uppsi,\xrm}\big( \thetac | \psi,x \big) & = & \prm_{\upthetac | \uppsi}\big( \thetac | \psi \big) = \prod_{x' \in \Xcal} \prm_{\upthetac(x') | \uppsi(\cdot,x')}\big(\thetac(x') | \psi(\cdot,x') \big) \\
-& = & \prod_{x' \in \Xcal} \Dir\big( \thetac(x') ; \alpha(\cdot,x') + \psi(\cdot,x') \big) \nonumber \;.
+\mu_{\upthetac(x') | \xrm,\Drm}(x,D) & = & \mu_{\upthetac(x') | \Drm}(D) \\
+& = & \left(\frac{\alpha_0 \alpham(x')}{\alpha_0 \alpham(x') + N \Psim(x';D)}\right) \alphac(x') + \left(\frac{N \Psim(x';D)}{\alpha_0 \alpham(x') + N \Psim(x';D)}\right) \Psic(x';D) \nonumber
+\end{IEEEeqnarray} 
+and the distinct model conditional PMF's are independent from one another. The Bayes predictive PMF can thus be expressed as
+\begin{IEEEeqnarray}{rCl}
+\Prm_{\yrm | \xrm,\Drm}(x,D) & = & \mu_{\upthetac(x) | \xrm,\Drm}(x,D) = \mu_{\upthetac(x) | \Drm}(D) \;.
 \end{IEEEeqnarray}
-Observe that when the conditioning is performed using the sufficient statistic, the independent conditional models $\upthetac(x)$ are only dependent on their corresponding subset of the  empirical PMF, $\uppsi(\cdot,x)$.
 
-The Bayes predictive PMF can thus be expressed as
+\todomid{Consider theta x argument in parentheses, not subscript!}
+
+A similar treatment demonstrates that
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\yrm | \xrm,\Drm}(x,D) & = & \mu_{\upthetac(x) | \xrm,\Drm}(x,D) = \mu_{\upthetac(x) | \Drm}(D) \\
-& = & \frac{\alpha(\cdot,x) + \Psi(\cdot,x;D)}{\alpha'(x) + N'(x;D)} \nonumber
+\prm_{\upthetac | \xrm,\uppsi}( \thetac | x,\psi ) & = & \prm_{\upthetac | \uppsi}( \thetac | \psi ) \equiv \prm_{\upthetac | \uppsim, \uppsic}( \thetac | \psim, \psic ) \\
+& = & \prod_{x' \in \Xcal} \prm_{\upthetac(x') | \uppsim(x'), \uppsic(x')}\big(\thetac(x') | \psim(x'), \psic(x') \big) \nonumber \\
+& = & \prod_{x' \in \Xcal} \Dir\Big( \thetac(x') ; \alpha_0 \alpham(x') + N \psim(x'), \mu_{\upthetac(x') | \uppsim(x'), \uppsic(x')}\big( \psim(x'), \psic(x') \big) \Big) \nonumber \;,
 \end{IEEEeqnarray}
-or, via the sufficient statistic,
+where
+\begin{IEEEeqnarray}{L}
+\mu_{\upthetac(x') | \uppsim(x'), \uppsic(x')}\big( \psim(x'), \psic(x') \big) \\
+\quad = \left(\frac{\alpha_0 \alpham(x')}{\alpha_0 \alpham(x') + N \psim(x')}\right) \alphac(x') + \left(\frac{N \psim(x')}{\alpha_0 \alpham(x') + N \psim(x')}\right) \psic(x') \nonumber \;.
+\end{IEEEeqnarray}
+Observe that when the conditioning is performed using the sufficient statistic, the independent conditional models $\upthetac(x)$ are only dependent on the marginal empirical model value $\uppsim(x)$ and on the corresponding conditional empirical model, $\uppsic(x)$. 
+
+The Bayes predictive PMF can thus be expressed as 
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\yrm | \xrm,\uppsi}(x,\psi) & = & \mu_{\upthetac(x) | \xrm,\uppsi}(x,\psi) = \mu_{\upthetac(x) | \uppsi(\cdot,x)}\big(\psi(\cdot,x)\big) \\
-& = & \frac{\alpha(\cdot,x) + \psi(\cdot,x)}{\alpha'(x) + \sum_y \psi(y,x)} \nonumber \;.
+\Prm_{\yrm | \xrm,\uppsi}(x,\psi) = \mu_{\upthetac(x) | \xrm,\uppsi}(x,\psi) & \equiv & \mu_{\upthetac(x) | \uppsim(x), \uppsic(x)}\big( \psim(x), \psic(x) \big) \\
+& = & \Prm_{\yrm | \xrm,\uppsim(x),\uppsic(x)}\big( x,\psim(x), \psic(x) \big) \nonumber \;.
 \end{IEEEeqnarray}
-A consequence of the Dirichlet prior is that the predictive PMF for a given value of $\xrm$ only depends on the corresponding training data $\uppsi(\cdot,\xrm)$, such that $\Prm_{\yrm | \xrm,\uppsi}(x,\psi) = \Prm_{\yrm | \xrm,\uppsi(\cdot,\xrm)}\big( x,\psi(\cdot,x) \big)$. This is intuitive considering the independence of the conditional models $\thetac(x)$ from one another.
+%A consequence of the Dirichlet prior is that the predictive PMF for a given value of $\xrm$ only depends on the corresponding training data $\uppsi(\cdot,\xrm)$, such that $\Prm_{\yrm | \xrm,\uppsi}(x,\psi) = \Prm_{\yrm | \xrm,\uppsi(\cdot,\xrm)}\big( x,\psi(\cdot,x) \big)$. This is intuitive considering the independence of the conditional models $\thetac(x)$ from one another.
 
 
 
