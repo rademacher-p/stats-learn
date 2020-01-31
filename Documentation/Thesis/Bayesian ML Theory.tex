@@ -2287,7 +2287,7 @@ Again, $\prm_{\yrm} = \prm_{\Drm_n} = \mu_{\uptheta}$ for all $n$.
 
 \subsubsection{Output conditional PDF, $\prm_{\yrm | \Drm}$}
 
-In Appendix \ref{app:DP_post}, it was shown that if the model $\uptheta \sim \DP(\alpha_0 \alpha)$ is a Dirichlet process, then the model conditioned on the training data $\Drm$ is also a Dirichlet process with parameterizing function $\alpha + \Psi(\Drm)$, where $\Psi(y;\Drm) = \sum_{n=1}^N \delta\left( y - \Drm_n \right)$ generalizes for a continuous domain. Thus, the conditional PDF of interest can be formulated as
+In Appendix \ref{app:DP_post}, it was shown that if the model $\uptheta \sim \DP(\alpha_0, \alpha)$ is a Dirichlet process, then the model conditioned on the training data $\Drm$ is also a Dirichlet process with parameterizing function $\alpha + \Psi(\Drm)$, where $\Psi(y;\Drm) = \sum_{n=1}^N \delta\left( y - \Drm_n \right)$ generalizes for a continuous domain. Thus, the conditional PDF of interest can be formulated as
 \begin{IEEEeqnarray}{rCl}
 \prm_{\yrm | \Drm} & = & \mu_{\uptheta | \Drm} \\
 & = & \frac{\alpha + \Psi(\Drm)}{\alpha_0 + N} = \frac{\alpha + \sum_{n=1}^N \delta\big( \cdot - \Drm_n \big)}{\alpha_0 + N} \nonumber \\
@@ -2457,6 +2457,8 @@ As for Dirichlet distributions for functions with countable domains, the minimal
 
 PGR: change dirac deltas to kronecker in fractions, no divide by zero???
 
+\todohi{Specify dirac delta domains!}
+
 \subsection{Model Extension}
 
 This section adds the input space $\Xcal$, now considered to be uncountably infinite; that is $|\Xcal| \geq \aleph_1$. The model distribution is a Dirichlet process over the space $\Ycal \times \Xcal$.
@@ -2471,12 +2473,12 @@ PGR
 
 \todomid{Move aggregation to appendix. Done?}
 
-The model is characterized by a Dirichlet process $\uptheta \sim \DP(\alpha_0 \alpha)$ with parameter function $\alpha : \Ycal \times \Xcal \mapsto \Rbb^+$. The concentration parameter generalizes to $\alpha_0 = \int_{\Ycal} \int_{\Xcal} \alpha(y,x) \mathrm{d} x \mathrm{d} y$. Using the aggregation property, any partition of the set $\Ycal \times \Xcal$, $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$ is a Dirichlet random process $\upphi(z) = \iint_{\Scal_z} \uptheta(y,x) \mathrm{d} x \mathrm{d} y$ with parameterizing function $\lambda(z) = \iint_{\Scal_z} \alpha(y,x) \mathrm{d} x \mathrm{d} y$. The PDF for the aggregation is
+The model is characterized by a Dirichlet process $\uptheta \sim \DP(\alpha_0, \alpha)$ with parameter function $\alpha : \Ycal \times \Xcal \mapsto \Rbb^+$. The concentration parameter generalizes to $\alpha_0 = \int_{\Ycal} \int_{\Xcal} \alpha(y,x) \mathrm{d} x \mathrm{d} y$. Using the aggregation property, any partition of the set $\Ycal \times \Xcal$, $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$ is a Dirichlet random process $\upphi(z) = \iint_{\Scal_z} \uptheta(y,x) \mathrm{d} x \mathrm{d} y$ with parameterizing function $\lambda(z) = \iint_{\Scal_z} \alpha(y,x) \mathrm{d} x \mathrm{d} y$. The PDF for the aggregation is
 \begin{IEEEeqnarray}{rCl}
 \prm_{\upphi}(\phi) & = & \beta(\lambda)^{-1} \prod_{z \in \Zcal} \phi(z)^{\lambda(z) - 1} \;.
 \end{IEEEeqnarray}
 
-The expected value of a Dirichlet process generalizes to $\DP(\alpha_0 \alpha)$
+The expected value of a Dirichlet process generalizes to $\DP(\alpha_0, \alpha)$
 \begin{equation}
 \mu_{\uptheta} = \alpha
 \end{equation}
@@ -3188,21 +3190,32 @@ Finally,
 
 \section{Proof: Continuous Model Posterior Distribution is Dirichlet Process} \label{app:DP_post}
 
-In this section, it is shown that if the model $\uptheta \sim \DP(\alpha_0 \alpha)$ is a Dirichlet process, then the model conditioned on the training data $\Drm$ is also a Dirichlet process with parameterizing function $\alpha + \sum_{n=1}^N \delta\big( \cdot - \Drm_n \big)$. 
+In this section, it is shown that if the model $\uptheta \sim \DP(\alpha_0, \alpha)$ is a Dirichlet process, then the model conditioned on the training data $\Drm$ is also a Dirichlet process with concentration $\alpha_0 + N$ and mean function 
+\begin{equation}
+\mu_{\uptheta | \Drm} = \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpha + \left(\frac{N}{\alpha_0 + N}\right) \Psi(\Drm) \;,
+\end{equation}
+where $\Psi(\Drm) = N^{-1} \sum_{n=1}^N \delta\big( \cdot - \Drm_n \big)$
 
-The defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Consider a DP over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$; the transformed random process $\upthetam(z) \equiv \int_{\Scal_z} \uptheta(y) \mathrm{d} y$ is neccessarily Dirichlet with parameterizing function $\alpham(z) \equiv \int_{\Scal_z} \alpha(y) \mathrm{d} y$.
+
+The defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Consider a DP over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$; the transformed random process $\upthetam(z) \equiv \int_{\Scal_z} \uptheta(y) \mathrm{d} y$ is neccessarily Dirichlet with concentration $\alpha_0$ and a mean function satisfying $\alpham(z) \equiv \int_{\Scal_z} \alpha(y) \mathrm{d} y$.
 
 To prove the hypothesis, it is required that
 \begin{IEEEeqnarray}{rCl}
-\upthetam | \Drm & \sim & \Dir\big( \alpha' + \Psi(\Drm) \big) \;,
+\upthetam | \Drm & \sim & \Dir\big( \alpha_0, \mu_{\upthetam | \Drm} \big) \;,
 \end{IEEEeqnarray}
-where $\Psi(z;\Drm) = \int_{\Scal_z} \sum_{n=1}^N \delta\big( y - \Drm_n \big) \mathrm{d} y = \sum_{n=1}^N \chi\big( \Drm_n;\Scal_z \big)$. $\chi$ is the indicator function
+where
+\begin{equation}
+\mu_{\upthetam | \Drm} = \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpham + \left(\frac{N}{\alpha_0 + N}\right) \Psim(D) 
+\end{equation}
+and $\Psim(z;\Drm) = \int_{\Scal_z} \Psi(y;D) \mathrm{d} y = N^{-1} \sum_{n=1}^N \chi\big( \Drm_n;\Scal_z \big)$. $\chi$ is the indicator function
 \begin{equation}
 \chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S.  \end{cases}
 \end{equation}
 
 
 PGR: SUFFICIENT STATISTIC FOR D!!!?
+
+\todohigh{FIXXX}
 
 To prove the hypothesis, exploit the results of Appendix \ref{app:Dir_agg} to represent the training data distribution conditioned on the aggregation $\upthetam$. The conditional distribution of interest is
 \begin{IEEEeqnarray}{L}
@@ -3240,7 +3253,7 @@ PGR: tilde not prime?
 
 \subsection{Proof that $\sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DMP}
 
-Next, it is demonstrated that the random process $\uppsi(y) \equiv \Psi(y;\Drm) = \sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DMP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta\big( D_n \big)$ and $\uptheta \sim \DP(\alpha_0 \alpha)$. 
+Next, it is demonstrated that the random process $\uppsi(y) \equiv \Psi(y;\Drm) = \sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DMP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta\big( D_n \big)$ and $\uptheta \sim \DP(\alpha_0, \alpha)$. 
 
 Observe that $\uppsim(z) \equiv \sum_{n=1}^N \chi\big( \Drm_n;\Scal_z \big)$, where $\chi$ is the indicator function
 \begin{equation}
