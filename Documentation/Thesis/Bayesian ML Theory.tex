@@ -2031,7 +2031,7 @@ PGR: comment on alpha0 versus alphax simplification
 
 Substituting the optimal Dirichlet-based classifier into the formula for the conditional probability of error \ref{eq:risk_cond_01}, the risk is
 \begin{IEEEeqnarray}{rCl}
-\Rcal_{\Theta}(f ; \uptheta) & = & 1 - \sum_{x \in \Xcal} \upthetam(x) \Erm_{\uppsi | \upthetam,\upthetac} \bigg[ \upthetac\Big( \argmax_{y \in \Ycal} \big( \uppsi(y,x) + \alpha(y,x) \big) ;x \Big) \bigg] \;.
+\Rcal_{\Theta}(f ; \uptheta) & = & 1 - \sum_{x \in \Xcal} \upthetam(x) \Erm_{\uppsi | \upthetam,\upthetac} \bigg[ \upthetac\Big( \argmax_{y \in \Ycal} \big( N \uppsi(y,x) + \alpha_0 \alpha(y,x) \big) ;x \Big) \bigg] \;.
 \end{IEEEeqnarray}
 Figures \ref{fig:Risk_cond_01_Dir_N_leg_a0__subj_good} and \ref{fig:Risk_cond_01_Dir_N_leg_a0__subj_bad} show how the conditional risk trends for classifiers based on well-matched and poorly-matched informative Dirichlet priors, respectively. Note that the well-matched prior does better with higher prior concentrations $\alpha_0$; this is reflective of the fact that the maximizing arguments $y \in \Ycal$ of both the true model $\thetac(x)$ and the prior mean $\alphac(x)$ are the same.
 \begin{figure}
