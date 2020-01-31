@@ -3139,43 +3139,42 @@ on the domain $\left\{ \psi \in {\Zbbgeq}^{\Ycal} : \sum_{y \in \Scal_z} \psi(y)
 
 
 
-\section{First and Second moments of a Dirichlet Process} \label{app:E_DP}
+\section{First and Second moments of a continuous Dirichlet Process} \label{app:E_DP}
 
-In this section, it is shown that the expected value of a Dirichlet process $\uptheta \sim \DP(\alpha_0 \alpha)$ is 
+In this section, it is shown that the expected value of a Dirichlet process $\uptheta \sim \DP(\alpha_0, \alpha)$ is 
 \begin{equation}
-\mu_{\uptheta} = \alpha \;,
+\mu_{\uptheta} = \alpha \;.
 \end{equation}
-where $\alpha_0 = \int_{\Ycal} \alpha(y) \mathrm{d} y$.
 
-The defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Define the partition of $\Ycal$, $\big\{ \Scal(y),S^c(y) \big\}$ where $\Scal(y) = \{ t \in \Ycal : t \leq y \}$. The transform random variable $\upthetam(y) \equiv \int_{-\infty}^y \uptheta(t) \mathrm{d} t$ is thus a Beta random variable with parameters $\lambda = \int_{-\infty}^y \alpha(t) \mathrm{d} t$ and $\lambda^c = \int_y^\infty \alpha(t) \mathrm{d} t$. Using the formula for the expected value of a beta random variable \cite{papoulis}, note that
+The defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Define the partition of $\Ycal$, $\big\{ \Scal(y),S^\text{c}(y) \big\}$ where $\Scal(y) = \{ t \in \Ycal : t \leq y \}$. The transform random variable $\upthetam(y) \equiv \int_{-\infty}^y \uptheta(t) \mathrm{d} t$ is thus a Beta random variable with parameters $\lambda = \alpha_0 \int_{-\infty}^y \alpha(t) \mathrm{d} t$ and $\lambda^\text{c} = \alpha_0 \int_y^\infty \alpha(t) \mathrm{d} t$. Using the formula for the expected value of a beta random variable \cite{papoulis}, note that
 \begin{IEEEeqnarray}{rCl}
-\mu_{\upthetam} & = & \frac{\lambda}{\lambda+\lambda^c} \\
-& = & \frac{\int_{-\infty}^y \alpha(t) \mathrm{d} t}{\alpha_0} = \int_{-\infty}^y \mu_{\uptheta}(t) \mathrm{d} t \nonumber \;.
+\mu_{\upthetam} & = & \frac{\lambda}{\lambda+\lambda^\text{c}} \\
+& = & \int_{-\infty}^y \alpha(t) \mathrm{d} t = \int_{-\infty}^y \mu_{\uptheta}(t) \mathrm{d} t \nonumber \;.
 \end{IEEEeqnarray}
 Differentiating with respect to $y$, we have the expected value of the DP.
 
 Next, the correlation function is shown to be 
 \begin{equation}
-\Erm_{\uptheta}\big[ \uptheta(y_1)\uptheta(y_2) \big] = \frac{\alpha(y_1)\alpha(y_2) + \alpha(y_1)\delta(y_1-y_2)}{\alpha_0(\alpha_0+1)} \;.
+\Erm_{\uptheta}\big[ \uptheta(y_1)\uptheta(y_2) \big] = \frac{\alpha_0 \alpha(y_1)\alpha(y_2) + \alpha(y_1)\delta(y_1-y_2)}{\alpha_0+1} \;.
 \end{equation}
-First, assume $y_2 \geq y_1$ and define a new partition of $\Ycal$, $\big\{ (-\infty,y_1], (y_1,y_2], (y_2,\infty) \big\}$. By the aggregation property, the random triplet $\left( \int_{-\infty}^{y_1} \uptheta(t) \mathrm{d} t, \int_{y_1}^{y_2} \uptheta(t) \mathrm{d} t, \int_{y_2}^{\infty} \uptheta(t) \mathrm{d} t \right)$ is Dirichlet with parameters $\left( \int_{-\infty}^{y_1} \alpha(t) \mathrm{d} t, \int_{y_1}^{y_2} \alpha(t) \mathrm{d} t, \int_{y_2}^{\infty} \alpha(t) \mathrm{d} t \right)$.
+First, assume $y_2 \geq y_1$ and define a new partition of $\Ycal$, $\big\{ (-\infty,y_1], (y_1,y_2], (y_2,\infty) \big\}$. By the aggregation property, the random triplet $\left( \int_{-\infty}^{y_1} \uptheta(t) \mathrm{d} t, \int_{y_1}^{y_2} \uptheta(t) \mathrm{d} t, \int_{y_2}^{\infty} \uptheta(t) \mathrm{d} t \right)$ is Dirichlet with concentration $\alpha_0$ and mean $\left( \int_{-\infty}^{y_1} \alpha(t) \mathrm{d} t, \int_{y_1}^{y_2} \alpha(t) \mathrm{d} t, \int_{y_2}^{\infty} \alpha(t) \mathrm{d} t \right)$.
 
 Define the function
 \begin{IEEEeqnarray}{L}
 g(t_1,t_2) = \Erm_{\uptheta}\left[ \int_{-\infty}^{y_1} \uptheta(t_1) \mathrm{d} t_1 \int_{-\infty}^{y_2} \uptheta(t_2) \mathrm{d} t_2 \right] \\
 \quad = \Erm_{\uptheta}\left[ \left( \int_{-\infty}^{y_1} \uptheta(t_1) \mathrm{d} t_1 \right)^2 + \left( \int_{-\infty}^{y_1} \uptheta(t_1) \mathrm{d} t_1 \right) \left( \int_{y_1}^{y_2} \uptheta(t_2) \mathrm{d} t_2 \right) \right] \nonumber \\
-\quad = \frac{\left( \int_{-\infty}^{y_1} \alpha(t_1) \mathrm{d} t_1 \right) \left( 1 + \int_{-\infty}^{y_1} \alpha(t_1) \mathrm{d} t_1 \right) + \left( \int_{-\infty}^{y_1} \alpha(t_1) \mathrm{d} t_1 \right) \left( \int_{y_1}^{y_2} \alpha(t_2) \mathrm{d} t_2 \right)}{\alpha_0(\alpha_0+1)} \nonumber \\
-\quad = \frac{\left( \int_{-\infty}^{y_1} \alpha(t_1) \mathrm{d} t_1 \right) \left( \int_{-\infty}^{y_2} \alpha(t_2) \mathrm{d} t_2 \right) + \left( \int_{-\infty}^{y_1} \alpha(t_1) \mathrm{d} t_1 \right)}{\alpha_0(\alpha_0+1)} \quad \forall y_2 \geq y_1 \nonumber \;.
+\quad = \frac{\left( \int_{-\infty}^{y_1} \alpha(t_1) \mathrm{d} t_1 \right) \left( 1 + \alpha_0\int_{-\infty}^{y_1} \alpha(t_1) \mathrm{d} t_1 \right) + \alpha_0 \left( \int_{-\infty}^{y_1} \alpha(t_1) \mathrm{d} t_1 \right) \left( \int_{y_1}^{y_2} \alpha(t_2) \mathrm{d} t_2 \right)}{\alpha_0+1} \nonumber \\
+\quad = \frac{\alpha_0 \left( \int_{-\infty}^{y_1} \alpha(t_1) \mathrm{d} t_1 \right) \left( \int_{-\infty}^{y_2} \alpha(t_2) \mathrm{d} t_2 \right) + \left( \int_{-\infty}^{y_1} \alpha(t_1) \mathrm{d} t_1 \right)}{\alpha_0+1} \quad \forall y_2 \geq y_1 \nonumber \;.
 \end{IEEEeqnarray}
 Following the same steps provides the values of $g$ for $t_2 \leq t_1$; the combined formula can be given as
 \begin{IEEEeqnarray}{L}
-g(t_1,t_2) = \frac{\left( \int_{-\infty}^{y_1} \alpha(t_1) \mathrm{d} t_1 \right) \left( \int_{-\infty}^{y_2} \alpha(t_2) \mathrm{d} t_2 \right) + \left( \int_{-\infty}^{\min(y_1,y_2)} \alpha(t_1) \mathrm{d} t_1 \right)}{\alpha_0(\alpha_0+1)} \;. 
+g(t_1,t_2) = \frac{\alpha_0 \left( \int_{-\infty}^{y_1} \alpha(t_1) \mathrm{d} t_1 \right) \left( \int_{-\infty}^{y_2} \alpha(t_2) \mathrm{d} t_2 \right) + \left( \int_{-\infty}^{\min(y_1,y_2)} \alpha(t_1) \mathrm{d} t_1 \right)}{\alpha_0+1} \;. 
 \end{IEEEeqnarray}
 Finally,
 \begin{IEEEeqnarray}{L}
 \Erm_{\uptheta}\big[ \uptheta(y_1)\uptheta(y_2) \big] = \frac{\mathrm{d}^2}{\mathrm{d} t_1 \mathrm{d} t_2} g(t_1,t_2) \\
-\quad = \frac{\frac{\mathrm{d}}{\mathrm{d} t_2} \left[ \alpha(y_1) \left( \int_{-\infty}^{y_2} \alpha(t_2) \mathrm{d} t_2 \right) + u(t_2-t_1) \alpha\big( \min(t_1,t_2) \big) \right]}{\alpha_0(\alpha_0+1)} \nonumber \\
-\quad = \frac{\alpha(y_1)\alpha(y_2) + \alpha(y_1)\delta(y_1-y_2)}{\alpha_0(\alpha_0+1)} \nonumber \;.
+\quad = \frac{\frac{\mathrm{d}}{\mathrm{d} t_2} \left[ \alpha_0 \alpha(y_1) \left( \int_{-\infty}^{y_2} \alpha(t_2) \mathrm{d} t_2 \right) + u(t_2-t_1) \alpha\big( \min(t_1,t_2) \big) \right]}{\alpha_0+1} \nonumber \\
+\quad = \frac{\alpha_0 \alpha(y_1)\alpha(y_2) + \alpha(y_1)\delta(y_1-y_2)}{\alpha_0+1} \nonumber \;.
 \end{IEEEeqnarray}
 
 
