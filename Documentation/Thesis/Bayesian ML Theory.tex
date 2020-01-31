@@ -133,11 +133,11 @@
 
 \todolow{line break symbol format, before/after?}
 
-\todohi{Is Dir and DP redundant?? DM and DMP?}
+\todomid{Is Dir and DP redundant?? DM and DMP?}
 
 \todolo{likelihood function terminology}
 
-\todohi{Dirichlet localization or concentration?}
+\todomid{Dirichlet localization or concentration?}
 
 \todolow{DIM and PR operator from AMS?}
 
@@ -146,13 +146,13 @@
 
 \todohigh{ALL figure notation: theta font + Ycal indexing. use R,f opt?}
 
-\todohi{CHECK for $\Theta$ vs $\Uptheta$}
+\todolo{CHECK for $\Theta$ vs $\Uptheta$}
 
-\todomid{check notation throughout for expectation/variance operators, proper arguments}
+\todolo{check notation throughout for expectation/variance operators, proper arguments}
 
 \todolo{use clairvoyant/irreducible terms and symbols $\Rcal$}
 
-\todomid{suppress arguments where sensible? eg Pd = theta}
+\todolo{suppress arguments where sensible? eg Pd = theta}
 
 \todomid{reconsider irreducible terminology}
 
@@ -185,7 +185,7 @@
 
 
 
-PGR: bibliography
+\todolow{bibliography}
 
 Theo: (mult moments), DP agg, Dir moments
 
@@ -1291,7 +1291,7 @@ It is instructive to treat the distribution $\Prm_{\yrm | \xrm,\uppsi}$ as an es
 \end{IEEEeqnarray}
 where the properties of an Empirical distribution conditioned on its aggregation have been used. The result is a convex combination of the conditional data-independent distribution $\alphac(\xrm)$ and the true conditional distribution $\upthetac(\xrm)$. The convex coefficients are dependent on the ``marginal'' values $\alpham(\xrm)$ and $\uppsim(\xrm)$; note that as the number of matching training samples $N \uppsim(x)$ increases relative to prior concentration $\alpha_0 \alpham(x)$, the estimate tends towards the true conditional PMF. 
 
-PGR: suppress delta dependency on psi and theta?
+
 
 To aid characterization of the estimator, define the random process $\Delta(\xrm,\uppsim,\uppsic,\upthetac) \equiv \Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$. For a given $\xrm$ and corresponding empirical model value $\uppsim(\xrm)$, the bias of the conditional PMF estimate is
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias}
@@ -1333,9 +1333,8 @@ Note that by the aggregation property of Empirical distributions, the empirical 
 \end{IEEEeqnarray}
 where $\Bi$ is the binomial PMF.
 
-To exemplify how the model estimate $\Prm_{\yrm | \xrm,\uppsi}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 10$. The data-independent PMF $\alphac(x)$ and true model $\upthetac(x)$ are shown in Figure \ref{fig:P_yx_error_N_0} - note the significant mismatch. 
+To exemplify how the model estimate $\Prm_{\yrm | \xrm,\uppsi}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 10$ and $|\Xcal| = 1$ for simplicity. The data-independent PMF $\alphac(x)$ and true model $\upthetac(x)$ are shown in Figure \ref{fig:P_yx_error_N_0} - note the significant mismatch. 
 
-PGR: ABOVE - STATE XCAL cardinality = 1
 
 Figures \ref{fig:P_yx_error_a0_0_1} and \ref{fig:P_yx_error_a0_10} show how the bias and variance of the estimate change for different values of $N \uppsim(x)$ and $\alpha_0 \alpham(x)$. The plot markers represent the conditional mean of the estimator, $\Erm_{\uppsic | \uppsim,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big]$; the upper and lower error bars represent the square-root of the expected squared deviation above and below the conditional mean, respectively. Each individual plot heading provides the error $\sqrt{\sum_{y \in \Ycal} \mathcal{E}(y,y ; \xrm,\uppsim,\upthetac)}$ to assess the quality of the PMF estimate. 
 
@@ -1734,7 +1733,7 @@ Calculation of the second derivative confirms that this value is a local minimum
 \begin{equation}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm | \uptheta}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{1}{N \uppsim(\xrm) \Sigma_{\yrm | \xrm,\uptheta}^{-1} + \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^{-2}} \right] \right] \;,
 \end{equation}
-which can be easily shown to be less than both the asymptotic values for $\alpha'(x) \to 0$ and $\alpha'(x) \to \infty$. Thus the concentation values \eqref{eq:alpha_x_min_Rex} can be used to find the optimal values of $\alpha_0$ and $\alpham(x)$which provide the minimum excess risk for the given prior conditional distributions $\alphac(x)$.
+which can be easily shown to be less than both the asymptotic values for $\alpha'(x) \to 0$ and $\alpha'(x) \to \infty$. Thus the concentation values \eqref{eq:alpha_x_min_Rex} can be used to find the optimal values of $\alpha_0$ and $\alpham(x)$ leading to the minimum excess risk for the given prior conditional distributions $\alphac(x)$.
 
 Note that the minimizing concentration values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible; the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low concentrations are preferable when the model has low conditional variance; these models can be quickly identified by learners that prioritize the emprical PMF estimate over the prior estimate. Additionally, note that these values $\alpha'(x)$ do not depend on the training volume $N$.
 
@@ -1790,10 +1789,11 @@ PGR: weighted conditional majority decision
 To determine the optimal learning function, the 0-1 loss from Equation \eqref{eq:loss_01} is substituted into Equation \eqref{eq:E_y|xD L} and Equation \eqref{eq:f_opt_xD} to find
 \begin{IEEEeqnarray}{rCl} \label{eq:f_opt_01_dir}
 f^*(x;D) & = & \argmax_{y \in \Ycal} \Prm_{\yrm | \xrm,\Drm}(y | x,D) \\
-& = & \argmax_{y \in \Ycal} \frac{\alpha(y,x) + \Psi(y,x;D)}{\alpha'(x) + N'(x;D)} \nonumber \\
-& = & \argmax_{y \in \Ycal} \left( \alpha(y,x) + \Psi(y,x;D) \right) \nonumber \;.
+& = & \argmax_{y \in \Ycal} \frac{\alpha_0 \alpham(x) \alphac(y;x) + N \Psim(x;D) \Psic(y;x;D)}{\alpha_0 \alpham(x) + N \Psim(x;D)} \nonumber \\
+& = & \argmax_{y \in \Ycal} \big( \alpha_0 \alpha(y,x) + N \Psi(y,x;D) \big) \nonumber \\
+& = & \argmax_{y \in \Ycal} \big( \alpha_0 \alpham(x) \alphac(y;x) + N \Psim(x;D) \Psic(y;x;D) \big) \nonumber \;.
 \end{IEEEeqnarray}
-Using the Dirichlet prior, different classes are ``scored'' by counting the number of training samples with a value of $\Xrm_n$ matching that of $\xrm$ and combining with the prior parameters $\alpha(\cdot,\xrm)$.  
+Using the Dirichlet prior, different classes are ``scored'' by counting the number of training samples with a value of $\Xrm_n$ matching that of $\xrm$ and combining with the prior parameters $\alpha_0$ and $\alpha(\cdot,\xrm)$.  
 
 
 
@@ -1801,9 +1801,9 @@ Using the Dirichlet prior, different classes are ``scored'' by counting the numb
 
 When the uniform prior is used, the Bayes classifier simplifies to 
 \begin{IEEEeqnarray}{rCl}
-f^*(x;D) & = & \argmax_{y \in \Ycal} \Psi(y,x;D) \;,
+f^*(x;D) & = & \argmax_{y \in \Ycal} \Psic(y;x;D) \;,
 \end{IEEEeqnarray}
-a conditional majority decision which chooses the class from $\Ycal$ most often represented among training set samples $\Drm$ with a matching input value $\xrm$. This is intuitive, as the model PDF parameter $\alpha$ imparts no confidence as to which classes may be most likely.
+the maximizing argument of the conditional empirical model. This effects a conditional majority decision which chooses the class from $\Ycal$ most often represented among training set samples $\Drm$ with a matching input value $\xrm$. This is intuitive, as the model PDF parameter $\alpha$ imparts no confidence as to which classes may be most likely.
 
 
 
@@ -1819,10 +1819,10 @@ a conditional majority decision which chooses the class from $\Ycal$ most often 
 Evaluating the minimum risk \eqref{eq:risk_min_01} using the distributions derived from the Dirichlet prior, the Bayes minimum probability of error is 
 \begin{IEEEeqnarray}{rCl}
 \Rcal^* & = & 1 - \Erm_{\xrm,\Drm} \left[ \max_{y \in \Ycal} \Prm_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) \right] \\
-& = & 1 - \Erm_{\xrm,\uppsi} \left[ \frac{ \max_{y \in \Ycal} \big( \alpha(y,x) + \uppsi(y,x) \big)}{\alpha'(x) + \uppsim(x)} \right] \nonumber \\
-& = & 1 - \sum_{x \in \Xcal} \frac{\Erm_{\uppsi} \Big[ \max_{y \in \Ycal} \big( \alpha(y,x) + \uppsi(y,x) \big) \Big]}{\alpha_0 + N} \nonumber \;.
+& = & 1 - \Erm_{\xrm,\uppsim,\uppsic} \left[ \frac{ \max_{y \in \Ycal} \big( \alpha_0 \alpham(x) \alphac(y;x) + N \uppsim(x) \uppsi(y;x) \big)}{\alpha_0 \alpham(x) + N \uppsim(x)} \right] \nonumber \\
+& = & 1 - \sum_{x \in \Xcal} \frac{\Erm_{\uppsi} \Big[ \max_{y \in \Ycal} \big( \alpha_0 \alpha(y,x) + N \uppsi(y,x) \big) \Big]}{\alpha_0 + N} \nonumber \;.
 \end{IEEEeqnarray}
-Figures \ref{fig:Risk_01_Dir_N_leg_a0} and \ref{fig:Risk_01_Dir_a0_leg_N} plot the minimum Bayes probability of error against training data volume $N$ and prior concentration $\alpha_0$, respectively. Note that for $N = 0$, the Bayes risk is $\Rcal^* = 1 - \sum_{x \in \Xcal} \frac{\max_{y \in \Ycal} \alpha(y,x)}{\alpha_0}$. Additionally, consider the risk for maximal/minimal values of the Dirichlet concentration. For $\alpha_0 \to 0$ (and $N > 1$), the risk is $\Rcal^* = 0$; conversely, for $\alpha_0 \to \infty$, the risk tends to $\Rcal^* \to 1 - \sum_{x \in \Xcal} \frac{\max_{y \in \Ycal} \alpha(y,x)}{\alpha_0}$. These trends can be visualized in Figures \ref{fig:Risk_01_Dir_Pyx__a0_high} and \ref{fig:Risk_01_Dir_Pyx__a0_low}.
+Figures \ref{fig:Risk_01_Dir_N_leg_a0} and \ref{fig:Risk_01_Dir_a0_leg_N} plot the minimum Bayes probability of error against training data volume $N$ and prior concentration $\alpha_0$, respectively. Note that for $N = 0$, the Bayes risk is $\Rcal^* = 1 - \sum_{x \in \Xcal} \max_{y \in \Ycal} \alpha(y,x)$. Additionally, consider the risk for maximal/minimal values of the Dirichlet concentration. For $\alpha_0 \to 0$ (and $N > 1$), the risk is $\Rcal^* = 0$; conversely, for $\alpha_0 \to \infty$, the risk tends to $\Rcal^* \to 1 - \sum_{x \in \Xcal} \max_{y \in \Ycal} \alpha(y,x)$. These trends can be visualized in Figures \ref{fig:Risk_01_Dir_Pyx__a0_high} and \ref{fig:Risk_01_Dir_Pyx__a0_low}.
 
 PGR: risk for $N \to \infty$?
 
@@ -1910,23 +1910,24 @@ PGR: add nmax CDF fig!
 Using the uniform prior, the minimum Bayes 0-1 risk is 
 \begin{IEEEeqnarray}{rCl}
 \Rcal^* & = & 1 - \Erm_{\xrm,\Drm} \left[ \max_{y \in \Ycal} \Prm_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) \right] \\
-& = & 1 - \sum_{x \in \Xcal} \frac{\Erm_{\uppsi} \big[ \max_{y \in \Ycal} \uppsi(y,x) \big] + 1}{|\Ycal||\Xcal| + N} \nonumber \\
-& = & 1 - \frac{1 + |\Xcal|^{-1} \sum_{x \in \Xcal} \Erm_{\uppsi} \big[ \max_{y \in \Ycal} \uppsi(y,x) \big]}{|\Ycal| + N/|\Xcal|} \nonumber \;.
+& = & 1 - \sum_{x \in \Xcal} \frac{1 + N \Erm_{\uppsi} \big[ \max_{y \in \Ycal} \uppsi(y,x) \big]}{|\Ycal||\Xcal| + N} \nonumber \\
+& = & 1 - \frac{1 + N |\Xcal|^{-1} \sum_{x \in \Xcal} \Erm_{\uppsi} \big[ \max_{y \in \Ycal} \uppsi(y,x) \big]}{|\Ycal| + N |\Xcal|^{-1}} \nonumber \\
+& = & 1 - \frac{1 + N |\Xcal|^{-1} \sum_{x \in \Xcal} \Erm_{\uppsim(x)} \Big[ \uppsim(x) \Erm_{\uppsic(x) | \uppsim(x)} \big[ \max_{y \in \Ycal} \uppsic(y;x) \big] \Big]}{|\Ycal| + N |\Xcal|^{-1}} \nonumber \;.
 \end{IEEEeqnarray}
-The expectation operates on the maximum value from a subset of a uniform Dirichlet-Multinomial random process. Via the Dirichlet-Multinomial aggregation property \cite{johnson}, a consequence of the the uniform PMF $\Prm_{\uppsi}$ is that the individual segments $\uppsi(\cdot,x)$ are identically distributed; thus, the expectation will be same for every value $x$.
+The expectation operates on the maximum value from a subset of a uniform Dirichlet-Empirical random process. Via the Dirichlet-Empirical aggregation property (related to the Dirichlet-Multinomial property \cite{johnson}), a consequence of the the uniform PMF $\Prm_{\uppsi}$ is that the individual segments $\uppsi(\cdot,x)$ are identically distributed; thus, the expectation will be same for every value $x$.
 
-To evaluate this expectation, new random variables $\uppsi_{\max}(x) \equiv \max_{y \in \Ycal} \uppsi(y,x)$ are introduced and characterized by their identical PMF. To this end, the probability of the event $\Prm\big( \uppsi_{\max}(x) \geq n \big) = \Prm\big( \cup_{y \in \Ycal} \{ \uppsi(y,x) \geq n \} \big)$ will be determined. As the distribution of $\uppsi$ is uniform, the event probability is proportionate to the cardinality of the set $\cup_{y \in \Ycal} \{ \psi: \psi(y,x) \geq n \}$. Using the inclusion-exclusion principle \cite{brualdi}, the cardinality is represented as
+To evaluate this expectation, new random variables $\uppsi_{\max}(x) \equiv \max_{y \in \Ycal} \uppsi(y,x) \in \{ n/N: n \in 0,\ldots,N \}$ are introduced and characterized by their identical PMF. To this end, the probability of the event $\Prm\big( \uppsi_{\max}(x) \geq n/N \big) = \Prm\big( \cup_{y \in \Ycal} \{ \uppsi(y,x) \geq n/N \} \big)$ will be determined. As the distribution of $\uppsi$ is uniform, the event probability is proportionate to the cardinality of the set $\cup_{y \in \Ycal} \{ \psi: \psi(y,x) \geq n/N \}$. Using the inclusion-exclusion principle \cite{brualdi}, the cardinality is represented as
 \begin{IEEEeqnarray}{L}
-\big| \cup_{y \in \Ycal} \{ \psi : \psi(y,x) \geq n \} \big| \\
+\big| \cup_{y \in \Ycal} \{ \psi : \psi(y,x) \geq n/N \} \big| \\
 \quad = \begin{cases} \binom{N+|\Ycal||\Xcal|-1}{|\Ycal||\Xcal|-1} & \mathrm{if} \ n < 0, \\ \sum_{m=1}^{|\Ycal|} \binom{|\Ycal|}{m} (-1)^{m-1} \binom{N-mn+|\Ycal||\Xcal|-1}{|\Ycal||\Xcal|-1} H\Big( \big\lfloor\frac{N}{m}\big\rfloor - n \Big) & \mathrm{if} \ 0 \leq n \leq N, \\ 0 & \mathrm{if} \ n > N, \end{cases} \nonumber
 \end{IEEEeqnarray}
 where $H: \Zbb \mapsto \{0,1\}$ is the discrete Heaviside step function. For $n < 0$, the cardinality is equivalent to $|\Uppsi|$. 
 
-For $0 \leq n < N$, the cardinality is an alternating binomial summation where the $m^\mathrm{th}$ term accounts for the different intersections of $m$ of the $|\Ycal|$ individual sets $\{ \psi : \psi(y,x) \geq n \}$. Observe that the cardinality of the intersections is only dependent on the number of contributing sets $m$ and not on which sets intersect. Furthermore, note the dependency of the intersection cardinalities on the argument $n$. The step function contributes such that if $n > \big\lfloor\frac{N}{m}\big\rfloor$, only up to $m-1$ individual sets will intersect. The binomial coefficient $\Mcal\big( (N-mn,|\Ycal||\Xcal|-1) \big)$ provides the intersection cardinality for a given $m$; note the similarity to the cardinality $|\Uppsi|$ - the only difference is the number of points that grid the $|\Ycal||\Xcal|-1$ dimensional region.
+For $0 \leq n < N$, the cardinality is an alternating binomial summation where the $m^\mathrm{th}$ term accounts for the different intersections of $m$ of the $|\Ycal|$ individual sets $\{ \psi : \psi(y,x) \geq n/N \}$. Observe that the cardinality of the intersections is only dependent on the number of contributing sets $m$ and not on which sets intersect. Furthermore, note the dependency of the intersection cardinalities on the argument $n$. The step function contributes such that if $n > \big\lfloor\frac{N}{m}\big\rfloor$, only up to $m-1$ individual sets will intersect. The binomial coefficient $\Mcal\big( (N-mn,|\Ycal||\Xcal|-1) \big)$ provides the intersection cardinality for a given $m$; note the similarity to the cardinality $|\Uppsi|$ - the only difference is the number of points that grid the $|\Ycal||\Xcal|-1$ dimensional region.
 
 The probability of interest can thus be expressed as
 \begin{IEEEeqnarray}{L}
-\Prm\big( \uppsi_{\max}(x) \geq n \big) = \binom{N+|\Ycal||\Xcal|-1}{|\Ycal||\Xcal|-1}^{-1} \big| \cup_{y \in \Ycal} \{ \psi : \psi(y,x) \geq n \} \big| \\
+\Prm\big( \uppsi_{\max}(x) \geq n/N \big) = \binom{N+|\Ycal||\Xcal|-1}{|\Ycal||\Xcal|-1}^{-1} \big| \cup_{y \in \Ycal} \{ \psi : \psi(y,x) \geq n/N \} \big| \\
 \quad = \begin{cases} 1 & \mathrm{if} \ n < 0, \\ \sum_{m=1}^{|\Ycal|} \binom{|\Ycal|}{m} (-1)^{m-1} \prod_{l=1}^{|\Ycal||\Xcal|-1} \Big( 1-\frac{mn}{N+l} \Big) H\Big( \big\lfloor\frac{N}{m}\big\rfloor - n \Big) & \mathrm{if} \ 0 \leq n \leq N, \\ 0 & \mathrm{if} \ n > N. \end{cases} \nonumber
 \end{IEEEeqnarray}
 
@@ -1935,11 +1936,11 @@ PGR: use Mcal op?
 
 PGR: Heaviside reference?
 
-As the PMF of $\uppsi_{\max}(x)$ has support on $n \in [0,\ldots,N]$, the expectation over $\uppsi$ is evaluated as
+As the PMF of $\uppsi_{\max}(x)$ has support on $\{ n/N: n \in 0,\ldots,N \}$, the expectation over $\uppsi$ is evaluated as
 \begin{IEEEeqnarray}{rCl}
-\Erm_{\uppsi}\big[ \uppsi_{\max}(x) \big] & = & \sum_{n=0}^N n \Big( \Prm\big( \uppsi_{\max}(x) \geq n \big) - \Prm\big( \uppsi_{\max}(x) \geq n+1 \big) \Big) \\
-& = & -1 + \sum_{n=0}^N \Prm\big( \uppsi_{\max}(x) \geq n \big) \nonumber \\
-& = & -1 + \sum_{m=1}^{|\Ycal|} \binom{|\Ycal|}{m} (-1)^{m-1} \sum_{n=0}^{\big\lfloor\frac{N}{m}\big\rfloor} \prod_{l=1}^{|\Ycal||\Xcal|-1} \Big( 1-\frac{mn}{N+l} \Big) \nonumber 
+\Erm_{\uppsi}\big[ \uppsi_{\max}(x) \big] & = & \sum_{n=0}^N \frac{n}{N} \Big( \Prm\big( \uppsi_{\max}(x) \geq n/N \big) - \Prm\big( \uppsi_{\max}(x) \geq (n+1)/N \big) \Big) \\
+& = & -\frac{1}{N} + \frac{1}{N} \sum_{n=0}^N \Prm\big( \uppsi_{\max}(x) \geq n/N \big) \nonumber \\
+& = & -\frac{1}{N} + \frac{1}{N} \sum_{m=1}^{|\Ycal|} \binom{|\Ycal|}{m} (-1)^{m-1} \sum_{n=0}^{\big\lfloor\frac{N}{m}\big\rfloor} \prod_{l=1}^{|\Ycal||\Xcal|-1} \Big( 1-\frac{mn}{N+l} \Big) \nonumber 
 \end{IEEEeqnarray}
 and the minimum 0-1 risk is
 \begin{IEEEeqnarray}{rCl}
@@ -1976,7 +1977,7 @@ providing a lower bound for the achievable 0-1 Bayes risk. The above formulation
 PGR: harmonic reference?
 
 
-Figure \ref{fig:Risk_01_uni_N_leg_My} demonstrates how the minimum 0-1 risk decreases with training volume $N$; observe that the risk is more severe for sequences corresponding to higher $|\Ycal|$. It is sensible that the probability of error should increase when more classes have to be considered. Figure \ref{fig:Risk_01_uni_N_leg_Mx} illustrates the minimum risk with multiple sequences for different cardinalities $|\Xcal|$. Note that risk increases with $|\Xcal|$. Considering $\Erm_{\Drm}\big[N'(\Drm)\big] = \mu_{\uppsim} = N/|\Xcal|$, this should be intuitive - each conditional empirical distribution $\Psi(\cdot,x;D) / N'(x;D)$ is forced to approximate $\upthetac(x)$ with less data.
+Figure \ref{fig:Risk_01_uni_N_leg_My} demonstrates how the minimum 0-1 risk decreases with training volume $N$; observe that the risk is more severe for sequences corresponding to higher $|\Ycal|$. It is sensible that the probability of error should increase when more classes have to be considered. Figure \ref{fig:Risk_01_uni_N_leg_Mx} illustrates the minimum risk with multiple sequences for different cardinalities $|\Xcal|$. Note that risk increases with $|\Xcal|$. Considering $N \Erm_{\Drm}\big[\Psim(\Drm)\big] = N \mu_{\uppsim} = N/|\Xcal|$, this should be intuitive - each conditional empirical distribution $\Psic(x;D)$ is forced to approximate $\upthetac(x)$ with fewer data.
 
 \begin{figure}
 \centering
@@ -2030,9 +2031,9 @@ PGR: comment on alpha0 versus alphax simplification
 
 Substituting the optimal Dirichlet-based classifier into the formula for the conditional probability of error \ref{eq:risk_cond_01}, the risk is
 \begin{IEEEeqnarray}{rCl}
-\Rcal_{\Theta}(f ; \uptheta) & = & 1 - \sum_{x \in \Xcal} \upthetam(x) \Erm_{\uppsi | \uptheta} \bigg[ \upthetac\Big( \argmax_{y \in \Ycal} \big( \uppsi(y,x) + \alpha(y,x) \big) ;x \Big) \bigg] \;.
+\Rcal_{\Theta}(f ; \uptheta) & = & 1 - \sum_{x \in \Xcal} \upthetam(x) \Erm_{\uppsi | \upthetam,\upthetac} \bigg[ \upthetac\Big( \argmax_{y \in \Ycal} \big( \uppsi(y,x) + \alpha(y,x) \big) ;x \Big) \bigg] \;.
 \end{IEEEeqnarray}
-Figures \ref{fig:Risk_cond_01_Dir_N_leg_a0__subj_good} and \ref{fig:Risk_cond_01_Dir_N_leg_a0__subj_bad} show how the conditional risk trends for classifiers based on well-matched and poorly-matched informative Dirichlet priors, respectively. Note that the well-matched prior does better with higher prior concentrations $\alpha_0$; this is reflective of the fact that the maximizing arguments $y \in \Ycal$ of both the true model $\thetac(x)$ and the prior mean $\alpha(\cdot,x) / \alpha'(x)$ are the same.
+Figures \ref{fig:Risk_cond_01_Dir_N_leg_a0__subj_good} and \ref{fig:Risk_cond_01_Dir_N_leg_a0__subj_bad} show how the conditional risk trends for classifiers based on well-matched and poorly-matched informative Dirichlet priors, respectively. Note that the well-matched prior does better with higher prior concentrations $\alpha_0$; this is reflective of the fact that the maximizing arguments $y \in \Ycal$ of both the true model $\thetac(x)$ and the prior mean $\alphac(x)$ are the same.
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_cond_01_Dir_N_leg_a0__subj_good.pdf}
@@ -2047,7 +2048,7 @@ Figures \ref{fig:Risk_cond_01_Dir_N_leg_a0__subj_good} and \ref{fig:Risk_cond_01
 \label{fig:Risk_cond_01_Dir_N_leg_a0__subj_bad}
 \end{figure}
 
-Also, it is important to consider how a given classifier performs for varying models $\theta$. Figures \ref{fig:Risk_cond_ex_01_Dir_theta__uni} and \ref{fig:Risk_cond_ex_01_Dir_theta__subj} demonstrate the excess conditional probability of error achieved by the conditional majority decision (based on a non-informative Dirichlet prior) and by a classifier derived from an informative Dirichlet prior, respectively. Note that while the former has fewer models for which the error is critically high, the latter has more models for which the clairvoyant risk $\Rcal_{\Theta}^*(\theta)$ is achieved. This a fundamental trade-off between Bayesian learners based on non-informative versus informative priors.
+Also, it is important to consider how a given classifier performs for varying models $\thetac(x)$. Figures \ref{fig:Risk_cond_ex_01_Dir_theta__uni} and \ref{fig:Risk_cond_ex_01_Dir_theta__subj} demonstrate the excess conditional probability of error achieved by the conditional majority decision (based on a non-informative Dirichlet prior) and by a classifier derived from an informative Dirichlet prior, respectively. Note that while the former has fewer models for which the error is critically high, the latter has more models for which the clairvoyant risk $\Rcal_{\Theta}^*(\theta)$ is achieved. This a fundamental trade-off between Bayesian learners based on non-informative versus informative priors.
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_cond_ex_01_Dir_theta__uni.pdf}
@@ -2094,7 +2095,7 @@ Also, it is important to consider how a given classifier performs for varying mo
 
 \chapter{Extention to Infinite-Dimensional Spaces - Countably Infinite}
 
-PGR: MERGE with finite chapter???
+\todohigh{DELETE or REWORK TO MERGE WITH FINITE Ch}
 
 \section{Intro}
 
@@ -2111,13 +2112,13 @@ This chapter extends previous results for applications where the space $\Ycal$ i
 PGR: ???
 
 
-\subsubsection{Model PDF, $\prm(\uptheta)$}
+\subsubsection{Model PDF, $\prm_{\uptheta}(\theta)$}
 
 PGR: Valid model representation? Marginals instead?
 
 
 \begin{IEEEeqnarray}{rCl}
-\prm(\uptheta) & = & \beta(\alpha_0 \alpha)^{-1} \prod_{y \in \Ycal} \uptheta(y)^{\alpha(y) - 1} \;,
+\prm_{\uptheta}(\theta) & = & \beta(\alpha_0 \alpha)^{-1} \prod_{y \in \Ycal} \uptheta(y)^{\alpha(y) - 1} \;,
 \end{IEEEeqnarray}
 
 \begin{equation}
@@ -2174,7 +2175,7 @@ Also,
 \subsubsection{Output conditional PMF, $\Prm(\yrm | \Drm)$}
 
 \begin{IEEEeqnarray}{rCL}
-\prm(\uptheta | \Drm) & = & \frac{\Prm(\Drm | \uptheta) \prm(\uptheta)}{\Prm(\Drm)} \\
+\prm(\uptheta | \Drm) & = & \frac{\Prm(\Drm | \uptheta) \prm_{\uptheta}(\theta)}{\Prm(\Drm)} \\
 & = & \beta \left( \alpha + \Psi(\Drm) \right)^{-1} \prod_{y \in \Ycal} \uptheta(y)^{\alpha(y) + \Psi(y;\Drm) - 1} \nonumber 
 \end{IEEEeqnarray}
 
