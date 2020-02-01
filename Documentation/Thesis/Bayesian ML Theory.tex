@@ -2309,7 +2309,7 @@ To represent the training data distribution, note that the Dirichlet process con
 and thus the complete PDF is
 \begin{IEEEeqnarray}{rCl}
 \prm_{\Drm}(D) & = & \prm_{\Drm_1}\big( D_1 \big) \prod_{n=2}^N \prm_{\Drm_n | \Drm_{n-1},\ldots,\Drm_1}\big( \Drm_n | \Drm_{n-1},\ldots,\Drm_1 \big) \\
-& = & \frac{\alpha\big( D_1 \big)}{\alpha_0} \prod_{n=2}^N \frac{\alpha\big( D_n \big) + \sum_{i=1}^{n-1} \delta\big( D_n - D_i \big)}{\alpha_0+n-1} \nonumber \;.
+& = & \frac{\alpha\big( D_1 \big)}{\alpha_0} \prod_{n=2}^N \frac{\alpha(D_n) + \sum_{i=1}^{n-1} \delta\big( D_n - D_i \big)}{\alpha_0+n-1} \nonumber \;.
 \end{IEEEeqnarray}
 
 Additionally, note that since $\prm_{\Drm_n | \uptheta} = \uptheta$ is independent of sample index $n$, the PDF does not vary when the input arguments are permuted. Furthermore, all marginal distributions of $\Drm$ will have the same form, regardless of which training samples $\Drm_n$ are used.
@@ -3209,7 +3209,7 @@ where
 \begin{equation}
 \mu_{\upthetam | \Drm} = \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpham + \left(\frac{N}{\alpha_0 + N}\right) \Psim(D) 
 \end{equation}
-and $\Psim(z;\Drm) = \int_{\Scal_z} \Psi(y;D) \mathrm{d} y = N^{-1} \sum_{n=1}^N \chi\big( \Drm_n;\Scal_z \big)$. $\chi$ is the indicator function
+and $\Psim(z;\Drm) = \int_{\Scal_z} \Psi(y;D) \mathrm{d} y = N^{-1} \sum_{n=1}^N \chi(\Drm_n;\Scal_z)$. $\chi$ is the indicator function
 \begin{equation}
 \chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S.  \end{cases}
 \end{equation}
@@ -3253,31 +3253,30 @@ This proves the hypothesis.
 
 This section introduces a new continuous-domain random process, referred to as the Empirical process (EP). It is the generalization of the Empirical distribution for i.i.d. samples drawn from a PDF. The Empirical process assumes functions from the set $\Uppsi = \left\{ N^{-1} \sum_{n=1}^N \delta(\cdot - D_n) : D \in \Ycal^N \right\}$ and is parameterized by a function $\theta : \Ycal \mapsto \Rbbgeq$.
 
-The continuous-domain Empirical process possesses the same properties as its discrete-domain variant. Define a partition of $\Ycal$, $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, and the corresponding function partitions $\uppsi_z \in \Rbbgeq^{\Scal_z}$, such that $\uppsi = \left\{ \ldots,\uppsi_z,\ldots \right\}$, and $\theta_z \in \Rbbgeq^{\Scal_z}$, such that $\theta = \left\{ \ldots,\theta_z,\ldots \right\}$. Thus, for a Empirical process $\uppsi \in \Uppsi$, the transformed random process $\uppsim$ satisfying $\uppsim(z) \equiv \int_{\Scal_z} \uppsi_z(y) \mathrm{d} y$ is neccessarily Emprical with parameterizing function $\thetam$ satisfying $\thetam(z) \equiv \int_{\Scal_z} \theta_z(y) \mathrm{d} y$.
+The continuous-domain Empirical process possesses the same aggregation property as its discrete-domain variant. Define a partition of $\Ycal$, $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, and the corresponding function partitions $\uppsi_z \in \Rbbgeq^{\Scal_z}$, such that $\uppsi = \left\{ \ldots,\uppsi_z,\ldots \right\}$, and $\theta_z \in \Rbbgeq^{\Scal_z}$, such that $\theta = \left\{ \ldots,\theta_z,\ldots \right\}$. Thus, for a Empirical process $\uppsi \in \Uppsi$, the transformed random process $\uppsim$ satisfying $\uppsim(z) \equiv \int_{\Scal_z} \uppsi_z(y) \mathrm{d} y$ is neccessarily Emprical with parameterizing function $\thetam$ satisfying $\thetam(z) \equiv \int_{\Scal_z} \theta_z(y) \mathrm{d} y$.
 
-Furthermore, when conditioned on the aggregation $\uppsim$, the normalized segments $\uppsic(z) \equiv \uppsi_z / \uppsim(z)$ are independent continuous-domain Empirical processes, $\uppsic(z) | \uppsim(z), \upthetac(z) \sim \EP\big(N \uppsim(z), \upthetac(z)\big)$, where $\thetac(z) \equiv \theta_z / \thetam(z) \in \Pcal(\Scal_z)$.
+Consequently, when conditioned on the aggregation $\uppsim$, the normalized segments $\uppsic(z) \equiv \uppsi_z / \uppsim(z)$ are independent continuous-domain Empirical processes, $\uppsic(z) | \uppsim(z), \upthetac(z) \sim \EP\big(N \uppsim(z), \upthetac(z)\big)$, where $\thetac(z) \equiv \theta_z / \thetam(z) \in \Pcal(\Scal_z)$.
 
 
-\todohigh{WIP}
 
-\subsection{Proof that $\sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DMP}
+\subsection{Proof that $\uppsi \equiv \sum_{n=1}^N \delta(\cdot - \Drm_n)$ given $\uptheta$ is an EP}
 
-Next, it is demonstrated that the random process $\uppsi(y) \equiv \Psi(y;\Drm) = \sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DMP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta\big( D_n \big)$ and $\uptheta \sim \DP(\alpha_0, \alpha)$. 
+Next, it is demonstrated that conditioned on $\uptheta$, the random process $\uppsi \equiv \Psi(\Drm) = \sum_{n=1}^N \delta(\cdot - \Drm_n)$ is an EP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta(D_n)$.
 
-Observe that $\uppsim(z) \equiv \sum_{n=1}^N \chi\big( \Drm_n;\Scal_z \big)$, where $\chi$ is the indicator function
+Observe that $\uppsim(z) \equiv N^{-1} \sum_{n=1}^N \chi(\Drm_n;\Scal_z)$, where $\chi$ is the indicator function
 \begin{equation}
 \chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S.  \end{cases}
 \end{equation}
-and note that $\Prm\Big( \chi\big( \Drm_n;\Scal_z \big) = 1 \big| \uptheta \Big) = \int_{\Scal_z} \uptheta(y) \mathrm{d} y$. As such, $\uppsim$ conditioned on the model $\uptheta$ is characterized by a multinomial distribution 
+and note that $\Prm\big( \chi(\Drm_n;\Scal_z) = 1 \big| \uptheta \big) = \upthetam(z)$, where $\upthetam(z) \equiv \int_{\Scal_z} \uptheta(y) \mathrm{d} y$. Since the events $\Drm_n \in \Scal_z$ are independent given $\uptheta$, $\uppsim$ conditioned on the model $\uptheta$ is characterized by an Empirical distribution 
 \begin{equation}
-\Prm_{\uppsim | \uptheta}(n' | \theta) = \Mcal(N \psim) \prod_{z \in \Zcal} \left( \int_{\Scal_z} \theta(y) \mathrm{d} y \right)^{N \psim(z)} = \Multi\left( n' ; N,\thetam(z) \right) \;,
+\Prm_{\uppsim | \uptheta}(\psim | \theta) \equiv \Mcal(N \psim) \prod_{z \in \Zcal} \left( \thetam(z) ^{\psim(z)} \right)^{N} = \Emp\big( \psim(z); N,\thetam(z) \big) \;.
 \end{equation}
-where $\upthetam(z) \equiv \int_{\Scal_z} \uptheta(y) \mathrm{d} y$, $z \in \Zcal$.
 
-By the aggregation property of the Dirichlet process $\uptheta$, the parameters of this multinomial distribution are characterized as $\upthetam \sim \Dir\left( \alpha' \right)$, and thus $\tilde{\nrm}$ is drawn from a Dirichlet-Multinomial PMF with the same parameters $\alpha'$. As this holds for any partition of $\Ycal$, $\uppsi$ is a Dirichlet-Multinomial Process.
 
 
 \subsection{Mean and Correlation Functions}
+
+\todohigh{WIP HERE}
 
 In this subsection the mean and correlation functions of a DMP are expressed. The mean function is
 \begin{IEEEeqnarray}{rCl}
@@ -3340,15 +3339,15 @@ PGR: tilde not prime?
 
 \subsection{Proof that $\sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DMP}
 
-Next, it is demonstrated that the random process $\uppsi(y) \equiv \Psi(y;\Drm) = \sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DMP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta\big( D_n \big)$ and $\uptheta \sim \DP(\alpha_0, \alpha)$. 
+Next, it is demonstrated that the random process $\uppsi(y) \equiv \Psi(y;\Drm) = \sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DMP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta(D_n)$ and $\uptheta \sim \DP(\alpha_0, \alpha)$. 
 
-Observe that $\uppsim(z) \equiv \sum_{n=1}^N \chi\big( \Drm_n;\Scal_z \big)$, where $\chi$ is the indicator function
+Observe that $\uppsim(z) \equiv \sum_{n=1}^N \chi(\Drm_n;\Scal_z)$, where $\chi$ is the indicator function
 \begin{equation}
 \chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S.  \end{cases}
 \end{equation}
-and note that $\Prm\Big( \chi\big( \Drm_n;\Scal_z \big) = 1 \big| \uptheta \Big) = \int_{\Scal_z} \uptheta(y) \mathrm{d} y$. As such, $\uppsim$ conditioned on the model $\uptheta$ is characterized by a multinomial distribution 
+and note that $\Prm\Big( \chi(\Drm_n;\Scal_z) = 1 \big| \uptheta \Big) = \int_{\Scal_z} \uptheta(y) \mathrm{d} y$. As such, $\uppsim$ conditioned on the model $\uptheta$ is characterized by a multinomial distribution 
 \begin{equation}
-\Prm_{\uppsim | \uptheta}(n' | \theta) = \Mcal(N \psim) \prod_{z \in \Zcal} \left( \int_{\Scal_z} \theta(y) \mathrm{d} y \right)^{N \psim(z)} = \Multi\left( n' ; N,\thetam(z) \right) \;,
+\Prm_{\uppsim | \uptheta}(\psim | \theta) = \Mcal(N \psim) \prod_{z \in \Zcal} \left( \int_{\Scal_z} \theta(y) \mathrm{d} y \right)^{N \psim(z)} = \Multi\left( n' ; N,\thetam(z) \right) \;,
 \end{equation}
 where $\upthetam(z) \equiv \int_{\Scal_z} \uptheta(y) \mathrm{d} y$, $z \in \Zcal$.
 
@@ -3411,15 +3410,15 @@ PGR: tilde not prime?
 
 \subsection{Proof that $\sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DMP}
 
-Next, it is demonstrated that the random process $\uppsi(y) \equiv \Psi(y;\Drm) = \sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DMP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta\big( D_n \big)$ and $\uptheta \sim \DP(\alpha_0, \alpha)$. 
+Next, it is demonstrated that the random process $\uppsi(y) \equiv \Psi(y;\Drm) = \sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DMP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta(D_n)$ and $\uptheta \sim \DP(\alpha_0, \alpha)$. 
 
-Observe that $\uppsim(z) \equiv \sum_{n=1}^N \chi\big( \Drm_n;\Scal_z \big)$, where $\chi$ is the indicator function
+Observe that $\uppsim(z) \equiv \sum_{n=1}^N \chi(\Drm_n;\Scal_z)$, where $\chi$ is the indicator function
 \begin{equation}
 \chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S.  \end{cases}
 \end{equation}
-and note that $\Prm\Big( \chi\big( \Drm_n;\Scal_z \big) = 1 \big| \uptheta \Big) = \int_{\Scal_z} \uptheta(y) \mathrm{d} y$. As such, $\uppsim$ conditioned on the model $\uptheta$ is characterized by a multinomial distribution 
+and note that $\Prm\Big( \chi(\Drm_n;\Scal_z) = 1 \big| \uptheta \Big) = \int_{\Scal_z} \uptheta(y) \mathrm{d} y$. As such, $\uppsim$ conditioned on the model $\uptheta$ is characterized by a multinomial distribution 
 \begin{equation}
-\Prm_{\uppsim | \uptheta}(n' | \theta) = \Mcal(N \psim) \prod_{z \in \Zcal} \left( \int_{\Scal_z} \theta(y) \mathrm{d} y \right)^{N \psim(z)} = \Multi\left( n' ; N,\thetam(z) \right) \;,
+\Prm_{\uppsim | \uptheta}(\psim | \theta) = \Mcal(N \psim) \prod_{z \in \Zcal} \left( \int_{\Scal_z} \theta(y) \mathrm{d} y \right)^{N \psim(z)} = \Multi\left( n' ; N,\thetam(z) \right) \;,
 \end{equation}
 where $\upthetam(z) \equiv \int_{\Scal_z} \uptheta(y) \mathrm{d} y$, $z \in \Zcal$.
 
