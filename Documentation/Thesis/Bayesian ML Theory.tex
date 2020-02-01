@@ -3271,19 +3271,20 @@ and note that $\Prm\big( \chi(\Drm_n;\Scal_z) = 1 \big| \uptheta \big) = \upthet
 \begin{equation}
 \Prm_{\uppsim | \uptheta}(\psim | \theta) \equiv \Mcal(N \psim) \prod_{z \in \Zcal} \left( \thetam(z) ^{\psim(z)} \right)^{N} = \Emp\big( \psim(z); N,\thetam(z) \big) \;.
 \end{equation}
+Since the aggregation property is satisfied, $\uppsi$ is a Empirical process.
 
 
 
 \subsection{Mean and Correlation Functions}
 
-\todohigh{WIP HERE}
-
-In this subsection the mean and correlation functions of a DMP are expressed. The mean function is
+In this subsection the mean and correlation functions of a continuous-domain EP are expressed. The mean function is defined as
 \begin{IEEEeqnarray}{rCl}
-\mu_{\uppsi}(y) & = & \sum_{n=1}^N \Erm_{\Drm_n}\Big[\delta\big( y-\Drm_n \big) \Big] \\
-& = & \sum_{n=1}^N \Prm_{\Drm_n}(y) \nonumber \\
-& = & N \frac{\alpha(y)}{\alpha_0} \nonumber \;.
+\mu_{\uppsi}(y) & = & \Erm_{\Drm | \uptheta}\left[ \frac{1}{N} \sum_{n=1}^N \delta\big( y-\Drm_n \big) \right] \\
+& = & \frac{1}{N} \sum_{n=1}^N \Prm_{\Drm_n}(y) = \frac{1}{N} \sum_{n=1}^N \mu_{\uptheta}(y) \nonumber \\
+& = & \alpha(y) \nonumber \;.
 \end{IEEEeqnarray}
+
+\todohigh{WIP HERE}
 
 The correlation function is
 \begin{IEEEeqnarray}{rCl}
