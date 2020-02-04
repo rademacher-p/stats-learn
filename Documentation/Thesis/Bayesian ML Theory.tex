@@ -3280,8 +3280,8 @@ Since the aggregation property is satisfied, $\uppsi$ is a Empirical process.
 In this subsection the mean and correlation functions of a continuous-domain EP are expressed. The mean function is defined as
 \begin{IEEEeqnarray}{rCl}
 \mu_{\uppsi}(y) & = & \Erm_{\Drm | \uptheta}\left[ \frac{1}{N} \sum_{n=1}^N \delta\big( y-\Drm_n \big) \right] \\
-& = & \frac{1}{N} \sum_{n=1}^N \Prm_{\Drm_n}(y) = \frac{1}{N} \sum_{n=1}^N \mu_{\uptheta}(y) \nonumber \\
-& = & \alpha(y) \nonumber \;.
+& = & \frac{1}{N} \sum_{n=1}^N \Prm_{\Drm_n | \uptheta(y)} = \frac{1}{N} \sum_{n=1}^N \uptheta(y) \nonumber \\
+& = & \uptheta(y) \nonumber \;.
 \end{IEEEeqnarray}
 
 \todohigh{WIP HERE}
