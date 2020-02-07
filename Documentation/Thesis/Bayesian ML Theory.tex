@@ -149,7 +149,7 @@
 
 \todohigh{ALL figure notation: theta font + Ycal indexing. use R,f opt?}
 
-\todolo{CHECK for $\Theta$ vs $\Uptheta$}
+\todomid{Use $\Pcal$ only? Define discrete version of $\Pcal$?}
 
 \todolo{check notation throughout for expectation/variance operators, proper arguments}
 
@@ -339,9 +339,13 @@ Similarly, the beta function $\beta$ operates on functions $g : \Xcal \mapsto \R
 \begin{equation}
 \beta(g) = \frac{\prod_{x \in \Xcal} \Gamma\big( g(x) \big)}{\Gamma \left( \sum_{x \in \Xcal} g(x) \right)} \;.
 \end{equation}
-Note that the countable domains of the input functions may have an infinite number of elements. These functions will also be used to operate on a subset of a functions' domain $\Scal \subset \Xcal$ and its corresponding image. Set notation for a function is used to express the argument, so that $\Mcal\Big( \big\{ g(x) : x \in S \big\} \Big)$ and $\beta\Big( \big\{ g(x) : x \in S \big\} \Big)$.
+Note that the countable domains of the input functions may have an infinite number of elements. 
 
-\todolo{define subset functions, ditch set inputs? appendix?}
+\todolow{set input notation elimated??}
+
+These functions will also be used to operate on a subset of a functions' domain $\Scal \subset \Xcal$ and its corresponding image. Set notation for a function is used to express the argument, so that $\Mcal\Big( \big\{ g(x) : x \in S \big\} \Big)$ and $\beta\Big( \big\{ g(x) : x \in S \big\} \Big)$.
+
+
 
 
 
@@ -2955,7 +2959,7 @@ While these function segments are independent, they are not Empirical processes.
 \Prm_{\uppsic | \uppsim,\uptheta}(\psic | \psim,\theta) & \equiv & \prod_{z \in \Zcal} \Bigg[ \Mcal\big( N \psim(z) \psic(z) \big) \left( \prod_{y \in \Scal_z} \thetac(y;z)^{\psic(y;z)} \right)^{N \psim(z)} \Bigg] \nonumber \\
 & = & \prod_{z \in \Zcal} \Emp\Big( \psic(z) ; N \psim(z), \thetac(z) \Big) \;.
 \end{IEEEeqnarray}
-Thus, when conditioned on the aggregation $\uppsim \in \Uppsim \subset \Pcal(\Zcal)$, the individual segments of the random process $\uppsic \in \Pcal(\Scal_z)^{\Zcal}$ are independent empirical processes of $N \uppsim(z)$ samples, parameterized by the individual segments of $\thetac \in \Pcal(\Scal_z)^{\Zcal}$.
+Thus, when also conditioned on the aggregation $\uppsim \in \Uppsim \subset \Pcal(\Zcal)$, the individual segments of the random process $\uppsic \in \Pcal(\Scal_z)^{\Zcal}$ are independent empirical processes of $N \uppsim(z)$ samples, parameterized by the individual segments of $\thetac \in \Pcal(\Scal_z)^{\Zcal}$.
 
 
 
@@ -3017,12 +3021,36 @@ parameterized by the conditional distributions $\thetac(z) \equiv \theta_z / \th
 
 
 
-\section{Dirichlet Process conditioned on its aggregation}
+\section{Dirichlet Distribution Properties}
 \label{app:Dir_agg}
 
-This section details an important property of Dirichlet distributed random processes: when conditioned on its own aggregation, the partitioned segments of the process become independent. Furthermore, if normalized, they are also Dirichlet processes. 
 
-First, define the PDF of a Dirichlet aggregation \cite{ferguson}. Let the random process $\uptheta \sim \Dir(\alpha_0,\alpha) \in \Pcal(\Ycal)$ be Dirichlet over the countable set $\Ycal$ with concentration $\alpha_0 \in \Rbb^+$ and parameterizing function $\alpha \in \left\{ {\Rbb^+}^{\Ycal} : \sum_{y \in \Ycal} \alpha(y) = 1 \right\}$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$ and the corresponding function partitions $\uptheta_z \in \Rbbgeq^{\Scal_z}$, such that $\uptheta = \left\{ \ldots,\uptheta_z,\ldots \right\}$ and $\alpha_z \in {\Rbb^+}^{\Scal_z}$, such that $\alpha = \left\{ \ldots,\alpha_z,\ldots \right\}$. The transformed random process $\upthetam(z) \equiv \sum_{y \in \Scal_z} \uptheta_z(y)$ is distributed as $\upthetam \sim \Dir(\alpha_0,\alpham) \in \Pcal(\Zcal)$ with concentration $\alpha_0$ and a parameterizing distribution defined as $\alpham(z) = \sum_{y \in \Scal_z} \alpha_z(y)$.
+\subsection{Aggregation}
+
+It is known that Dirichlet aggregations are also Dirichlet \cite{ferguson}. Let the random process $\uptheta \sim \Dir(\alpha_0,\alpha) \in \Uptheta \equiv \Pcal(\Ycal)$ be Dirichlet over the countable set $\Ycal$ with concentration $\alpha_0 \in \Rbb^+$ and parameterizing function $\alpha \in \left\{ {\Rbb^+}^{\Ycal} : \sum_{y \in \Ycal} \alpha(y) = 1 \right\}$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$ and the corresponding function partitions $\uptheta_z \in \Rbbgeq^{\Scal_z}$, such that $\uptheta = \left\{ \ldots,\uptheta_z,\ldots \right\}$ and $\alpha_z \in {\Rbb^+}^{\Scal_z}$, such that $\alpha = \left\{ \ldots,\alpha_z,\ldots \right\}$. The transformed random process $\upthetam(z) \equiv \sum_{y \in \Scal_z} \uptheta_z(y)$ is distributed as $\upthetam \sim \Dir(\alpha_0,\alpham) \in \Pcal(\Zcal)$ with a parameterizing distribution defined as $\alpham(z) = \sum_{y \in \Scal_z} \alpha_z(y)$.
+
+To prove this principle, define the subset 
+\begin{IEEEeqnarray}{rCl}
+\Uptheta'(\thetam) & = & \prod_{z \in \Zcal} \Uptheta'_z\big( \thetam(z) \big) \nonumber \\
+& = & \prod_{z \in \Zcal} \left\{ \theta_z \in \Rbbgeq^{\Scal_z} : \ \sum_{y \in \Scal_z} \theta_z(y) = \thetam(z) \right\} \subset \Uptheta
+\end{IEEEeqnarray}
+and note that
+\begin{IEEEeqnarray}{rCl}
+\prm_{\upthetam}(\thetam) & = & \int_{\Uptheta'(\thetam)} \prm_{\uptheta}(\theta) {\drm}\theta = \int_{\Uptheta'(\thetam)} \beta(\alpha_0 \alpha)^{-1} \prod_{y \in \Ycal} \theta(y)^{\alpha_0 \alpha(y) - 1} {\drm}\theta \nonumber \\
+& = & \beta(\alpha_0 \alpha)^{-1} \prod_{z \in \Zcal} \int_{\Uptheta'_z\big( \thetam(z) \big)} \prod_{y \in \Scal_z} \theta_z(y)^{\alpha_0 \alpha_z(y)-1} {\drm}\theta_z \nonumber \\
+& = & \beta(\alpha_0 \alpha)^{-1} \prod_{z \in \Zcal} \thetam(z)^{\alpha_0 \alpham(z) - 1} \int_{{\Uptheta''}_z} \prod_{y \in \Scal_z} \thetac(y;z)^{\alpha_0 \alpha_z(y)-1} {\drm}\thetac(z) \nonumber \\
+& = & \beta(\alpha_0 \alpha)^{-1} \prod_{z \in \Zcal} \thetam(z)^{\alpha_0 \alpham(z) - 1} \beta(\alpha_0 \alpha_z) \nonumber \\
+& = & \beta(\alpha_0 \alpha_m)^{-1} \prod_{z \in \Zcal} \thetam(z)^{\alpha_0 \alpham(z) - 1} = \Dir(\thetam; \alpha_0,\alpham)
+\end{IEEEeqnarray}
+where the transform $\thetac(z) \equiv \theta_z / \thetam(z) \in {\Uptheta''}_z = \left\{ \theta_z \in \Rbbgeq^{\Scal_z} : \ \sum_{y \in \Scal_z} \theta_z(y) = 1 \right\}$ has been used. Note that the determinant of the transform dictates ${\drm}\thetac(z) = \thetam(z)^{1-|\Scal_z|} {\drm}\theta_z$.
+
+\todolo{cite Jacobian?}
+
+
+
+\subsection{Conditioned on its Aggregation}
+
+This section details another important property of Dirichlet distributed random processes: when conditioned on its own aggregation $\upthetam$, the partitioned segments $\uptheta_z$ of the process become independent. Furthermore, the normalized functions $\upthetac(z)$ are also Dirichlet processes. 
 
 The PDF of the original random process $\uptheta$ conditioned on its aggregation $\upthetam$ can be formulated as
 \begin{IEEEeqnarray}{rCl}
@@ -3051,7 +3079,7 @@ PGR: discuss transform Jacobian and dimensionality?
 
 
 
-\section{Dirichlet-Empirical Process Properties} 
+\section{Dirichlet-Empirical Distribution Properties} 
 \label{app:DE}
 
 \subsection{Aggregation}
@@ -3113,7 +3141,7 @@ Thus, when conditioned on the aggregation $\uppsim \in \Uppsim \subset \Pcal(\Zc
 
 
 
-\section{Dirichlet-Multinomial random process conditioned on its aggregation} 
+\section{Dirichlet-Multinomial Process conditioned on its aggregation} 
 \label{app:DM_agg}
 
 \todohi{Even needed in addition to DE proofs? Replace psi? INCOMPLETE}
@@ -3155,7 +3183,7 @@ In this section, it is shown that the expected value of a Dirichlet process $\up
 \mu_{\uptheta} = \alpha \;.
 \end{equation}
 
-The defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Define the partition of $\Ycal$, $\big\{ \Scal(y),S^\text{c}(y) \big\}$ where $\Scal(y) = \{ t \in \Ycal : t \leq y \}$. The transform random variable $\upthetam(y) \equiv \int_{-\infty}^y \uptheta(t) {\drm}t$ is thus a Beta random variable with parameters $\lambda = \alpha_0 \int_{-\infty}^y \alpha(t) {\drm}t$ and $\lambda^\text{c} = \alpha_0 \int_y^\infty \alpha(t) {\drm}t$. Observe that $\mu_{\upthetam}(y) \equiv \int_{-\infty}^y \mu_{\uptheta}(t) {\drm}t$ and that using the formula for the expected value of a beta random variable \cite{papoulis},
+A defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Define the partition of $\Ycal$, $\big\{ \Scal(y),S^\text{c}(y) \big\}$ where $\Scal(y) = \{ t \in \Ycal : t \leq y \}$. The transform random variable $\upthetam(y) \equiv \int_{-\infty}^y \uptheta(t) {\drm}t$ is thus a Beta random variable with parameters $\lambda = \alpha_0 \int_{-\infty}^y \alpha(t) {\drm}t$ and $\lambda^\text{c} = \alpha_0 \int_y^\infty \alpha(t) {\drm}t$. Observe that $\mu_{\upthetam}(y) \equiv \int_{-\infty}^y \mu_{\uptheta}(t) {\drm}t$ and that using the formula for the expected value of a beta random variable \cite{papoulis},
 \begin{IEEEeqnarray}{rCl}
 \mu_{\upthetam} & = & \frac{\lambda}{\lambda+\lambda^\text{c}} \\
 & = & \int_{-\infty}^y \alpha(t) {\drm}t = \int_{-\infty}^y \mu_{\uptheta}(t) {\drm}t \nonumber \;.
@@ -3201,7 +3229,7 @@ In this section, it is shown that if the model $\uptheta \sim \DP(\alpha_0, \alp
 \end{equation}
 where $\Psi(\Drm) = N^{-1} \sum_{n=1}^N \delta\big( \cdot - \Drm_n \big)$
 
-The defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Consider a DP over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$ and the corresponding function partitions $\theta_z \in \Rbbgeq^{\Scal_z}$, such that $\uptheta = \left\{ \ldots,\uptheta_z,\ldots \right\}$, and $\alpha_z \in {\Rbb^+}^{\Scal_z}$, such that $\alpha = \left\{ \ldots,\alpha_z,\ldots \right\}$. The transformed random process $\upthetam \in \Pcal(\Zcal)$, $\upthetam(z) \equiv \int_{\Scal_z} \uptheta_z(y) {\drm}y$, is neccessarily Dirichlet with concentration $\alpha_0$ and a mean function $\alpham \in {\Rbb^+}^{\Zcal}$, $\alpham(z) \equiv \int_{\Scal_z} \alpha_z(y) {\drm}y$.
+A defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Consider a DP over the set $\Ycal$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$ and the corresponding function partitions $\theta_z \in \Rbbgeq^{\Scal_z}$, such that $\uptheta = \left\{ \ldots,\uptheta_z,\ldots \right\}$, and $\alpha_z \in {\Rbb^+}^{\Scal_z}$, such that $\alpha = \left\{ \ldots,\alpha_z,\ldots \right\}$. The transformed random process $\upthetam \in \Pcal(\Zcal)$, $\upthetam(z) \equiv \int_{\Scal_z} \uptheta_z(y) {\drm}y$, is neccessarily Dirichlet with concentration $\alpha_0$ and a mean function $\alpham \in {\Rbb^+}^{\Zcal}$, $\alpham(z) \equiv \int_{\Scal_z} \alpha_z(y) {\drm}y$.
 
 To prove the hypothesis, it is required that
 \begin{IEEEeqnarray}{rCl}
@@ -3217,7 +3245,7 @@ and $\Psim(z;\Drm) = \int_{\Scal_z} \Psi(y;D) {\drm}y = N^{-1} \sum_{n=1}^N \chi
 \end{equation}
 
 
-To prove the hypothesis, exploit the results of Appendix \ref{app:Dir_agg} to represent the training data distribution conditioned on the aggregation $\upthetam$. Introduce the normalized segments $\upthetac(z) \equiv \uptheta_z / \upthetam(z) \in \Pcal(\Scal_z)$, which have the Dirichlet properties of independence from one another and from the aggregation process $\upthetam$. The conditional distribution of interest is
+To prove the hypothesis, exploit the results of Appendix \ref{app:Dir_agg} to represent the training data distribution conditioned on the aggregation $\upthetam$. Introduce the normalized segments $\upthetac(z) \equiv \uptheta_z / \upthetam(z) \in \Pcal(\Scal_z)$, which are continuous-domain Dirichlet processes, independent from one another, and independent from the aggregation process $\upthetam$. The conditional distribution of interest is
 \begin{IEEEeqnarray}{rCl}
 \prm_{\Drm | \upthetam}(D | \upthetam) & = & \Erm_{\upthetac | \upthetam}\big[ \prm_{\Drm | \upthetam,\upthetac}(D | \upthetam,\upthetac) \big] \\
 & = & \Erm_{\upthetac | \upthetam}\left[ \prod_{n=1}^N \prod_{z \in \Zcal} \big( \upthetam(z) \upthetac(D_n;z) \big)^{\chi(D_n; \Scal_z)} \right] \nonumber \\
@@ -3249,7 +3277,9 @@ This proves the hypothesis.
 
 This section introduces a new continuous-domain random process, referred to as the Empirical process (EP). It is the generalization of the Empirical distribution for i.i.d. samples drawn from a PDF. The Empirical process is parameterized by $N$ samples and a function $\theta : \Ycal \mapsto \Rbbgeq$; it assumes functions from the set $\Uppsi = \left\{ N^{-1} \sum_{n=1}^N \delta(\cdot - D_n) : D \in \Ycal^N \right\}$.
 
-The continuous-domain Empirical process is characterized by the same aggregation property as its discrete-domain variant. Define a partition of $\Ycal$, $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, and the corresponding function partitions $\uppsi_z \in \Rbbgeq^{\Scal_z}$, such that $\uppsi = \left\{ \ldots,\uppsi_z,\ldots \right\}$, and $\theta_z \in \Rbbgeq^{\Scal_z}$, such that $\theta = \left\{ \ldots,\theta_z,\ldots \right\}$. Thus, for a Empirical process $\uppsi \in \Uppsi$, the transformed random process $\uppsim$ satisfying $\uppsim(z) \equiv \int_{\Scal_z} \uppsi_z(y) {\drm}y$ is neccessarily Emprical with parameterizing function $\thetam$ satisfying $\thetam(z) \equiv \int_{\Scal_z} \theta_z(y) {\drm}y$.
+The continuous-domain Empirical process is characterized by the same aggregation property as its discrete-domain variant. Define a partition of $\Ycal$, $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, and the corresponding function partitions $\uppsi_z \in \Rbbgeq^{\Scal_z}$, such that $\uppsi = \left\{ \ldots,\uppsi_z,\ldots \right\}$, and $\theta_z \in \Rbbgeq^{\Scal_z}$, such that $\theta = \left\{ \ldots,\theta_z,\ldots \right\}$. Thus, for a Empirical process $\uppsi \in \Uppsi$, the aggregation $\uppsim$ satisfying $\uppsim(z) \equiv \int_{\Scal_z} \uppsi_z(y) {\drm}y$ is an Emprical process with $N$ samples and parameterizing function $\thetam$ satisfying $\thetam(z) \equiv \int_{\Scal_z} \theta_z(y) {\drm}y$.
+
+Additionally, when also conditioned on the aggregation $\uppsim$, the normalized segments $\uppsic(z) \equiv \uppsi_z / \uppsim(z)$ are independent continuous-domain Empirical processes, $\uppsic(z) | \uppsim(z), \upthetac(z) \sim \EP\big(N \uppsim(z), \upthetac(z)\big)$, where $\thetac(z) \equiv \theta_z / \thetam(z) \in \Pcal(\Scal_z)$.
 
 
 
@@ -3295,12 +3325,7 @@ The correlation function is
 
 \subsection{Continuous aggregation}
 
-\todohigh{TRUE BELOW?? Move to subsection.}
-
-Consequently, when conditioned on the aggregation $\uppsim$, the normalized segments $\uppsic(z) \equiv \uppsi_z / \uppsim(z)$ are independent continuous-domain Empirical processes, $\uppsic(z) | \uppsim(z), \upthetac(z) \sim \EP\big(N \uppsim(z), \upthetac(z)\big)$, where $\thetac(z) \equiv \theta_z / \thetam(z) \in \Pcal(\Scal_z)$.
-
-
-\todohi{FIXXXX. UNDONE.}
+\todohigh{FIXXXX. UNDONE.}
 
 If $\uppsi$ is a Dirichlet-Multinomial process over a Euclidean space $\Ycal$, then conditioning on its discrete aggregation $\uppsim$ produces independent Dirichlet-Multinomial processes $\big\{ \uppsi(y) : y \in \Scal_z \big\} \sim \DMP\Big( \uppsim(z),\big\{ \alpha(y) : y \in \Scal_z \big\} \Big)$ over the partition spaces $\Scal_z$.
 
@@ -3329,6 +3354,8 @@ This section introduces a new random process, referred to as the Dirichlet-Empir
 
 Analagous to the Dirichlet and Dirichlet-Empirical distributions for countable spaces, the Dirichlet-Empirical process inherits the aggregation property from the Dirichlet process prior. Consider a Dirichlet-Empirical process $\uppsi \in \Uppsi$ and a partition of $\Ycal$, $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, and the corresponding function partitions $\uppsi_z \in \Rbbgeq^{\Scal_z}$, such that $\uppsi = \left\{ \ldots,\uppsi_z,\ldots \right\}$, and $\alpha_z \in {\Rbb^+}^{\Scal_z}$, such that $\alpha = \left\{ \ldots,\alpha_z,\ldots \right\}$. The transformed random process $\uppsim(z) \equiv \int_{\Scal_z} \uppsi_z(y) {\drm}y$ is neccessarily Dirichlet-Empirical for $N$ samples, concentration $\alpha_0$, and parameterizing function $\alpha_m : \Zcal \mapsto \Rbb^+$, $\alpham(z) \equiv \int_{\Scal_z} \alpha_z(y) {\drm}y$.
 
+Also, when conditioned on the aggregation $\uppsim$, the normalized segments $\uppsic(z) \equiv \uppsi_z / \uppsim(z)$ are independent continuous-domain Dirichlet-Empirical processes, $\uppsic(z) | \uppsim(z) \sim \DEP\big(N \uppsim(z), \alphac(z)\big)$, where $\alphac(z) \equiv \alpha_z / \alpham(z) \in \Pcal(\Scal_z)$.
+
 
 
 
@@ -3346,7 +3373,7 @@ and note that $\Prm\Big( \chi(\Drm_n;\Scal_z) = 1 \big| \uptheta \Big) = \int_{\
 \end{equation}
 of $N$ samples with parameters $\upthetam(z) \equiv \int_{\Scal_z} \uptheta(y) {\drm}y$, $z \in \Zcal$.
 
-By the aggregation property of the Dirichlet process $\uptheta$, the parameters of this Empirical distribution are characterized as $\upthetam \sim \Dir(\alpha_0,\alpha)$, and thus $\uppsim$ is drawn from a Dirichlet-Empirical PMF $\DE(N,\alpha_0,\alpha)$. As this aggregation property holds for any partition of $\Ycal$, $\uppsi$ is a Dirichlet-Empirical Process.
+By the aggregation property of the Dirichlet process $\uptheta$, the parameters of this Empirical distribution are characterized as $\upthetam \sim \Dir(\alpha_0,\alpham)$, and thus $\uppsim$ is drawn from a Dirichlet-Empirical PMF $\DE(N,\alpha_0,\alpham)$. As this aggregation property holds for any partition of $\Ycal$, $\uppsi$ is a Dirichlet-Empirical Process.
 
 
 
@@ -3382,7 +3409,6 @@ The correlation function is
 
 \subsection{Continuous aggregation}
 
-Consequently, when conditioned on the aggregation $\uppsim$, the normalized segments $\uppsic(z) \equiv \uppsi_z / \uppsim(z)$ are independent continuous-domain Empirical processes, $\uppsic(z) | \uppsim(z), \upthetac(z) \sim \EP\big(N \uppsim(z), \upthetac(z)\big)$, where $\thetac(z) \equiv \theta_z / \thetam(z) \in \Pcal(\Scal_z)$.
 
 \todohigh{FIXXXXXXXX!!!!}
 
@@ -3494,7 +3520,7 @@ To determine the MAP estimate of the model PMF $\uptheta$ given the training dat
 \begin{equation}
 \hat{\theta}_{MAP}(D) = \argmax_{\theta \in \Uptheta} \Prm_{\uptheta | \Drm}(\theta | D) \;,
 \end{equation}
-we perform contrained optimization. Note that the set $\Uptheta = \left\{ \theta \in {\Rbbgeq}^{M}: \sum_{m=1}^{M} \theta_m = 1 \right\}$ implies both equality and inequality constraints...
+we perform contrained optimization. Note that the set $\Uptheta = \left\{ \theta \in {\Rbbgeq}^{\Ycal}: \sum_{y \in \Ycal} \theta(y) = 1 \right\}$ implies both equality and inequality constraints...
 
 
 
