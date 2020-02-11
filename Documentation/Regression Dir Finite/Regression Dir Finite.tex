@@ -106,28 +106,23 @@ After introducing the problem and discussing the relevant probability distributi
 
 
 
-
-
-
-
-
-
-
 \section{Objective}
 
-Consider an observable random element $\xrm \in \Xcal$ and and unobservable random element $\yrm \in \Ycal$ which are jointly distributed according to an unknown probability distribution $\theta \in \Theta = \left\{ \theta \in {\Rbb_{\geq 0}}^{\Ycal \times \Xcal}: \sum_{y \in \Ycal} \sum_{x \in \Xcal} \theta(y,x) = 1 \right\}$, such that $\Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) = \theta(y,x)$. 
+Consider an observable scalar random variable $\xrm \in \Xcal$ and and unobservable scalar random variable $\yrm \in \Ycal$ which are jointly distributed according to an unknown probability distribution $\theta \in \Theta = \left\{ \theta \in {\Rbb_{\geq 0}}^{\Ycal \times \Xcal}: \sum_{y,x} \theta(y,x) = 1 \right\}$, such that $\Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) = \theta(y,x)$. 
 
 Also observed is a random sequence of $N$ samples drawn from $\theta$, denoted $\Drm = ( \Yrm,\Xrm ) \in \Dcal = \{\Ycal \times \Xcal\}^N$. The $N$ data pairs are identically distributed as $\Prm_{\Drm_n | \uptheta}(y,x | \theta) = \theta(y,x)$ and are conditionally independent from one another and from the novel pair $(\yrm,\xrm)$.
 
-The objective is to design a decision function $f: \Dcal \mapsto \Hcal^{\Xcal}$ which outputs a mapping from the space of the observed random element $\xrm$ to a decision space $\Hcal$. The metric guiding the design is a loss function $\Lcal: \Hcal \times \Ycal \mapsto \Rbb_{\geq 0}$ which penalizes the decision $h \in \Hcal$ based on the value of $\yrm$. The conditional expected loss, or conditional ``risk'', is defined as
-\begin{equation} \label{eq:risk_cond}
-\Rcal_{\Theta}(f ; \uptheta) = \Erm_{\Drm | \uptheta} \bigg[ \Erm_{\yrm,\xrm | \uptheta} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \;.
-\end{equation}
+The regression objective is to design a learning function $f: \Dcal \mapsto \Rbb^{\Xcal}$ which outputs an estimator from the space of the observed random element $\xrm$ to the real line. The metric guiding the design is the squared-error loss function $\Lcal: \Rbb \times \Ycal \mapsto \Rbb_{\geq 0}$, defined as $\Lcal(h,y) = (h-y)^2$. The conditional expected loss, or conditional ``risk'', is defined as
+\begin{IEEEeqnarray}{rCl} \label{eq:risk_cond}
+\Rcal_{\Theta}(f ; \uptheta) & = & \Erm_{\Drm | \uptheta} \bigg[ \Erm_{\yrm,\xrm | \uptheta} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \\
+& = & \Erm_{\xrm | \uptheta}\Bigg[ \Erm_{\yrm| \xrm,\uptheta}\bigg[ \Erm_{\Drm | \uptheta}\Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \Bigg] \nonumber \\
+& = & \Erm_{\xrm | \uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right] + \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( f(\xrm;\Drm) - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \nonumber \;,
+\end{IEEEeqnarray}
 
 As the model $\theta$ is not observed, $\Rcal_{\Theta}$ is not yet a feasible objective function for optimization. If the designer selects a PDF $\prm_{\uptheta}$, the Bayes risk is formulated as
 \begin{IEEEeqnarray}{rCl} \label{eq:risk}
-\Rcal(f) & = & \Erm_{\uptheta}\big[ \Rcal_{\Theta}(f ; \uptheta) \big] \\
-& = & \Erm_{\yrm,\xrm,\Drm}\big[ \Lcal(f(\xrm;\Drm),\yrm) \big] \nonumber
+\Rcal(f) & = & \Erm_{\uptheta}\big[ \Rcal_{\Theta}(f ; \uptheta) \big] \nonumber \\
+& = & \Erm_{\xrm,\Drm} \bigg[ \Erm_{\yrm | \xrm,\Drm} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] 
 \end{IEEEeqnarray}
 and $\yrm$, $\xrm$, and $\Drm$ are treated as jointly distributed random elements. The optimal learning function is expressed as
 \begin{equation} \label{eq:f_opt_xD}
@@ -137,10 +132,6 @@ and the corresponding minimum Bayes risk is
 \begin{equation} \label{eq_risk_min}
 \Rcal(f^*) = \Erm_{\xrm,\Drm} \left[ \min_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm}\big[ \Lcal(h,\yrm) \big] \right] \;.
 \end{equation}
-
-
-
-
 
 
 
@@ -186,11 +177,6 @@ These trends are demonstrated in Figure \ref{fig:P_theta}. The cardinalities $|\
 \caption{Model prior PDF $\prm_{\uptheta}$ for different localizations $\alpha_0$}
 \label{fig:P_theta}
 \end{figure}
-
-
-
-
-
 
 
 
@@ -245,9 +231,6 @@ and the training data are identical.
 
 
 
-
-
-
 \subsubsection{Aggregation Properties}
 
 Also of importance is the ``marginalized'' random process $\nrm'$, defined as $\nrm'(x) \equiv \sum_{y \in \Ycal} \nbarrm(y,x)$ over the set $\Xcal$. By the aggregation property of Dirichlet-Multinomial functions \cite{johnson}, the new function is distributed as $\nrm' \sim \DM(N,\alpha')$, where $\alpha'(x) = \sum_{y \in \Ycal} \alpha(y,x)$.
@@ -258,9 +241,6 @@ Also of interest is the distribution of $\nbarrm$ conditioned on its aggregation
 \quad = \prod_{x \in \Xcal} \left[ \Mcal\big( \bar{n}(\cdot,x) \big) \beta\big( \alpha(\cdot,x) \big)^{-1} \beta\big( \alpha(\cdot,x) + \bar{n}(\cdot,x) \big) \right] \nonumber \;.
 \end{IEEEeqnarray}
 Observe that conditioning on the aggregation renders the function segments $\nbarrm(\cdot,x)$ independent of one another and that they are also Dirichlet-Multinomial.
-
-
-
 
 
 
@@ -304,16 +284,6 @@ The weighting factors are dependent on these values as well. For $N'(x;D) = 0$ o
 
 
 
-
-
-
-
-
-
-
-
-
-
 \section{Regression and the Squared-Error Loss}
 
 The squared-error (SE) loss function is arguably the most commonly used loss function for regression, or in fact for any estimation problem. This can be attributed to its quadratic form, which enables closed-form expression of the minimizing estimation function $f^*$.
@@ -328,8 +298,6 @@ Substituting into \eqref{eq:risk}, the Bayes risk for a general estimator is
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_SE}
 \Rcal(f) & = & \Erm_{\xrm,\Drm} \bigg[ \Erm_{\yrm | \xrm,\Drm} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \;.
 \end{IEEEeqnarray}
-
-
 
 
 
@@ -352,7 +320,6 @@ f^*(\xrm;\Drm) & = & \argmin_{h \in \Rbb} \Erm_{\yrm | \xrm,\Drm} \left[ (h-\yrm
 The optimal estimate is interpreted as a convex combination of two separate estimates - the expected value of $\yrm$ conditioned on the observed $\xrm$ and the average of the training values $\Yrm_n$ which have a value $\Xrm_n$ matching the observed value of $\xrm$. The weighting factors are the same as those of $\Prm_{\yrm | \xrm,\Drm}$; thus, stronger prior information (larger $\alpha'(x)$) provides more weight to the estimate $\mu_{\yrm|\xrm}$ and more voluminous training data puts emphasis on the empirical conditional mean.
 
 Another interesting form for the optimal estimator is $f^*(\xrm;\Drm) = \Erm_{\uptheta | \xrm,\Drm} \left[ \mu_{\yrm | \xrm,\uptheta} \right]$. If the model $\uptheta$ were known, then the clairvoyant estimate $\mu_{\yrm | \xrm,\uptheta}$ would be optimal; instead, all such estimates are weighted and combined via the expectation over the model posterior PDF $\prm_{\uptheta | \xrm,\Drm}$.
-
 
 
 
@@ -431,7 +398,6 @@ It is also informative to visualize how the minimum squared-error changes with t
 This paper has assumed a Dirichlet prior for Bayesian learning, established relevant distributions, and applied the framework to squared-error regression. Closed-forms have been provided for the optimal estimation function and the minimum Bayes risk. Analysis and graphical examples highlight interesting trends for the estimation squared-error as a function of training data volume and the Dirichlet prior distribution parameters. Notably, Dirichlet priors with smaller localization parameters (and thus larger covariance) lead to optimal estimators with lower Bayes risk. 
 
 Future work will explore how the conditional risk \eqref{eq:risk_cond} changes with different estimator parameterizations $\alpha$ for different true models $\theta$. It will be shown that there is an optimal localization parameter dependent on the Dirichlet prior mean $\mu_{\uptheta}$ and the actual model; whether the optimal localization parameter is large or small will depend on the quality of the match between $\mu_{\uptheta}$ and $\theta$. Additionally, a ``minimax'' function will be found that minimizes the worst-case conditional risk $\max_{\theta \in \Theta}\Rcal_{\Theta}(f ; \theta)$.
-
 
 
 
