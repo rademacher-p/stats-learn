@@ -54,9 +54,31 @@
 
 \DeclareMathOperator{\Dir}{\mathrm{Dir}}
 \DeclareMathOperator{\DM}{\mathrm{DM}}
-\DeclareMathOperator{\Mult}{\mathrm{Mult}}
+\DeclareMathOperator{\Multi}{\mathrm{Multi}}
+\DeclareMathOperator{\Bi}{\mathrm{Bi}}
 \DeclareMathOperator{\DP}{\mathrm{DP}}
+\DeclareMathOperator{\DMP}{\mathrm{DMP}}
+\DeclareMathOperator{\Emp}{\mathrm{Emp}}
+\DeclareMathOperator{\DE}{\mathrm{DE}}
+\DeclareMathOperator{\EP}{\mathrm{EP}}
+\DeclareMathOperator{\DEP}{\mathrm{DEP}}
 
+\DeclareMathOperator{\thetam}{\theta_\text{m}}
+\DeclareMathOperator{\upthetam}{\uptheta_\text{m}}
+\DeclareMathOperator{\thetac}{\theta_\text{c}}
+\DeclareMathOperator{\upthetac}{\uptheta_\text{c}}
+
+\DeclareMathOperator{\psim}{\psi_\text{m}}
+\DeclareMathOperator{\Psim}{\Psi_\text{m}}
+\DeclareMathOperator{\uppsim}{\uppsi_\text{m}}
+\DeclareMathOperator{\Uppsim}{\Uppsi_\text{m}}
+\DeclareMathOperator{\psic}{\psi_\text{c}}
+\DeclareMathOperator{\Psic}{\Psi_\text{c}}
+\DeclareMathOperator{\uppsic}{\uppsi_\text{c}}
+\DeclareMathOperator{\Uppsic}{\Uppsi_\text{c}}
+
+\DeclareMathOperator{\alpham}{\alpha_\text{m}}
+\DeclareMathOperator{\alphac}{\alpha_\text{c}}
 
 
 
@@ -108,31 +130,42 @@ After introducing the problem and discussing the relevant probability distributi
 
 \section{Objective}
 
-Consider an observable scalar random variable $\xrm \in \Xcal$ and and unobservable scalar random variable $\yrm \in \Ycal$ which are jointly distributed according to an unknown probability distribution $\theta \in \Theta = \left\{ \theta \in {\Rbb_{\geq 0}}^{\Ycal \times \Xcal}: \sum_{y,x} \theta(y,x) = 1 \right\}$, such that $\Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) = \theta(y,x)$. 
+Consider an observable scalar random variable $\xrm \in \Xcal$ and and unobservable scalar random variable $\yrm \in \Ycal$ which are jointly distributed according to an unknown probability distribution $\theta \in \Pcal(\Ycal \times \Xcal) \equiv \left\{ \theta \in {\Rbb_{\geq 0}}^{\Ycal \times \Xcal}: \sum_{y,x} \theta(y,x) = 1 \right\}$, such that $\Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) = \theta(y,x)$. 
 
 Also observed is a random sequence of $N$ samples drawn from $\theta$, denoted $\Drm = ( \Yrm,\Xrm ) \in \Dcal = \{\Ycal \times \Xcal\}^N$. The $N$ data pairs are identically distributed as $\Prm_{\Drm_n | \uptheta}(y,x | \theta) = \theta(y,x)$ and are conditionally independent from one another and from the novel pair $(\yrm,\xrm)$.
+
+PGR
+
+An alternative representation is implemented via the bijection $\uptheta \Leftrightarrow (\upthetam,\upthetac)$, using the marginal distribution $\upthetam \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) \in \Pcal(\Xcal)$ and the conditional distribution $\upthetac \in \Pcal(\Ycal)^{\Xcal}$, where $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x)$. 
+
+
+PGR
+
+The squared-error (SE) loss function is arguably the most commonly used loss function for regression, or in fact for any estimation problem. This can be attributed to its quadratic form, which enables closed-form expression of the minimizing estimation function $f^*$.
+
+It is assumed that the unobserved random element $\yrm$ is a scalar random variable; that is, $\Ycal \subset \Rbb$. Additionally, the learning function's estimate is allowed to assume real numbers; thus, $\Hcal = \Rbb \supset \Ycal$.
+
+PGR
 
 The regression objective is to design a learning function $f: \Dcal \mapsto \Rbb^{\Xcal}$ which outputs an estimator from the space of the observed random element $\xrm$ to the real line. The metric guiding the design is the squared-error loss function $\Lcal: \Rbb \times \Ycal \mapsto \Rbb_{\geq 0}$, defined as $\Lcal(h,y) = (h-y)^2$. The conditional expected loss, or conditional ``risk'', is defined as
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond}
 \Rcal_{\Theta}(f ; \uptheta) & = & \Erm_{\Drm | \uptheta} \bigg[ \Erm_{\yrm,\xrm | \uptheta} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \\
-& = & \Erm_{\xrm | \uptheta}\Bigg[ \Erm_{\yrm| \xrm,\uptheta}\bigg[ \Erm_{\Drm | \uptheta}\Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \Bigg] \nonumber \\
 & = & \Erm_{\xrm | \uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right] + \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( f(\xrm;\Drm) - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \nonumber \;,
 \end{IEEEeqnarray}
+
+If the model $\theta$ were known, the ``clairvoyant'' estimate would be $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$ and the minimum risk $\Rcal_{\Theta}^*(\uptheta) = \Erm_{\xrm | \uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right]$ would be achieved. 
 
 As the model $\theta$ is not observed, $\Rcal_{\Theta}$ is not yet a feasible objective function for optimization. If the designer selects a PDF $\prm_{\uptheta}$, the Bayes risk is formulated as
 \begin{IEEEeqnarray}{rCl} \label{eq:risk}
 \Rcal(f) & = & \Erm_{\uptheta}\big[ \Rcal_{\Theta}(f ; \uptheta) \big] \nonumber \\
 & = & \Erm_{\xrm,\Drm} \bigg[ \Erm_{\yrm | \xrm,\Drm} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] 
 \end{IEEEeqnarray}
-and $\yrm$, $\xrm$, and $\Drm$ are treated as jointly distributed random elements. The optimal learning function is expressed as
-\begin{equation} \label{eq:f_opt_xD}
-f^*(\xrm;\Drm) = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm}\big[ \Lcal(h,\yrm) \big]
-\end{equation}
-and the corresponding minimum Bayes risk is
-\begin{equation} \label{eq_risk_min}
-\Rcal(f^*) = \Erm_{\xrm,\Drm} \left[ \min_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm}\big[ \Lcal(h,\yrm) \big] \right] \;.
-\end{equation}
-
+and $\yrm$, $\xrm$, and $\Drm$ are treated as jointly distributed random elements. The optimal Bayesian estimate is expressed as
+\begin{IEEEeqnarray}{rCl} \label{eq:f_opt_xD}
+f^*(\xrm;\Drm) & = & \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm}\big[ (h-\yrm)^2 \big] \nonumber \\
+& = & \mu_{\yrm | \xrm,\Drm} = \Erm_{\uptheta | \xrm,\Drm} \left[ \mu_{\yrm | \xrm,\uptheta} \right] \;,
+\end{IEEEeqnarray}
+the condtional expected value of the clairvoyant estimate with respect to the model posterior distribution $\prm_{\uptheta | \xrm,\Drm}$.
 
 
 
@@ -142,91 +175,36 @@ and the corresponding minimum Bayes risk is
 
 \section{Probability Distributions}
 
-In this section, the joint PMF $\Prm_{\yrm,\xrm,\Drm}$ is determined using the Dirichlet prior $\prm_{\uptheta}$. Other distributions of interest will be provided, including the training data PMF $\Prm_{\Drm}$ and the predictive distribution $\Prm_{\yrm | \xrm,\Drm}$.
 
-
-
-\subsection{Model PDF, $\prm_{\uptheta}$} \label{sec:P_theta}
-
-The Dirichlet PDF for the model random process $\uptheta \in \Theta$ is \cite{bishop}
-\begin{IEEEeqnarray}{rCl}
-\prm_{\uptheta}(\theta) & = & \beta(\alpha)^{-1} \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\alpha(y,x) - 1} \;,
-\end{IEEEeqnarray}
-where the user-selected PDF parameters $\alpha : \Ycal \times \Xcal \mapsto \Rbb^+$ are introduced and $\beta$ is the multivariate beta function.
-
-The parameters $\alpha$ controls around which models $\theta$ the PDF concentrates and how strongly. For convenience, introduce the localization parameter $\alpha_0 \equiv \sum_{y \in \Ycal} \sum_{x \in \Xcal} \alpha(y,x)$. Note that $\Prm_{\yrm,\xrm}(y,x) = \mu_{\uptheta}(y,x) = \alpha(y,x) / \alpha_0$, where $\mu$ denotes the mean function of a random variable.
-
-Of specific interest is how $\prm_{\uptheta}$ changes as the localization parameter approaches its limiting values. For $\alpha_0 \to \infty$, the PDF concentrates at its mean, resulting in
-\begin{IEEEeqnarray}{rCl}
-\prm_{\uptheta}(\theta) & \to & \delta\left( \theta - \frac{\alpha}{\alpha_0} \right) \;,
-\end{IEEEeqnarray}
-where $\delta(\cdot)$ represents the Dirac delta function over $\Theta$. Conversely, for $\alpha_0 \to 0$, the PDF tends toward
-%\begin{IEEEeqnarray}{rCl}
-%\prm_{\uptheta}(\theta) & \to & \sum_{y \in \Ycal} \sum_{x \in \Xcal} \frac{\alpha(y,x)}{\alpha_0} \delta\big( \theta - \delta[\cdot,y] \delta[\cdot,x] \big) \;,
-%\end{IEEEeqnarray}
-\begin{IEEEeqnarray}{rCl}
-\prm_{\uptheta}(\theta) & \to & \sum_{y \in \Ycal} \sum_{x \in \Xcal} \frac{\alpha(y,x)}{\alpha_0} \delta\big( \theta(\cdot,\cdot) - \delta[\cdot,y] \delta[\cdot,x] \big) \;,
-\end{IEEEeqnarray}
-where $\delta[\cdot,\cdot]$ is the Kronecker delta function. Note that the PDF has support only for the $|\Ycal| |\Xcal|$ models with an $\ell_0$ norm satisfying $\| \theta \|_0 = 1$. 
-
-These trends are demonstrated in Figure \ref{fig:P_theta}. The cardinalities $|\Ycal| = 3$ and $|\Xcal| = 1$ are chosen to enable visualization, despite the implication that $\xrm$ is deterministic. Note that for the top sub-plot, $\alpha(y,x) < 1$ and the PDF tends to infinity at the domain boundaries; this cannot be captured by the plot color scale.
-
-\begin{figure}
-\centering
-\includegraphics[width=0.8\linewidth]{P_theta.pdf}
-\caption{Model prior PDF $\prm_{\uptheta}$ for different localizations $\alpha_0$}
-\label{fig:P_theta}
-\end{figure}
-
-
-
-
-
-
-\subsection{Training Set PMF, $\Prm_{\Drm}$}
+\subsection{Training Set and the Empirical Process}
 
 The distribution of the training data $\Drm$ conditioned on the model can be formulated as
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\Drm | \uptheta}\big( D | \theta \big) & = & \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\bar{N}(y,x;D)} \;,
+\Prm_{\Drm | \uptheta}\big( D | \theta \big) & = & \left( \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\Psi(y,x;D)} \right)^N \;,
 \end{IEEEeqnarray}
-where the dependency on the training data $\Drm$ is expressed though a transform function $\bar{N} : \Dcal \mapsto \bar{\Ncal}$ defined as $\bar{N}(y,x;D) = \sum_{n=1}^N \delta \left[ y,Y_n \right] \delta \left[ x,X_n \right]$. This transform counts the occurences of each possible pair $(y,x)$ in the training data; its range is a function space $\bar{\Ncal} \subset {\Zbb_{\geq 0}}^{\Ycal \times \Xcal}$.
+where the dependency on the training data $\Drm$ is expressed though a transform function $\Psi : \Dcal \mapsto \Uppsi \subset \Pcal(\Ycal \times \Xcal)$ defined as $\Psi(y,x;D) = N^{-1} \sum_{n=1}^N \delta \big[ (y,x),D_n \big]$. 
 
 
-As the conditional distribution $\Prm_{\Drm | \uptheta}$ is of exponential form, it can be readily shown that the marginal distribution of the training data is \cite{minka-DirMult}
+%As the conditional distribution $\Prm_{\Drm | \uptheta}$ is of exponential form, it can be readily shown that the marginal distribution of the training data is \cite{minka-multi}
+%\begin{IEEEeqnarray}{rCl}
+%\Prm_{\Drm}(D) & = & \beta(\alpha)^{-1} \beta \left(  \alpha + \bar{N}(D) \right) \;.
+%\end{IEEEeqnarray}
+
+
+This transform forms the empirical distribution of the training data $\Drm$. Since the distribution $\Prm_{\Drm | \uptheta}$ depends on the training data only through via $\Psi$, $\Psi(\Drm)$ is a sufficient statistic \cite{bernardo} for the model $\uptheta$. As such, it is useful to define a new random process $\uppsi \equiv \Psi(\Drm) \in \Uppsi$. 
+
+The cardinality of the random process' domain is $|\Uppsi| = \Mcal\big( (N,|\Ycal||\Xcal|-1) \big)$, where $\Mcal$ is the multinomial coefficient; this can be shown using the stars-and-bars method \cite{feller}. The cardinality of original set is $|\Dcal| = \big( |\Ycal| |\Xcal| \big)^N$; thus $|\Uppsi| \leq |\Dcal|$ and the sufficient statistic compactly represents the valuable information in the training data. 
+
+The conditional distribution of the transformed process is
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\Drm}(D) & = & \beta(\alpha)^{-1} \beta \left(  \alpha + \bar{N}(D) \right) \;.
+\Prm_{\uppsi | \uptheta}(\psi | \theta) & = & \Mcal(N \psi) \left( \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\psi(y,x)} \right)^N \nonumber \\
+& \equiv & \Emp\big( \psi;N,\theta \big) \nonumber \;,
 \end{IEEEeqnarray}
-
-
-Note that both $\Prm_{\Drm | \uptheta}$ and $\Prm_{\Drm}$ depend on the training data $\Drm$ only through the transform $\bar{N}$; consequently, $\bar{N}(\Drm)$ is a sufficient statistic \cite{bernardo} for the model $\uptheta$. As such, it is useful to define a new random process $\nbarrm \equiv \bar{N}(\Drm) \in \bar{\Ncal}$. 
-
-The cardinality of the random process' domain is $|\bar{\Ncal}| = \Mcal\big( \{N,|\Ycal||\Xcal|-1\} \big)$, where $\Mcal$ is the multinomial coefficient; this can be shown using the stars-and-bars method \cite{feller}. The cardinality of original set is $|\Dcal| = \big( |\Ycal| |\Xcal| \big)^N$; thus $|\bar{\Ncal}| \leq |\Dcal|$ and the sufficient statistic compactly represents the valuable information in the training data. 
-
-It is easily shown that the conditional PMF $\Prm_{\nbarrm | \uptheta}$ is multinomial. As the Dirichlet distribution characterizes the parameters of this multinomial distribution, the marginal PMF of $\nbarrm$ is a Dirichlet-Multinomial distribution \cite{johnson} parameterized by $\alpha$,
+an Empirical PMF. As it is equivalent to a normalized Multiomial random process \cite{minka-multi}, the mean and covariance functions can be expressed as $\mu_{\uppsi | \uptheta} = \uptheta$ and
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\nbarrm}(\bar{n}) & = & \Mcal(\bar{n}) \beta(\alpha)^{-1} \beta(\alpha + \bar{n}) \;.
-\end{IEEEeqnarray}
-The first and second joint moments of $\bar{\nrm}$ are
-\begin{IEEEeqnarray}{rCl}
-\mu_{\bar{\nrm}}(y,x) & = & N \frac{\alpha(y,x)}{\alpha_0} = N \mu_\uptheta(y,x) 
-\end{IEEEeqnarray}
-and
-\begin{IEEEeqnarray}{L}
-\Erm\big[ \bar{\nrm}(y,x) \bar{\nrm}(y',x') \big] \\
-= \frac{N}{\alpha_0+1} \Big( (\alpha_0+N) \mu_\uptheta(y,x) \delta[y,y'] \delta[x,x'] \nonumber \\
-\qquad \qquad \qquad \qquad \qquad + \alpha_0(N-1) \mu_\uptheta(y,x) \mu_\uptheta(y',x') \Big) \nonumber \;.
+\Sigma_{\uppsi | \uptheta}(y,x,y',x')  & = & \frac{1}{N} \uptheta(y,x) \big( \delta[y,y'] \delta[x,x'] - \uptheta(y',x') \big) \;.
 \end{IEEEeqnarray}
 
-
-Again, the distributions for minimal and maximal $\alpha_0$ are relevant. For $\alpha_0 \to \infty$, the model PDF $\prm_{\uptheta}$ concentrates at its mean and thus $\bar{\nrm}$ is characterized by a multinomial distribution,
-\begin{IEEEeqnarray}{rCl}
-\Prm_{\nbarrm}(\bar{n}) & = & \Mcal(\bar{n}) \prod_{y \in \Ycal} \prod_{x \in \Xcal} \left(\frac{\alpha(y,x)}{\alpha_0}\right)^{\bar{n}(y,x)} \;.
-\end{IEEEeqnarray}
-Conversely, for $\alpha_0 \to 0$, the PMF tends toward
-\begin{IEEEeqnarray}{rCl} \label{eq:P_n_lim_zero}
-\Prm_{\nbarrm}(\bar{n}) & = & \sum_{y \in \Ycal} \sum_{x \in \Xcal} \frac{\alpha(y,x)}{\alpha_0} \delta\big[ \bar{n}(\cdot,\cdot) , N \delta[\cdot,y] \delta[\cdot,x] \big]
-\end{IEEEeqnarray}
-and the training data are identical. 
 
 
 
@@ -241,6 +219,53 @@ Also of interest is the distribution of $\nbarrm$ conditioned on its aggregation
 \quad = \prod_{x \in \Xcal} \left[ \Mcal\big( \bar{n}(\cdot,x) \big) \beta\big( \alpha(\cdot,x) \big)^{-1} \beta\big( \alpha(\cdot,x) + \bar{n}(\cdot,x) \big) \right] \nonumber \;.
 \end{IEEEeqnarray}
 Observe that conditioning on the aggregation renders the function segments $\nbarrm(\cdot,x)$ independent of one another and that they are also Dirichlet-Multinomial.
+
+
+
+
+
+
+
+
+\subsection{Model PDF, $\prm_{\uptheta}$} \label{sec:P_theta}
+
+The Dirichlet PDF for the model random process $\uptheta \in \Theta$ is \cite{bishop}
+\begin{IEEEeqnarray}{rCl}
+\prm_{\uptheta}(\theta) & = & \beta(\alpha_0 \alpha)^{-1} \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\alpha_0 \alpha(y,x) - 1} \nonumber \\
+& \equiv & \Dir(\theta; \alpha_0,\alpha) \;,
+\end{IEEEeqnarray}
+where $\beta$ is the multivariate beta function and the user-selected localization parameter $\alpha_0 \in \Rbb^+$ and mean function $\alpha \equiv \mu_{\uptheta} \in \Pcal(\Ycal \times \Xcal)$ are introduced.
+
+By the aggregation property \cite{ferguson}, $\upthetam \sim \Dir(\alpha_0,\alpham)$ is a Dirichlet random process parameterized by concentration $\alpha_0$ and distribution $\alpham \equiv \sum_{y \in \Ycal} \alpha(y,\cdot)$. Also, as demonstrated in Appendix \ref{app:Dir_agg}, the predictive models $\upthetac(x) \sim \Dir(\alpha_0 \alpham(x),\alphac)$ are independent Dirichlet processes, where $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x)$. They are independent of $\upthetam$, as well. Observe that $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$; thus, the clairvoyant estimate will depend only on the conditional model.
+
+
+
+
+PGR: trend stuff commented.
+%Of specific interest is how $\prm_{\uptheta}$ changes as the localization parameter approaches its limiting values. For $\alpha_0 \to \infty$, the PDF concentrates at its mean, resulting in
+%\begin{IEEEeqnarray}{rCl}
+%\prm_{\uptheta}(\theta) & \to & \delta\left( \theta - \alpha \right) \;,
+%\end{IEEEeqnarray}
+%where $\delta(\cdot)$ represents the Dirac delta function over $\Theta$. Conversely, for $\alpha_0 \to 0$, the PDF tends toward
+%\begin{IEEEeqnarray}{rCl}
+%\prm_{\uptheta}(\theta) & \to & \sum_{y \in \Ycal} \sum_{x \in \Xcal} \alpha(y,x) \delta\big( \theta - \delta[\cdot,y] \delta[\cdot,x] \big) \;,
+%\end{IEEEeqnarray}
+%where $\delta[\cdot,\cdot]$ is the Kronecker delta function. Note that the PDF has support only for the $|\Ycal| |\Xcal|$ models with an $\ell_0$ norm satisfying $\| \theta \|_0 = 1$. 
+%
+%These trends are demonstrated in Figure \ref{fig:P_theta}. The cardinalities $|\Ycal| = 3$ and $|\Xcal| = 1$ are chosen to enable visualization, despite the implication that $\xrm$ is deterministic. Note that for the top sub-plot, $\alpha(y,x) < 1$ and the PDF tends to infinity at the domain boundaries; this cannot be captured by the plot color scale.
+%
+%\begin{figure}
+%	\centering
+%	\includegraphics[width=0.8\linewidth]{P_theta.pdf}
+%	\caption{Model prior PDF $\prm_{\uptheta}$ for different localizations $\alpha_0$}
+%	\label{fig:P_theta}
+%\end{figure}
+
+
+
+
+
+
 
 
 
@@ -285,21 +310,6 @@ The weighting factors are dependent on these values as well. For $N'(x;D) = 0$ o
 
 
 \section{Regression and the Squared-Error Loss}
-
-The squared-error (SE) loss function is arguably the most commonly used loss function for regression, or in fact for any estimation problem. This can be attributed to its quadratic form, which enables closed-form expression of the minimizing estimation function $f^*$.
-
-It is assumed that the unobserved random element $\yrm$ is a scalar random variable; that is, $\Ycal \subset \Rbb$. Additionally, the learning function's estimate is allowed to assume real numbers; thus, $\Hcal = \Rbb \supset \Ycal$.
-
-The loss function is defined as
-\begin{equation}
-\Lcal(h,y) = (h-y)^2 \;.
-\end{equation}
-Substituting into \eqref{eq:risk}, the Bayes risk for a general estimator is 
-\begin{IEEEeqnarray}{rCl} \label{eq:risk_SE}
-\Rcal(f) & = & \Erm_{\xrm,\Drm} \bigg[ \Erm_{\yrm | \xrm,\Drm} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \;.
-\end{IEEEeqnarray}
-
-
 
 
 \subsection{Optimal Estimate: the Posterior Mean}

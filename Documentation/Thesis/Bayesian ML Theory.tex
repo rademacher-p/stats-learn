@@ -378,7 +378,7 @@ Also observed is a random sequence of $N$ samples from $\uptheta$, denoted $\Drm
 
 \subsection{Marginal and Conditional Model Distributions}
 
-As only $\yrm$ is unobservable, it will be useful to decompose the model distribution as $\uptheta \Leftrightarrow (\upthetam,\upthetac)$. First, introduce the marginal distribution $\upthetam \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) \in \Pcal(\Xcal)$; note that the summation is replaced by an integral when $\yrm$ is a continuous random variable. Next, introduce the conditional distributions $\upthetac \in \Pcal(\Ycal)^{\Xcal}$ defined as $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x)$. Note that the mapping between the two representations is a bijection.
+As only $\yrm$ is unobservable, it will be useful to alternatively represent the model distribution via the bijection $\uptheta \Leftrightarrow (\upthetam,\upthetac)$. First, introduce the marginal distribution $\upthetam \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) \in \Pcal(\Xcal)$; note that the summation is replaced by an integral when $\yrm$ is a continuous random variable. Next, introduce the conditional distributions $\upthetac \in \Pcal(\Ycal)^{\Xcal}$ defined as $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x)$.
 
 
 
@@ -639,12 +639,13 @@ It is important to note that this inequality holds for any number of training sa
 
 \todohi{Continuous? sums, PMFs...}
 
-\todohi{marginal/conditional independence discuss? x independence!}
+\todolo{Marginalize to thetam and thetac(x) dists?}
+
 
 %Using the marginal and conditional model representations, the Bayesian predicitive distributions analagous to the clairvoyant distributions can now be simplified as $\Prm_{\xrm | \Drm} = \mu_{\upthetam | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm} = \mu_{\upthetac(\xrm) | \xrm,\Drm}$.
 
 \begin{IEEEeqnarray}{rCl}
-\prm_{\upthetac,\upthetam | \Yrm,\Xrm}(\thetac,\thetam | Y,X) & = & \frac{\Prm_{\Yrm | \Xrm,\upthetac}(Y | X,\thetac)}{\Prm_{\Yrm | \Xrm}(Y | X)} 
+\prm_{\upthetac,\upthetam | \Yrm,\Xrm}(\thetac,\thetam | Y,X)  & = & \frac{\Prm_{\Yrm | \Xrm,\upthetac}(Y | X,\thetac)}{\Prm_{\Yrm | \Xrm}(Y | X)} 
 \frac{\Prm_{\Xrm | \upthetam}(X | \thetam)}{\Prm_{\Xrm}(X)} \prm_{\upthetac,\upthetam}(\thetac,\thetam) \\
 & = & \prm_{\upthetac | \Yrm,\Xrm}(\thetac | Y,X) \prm_{\upthetam | \Xrm}(\thetam | X) 
 \frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \Xrm}(\thetac | X)} \nonumber
@@ -656,6 +657,8 @@ It is important to note that this inequality holds for any number of training sa
 %& = & \prm_{\upthetam | \Xrm}(\thetam | X) 
 %\Erm_{\upthetac | \upthetam} \left[ \frac{\prm_{\upthetac | \Yrm,\Xrm}(\thetac | Y,X)}{\prm_{\upthetac | \Xrm}(\thetac | X)} \right] \nonumber
 %\end{IEEEeqnarray}
+
+\todolo{conditional EP independence? product notation?}
 
 \begin{IEEEeqnarray}{rCl}
 \prm_{\upthetac,\upthetam | \uppsic,\uppsim}(\thetac,\thetam | \psic,\psim) & = & \frac{\Prm_{\uppsic | \uppsim,\upthetac}\big( \psic | \psim,\thetac \big)}{\Prm_{\uppsic | \uppsim}\big( \psic | \psim \big)} 
@@ -687,6 +690,7 @@ Note that $\prm_{\upthetac | \Xrm} = \Erm_{\upthetam | \Xrm}\big[ \prm_{\uptheta
 Note that $\Prm_{\Yrm | \Xrm,\xrm} = \Erm_{\upthetam | \Xrm,\xrm} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\Yrm | \Xrm,\upthetac} \big] \Big]$ and also that $\Prm_{\uppsic | \uppsim,\xrm} = \Erm_{\upthetam | \uppsim,\xrm} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\uppsic | \uppsim,\upthetac} \big] \Big]$.
 
 
+\todohi{marginal/conditional independence discuss? x independence!}
 
 
 
@@ -1012,7 +1016,7 @@ a product of Dirichlet distributions defined on $\thetac \in \Pcal(\Ycal)^{\Xcal
 Next, the conditional distribution $\Prm_{\Drm | \uptheta}$ will be used to determine the marginal PMF, $\Prm_{\Drm}$ and properties will be discussed.
 
 
-As the conditional distribution $\Prm_{\Drm | \uptheta}$ is of exponential form, it can be readily shown that the marginal distribution of the training data is \cite{minka-DirMult}
+As the conditional distribution $\Prm_{\Drm | \uptheta}$ is of exponential form, it can be readily shown that the marginal distribution of the training data is \cite{minka-multi}
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\Drm}(D) & = & \Erm_{\uptheta} \left[ \prod_{n=1}^N \Prm_{\Drm_n | \uptheta}\big( D_n | \uptheta \big) \right] \\
 & = & \Erm_{\uptheta} \left[ \left( \prod_{y \in \Ycal} \prod_{x \in \Xcal} \uptheta(y,x)^{\Psi(y,x;D)} \right)^N \right] \nonumber \\
