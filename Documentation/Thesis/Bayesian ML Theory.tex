@@ -1244,6 +1244,8 @@ Similarly, the distribution can be expressed in terms of the empirical model suf
 \end{IEEEeqnarray}
 where the dependency on $\uppsi$ is expressed only through the marginal random process $\uppsim$.
 
+\todomid{independence of conditionals too}
+
 The posterior $\prm_{\upthetac | \xrm,\Drm}$ can be simplified by noting that the independence of $\upthetam$ and $\upthetac$ implies $\Prm_{\Yrm | \Xrm,\xrm} = \Erm_{\upthetac}\big[ \Prm_{\Yrm | \Xrm,\upthetac} \big] = \Prm_{\Yrm | \Xrm}$. Consequently, $\upthetac$ is conditionally independent of $\xrm$ given $\Drm$. Thus, as $\prm_{\upthetac}$ is a conjugate prior for $\Prm_{\Yrm | \Xrm,\upthetac}$ the posterior distribution is
 \begin{IEEEeqnarray}{rCl}
 \prm_{\upthetac | \xrm,\Drm}(\thetac | x,D) & = & \prm_{\upthetac | \Drm}(\thetac | D) = \prod_{x' \in \Xcal} \prm_{\upthetac(x') | \Drm}\big(\thetac(x') | D \big) \\

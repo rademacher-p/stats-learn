@@ -213,7 +213,7 @@ an Empirical PMF. As it is equivalent to a normalized Multiomial random process 
 
 \subsubsection{Marginal/Conditional Properties}
 
-The empirical process can be decomposed into marginal and conditional empirical processes via a bijection $\uppsi \Leftrightarrow (\uppsim, \uppsic)$, where $\uppsim \equiv \sum_{y \in \Ycal} \uppsi(y,\cdot)$ and $\uppsic(x) \equiv \uppsi(\cdot,x) / \uppsim(x)$. Like the Multinomial random process \cite{johnson}, the Empirical random process has an aggregation property, such that $\uppsim | \upthetam \sim \Emp(N,\upthetam)$. Also, $\uppsic(x) | \uppsim(x),\upthetac(x) \sim \Emp\big( N \uppsim(x),\upthetac(x) \big)$ are conditionally independent Empirical processes.
+The empirical process can be decomposed into marginal and conditional empirical processes via a bijection $\uppsi \Leftrightarrow (\uppsim, \uppsic)$, where $\uppsim \equiv \sum_{y \in \Ycal} \uppsi(y,\cdot) \in \Pcal(\Xcal)$ and $\uppsic(x) \equiv \uppsi(\cdot,x) / \uppsim(x) \in \Pcal(\Ycal)$. Like the Multinomial random process \cite{johnson}, the Empirical random process has an aggregation property, such that $\uppsim | \upthetam \sim \Emp(N,\upthetam)$. Also, $\uppsic(x) | \uppsim(x),\upthetac(x) \sim \Emp\big( N \uppsim(x),\upthetac(x) \big)$ are conditionally independent Empirical processes.
 
 
 
@@ -222,7 +222,7 @@ The empirical process can be decomposed into marginal and conditional empirical 
 
 
 
-\subsection{Model PDF, $\prm_{\uptheta}$} \label{sec:P_theta}
+\subsection{Model Dirichlet Process} \label{sec:P_theta}
 
 The Dirichlet PDF for the model random process $\uptheta \in \Theta$ is \cite{bishop}
 \begin{IEEEeqnarray}{rCl}
@@ -269,19 +269,25 @@ PGR: trend stuff commented.
 
 
 
-\subsection{Predictive PMF, $\Prm_{\yrm | \xrm,\Drm}$}
+\subsection{Bayesian Predictive Distribution}
 
-Observe that $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$; thus, the clairvoyant estimate will depend only on the conditional model.
+As shown in Equation \eqref{eq:f_opt_xD}, the decision selected by the optimally designed function depends on the predictive distribution of the unobserved $\yrm$ conditioned on all observable random elements. Observe that $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$ and thus that $\Prm_{\yrm | \xrm,\Drm} = \Erm_{\uptheta | \xrm,\Drm}\big[ \Prm_{\yrm | \xrm,\uptheta} \big] \equiv \mu_{\upthetac(\xrm) | \xrm,\Drm}$; the Bayesian predictive PMF is dependent only on the statistics of $\upthetac(\xrm)$.
 
-As shown in Equation \eqref{eq:f_opt_xD}, the decision selected by the optimally designed function depends on the predictive distribution of the unobserved $\yrm$ conditioned on all observable random elements. Note that $\Prm_{\yrm | \xrm,\Drm} = \Erm_{\uptheta | \xrm,\Drm}\big[ \Prm_{\yrm | \xrm,\uptheta} \big]$ - the Bayesian predictive PMF is the expected value of the true predictive PMF $\Prm_{\yrm | \xrm,\uptheta}$ with respect to the model posterior distribution.
+PGR: prove? apps?
 
-Since $\Prm_{\Drm | \uptheta}$ is of exponential form, the Dirichlet prior $\prm_{\uptheta}$ is its conjugate prior \cite{theodoridis-ML}; thus, the model posterior PDF given the training data is
+The training data $\Drm$ is represented using the empirical distribution $\uppsi$. Due to the independence of the conditional models from one another and from the marginal model, it can be shown that $\prm_{\upthetac(\xrm) | \uppsi, \xrm} \equiv \prm_{\upthetac(\xrm) | \uppsim(\xrm),\uppsic(\xrm)} \sim \Prm_{\uppsic(\xrm) | \uppsim(\xrm), \upthetac(\xrm)} \prm_{\upthetac(\xrm)}$. Since the Empirical PMF of $\uppsic(\xrm)$ has exponential form, the Dirichlet PDF $\prm_{\upthetac(\xrm)}$ is a conjugate prior \cite{theodoridis-ML}; thus, the model posterior PDF given the training data is distributed as 
 \begin{IEEEeqnarray}{L}
-\prm_{\uptheta | \Drm}(\theta | D) = \frac{\Prm_{\Drm | \uptheta}(D | \theta) \prm_{\uptheta}(\theta)}{\Prm_{\Drm}(D)} \\
-\quad = \beta \left( \alpha + \bar{N}(D) \right)^{-1} \prod_{y \in \Ycal} \prod_{x \in \Xcal} 
-\theta(y,x)^{\alpha(y,x) + \bar{N}(y,x;D) - 1} \nonumber \;, 
+\uptheta(\xrm) | \uppsim(\xrm),\uppsic(\xrm) \nonumber \\
+\quad \sim \Dir\Big( \alpha_0 \alpham(\xrm) + N \psim(\xrm), \mu_{\upthetac(\xrm) | \uppsim(\xrm), \uppsic(\xrm)} \Big) \;,
 \end{IEEEeqnarray}
-a Dirichlet distribution with parameter function $\alpha + \bar{N}(D)$.
+Dirichlet with mean function
+\begin{IEEEeqnarray}{rCl}
+\mu_{\upthetac(\xrm) | \uppsim(\xrm), \uppsic(\xrm)} & = & \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \psim(\xrm)}\right) \alphac(\xrm) \nonumber \\
+&& \quad + \left(\frac{N \psim(\xrm)}{\alpha_0 \alpham(\xrm) + N \psim(\xrm)}\right) \psic(\xrm) \nonumber \;.
+\end{IEEEeqnarray}
+
+The Bayesian predictive distribution is the mean of the posterior \cite{murphy}; to express in terms of the training data, the Empirical processes can be replaced, such that $\uppsim \equiv N^{-1} \sum_{n=1}^N \delta[\cdot,\Xrm_n]$ and $\uppsic(x) \equiv \left( \sum_{n=1}^N \delta[\cdot,\Yrm_n] \delta[x,\Xrm_n] \right) / \left( \sum_{n=1}^N \delta[x,\Xrm_n] \right)$.
+
 
 Also, the localization parameter increases proportionately with the volume of training data; consequently, as $N \to \infty$, the posterior converges to $\prm_{\uptheta | \Drm}(\theta | D) \to \delta\big( \theta - \bar{N}(D) / N \big)$ and the model is positively identified. This is a consequence of the full support of the Dirichlet distribution; general posterior distributions do not tend to a delta function at the empirical PMF. Conversely, as $\alpha_0 \to \infty$, the prior model certainty is stronger and the posterior tends toward $\prm_{\uptheta | \Drm}(\theta | D) \to \delta( \theta - \alpha / \alpha_0)$, independent of the training data. 
 
