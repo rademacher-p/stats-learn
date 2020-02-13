@@ -1,6 +1,6 @@
 
-Documentation/Thesis/Bayesian ML Theory.pdf
-Documentation/Regression Dir Finite/Regression Dir Finite.pdf
+Documentation/Thesis/*.pdf
+Documentation/Regression Dir Finite/*.pdf
 Documentation/Old/
 Code/Matlab/Old/
 
@@ -284,4 +284,3 @@ TSWLatexianTemp*
 
 # Makeindex log files
 *.lpz
-
