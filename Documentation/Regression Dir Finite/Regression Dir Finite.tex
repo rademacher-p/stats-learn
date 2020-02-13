@@ -34,6 +34,7 @@
 \DeclareMathOperator{\prm}{\mathrm{p}}
 \DeclareMathOperator{\Erm}{\mathrm{E}}
 \DeclareMathOperator{\Crm}{\mathrm{C}}
+\DeclareMathOperator{\drm}{\mathrm{d}}
 
 \DeclareMathOperator{\Xcal}{\mathcal{X}}
 \DeclareMathOperator{\Ycal}{\mathcal{Y}}
@@ -49,8 +50,10 @@
 \DeclareMathOperator{\Lcal}{\mathcal{L}}
 
 \DeclareMathOperator{\Rbb}{\mathbb{R}}
+\DeclareMathOperator{\Rbbgeq}{\mathbb{R}_{\geq 0}}
 \DeclareMathOperator{\Nbb}{\mathbb{N}}
 \DeclareMathOperator{\Zbb}{\mathbb{Z}}
+\DeclareMathOperator{\Zbbgeq}{\mathbb{Z}_{\geq 0}}
 
 \DeclareMathOperator{\Dir}{\mathrm{Dir}}
 \DeclareMathOperator{\DM}{\mathrm{DM}}
@@ -79,7 +82,6 @@
 
 \DeclareMathOperator{\alpham}{\alpha_\text{m}}
 \DeclareMathOperator{\alphac}{\alpha_\text{c}}
-
 
 
 \interdisplaylinepenalty=2500
@@ -130,7 +132,7 @@ After introducing the problem and discussing the relevant probability distributi
 
 \section{Objective}
 
-Consider an observable scalar random variable $\xrm \in \Xcal$ and and unobservable scalar random variable $\yrm \in \Ycal$ which are jointly distributed according to an unknown probability distribution $\theta \in \Pcal(\Ycal \times \Xcal) \equiv \left\{ \theta \in {\Rbb_{\geq 0}}^{\Ycal \times \Xcal}: \sum_{y,x} \theta(y,x) = 1 \right\}$, such that $\Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) = \theta(y,x)$. 
+Consider an observable scalar random variable $\xrm \in \Xcal$ and and unobservable scalar random variable $\yrm \in \Ycal$ which are jointly distributed according to an unknown probability distribution $\theta \in \Pcal(\Ycal \times \Xcal) \equiv \left\{ \theta \in {\Rbb_{\geq 0}}^{\Ycal \times \Xcal}: \sum_{y,x} \theta(y,x) = 1 \right\}$, such that $\Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) = \theta(y,x)$. The set function $\Pcal$ returns the set of probability distributions over the argument set.
 
 Also observed is a random sequence of $N$ samples drawn from $\theta$, denoted $\Drm = ( \Yrm,\Xrm ) \in \Dcal = \{\Ycal \times \Xcal\}^N$. The $N$ data pairs are identically distributed as $\Prm_{\Drm_n | \uptheta}(y,x | \theta) = \theta(y,x)$ and are conditionally independent from one another and from the novel pair $(\yrm,\xrm)$.
 
@@ -141,7 +143,7 @@ An alternative representation is implemented via the bijection $\uptheta \Leftri
 
 PGR
 
-The squared-error (SE) loss function is arguably the most commonly used loss function for regression, or in fact for any estimation problem. This can be attributed to its quadratic form, which enables closed-form expression of the minimizing estimation function $f^*$.
+The squared-error (SE) loss function is arguably the most commonly used loss function for regression, or in fact for any estimation problem. This can be attributed to its quadratic form, which enables closed-form evaluation of the optimal estimate.
 
 It is assumed that the unobserved random element $\yrm$ is a scalar random variable; that is, $\Ycal \subset \Rbb$. Additionally, the learning function's estimate is allowed to assume real numbers; thus, $\Hcal = \Rbb \supset \Ycal$.
 
@@ -191,9 +193,9 @@ where the dependency on the training data $\Drm$ is expressed though a transform
 %\end{IEEEeqnarray}
 
 
-This transform forms the empirical distribution of the training data $\Drm$. Since the distribution $\Prm_{\Drm | \uptheta}$ depends on the training data only through via $\Psi$, $\Psi(\Drm)$ is a sufficient statistic \cite{bernardo} for the model $\uptheta$. As such, it is useful to define a new random process $\uppsi \equiv \Psi(\Drm) \in \Uppsi$. 
+This transform forms the empirical distribution of the training data $\Drm$. Since the distribution $\Prm_{\Drm | \uptheta}$ depends on the training data only through via $\Psi$, $\Psi(\Drm)$ is a sufficient statistic \cite{bernardo} for the model $\uptheta$. As such, it is useful to perform the analysis with a new random process $\uppsi \equiv \Psi(\Drm) \in \Uppsi$ and use $\Prm_{\yrm | \xrm,\Drm}(x,D) = \Prm_{\yrm | \xrm,\uppsi}\big( x,\Psi(D) \big)$. 
 
-The cardinality of the random process' domain is $|\Uppsi| = \Mcal\big( (N,|\Ycal||\Xcal|-1) \big)$, where $\Mcal$ is the multinomial coefficient; this can be shown using the stars-and-bars method \cite{feller}. The cardinality of original set is $|\Dcal| = \big( |\Ycal| |\Xcal| \big)^N$; thus $|\Uppsi| \leq |\Dcal|$ and the sufficient statistic compactly represents the valuable information in the training data. 
+The cardinality of the random process' domain is $|\Uppsi| = \Mcal\big( (N,|\Ycal||\Xcal|-1) \big)$, where $\Mcal$ is the multinomial coefficient; this can be shown using the stars-and-bars method \cite{feller}. Note that this finite set is a sample grid of the distribution set $\Pcal(\Ycal \times \Xcal)$. The cardinality of original set is $|\Dcal| = \big( |\Ycal| |\Xcal| \big)^N$; thus $|\Uppsi| \leq |\Dcal|$ and the sufficient statistic compactly represents the valuable information in the training data. 
 
 The conditional distribution of the transformed process is
 \begin{IEEEeqnarray}{rCl}
@@ -209,16 +211,9 @@ an Empirical PMF. As it is equivalent to a normalized Multiomial random process 
 
 
 
-\subsubsection{Aggregation Properties}
+\subsubsection{Marginal/Conditional Properties}
 
-Also of importance is the ``marginalized'' random process $\nrm'$, defined as $\nrm'(x) \equiv \sum_{y \in \Ycal} \nbarrm(y,x)$ over the set $\Xcal$. By the aggregation property of Dirichlet-Multinomial functions \cite{johnson}, the new function is distributed as $\nrm' \sim \DM(N,\alpha')$, where $\alpha'(x) = \sum_{y \in \Ycal} \alpha(y,x)$.
-
-Also of interest is the distribution of $\nbarrm$ conditioned on its aggregation $\nrm'$. Using the Dirichlet-Multinomial properties presented in Appendix \ref{app:DM_agg},
-\begin{IEEEeqnarray}{L}
-\Prm_{\bar{\nrm} | \nrm'}(\bar{n} | n') \\
-\quad = \prod_{x \in \Xcal} \left[ \Mcal\big( \bar{n}(\cdot,x) \big) \beta\big( \alpha(\cdot,x) \big)^{-1} \beta\big( \alpha(\cdot,x) + \bar{n}(\cdot,x) \big) \right] \nonumber \;.
-\end{IEEEeqnarray}
-Observe that conditioning on the aggregation renders the function segments $\nbarrm(\cdot,x)$ independent of one another and that they are also Dirichlet-Multinomial.
+The empirical process can be decomposed into marginal and conditional empirical processes via a bijection $\uppsi \Leftrightarrow (\uppsim, \uppsic)$, where $\uppsim \equiv \sum_{y \in \Ycal} \uppsi(y,\cdot)$ and $\uppsic(x) \equiv \uppsi(\cdot,x) / \uppsim(x)$. Like the Multinomial random process \cite{johnson}, the Empirical random process has an aggregation property, such that $\uppsim | \upthetam \sim \Emp(N,\upthetam)$. Also, $\uppsic(x) | \uppsim(x),\upthetac(x) \sim \Emp\big( N \uppsim(x),\upthetac(x) \big)$ are conditionally independent Empirical processes.
 
 
 
@@ -236,7 +231,10 @@ The Dirichlet PDF for the model random process $\uptheta \in \Theta$ is \cite{bi
 \end{IEEEeqnarray}
 where $\beta$ is the multivariate beta function and the user-selected localization parameter $\alpha_0 \in \Rbb^+$ and mean function $\alpha \equiv \mu_{\uptheta} \in \Pcal(\Ycal \times \Xcal)$ are introduced.
 
-By the aggregation property \cite{ferguson}, $\upthetam \sim \Dir(\alpha_0,\alpham)$ is a Dirichlet random process parameterized by concentration $\alpha_0$ and distribution $\alpham \equiv \sum_{y \in \Ycal} \alpha(y,\cdot)$. Also, as demonstrated in Appendix \ref{app:Dir_agg}, the predictive models $\upthetac(x) \sim \Dir(\alpha_0 \alpham(x),\alphac)$ are independent Dirichlet processes, where $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x)$. They are independent of $\upthetam$, as well. Observe that $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$; thus, the clairvoyant estimate will depend only on the conditional model.
+
+\subsubsection{Marginal/Conditional Properties}
+
+By the aggregation property \cite{ferguson}, $\upthetam \sim \Dir(\alpha_0,\alpham)$ is a Dirichlet random process parameterized by concentration $\alpha_0$ and distribution $\alpham \equiv \sum_{y \in \Ycal} \alpha(y,\cdot)$. Also, as demonstrated in Appendix \ref{app:Dir_agg}, the predictive models $\upthetac(x) \sim \Dir(\alpha_0 \alpham(x),\alphac)$ are independent Dirichlet processes, where $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x)$. They are independent of $\upthetam$, as well. 
 
 
 
@@ -272,6 +270,8 @@ PGR: trend stuff commented.
 
 
 \subsection{Predictive PMF, $\Prm_{\yrm | \xrm,\Drm}$}
+
+Observe that $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$; thus, the clairvoyant estimate will depend only on the conditional model.
 
 As shown in Equation \eqref{eq:f_opt_xD}, the decision selected by the optimally designed function depends on the predictive distribution of the unobserved $\yrm$ conditioned on all observable random elements. Note that $\Prm_{\yrm | \xrm,\Drm} = \Erm_{\uptheta | \xrm,\Drm}\big[ \Prm_{\yrm | \xrm,\uptheta} \big]$ - the Bayesian predictive PMF is the expected value of the true predictive PMF $\Prm_{\yrm | \xrm,\uptheta}$ with respect to the model posterior distribution.
 
