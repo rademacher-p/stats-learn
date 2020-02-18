@@ -207,7 +207,7 @@ an Empirical PMF. As it is equivalent to a normalized Multiomial random process 
 \Sigma_{\uppsi | \uptheta}(y,x,y',x')  & = & \frac{1}{N} \uptheta(y,x) \big( \delta[y,y'] \delta[x,x'] - \uptheta(y',x') \big) \;.
 \end{IEEEeqnarray}
 
-
+PGR: asymptotics?? full support??
 
 
 
@@ -229,7 +229,9 @@ The Dirichlet PDF for the model random process $\uptheta \in \Theta$ is \cite{bi
 \prm_{\uptheta}(\theta) & = & \beta(\alpha_0 \alpha)^{-1} \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\alpha_0 \alpha(y,x) - 1} \nonumber \\
 & \equiv & \Dir(\theta; \alpha_0,\alpha) \;,
 \end{IEEEeqnarray}
-where $\beta$ is the multivariate beta function and the user-selected localization parameter $\alpha_0 \in \Rbb^+$ and mean function $\alpha \equiv \mu_{\uptheta} \in \Pcal(\Ycal \times \Xcal)$ are introduced.
+where $\beta$ is the multivariate beta function and the user-selected localization parameter $\alpha_0 \in \Rbb^+$ and mean function $\alpha \equiv \mu_{\uptheta} \in \Pcal(\Ycal \times \Xcal)$ are introduced. Note that as $\alpha_0 \to \infty$, the PDF tends to $\prm_{\uptheta} \to \delta(\cdot - \alpha)$, where $\delta$ is the Dirac delta function.
+
+PGR: trend stuff?
 
 
 \subsubsection{Marginal/Conditional Properties}
@@ -286,24 +288,13 @@ Dirichlet with mean function
 && \quad + \left(\frac{N \psim(\xrm)}{\alpha_0 \alpham(\xrm) + N \psim(\xrm)}\right) \psic(\xrm) \nonumber \;.
 \end{IEEEeqnarray}
 
-The Bayesian predictive distribution is the mean of the posterior \cite{murphy}; to express in terms of the training data, the Empirical processes can be replaced, such that $\uppsim \equiv N^{-1} \sum_{n=1}^N \delta[\cdot,\Xrm_n]$ and $\uppsic(x) \equiv \left( \sum_{n=1}^N \delta[\cdot,\Yrm_n] \delta[x,\Xrm_n] \right) / \left( \sum_{n=1}^N \delta[x,\Xrm_n] \right)$.
+The Bayesian predictive distribution is the mean of the posterior \cite{murphy}; to express in terms of the training data, the Empirical processes can be replaced, such that $\uppsim \equiv N^{-1} \sum_{n=1}^N \delta[\cdot,\Xrm_n]$ and $\uppsic(x) \equiv \frac{\sum_{n=1}^N \delta[\cdot,\Yrm_n] \delta[x,\Xrm_n]}{\sum_{n=1}^N \delta[x,\Xrm_n]}$.
 
 
 Also, the localization parameter increases proportionately with the volume of training data; consequently, as $N \to \infty$, the posterior converges to $\prm_{\uptheta | \Drm}(\theta | D) \to \delta\big( \theta - \bar{N}(D) / N \big)$ and the model is positively identified. This is a consequence of the full support of the Dirichlet distribution; general posterior distributions do not tend to a delta function at the empirical PMF. Conversely, as $\alpha_0 \to \infty$, the prior model certainty is stronger and the posterior tends toward $\prm_{\uptheta | \Drm}(\theta | D) \to \delta( \theta - \alpha / \alpha_0)$, independent of the training data. 
 
 
-The joint PMF of $\yrm$ and $\xrm$ conditioned on the training data is expressed as \cite{murphy}
-\begin{IEEEeqnarray}{rCl}
-\Prm_{\yrm,\xrm | \Drm}(y,x | D) & = & \mu_{\uptheta | \Drm}(y,x) \\
-& = & \frac{\alpha(y,x) + \bar{N}(y,x;D)}{\alpha_0 + N} \nonumber 
-\end{IEEEeqnarray}
-and the predictive distribution is generated via Bayes rule as
-\begin{IEEEeqnarray}{rCl}
-\Prm_{\yrm | \xrm,\Drm}(y | x,D) & = & \frac{\alpha(y,x) + \bar{N}(y,x;D)}{\alpha'(x) + N'(x;D)} \\
-& = & \left(\frac{\alpha'(x)}{\alpha'(x) + N'(x;D)}\right) \Prm_{\yrm | \xrm}(y | x) \nonumber \\
-&& \quad + \left(\frac{N'(x;D)}{\alpha'(x) + N'(x;D)}\right) \frac{\bar{N}(y,x;D)}{N'(x;D)} \nonumber \;,
-\end{IEEEeqnarray}
-where $N'(x;D) = \sum_{n=1}^N \delta[x,X_n]$. The last representation views the distribution as a convex combination of two conditional distributions. The first distribution $\Prm_{\yrm | \xrm}(y | x) = \alpha(y,x) / \alpha'(x)$ is independent of the training data and based on the prior knowledge implied via the model PDF parameter; the second distribution is the conditional empirical PMF and depends solely on $\Drm$. For both, only those values $\alpha$ and $\Drm$ corresponding to the observed value of $\xrm$ influence the distribution. 
+The last representation views the distribution as a convex combination of two conditional distributions. The first distribution $\Prm_{\yrm | \xrm}(y | x) = \alpha(y,x) / \alpha'(x)$ is independent of the training data and based on the prior knowledge implied via the model PDF parameter; the second distribution is the conditional empirical PMF and depends solely on $\Drm$. For both, only those values $\alpha$ and $\Drm$ corresponding to the observed value of $\xrm$ influence the distribution. 
 
 The weighting factors are dependent on these values as well. For $N'(x;D) = 0$ or as $\alpha_0 \to \infty$, the PMF tends toward the conditional distribution $\Prm_{\yrm|\xrm}$, which only depends on the model parameter $\alpha$. As the number of training examples increases or as $\alpha_0 \to 0$, $\Prm_{\yrm | \xrm,\Drm}$ tends towards the empirical conditional distribution. 
 
