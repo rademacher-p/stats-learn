@@ -360,9 +360,9 @@ PGR: new figs for notation. Larger sets for reviewers? Add text desc.
 
 It is instructional to consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. 
 
-First consider how the excess risk depends on $N$. As $N$ tends to infinity, the distributions $\Prm_{\uppsim(x) | \upthetam(x)}$ concentrate such that $\uppsim(x) \approx \thetam(x)$; thus, the weights $\lambda_{\text{Var}}(x)$ and $\lambda_{\text{Bias}}(x)$ tend to zero and $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable result is a consequence of the full support of the Dirichlet prior, ensuring that the model posterior concentrates at the empirical PMF.
+First consider how the excess risk depends on $N$. As $N$ tends to infinity, the distributions $\Prm_{\uppsim(x) | \upthetam(x)}$ concentrate such that $\uppsim(x) \approx \thetam(x)$; thus, the weights $\lambda_{\text{Var}}(x)$ and $\lambda_{\text{Bias}}(x)$ both tend to zero and $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable result is a consequence of the full support of the Dirichlet prior, ensuring that the model posterior concentrates at the empirical PMF.
 
-An interesting point regarding the dependency of the excess risk on $N$ is that there may be a local maximum. To demonstrate, consider the case of $|\Xcal| = 1$ - treating $N$ as a real number, there would be a maximum at 
+An interesting point regarding the dependency of the excess risk on $N$ is that there may be a local maximum. To demonstrate, consider the case of $|\Xcal| = 1$; treating $N$ as a real number, there would be a maximum at 
 \begin{equation}
 N \approx \alpha_0 \left( 1 - 2 \alpha_0 \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2}{\Sigma_{\yrm | \xrm,\uptheta}} \right) \;.
 \end{equation}
@@ -376,9 +376,19 @@ If the prior estimate $\mu_{\yrm | \xrm}$ has low bias and yet the prior confide
 
 
 
-Next consider the effects of the Dirichlet prior parameters. The analysis will interpret the Dirichlet parameters as the conditional prior means $\alphac(x)$ and the corresponding localizations $\alpha'(x) \equiv \alpha_0 \alpham(x)$. 
+Next consider the effects of the Dirichlet prior parameters. The analysis will interpret the Dirichlet parameters as the conditional prior means $\alphac(x)$ and the corresponding localizations $\alpha'(x) \equiv \alpha_0 \alpham(x)$. The localization parameters $\alpha'(x)$ effect a bias/variance risk trade-off. Consider how the excess risk tends as the priors become maximally concentrated. As $\alpha'(x) \to \infty$, $\lambda_{\text{Bias}}(x) \to 1$ and $\lambda_{\text{Var}}(x) \to 0$. This is intuitive given that the estimator tends toward the data-independent solution. Conversely, if concentrations $\alpha'(x) \to 0$ are chosen, $\lambda_{\text{Bias}}(x) \to \big( 1 - \upthetam(\xrm) \big)^N$ and $\lambda_{\text{Var}}(x) \to \Erm_{\uppsim(x) | \upthetam(x)}\left[ \big( N \uppsim(x) \big)^{-1} \right]$. Note that the variance weight is proportionate to the first inverse moment of a positive binomial random variable \cite{stephan}. 
 
-First consider the functions $\alphac(x)$, which only affect the squared estimator bias. Regardless of the prior localization, the best selections for these conditional priors must render $\mu_{\yrm | \xrm}$ unbiased; as a result, the excess risk is equivalent to the first term in \eqref{eq:risk_cond_SE_dir_ex}, measuring additional variance due to model uncertainty.
+
+Of primary interest are the values $\alpha'(x)$ that minimize the excess squared-error for given prior conditional distributions $\alphac(x)$. Calculating the first derivative, it can be shown that (for $N > 0$ and $\thetam(x) > 0$) only one stationary point exists at 
+\begin{equation} \label{eq:alpha_x_min_Rex}
+\alpha'(\xrm) \equiv \frac{\Sigma_{\yrm | \xrm,\uptheta}}{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2} \;.
+\end{equation}
+Calculation of the second derivative confirms that this value is a local minimum. Furthermore, the excess risk evaluated at these values is 
+\begin{equation}
+\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm | \uptheta}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{1}{N \uppsim(\xrm) \Sigma_{\yrm | \xrm,\uptheta}^{-1} + \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^{-2}} \right] \right] \;,
+\end{equation}
+which can be easily shown to be less than both the asymptotic values for $\alpha'(x) \to 0$ and $\alpha'(x) \to \infty$. Thus the concentation values \eqref{eq:alpha_x_min_Rex} can be used to find the optimal values of $\alpha_0$ and $\alpham(x)$ leading to the minimum excess risk for the given prior conditional distributions $\alphac(x)$.
+
 
 
 
