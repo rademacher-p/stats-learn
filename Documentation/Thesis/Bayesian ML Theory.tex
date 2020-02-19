@@ -149,6 +149,8 @@
 \todolo{Operator/functional terminology?}
 
 
+\todohi{outer product, diag operators!! fix arguments}
+
 \todohigh{HALDANE PRIOR}
 
 
@@ -299,13 +301,13 @@ These operations can be performed with respect to a condtional distribution as w
 \end{equation}
 Similarly, the conditional variance is notated $\Crm_{\xrm | \zrm}\big[ g(\xrm) \big](z)$. When $g$ is the identity operator, the conditional mean and variance as represented by $\mu_{\xrm | \zrm}(z)$ and $\Sigma_{\xrm | \zrm}(z)$, respectively.
 
-As with conditional distributions, it is common that an explicit value $z$ of the conditional random element will not be used, but rather the expectation will be left as a function of the random element $\zrm$. In these cases, the argument is suppressed and the notation $\Erm_{\xrm | \zrm}\big[ g(\xrm) \big]$ implies the dependency on $\zrm$. This convention also holds for the conditional variance operator $\Crm_{\xrm | \zrm}$, as well as for the $\mu_{\xrm | \zrm}$ and $\Sigma_{\xrm | \zrm}$ operators.
+As with conditional distributions, it is common that an explicit value $z$ of the conditional random element will not be used, but rather the expectation will be left as a function of the random element $\zrm$. In these cases, the argument is suppressed and the notation $\Erm_{\xrm | \zrm}\big[ g(\xrm) \big]$ implies the dependency on $\zrm$. This convention also holds for the conditional variance operator $\Crm_{\xrm | \zrm}$, as well as for the $\mu_{\xrm | \zrm}$ and $\Sigma_{\xrm | \zrm}$ functions.
 
 If the range of $g$ is a Hilbert space, such that $g(\xrm)$ is itself a function with a domain $\Ycal$, then the notation for these operators is expanded. The output of the expectation operator is a function over $\Ycal$ represented by
 \begin{equation}
 \Erm_{\xrm}\big[ g(\xrm) \big](y) = \sum_{x} \Prm_{\xrm}(x) g(y;x) \;.
 \end{equation}
-Similarly, the covariance operator notation is modified and the output is a function over $\Ycal \times \Ycal$, 
+Similarly, the covariance function notation is modified and the output is a function over $\Ycal \times \Ycal$, 
 \begin{IEEEeqnarray}{L}
 \Crm_{\xrm}\big[g(\xrm)\big](y,y') \\
 \quad = \Erm_{\xrm} \bigg[ \Big( g(y;\xrm) - \Erm_{\xrm}\big[g(y;\xrm)\big] \Big) \Big( g(y';\xrm) - \Erm_{\xrm}\big[g(y';\xrm)\big] \Big) \bigg] \nonumber \;.
@@ -427,9 +429,9 @@ Conditioned on the model $\uptheta$, the PMF of $\uppsi$ is
 & = & \Mcal(N \psi) \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{N \psi(y,x)} \nonumber \\
 & = & \Multi\big( N \psi;N,\theta \big) \nonumber \\
 & = & \Mcal(N \psi) \left( \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\psi(y,x)} \right)^N \nonumber \\
-& = & \Emp\big( \psi;N,\theta \big) \nonumber \;,
+& = & \Emp\big( \psi;N,\theta \big) \nonumber \;.
 \end{IEEEeqnarray}
-where the multinomial operator $\Mcal$ is used. Observe that the Empirical process is equivalent to a Multinomial process within a scale factor.
+Observe that the Empirical process is equivalent to a Multinomial process within a scale factor.
 
 The first and second joint moments of this Empirical distribution (derived from Multinomial moments \cite{theodoridis-ML}) are
 \begin{IEEEeqnarray}{rCl}
@@ -440,9 +442,14 @@ and
 \Erm_{\uppsi | \uptheta}\big[ \uppsi(y,x) \uppsi(y',x') \big] \\
 \quad = \frac{1}{N} \uptheta(y,x) \delta[y,y'] \delta[x,x'] + \left(1 - \frac{1}{N}\right) \uptheta(y,x) \uptheta(y',x') \nonumber
 \end{IEEEeqnarray}
+\begin{IEEEeqnarray}{L}
+\Erm_{\uppsi | \uptheta}\big[ \uppsi \otimes \uppsi \big] \\
+\quad = \frac{1}{N} \text{diag}(\uptheta)  + \left(1 - \frac{1}{N}\right) \uptheta \otimes \uptheta \nonumber
+\end{IEEEeqnarray}
+\todomid{outer product? argument notation?}
 and the covariance function is
 \begin{IEEEeqnarray}{rCl}
-\Sigma_{\uppsi | \uptheta}(y,x,y',x')  & = & \frac{1}{N} \big( \uptheta(y,x) \delta[y,y'] \delta[x,x'] - \uptheta(y,x) \uptheta(y',x') \big) \;.
+\Sigma_{\uppsi | \uptheta}(y,x,y',x' | \theta)  & = & \frac{1}{N} \big( \theta(y,x) \delta[y,y'] \delta[x,x'] - \theta(y,x) \theta(y',x') \big) \;.
 \end{IEEEeqnarray}
 The first and second moments of the Empirical distribution are proportionate to those of the Multinomial distribution.
 
@@ -1691,7 +1698,7 @@ The excess conditional risk can thus be represented as the conditional expectati
 
 These two second-order terms (of $y$) are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam(x)$ and $N$ via conditional expectations with respect to $\uppsim(x)$. By the aggregation property of Empirical distributions, $N \uppsim(x) | \upthetam(x) \sim \Bi \big(N,\upthetam(x)\big)$. Closed-forms have not been found for the function expectations of binomial random variables above.
 
-PGR: binomial citations?
+PGR: binomial inverse moment review citations?
 
 
 It is instructional to consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization.
@@ -1701,7 +1708,7 @@ First consider how the excess risk changes with the training volume $N$. For $N=
 
 Another interesting point regarding the dependency of the excess conditional risk on $N$ is that there may be a local maximum, depending on the learner parameterization. To demonstrate, consider the case of $|\Xcal| = 1$ - treating $N$ as a real number, there would be a maximum at 
 \begin{equation}
-N \approx \alpha_0 \left( 1 - 2 \alpha_0 \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2}{\Sigma_{\yrm | \xrm,\uptheta}} \right) \;.
+N \approx \alpha_0 \left( 1 - 2 \alpha_0 \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2}{\Sigma_{\yrm | \xrm,\upthetac}} \right) \;.
 \end{equation}
 \todohi{CHECK, consider x dependency + below}
 Note that as the squared-bias of the prior mean increases relative to the clairvoyant estimator variance, the maximizing value decreases (even below zero). Thus, the worse the prior estimate, the more likely the excess squared-error will decrease monotonically with $N$. Conversely, if the prior estimate is accurate, a local maximum may occur and additional training data may (temporarily) compromise the estimator performance. Also consider the effect of prior concentration; informative priors with sufficiently high $\alpha_0$ will not have the local maxima.
@@ -1747,10 +1754,10 @@ Consider how the excess risk tends as the priors become maximally concentrated. 
 
 Conversely, if concentrations $\alpha'(x) \to 0$ are chosen, the Bayesian estimate tends to the empirical mean, independent of $\alphac(\xrm)$, and the excess risk tends to
 \begin{IEEEeqnarray}{rCl}
-\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) & \to & \Erm_{\xrm | \uptheta}\left[ \Sigma_{\yrm | \xrm,\uptheta} \sum_{n=1}^N \binom{N}{n} \upthetam(\xrm)^n \big( 1 - \upthetam(\xrm) \big)^{N-n} \frac{1}{n} \right] \nonumber \\
-&& \qquad + \Erm_{\xrm | \uptheta}\left[ \big( 1 - \upthetam(\xrm) \big)^N \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right] \nonumber \;.
+\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) & \to & \Erm_{\xrm | \upthetam}\left[ \Sigma_{\yrm | \xrm,\upthetac} \sum_{n=1}^N \binom{N}{n} \upthetam(\xrm)^n \big( 1 - \upthetam(\xrm) \big)^{N-n} \frac{1}{n} \right] \nonumber \\
+&& \qquad + \Erm_{\xrm | \upthetam}\left[ \big( 1 - \upthetam(\xrm) \big)^N \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \right] \nonumber \;.
 \end{IEEEeqnarray}
-Note that the first term's scaling factor is proportionate to the first inverse moment of a positive binomial random variable \cite{stephan}. The second term's scaling factor tends to $\Prm_{\uppsim(\xrm) | \upthetam(\xrm)}\big( 0 | \thetam(x) \big)$, the probability that no training samples are observed matching the value $\xrm$. As $N$ increases, this term tends to zero, the risk due to the prior estimate bias decreases, and the excess risk becomes a function of $\uptheta$ only.
+Note that the first term's scaling factor is equivalent to the first inverse moment of a positive binomial random variable \cite{stephan}. The second term's scaling factor tends to $\Prm_{\uppsim(\xrm) | \upthetam(\xrm)}\big( 0 | \thetam(x) \big)$, the probability that no training samples are observed matching the value $\xrm$. As $N$ increases, this term tends to zero, the risk due to the prior estimate bias decreases, and the excess risk becomes a function of $\uptheta$ only.
 
 
 
@@ -1760,15 +1767,15 @@ PGR: add the derivative details below???
 
 Calculating the first derivative with respect to $\alpha'(x)$, it can be shown that for $N > 0$ and $\thetam(x) > 0$, only one stationary point exists, at 
 \begin{equation} \label{eq:alpha_x_min_Rex}
-\alpha'(\xrm) \equiv \frac{\Sigma_{\yrm | \xrm,\uptheta}}{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2} \;.
+\alpha'(\xrm) = \frac{\Sigma_{\yrm | \xrm,\upthetac}}{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2} \;.
 \end{equation}
 Calculation of the second derivative confirms that this value is a local minimum. Furthermore, the excess risk evaluated at these values is 
 \begin{equation}
-\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm | \uptheta}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{1}{N \uppsim(\xrm) \Sigma_{\yrm | \xrm,\uptheta}^{-1} + \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^{-2}} \right] \right] \;,
+\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{1}{N \uppsim(\xrm) \Sigma_{\yrm | \xrm,\upthetac}^{-1} + \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^{-2}} \right] \right] \;,
 \end{equation}
-which can be easily shown to be less than both the asymptotic values for $\alpha'(x) \to 0$ and $\alpha'(x) \to \infty$. Thus the concentation values \eqref{eq:alpha_x_min_Rex} can be used to find the optimal values of $\alpha_0$ and $\alpham(x)$ leading to the minimum excess risk for the given prior conditional distributions $\alphac(x)$.
+which can be easily shown to be less than both the asymptotic values for $\alpha'(x) \to 0$ and $\alpha'(x) \to \infty$. Thus the concentration values \eqref{eq:alpha_x_min_Rex} can be used to find the optimal values of $\alpha_0$ and $\alpham(x)$ leading to the minimum excess risk for the given prior conditional distributions $\alphac(x)$.
 
-Note that the minimizing concentration values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible; the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low concentrations are preferable when the model has low conditional variance; these models can be quickly identified by learners that prioritize the emprical PMF estimate over the prior estimate. Additionally, note that these values $\alpha'(x)$ do not depend on the training volume $N$.
+Note that the minimizing concentration values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible; the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low concentrations are preferable when the conditional model has low variance; these models can be accurately identified by learners that prioritize the empirical mean over the prior estimate, even with limited training data $N$. Additionally, note that these values $\alpha'(x)$ do not depend on the training volume $N$.
 
 
 
@@ -3057,8 +3064,7 @@ Additionally, when also conditioned on the aggregation $\uppsim$, the normalized
 
 \todohigh{FIXXXX. UNDONE.}
 
-Define the countable partition of $\Ycal \times \Xcal = \Rbb^2$, $\left\{ \ldots,\Scal_i,\ldots \right\}$, $i \in \Zbb$, such that $\Scal_i = \Rbb \times 
-\big [i\Delta,(i+1)\Delta \big)$, where $\Delta$ is an arbitrarily small interval. The corresponding function partitions are $\uppsi_i \in \Rbbgeq^{\Scal_i}$, such that $\uppsi = \left\{ \ldots,\uppsi_i,\ldots \right\}$, and $\theta_i \in \Rbbgeq^{\Scal_i}$, such that $\theta = \left\{ \ldots,\theta_i,\ldots \right\}$.
+Define the countable partition of $\Ycal \times \Xcal = \Rbb^2$, $\left\{ \ldots,\Scal_i,\ldots \right\}$, $i \in \Zbb$, such that $\Scal_i = \Rbb \times \big [i\Delta,(i+1)\Delta \big)$, where $\Delta$ is an arbitrarily small interval. The corresponding function partitions are $\uppsi_i \in \Rbbgeq^{\Scal_i}$, such that $\uppsi = \left\{ \ldots,\uppsi_i,\ldots \right\}$, and $\theta_i \in \Rbbgeq^{\Scal_i}$, such that $\theta = \left\{ \ldots,\theta_i,\ldots \right\}$.
 
 Introduce the aggregation process $\uppsim'(i) = \int_{\Scal_i} \uppsi_i(y,x) {\drm}y {\drm}x = \int_{i\Delta}^{(i+1)\Delta} \uppsim(x) {\drm}x$, which is Empirical with $N$ samples and parameterizing function $\thetam'(i) = \int_{\Scal_i} \theta_z(y,x) {\drm}y {\drm}x = \int_{i\Delta}^{(i+1)\Delta} \thetam(x) {\drm}x$. 
 
