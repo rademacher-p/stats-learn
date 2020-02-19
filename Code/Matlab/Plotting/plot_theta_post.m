@@ -2,10 +2,10 @@
 
 clear;
 
-alpha_0 = 10;
+alpha_0 = 6;
 
 % alpha = [1/3; 1/3; 1/3];
-alpha = [.5; .3; .2];
+alpha = [.4; .3; .3];
 
 N_plot = 100;
 
@@ -13,7 +13,7 @@ Theta = N_bar_set(numel(alpha),N_plot)/N_plot;
 L_set = size(Theta,2);
 
 
-N_bar = [1; 1; 4];
+N_bar = [0; 1; 2];
 
 N = sum(N_bar(:));
 psi = N_bar / N;
@@ -26,6 +26,7 @@ PDF_pri = beta_multi(alpha_0*alpha)^-1 * prod(Theta.^((alpha_0*alpha-1)*ones(1,L
 alpha_post = alpha_0*alpha + N*psi;
 PDF_post = beta_multi(alpha_post)^-1 * prod(Theta.^((alpha_post-1)*ones(1,L_set)));
 
+Cmax = max([PDF_pri,PDF_post]);
 
 
 figure(1); clf;
@@ -47,14 +48,14 @@ ylabel('$\theta_{\mathrm{c}}(\mathcal{Y}_2;x)$','Interpreter','latex');
 zlabel('$\theta_{\mathrm{c}}(\mathcal{Y}_3;x)$','Interpreter','latex');
 
 % vec_str_P = num2str(alpha','%0.0f,');
-str_a = num2str(alpha','%g,');
+str_a = num2str(alpha','%.2g,');
 % title(['Prior: $\alpha = [',vec_str_P(1:end-1),']^\mathrm{T}$'],'Interpreter','latex');
 % title(['Prior: $\alpha(\cdot,x) = [',str_a(1:end-1),']^{\mathrm{T}}$'],'Interpreter','latex');% title(['Prior: P$(y,x) = [',vec_str_P(1:end-1),']^T$, $\alpha_0 = ',num2str(alpha_0),'$'],'Interpreter','latex');
 title(['Prior: $\alpha_{\mathrm{c}}(x) = [',str_a(1:end-1),']^{\mathrm{T}}$'],'Interpreter','latex');% title(['Prior: P$(y,x) = [',vec_str_P(1:end-1),']^T$, $\alpha_0 = ',num2str(alpha_0),'$'],'Interpreter','latex');
 
 
 grid on; 
-cbar = colorbar; cbar.Label.Interpreter = 'latex'; set(gca,'CLim',[0,13]);
+cbar = colorbar; cbar.Label.Interpreter = 'latex'; set(gca,'CLim',[0,Cmax]);
 % cbar.Label.String = '$\mathrm{p}_{\theta}(\theta)$'; 
 cbar.Label.String = '$\mathrm{p}_{\theta_{\mathrm{c}}(x)}\big(\theta_{\mathrm{c}}(x)\big)$'; 
 
@@ -82,7 +83,7 @@ vec_str_nbar = num2str(psi','%.2g,');
 title(['Posterior: $\psi_{\mathrm{c}}(x) = [',vec_str_nbar(1:end-1),']^\mathrm{T}$'],'Interpreter','latex');
 grid on; 
 
-cbar = colorbar; cbar.Label.Interpreter = 'latex'; set(gca,'CLim',[0,13]);
+cbar = colorbar; cbar.Label.Interpreter = 'latex'; set(gca,'CLim',[0,Cmax]);
 % cbar.Label.String = 'p$(\theta | \mathrm{D})$'; 
 cbar.Label.String = '$\mathrm{p}_{\theta | \bar{\mathrm{n}}}(\theta | \bar{n})$'; 
 cbar.Label.String = '$\mathrm{p}_{\theta_{\mathrm{c}}(x) | \psi}\big(\theta_{\mathrm{c}}(x) | \psi \big)$'; 
