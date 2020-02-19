@@ -266,11 +266,11 @@ Dirichlet with mean function
 %&& \quad + \left(\frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right) \uppsic(\xrm) \nonumber \\
 %& \equiv & \Prm_{\yrm | \xrm,\uppsi} \;.
 %\end{IEEEeqnarray}
-Note that as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to 0$, the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior mean. Conversely, as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to \infty$, the Dirichlet posterior localization increases and the mean function tends to $\uppsic(\xrm)$. Consequently, $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$ and the model is positively identified. This is a consequence of the full support of the Dirichlet distribution. The adaptation of the posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde}.
+Note that as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to 0$, the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior mean. Conversely, as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to \infty$, the Dirichlet posterior localization increases and the mean function tends to $\uppsic(\xrm)$. Consequently, $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$ and the model is positively identified. This is a consequence of the full support of the Dirichlet distribution. The adaptation of the posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde} for $\alpha_0 \alpham(x) = 6$ and $N \psim(x) = 3$.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.9\linewidth]{P_theta_post_SSP.pdf}
-	\caption{Model PDF, prior and posterior}
+	\caption{Model prior and posterior}
 	\label{fig:P_theta_post_tilde}
 \end{figure}
 
@@ -341,6 +341,10 @@ These two second-order terms (of $y$) are scaled by factors dependent on the con
 \subsubsection{Trends}
 
 PGR: new figs for notation. Larger sets for reviewers? Add text desc.
+
+$\thetac(i/L) = \Bi(i;L-1,.25)$ ??
+
+PGR: title complete or ditch??
 
 
 It is instructional to consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. 
