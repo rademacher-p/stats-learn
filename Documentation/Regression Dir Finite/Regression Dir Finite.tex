@@ -87,7 +87,7 @@
 %\interdisplaylinepenalty=2500
 
 
-\title{Bayesian Learning for Regression using Dirichlet Prior Probability Distributions of Varying Localization}
+\title{Bayesian Learning for Regression using Dirichlet Prior Distributions of Varying Localization}
 
 
 %\name{Anonymous\thanks{Anonymous.}}
@@ -110,7 +110,7 @@
 
 
 \begin{abstract}
-When taking a Bayesian approach to machine learning applications, the performance of the learned function strongly depends on how well the prior distribution selected by the designer matches the true data-generating distribution. Dirichlet priors have a number of desirable properties - they lead to closed-form posterior distributions given independent training data, have full support over the space of data probability distributions, and can be maximally informative or non-informative depending on their localization parameter. This paper assumes a Dirichlet prior and produces predictive distributions to characterize unobservable random quantities given observed data. The results are then applied to the most common loss function for regression, the squared-error loss. The optimal Bayes estimator and the resultant risk trends are presented for different prior localizations, demonstrating a bias/variance trade-off.
+When taking a Bayesian approach to machine learning applications, the performance of the learned function strongly depends on how well the prior distribution selected by the designer matches the true data-generating model. Dirichlet priors have a number of desirable properties - they result in closed-form posterior distributions given independent training data, have full support over the space of data probability distributions, and can be maximally informative or non-informative depending on their localization parameter. This paper assumes a Dirichlet prior and details the predictive distributions that characterize unobservable random quantities given observed data. The results are then applied to the most common loss function for regression, the squared-error loss. The optimal Bayes estimator and the resultant risk trends are presented for different prior localizations, demonstrating a bias/variance trade-off.
 \end{abstract}
 
 \begin{keywords}
@@ -121,11 +121,11 @@ Bayesian learning, machine learning, regression, estimation, Dirichlet distribut
 
 \section{Introduction}
 
-The success or failure of Bayesian learning methods hinge on how well the prior knowledge imparted by the designer matches reality. The chosen prior distribution over the set of data-generating probability distributions reflects the users confidence that different distributions are responsible for generating the observed/unobserved random elements. If a highly localized prior is chosen that strongly weights the actual data probability distribution, low risk learning functions are possible even with limited training data; however, if the localized prior is poorly selected, a good solution may not be achieved. Conversely, a non-informative prior that effects fast adaptation during training; if data is limited, however, the learning function may not deliver the required performance.
+The success or failure of Bayesian learning methods hinge on how well the prior knowledge imparted by the designer matches reality. The chosen prior distribution over the set of data-generating probability distributions reflects the users confidence that different models are responsible for generating the observed/unobserved random elements. If a highly localized prior is chosen that strongly weights the actual data model, low risk learning functions are possible even with limited training data; however, if the localized prior is poorly selected, a good solution may not be achieved. Conversely, a non-informative prior effects fast adaptation during training and can be suitable for a variety of problems; if data is limited, however, the learning function may not deliver satisfactory performance.
 
-This work assumes that the joint observed and unobserved data elements are characterized by a Dirichlet prior. The class of Dirichlet probability density functions (PDF) has the desirable properties of full support over the set of possible data-generating distributions and a closed-form posterior distribution for independently and identically distributed data \cite{ferguson}. Furthermore, control of the Dirichlet parameters enables both minimally and maximally informative priors, providing a wide range of learning solutions.
+This work assumes that the joint observed and unobserved data elements are characterized by a Dirichlet prior. The class of Dirichlet probability density functions (PDF) has the desirable properties of full support over the set of possible data-generating distributions and a closed-form posterior distribution for independently and identically distributed (i.i.d.) data \cite{ferguson}. Furthermore, control of the Dirichlet parameters enables both minimally and maximally informative priors, providing a wide range of learning solutions.
 
-After motivating the Bayesian perspective and using the Dirichlet prior to generate the predictive distribution, it will be applied to the most common loss function for regression: the squared error loss function. The Bayes optimal estimator and the achieved risk will be presented. Results will exemplify the balance between prior knowledge and data adaptation; a critical bias/variance risk trade-off will be demonstrated.
+After motivating the Bayesian perspective and using the Dirichlet prior to generate the predictive distribution, it will be applied to the squared error loss function. The Bayes optimal estimator and the achieved risk will be presented. Results will exemplify the balance between prior knowledge and data adaptation; a bias/variance risk trade-off dependent on prior parameterization will be demonstrated.
 
 
 
@@ -133,26 +133,21 @@ After motivating the Bayesian perspective and using the Dirichlet prior to gener
 
 \section{Objective}
 
-Consider an observable scalar random variable $\xrm \in \Xcal$ and and unobservable scalar random variable $\yrm \in \Ycal$ which are jointly distributed according to an unknown probability mass function (PMF), $\theta \in \Pcal(\Ycal \times \Xcal) \equiv \Big\{ \theta \in {\Rbb_{\geq 0}}^{\Ycal \times \Xcal}: \sum_{y,x} \theta(y,x) = 1 \Bigg\}$, such that $\Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) = \theta(y,x)$. The set function $\Pcal$ returns the set of probability distributions over the argument set.
+Consider an observable scalar random variable $\xrm \in \Xcal \subset \Rbb$ and and unobservable scalar random variable $\yrm \in \Ycal \subset \Rbb$ which are jointly distributed according to an unknown probability mass function (PMF), $\theta \in \Pcal(\Ycal \times \Xcal) \equiv \Big\{ \theta \in {\Rbb_{\geq 0}}^{\Ycal \times \Xcal}: \sum_{y,x} \theta(y,x) = 1 \Big\}$, such that $\Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) = \theta(y,x)$. The set function $\Pcal$ returns the set of probability distributions over the argument set.
 
-Also observed is a random sequence of $N$ samples drawn from $\theta$, denoted $\Drm = ( \Yrm,\Xrm ) \in \Dcal = \{\Ycal \times \Xcal\}^N$. The $N$ data pairs are identically distributed as $\Prm_{\Drm_n | \uptheta}(y,x | \theta) = \theta(y,x)$ and are conditionally independent from one another and from the novel pair $(\yrm,\xrm)$.
-
-
-An alternative representation is implemented via the bijection $\uptheta \Leftrightarrow (\upthetam,\upthetac)$, using the marginal distribution $\upthetam \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) \in \Pcal(\Xcal)$ and the conditional distribution $\upthetac \in \Pcal(\Ycal)^{\Xcal}$, where $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x)$. 
+Also observed is a random sequence of $N$ samples drawn from $\theta$, denoted $\Drm \in \Dcal = \{\Ycal \times \Xcal\}^N$. The $N$ data pairs are identically distributed as $\Prm_{\Drm_n | \uptheta}(y,x | \theta) = \theta(y,x)$ and are conditionally independent from one another and from the novel pair $(\yrm,\xrm)$.
 
 
-It is assumed that the unobserved random element $\yrm$ is a scalar random variable; that is, $\Ycal \subset \Rbb$. Additionally, the learning function's estimate is allowed to assume real numbers; thus, $\Hcal = \Rbb \supset \Ycal$.
-
-PGR: quadratic min??
-
-The regression objective is to design a learning function $f: \Dcal \mapsto \Rbb^{\Xcal}$ which outputs an estimator from the space of the observed random element $\xrm$ to the real line. The metric guiding the design is the squared-error loss function $\Lcal: \Rbb \times \Ycal \mapsto \Rbb_{\geq 0}$, defined as $\Lcal(h,y) = (h-y)^2$. The expected loss, or ``risk'', is defined as
+The regression objective is to design a learning function $f: \Dcal \mapsto \Rbb^{\Xcal}$ which returns an estimator from the space of the observed variable $\xrm$ to the real line. The metric guiding the design is the squared-error loss function $\Lcal: \Rbb \times \Ycal \mapsto \Rbb_{\geq 0}$, defined as $\Lcal(h,y) = (h-y)^2$. The expected loss, or ``risk'', is defined as
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond}
 \Rcal_{\Theta}(f ; \uptheta) & = & \Erm_{\Drm | \uptheta} \bigg[ \Erm_{\yrm,\xrm | \uptheta} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \\
 & = & \Erm_{\xrm | \uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right] + \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( f(\xrm;\Drm) - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \nonumber \;,
 \end{IEEEeqnarray}
-where $\Sigma$ is the covariance function.
+where $\mu$ and $\Sigma$ are the mean and covariance functions, respectively.
 
-If the model $\theta$ were known, the ``clairvoyant'' estimate would be $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$, where $\mu$ is the mean function, and the minimum risk $\Rcal_{\Theta}^*(\uptheta) = \Erm_{\xrm | \uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right]$ would be achieved. Model uncertainty induces excess risk $\Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta) \equiv \Rcal_{\Theta}(f ; \uptheta) - \Rcal_{\Theta}^*(\uptheta)$.
+PGR: quadratic min??
+
+If the model $\theta$ were known, the ``clairvoyant'' estimate would be $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$, and the minimum risk $\Rcal_{\Theta}^*(\uptheta) = \Erm_{\xrm | \uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right]$ would be achieved. Model uncertainty induces excess risk $\Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta) \equiv \Rcal_{\Theta}(f ; \uptheta) - \Rcal_{\Theta}^*(\uptheta)$.
 
 As the model $\theta$ is not observed, $\Rcal_{\Theta}$ is not a feasible objective function for optimization. If the designer selects a PDF $\prm_{\uptheta}$, the Bayes risk is formulated as
 \begin{IEEEeqnarray}{rCl} \label{eq:risk}
@@ -161,7 +156,7 @@ As the model $\theta$ is not observed, $\Rcal_{\Theta}$ is not a feasible object
 \end{IEEEeqnarray}
 and $\yrm$, $\xrm$, and $\Drm$ are treated as jointly distributed random elements. The optimal Bayesian estimate is expressed as
 \begin{IEEEeqnarray}{rCl} \label{eq:f_opt_xD}
-f^*(\xrm;\Drm) & = & \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm}\big[ (h-\yrm)^2 \big] = \mu_{\yrm | \xrm,\Drm} \;.
+f^*(\xrm;\Drm) & = & \argmin_{h \in \Rbb} \Erm_{\yrm | \xrm,\Drm}\big[ (h-\yrm)^2 \big] = \mu_{\yrm | \xrm,\Drm} \;.
 \end{IEEEeqnarray}
 
 
@@ -174,9 +169,32 @@ f^*(\xrm;\Drm) & = & \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm}\big[ (h-\yrm)
 \section{Probability Distributions}
 
 
+\subsection{Model Dirichlet Process} \label{sec:P_theta}
+
+The Dirichlet PDF for the model random process $\uptheta \in \Theta$ is \cite{bishop}
+\begin{IEEEeqnarray}{rCl}
+\prm_{\uptheta}(\theta) & = & \beta(\alpha_0 \alpha)^{-1} \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\alpha_0 \alpha(y,x) - 1} \nonumber \\
+& \equiv & \Dir(\theta; \alpha_0,\alpha) \;,
+\end{IEEEeqnarray}
+where $\beta$ is the multivariate beta function and the user-selected localization parameter $\alpha_0 \in \Rbb^+$ and mean function $\alpha \equiv \mu_{\uptheta} \in \Pcal(\Ycal \times \Xcal)$ are introduced. Note that as $\alpha_0 \to \infty$, the PDF tends to $\prm_{\uptheta} \to \delta(\cdot - \alpha)$, where $\delta$ is the Dirac delta function over the set $\Pcal(\Ycal \times \Xcal)$.
+
+
+
+\subsubsection{Marginal/Conditional Properties} \label{sec:P_theta_mc}
+
+An alternative representation is implemented via the bijection $\uptheta \Leftrightarrow (\upthetam,\upthetac)$, using the marginal distribution $\upthetam \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) \in \Pcal(\Xcal)$ and the conditional distribution $\upthetac \in \Pcal(\Ycal)^{\Xcal}$, where $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x)$. 
+
+By the aggregation property \cite{ferguson}, $\upthetam \sim \Dir(\alpha_0,\alpham)$ is a Dirichlet random process parameterized by localization $\alpha_0$ and distribution $\alpham \equiv \sum_{y \in \Ycal} \alpha(y,\cdot)$. Also, the predictive models $\upthetac(x) \sim \Dir(\alpha_0 \alpham(x),\alphac)$ are independent Dirichlet processes, where $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x)$. They are independent of $\upthetam$ as well. 
+
+
+
+
+
+
+
 \subsection{Training Set and the Empirical Statistic}
 
-The distribution of the training data $\Drm$ conditioned on the model can be formulated as
+Using the i.i.d. assumption, the distribution of the training data $\Drm$ conditioned on the model can be formulated as
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\Drm | \uptheta}\big( D | \theta \big) & = & \left( \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\Psi(y,x;D)} \right)^N \;,
 \end{IEEEeqnarray}
@@ -189,16 +207,16 @@ where the dependency on the training data $\Drm$ is expressed though a transform
 %\end{IEEEeqnarray}
 
 
-This transform forms the empirical distribution of the training data $\Drm$. Since the distribution $\Prm_{\Drm | \uptheta}$ depends on the training data only through via $\Psi$, $\Psi(\Drm)$ is a sufficient statistic \cite{bernardo} for the model $\uptheta$. As such, it is useful to perform the analysis with a new random process $\uppsi \equiv \Psi(\Drm) \in \Uppsi$ and use $\Prm_{\yrm | \xrm,\Drm}(x,D) = \Prm_{\yrm | \xrm,\uppsi}\big( x,\Psi(D) \big)$. 
+This transform forms the empirical distribution of the training data $\Drm$. Since the distribution $\Prm_{\Drm | \uptheta}$ depends on the training data only through via $\Psi$, $\Psi(\Drm)$ is a sufficient statistic \cite{bernardo} for the model $\uptheta$. As such, the analysis is performed using a new random process $\uppsi \equiv \Psi(\Drm) \in \Uppsi$, noting that $\Prm_{\yrm | \xrm,\Drm}(x,D) = \Prm_{\yrm | \xrm,\uppsi}\big( x,\Psi(D) \big)$. 
 
-The cardinality of the random process' domain is $|\Uppsi| = \Mcal\big( (N,|\Ycal||\Xcal|-1) \big)$, where $\Mcal$ is the multinomial coefficient; this can be shown using the stars-and-bars method \cite{feller}. Note that this finite set is a sample grid of the distribution set $\Pcal(\Ycal \times \Xcal)$. The cardinality of original set is $|\Dcal| = \big( |\Ycal| |\Xcal| \big)^N$; thus $|\Uppsi| \leq |\Dcal|$ and the sufficient statistic compactly represents the valuable information in the training data. 
+The cardinality of the random process' domain is $|\Uppsi| = \Mcal\big( (N,|\Ycal||\Xcal|-1) \big)$, where $\Mcal$ is the multinomial coefficient; this can be shown using the stars-and-bars method \cite{feller}. Note that this finite set is a grid of the distribution set $\Pcal(\Ycal \times \Xcal)$ with cardinality satisfying $|\Uppsi| \leq |\Dcal| = \big( |\Ycal| |\Xcal| \big)^N$; thus, the sufficient statistic compactly represents the valuable information in the training data. 
 
 The conditional distribution of the transformed process is
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\uppsi | \uptheta}(\psi | \theta) & = & \Mcal(N \psi) \left( \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\psi(y,x)} \right)^N \nonumber \\
 & \equiv & \Emp\big( \psi;N,\theta \big) \nonumber \;,
 \end{IEEEeqnarray}
-an Empirical PMF. As it is equivalent to a normalized Multiomial random process \cite{minka-multi}, the mean and covariance functions can be expressed as $\mu_{\uppsi | \uptheta} = \uptheta$ and
+an Empirical PMF. As $\uppsi | \uptheta$ is equivalent to a normalized Multiomial random process \cite{minka-multi}, the mean and covariance functions are $\mu_{\uppsi | \uptheta} = \uptheta$ and
 \begin{IEEEeqnarray}{L}
 \Sigma_{\uppsi | \uptheta}(y,x,y',x' | \theta) \\
 \qquad = \frac{1}{N} \theta(y,x) \big( \delta[y,y'] \delta[x,x'] - \theta(y',x') \big) \nonumber \;.
@@ -209,34 +227,7 @@ an Empirical PMF. As it is equivalent to a normalized Multiomial random process 
 
 \subsubsection{Marginal/Conditional Properties} \label{sec:P_psi-theta_mc}
 
-The empirical process can be decomposed into marginal and conditional empirical processes via a bijection $\uppsi \Leftrightarrow (\uppsim, \uppsic)$, where $\uppsim \equiv \sum_{y \in \Ycal} \uppsi(y,\cdot) \in \Pcal(\Xcal)$ and $\uppsic(x) \equiv \uppsi(\cdot,x) / \uppsim(x) \in \Pcal(\Ycal)$. Like the Multinomial random process \cite{johnson}, the Empirical random process has an aggregation property, such that $\uppsim | \upthetam \sim \Emp(N,\upthetam)$. Also, $\uppsic(x) | \uppsim(x),\upthetac(x) \sim \Emp\big( N \uppsim(x),\upthetac(x) \big)$ are conditionally independent Empirical processes.
-
-
-
-
-
-
-
-
-\subsection{Model Dirichlet Process} \label{sec:P_theta}
-
-The Dirichlet PDF for the model random process $\uptheta \in \Theta$ is \cite{bishop}
-\begin{IEEEeqnarray}{rCl}
-\prm_{\uptheta}(\theta) & = & \beta(\alpha_0 \alpha)^{-1} \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\alpha_0 \alpha(y,x) - 1} \nonumber \\
-& \equiv & \Dir(\theta; \alpha_0,\alpha) \;,
-\end{IEEEeqnarray}
-where $\beta$ is the multivariate beta function and the user-selected localization parameter $\alpha_0 \in \Rbb^+$ and mean function $\alpha \equiv \mu_{\uptheta} \in \Pcal(\Ycal \times \Xcal)$ are introduced. Note that as $\alpha_0 \to \infty$, the PDF tends to $\prm_{\uptheta} \to \delta(\cdot - \alpha)$, where $\delta$ is the Dirac delta function.
-
-
-
-\subsubsection{Marginal/Conditional Properties} \label{sec:P_theta_mc}
-
-By the aggregation property \cite{ferguson}, $\upthetam \sim \Dir(\alpha_0,\alpham)$ is a Dirichlet random process parameterized by localization $\alpha_0$ and distribution $\alpham \equiv \sum_{y \in \Ycal} \alpha(y,\cdot)$. Also, the predictive models $\upthetac(x) \sim \Dir(\alpha_0 \alpham(x),\alphac)$ are independent Dirichlet processes, where $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x)$. They are independent of $\upthetam$ as well. 
-
-
-
-
-
+The empirical process can also be decomposed into marginal and conditional empirical processes via a bijection $\uppsi \Leftrightarrow (\uppsim, \uppsic)$, where $\uppsim \equiv \sum_{y \in \Ycal} \uppsi(y,\cdot) \in \Pcal(\Xcal)$ and $\uppsic(x) \equiv \uppsi(\cdot,x) / \uppsim(x) \in \Pcal(\Ycal)$. Like the Multinomial random process \cite{johnson}, the Empirical random process has an aggregation property, such that $\uppsim | \upthetam \sim \Emp(N,\upthetam)$. Also, $\uppsic(x) | \uppsim(x),\upthetac(x) \sim \Emp\big( N \uppsim(x),\upthetac(x) \big)$ can be shown to be conditionally independent Empirical processes.
 
 
 
@@ -248,25 +239,26 @@ By the aggregation property \cite{ferguson}, $\upthetam \sim \Dir(\alpha_0,\alph
 
 \subsection{Bayesian Predictive Distribution}
 
-As shown in Equation \eqref{eq:f_opt_xD}, the decision selected by the optimally designed function depends on the predictive distribution of the unobserved $\yrm$ conditioned on all observable random elements. The training data $\Drm$ is represented using the empirical sufficient statistic and $\Prm_{\yrm | \xrm,\uppsi}$ is used. Observe that $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$ and thus that $\Prm_{\yrm | \xrm,\uppsi} = \Erm_{\uptheta | \xrm,\uppsi}\big[ \Prm_{\yrm | \xrm,\uptheta} \big] \equiv \mu_{\upthetac(\xrm) | \xrm,\uppsi}$; the Bayesian predictive PMF is the posterior mean \cite{murphy} of the true predictive PMF.
+As shown in Equation \eqref{eq:f_opt_xD}, the decision selected by the optimally designed function depends on the predictive distribution of $\yrm$ conditioned on all observable random elements. The training data $\Drm$ is represented using the empirical sufficient statistic and $\Prm_{\yrm | \xrm,\uppsi}$ is used. Observe that $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$ and thus that $\Prm_{\yrm | \xrm,\uppsi} = \Erm_{\uptheta | \xrm,\uppsi}\big[ \Prm_{\yrm | \xrm,\uptheta} \big] \equiv \mu_{\upthetac(\xrm) | \xrm,\uppsi}$; the Bayesian predictive PMF is the posterior mean \cite{murphy} of the true predictive PMF.
 
-Due to the independence of the conditional models $\upthetac(\xrm)$ from one another and from the marginal model, it can be shown that $\prm_{\upthetac(\xrm) | \uppsi, \xrm} \equiv \prm_{\upthetac(\xrm) | \uppsim(\xrm),\uppsic(\xrm)} \sim \Prm_{\uppsic(\xrm) | \uppsim(\xrm), \upthetac(\xrm)} \prm_{\upthetac(\xrm)}$. Since the Empirical conditional PMF of $\uppsic(\xrm)$ has exponential form, the Dirichlet PDF $\prm_{\upthetac(\xrm)}$ is a conjugate prior \cite{theodoridis-ML}; thus, the model posterior PDF given the training data is distributed as 
+Due to the independence of the conditional models $\upthetac(\xrm)$ from one another and from the marginal model, $\prm_{\upthetac(\xrm) | \uppsi, \xrm} \equiv \prm_{\upthetac(\xrm) | \uppsim(\xrm),\uppsic(\xrm)} \sim \Prm_{\uppsic(\xrm) | \uppsim(\xrm), \upthetac(\xrm)} \prm_{\upthetac(\xrm)}$. Since the Empirical conditional PMF of $\uppsic(x)$ has exponential form, the Dirichlet PDF $\prm_{\upthetac(x)}$ is a conjugate prior \cite{theodoridis-ML}; thus, the true predictive models conditioned on the empirical statistic are independent Dirichlet processes,
 \begin{IEEEeqnarray}{L}
-\uptheta(\xrm) | \uppsim(\xrm),\uppsic(\xrm) \\
-\quad \sim \Dir\Big( \alpha_0 \alpham(\xrm) + N \psim(\xrm), \mu_{\upthetac(\xrm) | \uppsim(\xrm), \uppsic(\xrm)} \Big) \nonumber \;,
+\upthetac(x) | \uppsim(x),\uppsic(x) \\
+\quad \sim \Dir\Big( \alpha_0 \alpham(x) + N \psim(x), \mu_{\upthetac(x) | \uppsim(\xrm), \uppsic(x)} \Big) \nonumber \;,
 \end{IEEEeqnarray}
-Dirichlet with mean function
-\begin{IEEEeqnarray}{rCl}
-\mu_{\upthetac(\xrm) | \uppsim(\xrm), \uppsic(\xrm)} & = & \left( 1 + \frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm)} \right)^{-1} \alphac(\xrm) \nonumber \\
-&& \quad + \left( 1 + \frac{\alpha_0 \alpham(\xrm)}{N \uppsim(\xrm)} \right)^{-1} \uppsic(\xrm) \nonumber \\
-& \equiv & \Prm_{\yrm | \xrm,\uppsi} \;.
+with mean functions
+\begin{IEEEeqnarray}{rCl} \label{eq:pred_Bayes_psi}
+\mu_{\upthetac(x) | \uppsim(x), \uppsic(x)} & = & \gamma\big(\uppsim(x)\big) \alphac(x) \nonumber \\
+&& \quad + \Big(1-\gamma\big(\uppsim(x)\big)\Big) \uppsic(x) \nonumber \\
+& \equiv & \Prm_{\yrm | \xrm,\uppsi} \;,
 \end{IEEEeqnarray}
-%\begin{IEEEeqnarray}{rCl}
-%\mu_{\upthetac(\xrm) | \uppsim(\xrm), \uppsic(\xrm)} & = & \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right) \alphac(\xrm) \nonumber \\
-%&& \quad + \left(\frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right) \uppsic(\xrm) \nonumber \\
-%& \equiv & \Prm_{\yrm | \xrm,\uppsi} \;.
+where $\gamma\big(\psim(x)\big) \equiv \left( 1 + \frac{N \uppsim(x)}{\alpha_0 \alpham(\xrm)} \right)^{-1} \in (0,1]$.
+%\begin{IEEEeqnarray}{rCl} \label{eq:pred_Bayes_psi}
+%\mu_{\upthetac(x) | \uppsim(x), \uppsic(x)} & = & \left( 1 + \frac{N \uppsim(x)}{\alpha_0 \alpham(\xrm)} \right)^{-1} \alphac(x) \nonumber \\
+%&& \quad + \left( 1 + \frac{\alpha_0 \alpham(x)}{N \uppsim(x)} \right)^{-1} \uppsic(x) \nonumber \\
+%& \equiv & \Prm_{\yrm | \xrm,\uppsi}(x,\psi) \;.
 %\end{IEEEeqnarray}
-Note that as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to 0$, the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior mean. Conversely, as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to \infty$, the Dirichlet posterior localization increases and the mean function tends to $\uppsic(\xrm)$. Consequently, $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$ and the model is positively identified. This is a consequence of the full support of the Dirichlet distribution. The adaptation of the posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde} for $\alpha_0 \alpham(x) = 6$ and $N \psim(x) = 3$.
+Note that as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to 0$, the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior mean. Conversely, as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to \infty$, the mean tends to $\uppsic(x)$. Also, for larger training sets $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$ and the model is positively identified. This is a consequence of the full support of the Dirichlet distribution and does not hold in general. The adaptation of the posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde} for $\alpha_0 \alpham(x) = 6$ and $N \psim(x) = 3$.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.9\linewidth]{P_theta_post_SSP.pdf}
@@ -295,18 +287,22 @@ Note that as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to 0$, the posterior mea
 
 \subsection{Optimal Estimate: Bayesian Posterior Mean}
 
-To find the optimal Bayesian estimator, the Bayesian predictive distribution is substituted into \eqref{eq:f_opt_xD} and the posterior mean in terms of the empirical statistic is
+To find the optimal Bayesian estimator, the Bayesian predictive distribution \eqref{eq:pred_Bayes_psi} is substituted into \eqref{eq:f_opt_xD} and the posterior mean in terms of the empirical statistic is
 \begin{IEEEeqnarray}{rCl} \label{eq:f_opt_SE}
-f^*(\xrm;\uppsi) & \equiv & \left( 1 + \frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm)} \right)^{-1} \sum_{y \in \Ycal} \alphac(y;\xrm) \ y \\
-&& \quad + \left( 1 + \frac{\alpha_0 \alpham(\xrm)}{N \uppsim(\xrm)} \right)^{-1} \sum_{y \in \Ycal} \uppsic(y;\xrm) \ y \nonumber
+f^*(\xrm;\uppsi) & \equiv & \gamma\big(\uppsim(x)\big) \sum_{y \in \Ycal} \alphac(y;\xrm) \ y \\
+&& \quad + \Big(1-\gamma\big(\uppsim(x)\big)\Big) \sum_{y \in \Ycal} \uppsic(y;\xrm) \ y \nonumber
 \end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{rCl} \label{eq:f_opt_SE}
+%f^*(\xrm;\uppsi) & \equiv & \left( 1 + \frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm)} \right)^{-1} \sum_{y \in \Ycal} \alphac(y;\xrm) \ y \\
+%&& \quad + \left( 1 + \frac{\alpha_0 \alpham(\xrm)}{N \uppsim(\xrm)} \right)^{-1} \sum_{y \in \Ycal} \uppsic(y;\xrm) \ y \nonumber
+%\end{IEEEeqnarray}
 %\begin{IEEEeqnarray}{rCl} \label{eq:f_opt_SE}
 %f^*(\xrm;\uppsi) & \equiv & \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right) \sum_{y \in \Ycal} \alphac(y;\xrm) \ y \\
 %&& \quad + \left(\frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right) \sum_{y \in \Ycal} \uppsic(y;\xrm) \ y \nonumber
 %\end{IEEEeqnarray}
-The optimal estimate is a convex combination of first moments from two distributions - the prior mean of the conditional model, $\Prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$, and the conditional empirical PMF. Note that expressed in terms of the training data, the second expectation is equivalent to $\frac{\sum_{n=1}^N \Yrm_n \delta[x,\Xrm_n]}{\sum_{n=1}^N \delta[x,\Xrm_n]}$.
+The optimal estimate is a convex combination of two mean values - the first moment of the data-independent PMF $\Prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$, and the conditional empirical mean.
 
-The weighting factors are inherited from $\Prm_{\yrm | \xrm,\uppsi}$; thus, stronger prior information (larger $\alpha_0 \alpham(x)$) provides more weight to the data-independent estimate $\mu_{\yrm|\xrm}$ and higher data volume $N \uppsim(x)$ puts emphasis on the empirical mean.
+The weighting factors are inherited from $\Prm_{\yrm | \xrm,\uppsi}$; thus, stronger prior information (larger $\alpha_0 \alpham(x)$) provides more emphasis on the data-independent estimate $\mu_{\yrm|\xrm}$ and higher data volume $N \uppsim(x)$ puts emphasis on the empirical mean.
 
 
 
@@ -317,23 +313,29 @@ The weighting factors are inherited from $\Prm_{\yrm | \xrm,\uppsi}$; thus, stro
 PGR: risk eq steps? comp complexity?
 
 Substituting the Bayesian estimator \eqref{eq:f_opt_SE} into \eqref{eq:risk_cond}, transforming to the empirical statistic, and exploiting the properties from Section \ref{sec:P_psi-theta_mc}, the excess squared-error risk is 
-\begin{IEEEeqnarray}{rCl} \label{eq:risk_cond_SE_dir_ex}
-\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) & = & \Erm_{\xrm,\uppsi | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\uppsi} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
-& = & \Erm_{\xrm | \upthetam}\Big[ \Sigma_{\yrm | \xrm,\upthetac} \lambda_{\text{Var}}(\xrm)  \nonumber \\
-&& \quad + \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \lambda_{\text{Bias}}(\xrm) \Big] \nonumber \;,
+\begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex}
+\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\uppsi | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\uppsi} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
+\quad \equiv \Erm_{\xrm | \upthetam}\Big[ \lambda_{\text{Bias}}(\xrm) \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 + \lambda_{\text{Var}}(\xrm) \Sigma_{\yrm | \xrm,\upthetac} \Big] \nonumber \;,
 \end{IEEEeqnarray}
-a conditional expectation of two functions, where
+a conditional expectation of two weighted functions, where
 \begin{IEEEeqnarray}{rCl}
-\lambda_{\text{Var}}(x) & = & \Erm_{\uppsim(x) | \upthetam(x)}\left[ \frac{N \uppsim(x)}{\big( \alpha_0 \alpham(x) + N \uppsim(x) \big)^2} \right]
+\lambda_{\text{Bias}}(x) & = & \Erm_{\uppsim(x) | \upthetam(x)}\left[ \gamma\big(\uppsim(x)\big)^2 \right] 
 \end{IEEEeqnarray}
 and
 \begin{IEEEeqnarray}{rCl}
-\lambda_{\text{Bias}}(x) & = & \Erm_{\uppsim(x) | \upthetam(x)}\left[ \left(\frac{\alpha_0 \alpham(x)}{\alpha_0 \alpham(x) + N \uppsim(x)}\right)^2 \right] \;.
+\lambda_{\text{Var}}(x) & = & \Erm_{\uppsim(x) | \upthetam(x)}\left[ \frac{\Big( 1 - \gamma\big(\uppsim(x)\big) \Big)^2}{N \uppsim(x)} \right] \;.
 \end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{rCl}
+%lambda__{\text{Var}}(x) & = & \Erm_{\uppsim(x) | \upthetam(x)}\left[ \frac{N \uppsim(x)}{\big( \alpha_0 \alpham(x) + N \uppsim(x) \big)^2} \right]
+%\end{IEEEeqnarray}
+%and
+%\begin{IEEEeqnarray}{rCl}
+%lambda__{\text{Bias}}(x) & = & \Erm_{\uppsim(x) | \upthetam(x)}\left[ \left(\frac{\alpha_0 \alpham(x)}{\alpha_0 \alpham(x) + N \uppsim(x)}\right)^2 \right] \;.
+%\end{IEEEeqnarray}
 
-The first function depends on $\Sigma_{\yrm | \xrm,\upthetac}$ and measures the estimator variance in excess of the clairvoyant squared-error. The second function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. 
+The first function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. The second function depends on $\Sigma_{\yrm | \xrm,\upthetac}$ and measures the estimator variance in excess of the clairvoyant squared-error $\Rcal_{\Theta}^*(\uptheta)$.
 
-These two second-order terms (of $y$) are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam(x)$ and $N$ via conditional expectations with respect to $\uppsim(x)$. By the aggregation property of Empirical distributions, $N \uppsim(x) | \upthetam(x) \sim \Bi \big(N,\upthetam(x)\big)$ is Binomially distributed. Closed-forms have not been found for the function expectations of binomial random variables above.
+Both functions are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam(x)$ and $N$ via conditional expectations with respect to $\uppsim(x)$. By the aggregation property of Empirical distributions, $N \uppsim(x) | \upthetam(x) \sim \Bi \big(N,\upthetam(x)\big)$ is Binomially distributed. Closed-forms have not been found for the function expectations of binomial random variables above.
 
 
 
@@ -342,14 +344,12 @@ These two second-order terms (of $y$) are scaled by factors dependent on the con
 
 PGR: new figs for notation. Larger sets for reviewers? Add text desc.
 
-$\thetac(i/L) = \Bi(i;L-1,.25)$ ??
-
 PGR: title complete or ditch??
 
+Both $\yrm$ and $\xrm$ are 8-bit representations on the unit interval, such that $\Ycal = \Xcal = \{0,1/256,\ldots,255/256\}$. Let $\thetac(y;x) = \Bi(256y;255,.25)$
 
-It is instructional to consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. 
 
-First consider how the excess risk depends on $N$. As $N$ tends to infinity, the distributions $\Prm_{\uppsim(x) | \upthetam(x)}$ concentrate such that $\uppsim(x) \approx \thetam(x)$; thus, the weights $\lambda_{\text{Var}}(x)$ and $\lambda_{\text{Bias}}(x)$ both tend to zero and $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable result is a consequence of the full support of the Dirichlet prior, ensuring that the model posterior concentrates at the empirical PMF.
+Consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. As $N$ tends to infinity, the distributions $\Prm_{\uppsim(x) | \upthetam(x)}$ concentrate such that $\uppsim(x) \approx \thetam(x)$; thus, the weights $\lambda_{\text{Var}}(x)$ and $\lambda_{\text{Bias}}(x)$ both tend to zero and $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable result is a consequence of the full support of the Dirichlet prior, ensuring that the model posterior is localized around the empirical PMF.
 
 An interesting point regarding the dependency of the excess risk on $N$ is that there may be a local maximum. To demonstrate, consider the case of $|\Xcal| = 1$; treating $N$ as a real number, there would be a maximum at 
 \begin{equation}
@@ -375,7 +375,7 @@ Of primary interest are the values $\alpha'(x)$ that minimize the excess squared
 Evaluation of the second derivative confirms the local maximum and comparison of the local risk value to the $\alpha'(x) \to 0$ and $\alpha'(x) \to \infty$ limits confirms the global minimum.
 
 
-Note that the minimizing concentration values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible; the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low concentrations are preferable when the conditional model has low variance; these models can be accurately identified by learners that emphasize the empirical mean, even with limited training data. These trends are demonstrated by Figures \ref{fig:Risk_cond_SE_Dir_a0_leg_N_unbiased} and \ref{fig:Risk_cond_SE_Dir_a0_leg_N_biased}, corresponding to unbiased and biased prior estimators, respectively.
+Note that the minimizing localization values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible; the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low localizations are preferable when the conditional model has low variance; these models can be accurately identified by learners that emphasize the empirical mean, even with limited training data. These trends are demonstrated by Figures \ref{fig:Risk_cond_SE_Dir_a0_leg_N_unbiased} and \ref{fig:Risk_cond_SE_Dir_a0_leg_N_biased}, corresponding to unbiased and biased prior estimators, respectively.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.9\linewidth]{Risk_cond_SE_Dir_a0_leg_N_unbiased.pdf}

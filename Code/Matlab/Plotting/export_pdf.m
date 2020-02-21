@@ -2,12 +2,12 @@
 
 clear;
 
-dir_root = 'C:\Users\paulg\Documents\PhD\Dissertation\Matlab';
+dir_root = 'C:\Users\paulg\Documents\PhD\Dissertation\Code\Matlab';
 
 dir_figs = fullfile(dir_root,'Figures');
 
 % files = dir('*.fig');
-files = dir(fullfile(dir_figs,'Risk_cond_01_Dir_N_leg_a0__subj_*.fig'));
+files = dir(fullfile(dir_figs,'P_theta_post_SSP*.fig'));
 
 N_files = numel(files);
 for ii = 1:N_files
