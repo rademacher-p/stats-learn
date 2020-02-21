@@ -145,7 +145,7 @@ The regression objective is to design a learning function $f: \Dcal \mapsto \Rbb
 \end{IEEEeqnarray}
 where $\mu$ and $\Sigma$ are the mean and covariance functions, respectively.
 
-PGR: quadratic min??
+%PGR: quadratic min??
 
 If the model $\theta$ were known, the ``clairvoyant'' estimate would be $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$, and the minimum risk $\Rcal_{\Theta}^*(\uptheta) = \Erm_{\xrm | \uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right]$ would be achieved. Model uncertainty induces excess risk $\Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta) \equiv \Rcal_{\Theta}(f ; \uptheta) - \Rcal_{\Theta}^*(\uptheta)$.
 
@@ -261,8 +261,8 @@ where $\gamma\big(\psim(x)\big) \equiv \left( 1 + \frac{N \uppsim(x)}{\alpha_0 \
 Note that as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to 0$, the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior mean. Conversely, as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to \infty$, the mean tends to $\uppsic(x)$. Also, for larger training sets $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$ and the model is positively identified. This is a consequence of the full support of the Dirichlet distribution and does not hold in general. The adaptation of the posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde} for $\alpha_0 \alpham(x) = 6$ and $N \psim(x) = 3$.
 \begin{figure}
 	\centering
-	\includegraphics[width=0.9\linewidth]{P_theta_post_SSP.pdf}
-	\caption{Model prior and posterior}
+	\includegraphics[width=1\linewidth]{P_theta_post_SSP.pdf}
+	\caption{Model prior $\prm_{\upthetac(x)}$ and posterior $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)}$}
 	\label{fig:P_theta_post_tilde}
 \end{figure}
 
@@ -310,7 +310,7 @@ The weighting factors are inherited from $\Prm_{\yrm | \xrm,\uppsi}$; thus, stro
 
 \subsection{Squared-Error Risk}
 
-PGR: risk eq steps? comp complexity?
+%PGR: risk eq steps? comp complexity?
 
 Substituting the Bayesian estimator \eqref{eq:f_opt_SE} into \eqref{eq:risk_cond}, transforming to the empirical statistic, and exploiting the properties from Section \ref{sec:P_psi-theta_mc}, the excess squared-error risk is 
 \begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex}
@@ -342,24 +342,19 @@ Both functions are scaled by factors dependent on the conditional prior localiza
 
 \subsubsection{Trends}
 
-PGR: new figs for notation. Larger sets for reviewers? Add text desc.
-
-PGR: title complete or ditch??
-
-Both $\yrm$ and $\xrm$ are 8-bit representations on the unit interval, such that $\Ycal = \Xcal = \{0,1/256,\ldots,255/256\}$. Let $\thetac(y;x) = \Bi(256y;255,.25)$
-
-
 Consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. As $N$ tends to infinity, the distributions $\Prm_{\uppsim(x) | \upthetam(x)}$ concentrate such that $\uppsim(x) \approx \thetam(x)$; thus, the weights $\lambda_{\text{Var}}(x)$ and $\lambda_{\text{Bias}}(x)$ both tend to zero and $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable result is a consequence of the full support of the Dirichlet prior, ensuring that the model posterior is localized around the empirical PMF.
 
 An interesting point regarding the dependency of the excess risk on $N$ is that there may be a local maximum. To demonstrate, consider the case of $|\Xcal| = 1$; treating $N$ as a real number, there would be a maximum at 
 \begin{equation}
 N \approx \alpha_0 \left( 1 - 2 \alpha_0 \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2}{\Sigma_{\yrm | \xrm,\upthetac}} \right) \;.
 \end{equation}
-If the prior estimate $\mu_{\yrm | \xrm}$ has low bias and yet the prior confidence $\alpha_0$ is small, a local maximum may occur and additional training data may (temporarily) compromise the estimator performance. Figure \ref{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased} exemplifies the excess conditional squared-error as a function of $N$ for such estimators with varying localization $\alpha_0$. 
+If the prior estimate $\mu_{\yrm | \xrm}$ has low bias and yet the prior confidence $\alpha_0$ is small, a local maximum may occur and additional training data may (temporarily) compromise the estimator performance. 
+
+Figure \ref{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased} exemplifies the excess conditional squared-error as a function of $N$ for such estimators with varying localization $\alpha_0$. The variable $\yrm$ is an 8-bit representation on the unit interval, such that $\Ycal = \{i/256: i \in 0\ldots,255\}$, with $\thetac(y;x) = 1/256$ and $\alphac(y;x) = \Bi(256y;255,.5)$.
 \begin{figure}
 	\centering
-	\includegraphics[width=0.9\linewidth]{Risk_cond_SE_Dir_N_leg_a0_unbiased.pdf}
-	\caption{Squared-Error Risk for unbiased Dirichlet estimators}
+	\includegraphics[width=1\linewidth]{Risk_cond_SE_Dir_N_leg_a0_unbiased_SSP.pdf}
+	\caption{Squared-Error Risk vs. $N$ for unbiased estimators}
 	\label{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased}
 \end{figure}
 
@@ -375,17 +370,17 @@ Of primary interest are the values $\alpha'(x)$ that minimize the excess squared
 Evaluation of the second derivative confirms the local maximum and comparison of the local risk value to the $\alpha'(x) \to 0$ and $\alpha'(x) \to \infty$ limits confirms the global minimum.
 
 
-Note that the minimizing localization values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible; the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low localizations are preferable when the conditional model has low variance; these models can be accurately identified by learners that emphasize the empirical mean, even with limited training data. These trends are demonstrated by Figures \ref{fig:Risk_cond_SE_Dir_a0_leg_N_unbiased} and \ref{fig:Risk_cond_SE_Dir_a0_leg_N_biased}, corresponding to unbiased and biased prior estimators, respectively.
+Note that the minimizing localization values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible; the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low localizations are preferable when the conditional model has low variance; these models can be accurately identified by learners that emphasize the empirical mean, even with limited training data. These trends are demonstrated in Figure  \ref{fig:Risk_cond_SE_Dir_a0_leg_N_biased} for a biased prior distribution $\alphac(y;x) = \Bi(256y;255,.75)$
+%\begin{figure}
+%	\centering
+%	\includegraphics[width=0.9\linewidth]{Risk_cond_SE_Dir_a0_leg_N_unbiased.pdf}
+%	\caption{Conditional SE Risk versus $\alpha_0 \alpham(x)$, unbiased Dirichlet estimator using varying training set volumes}
+%	\label{fig:Risk_cond_SE_Dir_a0_leg_N_unbiased}
+%\end{figure}
 \begin{figure}
 	\centering
-	\includegraphics[width=0.9\linewidth]{Risk_cond_SE_Dir_a0_leg_N_unbiased.pdf}
-	\caption{Conditional SE Risk versus $\alpha_0 \alpham(x)$, unbiased Dirichlet estimator using varying training set volumes}
-	\label{fig:Risk_cond_SE_Dir_a0_leg_N_unbiased}
-\end{figure}
-\begin{figure}
-	\centering
-	\includegraphics[width=0.9\linewidth]{Risk_cond_SE_Dir_a0_leg_N_biased.pdf}
-	\caption{Conditional SE Risk versus $\alpha_0$, biased Dirichlet estimator using varying training set volumes}
+	\includegraphics[width=0.95\linewidth]{Risk_cond_SE_Dir_a0_leg_N_biased_SSP.pdf}
+	\caption{Squared-Error Risk vs. $\alpha_0$ for a biased estimator}
 	\label{fig:Risk_cond_SE_Dir_a0_leg_N_biased}
 \end{figure}
 
