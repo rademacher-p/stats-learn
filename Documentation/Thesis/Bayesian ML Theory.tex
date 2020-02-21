@@ -1710,7 +1710,7 @@ First consider how the excess risk changes with the training volume $N$. For $N=
 
 Another interesting point regarding the dependency of the excess conditional risk on $N$ is that there may be a local maximum, depending on the learner parameterization. To demonstrate, consider the case of $|\Xcal| = 1$ - treating $N$ as a real number, there would be a maximum at 
 \begin{equation}
-N \approx \alpha_0 \left( 1 - 2 \alpha_0 \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2}{\Sigma_{\yrm | \xrm,\upthetac}} \right) \;.
+N = \alpha_0 \left( 1 - 2 \alpha_0 \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2}{\Sigma_{\yrm | \xrm,\upthetac}} \right) \;.
 \end{equation}
 \todohi{CHECK, consider x dependency + below}
 Note that as the squared-bias of the prior mean increases relative to the clairvoyant estimator variance, the maximizing value decreases (even below zero). Thus, the worse the prior estimate, the more likely the excess squared-error will decrease monotonically with $N$. Conversely, if the prior estimate is accurate, a local maximum may occur and additional training data may (temporarily) compromise the estimator performance. Also consider the effect of prior concentration; informative priors with sufficiently high $\alpha_0$ will not have the local maxima.
