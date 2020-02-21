@@ -4,6 +4,8 @@ Documentation/Regression Dir Finite/*.pdf
 Documentation/Old/
 Code/Matlab/Old/
 
+*.asv
+
 ##### ABOVE: PGR additions
 ##### BELOW: github/gitignore Tex template file
 

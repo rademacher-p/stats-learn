@@ -10,6 +10,10 @@ Risk_a = 0;
 for idx_x = 1:numel(X)
     
     theta_m = sum(theta(:,idx_x));
+    if theta_m == 0
+        continue
+    end
+    
     theta_c = theta(:,idx_x) ./ theta_m;
 
     alpha_m = sum(alpha(:,idx_x));

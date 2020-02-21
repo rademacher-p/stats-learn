@@ -51,7 +51,7 @@ zlabel('$\theta_{\mathrm{c}}(\mathcal{Y}_3;x)$','Interpreter','latex');
 str_a = num2str(alpha','%.2g,');
 % title(['Prior: $\alpha = [',vec_str_P(1:end-1),']^\mathrm{T}$'],'Interpreter','latex');
 % title(['Prior: $\alpha(\cdot,x) = [',str_a(1:end-1),']^{\mathrm{T}}$'],'Interpreter','latex');% title(['Prior: P$(y,x) = [',vec_str_P(1:end-1),']^T$, $\alpha_0 = ',num2str(alpha_0),'$'],'Interpreter','latex');
-title(['Prior: $\alpha_{\mathrm{c}}(x) = [',str_a(1:end-1),']^{\mathrm{T}}$'],'Interpreter','latex');% title(['Prior: P$(y,x) = [',vec_str_P(1:end-1),']^T$, $\alpha_0 = ',num2str(alpha_0),'$'],'Interpreter','latex');
+title(['Prior: $\alpha_{\mathrm{c}}(x) = (',str_a(1:end-1),')$'],'Interpreter','latex');% title(['Prior: P$(y,x) = [',vec_str_P(1:end-1),']^T$, $\alpha_0 = ',num2str(alpha_0),'$'],'Interpreter','latex');
 
 
 grid on; 
@@ -80,7 +80,7 @@ zlabel('$\theta_{\mathrm{c}}(\mathcal{Y}_3;x)$','Interpreter','latex');
 
 vec_str_nbar = num2str(psi','%.2g,');
 % title(['Posterior: $\bar{n} = [',vec_str_nbar(1:end-1),']^\mathrm{T}$'],'Interpreter','latex');
-title(['Posterior: $\psi_{\mathrm{c}}(x) = [',vec_str_nbar(1:end-1),']^\mathrm{T}$'],'Interpreter','latex');
+title(['Posterior: $\psi_{\mathrm{c}}(x) = (',vec_str_nbar(1:end-1),')$'],'Interpreter','latex');
 grid on; 
 
 cbar = colorbar; cbar.Label.Interpreter = 'latex'; set(gca,'CLim',[0,Cmax]);

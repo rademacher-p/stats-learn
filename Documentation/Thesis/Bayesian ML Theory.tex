@@ -1290,6 +1290,8 @@ where
 \end{IEEEeqnarray}
 Observe that when the conditioning is performed using the sufficient statistic, the independent conditional models $\upthetac(x)$ are only dependent on the marginal empirical model value $\uppsim(x)$ and on the corresponding conditional empirical model, $\uppsic(x)$. 
 
+\todomid{coefficient notation from SSP conf paper?}
+
 The Bayes predictive PMF can thus be expressed as 
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\yrm | \xrm,\uppsi}(x,\psi) = \mu_{\upthetac(x) | \xrm,\uppsi}(x,\psi) & \equiv & \mu_{\upthetac(x) | \uppsim(x), \uppsic(x)}\big( \psim(x), \psic(x) \big) \\
@@ -1692,7 +1694,7 @@ Evaluation of the excess risk for an estimator based on the Dirichlet prior will
 \end{IEEEeqnarray}
 where the function $\mathcal{E}$ is defined in \eqref{eq:predictive_del_sq}. 
 
-\todolo{use weight notation from conf paper}
+\todomid{use weight notation from conf paper}
 
 The excess conditional risk can thus be represented as the conditional expectation (with respect to $\Prm_{\xrm | \uptheta} = \upthetam$) of a sum of two functions of $\xrm$. The first function measures the additional variance beyond that of the clairvoyant estimator (i.e. the clairvoyant squared-error); like the clairvoyant risk, it depends on $\Sigma_{\yrm | \xrm,\upthetac}$, the conditional variance of the clairvoyant estimate for a given observation of $\xrm$. The second function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. This term alone is influenced by the data-independent Bayes predictive distribution $\Prm_{\yrm | \xrm} = \alphac(\xrm)$.
 

@@ -10,8 +10,9 @@ en_emp = 0;
 N_mc = 5000;                  % Number of monte carlo iterations
 
 
-Y = num2cell((1:2)'/2);             % output set
-X = num2cell((1:2)');             % input set
+M_reg = [256,256];
+Y = num2cell((0:M_reg(1)-1)'/M_reg(1));             % output set
+X = num2cell((0:M_reg(2)-1)'/M_reg(2));             % input set
 
 % % Y = {'a';'b';'c';'d'};
 % Y = num2cell((1:4)');
@@ -31,45 +32,46 @@ fcn_risk_an = @risk_cond_dir_SE;
 
 
 
-theta_m = ones(numel(X),1)/numel(X);
+% theta_m = ones(numel(X),1)/numel(X);
 % theta_m = [.7; .3];
 % theta_m = [.5,.5; .7,.3; .9,.1]';
 % theta_m = N_bar_set(numel(X),100)/100;
+theta_m = binopdf(0:numel(X)-1,numel(X)-1,0.25)';
+% theta_m = pmf_DM([0:numel(X)-1; numel(X)-1:-1:0],1e3,[0.25;0.75])';
+% theta_m = [1; zeros(numel(X)-1,1)];
 
-% theta_c = ones(numel(Y),numel(X))/numel(Y);
+
+theta_c = ones(numel(Y),numel(X))/numel(Y);
 % theta_c = repmat([.6; .4],[1,numel(X)]);
 % theta_c = repmat([.8; .1; .1],[1,numel(X)]);
 % theta_c = repmat(cat(3,[.5;.5], [.3;.7], [.1;.9]),[1,numel(X)]);
 % theta_c = repmat(cat(3,[1/3;1/3;1/3], [.8;.1;.1]),[1,numel(X)]);
 % theta_c = repmat(N_bar_set_gen([numel(Y),1],81)/81,[1,numel(X)]);
-
-p_t = 0.25;
-temp = zeros(numel(Y),1);
-for idx = 1:numel(Y)
-    temp(idx) = nchoosek(numel(Y)-1,idx-1)*(p_t)^(idx-1) * (1-p_t)^(numel(Y)-idx);
-end
-theta_c = repmat(temp,[1,numel(X)]);
-
+% theta_c = repmat(binopdf(0:numel(Y)-1,numel(Y)-1,0.25)',[1,numel(X)]);
 
 % N = 10;
 % N = [0, 1, 10]';
 % N = [0, 1, 2, 4]';
-% N = [0, 2, 4, 8]';
-N = (0:1:100)';
+N = [0, 2, 4, 8]';
+% N = (0:1:100)';
 
 % alpha_0 = numel(Y)*numel(X);
 % alpha_0 = 10*numel(Y)*numel(X);
 % alpha_0 = numel(Y)*numel(X)*[.1, 1, 10]';
 % alpha_0 = numel(Y)*numel(X)*[0.5,1,2,4]';
-alpha_0 = numel(Y)*numel(X)*2.^[-3,-2,-1,0]';
-% alpha_0 = (.1:.1:10)';
+% alpha_0 = numel(Y)*numel(X)*2.^(-5:-2)';
+alpha_0 = 10*(.1:.1:10)';
 % alpha_0 = (.01:.01:20)';
 
 
-alpha_m = ones(numel(X),1)/numel(X);
+% alpha_m = ones(numel(X),1)/numel(X);
 % alpha_m = [.9; .1];
 % alpha_m = [.5,.5; .7,.3; .9,.1]';
 % alpha_m = N_bar_set(numel(X),100)/100;
+alpha_m = binopdf(0:numel(X)-1,numel(X)-1,0.25)';
+% alpha_m = pmf_DM([0:numel(X)-1; numel(X)-1:-1:0],1e3,[0.25;0.75])';
+% alpha_m = [1; zeros(numel(X)-1,1)];
+
 
 % alpha_c = ones(numel(Y),numel(X))/numel(Y);
 % alpha_c = [.2; .8]*ones(1,numel(X));
@@ -77,13 +79,7 @@ alpha_m = ones(numel(X),1)/numel(X);
 % alpha_c = cat(3,[.5;.5], [.3;.7], [.1;.9]);
 % alpha_c = repmat(cat(3,[1/3;1/3;1/3], [.8;.1;.1]),[1,numel(X)]);
 % alpha_c = repmat(N_bar_set_gen([numel(Y),1],81)/81,[1,numel(X)]);
-
-p_a = 0.25;
-temp = zeros(numel(Y),1);
-for idx = 1:numel(Y)
-    temp(idx) = nchoosek(numel(Y)-1,idx-1)*(p_a)^(idx-1) * (1-p_a)^(numel(Y)-idx);
-end
-alpha_c = repmat(temp,[1,numel(X)]);
+alpha_c = repmat(binopdf(0:numel(Y)-1,numel(Y)-1,0.25)',[1,numel(X)]);
 
 
 
@@ -112,6 +108,7 @@ for idx_t_c = 1:L_theta_c
 
 
 theta_p = theta_c(:,:,idx_t_c).*(ones(numel(Y),1)*theta_m(:,idx_t_m)');
+theta_p = theta_p / sum(theta_p(:)); %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 fcn_prior = @(N_mc)repmat(theta_p,[1,1,N_mc]);
 
@@ -496,10 +493,10 @@ if (L_theta_m == 1) && (L_theta_c == 1) && ...
     vec_str_theta = num2str(unique(theta_c','rows'),'%g,');
     vec_str_y_x = num2str(unique(alpha_c','rows'),'%g,');
     vec_str_x = num2str(alpha_m','%0.1f,'); %vec_str_x = num2str(P_x','%0.1f,'); 
-    title([str_loss,' Risk, '...
-        '$\theta_{\mathrm{c}}(x) = (',vec_str_theta(1:end-1),')$, ',...
-        '$\alpha_{\mathrm{c}}(x) = (',vec_str_y_x(1:end-1),')$, ',...
-        '$\alpha_{\mathrm{m}}(x) = (',vec_str_x(1:end-1),')$'],'Interpreter','latex');   
+%     title([str_loss,' Risk, '...
+%         '$\theta_{\mathrm{c}}(x) = (',vec_str_theta(1:end-1),')$, ',...
+%         '$\alpha_{\mathrm{c}}(x) = (',vec_str_y_x(1:end-1),')$, ',...
+%         '$\alpha_{\mathrm{m}}(x) = (',vec_str_x(1:end-1),')$'],'Interpreter','latex');   
 %     title([str_loss,' Risk, '...
 %         '$\mathrm{P}_{\mathrm{y}|\mathrm{x},\theta} = [',vec_str_theta(1:end-1),']^{\mathrm{T}}$, ',...
 %         '$\mathrm{P}_{\mathrm{y}|\mathrm{x}} = [',vec_str_y_x(1:end-1),']^{\mathrm{T}}$, ',...
@@ -539,10 +536,10 @@ if (L_theta_m == 1) && (L_theta_c == 1) && ...
     vec_str_theta = num2str(unique(theta_c','rows'),'%0.1f,');
     vec_str_y_x = num2str(unique(alpha_c','rows'),'%0.1f,');
     vec_str_x = num2str(alpha_m','%0.1f,'); 
-    title([str_loss,' Risk, '...
-        '$\mathrm{P}_{\mathrm{y}|\mathrm{x},\theta} = [',vec_str_theta(1:end-1),']^{\mathrm{T}}$, ',...
-        '$\mathrm{P}_{\mathrm{y}|\mathrm{x}} = [',vec_str_y_x(1:end-1),']^{\mathrm{T}}$, ',...
-        '$\mathrm{P}_{\mathrm{x}} = [',vec_str_x(1:end-1),']^{\mathrm{T}}$'],'Interpreter','latex');    
+%     title([str_loss,' Risk, '...
+%         '$\mathrm{P}_{\mathrm{y}|\mathrm{x},\theta} = [',vec_str_theta(1:end-1),']^{\mathrm{T}}$, ',...
+%         '$\mathrm{P}_{\mathrm{y}|\mathrm{x}} = [',vec_str_y_x(1:end-1),']^{\mathrm{T}}$, ',...
+%         '$\mathrm{P}_{\mathrm{x}} = [',vec_str_x(1:end-1),']^{\mathrm{T}}$'],'Interpreter','latex');    
     xlabel('$\alpha_0$','Interpreter','latex'); 
     ylabel('$\mathcal{R}_{\Theta}(f;\theta)$','Interpreter','latex'); 
     legend(sub_leg,str_leg,'Interpreter','latex','Location','northeast'); 
