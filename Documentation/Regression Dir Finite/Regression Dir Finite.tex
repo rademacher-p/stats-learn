@@ -150,14 +150,14 @@ If the model $\theta$ were known, the ``clairvoyant'' \cite{kay-det} estimate wo
 
 As the model $\theta$ is not observed, $\Rcal_{\Theta}$ is not a feasible objective function for optimization. If the designer selects a PDF $\prm_{\uptheta}$, the Bayes risk is formulated as
 \begin{IEEEeqnarray}{rCl} \label{eq:risk}
-\Rcal(f) & = & \Erm_{\uptheta}\big[ \Rcal_{\Theta}(f ; \uptheta) \big] \nonumber \\
-& = & \Erm_{\xrm,\Drm} \bigg[ \Erm_{\yrm | \xrm,\Drm} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] 
+\Rcal(f; \prm_{\uptheta}) & = & \Erm_{\uptheta}\big[ \Rcal_{\Theta}(f ; \uptheta) \big] \nonumber \\
+& \equiv & \Erm_{\xrm,\Drm} \bigg[ \Erm_{\yrm | \xrm,\Drm} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] 
 \end{IEEEeqnarray}
 and $\yrm$, $\xrm$, and $\Drm$ are treated as jointly distributed random variables. The optimal Bayesian estimate is expressed as
 \begin{IEEEeqnarray}{rCl} \label{eq:f_opt_xD}
-f^*(\xrm;\Drm) & = & \argmin_{y' \in \Rbb} \Erm_{\yrm | \xrm,\Drm}\big[ (y'-\yrm)^2 \big] = \mu_{\yrm | \xrm,\Drm} \;.
+f^*(\xrm;\Drm) & = & \argmin_{y' \in \Rbb} \Erm_{\yrm | \xrm,\Drm}\big[ (y'-\yrm)^2 \big] = \mu_{\yrm | \xrm,\Drm} \;,
 \end{IEEEeqnarray}
-
+where the dependency of $f^*$ on the prior $\prm_{\uptheta}$ (through $\Prm_{\yrm | \xrm,\Drm}$) is suppressed for brevity.
 
 
 
@@ -391,15 +391,9 @@ Note that the minimizing localization values $\alpha'(x)$ are inversely proporti
 
 \section{Conclusions}
 
-This paper has assumed a Dirichlet prior for Bayesian learning and applied the resultant predictive distribution to squared-error regression. Closed-forms have been provided for the optimal estimator and the achieved risk. Analysis and graphical examples highlight risk trends as a function of training data volume and the Dirichlet prior localization, demonstating a bias/variance risk trade-off.
+This paper has assumed a Dirichlet prior for Bayesian learning and applied the resultant predictive distribution to squared-error regression. Closed-forms have been provided for the optimal estimator and the achieved risk. Analysis and graphical examples highlight risk trends as a function of training data volume and the Dirichlet prior localization, demonstrating a bias/variance risk trade-off.
 
 Future work will generalize these concepts for data drawn from continuous spaces using the continuous Dirichlet process \cite{gershman}. Additionally, these estimators will be compared to classical methods such as generalized linear regression. The inherent adaptability due to the full prior support will highlight the utility of these Bayesian estimators for a wide range of regression problems; however, for data-limited problems, the ``prior knowledge'' implied by classical methods can yield superior performance when the data model is well understood.
-
-
-
-
-
-
 
 
 
@@ -410,29 +404,4 @@ Future work will generalize these concepts for data drawn from continuous spaces
 
 
 \end{document}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
