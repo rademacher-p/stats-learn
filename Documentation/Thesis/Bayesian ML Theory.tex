@@ -1203,9 +1203,9 @@ Figure \ref{fig:P_theta_D} shows the influence of the training data on the model
 \end{figure}
 
 
-Recall that the joint PMF of $\yrm$ and $\xrm$ conditioned on the training data can be expressed as \cite{murphy}
+Recall that the joint PMF of $\yrm$ and $\xrm$ conditioned on the training data is equivalent to the posterior mean $\mu_{\uptheta | \Drm}$, such that \cite{murphy}
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\yrm,\xrm | \Drm} & = & \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpha + \left(\frac{N}{\alpha_0 + N}\right) \Psi(\Drm) \\
+\Prm_{\yrm,\xrm | \Drm} & = & \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpha + \left(\frac{N}{\alpha_0 + N}\right) \Psi(\Drm) \nonumber \\
 & = & \left(1 + \frac{N}{\alpha_0}\right)^{-1} \alpha + \left(1 + \frac{\alpha_0}{N}\right)^{-1} \Psi(\Drm) \;.
 \end{IEEEeqnarray}
 This is a mixture distribution of the prior mean $\mu_{\uptheta} = \alpha/\alpha_0$ and the empirical distribution $\Psi(\Drm)$. The more informative the model prior (i.e. larger $\alpha_0$), the more the prior mean is favored; the more data, the more the empirical model is favored. The marginal distribution for $\xrm$ given $\Drm$ is
@@ -2305,7 +2305,7 @@ The model is characterized by a Dirichlet process $\uptheta \sim \DP(\alpha_0, \
 \end{equation}
 and the correlation function is
 \begin{IEEEeqnarray}{rCl}
-\Erm_{\uptheta}\big[ \uptheta(y,x) \uptheta(y',x') \big] & = & \frac{\alpha_0 \alpha(y,x) \alpha(y',x') + \alpha(y,x) \delta(y-y')\delta(x-x')}{\alpha_0+1} \;.
+\Erm_{\uptheta}\big[ \uptheta(y,x) \uptheta(y',x') \big] & = & \frac{\alpha(y,x) \delta(y-y')\delta(x-x') + \alpha_0 \alpha(y,x) \alpha(y',x')}{\alpha_0+1} \;.
 \end{IEEEeqnarray}
 The covariance function is thus
 \begin{IEEEeqnarray}{rCl}
@@ -2324,46 +2324,47 @@ By the continuous-domain Dirichlet process properties detailed in Appendix \ref{
 
 \subsection{Predictive PDF, $\prm_{\yrm | \xrm,\Drm}$}
 
-The properties of the Dirichlet distribution proven in Appendix \ref{app:DP_post} generalize, such that the model conditioned on the training data $\Drm$ is Dirichlet with parameterizing function $\alpha + \Psi(\Drm)$, where $\Psi(y,x;\Drm) = \sum_{n=1}^N \delta\left( y - \Yrm_n \right)\left( x - \Xrm_n \right)$. Recall that $\Drm_n = \big( \Yrm_n,\Xrm_n \big)$ with $Y \in \Ycal^N$ and $X \in \Xcal^N$.
+\todohi{predictive model posterior}
 
-The PDF $\prm_{\yrm,\xrm | \Drm}$ is thus
+By the properties of the Dirichlet process proven in Appendix \ref{app:DP_post}, the model conditioned on the training data $\Drm$ is Dirichlet with concentration $\alpha_0 + N$ and mean function 
 \begin{IEEEeqnarray}{rCl}
-\prm_{\yrm,\xrm | \Drm} & = & \mu_{\uptheta | \Drm} \\
-& = & \frac{\alpha + \Psi(\Drm)}{\alpha_0 + N} \nonumber \\
-& = & \frac{\alpha + \sum_{n=1}^N \delta\big( \cdot - \Yrm_n \big)\delta\big( \cdot - \Xrm_n \big)}{\alpha_0 + N} \nonumber \\
-& = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \alpha + \left(\frac{N}{\alpha_0+N}\right) \frac{\sum_{n=1}^N \delta\big( \cdot - \Yrm_n \big) \delta\big( \cdot - \Xrm_n \big)}{N} \nonumber
+\mu_{\uptheta | \Drm} & = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \alpha + \left(\frac{N}{\alpha_0+N}\right) \Psi(\Drm) \;,
 \end{IEEEeqnarray}
-and the conditional PDF of interest is
-\begin{IEEEeqnarray}{rCl}
-\prm_{\yrm | \xrm,\Drm} & = & \frac{\alpha(\cdot,\xrm) + \Psi(\cdot,\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)} \\
-& = & \frac{\alpha(\cdot,\xrm) + \sum_{n=1}^N \delta\big( \cdot - \Yrm_n \big) \delta\big( \xrm - \Xrm_n \big)}{\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big)} \nonumber \\
-& = & \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm)+N \Psim(\xrm;\Drm)}\right) \frac{\alpha(\cdot,\xrm)}{\alpha_0 \alpham(\xrm)} + \left(\frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm)+N \Psim(\xrm;\Drm)}\right) \frac{\Psi(\cdot,\xrm;\Drm)}{N \Psim(\xrm;\Drm)} \nonumber \;,
-\end{IEEEeqnarray}
-where $ \alpha_0 \alpham(x) = \int_{\Ycal} \alpha(y,x) {\drm}y$ and $N'(x;\Drm) = \sum_{n=1}^N \delta\big( x - \Xrm_n \big)$.
+where $\Psi(y,x;D) = N^{-1} \sum_{n=1}^N \delta\big( (y,x) - D_n \big)$. 
 
-The conditional distribution when $\Xcal$ is a Euclidean space has notable differences from its form for a countable set $\Xcal$. Specifically, as $N'(x;\Drm) \in [0,\infty)$, and in fact will either be zero or tend towards infinity, the coefficients dictating the convex combination of distributions will be zero or one (assuming a non-impulsive model parameter $\alpha$). Thus, the distribution for a given observation $\xrm$ will be either strictly dependent on either the training data or the prior knowledge regarding $\uptheta$.
+Recall that $\Drm_n \Leftrightarrow \big( \Yrm_n,\Xrm_n \big)$, where $\Yrm \in \Ycal^N$ and $\Xrm \in \Xcal^N$. Since $\prm_{\yrm,\xrm | \Drm} = \mu_{\uptheta | \Drm}$, the conditional PDF of interest is
+\begin{IEEEeqnarray}{rCl}
+\prm_{\yrm | \xrm,\Drm} & = & \frac{\alpha_0 \alpha(\cdot,\xrm) + N \Psi(\cdot,\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)} \\
+& \equiv & \frac{\alpha_0 \alpha(\cdot,\xrm) + \sum_{n=1}^N \delta\big( \cdot - \Yrm_n \big) \delta\big( \xrm - \Xrm_n \big)}{\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big)} \nonumber \\
+& = & \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm)+N \Psim(\xrm;\Drm)}\right) \alphac(\xrm) + \left(\frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm)+N \Psim(\xrm;\Drm)}\right) \Psic(\xrm;\Drm) \nonumber \;,
+\end{IEEEeqnarray}
+where marginal functions generalize for continuous spaces as $\alpham = \int_{\Ycal} \alpha(y,\cdot) {\drm}y$ and $\Psim(D) = \int_{\Ycal} \Psi(y,\cdot;D) {\drm}y \equiv N^{-1} \sum_{n=1}^N \delta(\cdot - X_n)$, and conditional functions are $\alphac(x) = \frac{\alpha(\cdot,x)}{\alpham(x)}$ and $\Psic(x;D) = \frac{\Psi(\cdot,x;D)}{\Psim(x;D)} \equiv \frac{\sum_{n=1}^N \delta(\cdot - Y_n) \delta(x - X_n)}{\sum_{n=1}^N \delta(\cdot - X_n)} = \frac{\sum_{n=1}^N \delta(\cdot - Y_n) \delta[x,X_n]}{\sum_{n=1}^N \delta[x,X_n]}$.
+
+The conditional distribution when $\Xcal$ is a Euclidean space has notable differences from its form for a countable set $\Xcal$. Specifically, since $\Psim(x;D)$ is either zero or tends towards infinity, a non-impulsive prior mean $\alpha$ will result in convex coefficients that are zero or one. In this case, the distribution for a given observation $\xrm$ will be either strictly dependent on either the training data or the prior knowledge.
 
 
 
 \subsection{Training Data PDF, $\prm_{\Drm}$}
 
+\todohi{move before predictive}
+
 By the Dirichlet process properties,
-\begin{IEEEeqnarray}{L}
-\prm_{\Drm_{n+1} | \Drm_n,\ldots,\Drm_1} = \\
-\quad \frac{\alpha(\cdot,\cdot) + \sum_{n'=1}^n \delta\big( \cdot - \Yrm_i \big) \delta\big( \cdot - \Xrm_i \big)}{\alpha_0 + N} \nonumber
+\begin{IEEEeqnarray}{rCl}
+\prm_{\Drm_{n+1} | \Drm_n,\ldots,\Drm_1} & = & \mu_{\uptheta | \Drm_n,\ldots,\Drm_1} \\
+& \equiv & \frac{\alpha_0 \alpha + \sum_{i=1}^n \delta\big( \cdot - \Yrm_i \big) \delta\big( \cdot - \Xrm_i \big)}{\alpha_0 + N} \nonumber
 \end{IEEEeqnarray}
 and thus
 \begin{IEEEeqnarray}{rCl}
-\prm_{\Drm}(D) & = & \prm\big (D_1 \big) \prod_{n=2}^N \prm\big( D_n | D_{n-1},\ldots,D_1 \big) \\
-& = & \frac{\alpha\big( Y_1,X_1 \big)}{\alpha_0} \prod_{n=2}^N \frac{\alpha\big( Y_n,X_n \big) + \sum_{i=1}^{n-1} \delta\big( Y_n -  Y_i \big) \delta\big( X_n - X_i \big)}{\alpha_0+n-1} \nonumber
+\prm_{\Drm}(D) & = & \Erm_{\uptheta}\left[ \prod_{n=1}^N \uptheta\big( D_n \big) \right] \\
+& = & \prm_{\Drm_1}\big(D_1\big) \prod_{n=2}^N \prm_{\Drm_{n} | \Drm_{n-1},\ldots,\Drm_1}\big( D_n | D_{n-1},\ldots,D_1 \big) \nonumber \\
+& \equiv & \alpha\big( Y_1,X_1 \big) \prod_{n=2}^N \frac{\alpha_0 \alpha\big( Y_n,X_n \big) + \sum_{i=1}^{n-1} \delta\big( Y_n -  Y_i \big) \delta\big( X_n - X_i \big)}{\alpha_0+n-1} \nonumber
 \end{IEEEeqnarray}
 
 It is instructional to find the PDF's for the training output values $\Yrm$ given the input values $\Xrm$, as well as the marginal PDF for the input values alone. Observe that the PDF for $\Xrm$ can be represented as
 \begin{IEEEeqnarray}{rCl}
-\prm_{\Xrm}(X) & = & \Erm_{\uptheta}\big[ \prm_{\Xrm | \uptheta}(X | \uptheta) \big] = \Erm_{\uptheta}\left[ \prod_{n=1}^N \upthetam\big( X_n \big) \right] \\
-& = & \frac{\alpha'\big( X_1 \big)}{\alpha_0} \prod_{n=2}^N \frac{\alpha'\big( X_n \big) + \sum_{i=1}^{n-1} \delta\big( X_n-X_i \big)}{\alpha_0+n-1} \nonumber
+\prm_{\Xrm}(X) & = & \Erm_{\uptheta}\big[ \prm_{\Xrm | \uptheta}(X | \uptheta) \big] \equiv \Erm_{\upthetam}\left[ \prod_{n=1}^N \upthetam\big( X_n \big) \right] \\
+& = & \alpham\big( X_1 \big) \prod_{n=2}^N \frac{\alpha_0 \alpham\big( X_n \big) + \sum_{i=1}^{n-1} \delta\big( X_n-X_i \big)}{\alpha_0+n-1} \nonumber \;.
 \end{IEEEeqnarray}
-since, by the aggregation principle, $\upthetam = \int_{\Ycal} \uptheta(y,\cdot) {\drm}y$ is a Dirichlet process with parameter function $\alpha': \Xcal \mapsto \Rbb^+$.
 
 
 %The PDF for $\Xrm$ is
@@ -2385,16 +2386,16 @@ which equivalent to $\prm_{\xrm}$.
 
 PGR: express conditional below using Dir aggregation conditional independence properties?
 
-The conditional distribution of intererest is
+The conditional distribution of interest is
 \begin{IEEEeqnarray}{rCl}
-\prm_{\Yrm | \Xrm}(Y | X) & = & \frac{\alpha\big( Y_1,X_1 \big)}{\alpha'\big( X_1 \big)} \prod_{n=2}^N \frac{\alpha\big( Y_n,X_n \big) + \sum_{i=1}^{n-1} \delta\big( Y_n-Y_i \big) \delta\big( X_n-X_i \big)}{\alpha'\big( X_n \big) + \sum_{i=1}^{n-1} \delta\big( X_n-X_i \big)} 
+\prm_{\Yrm | \Xrm}(Y | X) & = & \frac{\alpha\big( Y_1,X_1 \big)}{\alpha'\big( X_1 \big)} \prod_{n=2}^N \frac{\alpha\big( Y_n,X_n \big) + \sum_{i=1}^{n-1} \delta\big( Y_n-Y_i \big) \delta\big( X_n-X_i \big)}{\alpham\big( X_n \big) + \sum_{i=1}^{n-1} \delta\big( X_n-X_i \big)} 
 \end{IEEEeqnarray}
 
 Marginalized conditional PDF's for the first and second samples are found. Observe that the marginal distribution for the first $N-1$ values of $\Yrm$ is
 \begin{IEEEeqnarray}{L}
 \prm_{\Yrm_1,\ldots,\Yrm_{N-1} | \Xrm}\big( Y_1,\ldots,Y_{N-1} | X \big) \\
-= \int_{\Ycal} \frac{\alpha\big( Y_1,X_1 \big)}{\alpha'\big( X_1 \big)} \prod_{n=2}^N \frac{\alpha \big( Y_n,X_n \big) + \sum_{i=1}^{n-1} \delta\big( Y_n-Y_i \big) \delta\big( X_n-X_i \big)}{\alpha'\big( X_n \big) + \sum_{i=1}^{n-1} \delta\big( X_n-X_i \big)} {\drm}Y_N \nonumber \\
-= \frac{\alpha\big( Y_1,X_1 \big)}{\alpha'\big( X_1 \big)} \prod_{n=2}^{N-1} \frac{\alpha\big( Y_n,X_n \big) + \sum_{i=1}^{n-1} \delta\big( Y_n-Y_i \big) \delta\big( X_n-X_i \big)}{\alpha'\big( X_n \big) + \sum_{i=1}^{n-1} \delta\big( X_n-X_i \big)} \nonumber
+= \int_{\Ycal} \frac{\alpha\big( Y_1,X_1 \big)}{\alpha'\big( X_1 \big)} \prod_{n=2}^N \frac{\alpha \big( Y_n,X_n \big) + \sum_{i=1}^{n-1} \delta\big( Y_n-Y_i \big) \delta\big( X_n-X_i \big)}{\alpham\big( X_n \big) + \sum_{i=1}^{n-1} \delta\big( X_n-X_i \big)} {\drm}Y_N \nonumber \\
+= \frac{\alpha\big( Y_1,X_1 \big)}{\alpha'\big( X_1 \big)} \prod_{n=2}^{N-1} \frac{\alpha\big( Y_n,X_n \big) + \sum_{i=1}^{n-1} \delta\big( Y_n-Y_i \big) \delta\big( X_n-X_i \big)}{\alpham\big( X_n \big) + \sum_{i=1}^{n-1} \delta\big( X_n-X_i \big)} \nonumber
 \end{IEEEeqnarray}
 which is independent of $\Xrm_N$. Repeated integrations and an application of the permutation invariance principle can show that when conditioned on $\Xrm$ any subset of training data values $\Yrm_1,\ldots,\Yrm_N$ will only be dependent on the corresponding values $\Xrm_n$. The first and second order conditional distributions are
 \begin{IEEEeqnarray}{rCl}
@@ -3058,9 +3059,11 @@ The correlation function is
 
 The aggregation property has been stated for countable partitions of the process domain - it also holds for continuous aggregations. Define an Empirical process $\uppsi \in \Uppsi$ parameterized by $N$ samples and a function $\theta \in \Pcal(\Ycal \times \Xcal)$, where $\Ycal = \Xcal = \Rbb$ for simplicity. The process assumes functions from the set $\Uppsi = \left\{ N^{-1} \sum_{n=1}^N \delta(\cdot - Y_n) \delta(\cdot - X_n) : Y \in \Ycal^N, X \in \Xcal^N \right\}$. The aggregation $\uppsim \equiv \int_{\Ycal} \uppsi(y,\cdot) {\drm}y$ is an Empirical process with $N$ samples and parameterizing function $\thetam \equiv \int_{\Ycal} \theta(y,\cdot) {\drm}y$. Note that $\uppsim \in \Uppsim = \left\{ N^{-1} \sum_{n=1}^N \delta(\cdot - X_n) : X \in \Xcal^N \right\}$.
 
+\todolow{aggs are aggs of original}
+
 PGR
 
-Additionally, when also conditioned on the aggregation $\uppsim$, the normalized random processes $\uppsic(x) \equiv \uppsi(\cdot,x) / \uppsim(x)$ are independent continuous-domain Empirical processes, $\uppsic(z) | \uppsim(z), \upthetac(z) \sim \EP\big(N \uppsim(z), \upthetac(z)\big)$, where $\thetac(z) \equiv \theta_z / \thetam(z) \in \Pcal(\Scal_z)$.
+Additionally, when also conditioned on the aggregation $\uppsim$, the normalized random processes $\uppsic(x) \equiv \uppsi(\cdot,x) / \uppsim(x)$ are independent continuous-domain Empirical processes, $\uppsic(x) | \uppsim(x), \upthetac(x) \sim \EP\big(N \uppsim(x) / \delta(0), \upthetac(x)\big)$, where $\thetac(x) \equiv \theta(\cdot,x) / \thetam(x) \in \Pcal(\Ycal)$.
 
 
 
