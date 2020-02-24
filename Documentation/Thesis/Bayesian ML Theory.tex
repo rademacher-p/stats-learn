@@ -3056,7 +3056,7 @@ The correlation function is
 
 \todomid{Generalize the property?}
 
-The aggregation property has been stated for countable partitions of the process domain - it also holds for continuous aggregations. Define an Empirical process $\uppsi \in \Uppsi$ parameterized by $N$ samples and a function $\theta \in \Pcal(\Ycal \times \Xcal)$, where $\Ycal = \Xcal = \Rbb$ for simplicity. The process assumes functions from the set $\Uppsi = \left\{ N^{-1} \sum_{n=1}^N \delta(\cdot - Y_n) \delta(\cdot - X_n) : Y \in \Ycal^N, X \in \Xcal^N \right\}$. The aggregation $\uppsim \equiv \int_{\Ycal} \uppsi(y,\cdot) {\drm}y$ is an Emprical process with $N$ samples and parameterizing function $\thetam \equiv \int_{\Ycal} \theta(y,\cdot) {\drm}y$. Note that $\uppsim \in \Uppsim = \left\{ N^{-1} \sum_{n=1}^N \delta(\cdot - X_n) : X \in \Xcal^N \right\}$.
+The aggregation property has been stated for countable partitions of the process domain - it also holds for continuous aggregations. Define an Empirical process $\uppsi \in \Uppsi$ parameterized by $N$ samples and a function $\theta \in \Pcal(\Ycal \times \Xcal)$, where $\Ycal = \Xcal = \Rbb$ for simplicity. The process assumes functions from the set $\Uppsi = \left\{ N^{-1} \sum_{n=1}^N \delta(\cdot - Y_n) \delta(\cdot - X_n) : Y \in \Ycal^N, X \in \Xcal^N \right\}$. The aggregation $\uppsim \equiv \int_{\Ycal} \uppsi(y,\cdot) {\drm}y$ is an Empirical process with $N$ samples and parameterizing function $\thetam \equiv \int_{\Ycal} \theta(y,\cdot) {\drm}y$. Note that $\uppsim \in \Uppsim = \left\{ N^{-1} \sum_{n=1}^N \delta(\cdot - X_n) : X \in \Xcal^N \right\}$.
 
 PGR
 
@@ -3190,9 +3190,11 @@ Finally,
 
 The aggregation property has been stated for countable partitions of the process domain - it also holds for continuous aggregations. Define an Dirichlet process $\uptheta \in \Pcal(\Ycal \times \Xcal)$ parameterized by concentration $\alpha_0$ and mean function $\alpha$, where $\Ycal = \Xcal = \Rbb$ for simplicity. The aggregation $\upthetam \equiv \int_{\Ycal} \uptheta(y,\cdot) {\drm}y \in \Pcal(\Xcal)$ is a Dirichlet process with concentration $\alpha_0$ and parameterizing function $\alpham \equiv \int_{\Ycal} \alpha(y,\cdot) {\drm}y$. 
 
-Additionally, the normalized functinons $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x)$ are independent continuous-domain Dirichlet processes, $\upthetac(x) \sim \DP\big(\alpha_0 \alpham(x), \alphac(x)\big)$, where $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x) \in \Pcal(\Ycal)$, and are independent of the aggregation process $\upthetam$.
-
 \todohi{Confirm?}
+
+Additionally, the normalized functions $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x)$ are independent continuous-domain Dirichlet processes, $\upthetac(x) \sim \DP\big(\alpha_0 \alpham(x), \alphac(x)\big)$, where $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x) \in \Pcal(\Ycal)$, and are independent of the aggregation process $\upthetam$.
+
+
 
 
 
