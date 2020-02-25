@@ -2332,13 +2332,13 @@ By the properties of the Dirichlet process proven in Appendix \ref{app:DP_post},
 \end{IEEEeqnarray}
 where $\Psi(y,x;D) = N^{-1} \sum_{n=1}^N \delta\big( (y,x) - D_n \big)$. 
 
-Recall that $\Drm_n \Leftrightarrow \big( \Yrm_n,\Xrm_n \big)$, where $\Yrm \in \Ycal^N$ and $\Xrm \in \Xcal^N$. Since $\prm_{\yrm,\xrm | \Drm} = \mu_{\uptheta | \Drm}$, the conditional PDF of interest is
+Recall that $\Drm_n \Leftrightarrow \big( \Yrm_n,\Xrm_n \big)$, where $\Yrm \in \Ycal^N$ and $\Xrm \in \Xcal^N$. Since $\prm_{\yrm,\xrm | \Drm} = \mu_{\uptheta | \Drm}$, by Bayes rule the conditional PDF of interest is
 \begin{IEEEeqnarray}{rCl}
 \prm_{\yrm | \xrm,\Drm} & = & \frac{\alpha_0 \alpha(\cdot,\xrm) + N \Psi(\cdot,\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)} \\
 & \equiv & \frac{\alpha_0 \alpha(\cdot,\xrm) + \sum_{n=1}^N \delta\big( \cdot - \Yrm_n \big) \delta\big( \xrm - \Xrm_n \big)}{\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big)} \nonumber \\
 & = & \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm)+N \Psim(\xrm;\Drm)}\right) \alphac(\xrm) + \left(\frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm)+N \Psim(\xrm;\Drm)}\right) \Psic(\xrm;\Drm) \nonumber \;,
 \end{IEEEeqnarray}
-where marginal functions generalize for continuous spaces as $\alpham = \int_{\Ycal} \alpha(y,\cdot) {\drm}y$ and $\Psim(D) = \int_{\Ycal} \Psi(y,\cdot;D) {\drm}y \equiv N^{-1} \sum_{n=1}^N \delta(\cdot - X_n)$, and conditional functions are $\alphac(x) = \frac{\alpha(\cdot,x)}{\alpham(x)}$ and $\Psic(x;D) = \frac{\Psi(\cdot,x;D)}{\Psim(x;D)} \equiv \frac{\sum_{n=1}^N \delta(\cdot - Y_n) \delta(x - X_n)}{\sum_{n=1}^N \delta(\cdot - X_n)} = \frac{\sum_{n=1}^N \delta(\cdot - Y_n) \delta[x,X_n]}{\sum_{n=1}^N \delta[x,X_n]}$.
+where the marginal and conditional functions are $\Psim(D) = \int_{\Ycal} \Psi(y,\cdot;D) {\drm}y \equiv N^{-1} \sum_{n=1}^N \delta(\cdot - X_n)$ and $\Psic(x;D) = \frac{\Psi(\cdot,x;D)}{\Psim(x;D)} \equiv \frac{\sum_{n=1}^N \delta(\cdot - Y_n) \delta(x - X_n)}{\sum_{n=1}^N \delta(\cdot - X_n)} = \frac{\sum_{n=1}^N \delta(\cdot - Y_n) \delta[x,X_n]}{\sum_{n=1}^N \delta[x,X_n]}$.
 
 The conditional distribution when $\Xcal$ is a Euclidean space has notable differences from its form for a countable set $\Xcal$. Specifically, since $\Psim(x;D)$ is either zero or tends towards infinity, a non-impulsive prior mean $\alpha$ will result in convex coefficients that are zero or one. In this case, the distribution for a given observation $\xrm$ will be either strictly dependent on either the training data or the prior knowledge.
 
@@ -2380,7 +2380,7 @@ It is instructional to find the PDF's for the training output values $\Yrm$ give
 
 Additionally, by the invariance principle, the PDF's for the first-degree marginals are
 \begin{IEEEeqnarray}{rCl}
-\prm_{\Xrm_n} & = & \frac{\alpha'}{\alpha_0} \;.
+\prm_{\Xrm_n} & = & \mu_{\upthetam} = \alpham \;.
 \end{IEEEeqnarray}
 which equivalent to $\prm_{\xrm}$.
 
@@ -3133,7 +3133,7 @@ To prove the hypothesis, exploit the results of Appendix \ref{app:Dir_agg} to re
 & = & \left( \prod_{z \in \Zcal} \prod_{n=1}^N \upthetam(z)^{\chi(D_n; \Scal_z)} \right) \prod_{z \in \Zcal} \Erm_{\upthetac(z)}\left[ \prod_{n=1}^N \upthetac(D_n; z)^{\chi(D_n; \Scal_z)} \right] \nonumber \\
 & = & \left( \prod_{z \in \Zcal} \upthetam(z)^{\Psim(z;D)} \right)^N \prod_{z \in \Zcal} \Erm_{\upthetac(z)}\left[ \prod_{n=1}^N \upthetac(D_n; z)^{\chi(D_n; \Scal_z)} \right] \nonumber \;,
 \end{IEEEeqnarray}
-Observe that the dependency of this likelihood function on $\upthetam$ is polynomial. The training data marginal distribution is thus
+Observe that the dependency of this likelihood function on $\upthetam$ is polynomial. Thus, $\upthetam$ is a conjugate prior for $\Drm$ and the training data marginal distribution is
 \begin{IEEEeqnarray}{rCl}
 \prm_{\Drm}(D) & = & \Erm_{\upthetam} \left[ \left( \prod_{z \in \Zcal} \upthetam(z)^{\Psim(z;D)} \right)^N \right] \prod_{z \in \Zcal} \Erm_{\upthetac(z)}\left[ \prod_{n=1}^N \upthetac(D_n; z)^{\chi(D_n; \Scal_z)} \right] \\
 & = & \frac{\beta\big( \alpha_0 \alpham + N \Psim(D) \big)}{\beta(\alpha_0 \alpham)} \prod_{z \in \Zcal} \Erm_{\upthetac(z)}\left[ \prod_{n=1}^N \upthetac(D_n; z)^{\chi(D_n; \Scal_z)} \right] \nonumber
