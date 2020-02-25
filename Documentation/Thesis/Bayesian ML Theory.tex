@@ -107,7 +107,7 @@
 
 
 \usepackage[backend=biber,style=numeric]{biblatex}
-\addbibresource{{../References/phd_bib.bib}}
+\addbibresource{{../References/PhD_refs.bib}}
 
 \graphicspath{ {../Figures/} }
 
@@ -1694,7 +1694,7 @@ Evaluation of the excess risk for an estimator based on the Dirichlet prior will
 \end{IEEEeqnarray}
 where the function $\mathcal{E}$ is defined in \eqref{eq:predictive_del_sq}. 
 
-\todomid{use weight notation from conf paper}
+\todomid{use weight notation from conf paper? add theta dependency to lambda}
 
 The excess conditional risk can thus be represented as the conditional expectation (with respect to $\Prm_{\xrm | \uptheta} = \upthetam$) of a sum of two functions of $\xrm$. The first function measures the additional variance beyond that of the clairvoyant estimator (i.e. the clairvoyant squared-error); like the clairvoyant risk, it depends on $\Sigma_{\yrm | \xrm,\upthetac}$, the conditional variance of the clairvoyant estimate for a given observation of $\xrm$. The second function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. This term alone is influenced by the data-independent Bayes predictive distribution $\Prm_{\yrm | \xrm} = \alphac(\xrm)$.
 
@@ -1706,7 +1706,7 @@ PGR: binomial inverse moment review citations?
 It is instructional to consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization.
 
 
-First consider how the excess risk changes with the training volume $N$. For $N=0$, it is evident that the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$,  the expected squared bias between the clairvoyant and data-independent estimators. As $N$ tends to infinity, the binomial distribution controlling the scaling factors concentrates such that $\uppsim(x) \approx \thetam(x)$; thus, the two expectations of interest tend to zero and thus $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable estimator property is a consequence of the full support of the Dirichlet prior, ensuring that the model posterior concentrates at the empirical PMF.
+First consider how the excess risk changes with the training volume $N$. For $N=0$, it is evident that the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$,  the expected squared bias between the clairvoyant and data-independent estimators. As $N$ tends to infinity, the binomial distribution controlling the scaling factors concentrates such that $\uppsim(x) \approx \thetam(x)$; thus for $\thetam(x) > 0$, the two expectations of interest tend to zero and thus $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable estimator property is a consequence of the full support of the Dirichlet prior, ensuring that the model posterior concentrates at the empirical PMF.
 
 Another interesting point regarding the dependency of the excess conditional risk on $N$ is that there may be a local maximum, depending on the learner parameterization. To demonstrate, consider the case of $|\Xcal| = 1$ - treating $N$ as a real number, there would be a maximum at 
 \begin{equation}
@@ -3532,7 +3532,7 @@ we perform contrained optimization. Note that the set $\Uptheta = \left\{ \theta
 
 
 %\bibliographystyle{plain}
-%\bibliography{{../References/phd_bib}}
+%\bibliography{{../References/PhD_refs}}
 \printbibliography[heading=bibintoc]
 
 
