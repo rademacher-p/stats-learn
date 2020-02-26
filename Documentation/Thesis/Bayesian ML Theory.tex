@@ -607,13 +607,106 @@ and the minimum Bayes risk is
 
 
 
+
+
+
+
+
+
+
+
+\subsubsection{Model Posteriors}
+
+\todohi{Continuous? sums, PMFs...}
+
+
+
 Observe that the Bayesian distributions can be represented as $\Prm_{\xrm | \Drm} = \Erm_{\uptheta | \Drm}\big[ \Prm_{\xrm | \uptheta} \big] \equiv \mu_{\upthetam | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm} = \Erm_{\uptheta | \xrm,\Drm}\big[ \Prm_{\yrm | \xrm,\uptheta} \big] \equiv \mu_{\upthetac(\xrm) | \xrm,\Drm}$, the expected values of the corresponding clairvoyant distributions with respect to the model posteriors $\prm_{\upthetam | \Drm}$ and $\prm_{\upthetac(\xrm) | \xrm,\Drm}$, respectively. Also, $\Prm_{\yrm,\xrm | \Drm} = \Erm_{\uptheta | \Drm}\big[ \Prm_{\yrm,\xrm | \uptheta} \big] \equiv \mu_{\uptheta | \Drm}$. Thus, the Bayesian approach to prediction uses the model posterior given the observable random elements to integrate out the model dependency of the risk $\Rcal_{\Theta}(f ; \uptheta)$.
 
 \todomid{Consider notation $\mu_{\upthetac | \xrm,\Drm}(\xrm; \xrm,\Drm)$ !?!?}
 
+
+The relevant posteriors can be represented as
+\begin{IEEEeqnarray}{rCl}
+\prm_{\upthetam | \Yrm,\Xrm}(\thetam | Y,X) & = & \frac{\Erm_{\upthetac | \upthetam}\left[ \Prm_{\Yrm | \Xrm,\upthetac}(Y | X,\upthetac) \right](\thetam)}{\Prm_{\Yrm | \Xrm}(Y | X)} 
+\frac{\Prm_{\Xrm | \upthetam}(X | \thetam)}{\Prm_{\Xrm}(X)} \prm_{\upthetam}(\thetam) 
+\end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{rCl}
+%\prm_{\upthetac,\upthetam | \Yrm,\Xrm}(\thetac,\thetam | Y,X) & = & \frac{\Prm_{\Yrm | \Xrm,\upthetac}(Y | X,\thetac)}{\Prm_{\Yrm | \Xrm}(Y | X)} 
+%\frac{\Prm_{\Xrm | \upthetam}(X | \thetam)}{\Prm_{\Xrm}(X)} \prm_{\upthetac,\upthetam}(\thetac,\thetam) \\
+%& = & \prm_{\upthetac | \Yrm,\Xrm}(\thetac | Y,X) \prm_{\upthetam | \Xrm}(\thetam | X) 
+%\frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \Xrm}(\thetac | X)} \nonumber
+%\end{IEEEeqnarray}
+and
+\begin{IEEEeqnarray}{rCl}
+\prm_{\upthetac | \Yrm,\Xrm,\xrm}(\thetac | Y,X,x) & = &  
+\frac{\Erm_{\upthetam | \upthetac}\left[ \Prm_{\Xrm,\xrm | \upthetam}(X,x | \upthetam) \right](\thetac)}{\Prm_{\Xrm,\xrm}(X,x)} \frac{\Prm_{\Yrm | \Xrm,\upthetac}(Y | X,\thetac)}{\Prm_{\Yrm | \Xrm,\xrm}(Y | X,x)} \prm_{\upthetac}(\thetac) 
+\end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{rCl}
+%\prm_{\upthetac,\upthetam | \Yrm,\Xrm,\xrm}(\thetac,\thetam | Y,X,x) & = & \frac{\Prm_{\Yrm | \Xrm,\upthetac}(Y | X,\thetac)}{\Prm_{\Yrm | \Xrm,\xrm}(Y | X,x)} 
+%\frac{\Prm_{\Xrm,\xrm | \upthetam}(X,x | \thetam)}{\Prm_{\Xrm,\xrm}(X,x)} \prm_{\upthetac,\upthetam}(\thetac,\thetam) \\
+%& = & \prm_{\upthetac | \Yrm,\Xrm}(\thetac | Y,X) \prm_{\upthetam | \Xrm,\xrm}(\thetam | X,x) 
+%\frac{\Prm_{\Yrm | \Xrm}(Y | X)}{\Prm_{\Yrm | \Xrm,\xrm}(Y | X,x)}
+%\frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \Xrm}(\thetac | X)} \nonumber
+%\end{IEEEeqnarray}
+where $\Prm_{\Yrm | \Xrm} = \Erm_{\upthetam | \Xrm} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\Yrm | \Xrm,\upthetac} \big] \Big]$ and $\Prm_{\Yrm | \Xrm,\xrm} = \Erm_{\upthetam | \Xrm,\xrm} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\Yrm | \Xrm,\upthetac} \big] \Big]$.
+
+\todohi{marginal/conditional independence discuss? x independence!}
+
+
+
+
+
 Additionally, since $\Psi(\Drm)$ is a sufficient statistic for the model $\uptheta$, the Bayesian distributions of interest $\Prm_{\Drm}$, $\Prm_{\xrm | \Drm}$, and $\Prm_{\yrm | \xrm,\Drm}$ will also depend on $\Drm$ via $\Psi(\Drm)$; as such, the training data can be transformed into the empirical process $\uppsi$ for Bayesian prediction without incurring any additional risk. 
 
 For this approach, the distributions $\Prm_{\uppsi}$, $\Prm_{\xrm | \uppsi}$, and $\Prm_{\yrm | \xrm,\uppsi}$ are required. Note that $\Mcal\big( N \Psi(D) \big) \Prm_{\Drm | \uptheta}(D | \theta) = \Prm_{\uppsi | \uptheta}\big( \Psi(D) | \theta \big)$. Also, observe that the relevant posterior distributions satisfy $\prm_{\upthetam | \Drm}(D) = \prm_{\upthetam | \uppsi}\big( \Psi(D) \big)$ and $\prm_{\upthetac(x) | \xrm,\Drm}(x,D) = \prm_{\upthetac(x) | \xrm,\uppsi}\big( x,\Psi(D) \big)$; consequently, $\Prm_{\xrm | \Drm}(D) = \Prm_{\xrm | \uppsi}\big( \Psi(D) \big)$, and $\Prm_{\yrm | \xrm,\Drm}(x,D) = \Prm_{\yrm | \xrm,\uppsi}\big( x,\Psi(D) \big)$.
+
+
+
+The posteriors can be represented as
+\begin{IEEEeqnarray}{rCl}
+\prm_{\upthetam | \uppsic,\uppsim}(\thetam | \psic,\psim) & = & \frac{\Erm_{\upthetac | \upthetam}\left[ \Prm_{\uppsic | \uppsim,\upthetac}\big( \psic | \psim,\upthetac \big) \right](\thetam)}{\Prm_{\uppsic | \uppsim}\big( \psic | \psim \big)} 
+\frac{\Prm_{\uppsim | \upthetam}\big( \psim | \thetam \big)}{\Prm_{\uppsim}\big( \psim \big)} \prm_{\upthetam}(\thetam) \nonumber \\
+\end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{rCl}
+%\prm_{\upthetac,\upthetam | \uppsic,\uppsim}(\thetac,\thetam | \psic,\psim) & = & \frac{\Prm_{\uppsic | \uppsim,\upthetac}\big( \psic | \psim,\thetac \big)}{\Prm_{\uppsic | \uppsim}\big( \psic | \psim \big)} 
+%\frac{\Prm_{\uppsim | \upthetam}\big( \psim | \thetam \big)}{\Prm_{\uppsim}\big( \psim \big)} \prm_{\upthetac,\upthetam}(\thetac,\thetam) \\
+%& = & \prm_{\upthetac | \uppsic,\uppsim}\Big( \thetac | \psic,\psim \Big) \prm_{\upthetam | \uppsim}\Big( \thetam | \psim \Big) 
+%\frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \uppsim}\big( \thetac | \psim \big)} \nonumber
+%\end{IEEEeqnarray}
+and
+\begin{IEEEeqnarray}{rCl}
+\prm_{\upthetac | \uppsic,\uppsim,\xrm}(\thetac | \psic,\psim,x) & = & \frac{\prm_{\upthetam | \upthetac}\left[ \Prm_{\uppsim,\xrm | \upthetam}\big( \psim,x | \upthetam \big) \right](\thetac)}{\Prm_{\uppsim,\xrm}\big( \psim,x \big)} \frac{\Prm_{\uppsic | \uppsim,\upthetac}\big( \psic | \psim,\thetac \big)}{\Prm_{\uppsic | \uppsim,\xrm}\big( \psic | \psim,x \big)} 
+\prm_{\upthetac}(\thetac) \nonumber \\
+\end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{rCl}
+%\prm_{\upthetac,\upthetam | \uppsic,\uppsim,\xrm}(\thetac,\thetam | \psic,\psim,x) & = & \frac{\Prm_{\uppsic | \uppsim,\upthetac}\big( \psic | \psim,\thetac \big)}{\Prm_{\uppsic | \uppsim,\xrm}\big( \psic | \psim,x \big)} 
+%\frac{\Prm_{\uppsim,\xrm | \upthetam}\big( \psim,x | \thetam \big)}{\Prm_{\uppsim,\xrm}\big( \psim,x \big)} \prm_{\upthetac,\upthetam}(\thetac,\thetam) \nonumber \\
+%& = & \prm_{\upthetac | \uppsic,\uppsim}\Big( \thetac | \psic,\psim \Big) \prm_{\upthetam | \uppsim,\xrm}\Big( \thetam | \psim,x \Big) \nonumber \\
+%&& \quad \frac{\Prm_{\uppsic | \uppsim}\big( \psic | \psim \big)}{\Prm_{\uppsic | \uppsim,\xrm}\big( \psic | \psim,x \big)} \frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \uppsim}\big( \thetac | \psim \big)} 
+%\end{IEEEeqnarray}
+where $\Prm_{\uppsic | \uppsim} = \Erm_{\upthetam | \uppsim} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\uppsic | \uppsim,\upthetac} \big] \Big]$ and $\Prm_{\uppsic | \uppsim,\xrm} = \Erm_{\upthetam | \uppsim,\xrm} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\uppsic | \uppsim,\upthetac} \big] \Big]$.
+
+
+\todolo{conditional EP independence? product notation?}
+
+
+
+
+%Note that $\prm_{\upthetac | \Xrm} = \Erm_{\upthetam | \Xrm}\big[ \prm_{\upthetac | \upthetam} \big]$ and $\prm_{\upthetac | \uppsim} = \Erm_{\upthetam | \uppsim}\big[ \prm_{\upthetac | \upthetam} \big]$
+
+
+%\begin{IEEEeqnarray}{rCl}
+%\prm_{\upthetam | \Yrm,\Xrm}(\thetam | Y,X) & = & \frac{\Erm_{\upthetac | \upthetam} \left[ \Prm_{\Yrm | \Xrm,\upthetac}(Y | X,\thetac) \right]}{\Prm_{\Yrm | \Xrm}(Y | X)} 
+%\frac{\Prm_{\Xrm | \upthetam}(X | \thetam)}{\Prm_{\Xrm}(X)} \prm_{\upthetam}(\thetam) \\
+%& = & \prm_{\upthetam | \Xrm}(\thetam | X) 
+%\Erm_{\upthetac | \upthetam} \left[ \frac{\prm_{\upthetac | \Yrm,\Xrm}(\thetac | Y,X)}{\prm_{\upthetac | \Xrm}(\thetac | X)} \right] \nonumber
+%\end{IEEEeqnarray}
+
+% Note that $\prm_{\upthetac | \Xrm}(X) = \prm_{\upthetac | \uppsim}\big( \Psim(X) \big) = \Erm_{\upthetam | \Xrm}\big[ \prm_{\upthetac | \upthetam} \big](X)$.
+
+
+
 
 
 
@@ -645,64 +738,8 @@ It is important to note that this inequality holds for any number of training sa
 
 
 
-\subsection{Model Posteriors}
-
-\todohi{Location? Clean up...}
-
-\todohi{Continuous? sums, PMFs...}
-
-\todolo{Marginalize to thetam and thetac(x) dists?}
 
 
-%Using the marginal and conditional model representations, the Bayesian predicitive distributions analagous to the clairvoyant distributions can now be simplified as $\Prm_{\xrm | \Drm} = \mu_{\upthetam | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm} = \mu_{\upthetac(\xrm) | \xrm,\Drm}$.
-
-\begin{IEEEeqnarray}{rCl}
-\prm_{\upthetac,\upthetam | \Yrm,\Xrm}(\thetac,\thetam | Y,X)  & = & \frac{\Prm_{\Yrm | \Xrm,\upthetac}(Y | X,\thetac)}{\Prm_{\Yrm | \Xrm}(Y | X)} 
-\frac{\Prm_{\Xrm | \upthetam}(X | \thetam)}{\Prm_{\Xrm}(X)} \prm_{\upthetac,\upthetam}(\thetac,\thetam) \\
-& = & \prm_{\upthetac | \Yrm,\Xrm}(\thetac | Y,X) \prm_{\upthetam | \Xrm}(\thetam | X) 
-\frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \Xrm}(\thetac | X)} \nonumber
-\end{IEEEeqnarray}
-
-%\begin{IEEEeqnarray}{rCl}
-%\prm_{\upthetam | \Yrm,\Xrm}(\thetam | Y,X) & = & \frac{\Erm_{\upthetac | \upthetam} \left[ \Prm_{\Yrm | \Xrm,\upthetac}(Y | X,\thetac) \right]}{\Prm_{\Yrm | \Xrm}(Y | X)} 
-%\frac{\Prm_{\Xrm | \upthetam}(X | \thetam)}{\Prm_{\Xrm}(X)} \prm_{\upthetam}(\thetam) \\
-%& = & \prm_{\upthetam | \Xrm}(\thetam | X) 
-%\Erm_{\upthetac | \upthetam} \left[ \frac{\prm_{\upthetac | \Yrm,\Xrm}(\thetac | Y,X)}{\prm_{\upthetac | \Xrm}(\thetac | X)} \right] \nonumber
-%\end{IEEEeqnarray}
-
-\todolo{conditional EP independence? product notation?}
-
-\begin{IEEEeqnarray}{rCl}
-\prm_{\upthetac,\upthetam | \uppsic,\uppsim}(\thetac,\thetam | \psic,\psim) & = & \frac{\Prm_{\uppsic | \uppsim,\upthetac}\big( \psic | \psim,\thetac \big)}{\Prm_{\uppsic | \uppsim}\big( \psic | \psim \big)} 
-\frac{\Prm_{\uppsim | \upthetam}\big( \psim | \thetam \big)}{\Prm_{\uppsim}\big( \psim \big)} \prm_{\upthetac,\upthetam}(\thetac,\thetam) \\
-& = & \prm_{\upthetac | \uppsic,\uppsim}\Big( \thetac | \psic,\psim \Big) \prm_{\upthetam | \uppsim}\Big( \thetam | \psim \Big) 
-\frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \uppsim}\big( \thetac | \psim \big)} \nonumber
-\end{IEEEeqnarray}
-
-% Note that $\prm_{\upthetac | \Xrm}(X) = \prm_{\upthetac | \uppsim}\big( \Psim(X) \big) = \Erm_{\upthetam | \Xrm}\big[ \prm_{\upthetac | \upthetam} \big](X)$.
-
-Note that $\prm_{\upthetac | \Xrm} = \Erm_{\upthetam | \Xrm}\big[ \prm_{\upthetac | \upthetam} \big]$ and $\prm_{\upthetac | \uppsim} = \Erm_{\upthetam | \uppsim}\big[ \prm_{\upthetac | \upthetam} \big]$. Also, note that $\Prm_{\Yrm | \Xrm} = \Erm_{\upthetam | \Xrm} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\Yrm | \Xrm,\upthetac} \big] \Big]$ and $\Prm_{\uppsic | \uppsim} = \Erm_{\upthetam | \uppsim} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\uppsic | \uppsim,\upthetac} \big] \Big]$.
-
-
-\begin{IEEEeqnarray}{rCl}
-\prm_{\upthetac,\upthetam | \Yrm,\Xrm,\xrm}(\thetac,\thetam | Y,X,x) & = & \frac{\Prm_{\Yrm | \Xrm,\upthetac}(Y | X,\thetac)}{\Prm_{\Yrm | \Xrm,\xrm}(Y | X,x)} 
-\frac{\Prm_{\Xrm,\xrm | \upthetam}(X,x | \thetam)}{\Prm_{\Xrm,\xrm}(X,x)} \prm_{\upthetac,\upthetam}(\thetac,\thetam) \\
-& = & \prm_{\upthetac | \Yrm,\Xrm}(\thetac | Y,X) \prm_{\upthetam | \Xrm,\xrm}(\thetam | X,x) 
-\frac{\Prm_{\Yrm | \Xrm}(Y | X)}{\Prm_{\Yrm | \Xrm,\xrm}(Y | X,x)}
-\frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \Xrm}(\thetac | X)} \nonumber
-\end{IEEEeqnarray}
-
-\begin{IEEEeqnarray}{rCl}
-\prm_{\upthetac,\upthetam | \uppsic,\uppsim,\xrm}(\thetac,\thetam | \psic,\psim,x) & = & \frac{\Prm_{\uppsic | \uppsim,\upthetac}\big( \psic | \psim,\thetac \big)}{\Prm_{\uppsic | \uppsim,\xrm}\big( \psic | \psim,x \big)} 
-\frac{\Prm_{\uppsim,\xrm | \upthetam}\big( \psim,x | \thetam \big)}{\Prm_{\uppsim,\xrm}\big( \psim,x \big)} \prm_{\upthetac,\upthetam}(\thetac,\thetam) \nonumber \\
-& = & \prm_{\upthetac | \uppsic,\uppsim}\Big( \thetac | \psic,\psim \Big) \prm_{\upthetam | \uppsim,\xrm}\Big( \thetam | \psim,x \Big) \nonumber \\
-&& \quad \frac{\Prm_{\uppsic | \uppsim}\big( \psic | \psim \big)}{\Prm_{\uppsic | \uppsim,\xrm}\big( \psic | \psim,x \big)} \frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \uppsim}\big( \thetac | \psim \big)} 
-\end{IEEEeqnarray}
-
-Note that $\Prm_{\Yrm | \Xrm,\xrm} = \Erm_{\upthetam | \Xrm,\xrm} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\Yrm | \Xrm,\upthetac} \big] \Big]$ and also that $\Prm_{\uppsic | \uppsim,\xrm} = \Erm_{\upthetam | \uppsim,\xrm} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\uppsic | \uppsim,\upthetac} \big] \Big]$.
-
-
-\todohi{marginal/conditional independence discuss? x independence!}
 
 
 
@@ -2324,7 +2361,7 @@ By the continuous-domain Dirichlet process properties detailed in Appendix \ref{
 
 \subsection{Predictive PDF, $\prm_{\yrm | \xrm,\Drm}$}
 
-\todohi{predictive model posterior}
+\todohi{predictive model posterior, add x|D}
 
 By the properties of the Dirichlet process proven in Appendix \ref{app:DP_post}, the model conditioned on the training data $\Drm$ is Dirichlet with concentration $\alpha_0 + N$ and mean function 
 \begin{IEEEeqnarray}{rCl}
@@ -2771,7 +2808,7 @@ where the multinomial theorem \cite{graham} has been used.
 
 \subsection{Conditioned on its Aggregation}
 
-If the Empirical random process $\uppsi$ is conditioned on its aggregation $\uppsim$ over the partition $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, the distinct segements $\uppsi_z$ become independent random processes, such that for $\psi \in \Uppsi'(\psim)$,
+If the Empirical random process $\uppsi$ is conditioned on its aggregation $\uppsim$ over the partition $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, the distinct segments $\uppsi_z$ become independent random processes, such that for $\psi \in \Uppsi'(\psim)$,
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\uppsi | \uppsim,\uptheta}(\psi | \psim,\theta) & = & \frac{\Prm_{\uppsi,\uppsim | \uptheta}(\psi,\psim | \theta)}{\Prm_{\uppsim | \uptheta}(\psim | \theta)} \equiv \frac{\Mcal(N \psi)}{\Mcal(N \psim)} \left( \frac{\prod_{y \in \Ycal} \theta(y)^{\psi(y)}}{\prod_{z \in \Zcal} \thetam(z)^{\psim(z)}} \right)^N \\
 & = & \prod_{z \in \Zcal} \Bigg[ \Mcal(N \psi_z) \left(\frac{\prod_{y \in \Scal_z} \theta_z(y)^{\psi_z(y)}}{\thetam(z)^{\psim(z)}} \right)^N \Bigg] \nonumber \\
@@ -3120,7 +3157,7 @@ where
 \begin{equation}
 \mu_{\upthetam | \Drm} = \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpham + \left(\frac{N}{\alpha_0 + N}\right) \Psim(D) 
 \end{equation}
-and $\Psim(z;\Drm) = \int_{\Scal_z} \Psi(y;D) {\drm}y = N^{-1} \sum_{n=1}^N \chi(\Drm_n;\Scal_z)$. $\chi$ is the indicator function
+and $\Psim(z;D) = \int_{\Scal_z} \Psi(y;D) {\drm}y = N^{-1} \sum_{n=1}^N \chi(D_n;\Scal_z)$. $\chi$ is the indicator function
 \begin{equation}
 \chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S.  \end{cases}
 \end{equation}
