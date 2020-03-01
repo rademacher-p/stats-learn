@@ -2472,7 +2472,7 @@ Recall that $\prm_{\xrm | \uppsi} \equiv \mu_{\upthetam | \uppsim}$.
 
 \todohigh{CONFIRM?}
 
-Also, it can be shown that $\upthetac(x) | \xrm,\Drm \sim \upthetac(x) | \Drm \sim \DP\Big(\delta(0)^{-1} \alpha_0 \alpham(x), \mu_{\upthetac(x) | \Drm} \Big)$, where
+Also, it can be shown that $\upthetac(x) | \xrm,\Drm \sim \upthetac(x) | \Drm \sim \DP\big(\delta(0)^{-1} \alpha_0 \alpham(x), \mu_{\upthetac(x) | \Drm} \big)$, where
 \begin{IEEEeqnarray}{rCl}
 \mu_{\upthetac(x) | \Drm} & = & \left(\frac{\alpha_0 \alpham(x)}{\alpha_0 \alpham(x)+N \Psim(x;\Drm)}\right) \alphac(x) + \left(\frac{N \Psim(x;\Drm)}{\alpha_0 \alpham(x)+N \Psim(x;\Drm)}\right) \Psic(x;\Drm) \nonumber \;.
 \end{IEEEeqnarray}
@@ -2527,9 +2527,9 @@ Note that the marginal PDF's are $\prm_{\Xrm_n} = \prm_{\xrm} = \mu_{\upthetam} 
 PGR: express conditional below using Dir aggregation conditional independence properties?
 
 
-To find the distribution $\prm_{\Yrm | \Xrm}$, note that the independent observations $\Yrm_n | \Xrm_n,\upthetac$ are conditionally independent of $\Xrm_i$, $i \neq n$, and are characterized by the joint processes $\upthetac(x) \sim \DP\big(\alpha_0 \alpham(x), \alphac(x)\big)$, such that 
+To find the distribution $\prm_{\Yrm | \Xrm}$, note that the independent observations $\Yrm_n | \Xrm_n,\upthetac$ are conditionally independent of $\Xrm_i$, $i \neq n$, and are characterized by the joint processes $\upthetac(x) \sim \DP\big(\delta(0)^{-1} \alpha_0 \alpham(x), \alphac(x)\big)$, such that 
 
-PGR: Bayes...
+PGR: Bayes...?!?!?!?!!
 
 \begin{IEEEeqnarray}{rCl}
 \prm_{\Yrm | \Xrm}(Y | X) & = & \Erm_{\upthetac}\left[ \prod_{n=1}^N \upthetac\big( Y_n;X_n \big) \right] \\
@@ -2590,11 +2590,7 @@ and
 \qquad = \frac{1}{1 + \alpha_0^{-1}} \Big( (\alpha_0^{-1} + N^{-1}) \alpha(y,x) \delta(y-y') \delta(x-x') + (1 - N^{-1}) \alpha(y,x) \alpha(y',x') \Big) \nonumber \;.
 \end{IEEEeqnarray}
 
-
-Observe that by the aggregation principle, $\uppsim \sim \DEP(N,\alpha_0,\alpham)$ is a DEP over the set $\Xcal$.
-
-Additionally, the 1-dimensional subsets conditioned on the marginalized DEP are characterized as
-
+Observe that by the aggregation principle, $\uppsim \sim \DEP(N,\alpha_0,\alpham)$ is a DEP over the set $\Xcal$. Additionally, the 1-dimensional subsets conditioned on the marginalized DEP are characterized as
 \begin{equation}
 \uppsic(x) \big| \uppsim(x) \sim \DEP\left( \frac{N \uppsim(x)}{\delta(0)}, \frac{\alpha_0 \alpham(x)}{\delta(0)}, \alphac(x) \right)
 \end{equation}
@@ -3213,7 +3209,7 @@ The aggregation property has been stated for countable partitions of the process
 
 PGR
 
-Additionally, when also conditioned on the aggregation $\uppsim$, the normalized random processes $\uppsic(x) \equiv \uppsi(\cdot,x) / \uppsim(x)$ are independent continuous-domain Empirical processes, $\uppsic(x) | \uppsim(x), \upthetac(x) \sim \EP\big(N \uppsim(x) / \delta(0), \upthetac(x)\big)$, where $\thetac(x) \equiv \theta(\cdot,x) / \thetam(x) \in \Pcal(\Ycal)$.
+Additionally, when also conditioned on the aggregation $\uppsim$, the normalized random processes $\uppsic(x) \equiv \uppsi(\cdot,x) / \uppsim(x)$ are independent continuous-domain Empirical processes, $\uppsic(x) | \uppsim(x), \upthetac(x) \sim \EP\big(\delta(0)^{-1} N \uppsim(x), \upthetac(x)\big)$, where $\thetac(x) \equiv \theta(\cdot,x) / \thetam(x) \in \Pcal(\Ycal)$.
 
 
 
@@ -3230,7 +3226,7 @@ Let $x \equiv i\Delta$ and ${\drm}x \equiv \Delta$; observe that as $\Delta \to 
 PGR ??
 
 \begin{equation}
-\uppsic(x) | \uppsim(x), \upthetac(x) \sim \EP\big(N \Delta \uppsim(x), \upthetac(x)\big)
+\uppsic(x) | \uppsim(x), \upthetac(x) \sim \EP\big(\Delta N \uppsim(x), \upthetac(x)\big)
 \end{equation}
 
 
@@ -3354,7 +3350,7 @@ The aggregation property has been stated for countable partitions of the process
 
 \todohi{CONFIRM??}
 
-Additionally, the normalized functions $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x) \in \Pcal(\Ycal)$ are independent continuous-domain Dirichlet processes, $\upthetac(x) \sim \DP\big(\alpha_0 \alpham(x), \alphac(x)\big)$, where $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x) \in \Pcal(\Ycal)$, and are independent of the aggregation process $\upthetam$.
+Additionally, the normalized functions $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x) \in \Pcal(\Ycal)$ are independent continuous-domain Dirichlet processes, $\upthetac(x) \sim \DP\big(\delta(0) ^{-1} \alpha_0 \alpham(x), \alphac(x)\big)$, where $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x) \in \Pcal(\Ycal)$, and are independent of the aggregation process $\upthetam$.
 
 
 
@@ -3429,7 +3425,7 @@ The correlation function is
 \subsection{Continuous aggregation}
 
 
-\todohigh{FIXXXXXXXX!!!!}
+\todohigh{FIXXXXXXXX!!!! Use delta(0) notation as EP...}
 
 If $\uppsi$ is a Dirichlet-Multinomial process over a Euclidean space $\Ycal$, then conditioning on its discrete aggregation $\uppsim$ produces independent Dirichlet-Multinomial processes $\big\{ \uppsi(y) : y \in \Scal_z \big\} \sim \DMP\Big( \uppsim(z),\big\{ \alpha(y) : y \in \Scal_z \big\} \Big)$ over the partition spaces $\Scal_z$.
 
