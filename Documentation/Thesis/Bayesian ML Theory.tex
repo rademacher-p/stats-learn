@@ -2528,6 +2528,9 @@ PGR: express conditional below using Dir aggregation conditional independence pr
 
 
 To find the distribution $\prm_{\Yrm | \Xrm}$, note that the independent observations $\Yrm_n | \Xrm_n,\upthetac$ are conditionally independent of $\Xrm_i$, $i \neq n$, and are characterized by the joint processes $\upthetac(x) \sim \DP\big(\alpha_0 \alpham(x), \alphac(x)\big)$, such that 
+
+PGR: Bayes...
+
 \begin{IEEEeqnarray}{rCl}
 \prm_{\Yrm | \Xrm}(Y | X) & = & \Erm_{\upthetac}\left[ \prod_{n=1}^N \upthetac\big( Y_n;X_n \big) \right] \\
 & = & \alphac\big( Y_1;X_1 \big) \prod_{n=2}^N \frac{\alpha_0 \alpham(X_n) \alphac\big( Y_n;X_n \big) + \sum_{i=1}^{n-1} \delta\big( Y_n-Y_i \big) \delta\big( X_n-X_i \big)}{\alpha_0 \alpham\big( X_n \big) + \sum_{i=1}^{n-1} \delta\big( X_n-X_i \big)} 
@@ -2609,10 +2612,12 @@ Additionally, the 1-dimensional subsets conditioned on the marginalized DEP are 
 
 PGR: COPIED, incomplete
 
-\begin{IEEEeqnarray}{L}
-\Erm_{\yrm | \xrm,\Drm} \big[ \Lcal(h,\yrm) \big] = \int_{\Ycal} \Lcal(h,y) \prm_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) {\drm}y \\
-= \frac{\alpha_0 \alpham(\xrm) \int_{\Ycal} \alphac(y;\xrm) \Lcal(h,y) {\drm}y + N \Psim(\xrm;\Drm) \int_{\Ycal} \Psic(y;\xrm;\Drm) \Lcal(h,y) {\drm}y}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)} \nonumber \\
-= \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)}\right) \Erm_{\yrm | \xrm}\big[ \Lcal(h,\yrm) \big] + \left(\frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)}\right) \frac{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \Lcal\big( h,\Yrm_n \big)}{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big)} \nonumber \;.
+\begin{IEEEeqnarray}{rCl}
+\Erm_{\yrm | \xrm,\Drm} \big[ \Lcal(h,\yrm) \big] & = & \int_{\Ycal} \Lcal(h,y) \prm_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) {\drm}y \\
+& = & \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)}\right) \int_{\Ycal} \alphac(y;\xrm) \Lcal(h,y) {\drm}y \\
+&& \qquad + \left(\frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)}\right) \int_{\Ycal} \Psic(y;\xrm;\Drm) \Lcal(h,y) {\drm}y \nonumber \\
+& = & \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)}\right) \Erm_{\yrm | \xrm}\big[ \Lcal(h,\yrm) \big] \\
+&& \qquad + \left(\frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)}\right) \frac{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \Lcal\big( h,\Yrm_n \big)}{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big)} \nonumber \;.
 \end{IEEEeqnarray}
 
 
@@ -2677,16 +2682,16 @@ PGR: D PERSPECTIVE
 \begin{IEEEeqnarray}{L}
 \Erm_{\xrm,\Drm} \left[ \mu_{\yrm | \xrm,\Drm}^2 \right] = \Erm_{\xrm} \Erm_{\Drm | \xrm} \left[ \mu_{\yrm | \xrm,\Drm}^2 \right] \\
 \quad = \Erm_{\xrm} \left[ \Erm_{\Drm | \xrm} \left[ \left( \frac{\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big)}{\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big)} \right)^2 \right] \right] \nonumber \\
-\quad = \Erm_{\xrm} \left[ \Erm_{\Drm} \left[ \frac{ \alpha_0 \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 }{\alpha_0 \alpham(\xrm) \left(\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0 + N)} \right] \right] \nonumber \\
-\quad = \Erm_{\xrm} \left[ \Erm_{\Xrm} \left[ \frac{\alpha_0 \Erm_{\Yrm | \Xrm} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 \right] }{\alpha_0 \alpham(\xrm) \left(\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0+N)} \right] \right] \nonumber 
+\quad = \Erm_{\xrm} \left[ \Erm_{\Drm} \left[ \frac{\left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 }{\alpham(\xrm) \left(\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0 + N)} \right] \right] \nonumber \\
+\quad = \Erm_{\xrm} \left[ \Erm_{\Xrm} \left[ \frac{\Erm_{\Yrm | \Xrm} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 \right] }{\alpham(\xrm) \left(\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0+N)} \right] \right] \nonumber 
 \end{IEEEeqnarray}
 
 Evaluating the expectation over $\Yrm$ given $\Xrm$, we have
 \begin{IEEEeqnarray}{L}
 \Erm_{\Yrm | \Xrm} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 \right] \\ 
-= \alpha_0 \alpham(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} \sum_{n=1}^N \mu_{\yrm | \xrm}\big( \Xrm_n \big) \delta\big( \xrm - \Xrm_n \big) \nonumber \\
+= \alpha_0^2 \alpham(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} \sum_{n=1}^N \mu_{\yrm | \xrm}\big( \Xrm_n \big) \delta\big( \xrm - \Xrm_n \big) \nonumber \\
 \quad + \sum_{n=1}^N \Erm_{\yrm|\xrm}\big[ \yrm^2 \big]\big( \Xrm_n \big) \delta\big( \xrm - \Xrm_n \big)^2 \nonumber \\
-\quad + \sum_{n \neq n'} \frac{\alpha'\big( \Xrm_n \big) \mu_{\yrm | \xrm}\big(\Xrm_n \big) \alpha'\big( \Xrm_{n'} \big) \mu_{\yrm | \xrm}\big( \Xrm_{n'} \big) + \alpha'\big( \Xrm_n \big) \Erm_{\yrm|\xrm}\big[ \yrm^2 \big]\big( \Xrm_n \big) \delta\big( \Xrm_n-\Xrm_{n'} \big)}{\alpha'\big( \Xrm_n \big) \alpha'\big( \Xrm_{n'} \big) + \alpha'\big( \Xrm_n \big) \delta\big( \Xrm_n-\Xrm_{n'} \big)} \nonumber \\
+\quad + \sum_{n \neq n'} \frac{\alpha_0 \alpham\big( \Xrm_{n'} \big) \mu_{\yrm | \xrm}\big(\Xrm_n \big) \mu_{\yrm | \xrm}\big( \Xrm_{n'} \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big]\big( \Xrm_n \big) \delta\big( \Xrm_n-\Xrm_{n'} \big)}{\alpha_0 \alpham\big( \Xrm_{n'} \big) + \delta\big( \Xrm_n-\Xrm_{n'} \big)} \nonumber \\
 \qquad \quad \delta\big( \xrm - \Xrm_n \big) \delta\big( \xrm - \Xrm_{n'} \big) \nonumber \\
 = \ldots \nonumber \\
 = \alpha_0 \alpham(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big)^2 \nonumber \\
