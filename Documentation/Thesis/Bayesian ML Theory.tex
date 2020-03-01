@@ -2393,7 +2393,7 @@ depends only on the conditional models $\upthetac(x)$. The dependency on the dat
 
 The same bijection can be used to decompose the empirical process into marginal and conditional empirical processes. The ``marginalized'' random process $\uppsim \in \Uppsim \subset \Pcal(\Xcal)$ is now defined as $\uppsim \equiv \int_{\Ycal} \uppsi(y,\cdot) {\drm}y$. Using the aggregation property of empirical processes detailed in Appendix \ref{app:EP}, it can be shown that conditioned on the model $\uptheta$, the marginal model is also an Empirical process, $\uppsim | \upthetam \sim \EP(N,\upthetam)$. Note the conditional independence from $\upthetac$. 
 
-Additionally, given the model $\uptheta$, the conditional processes $\uppsic \in \Uppsic$ are independent Empirical processes $\uppsic(x) | \uppsim(x),\upthetac(x) \sim \EP\big( N \uppsim(x) / \delta(0),\upthetac(x) \big)$. They are independent of the marginal model $\upthetam$.
+Additionally, given the model $\uptheta$, the conditional processes $\uppsic \in \Uppsic$ are independent Empirical processes $\uppsic(x) | \uppsim(x),\upthetac(x) \sim \EP\big( \delta(0)^{-1} N \uppsim(x),\upthetac(x) \big)$. They are independent of the marginal model $\upthetam$.
 
 \todohigh{CHECKKKKKKK}
 
@@ -2420,7 +2420,7 @@ The model is characterized by a Dirichlet process $\uptheta \sim \DP(\alpha_0, \
 and the correlation function is
 \begin{IEEEeqnarray}{rCl}
 \Erm_{\uptheta}\big[ \uptheta(y,x) \uptheta(y',x') \big] & = & \frac{\alpha(y,x) \delta(y-y')\delta(x-x') + \alpha_0 \alpha(y,x) \alpha(y',x')}{\alpha_0+1} \\
-& = & \frac{1}{\alpha_0+1} \alpha(y,x) \delta(y-y')\delta(x-x') + \frac{\alpha_0}{\alpha_0+1} \alpha(y,x) \alpha(y',x') \;.
+& = & \frac{1}{\alpha_0+1} \alpha(y,x) \delta(y-y')\delta(x-x') + \frac{\alpha_0}{\alpha_0+1} \alpha(y,x) \alpha(y',x') \nonumber \;.
 \end{IEEEeqnarray}
 The covariance function is thus
 \begin{IEEEeqnarray}{rCl}
@@ -2430,9 +2430,9 @@ The covariance function is thus
 
 \subsubsection{Marginal and Conditional Distributions}
 
-The marginal distribution $\upthetam$ and the conditional distribution $\upthetac$ are also of interest. Define the bijection $\alpha \Leftrightarrow (\alpham,\alphac)$, where $\alpham \equiv \int_{\Ycal} \alpha(y,\cdot) {\drm}y$, and $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x)$ for each $x \in \Xcal$. Again, $\alpham \in \Pcal(\Xcal)$ and $\alphac \in \Pcal(\Ycal)^{\Xcal}$.
+The marginal distribution $\upthetam$ and the conditional distribution $\upthetac$ are also of interest. Define the bijection $\alpha \Leftrightarrow (\alpham,\alphac)$, where $\alpham \equiv \int_{\Ycal} \alpha(y,\cdot) {\drm}y$ (and $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x)$) for each $x \in \Xcal$. Again, $\alpham \in \Pcal(\Xcal)$ and $\alphac \in \Pcal(\Ycal)^{\Xcal}$.
 
-By the continuous-domain Dirichlet process properties detailed in Appendix \ref{app:DP}, $\upthetam \sim \DP(\alpha_0,\alpham)$ is a Dirichlet random process parameterized by concentration $\alpha_0$ and distribution $\alpham$; observe that the PDF $\prm_{\xrm} = \mu_{\upthetam} = \alpham$. Also, the functions $\upthetac(x) \sim \DP\big(\alpha_0 \alpham(x), \alphac(x)\big)$ are independent Dirichlet processes and are independent of $\upthetam$ as well. Note that $\prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$. 
+By the continuous-domain Dirichlet process properties detailed in Appendix \ref{app:DP}, $\upthetam \sim \DP(\alpha_0,\alpham)$ is a Dirichlet random process parameterized by concentration $\alpha_0$ and distribution $\alpham$; observe that the PDF $\prm_{\xrm} = \mu_{\upthetam} = \alpham$. Also, the functions $\upthetac(x) \sim \DP\big(\delta(0)^{-1} \alpha_0 \alpham(x), \alphac(x)\big)$ are independent Dirichlet processes and are independent of $\upthetam$ as well. Note that $\prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$. 
 
 
 
@@ -2472,12 +2472,12 @@ Recall that $\prm_{\xrm | \uppsi} \equiv \mu_{\upthetam | \uppsim}$.
 
 \todohigh{CONFIRM?}
 
-Also, it can be shown that $\upthetac(x) | \xrm,\Drm \sim \upthetac(x) | \Drm \sim \DP\big(\alpha_0 \alpham(x), \mu_{\upthetac(x) | \Drm} \big)$, where
+Also, it can be shown that $\upthetac(x) | \xrm,\Drm \sim \upthetac(x) | \Drm \sim \DP\Big(\delta(0)^{-1} \alpha_0 \alpham(x), \mu_{\upthetac(x) | \Drm} \Big)$, where
 \begin{IEEEeqnarray}{rCl}
 \mu_{\upthetac(x) | \Drm} & = & \left(\frac{\alpha_0 \alpham(x)}{\alpha_0 \alpham(x)+N \Psim(x;\Drm)}\right) \alphac(x) + \left(\frac{N \Psim(x;\Drm)}{\alpha_0 \alpham(x)+N \Psim(x;\Drm)}\right) \Psic(x;\Drm) \nonumber \;.
 \end{IEEEeqnarray}
 
-Using the empirical statistic representation, observe that $ \upthetac(x) | \xrm,\uppsim,\uppsic \sim \upthetac(x) | \uppsim(x),\uppsic(x) \sim \DP\big(\alpha_0 \alpham(x), \mu_{\upthetac(x) | \uppsim(x),\uppsic(x)} \big)$, where
+Using the empirical statistic representation, observe that $\upthetac(x) | \xrm,\uppsim,\uppsic \sim \upthetac(x) | \uppsim(x),\uppsic(x) \sim \DP\Big( \delta(0)^{-1} \big(\alpha_0 \alpham(x) + N \uppsim(x) \big), \mu_{\upthetac(x) | \uppsim(x),\uppsic(x)} \Big)$, where
 \begin{IEEEeqnarray}{rCl}
 \mu_{\upthetac(x) | \uppsim(x),\uppsic(x)} & = & \left(\frac{\alpha_0 \alpham(x)}{\alpha_0 \alpham(x)+N \uppsim(x)}\right) \alphac(x) + \left(\frac{N \uppsim(x)}{\alpha_0 \alpham(x)+N \uppsim(x)}\right) \uppsic(x) \nonumber \;.
 \end{IEEEeqnarray}
@@ -2559,7 +2559,7 @@ and
 \quad = \frac{\delta(x-x')}{\alpha_0 \alpham(x) + \delta(x-x')} \alphac(y;x) \delta(y-y') + \frac{\alpha_0 \alpham(x)}{\alpha_0 \alpham(x) + \delta(x-x')} \alphac(y;x) \alpha(y';x') \nonumber
 \end{IEEEeqnarray}
 
-\todomid{show via DP properties?}
+\todohigh{SHOW USING FULL DP CORRELATION FORMULA! SAME FOR EP, DEP!!!}
 
 and the first and second order moments of interest are
 \begin{equation}
@@ -2596,7 +2596,7 @@ Observe that by the aggregation principle, $\uppsim \sim \DEP(N,\alpha_0,\alpham
 Additionally, the 1-dimensional subsets conditioned on the marginalized DEP are characterized as
 
 \begin{equation}
-\uppsic(x) \Big| \uppsim(x) \sim \DEP\left( \frac{\uppsim(x)}{\delta(0)}, \alpha_0 \alpham(x) / \delta(0), \alphac(x) \right)
+\uppsic(x) \big| \uppsim(x) \sim \DEP\left( \frac{N \uppsim(x)}{\delta(0)}, \frac{\alpha_0 \alpham(x)}{\delta(0)}, \alphac(x) \right)
 \end{equation}
 
 \todohigh{FIXXXX}
@@ -2679,11 +2679,10 @@ and the two terms are independently evaluated.
 
 PGR: D PERSPECTIVE
 
-\begin{IEEEeqnarray}{L}
-\Erm_{\xrm,\Drm} \left[ \mu_{\yrm | \xrm,\Drm}^2 \right] = \Erm_{\xrm} \Erm_{\Drm | \xrm} \left[ \mu_{\yrm | \xrm,\Drm}^2 \right] \\
-\quad = \Erm_{\xrm} \left[ \Erm_{\Drm | \xrm} \left[ \left( \frac{\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big)}{\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big)} \right)^2 \right] \right] \nonumber \\
-\quad = \Erm_{\xrm} \left[ \Erm_{\Drm} \left[ \frac{\left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 }{\alpham(\xrm) \left(\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0 + N)} \right] \right] \nonumber \\
-\quad = \Erm_{\xrm} \left[ \Erm_{\Xrm} \left[ \frac{\Erm_{\Yrm | \Xrm} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 \right] }{\alpham(\xrm) \left(\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0+N)} \right] \right] \nonumber 
+\begin{IEEEeqnarray}{rCl}
+\Erm_{\xrm,\Drm} \left[ \mu_{\yrm | \xrm,\Drm}^2 \right] & = & \Erm_{\xrm,\Drm} \left[ \left( \frac{\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big)}{\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big)} \right)^2 \right] \nonumber \\
+& = & \Erm_{\xrm} \left[ \Erm_{\Drm} \left[ \frac{\left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 }{\alpham(\xrm) \left(\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0 + N)} \right] \right] \nonumber \\
+& = & \Erm_{\xrm} \left[ \Erm_{\Xrm} \left[ \frac{\Erm_{\Yrm | \Xrm} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 \right] }{\alpham(\xrm) \left(\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0+N)} \right] \right] \nonumber 
 \end{IEEEeqnarray}
 
 Evaluating the expectation over $\Yrm$ given $\Xrm$, we have
@@ -2694,7 +2693,7 @@ Evaluating the expectation over $\Yrm$ given $\Xrm$, we have
 \quad + \sum_{n \neq n'} \frac{\alpha_0 \alpham\big( \Xrm_{n'} \big) \mu_{\yrm | \xrm}\big(\Xrm_n \big) \mu_{\yrm | \xrm}\big( \Xrm_{n'} \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big]\big( \Xrm_n \big) \delta\big( \Xrm_n-\Xrm_{n'} \big)}{\alpha_0 \alpham\big( \Xrm_{n'} \big) + \delta\big( \Xrm_n-\Xrm_{n'} \big)} \nonumber \\
 \qquad \quad \delta\big( \xrm - \Xrm_n \big) \delta\big( \xrm - \Xrm_{n'} \big) \nonumber \\
 = \ldots \nonumber \\
-= \alpha_0 \alpham(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big)^2 \nonumber \\
+= \alpha_0^2 \alpham(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big)^2 \nonumber \\
 \quad + \frac{\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 + \Erm_{\yrm|\xrm}\big[ \yrm^2  \big] \delta(0)}{\alpha_0 \alpham(\xrm) + \delta(0)} \sum_{n \neq n'} \delta\big( \xrm - \Xrm_n \big) \delta\big( \xrm - \Xrm_{n'} \big) \nonumber \\
 \ldots \nonumber \\
 = \frac{\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big)}{\alpha_0 \alpham(\xrm) + \delta(0)} \nonumber \\
@@ -2702,7 +2701,6 @@ Evaluating the expectation over $\Yrm$ given $\Xrm$, we have
 \end{IEEEeqnarray}
 
 
-PGR: Y given X PDFs, moments??? In PDF section, or in Appendix?
 
 
 
@@ -2711,27 +2709,27 @@ PGR: Y given X PDFs, moments??? In PDF section, or in Appendix?
 Plugging,
 \begin{IEEEeqnarray}{L}
 \Erm_{\xrm,\Drm} \Big[ \mu_{\yrm | \xrm,\Drm}^2 \Big] \\
-\quad = \Erm_{\xrm} \left[ \Erm_{\Xrm} \left[ \frac{\alpha_0 \Erm_{\Yrm | \Xrm} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 \right] }{\alpha_0 \alpham(\xrm) \left(\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0+N)} \right] \right] \nonumber \\
-\quad = \Erm_{\xrm} \left[ \frac{\alpha_0 \Erm_{\Xrm} \left[ \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) + \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \left( \alpha_0 \alpham(\xrm) + \delta(0) + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \right) \right] }{\alpha_0 \alpham(\xrm) \big( \alpha_0 \alpham(\xrm) + \delta(0) \big) (\alpha_0+N)} \right] \nonumber 
+\quad = \Erm_{\xrm} \left[ \Erm_{\Xrm} \left[ \frac{\Erm_{\Yrm | \Xrm} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 \right] }{\alpham(\xrm) \left(\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0+N)} \right] \right] \nonumber \\
+\quad = \Erm_{\xrm} \left[ \frac{\Erm_{\Xrm} \left[ \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) + \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \left( \alpha_0 \alpham(\xrm) + \delta(0) + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \right) \right] }{\alpham(\xrm) \big( \alpha_0 \alpham(\xrm) + \delta(0) \big) (\alpha_0+N)} \right] \nonumber 
 \end{IEEEeqnarray}
 
 Evaluating the expectation over $\Xrm$,
 \begin{IEEEeqnarray}{L}
 \Erm_{\Xrm} \left[ \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) + \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \left( \alpha_0 \alpham(\xrm) + \delta(0) + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \right) \right] \nonumber \\
-\quad = \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N \frac{\alpha_0 \alpham(\xrm)}{\alpha_0} + \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \left( \alpha_0 \alpham(\xrm) + \delta(0) + N \frac{\alpha_0 \alpham(\xrm)}{\alpha_0} \right) \nonumber \\
-\quad = \frac{\alpha_0 \alpham(\xrm)}{\alpha_0} \Big( \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N + \mu_{\yrm | \xrm}^2 \big( \alpha_0 \alpha_0 \alpham(\xrm) + \alpha_0 \delta(0) + N \alpha_0 \alpham(\xrm) \big) \Big) \nonumber
+\quad = \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N \alpham(\xrm) + \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \big( \alpha_0 \alpham(\xrm) + \delta(0) + N \alpham(\xrm) \big) \nonumber \\
+\quad = \alpham(\xrm) \Big( \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N + \mu_{\yrm | \xrm}^2 \alpha_0 \big( \alpha_0 \alpham(\xrm) + \delta(0) + N \alpham(\xrm) \big) \Big) \nonumber
 \end{IEEEeqnarray}
 
 Plugging,
 \begin{IEEEeqnarray}{L}
 \Erm_{\xrm,\Drm} \Big[ \mu_{\yrm | \xrm,\Drm}^2 \Big] \\
-\quad = \Erm_{\xrm} \left[ \frac{\Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N + \mu_{\yrm | \xrm}^2 \big( \alpha_0 \alpha_0 \alpham(\xrm) + \alpha_0 \delta(0) + N \alpha_0 \alpham(\xrm) \big)}{ \big( \alpha_0 \alpham(\xrm) + \delta(0) \big) (\alpha_0+N)} \right] \nonumber
+\quad = \Erm_{\xrm} \left[ \frac{\Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N + \mu_{\yrm | \xrm}^2 \alpha_0 \big( \alpha_0 \alpham(\xrm) + \delta(0) + N \alpham(\xrm) \big)}{ \big( \alpha_0 \alpham(\xrm) + \delta(0) \big) (\alpha_0+N)} \right] \nonumber
 \end{IEEEeqnarray}
 
 Combining with the second moment produces the risk,
 \begin{IEEEeqnarray}{L}
 \Rcal^* = \Erm_{\xrm,\Drm} \Big[ \Erm_{\yrm | \xrm,\Drm}\big[ \yrm^2 \big] - \mu_{\yrm | \xrm,\Drm}^2 \Big] \\
-= \Erm_{\xrm} \left[ \frac{\alpha_0 \alpha_0 \alpham(\xrm) + \alpha_0 \delta(0) + N \alpha_0 \alpham(\xrm)}{(\alpha_0+N) \big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \Sigma_{\yrm | \xrm} \right] \nonumber \\
+= \Erm_{\xrm} \left[ \frac{\alpha_0 \big( \alpha_0 \alpham(\xrm) + \delta(0) + N \alpham(\xrm) \big)}{(\alpha_0+N) \big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \Sigma_{\yrm | \xrm} \right] \nonumber \\
 = \Erm_{\xrm} \left[ \frac{\alpham(\xrm) + (\alpha_0+N)^{-1} \delta(0)}{\alpham(\xrm) + \alpha_0^{-1} \delta(0)} \Sigma_{\yrm | \xrm} \right] \nonumber
 \end{IEEEeqnarray}
 
@@ -2796,39 +2794,38 @@ Combining with the second moment produces the risk,
 PGR: Discuss Dirac deltas!!!
 
 
-PGR: DMP PERSPECTIVE???
+PGR: DEP PERSPECTIVE???
 
-To perform the expectation over the Dirichlet-Multinomial process $\uppsi \sim \DMP(\alpha_0 \alpha)$, split the expectation into an expectation over the marginal DMP $\uppsim \sim \DMP(\alpha')$ and a conditional expectation over $\uppsi$ given $\uppsim$. The characterization of the conditional DMP is found in Appendix \ref{app:DM_agg}.
+To perform the expectation over the Dirichlet-Empirical process $\uppsi \sim \DEP(N,\alpha_0, \alpha)$, split the expectation into an expectation over the marginal DEP $\uppsim \sim \DMP(N,\alpha_0,\alpham)$ and a conditional expectation over $\uppsic$ given $\uppsim$. The characterization of the conditional DEP is found in Appendix \ref{app:DEP}.
 
-\begin{IEEEeqnarray}{L}
-\Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] \\
-\quad = \Erm_{\xrm} \left[ \Erm_{\uppsi | \xrm} \left[ \left( \frac{\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \int_{\Ycal} y \uppsi(y,\xrm) {\drm}y}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)} \right)^2 \right] \right] \nonumber \\
-\quad = \Erm_{\xrm} \Erm_{\uppsim} \left[ \frac{\alpha_0 \Erm_{\uppsic | \uppsim} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \int_{\Ycal} y \uppsi(y,\xrm) {\drm}y \right)^2 \right] }{\alpha_0 \alpham(\xrm)\big(\alpha'(x) + \uppsim(x) \big) (\alpha_0+N)} \right] \nonumber
+\begin{IEEEeqnarray}{rCl}
+\Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] & = & \Erm_{\xrm,\uppsi} \left[ \left( \frac{\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + N \int_{\Ycal} y \uppsi(y,\xrm) {\drm}y}{\alpha_0 \alpham(\xrm) + N \int_{\Ycal} \uppsi(y,\xrm) {\drm}y} \right)^2 \right] \nonumber \\
+& = & \Erm_{\xrm} \left[ \Erm_{\uppsim} \left[ \frac{\Erm_{\uppsic | \uppsim} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + N \uppsim(\xrm) \int_{\Ycal} y \uppsic(y;\xrm) {\drm}y \right)^2 \right] }{\alpham(\xrm)\big(\alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber
 \end{IEEEeqnarray}
 
 
 Evaluating the conditional expectation,
 \begin{IEEEeqnarray}{L}
-\Erm_{\uppsic | \uppsim} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \int_{\Ycal} y \uppsi(y,\xrm) {\drm}y \right)^2 \right] \\
-\quad = \alpha_0 \alpham(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2 \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} \int_{\Ycal} y \delta(0) \frac{\uppsim(\xrm)}{\delta(0)} \frac{\delta(0)^{-1} \alpha(y,\xrm)}{\delta(0)^{-1} \alpha_0 \alpham(\xrm)} {\drm}y \nonumber \\
-\qquad + \delta(0)^2 \frac{\delta(0)^{-1} \uppsim(\xrm)}{\big( \delta(0)^{-1}\alpha_0 \alpham(\xrm) \big) \big( \delta(0)^{-1}\alpha_0 \alpham(\xrm) + 1 \big)} \int_{\Ycal} \int_{\Ycal} y y' \Bigg[ \left( \frac{\uppsim(\xrm)}{\delta(0)} - 1 \right) \frac{\alpha(y,\xrm)}{\delta(0)} \frac{\alpha(y',\xrm)}{\delta(0)} \nonumber \\
-\qquad + \left( \frac{\alpha_0 \alpham(\xrm)}{\delta(0)} + \frac{\uppsim(\xrm)}{\delta(0)} \right) \frac{\alpha(y,\xrm)}{\delta(0)} \delta(y-y') \Bigg] {\drm}y {\drm}y' \nonumber \\
-\quad = \alpha_0 \alpham(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2 \alpha_0 \alpham(\xrm) \uppsim(\xrm) \mu_{\yrm | \xrm}^2 \nonumber \\
-\qquad + \frac{\uppsim(\xrm)}{\alpha_0 \alpham(\xrm)\big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \Big[ \big( \uppsim(\xrm) - \delta(0) \big) \alpha_0 \alpham(\xrm)^2 \mu_{\yrm | \xrm}^2 + \delta(0) \big( \alpha_0 \alpham(\xrm)+\uppsim(\xrm) \big) \alpha_0 \alpham(\xrm) \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \Big] \nonumber \\
-\quad = \frac{\alpha_0 \alpham(\xrm)+\uppsim(\xrm)}{\alpha_0 \alpham(\xrm)+\delta(0)} \Big[ \mu_{\yrm | \xrm}^2 \alpha_0 \alpham(\xrm) \big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) \uppsim(\xrm) \Big] \nonumber
+\Erm_{\uppsic | \uppsim} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + N \uppsim(\xrm) \int_{\Ycal} y \uppsic(y;\xrm) {\drm}y \right)^2 \right] \\
+\quad = \alpha_0^2 \alpham(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2 \alpha_0 \alpham(\xrm) N \uppsim(\xrm) \mu_{\yrm | \xrm} \int_{\Ycal} y \alphac(y;\xrm) {\drm}y \nonumber \\
+\qquad + \frac{N^2 \uppsim(\xrm)^2}{1 + \frac{\delta(0)}{\alpha_0 \alpham(\xrm)}} \int_{\Ycal} \int_{\Ycal} y y' \Bigg[ \left( 1 - \frac{\delta(0)}{N \uppsim(\xrm)} \right) \alphac(y;\xrm) \alphac(y';\xrm) \nonumber \\
+\qquad \qquad + \left( \frac{\delta(0)}{\alpha_0 \alpham(\xrm)} + \frac{\delta(0)}{N \uppsim(\xrm)} \right) \alphac(y;\xrm) \delta(y-y') \Bigg] {\drm}y {\drm}y' \nonumber \\
+\quad = \alpha_0 \alpham(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2 \alpha_0 \alpham(\xrm) N \uppsim(\xrm) \mu_{\yrm | \xrm}^2 \nonumber \\
+\qquad + \frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm)+\delta(0)} \Big[ \big( N \uppsim(\xrm) - \delta(0) \big) \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 + \delta(0) \big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big) \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \Big] \nonumber \\
+\quad = \frac{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm)+\delta(0)} \Big[ \mu_{\yrm | \xrm}^2 \alpha_0 \alpham(\xrm) \big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N \uppsim(\xrm) \Big] \nonumber
 \end{IEEEeqnarray}
 
 Plugging,
 \begin{IEEEeqnarray}{L}
 \Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] \\
-\quad = \Erm_{\xrm} \left[ \frac{\alpha_0 \Erm_{\uppsim} \Big[ \mu_{\yrm | \xrm}^2 \alpha_0 \alpham(\xrm) \big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) \uppsim(\xrm) \Big] }{\alpha_0 \alpham(\xrm) \big( \alpha_0 \alpham(\xrm)+\delta(0) \big) (\alpha_0+N)} \right] \nonumber \\ 
-\quad = \Erm_{\xrm} \left[ \frac{\mu_{\yrm | \xrm}^2 \big( \alpha_0 \alpha_0 \alpham(\xrm) + N \alpha_0 \alpham(\xrm) + \delta(0) \alpha_0 \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N}{(\alpha_0+N) \big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \right] \nonumber
+\quad = \Erm_{\xrm} \left[ \frac{\Erm_{\uppsim} \Big[ \mu_{\yrm | \xrm}^2 \alpha_0 \alpham(\xrm) \big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N \uppsim(\xrm) \Big] }{\alpham(\xrm) \big( \alpha_0 \alpham(\xrm)+\delta(0) \big) (\alpha_0+N)} \right] \nonumber \\ 
+\quad = \Erm_{\xrm} \left[ \frac{\mu_{\yrm | \xrm}^2 \alpha_0 \big( \alpha_0 \alpham(\xrm) + N \alpham(\xrm) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N}{(\alpha_0+N) \big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \right] \nonumber
 \end{IEEEeqnarray}
 
 Combining produces the risk,
-\begin{IEEEeqnarray}{L}
-\Rcal^* = \Erm_{\xrm} \left[ \frac{\alpha_0 \alpha_0 \alpham(\xrm) + \alpha_0 \delta(0) + N \alpha_0 \alpham(\xrm)}{(\alpha_0+N)\big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \Sigma_{\yrm | \xrm} \right] \\
-= \Erm_{\xrm} \left[ \frac{\Prm(\xrm) + (\alpha_0+N)^{-1} \delta(0)}{\Prm(\xrm) + \alpha_0^{-1} \delta(0)} \Sigma_{\yrm | \xrm} \right] \nonumber
+\begin{IEEEeqnarray}{rCl}
+\Rcal^* & = & \Erm_{\xrm} \left[ \frac{\alpha_0 \big(\alpha_0 \alpham(\xrm) + \delta(0) + N \alpham(\xrm) \big)}{(\alpha_0+N)\big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \Sigma_{\yrm | \xrm} \right] \\
+& = & \Erm_{\xrm} \left[ \frac{\alpham(\xrm) + (\alpha_0+N)^{-1} \delta(0)}{\alpham(\xrm) + \alpha_0^{-1} \delta(0)} \Sigma_{\yrm | \xrm} \right] \nonumber
 \end{IEEEeqnarray}
 
 
