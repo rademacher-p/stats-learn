@@ -413,8 +413,7 @@ and the function is defined as
 \end{IEEEeqnarray}
 This function determines the empirical probability of the pair $(y,x)$. Note that the set $\Uppsi$ is a finite subset of $\Uptheta$ and thus that the empirical model $\Psi(\Drm)$ is a valid probability distribution.
 
-
-Observe that $\Prm_{\Drm | \uptheta}$ depends on the training data $\Drm$ only through the transform $\Psi$; the empirical model $\Psi(\Drm)$ is thus a sufficient statistic \cite{bernardo} for the model $\uptheta$. As such, it is useful to define a new random process $\uppsi \equiv \Psi(\Drm) \in \Uppsi$. 
+The distribution $\Prm_{\Drm | \uptheta}$ depends on the training data $\Drm$ only through the transform $\Psi$; as such, it is useful to define a new random process $\uppsi \equiv \Psi(\Drm) \in \Uppsi$. It can be shown that $\Prm_{\Drm | \uppsi,\uptheta}$ is a uniform distribution over $\{D \in \Dcal: \Psi(D) = \uppsi\}$ and thus that the empirical model $\uppsi$ is a sufficient statistic \cite{bernardo} for the model $\uptheta$.  
 
 \todomid{show SS via Kay, data likelihood?! D AND x?}
 
@@ -1500,8 +1499,6 @@ The elements of the finite cardinality set $\Ycal$ are real numbers, such that $
 
 
 
-
-
 \subsubsection{Optimal Estimate: the Posterior Mean}
 
 PGR: plots?
@@ -1754,7 +1751,7 @@ Note that as the squared-bias of the prior mean increases relative to the clairv
 
 The excess risk at this potentially non-integral value would be 
 \begin{equation}
-\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \frac{\frac{1}{\alpha_0 \alpham(\xrm)} - \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2}{\Sigma_{\yrm | \xrm,\uptheta}}}{4\left( 1 - \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2}{\Sigma_{\yrm | \xrm,\uptheta}} \right)} \Sigma_{\yrm | \xrm,\uptheta} \right] \;.
+\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \frac{\Sigma_{\yrm | \xrm,\uptheta}}{4 \alpha_0 \left( 1 - \alpha_0 \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2}{\Sigma_{\yrm | \xrm,\uptheta}} \right)} \;.
 \end{equation}
 
 PGR: better form above???
@@ -1781,8 +1778,6 @@ Figures \ref{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased} and \ref{fig:Risk_cond_SE_D
 
 Next consider the effects of the Dirichlet prior parameters. The analysis will interpret the Dirichlet parameters as the conditional prior distributions $\alphac(x)$ and the corresponding concentrations $\alpha'(x) \equiv \alpha_0 \alpham(x)$. 
 
-\todolow{alpha' good?}
-
 First consider the conditional prior PMF's $\alphac(x)$; as shown, they manifest themselves in the risk through the squared estimator bias. It is clear that regardless of how the values $\alpha_0$ and $\alpham(x)$ are chosen, the best selections for these conditional priors must have first moments matching those of the corresponding clairvoyant predictive distributions $\Prm_{\yrm | \xrm,\uptheta}$ for each $x \in \Xcal$. The resultant estimators $\mu_{\yrm | \xrm}$ are unbiased and the excess conditional risk is equivalent to the first term in \eqref{eq:risk_cond_SE_dir_ex}, measuring additional variance due to model uncertainty.
 
 
@@ -1800,9 +1795,9 @@ Note that the first term's scaling factor is equivalent to the first inverse mom
 
 
 
-Of further interest are the values $\alpha'(x)$ that minimize the excess squared-error for given prior conditional distributions $\alphac(x)$. With the asymptotic values of the excess risk known, all that remains is to determine any local minima. Since the excess risk is a sum of $|\Xcal|$ terms of identical form, each dependent on their own concentration $\alpha'(x)$, only one component needs to be minimized. 
+Of further interest are the values $\alpha'(x)$ that minimize the excess squared-error for given prior conditional distributions $\alphac(x)$. With the asymptotic values of the excess risk known, all that remains is to determine any local minima. Since the $|\Xcal|$ summands of the excess risk depend only on the corresponding concentrations $\alpha'(x)$, each of these values can be optimized separately. 
 
-PGR: add the derivative details below???
+\todomid{add the derivative details below???}
 
 Calculating the first derivative with respect to $\alpha'(x)$, it can be shown that for $N > 0$ and $\thetam(x) > 0$, only one stationary point exists, at 
 \begin{equation} \label{eq:alpha_x_min_Rex}
@@ -2325,29 +2320,32 @@ PGR: account for impulsive alpha?
 
 \todohi{move continuous integral formulas here}
 
-This chapter extends further to the case where $\Ycal$ and $\Xcal$ are Euclidean spaces and the model $\uptheta$ is a continuous-domain Dirichlet process. Note that $|\Ycal| \geq \aleph_1$ and $|\Xcal| \geq \aleph_1$. 
+This chapter extends further to the case where $\Ycal$ and $\Xcal$ are Euclidean spaces and the model $\uptheta$ is a continuous-domain random process. Note that $|\Ycal| \geq \aleph_1$ and $|\Xcal| \geq \aleph_1$. 
 
 
-\section{Problem MOD?}
+\section{Problem PGR MOD?}
 
 \todohigh{LOCATION??}
 
 \subsection{Model}
 
-The model $\uptheta$ has a continuous domain. Thus, the marginal model is defined as $\upthetam \equiv \int_{\Ycal} \uptheta(y,\cdot) {\drm}y \in \Pcal(\Xcal)$. 
+The model $\uptheta$ is a PDF and has a continuous domain. Thus, the marginal model is defined as $\upthetam \equiv \int_{\Ycal} \uptheta(y,\cdot) {\drm}y \in \Pcal(\Xcal)$. 
 
 
-\subsection{Empirical Statistic}
+\subsection{Empirical Sufficient Statistic}
 
 The training data is distributed as 
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\Drm | \uptheta}\big( D | \theta \big) & = & \prod_{n=1}^N \Prm_{\Drm_n | \uptheta}\big( D_n | \theta \big) = \prod_{n=1}^N \theta(D_n) \;.
+\prm_{\Drm | \uptheta}\big( D | \theta \big) & = & \prod_{n=1}^N \prm_{\Drm_n | \uptheta}\big( D_n | \theta \big) = \prod_{n=1}^N \theta(D_n) \;.
 \end{IEEEeqnarray}
-The dependency of the likelihood on the training data $\Drm$ can be shown to be only via $\Psi : \Dcal \mapsto \Uppsi \subset \Uptheta$, defined as
+
+
+It can be shown that the likelihood $\prm_{\Drm | \uptheta}$ depends on the training data $\Drm$ only via $\Psi : \Dcal \mapsto \Uppsi \subset \Uptheta$, defined as
 \begin{IEEEeqnarray}{rCl}
 \Psi(y,x;D) & = & \frac{1}{N} \sum_{n=1}^N \delta \big( (y,x) - D_n \big) \\
 & \equiv & \frac{1}{N} \sum_{n=1}^N \delta(y - Y_n) \delta(x - X_n) \nonumber \;.
 \end{IEEEeqnarray}
+As such, the distribution $\prm_{\Drm | \uppsi,\uptheta}$ is uniform on the discrete set $\{D \in \Dcal : \Uppsi(D) = \uppsi\}$ and $\uppsi$ is a sufficient statistic.
 
 \todohi{CONFIRM??}
 
@@ -2373,7 +2371,7 @@ and the covariance function is
 
 The marginal and conditional distributions of the data using the representation $\Drm \Leftrightarrow (\Yrm,\Xrm)$ is of use.
 
-The dependency of $\Prm_{\Xrm | \uptheta}\big( X | \theta \big) \equiv \Prm_{\Xrm | \upthetam}\big( X | \thetam \big) = \prod_{n=1}^N \thetam(X_n)$ on $X$ is expressed via the marginal empirical statistic $\Psim : \Xcal^N \mapsto \Uppsim \subset \Pcal(\Xcal)$, defined as
+The dependency of $\prm_{\Xrm | \uptheta}\big( X | \theta \big) \equiv \prm_{\Xrm | \upthetam}\big( X | \thetam \big) = \prod_{n=1}^N \thetam(X_n)$ on $X$ is expressed via the marginal empirical statistic $\Psim : \Xcal^N \mapsto \Uppsim \subset \Pcal(\Xcal)$, defined as
 \begin{IEEEeqnarray}{rCl}
 \Psim(X) & = & \frac{1}{N} \sum_{n=1}^N \delta\big( \cdot - X_n \big) = \int_{\Ycal} \Psi(y,\cdot;D) {\drm}y \;.
 \end{IEEEeqnarray}
@@ -2383,7 +2381,7 @@ Note that the dependency on $\uptheta$ is only through the marginal model $\upth
 
 The conditional distribution of the values $\Yrm$ given the corresponding $\Xrm$ and the model $\uptheta$,
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\Yrm | \Xrm,\uptheta}\big( Y | X,\theta \big) & = & \prod_{n=1}^N \frac{\Prm_{\Yrm_n,\Xrm_n | \uptheta}\big( Y_n,X_n | \theta \big)}{\Prm_{\Xrm_n | \uptheta}\big( X_n | \theta \big)} = \prod_{n=1}^N \thetac(Y_n;X_n) \;,
+\prm_{\Yrm | \Xrm,\uptheta}\big( Y | X,\theta \big) & = & \prod_{n=1}^N \frac{\prm_{\Yrm_n,\Xrm_n | \uptheta}\big( Y_n,X_n | \theta \big)}{\prm_{\Xrm_n | \uptheta}\big( X_n | \theta \big)} = \prod_{n=1}^N \thetac(Y_n;X_n) \;,
 \end{IEEEeqnarray}
 depends only on the conditional models $\upthetac(x)$. The dependency on the data $\Drm$ can be expressed using $\Psim$ and $\Psic : \{\Ycal \times \Xcal\}^N \mapsto \Uppsic \subset \Pcal(\Ycal)^{\Xcal}$, defined as
 \begin{equation}
