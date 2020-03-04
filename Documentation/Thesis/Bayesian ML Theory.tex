@@ -142,7 +142,7 @@
 
 \todomid{Dirichlet localization or concentration?}
 
-\todolow{DIM and PR operator from AMS?}
+\todolow{DIM and PR and LIM operators from AMS?}
 
 \todolow{Ditch PMF/PDF case? roman?}
 
@@ -724,7 +724,7 @@ The trends in Bayesian risk as $N \to \infty$ are of specific interest. For prio
 & \to & 
 \end{IEEEeqnarray}
 
-\todohigh{FIXXXXXX}
+\todohigh{FIXXXXXX lim}
 
 
 
@@ -2336,21 +2336,25 @@ The model $\uptheta$ is a PDF and has a continuous domain. Thus, the marginal mo
 
 The training data is distributed as 
 \begin{IEEEeqnarray}{rCl}
-\prm_{\Drm | \uptheta}\big( D | \theta \big) & = & \prod_{n=1}^N \prm_{\Drm_n | \uptheta}\big( D_n | \theta \big) = \prod_{n=1}^N \theta(D_n) \;.
+\prm_{\Drm | \uptheta}\big( D | \theta \big) & = & \prod_{n=1}^N \prm_{\Drm_n | \uptheta}\big( D_n | \theta \big) = \prod_{n=1}^N \theta(D_n) \nonumber \\ 
+& = & \exp\left( \sum_{n=1}^N \ln\big(\theta(D_n)\big) \right) \nonumber \\
+& = & \exp\left( \int_{\Ycal \times \Xcal} N \Psi(y,x;D) \ln\big(\theta(y,x)\big) {\drm}y {\drm}x \right) \nonumber \\
+& = & \prod_{\Ycal \times \Xcal} \left( \theta(y,x)^{N \Psi(y,x;D)} \right)^{{\drm}y {\drm}x} \;,
 \end{IEEEeqnarray}
+where the operator $\prod$ is the geometric integral, the continuous analog of the discrete product operator.
 
+\todohigh{CITE for geometric integral!!}
 
-It can be shown that the likelihood $\prm_{\Drm | \uptheta}$ depends on the training data $\Drm$ only via $\Psi : \Dcal \mapsto \Uppsi \subset \Uptheta$, defined as
+Note that the dependency on the training data is expressed via the empirical transform $\Psi : \Dcal \mapsto \Uppsi \subset \Uptheta$, redefined for continuous data as
 \begin{IEEEeqnarray}{rCl}
 \Psi(y,x;D) & = & \frac{1}{N} \sum_{n=1}^N \delta \big( (y,x) - D_n \big) \\
 & \equiv & \frac{1}{N} \sum_{n=1}^N \delta(y - Y_n) \delta(x - X_n) \nonumber \;.
 \end{IEEEeqnarray}
-As such, the distribution $\prm_{\Drm | \uppsi,\uptheta}$ is uniform on the discrete set $\{D \in \Dcal : \Uppsi(D) = \uppsi\}$ and $\uppsi$ is a sufficient statistic.
+Define the new random process $\uppsi \equiv \Psi(\Drm) \in \Uppsi$. Since the likelihood function only depends on the data through $\Psi(\Drm)$, the distribution $\prm_{\Drm | \uppsi,\uptheta}$ is uniform on the discrete set $\{D \in \Dcal : \Uppsi(D) = \uppsi\}$; consequently, the empirical model $\uppsi$ is a sufficient statistic.
 
-\todohi{CONFIRM??}
+\todomid{PDF for psi using geometric integral for Mcal?}
 
-
-As shown in Appendix \ref{app:EP}, given $\uptheta$, the new random process $\uppsi \equiv \Psi(\Drm) \in \Uppsi$ is a continuous-domain empirical process $\uppsi \sim \EP(N,\theta)$. The first and second joint moments are
+As shown in Appendix \ref{app:EP}, given $\uptheta$, the empirical model is a continuous-domain empirical process $\uppsi \sim \EP(N,\theta)$. The first and second joint moments are
 \begin{IEEEeqnarray}{rCl}
 \mu_{\uppsi | \uptheta} & = & \uptheta
 \end{IEEEeqnarray}
@@ -2371,13 +2375,16 @@ and the covariance function is
 
 The marginal and conditional distributions of the data using the representation $\Drm \Leftrightarrow (\Yrm,\Xrm)$ is of use.
 
-The dependency of $\prm_{\Xrm | \uptheta}\big( X | \theta \big) \equiv \prm_{\Xrm | \upthetam}\big( X | \thetam \big) = \prod_{n=1}^N \thetam(X_n)$ on $X$ is expressed via the marginal empirical statistic $\Psim : \Xcal^N \mapsto \Uppsim \subset \Pcal(\Xcal)$, defined as
+The dependency of
+\begin{IEEEeqnarray}{rCl}
+\prm_{\Xrm | \uptheta}\big( X | \theta \big) & \equiv & \prod_{n=1}^N \prm_{\Xrm_n | \upthetam}\big( X_n | \thetam \big) = \prod_{n=1}^N \thetam(X_n) \nonumber \\ 
+& = & \prod_{\Xcal} \left( \thetam(x)^{N \Psim(x;X)} \right)^{{\drm}x} \;,
+\end{IEEEeqnarray}
+on $X$ is expressed via the marginal empirical statistic $\Psim : \Xcal^N \mapsto \Uppsim \subset \Pcal(\Xcal)$, defined as
 \begin{IEEEeqnarray}{rCl}
 \Psim(X) & = & \frac{1}{N} \sum_{n=1}^N \delta\big( \cdot - X_n \big) = \int_{\Ycal} \Psi(y,\cdot;D) {\drm}y \;.
 \end{IEEEeqnarray}
 Note that the dependency on $\uptheta$ is only through the marginal model $\upthetam$.
-
-\todohi{CONFIRM??}
 
 The conditional distribution of the values $\Yrm$ given the corresponding $\Xrm$ and the model $\uptheta$,
 \begin{IEEEeqnarray}{rCl}
@@ -2387,6 +2394,8 @@ depends only on the conditional models $\upthetac(x)$. The dependency on the dat
 \begin{equation}
 \Psic(x;Y,X) = \frac{\Psi(\cdot,x;Y,X)}{\Psim(x;X)} = \frac{\sum_{n=1}^N \delta\big( \cdot - Y_n \big) \delta\big[ x,X_n \big]}{\sum_{n=1}^N \delta\big[ x,X_n \big]} \;.
 \end{equation}
+
+\todohi{prod??}
 
 
 The same bijection can be used to decompose the empirical process into marginal and conditional empirical processes. The ``marginalized'' random process $\uppsim \in \Uppsim \subset \Pcal(\Xcal)$ is now defined as $\uppsim \equiv \int_{\Ycal} \uppsi(y,\cdot) {\drm}y$. Using the aggregation property of empirical processes detailed in Appendix \ref{app:EP}, it can be shown that conditioned on the model $\uptheta$, the marginal model is also an Empirical process, $\uppsim | \upthetam \sim \EP(N,\upthetam)$. Note the conditional independence from $\upthetac$. 
