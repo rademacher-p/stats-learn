@@ -349,7 +349,7 @@ N = \alpha_0 \left( 1 - 2 \alpha_0 \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | 
 \end{equation}
 If the prior estimate $\mu_{\yrm | \xrm}$ has low bias and yet the prior confidence $\alpha_0$ is small, a local maximum may occur and additional training data may (temporarily) compromise the estimator performance. 
 
-Figure \ref{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased} exemplifies the excess conditional squared-error as a function of $N$ for such estimators with varying localization $\alpha_0$. The variable $\yrm$ is a discretization of the unit interval, such that $\Ycal = \{i/256: i \in 0,\ldots,255\}$, with $\thetac(y;x) = 1/256$ and $\alphac(y;x) = \Bi(256y;255,.5)$.
+Figure \ref{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased} exemplifies the excess conditional squared-error as a function of $N$ for such estimators with varying localization $\alpha_0$. The variable $\yrm$ is a discretization of the unit interval, such that $\Ycal = \{i/256: i \in 0,\ldots,255\}$, with $\thetac(y;x) = 1/256$ and $\alphac(y;x) = \Bi(256y;255,0.5)$.
 \begin{figure}
 	\centering
 	\includegraphics[width=1\linewidth]{Risk_cond_SE_Dir_N_leg_a0_unbiased_SSP.pdf}
@@ -369,7 +369,7 @@ Of primary interest are the values $\alpha'(x)$ that minimize the excess squared
 Evaluation of the second derivative confirms the local minimum and comparison of the local risk value to the $\alpha'(x) \to 0$ and $\alpha'(x) \to \infty$ values confirms the global minimum.
 
 
-Note that the minimizing localization values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible - the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low localizations are preferable when the conditional model has low variance; these models can be accurately identified by learners that emphasize the empirical mean, even with limited training data. These trends are demonstrated in Figure  \ref{fig:Risk_cond_SE_Dir_a0_leg_N_biased} for a biased prior distribution with $\alphac(y;x) = \Bi(256y;255,.75)$.
+Note that the minimizing localization values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible - the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low localizations are preferable when the conditional models have low variance; these models can be accurately identified by learners that emphasize the empirical mean, even with limited training data. These trends are demonstrated in Figure  \ref{fig:Risk_cond_SE_Dir_a0_leg_N_biased} for a biased prior distribution with $\alphac(y;x) = \Bi(256y;255,0.75)$.
 %\begin{figure}
 %	\centering
 %	\includegraphics[width=0.9\linewidth]{Risk_cond_SE_Dir_a0_leg_N_unbiased.pdf}
