@@ -42,6 +42,9 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
 
+%\newcommand{\diag}{\mathop{\rm diag}}
+\DeclareMathOperator{\diag}{\mathrm{diag}}
+
 \DeclareMathOperator{\xrm}{\mathrm{x}}
 \DeclareMathOperator{\Xrm}{\mathrm{X}}
 \DeclareMathOperator{\yrm}{\mathrm{y}}
@@ -242,13 +245,13 @@ This section details the mathematical notation and typesetting conventions used 
 
 \subsection*{Sets and Function Arguments}
 
-\todohi{Cartesian product notation!!}
-
 Sets will typically be typeset with a calligraphic font, such as $\Xcal$. Exceptions include common number sets such as the real numbers, which are typeset using blackboard bold $\Rbb$. Function spaces such as the set of functions $\Xcal \mapsto \Ycal$ are compactly represented as $\Ycal^{\Xcal}$.
 
 \todolo{non-calligraphic for risk, loss, etc?}
 
-Various mappings will be defined for which the domain and/or the range \cite{rudin} are function spaces. The set of functions $\Xcal \mapsto \Ycal$ is denoted $\Ycal^{\Xcal}$. For a mapping $g : \Zcal \mapsto \Ycal^{\Xcal}$, the argument notation $g(z) \in \Ycal^{\Xcal}$ denotes a function, while $g(x;z) \in \Ycal$ is a specific value of that function. Semicolons are used to distinguish between the different groups of arguments. A set of finite sequences $\{1,\ldots,N\} \mapsto \Scal$ will be represented as $\Scal^N$ for brevity.
+Various mappings will be defined for which the domain and/or the range \cite{rudin} are function spaces. The set of functions $\Xcal \mapsto \Ycal$ is denoted $\Ycal^{\Xcal}$. For a mapping $g : \Zcal \mapsto \Ycal^{\Xcal}$, the argument notation $g(z) \in \Ycal^{\Xcal}$ denotes a function, while $g(x;z) \in \Ycal$ is a specific value of that function. Semicolons are used to distinguish between the different groups of arguments. A set of sequences $\{1,\ldots,N\} \mapsto \Scal$ will be represented as $\Scal^N$ for brevity.
+
+The Cartesian product of sets will be frequently used, such that for $x \in \Xcal$ and $y \in \Ycal$, the pair $(x,y) \in \Xcal \times \Ycal$. For a general product of sets $\Scal_i$, $i = 1,\ldots$, the notation $\prod_i \Scal_i = \Scal_1 \times \Scal_2 \ldots$.
 
 The convention adopted for natural numbers is $\Nbb = \{1,2,\ldots\}$; the set of non-negative integers is denoted $\Zbbgeq = \Nbb \cup \{0\}$. The set of positive real numbers $\Rbb^+$ excludes zero, while non-negative real numbers are represented as $\Rbbgeq = \Rbb^+ \cup \{0\}$. The cardinality of countably infinite sets, including the set of natural numbers, is denoted $\aleph_0 = |\Nbb|$; the cardinality of uncountable sets such as $\Rbb$ is at least $\aleph_1$.
 
@@ -324,9 +327,11 @@ As for probability distributions, the subscript notation of these operators may 
 
 
 
-\subsection*{Special Functions}
+\subsection*{Special Operators and Functions}
 
-Certain specialized functions are detailed next. Both the Dirac and Kronecker delta functions will be used throughout. The Dirac delta function over a Euclidean domain $\Xcal$ is represented as $\delta(\cdot)$; it has support only at the point $x=0$ and satisfies
+Certain specialized functions are detailed next. 
+
+Both the Dirac and Kronecker delta functions will be used throughout. The Dirac delta function over a Euclidean domain $\Xcal$ is represented as $\delta(\cdot)$; it has support only at the point $x=0$ and satisfies
 \begin{equation}
 \int_{\Xcal} \delta(x) {\drm}x = 1 \;.
 \end{equation}
@@ -341,6 +346,9 @@ Consider a countable set $\Xcal$; the Kronecker delta function has domain $\Xcal
 
 PGR: reference Dirac/Kronecker?
 
+Various operators commonly used in linear algebra will be generalized for functions. Specifically, the outer product operator $\otimes$ is used on two real-valued functions $f \in \Rbb^{\Xcal}$ and $g \in \Rbb^{\Ycal}$, such that $\big(f \otimes g\big) \in \Rbb^{\Xcal \times \Ycal}$ with $\big(f \otimes g\big) (x,y) = f(x) g(y)$. Also, the diagonal operator operates on a single real-valued function, such that $\diag(f) \in \Rbb^{\Xcal \times \Xcal}$. For countable sets $\Xrm$, the operator values are $\diag(f)(x,x') = f(x) \delta[x,x']$; for Euclidean sets, the operator values are $\diag(f)(x,x') = f(x) \delta(x-x')$.
+
+\todohigh{TENSOR PRODUCT? direct sum??}
 
 The multinomial coefficient and multivariate beta function, which typically operate on sequences, are defined more generally for function inputs. The multinomial operator $\Mcal$ is used for functions $g : \Xcal \mapsto \Zbbgeq$ that map to non-negative integers from an arbitrary countable domain $\Xcal$. The output of the operator is
 \begin{equation}
@@ -351,10 +359,6 @@ Similarly, the beta function $\beta$ operates on functions $g : \Xcal \mapsto \R
 \beta(g) = \frac{\prod_{x \in \Xcal} \Gamma\big( g(x) \big)}{\Gamma \left( \sum_{x \in \Xcal} g(x) \right)} \;.
 \end{equation}
 Note that the countable domains of the input functions may have an infinite number of elements. 
-
-\todolow{set input notation elimated??}
-
-These functions will also be used to operate on a subset of a functions' domain $\Scal \subset \Xcal$ and its corresponding image. Set notation for a function is used to express the argument, so that $\Mcal\Big( \big\{ g(x) : x \in S \big\} \Big)$ and $\beta\Big( \big\{ g(x) : x \in S \big\} \Big)$.
 
 
 
@@ -2318,8 +2322,6 @@ PGR: SPECIFY EUCLIDEAN/HILBERT??
 
 PGR: account for impulsive alpha?
 
-\todohi{move continuous integral formulas here}
-
 This chapter extends further to the case where $\Ycal$ and $\Xcal$ are Euclidean spaces and the model $\uptheta$ is a continuous-domain random process. Note that $|\Ycal| \geq \aleph_1$ and $|\Xcal| \geq \aleph_1$. 
 
 
@@ -2339,7 +2341,7 @@ The training data is distributed as
 \prm_{\Drm | \uptheta}\big( D | \theta \big) & = & \prod_{n=1}^N \prm_{\Drm_n | \uptheta}\big( D_n | \theta \big) = \prod_{n=1}^N \theta(D_n) \nonumber \\ 
 & = & \exp\left( \sum_{n=1}^N \ln\big(\theta(D_n)\big) \right) \nonumber \\
 & = & \exp\left( \int_{\Ycal \times \Xcal} N \Psi(y,x;D) \ln\big(\theta(y,x)\big) {\drm}y {\drm}x \right) \nonumber \\
-& = & \prod_{\Ycal \times \Xcal} \left( \theta(y,x)^{N \Psi(y,x;D)} \right)^{{\drm}y {\drm}x} \;,
+& \equiv & \prod_{\Ycal \times \Xcal} \left( \theta(y,x)^{N \Psi(y,x;D)} \right)^{{\drm}y {\drm}x} \;,
 \end{IEEEeqnarray}
 where the operator $\prod$ is the geometric integral, the continuous analog of the discrete product operator.
 
@@ -2388,14 +2390,15 @@ Note that the dependency on $\uptheta$ is only through the marginal model $\upth
 
 The conditional distribution of the values $\Yrm$ given the corresponding $\Xrm$ and the model $\uptheta$,
 \begin{IEEEeqnarray}{rCl}
-\prm_{\Yrm | \Xrm,\uptheta}\big( Y | X,\theta \big) & = & \prod_{n=1}^N \frac{\prm_{\Yrm_n,\Xrm_n | \uptheta}\big( Y_n,X_n | \theta \big)}{\prm_{\Xrm_n | \uptheta}\big( X_n | \theta \big)} = \prod_{n=1}^N \thetac(Y_n;X_n) \;,
+\prm_{\Yrm | \Xrm,\uptheta}\big( Y | X,\theta \big) & = & \prod_{n=1}^N \frac{\prm_{\Yrm_n,\Xrm_n | \uptheta}\big( Y_n,X_n | \theta \big)}{\prm_{\Xrm_n | \uptheta}\big( X_n | \theta \big)} = \prod_{n=1}^N \thetac(Y_n;X_n) \nonumber \\
+& = & \prod_{\Xcal} \left( \prod_{\Ycal} \thetac(y;x)^{\Psic(y;x;Y,X) {\drm}y} \right)^{N \Psim(x;X) {\drm}x} 
 \end{IEEEeqnarray}
 depends only on the conditional models $\upthetac(x)$. The dependency on the data $\Drm$ can be expressed using $\Psim$ and $\Psic : \{\Ycal \times \Xcal\}^N \mapsto \Uppsic \subset \Pcal(\Ycal)^{\Xcal}$, defined as
 \begin{equation}
 \Psic(x;Y,X) = \frac{\Psi(\cdot,x;Y,X)}{\Psim(x;X)} = \frac{\sum_{n=1}^N \delta\big( \cdot - Y_n \big) \delta\big[ x,X_n \big]}{\sum_{n=1}^N \delta\big[ x,X_n \big]} \;.
 \end{equation}
 
-\todohi{prod??}
+\todohi{outer/cartesian prod??}
 
 
 The same bijection can be used to decompose the empirical process into marginal and conditional empirical processes. The ``marginalized'' random process $\uppsim \in \Uppsim \subset \Pcal(\Xcal)$ is now defined as $\uppsim \equiv \int_{\Ycal} \uppsi(y,\cdot) {\drm}y$. Using the aggregation property of empirical processes detailed in Appendix \ref{app:EP}, it can be shown that conditioned on the model $\uptheta$, the marginal model is also an Empirical process, $\uppsim | \upthetam \sim \EP(N,\upthetam)$. Note the conditional independence from $\upthetac$. 
@@ -2417,8 +2420,6 @@ Additionally, given the model $\uptheta$, the conditional processes $\uppsic \in
 
 
 \subsection{Model $\uptheta$ Characterization}
-
-\todomid{Move aggregation to appendix. Done?}
 
 The model is characterized by a Dirichlet process $\uptheta \sim \DP(\alpha_0, \alpha)$ with concentration $\alpha_0$ and mean function $\alpha \in \Pcal(\Ycal \times \Xcal)$. As shown in Appendix \ref{app:DP}, the expected value of a Dirichlet process is $\DP(\alpha_0, \alpha)$
 \begin{equation}
@@ -2466,20 +2467,18 @@ The conditional distribution when $\Xcal$ is a Euclidean space has notable diffe
 
 \subsubsection{Via the Conditional Model Process}
 
-Using the properties detailed in Appendix \ref{app:DP_post}, it can be shown that the marginal process satisfies $\upthetam | \Drm \sim \upthetam | \Xrm \sim \DP(\alpha_0, \mu_{\upthetam | \Xrm})$, where
+Using the properties detailed in Appendix \ref{app:DP_post}, it can be shown that the marginal process satisfies $\upthetam | \Drm \sim \upthetam | \Xrm \sim \DP(\alpha_0 + N, \mu_{\upthetam | \Xrm})$, where
 \begin{IEEEeqnarray}{rCl}
 \mu_{\upthetam | \Xrm} & = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \alpham + \left(\frac{N}{\alpha_0+N}\right) \Psim(\Xrm) \;.
 \end{IEEEeqnarray}
 
-Using the empirical statistic representation, observe that $\upthetam | \uppsim,\uppsic \sim \upthetam | \uppsim \sim \DP(\alpha_0, \mu_{\upthetam | \uppsim})$, where
+Using the empirical statistic representation, observe that $\upthetam | \uppsim,\uppsic \sim \upthetam | \uppsim \sim \DP(\alpha_0 + N, \mu_{\upthetam | \uppsim})$, where
 \begin{IEEEeqnarray}{rCl}
 \mu_{\upthetam | \uppsim} & = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \alpham + \left(\frac{N}{\alpha_0+N}\right) \uppsim \;.
 \end{IEEEeqnarray}
 Recall that $\prm_{\xrm | \uppsi} \equiv \mu_{\upthetam | \uppsim}$.
 
-\todohigh{CONFIRM?}
-
-Also, it can be shown that $\upthetac(x) | \xrm,\Drm \sim \upthetac(x) | \Drm \sim \DP\big(\delta(0)^{-1} \alpha_0 \alpham(x), \mu_{\upthetac(x) | \Drm} \big)$, where
+Also, it can be shown that $\upthetac(x) | \xrm,\Drm \sim \upthetac(x) | \Drm \sim \DP\Big(\delta(0)^{-1} \big(\alpha_0 \alpham(x) + N \Psim(x;\Drm) \big), \mu_{\upthetac(x) | \Drm} \Big)$, where
 \begin{IEEEeqnarray}{rCl}
 \mu_{\upthetac(x) | \Drm} & = & \left(\frac{\alpha_0 \alpham(x)}{\alpha_0 \alpham(x)+N \Psim(x;\Drm)}\right) \alphac(x) + \left(\frac{N \Psim(x;\Drm)}{\alpha_0 \alpham(x)+N \Psim(x;\Drm)}\right) \Psic(x;\Drm) \nonumber \;.
 \end{IEEEeqnarray}
@@ -2510,6 +2509,9 @@ and thus the training data PDF is
 & \equiv & \alpha\big( Y_1,X_1 \big) \prod_{n=2}^N \frac{\alpha_0 \alpha\big( Y_n,X_n \big) + \sum_{i=1}^{n-1} \delta\big( Y_n -  Y_i \big) \delta\big( X_n - X_i \big)}{\alpha_0+n-1} \nonumber \;.
 \end{IEEEeqnarray}
 
+
+PGR: BELOW, just integrate??
+
 It is instructional to find the PDF's for the training output values $\Yrm$ given the input values $\Xrm$, as well as the marginal PDF for the input values alone. Observe that since the independent observations $\Xrm_n | \upthetam$ are characterized by the Dirichlet process $\upthetam \sim \DP(\alpha_0,\alpham)$, the PDF for $\Xrm$ can be represented as
 \begin{IEEEeqnarray}{rCl}
 \prm_{\Xrm}(X) & = & \Erm_{\uptheta}\big[ \prm_{\Xrm | \uptheta}(X | \uptheta) \big] \equiv \Erm_{\upthetam}\left[ \prod_{n=1}^N \upthetam\big( X_n \big) \right] \\
@@ -2530,18 +2532,21 @@ Note that the marginal PDF's are $\prm_{\Xrm_n} = \prm_{\xrm} = \mu_{\upthetam} 
 
 
 
+Using Bayes theorem,
+\begin{IEEEeqnarray}{rCl}
+\prm_{\Yrm | \Xrm}(Y | X) & = & \Erm_{\upthetac}\left[ \prod_{n=1}^N \upthetac\big( Y_n;X_n \big) \right] \\
+& = & \alphac\big( Y_1;X_1 \big) \prod_{n=2}^N \frac{\alpha_0 \alpham(X_n) \alphac\big( Y_n;X_n \big) + \sum_{i=1}^{n-1} \delta\big( Y_n-Y_i \big) \delta\big( X_n-X_i \big)}{\alpha_0 \alpham\big( X_n \big) + \sum_{i=1}^{n-1} \delta\big( X_n-X_i \big)} 
+\end{IEEEeqnarray}
+
 
 PGR: express conditional below using Dir aggregation conditional independence properties?
 
 
 To find the distribution $\prm_{\Yrm | \Xrm}$, note that the independent observations $\Yrm_n | \Xrm_n,\upthetac$ are conditionally independent of $\Xrm_i$, $i \neq n$, and are characterized by the joint processes $\upthetac(x) \sim \DP\big(\delta(0)^{-1} \alpha_0 \alpham(x), \alphac(x)\big)$, such that 
 
-PGR: Bayes...?!?!?!?!!
+PGR
 
-\begin{IEEEeqnarray}{rCl}
-\prm_{\Yrm | \Xrm}(Y | X) & = & \Erm_{\upthetac}\left[ \prod_{n=1}^N \upthetac\big( Y_n;X_n \big) \right] \\
-& = & \alphac\big( Y_1;X_1 \big) \prod_{n=2}^N \frac{\alpha_0 \alpham(X_n) \alphac\big( Y_n;X_n \big) + \sum_{i=1}^{n-1} \delta\big( Y_n-Y_i \big) \delta\big( X_n-X_i \big)}{\alpha_0 \alpham\big( X_n \big) + \sum_{i=1}^{n-1} \delta\big( X_n-X_i \big)} 
-\end{IEEEeqnarray}
+
 
 
 
@@ -2555,11 +2560,19 @@ PGR: Bayes...?!?!?!?!!
 %\end{IEEEeqnarray}
 %which is independent of $\Xrm_N$. Repeated integrations and an application of the permutation invariance principle can show that when conditioned on $\Xrm$ any subset of training data values $\Yrm_1,\ldots,\Yrm_N$ will only be dependent on the corresponding values $\Xrm_n$. 
 
-The first and second order conditional distributions are
+
+\todohi{move moment stuff to SE section!}
+
+Note that the independent observations $\Yrm_n | \Xrm_n,\upthetac$ are conditionally independent of $\Xrm_i$, $i \neq n$, and that they are characterized by the independent processes $\upthetac(x) \sim \DP\big(\delta(0)^{-1} \alpha_0 \alpham(x), \alphac(x)\big)$. Consequently, the joint distribution of any samples from $\Yrm$ given $\Xrm$ will only depend on the matching training samples.
+
+As such, the first order conditional distributions are
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\Yrm_n | \Xrm_n}(x) & = & \Prm_{\yrm | \xrm}(x) = \mu_{\upthetac(x)} = \alphac(x) 
+\Prm_{\Yrm_n | \Xrm}(X) & = & \Prm_{\yrm | \xrm}(X_n) = \mu_{\upthetac(X_n)} = \alphac(X_n) \;,
 \end{IEEEeqnarray}
-and
+and the corresponding first and second moments are $\mu_{\Yrm_n | \Xrm} = \mu_{\yrm|\xrm}\big( \Xrm_n \big)$ and $\Erm_{\Yrm_n | \Xrm}\big[ \Yrm_n^2 \big] = \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \big( \Xrm_n \big)$.
+
+To determine the second order conditional distributions, first note that for $\Xrm_n \neq \Xrm_{n'}$, $\Prm_{\Yrm_n,\Yrm_{n'} | \Xrm_n,\Xrm_{n'}} = \mu_{\upthetac(\Xrm_n)} \mu_{\upthetac(\Xrm_{n'})} = \alphac(\Xrm_n) \alphac(\Xrm_{n'})$. If $\Xrm_n = \Xrm_{n'}$,
+
 \begin{IEEEeqnarray}{L}
 \Prm_{\Yrm_n,\Yrm_{n'} | \Xrm_n,\Xrm_{n'}} (y,y' | x,x') \\
 \quad = \frac{\alpha_0 \alpham(x) \alphac(y;x) \alpha(y';x') + \alphac(y;x) \delta(y-y') \delta(x-x')}{\alpha_0 \alpham(x) + \delta(x-x')} \nonumber \\
@@ -2568,14 +2581,7 @@ and
 
 \todohigh{SHOW USING FULL DP CORRELATION FORMULA! SAME FOR EP, DEP!!!}
 
-and the first and second order moments of interest are
-\begin{equation}
-\mu_{\Yrm_n | \Xrm} = \mu_{\yrm|\xrm}\big( \Xrm_n \big) \;,
-\end{equation}
-\begin{equation}
-\Erm_{\Yrm_n | \Xrm}\big[ \Yrm_n^2 \big] = \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \big( \Xrm_n \big) \;,
-\end{equation}
-and 
+and the first and second order moments of interest are 
 \begin{IEEEeqnarray}{L}
 \Erm_{\Yrm_n,\Yrm_{n'} | \Xrm}\big[ \Yrm_n \Yrm_{n'} \big] \\
 \quad = \frac{\alpha_0 \alpham\big( \Xrm_n \big) \mu_{\yrm|\xrm}\big( \Xrm_n ) \mu_{\yrm|\xrm}\big (\Xrm_{n'} \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \big( \Xrm_n \big) \delta\big( \Xrm_n - \Xrm_{n'} \big)}{\alpha_0 \alpham\big( \Xrm_n \big) + \delta\big( \Xrm_n - \Xrm_{n'} \big)} \nonumber \;.
@@ -2899,7 +2905,11 @@ This chapter details the properties of various discrete-domain random processes.
 
 \subsection{Aggregation}
 
-A characteristic of an Empirical random process is that its aggregations are also Empirical processes. Consider a random process $\uppsi \sim \Emp(N,\theta)$ drawn from $\Uppsi \subset \Pcal(\Ycal)$ for $N$ samples and mean function $\theta$. Define an arbitrary partition of $\Ycal$: $\left( \ldots,\Scal_z,\ldots \right)$, $z \in \Zcal$ and the corresponding function partitions $\uppsi_z \in \Rbbgeq^{\Scal_z}$, such that $\uppsi = \left\{ \ldots,\uppsi_z,\ldots \right\}$, and $\theta_z \in \Rbbgeq^{\Scal_z}$, such that $\theta = \left( \ldots,\theta_z,\ldots \right)$. The transformed random process $\uppsim \in \Uppsim \subset \Pcal(\Zcal)$, defined as $\uppsim(z) \equiv \sum_{y \in \Scal_z} \uppsi_z(y)$, is distributed as $\uppsim \sim \Emp(N,\thetam)$ with a parameterizing distribution $\upthetam$ defined as $\thetam(z) = \sum_{y \in \Scal_z} \theta_z(y)$.
+\todomid{integer z? remove? use i?}
+
+\todomid{concatenation notation?}
+
+A characteristic of an Empirical random process is that its aggregations are also Empirical processes. Consider a random process $\uppsi \sim \Emp(N,\theta)$ drawn from $\Uppsi \subset \Pcal(\Ycal)$ for $N$ samples and mean function $\theta$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$ and the corresponding function partitions $\uppsi_z \in \Rbbgeq^{\Scal_z}$, such that $\uppsi = \left( \ldots,\uppsi_z,\ldots \right)$, and $\theta_z \in \Rbbgeq^{\Scal_z}$, such that $\theta = \left( \ldots,\theta_z,\ldots \right)$. The transformed random process $\uppsim \in \Uppsim \subset \Pcal(\Zcal)$, defined as $\uppsim(z) \equiv \sum_{y \in \Scal_z} \uppsi_z(y)$, is distributed as $\uppsim \sim \Emp(N,\thetam)$ with a parameterizing distribution $\upthetam$ defined as $\thetam(z) = \sum_{y \in \Scal_z} \theta_z(y)$.
 
 To prove this principle, define the subset 
 \begin{IEEEeqnarray}{rCl}
@@ -3242,7 +3252,7 @@ PGR ??
 
 \subsection{Definition}
 
-The Dirichlet process $\uptheta \sim \Dir(\alpha_0,\alpha) \in \Uptheta \equiv \Pcal(\Ycal)$ over the Euclidean set $\Ycal$ is parameterized by the concentration $\alpha_0 \in \Rbb^+$ and mean function $\alpha \in \left\{ {\Rbb^+}^{\Ycal} : \int_{\Ycal} \alpha(y) {\drm}y = 1 \right\}$. The continuous-domain Dirichlet process is characterized by the same aggregation property as its discrete-domain variant. Define a countable partition of $\Ycal$, $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, and the corresponding function partitions $\uptheta_z \in \Rbbgeq^{\Scal_z}$, such that $\uptheta = \left( \ldots,\uptheta_z,\ldots \right)$ and $\alpha_z \in {\Rbb^+}^{\Scal_z}$, such that $\alpha = \left( \ldots,\alpha_z,\ldots \right)$. Thus, the transformed random process $\upthetam \in \Pcal(\Zcal)$, defined as $\upthetam(z) \equiv \int_{\Scal_z} \uptheta_z(y) {\drm}y$, is Dirichlet with concentration $\alpha_0$ and mean function $\alpham$, defined as $\alpham(z) = \int_{\Scal_z} \alpha_z(y) {\drm}y$.
+The Dirichlet process $\uptheta \sim \Dir(\alpha_0,\alpha)$ assumes distributions from from $\Uptheta \equiv \Pcal(\Ycal)$ and is parameterized by concentration $\alpha_0 \in \Rbb^+$ and mean function $\alpha \in \left\{ {\Rbb^+}^{\Ycal} : \int_{\Ycal} \alpha(y) {\drm}y = 1 \right\}$. The continuous-domain Dirichlet process is characterized by the same aggregation property as its discrete-domain variant. Define a countable partition of $\Ycal$, $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, and the corresponding function partitions $\uptheta_z \in \Rbbgeq^{\Scal_z}$, such that $\uptheta = \left( \ldots,\uptheta_z,\ldots \right)$ and $\alpha_z \in {\Rbb^+}^{\Scal_z}$, such that $\alpha = \left( \ldots,\alpha_z,\ldots \right)$. Thus, the transformed random process $\upthetam \in \Pcal(\Zcal)$, defined as $\upthetam(z) \equiv \int_{\Scal_z} \uptheta_z(y) {\drm}y$, is Dirichlet with concentration $\alpha_0$ and mean function $\alpham$, defined as $\alpham(z) = \int_{\Scal_z} \alpha_z(y) {\drm}y$.
 
 Additionally, the normalized random processes $\upthetac(z) \equiv \uptheta_z / \upthetam(z) \in \Pcal(\Scal_z)$ are independent continuous-domain Dirichlet processes $\upthetac(z) \sim \Dir\big(\alpha_0 \alpham(z), \alphac(z)\big)$, where $\alphac(z) \equiv \alpha_z / \alpham(z)$, and are independent of the aggregation process $\upthetam$.
 
@@ -3363,16 +3373,16 @@ Additionally, the normalized functions $\upthetac(x) \equiv \uptheta(\cdot,x) / 
 
 
 
-\section{Dirichlet-Emprical Process Properties} \label{app:DEP}
+\section{Dirichlet-Empirical Process Properties} \label{app:DEP}
 
 
 \subsection{Definition}
 
-This section introduces a new random process, referred to as the Dirichlet-Empirical process (DEP). It is the generalization of the Dirichlet-Empirical distribution for i.i.d. samples drawn from a continuous set $\Ycal$; that is, it is the expectation of an Empirical process with respect to its mean function, a Dirichlet process prior with concentration $\alpha_0$ and mean function $\alpha : \Ycal \mapsto \Rbb^+$. The Dirichlet-Empirical process is parameterized by $N$ samples, concentration $\alpha_0$, and mean function $\alpha$; it assumes functions from the set $\Uppsi = \left\{ N^{-1} \sum_{n=1}^N \delta(\cdot - D_n) : D \in \Ycal^N \right\}$.
+This section introduces a new random process, referred to as the Dirichlet-Empirical process (DEP). It is the generalization of the Dirichlet-Empirical distribution for i.i.d. samples drawn from a continuous set $\Ycal$; that is, it is the expectation of an Empirical process $\uppsi | \uptheta \sim \EP(N,\uptheta)$ with respect to its mean function $\uptheta \sim \DP(\alpha_0,\alpha)$, a Dirichlet process prior with concentration $\alpha_0$ and mean function $\alpha$. The Dirichlet-Empirical process $\uppsi \sim \DEP(N,\alpha_0,\alpha)$ is parameterized by $N$ samples, concentration $\alpha_0$, and mean function $\alpha$; it assumes functions from the set $\Uppsi = \left\{ N^{-1} \sum_{n=1}^N \delta(\cdot - D_n) : D \in \Ycal^N \right\}$.
 
-Analagous to the Dirichlet and Dirichlet-Empirical distributions for countable spaces, the Dirichlet-Empirical process inherits the aggregation property from the Dirichlet process prior. Consider a Dirichlet-Empirical process $\uppsi \in \Uppsi$ and a countable partition of $\Ycal$, $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, and the corresponding function partitions $\uppsi_z \in \Rbbgeq^{\Scal_z}$, such that $\uppsi = \left( \ldots,\uppsi_z,\ldots \right)$, and $\alpha_z \in {\Rbb^+}^{\Scal_z}$, such that $\alpha = \left( \ldots,\alpha_z,\ldots \right)$. The transformed random process $\uppsim$, defined as $\uppsim(z) \equiv \int_{\Scal_z} \uppsi_z(y) {\drm}y$, is neccessarily Dirichlet-Empirical for $N$ samples, concentration $\alpha_0$, and mean function $\alpham$, defined as $\alpham(z) \equiv \int_{\Scal_z} \alpha_z(y) {\drm}y$.
+Analogous to the Dirichlet and Dirichlet-Empirical distributions for countable spaces, the Dirichlet-Empirical process inherits the aggregation property from the Dirichlet process prior. Consider a Dirichlet-Empirical process $\uppsi \in \Uppsi$ and a countable partition of $\Ycal$, $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, and the corresponding function partitions $\uppsi_z \in \Rbbgeq^{\Scal_z}$, such that $\uppsi = \left( \ldots,\uppsi_z,\ldots \right)$, and $\alpha_z \in {\Rbb^+}^{\Scal_z}$, such that $\alpha = \left( \ldots,\alpha_z,\ldots \right)$. The transformed random process $\uppsim$, defined as $\uppsim(z) \equiv \int_{\Scal_z} \uppsi_z(y) {\drm}y$, is necessarily Dirichlet-Empirical for $N$ samples, concentration $\alpha_0$, and mean function $\alpham$, defined as $\alpham(z) \equiv \int_{\Scal_z} \alpha_z(y) {\drm}y$.
 
-Also, when conditioned on the aggregation $\uppsim$, the normalized functions $\uppsic(z) \equiv \uppsi_z / \uppsim(z)$ are independent continuous-domain Dirichlet-Empirical processes, $\uppsic(z) | \uppsim(z) \sim \DEP\big(N \uppsim(z), \alphac(z)\big)$, where $\alphac(z) \equiv \alpha_z / \alpham(z)$.
+Also, when conditioned on the aggregation $\uppsim$, the normalized functions $\uppsic(z) \equiv \uppsi_z / \uppsim(z)$ are independent continuous-domain Dirichlet-Empirical processes, $\uppsic(z) | \uppsim(z) \sim \DEP\big(N \uppsim(z), \alpha_0 \alpham(z), \alphac(z)\big)$, where $\alphac(z) \equiv \alpha_z / \alpham(z)$.
 
 
 
