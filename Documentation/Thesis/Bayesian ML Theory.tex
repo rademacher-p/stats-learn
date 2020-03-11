@@ -251,7 +251,7 @@ Sets will typically be typeset with a calligraphic font, such as $\Xcal$. Except
 
 Various mappings will be defined for which the domain and/or the range \cite{rudin} are function spaces. The set of functions $\Xcal \mapsto \Ycal$ is denoted $\Ycal^{\Xcal}$. For a mapping $g : \Zcal \mapsto \Ycal^{\Xcal}$, the argument notation $g(z) \in \Ycal^{\Xcal}$ denotes a function, while $g(x;z) \in \Ycal$ is a specific value of that function. Semicolons are used to distinguish between the different groups of arguments. A set of sequences $\{1,\ldots,N\} \mapsto \Scal$ will be represented as $\Scal^N$ for brevity.
 
-The Cartesian product of sets will be frequently used, such that for $x \in \Xcal$ and $y \in \Ycal$, the pair $(x,y) \in \Xcal \times \Ycal$. For a general product of sets $\Scal_i$, $i = 1,\ldots$, the notation $\prod_i \Scal_i = \Scal_1 \times \Scal_2 \ldots$.
+The Cartesian product of sets will be frequently used, such that for $x \in \Xcal$ and $y \in \Ycal$, the pair $(x,y) \in \Xcal \times \Ycal$. For a general product of sets $\Scal_i$, $i = 1,\ldots$, the notation $\prod_i \Scal_i = \Scal_1 \times \Scal_2 \ldots$ is used.
 
 The convention adopted for natural numbers is $\Nbb = \{1,2,\ldots\}$; the set of non-negative integers is denoted $\Zbbgeq = \Nbb \cup \{0\}$. The set of positive real numbers $\Rbb^+$ excludes zero, while non-negative real numbers are represented as $\Rbbgeq = \Rbb^+ \cup \{0\}$. The cardinality of countably infinite sets, including the set of natural numbers, is denoted $\aleph_0 = |\Nbb|$; the cardinality of uncountable sets such as $\Rbb$ is at least $\aleph_1$.
 
@@ -346,9 +346,9 @@ Consider a countable set $\Xcal$; the Kronecker delta function has domain $\Xcal
 
 PGR: reference Dirac/Kronecker?
 
-Various operators commonly used in linear algebra will be generalized for functions. Specifically, the outer product operator $\otimes$ is used on two real-valued functions $f \in \Rbb^{\Xcal}$ and $g \in \Rbb^{\Ycal}$, such that $\big(f \otimes g\big) \in \Rbb^{\Xcal \times \Ycal}$ with $\big(f \otimes g\big) (x,y) = f(x) g(y)$. Also, the diagonal operator operates on a single real-valued function, such that $\diag(f) \in \Rbb^{\Xcal \times \Xcal}$. For countable sets $\Xrm$, the operator values are $\diag(f)(x,x') = f(x) \delta[x,x']$; for Euclidean sets, the operator values are $\diag(f)(x,x') = f(x) \delta(x-x')$.
+Various operators commonly used in linear algebra will be generalized for functions. Specifically, the outer product operator $\otimes$ is used on two real-valued functions $f \in \Rbb^{\Xcal}$ and $g \in \Rbb^{\Ycal}$, such that $\big(f \otimes g\big) \in \Rbb^{\Xcal \times \Ycal}$ with $\big(f \otimes g\big) (x,y) = f(x) g(y)$. A general outer product of functions is denoted $\bigotimes_i f_i = f_1 \otimes f_2 \ldots$ for $i = 1,\ldots$, where $\Big(\bigotimes_i f_i\Big)(x_1,x_2,\ldots) = f_1(x_1)f_x(x_2)\ldots$, is used as well. Also, the diagonal operator operates on a single real-valued function, such that $\diag(f) \in \Rbb^{\Xcal \times \Xcal}$. For countable sets $\Xrm$, the operator values are $\diag(f)(x,x') = f(x) \delta[x,x']$; for Euclidean sets, the operator values are $\diag(f)(x,x') = f(x) \delta(x-x')$.
 
-\todohigh{TENSOR PRODUCT? direct sum??!}
+\todolow{tensor product?}
 
 The multinomial coefficient and multivariate beta function, which typically operate on sequences, are defined more generally for function inputs. The multinomial operator $\Mcal$ is used for functions $g : \Xcal \mapsto \Zbbgeq$ that map to non-negative integers from an arbitrary countable domain $\Xcal$. The output of the operator is
 \begin{equation}
@@ -381,10 +381,12 @@ Note that the countable domains of the input functions may have an infinite numb
 
 Consider an observable random element $\xrm \in \Xcal$ and and unobservable random element $\yrm \in \Ycal$ which are jointly distributed according to an unknown probability distribution $\uptheta \in \Uptheta \equiv \Pcal(\Ycal \times \Xcal)$, such that $\Prm_{\yrm,\xrm | \uptheta} = \uptheta$. Note that the uppercase PMF notation used throughout this section implies that the random elements are discrete; PDF's are used when $\xrm$ and/or $\yrm$ are continuous random variables/processes.
 
-Also observed is a random sequence of $N$ samples from $\uptheta$, denoted $\Drm \in \Dcal = \{\Ycal \times \Xcal\}^N$; an alternative representation that can be used is $\Drm \Leftrightarrow \big( (\Yrm_1,\Xrm_1),\ldots,(\Yrm_N,\Xrm_N) \big)$, where $\Yrm \in \Ycal^N$ and $\Xrm \in \Xcal^N$. The $N$ data pairs are conditionally independent from one another and are identically distributed as $\Prm_{\Drm_n | \uptheta} = \uptheta$. The samples are also conditionally independent from $(\yrm,\xrm)$. Thus,  
+Also observed is a random sequence of $N$ samples from $\uptheta$, denoted $\Drm \in \Dcal = \{\Ycal \times \Xcal\}^N$; an alternative representation that can be used is $\Drm \Leftrightarrow \big( (\Yrm_1,\Xrm_1),\ldots,(\Yrm_N,\Xrm_N) \big)$, where $\Yrm \in \Ycal^N$ and $\Xrm \in \Xcal^N$. The $N$ data pairs are conditionally independent from one another and are identically distributed as $\Prm_{\Drm_n | \uptheta} = \uptheta$. The samples are also conditionally independent from $(\yrm,\xrm)$. Thus $\Prm_{\yrm,\xrm,\Drm | \uptheta} = \Prm_{\yrm,\xrm | \uptheta} \bigotimes_{n=1}^N \Prm_{\Drm_n | \uptheta}$ and
 \begin{equation}
 \Prm_{\yrm,\xrm,\Drm | \uptheta}(y,x,D | \theta) = \Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) \prod_{n=1}^N \Prm_{\Drm_n | \uptheta}\big(Y_n,X_n | \theta\big) \;.
 \end{equation}
+
+
 
 
 \subsection{Marginal and Conditional Model Distributions}
@@ -412,8 +414,8 @@ where the dependency on the training data $\Drm$ is expressed though a transform
 \end{IEEEeqnarray}
 and the function is defined as
 \begin{IEEEeqnarray}{rCl}
-\Psi(y,x;D) & = & \frac{1}{N} \sum_{n=1}^N \delta \big[ (y,x),D_n \big] \\
-& \equiv & \frac{1}{N} \sum_{n=1}^N \delta \left[ y,Y_n \right] \delta \left[ x,X_n \right] \nonumber \;.
+\Psi(D) & = & \frac{1}{N} \sum_{n=1}^N \delta \big[ \cdot,D_n \big] \\
+& \equiv & \frac{1}{N} \sum_{n=1}^N \delta \left[ \cdot,Y_n \right] \delta \left[ \cdot,X_n \right] ?? \nonumber \;.
 \end{IEEEeqnarray}
 This function determines the empirical probability of the pair $(y,x)$. Note that the set $\Uppsi$ is a finite subset of $\Uptheta$ and thus that the empirical model $\Psi(\Drm)$ is a valid probability distribution.
 
@@ -442,18 +444,18 @@ The first and second joint moments of this Empirical distribution (derived from 
 \end{IEEEeqnarray}
 and
 \begin{IEEEeqnarray}{L}
-\Erm_{\uppsi | \uptheta}\big[ \uppsi(y,x) \uppsi(y',x') \big] \\
-\quad = \frac{1}{N} \uptheta(y,x) \delta[y,y'] \delta[x,x'] + \left(1 - \frac{1}{N}\right) \uptheta(y,x) \uptheta(y',x') \nonumber
+\Erm_{\uppsi | \uptheta}\big[ \uppsi \otimes \uppsi \big] = \frac{1}{N} \diag(\uptheta)  + \left(1 - \frac{1}{N}\right) \uptheta \otimes \uptheta 
 \end{IEEEeqnarray}
-\begin{IEEEeqnarray}{L}
-\Erm_{\uppsi | \uptheta}\big[ \uppsi \otimes \uppsi \big] \\
-\quad = \frac{1}{N} \text{diag}(\uptheta)  + \left(1 - \frac{1}{N}\right) \uptheta \otimes \uptheta \nonumber
-\end{IEEEeqnarray}
-\todomid{outer product? argument notation?}
+%\begin{IEEEeqnarray}{L}
+%\Erm_{\uppsi | \uptheta}\big[ \uppsi(y,x) \uppsi(y',x') \big] = \frac{1}{N} \uptheta(y,x) \delta[y,y'] \delta[x,x'] + \left(1 - \frac{1}{N}\right) \uptheta(y,x) \uptheta(y',x') 
+%\end{IEEEeqnarray}
 and the covariance function is
 \begin{IEEEeqnarray}{rCl}
-\Sigma_{\uppsi | \uptheta}(y,x,y',x' | \theta) & = & \frac{1}{N} \big( \theta(y,x) \delta[y,y'] \delta[x,x'] - \theta(y,x) \theta(y',x') \big) \;.
+\Sigma_{\uppsi | \uptheta} & = & \frac{1}{N} \big( \diag(\uptheta) - \uptheta \otimes \uptheta \big) \;.
 \end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{rCl}
+%\Sigma_{\uppsi | \uptheta}(y,x,y',x' | \theta) & = & \frac{1}{N} \big( \theta(y,x) \delta[y,y'] \delta[x,x'] - \theta(y,x) \theta(y',x') \big) \;.
+%\end{IEEEeqnarray}
 The first and second moments of the Empirical distribution are proportionate to those of the Multinomial distribution.
 
 Observe that for larger training data volumes $N$, the set $\Uppsi$ becomes a denser grid of samples from the set $\Uptheta$ and the covariance tends to zero, concentrating the Empirical PMF around the model $\uptheta$. Thus, as $N \to \infty$, 
@@ -516,13 +518,17 @@ Analogous to the decomposition of the model $\uptheta$ into its marginal and con
 
 Also of interest is the conditional distribution of $\uppsic \in \Uppsic$, where $\uppsic(x) \equiv \uppsi(\cdot,x) / \uppsim(x)$. Using the Empirical process properties proven in Appendix \ref{app:emp}, it can be shown that when conditioned on $\uppsi$ and on the model $\uptheta$, the PMF of $\uppsic$ is
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\uppsic | \uppsim , \uptheta}(\psic | \psim , \theta) & \equiv & \Prm_{\uppsic | \uppsim , \upthetac}(\psic | \psim , \thetac) \\
-& = & \prod_{x \in \Xcal} \Bigg[ \Mcal\big( N \psim(x) \psic(x) \big) \left( \prod_{y \in \Ycal} \thetac(y;x)^{\psic(y;x)} \right)^{N \psim(x)} \Bigg] \\
+\Prm_{\uppsic | \uppsim, \uptheta}(\psic | \psim , \theta) & \equiv & \Prm_{\uppsic | \uppsim, \upthetac}(\psic | \psim , \thetac) \\
+& = & \prod_{x \in \Xcal} \Bigg[ \Mcal\big( N \psim(x) \psic(x) \big) \left( \prod_{y \in \Ycal} \thetac(y;x)^{\psic(y;x)} \right)^{N \psim(x)} \Bigg] \nonumber \\
 & = & \prod_{x \in \Xcal} \Emp\Big( \psic(x) ; N \psim(x) , \thetac(x) \Big) \nonumber \;,
+\end{IEEEeqnarray}
+\begin{IEEEeqnarray}{rCl}
+\Prm_{\uppsic | \uppsim, \uptheta} & \equiv & \bigotimes_{x \in \Xcal} \Prm_{\uppsic(x) | \uppsim(x), \upthetac(x)} \\
+& = & \bigotimes_{x \in \Xcal} \Emp\Big(N \uppsim(x), \upthetac(x) \Big) \nonumber \;,
 \end{IEEEeqnarray}
 over the domain $\prod_{x \in \Xcal} \left\{ \frac{n}{N \psim(x)}: n \in {\Zbbgeq}^{\Ycal}, \ \sum_{y \in \Ycal} n(y) = N \psim(x) \right\}$. Observe that conditioning on the marginal empirical process renders the conditional processes $\uppsic(x)$ independent of one another and that they are also Empirically distributed, such that $\uppsic(x) | \uppsim(x),\upthetac(x) \sim \Emp\big( N \uppsim(x),\upthetac(x) \big)$. 
 
-
+\todohigh{otimes for all? ordered set?}
 
 
 
@@ -971,13 +977,20 @@ The first and second joint moments of the model are
 \end{equation}
 and
 \begin{IEEEeqnarray}{rCl}
-\Erm_{\uptheta}\big[ \uptheta(y,x) \uptheta(y',x') \big] & = & \frac{\alpha(y,x) \delta[y,y'] \delta[x,x'] + \alpha_0 \alpha(y,x) \alpha(y',x')}{\alpha_0+1} \;.
+\Erm_{\uptheta}\big[ \uptheta \otimes \uptheta \big] & = & \frac{1}{\alpha_0+1} \diag(\alpha) + \frac{\alpha_0}{\alpha_0+1} \alpha \otimes \alpha \;.
 \end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{rCl}
+%\Erm_{\uptheta}\big[ \uptheta(y,x) \uptheta(y',x') \big] & = & \frac{\alpha(y,x) \delta[y,y'] \delta[x,x'] + \alpha_0 \alpha(y,x) \alpha(y',x')}{\alpha_0+1} \;.
+%\end{IEEEeqnarray}
 Observe that $\Prm_{\yrm,\xrm}  = \mu_{\uptheta} = \alpha$. The covariance is
 \begin{IEEEeqnarray}{rCl}
-\Sigma_{\uptheta}(y,x,y',x') & = & \Erm_{\uptheta}\Big[ \big(\uptheta(y,x)-\mu_{\uptheta}(y,x)\big) \big(\uptheta(y',x')-\mu_{\uptheta}(y',x')\big) \Big] \\
-& = & \frac{\alpha(y,x) \delta[y,y'] \delta[x,x'] - \alpha(y,x) \alpha(y',x')}{\alpha_0+1} \nonumber \;.
+\Sigma_{\uptheta} & = & \Erm_{\uptheta}\Big[ \big(\uptheta-\mu_{\uptheta}\big) \otimes \big(\uptheta-\mu_{\uptheta}\big) \Big] \\
+& = & \frac{\diag(\alpha) - \alpha \otimes \alpha}{\alpha_0+1} \nonumber \;.
 \end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{rCl}
+%\Sigma_{\uptheta}(y,x,y',x') & = & \Erm_{\uptheta}\Big[ \big(\uptheta(y,x)-\mu_{\uptheta}(y,x)\big) \big(\uptheta(y',x')-\mu_{\uptheta}(y',x')\big) \Big] \\
+%& = & \frac{\alpha(y,x) \delta[y,y'] \delta[x,x'] - \alpha(y,x) \alpha(y',x')}{\alpha_0+1} \nonumber \;.
+%\end{IEEEeqnarray}
 Also, for PDF's satisfying $\alpha(y,x) > \alpha_0^{-1}$, the maximizing value of the distribution is
 \begin{equation}
 \theta_\mathrm{max} = \argmax_{\theta \in \Uptheta} \prm_{\uptheta}(\theta) = \frac{\alpha - \alpha_0^{-1}}{1 - \alpha_0^{-1} |\Ycal||\Xcal|} \;.
@@ -1103,14 +1116,21 @@ The first and second joint moments of the empirical model $\uppsi$ are
 \end{IEEEeqnarray}
 and
 \begin{IEEEeqnarray}{L}
-\Erm_{\uppsi}\big[ \uppsi(y,x) \uppsi(y',x') \big] \\
-\qquad = \frac{1}{1 + \alpha_0^{-1}} \Big( (\alpha_0^{-1} + N^{-1}) \alpha(y,x) \delta[y,y'] \delta[x,x'] + (1 - N^{-1}) \alpha(y,x) \alpha(y',x') \Big) \nonumber \;.
+\Erm_{\uppsi}\big[ \uppsi \otimes \uppsi \big] = \frac{\alpha_0^{-1} + N^{-1}}{1 + \alpha_0^{-1}} \diag(\alpha) + \frac{1 - N^{-1}}{1 + \alpha_0^{-1}} \alpha \otimes \alpha \nonumber \;.
 \end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{L}
+%\Erm_{\uppsi}\big[ \uppsi(y,x) \uppsi(y',x') \big] \\
+%\qquad = \frac{1}{1 + \alpha_0^{-1}} \Big( (\alpha_0^{-1} + N^{-1}) \alpha(y,x) \delta[y,y'] \delta[x,x'] + (1 - N^{-1}) \alpha(y,x) \alpha(y',x') \Big) \nonumber \;.
+%\end{IEEEeqnarray}
 The covariance function is
 \begin{IEEEeqnarray}{rCl}
-\Sigma_{\uppsi}(y,x,y',x') & = & \frac{\alpha_0^{-1} + N^{-1}}{1 + \alpha_0^{-1}} \big( \alpha(y,x) \delta[y,y'] \delta[x,x'] - \alpha(y,x) \alpha(y',x') \big) \\
-& = & \left(1 + \frac{\alpha_0}{N}\right) \Sigma_{\uptheta}(y,x,y',x') \nonumber \;.
+\Sigma_{\uppsi} & = & \frac{\alpha_0^{-1} + N^{-1}}{1 + \alpha_0^{-1}} \big( \diag(\alpha) - \alpha \otimes \alpha \big) \\
+& = & \left(1 + \frac{\alpha_0}{N}\right) \Sigma_{\uptheta} \nonumber \;.
 \end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{rCl}
+%\Sigma_{\uppsi}(y,x,y',x') & = & \frac{\alpha_0^{-1} + N^{-1}}{1 + \alpha_0^{-1}} \big( \alpha(y,x) \delta[y,y'] \delta[x,x'] - \alpha(y,x) \alpha(y',x') \big) \\
+%& = & \left(1 + \frac{\alpha_0}{N}\right) \Sigma_{\uptheta}(y,x,y',x') \nonumber \;.
+%\end{IEEEeqnarray}
 Observe that as $N \to \infty$, the variance $\Sigma_{\uppsi} \to \Sigma_{\uptheta}$.
 
 
@@ -2322,6 +2342,8 @@ PGR: SPECIFY EUCLIDEAN/HILBERT??
 
 PGR: account for impulsive alpha?
 
+\todohi{discuss otimes for dirac, USE?}
+
 This chapter extends further to the case where $\Ycal$ and $\Xcal$ are Euclidean spaces and the model $\uptheta$ is a continuous-domain random process. Note that $|\Ycal| \geq \aleph_1$ and $|\Xcal| \geq \aleph_1$. 
 
 
@@ -2349,8 +2371,8 @@ where the operator $\prod$ is the geometric integral, the continuous analog of t
 
 Note that the dependency on the training data is expressed via the empirical transform $\Psi : \Dcal \mapsto \Uppsi \subset \Uptheta$, redefined for continuous data as
 \begin{IEEEeqnarray}{rCl}
-\Psi(y,x;D) & = & \frac{1}{N} \sum_{n=1}^N \delta \big( (y,x) - D_n \big) \\
-& \equiv & \frac{1}{N} \sum_{n=1}^N \delta(y - Y_n) \delta(x - X_n) \nonumber \;.
+\Psi(D) & = & \frac{1}{N} \sum_{n=1}^N \delta \big( \cdot - D_n \big) \\
+& \equiv & \frac{1}{N} \sum_{n=1}^N \delta(\cdot - Y_n) \delta(\cdot - X_n) ?? \nonumber \;.
 \end{IEEEeqnarray}
 Define the new random process $\uppsi \equiv \Psi(\Drm) \in \Uppsi$. Since the likelihood function only depends on the data through $\Psi(\Drm)$, the distribution $\prm_{\Drm | \uppsi,\uptheta}$ is uniform on the discrete set $\{D \in \Dcal : \Uppsi(D) = \uppsi\}$; consequently, the empirical model $\uppsi$ is a sufficient statistic.
 
@@ -2397,8 +2419,6 @@ depends only on the conditional models $\upthetac(x)$. The dependency on the dat
 \begin{equation}
 \Psic(x;Y,X) = \frac{\Psi(\cdot,x;Y,X)}{\Psim(x;X)} = \frac{\sum_{n=1}^N \delta\big( \cdot - Y_n \big) \delta\big[ x,X_n \big]}{\sum_{n=1}^N \delta\big[ x,X_n \big]} \;.
 \end{equation}
-
-\todohi{outer/cartesian prod??}
 
 
 The same bijection can be used to decompose the empirical process into marginal and conditional empirical processes. The ``marginalized'' random process $\uppsim \in \Uppsim \subset \Pcal(\Xcal)$ is now defined as $\uppsim \equiv \int_{\Ycal} \uppsi(y,\cdot) {\drm}y$. Using the aggregation property of empirical processes detailed in Appendix \ref{app:EP}, it can be shown that conditioned on the model $\uptheta$, the marginal model is also an Empirical process, $\uppsim | \upthetam \sim \EP(N,\upthetam)$. Note the conditional independence from $\upthetac$. 
@@ -2539,17 +2559,7 @@ Using Bayes theorem,
 \end{IEEEeqnarray}
 
 
-PGR: express conditional below using Dir aggregation conditional independence properties?
-
-
-To find the distribution $\prm_{\Yrm | \Xrm}$, note that the independent observations $\Yrm_n | \Xrm_n,\upthetac$ are conditionally independent of $\Xrm_i$, $i \neq n$, and are characterized by the joint processes $\upthetac(x) \sim \DP\big(\delta(0)^{-1} \alpha_0 \alpham(x), \alphac(x)\big)$, such that 
-
-PGR
-
-
-
-
-
+\todomid{express conditional using Dir aggregation conditional independence properties?}
 
 
 %Marginalized conditional PDF's for the first and second samples are found. Observe that the marginal distribution for the first $N-1$ values of $\Yrm$ is
@@ -2561,31 +2571,32 @@ PGR
 %which is independent of $\Xrm_N$. Repeated integrations and an application of the permutation invariance principle can show that when conditioned on $\Xrm$ any subset of training data values $\Yrm_1,\ldots,\Yrm_N$ will only be dependent on the corresponding values $\Xrm_n$. 
 
 
-\todohi{move moment stuff to SE section!}
-
 Note that the independent observations $\Yrm_n | \Xrm_n,\upthetac$ are conditionally independent of $\Xrm_i$, $i \neq n$, and that they are characterized by the independent processes $\upthetac(x) \sim \DP\big(\delta(0)^{-1} \alpha_0 \alpham(x), \alphac(x)\big)$. Consequently, the joint distribution of any samples from $\Yrm$ given $\Xrm$ will only depend on the matching training samples.
 
-As such, the first order conditional distributions are
+The first and second order conditional distributions are of specific interest. The first order conditional distributions are
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\Yrm_n | \Xrm}(X) & = & \Prm_{\yrm | \xrm}(X_n) = \mu_{\upthetac(X_n)} = \alphac(X_n) \;,
+\Prm_{\Yrm_n | \Xrm}(X) & = & \Prm_{\Yrm_n | \Xrm_n}(X_n) = \Prm_{\yrm | \xrm}(X_n) = \mu_{\upthetac(X_n)} = \alphac(X_n) \;,
 \end{IEEEeqnarray}
-and the corresponding first and second moments are $\mu_{\Yrm_n | \Xrm} = \mu_{\yrm|\xrm}\big( \Xrm_n \big)$ and $\Erm_{\Yrm_n | \Xrm}\big[ \Yrm_n^2 \big] = \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \big( \Xrm_n \big)$.
-
-To determine the second order conditional distributions, first note that for $\Xrm_n \neq \Xrm_{n'}$, $\Prm_{\Yrm_n,\Yrm_{n'} | \Xrm_n,\Xrm_{n'}} = \mu_{\upthetac(\Xrm_n)} \mu_{\upthetac(\Xrm_{n'})} = \alphac(\Xrm_n) \alphac(\Xrm_{n'})$. If $\Xrm_n = \Xrm_{n'}$,
-
+To determine the second order conditional distributions, first note that for $\Xrm_n \neq \Xrm_{n'}$, $\Prm_{\Yrm_n,\Yrm_{n'} | \Xrm_n,\Xrm_{n'}} = \mu_{\upthetac(\Xrm_n)} \otimes \mu_{\upthetac(\Xrm_{n'})} = \alphac(\Xrm_n) \otimes \alphac(\Xrm_{n'})$. Contrasting, if $\Xrm_n = \Xrm_{n'}$, then
 \begin{IEEEeqnarray}{L}
-\Prm_{\Yrm_n,\Yrm_{n'} | \Xrm_n,\Xrm_{n'}} (y,y' | x,x') \\
-\quad = \frac{\alpha_0 \alpham(x) \alphac(y;x) \alpha(y';x') + \alphac(y;x) \delta(y-y') \delta(x-x')}{\alpha_0 \alpham(x) + \delta(x-x')} \nonumber \\
-\quad = \frac{\delta(x-x')}{\alpha_0 \alpham(x) + \delta(x-x')} \alphac(y;x) \delta(y-y') + \frac{\alpha_0 \alpham(x)}{\alpha_0 \alpham(x) + \delta(x-x')} \alphac(y;x) \alpha(y';x') \nonumber
+\Prm_{\Yrm_n,\Yrm_{n'} | \Xrm_n,\Xrm_{n'}} = \Erm_{\upthetac(\Xrm_n)} \big[\upthetac(\Xrm_n) \otimes \upthetac(\Xrm_n)\big]  \\
+\quad = \frac{\diag\big(\alphac(\Xrm_n)\big) + \delta(0)^{-1} \alpha_0 \alpham(\Xrm_n) \alphac(\Xrm_n) \otimes \alpha(\Xrm_n)}{\delta(0)^{-1} \alpha_0 \alpham(\Xrm_n) + 1} \nonumber \\
+\quad = \frac{\delta(0)}{\alpha_0 \alpham(\Xrm_n) + \delta(0)} \diag\big(\alphac(\Xrm_n)\big) + \frac{\alpha_0 \alpham(\Xrm_n)}{\alpha_0 \alpham(\Xrm_n) + \delta(0)} \alphac(\Xrm_n) \otimes  \alpha(\Xrm_n) \nonumber \;.
 \end{IEEEeqnarray}
-
-\todohigh{SHOW USING FULL DP CORRELATION FORMULA! SAME FOR EP, DEP!!!}
-
-and the first and second order moments of interest are 
+Combining, the formula for the second order distribution is
 \begin{IEEEeqnarray}{L}
-\Erm_{\Yrm_n,\Yrm_{n'} | \Xrm}\big[ \Yrm_n \Yrm_{n'} \big] \\
-\quad = \frac{\alpha_0 \alpham\big( \Xrm_n \big) \mu_{\yrm|\xrm}\big( \Xrm_n ) \mu_{\yrm|\xrm}\big (\Xrm_{n'} \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \big( \Xrm_n \big) \delta\big( \Xrm_n - \Xrm_{n'} \big)}{\alpha_0 \alpham\big( \Xrm_n \big) + \delta\big( \Xrm_n - \Xrm_{n'} \big)} \nonumber \;.
+\Prm_{\Yrm_n,\Yrm_{n'} | \Xrm_n,\Xrm_{n'}} \\
+\quad = \frac{\delta(\Xrm_n-\Xrm_{n'})}{\alpha_0 \alpham(\Xrm_n) + \delta(\Xrm_n-\Xrm_{n'})} \diag\big(\alphac(\Xrm_n)\big) + \frac{\alpha_0 \alpham(\Xrm_n)}{\alpha_0 \alpham(\Xrm_n) + \delta(\Xrm_n-\Xrm_{n'})} \alphac(\Xrm_n) \otimes \alpha(\Xrm_{n'}) \nonumber
 \end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{L}
+%\Prm_{\Yrm_n,\Yrm_{n'} | \Xrm_n,\Xrm_{n'}} (y,y' | x,x') \\
+%\quad = \frac{\alpha_0 \alpham(x) \alphac(y;x) \alpha(y';x') + \alphac(y;x) \delta(y-y') \delta(x-x')}{\alpha_0 \alpham(x) + \delta(x-x')} \nonumber \\
+%\quad = \frac{\delta(x-x')}{\alpha_0 \alpham(x) + \delta(x-x')} \alphac(y;x) \delta(y-y') + \frac{\alpha_0 \alpham(x)}{\alpha_0 \alpham(x) + \delta(x-x')} \alphac(y;x) \alpha(y';x') \nonumber
+%\end{IEEEeqnarray}
+
+
+
+
 
 
 
@@ -2600,7 +2611,7 @@ We have the Dirichlet-Empirical process $\uppsi \equiv \Psi(\Drm) \sim \DEP(N,\a
 and
 \begin{IEEEeqnarray}{L}
 \Erm_{\uppsi}\big[ \uppsi(y,x) \uppsi(y',x') \big] \\
-\qquad = \frac{1}{1 + \alpha_0^{-1}} \Big( (\alpha_0^{-1} + N^{-1}) \alpha(y,x) \delta(y-y') \delta(x-x') + (1 - N^{-1}) \alpha(y,x) \alpha(y',x') \Big) \nonumber \;.
+\qquad = \frac{\alpha_0^{-1} + N^{-1}}{1 + \alpha_0^{-1}} \alpha(y,x) \delta(y-y') \delta(x-x') + \frac{1 - N^{-1}}{1 + \alpha_0^{-1}} \alpha(y,x) \alpha(y',x')  \nonumber \;.
 \end{IEEEeqnarray}
 
 Observe that by the aggregation principle, $\uppsim \sim \DEP(N,\alpha_0,\alpham)$ is a DEP over the set $\Xcal$. Additionally, the 1-dimensional subsets conditioned on the marginalized DEP are characterized as
@@ -2688,6 +2699,13 @@ and the two terms are independently evaluated.
 
 PGR: D PERSPECTIVE
 
+To evaluate the expectation directly using training samples $\Yrm$ and $\Xrm$, first note that  $\mu_{\Yrm_n | \Xrm} = \mu_{\yrm|\xrm}\big( \Xrm_n \big)$ and $\Erm_{\Yrm_n | \Xrm}\big[ \Yrm_n^2 \big] = \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \big( \Xrm_n \big)$, and that
+\begin{IEEEeqnarray}{L}
+\Erm_{\Yrm_n,\Yrm_{n'} | \Xrm}\big[ \Yrm_n \Yrm_{n'} \big] \\
+\quad = \frac{\alpha_0 \alpham\big( \Xrm_n \big) \mu_{\yrm|\xrm}\big( \Xrm_n ) \mu_{\yrm|\xrm}\big (\Xrm_{n'} \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \big( \Xrm_n \big) \delta\big( \Xrm_n - \Xrm_{n'} \big)}{\alpha_0 \alpham\big( \Xrm_n \big) + \delta\big( \Xrm_n - \Xrm_{n'} \big)} \nonumber \;.
+\end{IEEEeqnarray}
+
+Solving,
 \begin{IEEEeqnarray}{rCl}
 \Erm_{\xrm,\Drm} \left[ \mu_{\yrm | \xrm,\Drm}^2 \right] & = & \Erm_{\xrm,\Drm} \left[ \left( \frac{\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big)}{\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big)} \right)^2 \right] \nonumber \\
 & = & \Erm_{\xrm} \left[ \Erm_{\Drm} \left[ \frac{\left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 }{\alpham(\xrm) \left(\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0 + N)} \right] \right] \nonumber \\
