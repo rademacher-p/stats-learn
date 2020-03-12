@@ -381,7 +381,7 @@ Note that the countable domains of the input functions may have an infinite numb
 
 Consider an observable random element $\xrm \in \Xcal$ and and unobservable random element $\yrm \in \Ycal$ which are jointly distributed according to an unknown probability distribution $\uptheta \in \Uptheta \equiv \Pcal(\Ycal \times \Xcal)$, such that $\Prm_{\yrm,\xrm | \uptheta} = \uptheta$. Note that the uppercase PMF notation used throughout this section implies that the random elements are discrete; PDF's are used when $\xrm$ and/or $\yrm$ are continuous random variables/processes.
 
-Also observed is a random sequence of $N$ samples from $\uptheta$, denoted $\Drm \in \Dcal = \{\Ycal \times \Xcal\}^N$; an alternative representation that can be used is $\Drm \Leftrightarrow \big( (\Yrm_1,\Xrm_1),\ldots,(\Yrm_N,\Xrm_N) \big)$, where $\Yrm \in \Ycal^N$ and $\Xrm \in \Xcal^N$. The $N$ data pairs are conditionally independent from one another and are identically distributed as $\Prm_{\Drm_n | \uptheta} = \uptheta$. The samples are also conditionally independent from $(\yrm,\xrm)$. Thus $\Prm_{\yrm,\xrm,\Drm | \uptheta} = \Prm_{\yrm,\xrm | \uptheta} \bigotimes_{n=1}^N \Prm_{\Drm_n | \uptheta}$ and
+Also observed is a random sequence of $N$ samples from $\uptheta$, denoted $\Drm \in \Dcal = \{\Ycal \times \Xcal\}^N$; an alternative representation that can be used is $\Drm \Leftrightarrow \big( (\Yrm_1,\Xrm_1),\ldots,(\Yrm_N,\Xrm_N) \big)$, where $\Yrm \in \Ycal^N$ and $\Xrm \in \Xcal^N$. The $N$ data pairs are conditionally independent from one another and are identically distributed as $\Prm_{\Drm_n | \uptheta} = \uptheta$. The samples are also conditionally independent from $(\yrm,\xrm)$. Thus $\Prm_{\yrm,\xrm,\Drm | \uptheta} = \Prm_{\yrm,\xrm | \uptheta} \otimes \left( \bigotimes_{n=1}^N \Prm_{\Drm_n | \uptheta} \right) = \uptheta \otimes \left( \bigotimes_{n=1}^N \uptheta \right)$ and
 \begin{equation}
 \Prm_{\yrm,\xrm,\Drm | \uptheta}(y,x,D | \theta) = \Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) \prod_{n=1}^N \Prm_{\Drm_n | \uptheta}\big(Y_n,X_n | \theta\big) \;.
 \end{equation}
@@ -528,7 +528,7 @@ Also of interest is the conditional distribution of $\uppsic \in \Uppsic$, where
 \end{IEEEeqnarray}
 over the domain $\prod_{x \in \Xcal} \left\{ \frac{n}{N \psim(x)}: n \in {\Zbbgeq}^{\Ycal}, \ \sum_{y \in \Ycal} n(y) = N \psim(x) \right\}$. Observe that conditioning on the marginal empirical process renders the conditional processes $\uppsic(x)$ independent of one another and that they are also Empirically distributed, such that $\uppsic(x) | \uppsim(x),\upthetac(x) \sim \Emp\big( N \uppsim(x),\upthetac(x) \big)$. 
 
-\todohigh{otimes for all? ordered set?}
+\todohigh{otimes for all? ordered set? use sim notation?}
 
 
 
@@ -1054,12 +1054,15 @@ By the aggregation property \cite{ferguson}, $\upthetam \sim \Dir(\alpha_0,\alph
 & = & \prod_{x \in \Xcal} \Bigg[ \beta\big( \alpha_0 \alpham(x) \alphac(x) \big)^{-1} \prod_{y \in \Ycal} \thetac(y;x)^{\alpha_0 \alpham(x) \alphac(y;x) - 1} \Bigg] \nonumber \\
 & = & \prod_{x \in \Xcal} \Dir\Big( \thetac(x) ; \alpha_0 \alpham(x), \alphac(x) \Big) \nonumber \;,
 \end{IEEEeqnarray}
+\begin{IEEEeqnarray}{rCl}
+\upthetac | \upthetam & \sim & \upthetac \sim \bigotimes_{x \in \Xcal} \Dir\Big( \alpha_0 \alpham(x), \alphac(x) \Big) ?? \;,
+\end{IEEEeqnarray}
 a product of Dirichlet distributions defined on $\thetac \in \Pcal(\Ycal)^{\Xcal}$. As shown, the processes $\upthetac(x)$ are Dirichlet with parameterizing distributions $\alphac(x)$ and concentrations $\alpha_0 \alpham(x)$, independent of one another, and independent of the marginal distribution $\upthetam$. Note that $\Prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$. 
 
-\todolo{Keep normal alpha in exponents above??}
 
 
-\todomid{use conditional independence property to simplify throughout?!? In loss app sections?!?!}
+
+
 
 
 
@@ -2473,11 +2476,16 @@ By the properties of the Dirichlet process proven in Appendix \ref{app:DP_post},
 \end{IEEEeqnarray}
 where $\Psi(y,x;D) = N^{-1} \sum_{n=1}^N \delta\big( (y,x) - D_n \big)$. 
 
-Recall that $\Drm_n \Leftrightarrow \big( \Yrm_n,\Xrm_n \big)$, where $\Yrm \in \Ycal^N$ and $\Xrm \in \Xcal^N$. Since $\prm_{\yrm,\xrm | \Drm} = \mu_{\uptheta | \Drm}$, by Bayes rule the conditional PDF of interest is
+Recall that $\Drm_n \Leftrightarrow \big( \Yrm_n,\Xrm_n \big)$, where $\Yrm \in \Ycal^N$ and $\Xrm \in \Xcal^N$. Since $\prm_{\yrm,\xrm | \Drm} = \mu_{\uptheta | \Drm}$, by Bayes rule the marginal PDF is
+\begin{IEEEeqnarray}{rCl}
+\prm_{\xrm | \Drm} & = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \alpham + \left(\frac{N}{\alpha_0+N}\right) \Psim(\Drm) \;,
+\end{IEEEeqnarray}
+and the conditional PDF of interest is
 \begin{IEEEeqnarray}{rCl}
 \prm_{\yrm | \xrm,\Drm} & = & \frac{\alpha_0 \alpha(\cdot,\xrm) + N \Psi(\cdot,\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)} \\
 & \equiv & \frac{\alpha_0 \alpha(\cdot,\xrm) + \sum_{n=1}^N \delta\big( \cdot - \Yrm_n \big) \delta\big( \xrm - \Xrm_n \big)}{\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big)} \nonumber \\
-& = & \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm)+N \Psim(\xrm;\Drm)}\right) \alphac(\xrm) + \left(\frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm)+N \Psim(\xrm;\Drm)}\right) \Psic(\xrm;\Drm) \nonumber \;.
+& = & \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm)+N \Psim(\xrm;\Drm)}\right) \alphac(\xrm) + \left(\frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm)+N \Psim(\xrm;\Drm)}\right) \Psic(\xrm;\Drm) \nonumber \\
+& = & \left(1 + \frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm)}\right)^{-1} \alphac(\xrm) + \left(1 + \frac{\alpha_0 \alpham(\xrm)}{N \Psim(\xrm;\Drm)}\right)^{-1} \Psic(\xrm;\Drm) \nonumber \;.
 \end{IEEEeqnarray}
 
 
@@ -3192,42 +3200,69 @@ Additionally, when also conditioned on the aggregation $\uppsim$, the normalized
 
 
 
-\subsection{Proof that $\uppsi \equiv N^{-1} \sum_{n=1}^N \delta(\cdot - \Drm_n)$ given $\theta$ is an EP}
 
-Next, it is demonstrated that conditioned on $\uptheta$, the random process $\uppsi \equiv \Psi(\Drm) = N^{-1} \sum_{n=1}^N \delta(\cdot - \Drm_n)$ is an EP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta(D_n)$.
 
-Observe that $\uppsim(z) \equiv N^{-1} \sum_{n=1}^N \chi(\Drm_n;\Scal_z)$, where $\chi$ is the indicator function
+
+%\subsection{Mean and Correlation Functions}
+%
+%In this subsection the mean and correlation functions of a continuous-domain EP are expressed. The mean function is
+%\begin{IEEEeqnarray}{rCl}
+%\mu_{\uppsi | \uptheta} & = & \Erm_{\Drm | \uptheta}\left[ \frac{1}{N} \sum_{n=1}^N \delta\big( \cdot - \Drm_n \big) \right] \\
+%& = & \frac{1}{N} \sum_{n=1}^N \Prm_{\Drm_n | \uptheta} = \frac{1}{N} \sum_{n=1}^N \uptheta \nonumber \\
+%& = & \uptheta \nonumber \;.
+%\end{IEEEeqnarray}
+%
+%\todolo{Binomial RV proof? Like DP?}
+%
+%The correlation function is
+%\begin{IEEEeqnarray}{rCl}
+%\Erm_{\uppsi | \uptheta}\big[ \uppsi(y) \uppsi(y') \big] & = & N^{-2} \sum_{n=1}^N \sum_{n'=1}^N \Erm_{\Drm | \uptheta}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_{n'} \big) \Big] \nonumber \\
+%& = & N^{-2} \sum_n \Erm_{\Drm_n | \uptheta}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_n \big) \Big] \nonumber \\
+%&& \quad + N^{-2} \sum_{n \neq n'} \Erm_{\Drm_n | \uptheta}\Big[ \delta\big( y-\Drm_n \big) \Big] \Erm_{\Drm_{n'} | \uptheta}\Big[ \delta\big( y'-\Drm_{n'} \big) \Big] \nonumber \\
+%& = & N^{-2} \sum_n \int_{\Ycal} \uptheta(\tilde{y}) \delta(y-\tilde{y}) \delta(y'-\tilde{y}) {\drm}\tilde{y}  \nonumber \\
+%&& \quad + N^{-2} \sum_{n \neq n'} \int_{\Ycal} \uptheta(\tilde{y}) \delta(y-\tilde{y}) {\drm}\tilde{y} \int_{\Ycal} \uptheta(\tilde{y}') \delta(y'-\tilde{y}') {\drm}\tilde{y}' \nonumber \\
+%& = & \frac{1}{N} \uptheta(y) \delta(y-y') + \left(1-\frac{1}{N}\right) \uptheta(y) \uptheta(y') \;.
+%\end{IEEEeqnarray}
+
+
+\subsection{Mean and Correlation Functions} \label{app:E_EP}
+
+In this section, it is shown that the expected value of an Empirical process $\uppsi \sim \EP(N, \theta)$ is 
 \begin{equation}
-\chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S.  \end{cases}
+\mu_{\uppsi} = \theta \;.
 \end{equation}
-and note that $\Prm\big( \chi(\Drm_n;\Scal_z) = 1 \big| \uptheta \big) =\\equiv \upthetam(z)$, where $\upthetam(z) \equiv \int_{\Scal_z} \uptheta(y) {\drm}y$. As the events $\Drm_n \in \Scal_z$ are independent given $\uptheta$, $\uppsim$ conditioned on the model $\uptheta$ is characterized by an Empirical distribution 
-\begin{equation}
-\Prm_{\uppsim | \uptheta}(\psim | \theta) \equiv \Mcal(N \psim) \prod_{z \in \Zcal} \left( \thetam(z) ^{\psim(z)} \right)^{N} = \Emp\big( \psim; N,\thetam \big)
-\end{equation}
-of $N$ samples with parameters $\thetam$. Since the aggregation property is satisfied, $\uppsi$ is a Empirical process.
 
-
-
-\subsection{Mean and Correlation Functions}
-
-In this subsection the mean and correlation functions of a continuous-domain EP are expressed. The mean function is
+A defining characteristic of Empirical processes is that their aggregations are also Empirical. Define the partition of $\Ycal = \Rbb$, $\big\{ \Scal(y),S^\text{c}(y) \big\}$ where $\Scal(y) = (-\infty,y]$. The transform random process $\big(\uppsim, \uppsim^\text{c}\big)$, where $\uppsim \equiv \int_{\infty}^y \uppsi(t) {\drm}t$, is thus a discrete-domain Empirical random process for $N$ samples and mean $\big(\thetam,\thetam^\text{c}\big)$, where $\thetam = \int_{-\infty}^y \theta(t) {\drm}t$ and $\thetam^\text{c} = \int_y^\infty \theta(t) {\drm}t$. Dependency on $y$ is suppressed for brevity. Observe that $\mu_{\uppsim}(y) = \thetam$ and thus that 
 \begin{IEEEeqnarray}{rCl}
-\mu_{\uppsi | \uptheta} & = & \Erm_{\Drm | \uptheta}\left[ \frac{1}{N} \sum_{n=1}^N \delta\big( \cdot - \Drm_n \big) \right] \\
-& = & \frac{1}{N} \sum_{n=1}^N \Prm_{\Drm_n | \uptheta} = \frac{1}{N} \sum_{n=1}^N \uptheta \nonumber \\
-& = & \uptheta \nonumber \;.
+\mu_{\uppsim} & = & \int_{-\infty}^y \theta(t) {\drm}t = \int_{-\infty}^y \mu_{\uppsi}(t) {\drm}t \nonumber \;.
+\end{IEEEeqnarray}
+Differentiating with respect to $y$, we have the expected value of the EP.
+
+Next, the correlation function is shown to be 
+\begin{equation}
+\Erm_{\uppsi}\big[ \uppsi(y_1)\uppsi(y_2) \big] = \frac{1}{N} \uptheta(y_1) \delta(y_1-y_2) + \left(1-\frac{1}{N}\right) \uptheta(y_1) \uptheta(y_2) \;.
+\end{equation}
+First, assume $y_2 \geq y_1$ and define a new partition of $\Ycal$, $\big\{ (-\infty,y_1], (y_1,y_2], (y_2,\infty) \big\}$. By the aggregation property, the random triplet $\left( \int_{-\infty}^{y_1} \uppsi(t) {\drm}t, \int_{y_1}^{y_2} \uppsi(t) {\drm}t, \int_{y_2}^{\infty} \uppsi(t) {\drm}t \right)$ is Empirical with $N$ samples and mean $\left( \int_{-\infty}^{y_1} \theta(t) {\drm}t, \int_{y_1}^{y_2} \theta(t) {\drm}t, \int_{y_2}^{\infty} \theta(t) {\drm}t \right)$.
+
+Define the function
+\begin{IEEEeqnarray}{L}
+g(t_1,t_2) = \Erm_{\uppsi}\left[ \int_{-\infty}^{y_1} \uppsi(t_1) {\drm}t_1 \int_{-\infty}^{y_2} \uppsi(t_2) {\drm}t_2 \right] \\
+\quad = \Erm_{\uppsi}\left[ \left( \int_{-\infty}^{y_1} \uppsi(t_1) {\drm}t_1 \right)^2 + \left( \int_{-\infty}^{y_1} \uppsi(t_1) {\drm}t_1 \right) \left( \int_{y_1}^{y_2} \uppsi(t_2) {\drm}t_2 \right) \right] \nonumber \\
+\quad = \frac{1}{N} \left( \int_{-\infty}^{y_1} \theta(t_1) {\drm}t_1 \right) \left( 1 + (N-1) \int_{-\infty}^{y_1} \theta(t_1) {\drm}t_1 \right) + \left(1-\frac{1}{N}\right) \left( \int_{-\infty}^{y_1} \theta(t_1) {\drm}t_1 \right) \left( \int_{y_1}^{y_2} \theta(t_2) {\drm}t_2 \right) \nonumber \\
+\quad = \frac{1}{N} \left( \int_{-\infty}^{y_1} \theta(t_1) {\drm}t_1 \right) + \left(1-\frac{1}{N}\right) \left( \int_{-\infty}^{y_1} \theta(t_1) {\drm}t_1 \right) \left( \int_{-\infty}^{y_2} \theta(t_2) {\drm}t_2 \right) \quad \forall y_2 \geq y_1 \nonumber \;.
+\end{IEEEeqnarray}
+Following the same steps provides the values of $g$ for $t_2 \leq t_1$; the combined formula can be given as
+\begin{IEEEeqnarray}{L}
+g(t_1,t_2) = \frac{1}{N} \left( \int_{-\infty}^{\min(y_1,y_2)} \theta(t_1) {\drm}t_1 \right) + \left(1-\frac{1}{N}\right) \left( \int_{-\infty}^{y_1} \theta(t_1) {\drm}t_1 \right) \left( \int_{-\infty}^{y_2} \theta(t_2) {\drm}t_2 \right) \;. 
+\end{IEEEeqnarray}
+Finally,
+\begin{IEEEeqnarray}{L}
+\Erm_{\uppsi}\big[ \uppsi(y_1)\uppsi(y_2) \big] = \frac{{\drm}^2}{{\drm}t_1 {\drm}t_2} g(t_1,t_2) \\
+\quad = \frac{{\drm}}{{\drm}t_2} \left[ \frac{1}{N} u(t_2-t_1) \theta\big( \min(t_1,t_2) \big) + \left(1-\frac{1}{N}\right) \theta(y_1) \left( \int_{-\infty}^{y_2} \theta(t_2) {\drm}t_2 \right) \right] \nonumber \\
+\quad = \frac{1}{N} \theta(y_1)\delta(y_1-y_2) + \left(1-\frac{1}{N}\right) \theta(y_1)\theta(y_2) \nonumber \;.
 \end{IEEEeqnarray}
 
-\todolo{Binomial RV proof? Like DP?}
 
-The correlation function is
-\begin{IEEEeqnarray}{rCl}
-\Erm_{\uppsi | \uptheta}\big[ \uppsi(y) \uppsi(y') \big] & = & N^{-2} \sum_{n=1}^N \sum_{n'=1}^N \Erm_{\Drm | \uptheta}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_{n'} \big) \Big] \nonumber \\
-& = & N^{-2} \sum_n \Erm_{\Drm_n | \uptheta}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_n \big) \Big] \nonumber \\
-&& \quad + N^{-2} \sum_{n \neq n'} \Erm_{\Drm_n | \uptheta}\Big[ \delta\big( y-\Drm_n \big) \Big] \Erm_{\Drm_{n'} | \uptheta}\Big[ \delta\big( y'-\Drm_{n'} \big) \Big] \nonumber \\
-& = & N^{-2} \sum_n \int_{\Ycal} \uptheta(\tilde{y}) \delta(y-\tilde{y}) \delta(y'-\tilde{y}) {\drm}\tilde{y}  \nonumber \\
-&& \quad + N^{-2} \sum_{n \neq n'} \int_{\Ycal} \uptheta(\tilde{y}) \delta(y-\tilde{y}) {\drm}\tilde{y} \int_{\Ycal} \uptheta(\tilde{y}') \delta(y'-\tilde{y}') {\drm}\tilde{y}' \nonumber \\
-& = & \frac{1}{N} \uptheta(y) \delta(y-y') + \left(1-\frac{1}{N}\right) \uptheta(y) \uptheta(y') \;.
-\end{IEEEeqnarray}
 
 
 
@@ -3279,58 +3314,6 @@ Additionally, the normalized random processes $\upthetac(z) \equiv \uptheta_z / 
 
 
 
-\subsection{Proof: Model Posterior Process is Dirichlet} \label{app:DP_post}
-
-In this section, it is shown that if the model $\uptheta \sim \DP(\alpha_0, \alpha)$ is a Dirichlet process, then the model conditioned on the training data $\Drm$ is also a Dirichlet process with concentration $\alpha_0 + N$ and mean function 
-\begin{equation}
-\mu_{\uptheta | \Drm} = \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpha + \left(\frac{N}{\alpha_0 + N}\right) \Psi(\Drm) \;,
-\end{equation}
-where $\Psi(\Drm) = N^{-1} \sum_{n=1}^N \delta\big( \cdot - \Drm_n \big)$
-
-A defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Consider a DP over the set $\Ycal$. Define an arbitrary countable partition of $\Ycal$: $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$ and the corresponding function partitions $\theta_z \in \Rbbgeq^{\Scal_z}$, such that $\uptheta = \left\{ \ldots,\uptheta_z,\ldots \right\}$, and $\alpha_z \in {\Rbb^+}^{\Scal_z}$, such that $\alpha = \left\{ \ldots,\alpha_z,\ldots \right\}$. The transformed random process $\upthetam \in \Pcal(\Zcal)$, $\upthetam(z) \equiv \int_{\Scal_z} \uptheta_z(y) {\drm}y$, is neccessarily Dirichlet with concentration $\alpha_0$ and a mean function $\alpham \in {\Rbb^+}^{\Zcal}$, $\alpham(z) \equiv \int_{\Scal_z} \alpha_z(y) {\drm}y$.
-
-To prove the hypothesis, it is required that
-\begin{IEEEeqnarray}{rCl}
-\upthetam | \Drm & \sim & \Dir\big( \alpha_0 + N, \mu_{\upthetam | \Drm} \big) \;,
-\end{IEEEeqnarray}
-where
-\begin{equation}
-\mu_{\upthetam | \Drm} = \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpham + \left(\frac{N}{\alpha_0 + N}\right) \Psim(D) 
-\end{equation}
-and $\Psim(z;D) = \int_{\Scal_z} \Psi(y;D) {\drm}y = N^{-1} \sum_{n=1}^N \chi(D_n;\Scal_z)$. $\chi$ is the indicator function
-\begin{equation}
-\chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S.  \end{cases}
-\end{equation}
-
-
-To prove the hypothesis, exploit the results of Appendix \ref{app:Dir_agg} to represent the training data distribution conditioned on the aggregation $\upthetam$. Introduce the normalized functions $\upthetac(z) \equiv \uptheta_z / \upthetam(z) \in \Pcal(\Scal_z)$, which are continuous-domain Dirichlet processes, independent from one another, and independent from the aggregation process $\upthetam$. The conditional distribution of interest is
-\begin{IEEEeqnarray}{rCl}
-\prm_{\Drm | \upthetam}(D | \upthetam) & = & \Erm_{\upthetac | \upthetam}\big[ \prm_{\Drm | \upthetam,\upthetac}(D | \upthetam,\upthetac) \big] \\
-& = & \Erm_{\upthetac | \upthetam}\left[ \prod_{n=1}^N \prod_{z \in \Zcal} \big( \upthetam(z) \upthetac(D_n;z) \big)^{\chi(D_n; \Scal_z)} \right] \nonumber \\
-& = & \left( \prod_{z \in \Zcal} \prod_{n=1}^N \upthetam(z)^{\chi(D_n; \Scal_z)} \right) \prod_{z \in \Zcal} \Erm_{\upthetac(z)}\left[ \prod_{n=1}^N \upthetac(D_n; z)^{\chi(D_n; \Scal_z)} \right] \nonumber \\
-& = & \left( \prod_{z \in \Zcal} \upthetam(z)^{\Psim(z;D)} \right)^N \prod_{z \in \Zcal} \Erm_{\upthetac(z)}\left[ \prod_{n=1}^N \upthetac(D_n; z)^{\chi(D_n; \Scal_z)} \right] \nonumber \;,
-\end{IEEEeqnarray}
-Observe that the dependency of this likelihood function on $\upthetam$ is polynomial. Thus, $\upthetam$ is a conjugate prior for $\Drm$ and the training data marginal distribution is
-\begin{IEEEeqnarray}{rCl}
-\prm_{\Drm}(D) & = & \Erm_{\upthetam} \left[ \left( \prod_{z \in \Zcal} \upthetam(z)^{\Psim(z;D)} \right)^N \right] \prod_{z \in \Zcal} \Erm_{\upthetac(z)}\left[ \prod_{n=1}^N \upthetac(D_n; z)^{\chi(D_n; \Scal_z)} \right] \\
-& = & \frac{\beta\big( \alpha_0 \alpham + N \Psim(D) \big)}{\beta(\alpha_0 \alpham)} \prod_{z \in \Zcal} \Erm_{\upthetac(z)}\left[ \prod_{n=1}^N \upthetac(D_n; z)^{\chi(D_n; \Scal_z)} \right] \nonumber
-\end{IEEEeqnarray}
-and the distribution of interest is
-\begin{IEEEeqnarray}{rCl}
-\prm_{\upthetam | \Drm}(\thetam | D) & = & \frac{\prod_{z \in \Zcal} \thetam(z)^{\alpha_0 \alpham(z) + N \Psim(z;D) - 1}}{\beta\big( \alpha_0 \alpham + N \Psim(D) \big)} \\
-& = & \Dir\big( \upthetam ; \alpha_0 + N, \mu_{\upthetam | \Drm} \big) \nonumber \;.
-\end{IEEEeqnarray}
-This proves the hypothesis.
-
-
-\todomid{Below: location?}
-
-Additionally, observe that $\uptheta | \{\Drm = D\} \sim \uptheta | \left\{ \uppsi = \Psi(D)\right\}$; that is, the statistic $\Psi(\Drm)$ encapsulates all the relevant information about the training set. This is a natural generalization of the results for the discrete-domain model process. Additionally, note that $\upthetam | \{\Drm = D\} \sim \upthetam | \big\{ \uppsim = \Psim(D)\big\}$. The model aggregation process is only dependent on the aggregation of the empirical distribution. These properties result from the independence of $\upthetam$ from $\upthetac$, a property that Dirichlet processes hold.
-
-Also, when an Empirical process $\uppsi \sim \EP(N,\theta)$ has a mean function which is characterized by a Dirichlet process $\uptheta \sim \DP(\alpha_0,\alpha)$, the posterior $\uptheta | \uppsi \sim \DP(\alpha_0 + N, \mu_{\uptheta | \uppsi})$, with
-\begin{IEEEeqnarray}{rCl}
-\mu_{\uptheta | \uppsi} & = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \alpha + \left(\frac{N}{\alpha_0+N}\right) \uppsi
-\end{IEEEeqnarray}
 
 
 
@@ -3342,16 +3325,16 @@ In this section, it is shown that the expected value of a Dirichlet process $\up
 \mu_{\uptheta} = \alpha \;.
 \end{equation}
 
-A defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Define the partition of $\Ycal = \Rbb$, $\big\{ \Scal(y),S^\text{c}(y) \big\}$ where $\Scal(y) = \{ t \in \Ycal : t \leq y \}$. The transform random variable $\upthetam(y) \equiv \int_{-\infty}^y \uptheta(t) {\drm}t$ is thus a Beta random variable with parameters $\lambda = \alpha_0 \int_{-\infty}^y \alpha(t) {\drm}t$ and $\lambda^\text{c} = \alpha_0 \int_y^\infty \alpha(t) {\drm}t$. Observe that $\mu_{\upthetam}(y) \equiv \int_{-\infty}^y \mu_{\uptheta}(t) {\drm}t$ and that using the formula for the expected value of a beta random variable \cite{papoulis},
+A defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Define the partition of $\Ycal = \Rbb$, $\big\{ \Scal(y),S^\text{c}(y) \big\}$ where $\Scal(y) = (-\infty,y]$. The transform random variable $\upthetam \equiv \int_{-\infty}^y \uptheta(t) {\drm}t$ is thus a Beta random variable with parameters $\lambda = \alpha_0 \int_{-\infty}^y \alpha(t) {\drm}t$ and $\lambda^\text{c} = \alpha_0 \int_y^\infty \alpha(t) {\drm}t$. Dependency on $y$ is suppressed for brevity. Observe that $\mu_{\upthetam} \equiv \int_{-\infty}^y \mu_{\uptheta}(t) {\drm}t$ and that using the formula for the expected value of a beta random variable \cite{papoulis},
 \begin{IEEEeqnarray}{rCl}
-\mu_{\upthetam} & = & \frac{\lambda}{\lambda+\lambda^\text{c}} \\
+\mu_{\upthetam} & = & \frac{\lambda}{\lambda + \lambda^\text{c}} \\
 & = & \int_{-\infty}^y \alpha(t) {\drm}t = \int_{-\infty}^y \mu_{\uptheta}(t) {\drm}t \nonumber \;.
 \end{IEEEeqnarray}
 Differentiating with respect to $y$, we have the expected value of the DP.
 
 Next, the correlation function is shown to be 
 \begin{equation}
-\Erm_{\uptheta}\big[ \uptheta(y_1)\uptheta(y_2) \big] = \frac{\alpha_0 \alpha(y_1)\alpha(y_2) + \alpha(y_1)\delta(y_1-y_2)}{\alpha_0+1} \;.
+\Erm_{\uptheta}\big[ \uptheta(y_1)\uptheta(y_2) \big] = \frac{\alpha(y_1)\delta(y_1-y_2) + \alpha_0 \alpha(y_1)\alpha(y_2)}{\alpha_0+1} \;.
 \end{equation}
 First, assume $y_2 \geq y_1$ and define a new partition of $\Ycal$, $\big\{ (-\infty,y_1], (y_1,y_2], (y_2,\infty) \big\}$. By the aggregation property, the random triplet $\left( \int_{-\infty}^{y_1} \uptheta(t) {\drm}t, \int_{y_1}^{y_2} \uptheta(t) {\drm}t, \int_{y_2}^{\infty} \uptheta(t) {\drm}t \right)$ is Dirichlet with concentration $\alpha_0$ and mean $\left( \int_{-\infty}^{y_1} \alpha(t) {\drm}t, \int_{y_1}^{y_2} \alpha(t) {\drm}t, \int_{y_2}^{\infty} \alpha(t) {\drm}t \right)$.
 
@@ -3360,17 +3343,17 @@ Define the function
 g(t_1,t_2) = \Erm_{\uptheta}\left[ \int_{-\infty}^{y_1} \uptheta(t_1) {\drm}t_1 \int_{-\infty}^{y_2} \uptheta(t_2) {\drm}t_2 \right] \\
 \quad = \Erm_{\uptheta}\left[ \left( \int_{-\infty}^{y_1} \uptheta(t_1) {\drm}t_1 \right)^2 + \left( \int_{-\infty}^{y_1} \uptheta(t_1) {\drm}t_1 \right) \left( \int_{y_1}^{y_2} \uptheta(t_2) {\drm}t_2 \right) \right] \nonumber \\
 \quad = \frac{\left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) \left( 1 + \alpha_0\int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) + \alpha_0 \left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) \left( \int_{y_1}^{y_2} \alpha(t_2) {\drm}t_2 \right)}{\alpha_0+1} \nonumber \\
-\quad = \frac{\alpha_0 \left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) \left( \int_{-\infty}^{y_2} \alpha(t_2) {\drm}t_2 \right) + \left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right)}{\alpha_0+1} \quad \forall y_2 \geq y_1 \nonumber \;.
+\quad = \frac{\left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) + \alpha_0 \left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) \left( \int_{-\infty}^{y_2} \alpha(t_2) {\drm}t_2 \right)}{\alpha_0+1} \quad \forall \ y_2 \geq y_1 \nonumber \;.
 \end{IEEEeqnarray}
 Following the same steps provides the values of $g$ for $t_2 \leq t_1$; the combined formula can be given as
 \begin{IEEEeqnarray}{L}
-g(t_1,t_2) = \frac{\alpha_0 \left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) \left( \int_{-\infty}^{y_2} \alpha(t_2) {\drm}t_2 \right) + \left( \int_{-\infty}^{\min(y_1,y_2)} \alpha(t_1) {\drm}t_1 \right)}{\alpha_0+1} \;. 
+g(t_1,t_2) = \frac{\left( \int_{-\infty}^{\min(y_1,y_2)} \alpha(t_1) {\drm}t_1 \right) + \alpha_0 \left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) \left( \int_{-\infty}^{y_2} \alpha(t_2) {\drm}t_2 \right)}{\alpha_0+1} \;. 
 \end{IEEEeqnarray}
 Finally,
 \begin{IEEEeqnarray}{L}
 \Erm_{\uptheta}\big[ \uptheta(y_1)\uptheta(y_2) \big] = \frac{{\drm}^2}{{\drm}t_1 {\drm}t_2} g(t_1,t_2) \\
-\quad = \frac{\frac{{\drm}}{{\drm}t_2} \left[ \alpha_0 \alpha(y_1) \left( \int_{-\infty}^{y_2} \alpha(t_2) {\drm}t_2 \right) + u(t_2-t_1) \alpha\big( \min(t_1,t_2) \big) \right]}{\alpha_0+1} \nonumber \\
-\quad = \frac{\alpha_0 \alpha(y_1)\alpha(y_2) + \alpha(y_1)\delta(y_1-y_2)}{\alpha_0+1} \nonumber \;.
+\quad = \frac{\frac{{\drm}}{{\drm}t_2} \left[ u(t_2-t_1) \alpha\big( \min(t_1,t_2) \big) + \alpha_0 \alpha(y_1) \left( \int_{-\infty}^{y_2} \alpha(t_2) {\drm}t_2 \right) \right]}{\alpha_0+1} \nonumber \\
+\quad = \frac{\alpha(y_1)\delta(y_1-y_2) + \alpha_0 \alpha(y_1)\alpha(y_2)}{\alpha_0+1} \nonumber \;.
 \end{IEEEeqnarray}
 
 
@@ -3405,51 +3388,79 @@ Also, when conditioned on the aggregation $\uppsim$, the normalized functions $\
 
 
 
-\subsection{Proof that $\uppsi \equiv N^{-1} \sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DEP}
-
-Next, it is demonstrated that the random process $\uppsi \equiv \Psi(\Drm) = N^{-1} \sum_{n=1}^N \delta\big( \cdot-\Drm_n \big)$ is a DMP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta(D_n)$ and $\uptheta \sim \DP(\alpha_0, \alpha)$. 
-
-Observe that $\uppsim(z) \equiv N^{-1} \sum_{n=1}^N \chi(\Drm_n;\Scal_z)$, where $\chi$ is the indicator function
-\begin{equation}
-\chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S.  \end{cases}
-\end{equation}
-and note that $\Prm\Big( \chi(\Drm_n;\Scal_z) = 1 \big| \uptheta \Big) = \int_{\Scal_z} \uptheta(y) {\drm}y$. As such, $\uppsim$ conditioned on the model $\uptheta$ is characterized by an Empirical distribution 
-\begin{equation}
-\Prm_{\uppsim | \uptheta}(\psim | \theta) \equiv \Mcal(N \psim) \prod_{z \in \Zcal} \left( \thetam(z) ^{\psim(z)} \right)^{N} = \Emp\big( \psim; N,\thetam \big)
-\end{equation}
-of $N$ samples with parameters $\upthetam(z) \equiv \int_{\Scal_z} \uptheta(y) {\drm}y$, $z \in \Zcal$.
-
-By the aggregation property of the Dirichlet process $\uptheta$, the parameters of this Empirical distribution are characterized as $\upthetam \sim \Dir(\alpha_0,\alpham)$, and thus $\uppsim$ is drawn from a Dirichlet-Empirical PMF $\DE(N,\alpha_0,\alpham)$. As this aggregation property holds for any countable partition of $\Ycal$, $\uppsi$ is a Dirichlet-Empirical Process.
 
 
 
-
-\subsection{Mean and Correlation Functions}
-
-In this subsection the mean and correlation functions of a DMP are expressed. The mean function is 
-\begin{IEEEeqnarray}{rCl}
-\mu_{\uppsi} & = & N^{-1} \sum_{n=1}^N \Erm_{\Drm_n}\Big[\delta\big( \cdot-\Drm_n \big) \Big] \\
-& = & N^{-1} \sum_{n=1}^N \Prm_{\Drm_n} = N^{-1} \sum_{n=1}^N \mu_{\uptheta} \nonumber \\
-& = & \mu_{\uptheta} = \alpha \nonumber \;.
-\end{IEEEeqnarray}
-
-The correlation function is
-\begin{IEEEeqnarray}{rCl}
-\Erm_{\uppsi}\big[ \uppsi(y) \uppsi(y') \big] & = & \Erm_{\uptheta}\Big[ \Erm_{\uppsi | \uptheta}\big[ \uppsi(y) \uppsi(y') \big] \Big] \nonumber \\
-& = & \Erm_{\uptheta}\left[ \frac{1}{N} \uptheta(y) \delta(y-y') + \left(1-\frac{1}{N}\right) \uptheta(y) \uptheta(y') \right] \nonumber \\
-& = & \frac{1}{N} \alpha(y) \delta(y-y') + \left(1-\frac{1}{N}\right) \frac{\alpha_0 \alpha(y_1)\alpha(y_2) + \alpha(y_1)\delta(y_1-y_2)}{\alpha_0+1} \nonumber \\
-& = & \frac{1}{1 + \alpha_0^{-1}} \Big( (\alpha_0^{-1} + N^{-1}) \alpha(y) \delta(y-y') + (1 - N^{-1}) \alpha(y) \alpha(y') \Big) \;.
-\end{IEEEeqnarray}
-
+%\subsection{Mean and Correlation Functions}
+%
+%In this subsection the mean and correlation functions of a DMP are expressed. The mean function is 
 %\begin{IEEEeqnarray}{rCl}
-%\Erm_{\uppsi}\big[ \uppsi(y) \uppsi(y') \big] & = & N^{-2} \sum_{n=1}^N \sum_{n'=1}^N \Erm_{\Drm_n,\Drm_{n'}}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_{n'} \big) \Big] \nonumber \\
-%& = & N^{-2} \sum_n \Erm_{\Drm_n}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_n \big) \Big] \nonumber \\
-%&& \quad + N^{-2} \sum_{n \neq n'} \Erm_{\Drm_n,\Drm_{n'}}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_{n'} \big) \Big] \nonumber \\
-%& = & N^{-2} \sum_n \int_{\Ycal} \frac{\alpha(\tilde{y})}{\alpha_0} \delta(y-\tilde{y}) \delta(y'-\tilde{y}) \nonumber \\
-%&& \quad + N^{-2} \sum_{n \neq n'} \int_{\Ycal} \int_{\Ycal} \frac{\alpha(\tilde{y}) \alpha(\tilde{y}') + \alpha(\tilde{y}) \delta(\tilde{y}-\tilde{y}')}{\alpha_0 (\alpha_0+1)} \delta(y-\tilde{y}) \delta(y-\tilde{y}') \nonumber \\
-%& = & N \frac{\alpha(y)}{\alpha_0} \delta(y-y') + N(N-1) \frac{\alpha(y) \alpha(y') + \alpha(y) \delta(y-y')}{\alpha_0 (\alpha_0+1)} \nonumber \\
-%& = & \frac{N}{\alpha_0 (\alpha_0+1)} \big[ (N-1)\alpha(y) \alpha(y') + (\alpha_0+N) \alpha(y) \delta(y-y') \big] \nonumber \;.
+%\mu_{\uppsi} & = & N^{-1} \sum_{n=1}^N \Erm_{\Drm_n}\Big[\delta\big( \cdot-\Drm_n \big) \Big] \\
+%& = & N^{-1} \sum_{n=1}^N \Prm_{\Drm_n} = N^{-1} \sum_{n=1}^N \mu_{\uptheta} \nonumber \\
+%& = & \mu_{\uptheta} = \alpha \nonumber \;.
 %\end{IEEEeqnarray}
+%
+%The correlation function is
+%\begin{IEEEeqnarray}{rCl}
+%\Erm_{\uppsi}\big[ \uppsi(y) \uppsi(y') \big] & = & \Erm_{\uptheta}\Big[ \Erm_{\uppsi | \uptheta}\big[ \uppsi(y) \uppsi(y') \big] \Big] \nonumber \\
+%& = & \Erm_{\uptheta}\left[ \frac{1}{N} \uptheta(y) \delta(y-y') + \left(1-\frac{1}{N}\right) \uptheta(y) \uptheta(y') \right] \nonumber \\
+%& = & \frac{1}{N} \alpha(y) \delta(y-y') + \left(1-\frac{1}{N}\right) \frac{\alpha_0 \alpha(y_1)\alpha(y_2) + \alpha(y_1)\delta(y_1-y_2)}{\alpha_0+1} \nonumber \\
+%& = & \frac{1}{1 + \alpha_0^{-1}} \Big( (\alpha_0^{-1} + N^{-1}) \alpha(y) \delta(y-y') + (1 - N^{-1}) \alpha(y) \alpha(y') \Big) \;.
+%\end{IEEEeqnarray}
+%
+%%\begin{IEEEeqnarray}{rCl}
+%%\Erm_{\uppsi}\big[ \uppsi(y) \uppsi(y') \big] & = & N^{-2} \sum_{n=1}^N \sum_{n'=1}^N \Erm_{\Drm_n,\Drm_{n'}}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_{n'} \big) \Big] \nonumber \\
+%%& = & N^{-2} \sum_n \Erm_{\Drm_n}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_n \big) \Big] \nonumber \\
+%%&& \quad + N^{-2} \sum_{n \neq n'} \Erm_{\Drm_n,\Drm_{n'}}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_{n'} \big) \Big] \nonumber \\
+%%& = & N^{-2} \sum_n \int_{\Ycal} \frac{\alpha(\tilde{y})}{\alpha_0} \delta(y-\tilde{y}) \delta(y'-\tilde{y}) \nonumber \\
+%%&& \quad + N^{-2} \sum_{n \neq n'} \int_{\Ycal} \int_{\Ycal} \frac{\alpha(\tilde{y}) \alpha(\tilde{y}') + \alpha(\tilde{y}) \delta(\tilde{y}-\tilde{y}')}{\alpha_0 (\alpha_0+1)} \delta(y-\tilde{y}) \delta(y-\tilde{y}') \nonumber \\
+%%& = & N \frac{\alpha(y)}{\alpha_0} \delta(y-y') + N(N-1) \frac{\alpha(y) \alpha(y') + \alpha(y) \delta(y-y')}{\alpha_0 (\alpha_0+1)} \nonumber \\
+%%& = & \frac{N}{\alpha_0 (\alpha_0+1)} \big[ (N-1)\alpha(y) \alpha(y') + (\alpha_0+N) \alpha(y) \delta(y-y') \big] \nonumber \;.
+%%\end{IEEEeqnarray}
+
+
+
+
+\subsection{Mean and Correlation Functions} \label{app:E_DEP}
+
+In this section, it is shown that the expected value of a Dirichlet-Empirical process $\uppsi \sim \DEP(N, \alpha_0, \alpha)$ is 
+\begin{equation}
+\mu_{\uppsi} = \alpha \;.
+\end{equation}
+
+A defining characteristic of Dirichlet-Empirical processes is that their aggregations are also Dirichlet-Empirical. Define the partition of $\Ycal = \Rbb$, $\big\{ \Scal(y),S^\text{c}(y) \big\}$ where $\Scal(y) = (-\infty,y]$. The transform random process $\big(\uppsim, \uppsim^\text{c}\big)$, where $\uppsim \equiv \int_{\infty}^y \uppsi(t) {\drm}t$, is thus a discrete-domain Dirichlet-Empirical random process for $N$ samples, concentration $\alpha_0$, and mean $\big(\alpham,\alpham^\text{c}\big)$, where $\alpham = \int_{-\infty}^y \alpha(t) {\drm}t$ and $\alpham^\text{c} = \int_y^\infty \alpha(t) {\drm}t$. Dependency on $y$ is suppressed for brevity. Observe that $\mu_{\uppsim}(y) = \alpham$ and thus that 
+\begin{IEEEeqnarray}{rCl}
+\mu_{\uppsim} & = & \int_{-\infty}^y \alpha(t) {\drm}t = \int_{-\infty}^y \mu_{\uppsi}(t) {\drm}t \nonumber \;.
+\end{IEEEeqnarray}
+Differentiating with respect to $y$, we have the expected value of the DEP.
+
+Next, the correlation function is shown to be 
+\begin{equation}
+\Erm_{\uppsi}\big[ \uppsi(y_1)\uppsi(y_2) \big] = \frac{(\alpha_0^{-1} + N^{-1}) \alpha(y_1) \delta(y_1-y_2) + (1 - N^{-1}) \alpha(y_1) \alpha(y_2)}{1 + \alpha_0^{-1}} \;.
+\end{equation}
+First, assume $y_2 \geq y_1$ and define a new partition of $\Ycal$, $\big\{ (-\infty,y_1], (y_1,y_2], (y_2,\infty) \big\}$. By the aggregation property, the random triplet $\left( \int_{-\infty}^{y_1} \uppsi(t) {\drm}t, \int_{y_1}^{y_2} \uppsi(t) {\drm}t, \int_{y_2}^{\infty} \uppsi(t) {\drm}t \right)$ is Dirichlet-Empirical with $N$ samples, concentration $\alpha_0$, and mean $\left( \int_{-\infty}^{y_1} \alpha(t) {\drm}t, \int_{y_1}^{y_2} \alpha(t) {\drm}t, \int_{y_2}^{\infty} \alpha(t) {\drm}t \right)$.
+
+Define the function
+\begin{IEEEeqnarray}{L}
+g(t_1,t_2) = \Erm_{\uppsi}\left[ \int_{-\infty}^{y_1} \uppsi(t_1) {\drm}t_1 \int_{-\infty}^{y_2} \uppsi(t_2) {\drm}t_2 \right] \\
+\quad = \Erm_{\uppsi}\left[ \left( \int_{-\infty}^{y_1} \uppsi(t_1) {\drm}t_1 \right)^2 + \left( \int_{-\infty}^{y_1} \uppsi(t_1) {\drm}t_1 \right) \left( \int_{y_1}^{y_2} \uppsi(t_2) {\drm}t_2 \right) \right] \nonumber \\
+\quad = \frac{\left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) \left( (\alpha_0^{-1} + N^{-1}) + \left(1-N^{-1}\right) \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) + \left(1-N^{-1}\right) \left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) \left( \int_{y_1}^{y_2} \alpha(t_2) {\drm}t_2 \right)}{1 + \alpha_0^{-1}} \nonumber \\
+\quad = \frac{(\alpha_0^{-1} + N^{-1}) \left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) + \left(1-N^{-1}\right) \left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) \left( \int_{-\infty}^{y_2} \alpha(t_2) {\drm}t_2 \right)}{1 + \alpha_0^{-1}} \quad \forall y_2 \geq y_1 \nonumber \;.
+\end{IEEEeqnarray}
+Following the same steps provides the values of $g$ for $t_2 \leq t_1$; the combined formula can be given as
+\begin{IEEEeqnarray}{L}
+g(t_1,t_2) \quad = \frac{(\alpha_0^{-1} + N^{-1}) \left( \int_{-\infty}^{\min(y_1,y_2)} \alpha(t_1) {\drm}t_1 \right) + \left(1-N^{-1}\right) \left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) \left( \int_{-\infty}^{y_2} \alpha(t_2) {\drm}t_2 \right)}{1 + \alpha_0^{-1}} \quad \forall \ y_2 \geq y_1 \nonumber \;. 
+\end{IEEEeqnarray}
+Finally,
+\begin{IEEEeqnarray}{L}
+\Erm_{\uppsi}\big[ \uppsi(y_1)\uppsi(y_2) \big] = \frac{{\drm}^2}{{\drm}t_1 {\drm}t_2} g(t_1,t_2) \\
+\quad = \frac{\frac{{\drm}}{{\drm}t_2} \left[ (\alpha_0^{-1} + N^{-1}) \Big( u(t_2-t_1) \alpha\big( \min(t_1,t_2) \big) \Big) + \left(1-N^{-1}\right) \alpha(y_1) \left( \int_{-\infty}^{y_2} \alpha(t_2) {\drm}t_2 \right) \right]}{1 + \alpha_0^{-1}} \nonumber \\
+\quad = \frac{(\alpha_0^{-1} + N^{-1}) \alpha(y_1) \delta(y_1-y_2) + (1 - N^{-1}) \alpha(y_1) \alpha(y_2)}{1 + \alpha_0^{-1}} \nonumber \;.
+\end{IEEEeqnarray}
+
+
+
+
 
 
 
@@ -3475,7 +3486,7 @@ Note that as $\Delta \to 0$, $\tilde{\nrm}(y,k) \approx \Delta \uppsi(y,\Delta k
 
 
 
-\section{The continuous-domain Dirichlet-Multinomial Process} \label{app:DMP}
+\section{The Dirichlet-Multinomial Process} \label{app:DMP}
 
 \todohigh{EVEN NEEDED GIVEN DEP???}
 
@@ -3539,6 +3550,134 @@ Note that as $\Delta \to 0$, $\tilde{\nrm}(y,k) \approx \Delta \uppsi(y,\Delta k
 \begin{equation}
 \Delta \uppsi(\cdot,x) | \Delta \uppsim(k) \sim \DMP\big( \Delta \uppsim(k), \Delta \alpha(\cdot,x) \big) \;.
 \end{equation}
+
+
+
+
+
+
+\section{PGR PGR Continuous domain Posteriors}
+
+
+\subsection{Proof that $\uppsi \equiv N^{-1} \sum_{n=1}^N \delta(\cdot - \Drm_n)$ given $\theta$ is an EP}
+
+It is demonstrated that conditioned on $\uptheta$, the random process $\uppsi \equiv \Psi(\Drm) = N^{-1} \sum_{n=1}^N \delta(\cdot - \Drm_n)$ is an EP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta(D_n)$.
+
+Observe that $\uppsim(z) \equiv N^{-1} \sum_{n=1}^N \chi(\Drm_n;\Scal_z)$, where $\chi$ is the indicator function
+\begin{equation}
+\chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S.  \end{cases}
+\end{equation}
+and note that $\Prm\big( \chi(\Drm_n;\Scal_z) = 1 \big| \uptheta \big) \equiv \upthetam(z)$, where $\upthetam(z) \equiv \int_{\Scal_z} \uptheta(y) {\drm}y$. As the events $\Drm_n \in \Scal_z$ are independent given $\uptheta$, $\uppsim$ conditioned on the model $\uptheta$ is characterized by an Empirical distribution 
+\begin{equation}
+\Prm_{\uppsim | \uptheta}(\psim | \theta) \equiv \Mcal(N \psim) \prod_{z \in \Zcal} \left( \thetam(z) ^{\psim(z)} \right)^{N} = \Emp\big( \psim; N,\thetam \big)
+\end{equation}
+of $N$ samples with parameters $\thetam$. Since the aggregation property is satisfied, $\uppsi$ is a Empirical process.
+
+
+
+
+\subsection{Proof: Model Posterior Process is Dirichlet} \label{app:DP_post}
+
+In this section, it is shown that for i.i.d. data $\Drm$ distributed as $\prm_{\Drm | \uptheta} = \bigotimes_{n=1}^N \uptheta$ with parameterizing distribution $\uptheta \sim \DP(\alpha_0, \alpha)$, then the model conditioned on the training data is also a Dirichlet process with concentration $\alpha_0 + N$ and mean function 
+\begin{equation}
+\mu_{\uptheta | \Drm} = \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpha + \left(\frac{N}{\alpha_0 + N}\right) \Psi(\Drm) \;,
+\end{equation}
+where $\Psi(\Drm) = N^{-1} \sum_{n=1}^N \delta\big( \cdot - \Drm_n \big)$.
+
+A defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Consider a DP over the set $\Ycal$. Define an arbitrary countable partition of $\Ycal$: $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$ and the corresponding function partitions $\theta_z \in \Rbbgeq^{\Scal_z}$, such that $\uptheta = \left( \ldots,\uptheta_z,\ldots \right)$, and $\alpha_z \in {\Rbb^+}^{\Scal_z}$, such that $\alpha = \left( \ldots,\alpha_z,\ldots \right)$. The transformed random process $\upthetam \in \Pcal(\Zcal)$, $\upthetam(z) \equiv \int_{\Scal_z} \uptheta_z(y) {\drm}y$, is necessarily Dirichlet with concentration $\alpha_0$ and a mean function $\alpham \in {\Rbb^+}^{\Zcal}$, $\alpham(z) \equiv \int_{\Scal_z} \alpha_z(y) {\drm}y$.
+
+To prove the hypothesis, it must be shown that
+\begin{IEEEeqnarray}{rCl}
+\upthetam | \Drm & \sim & \Dir\big( \alpha_0 + N, \mu_{\upthetam | \Drm} \big) \;,
+\end{IEEEeqnarray}
+where
+\begin{equation}
+\mu_{\upthetam | \Drm} = \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpham + \left(\frac{N}{\alpha_0 + N}\right) \Psim(D) 
+\end{equation}
+and $\Psim(z;D) = \int_{\Scal_z} \Psi(y;D) {\drm}y = N^{-1} \sum_{n=1}^N \chi(D_n;\Scal_z)$. $\chi$ is the indicator function
+\begin{equation}
+\chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S.  \end{cases}
+\end{equation}
+
+
+To demonstrate this property, exploit the results of Appendix \ref{app:Dir_agg} to represent the training data distribution conditioned on the aggregation $\upthetam$. Introduce the normalized functions $\upthetac(z) \equiv \uptheta_z / \upthetam(z) \in \Pcal(\Scal_z)$, which are continuous-domain Dirichlet processes, independent from one another, and independent from the aggregation process $\upthetam$. The conditional distribution of interest is
+\begin{IEEEeqnarray}{rCl}
+\prm_{\Drm | \upthetam}(D | \upthetam) & = & \Erm_{\upthetac | \upthetam}\big[ \prm_{\Drm | \upthetam,\upthetac}(D | \upthetam,\upthetac) \big] \\
+& = & \Erm_{\upthetac | \upthetam}\left[ \prod_{n=1}^N \prod_{z \in \Zcal} \big( \upthetam(z) \upthetac(D_n;z) \big)^{\chi(D_n; \Scal_z)} \right] \nonumber \\
+& = & \left( \prod_{z \in \Zcal} \prod_{n=1}^N \upthetam(z)^{\chi(D_n; \Scal_z)} \right) \prod_{z \in \Zcal} \Erm_{\upthetac(z)}\left[ \prod_{n=1}^N \upthetac(D_n; z)^{\chi(D_n; \Scal_z)} \right] \nonumber \\
+& = & \left( \prod_{z \in \Zcal} \upthetam(z)^{\Psim(z;D)} \right)^N \prod_{z \in \Zcal} \Erm_{\upthetac(z)}\left[ \prod_{n=1}^N \upthetac(D_n; z)^{\chi(D_n; \Scal_z)} \right] \nonumber \;,
+\end{IEEEeqnarray}
+Observe that the dependency of this likelihood function on $\upthetam$ is polynomial. Thus, $\upthetam$ is a conjugate prior for $\Drm$ and the training data marginal distribution is
+\begin{IEEEeqnarray}{rCl}
+\prm_{\Drm}(D) & = & \Erm_{\upthetam} \left[ \left( \prod_{z \in \Zcal} \upthetam(z)^{\Psim(z;D)} \right)^N \right] \prod_{z \in \Zcal} \Erm_{\upthetac(z)}\left[ \prod_{n=1}^N \upthetac(D_n; z)^{\chi(D_n; \Scal_z)} \right] \\
+& = & \frac{\beta\big( \alpha_0 \alpham + N \Psim(D) \big)}{\beta(\alpha_0 \alpham)} \prod_{z \in \Zcal} \Erm_{\upthetac(z)}\left[ \prod_{n=1}^N \upthetac(D_n; z)^{\chi(D_n; \Scal_z)} \right] \nonumber
+\end{IEEEeqnarray}
+and the distribution of interest is
+\begin{IEEEeqnarray}{rCl}
+\prm_{\upthetam | \Drm}(\thetam | D) & = & \frac{\prod_{z \in \Zcal} \thetam(z)^{\alpha_0 \alpham(z) + N \Psim(z;D) - 1}}{\beta\big( \alpha_0 \alpham + N \Psim(D) \big)} \\
+& = & \Dir\big( \upthetam ; \alpha_0 + N, \mu_{\upthetam | \Drm} \big) \nonumber \;.
+\end{IEEEeqnarray}
+This proves the hypothesis.
+
+
+\subsubsection{PGR??}
+
+\todohigh{FIX? LOCATION?}
+
+The likelihood function of the data $\Drm$ given the model $\uptheta$ is
+\begin{IEEEeqnarray}{rCl}
+\prm_{\Drm | \uptheta}\big( D | \theta \big) & = & \prod_{n=1}^N \prm_{\Drm_n | \uptheta}\big( D_n | \theta \big) = \prod_{n=1}^N \theta(D_n) \nonumber \\ 
+& = & \exp\left( \sum_{n=1}^N \ln\big(\theta(D_n)\big) \right) \nonumber \\
+& = & \exp\left( \int_{\Ycal \times \Xcal} N \Psi(y,x;D) \ln\big(\theta(y,x)\big) {\drm}y {\drm}x \right) \nonumber \\
+& \equiv & \prod_{\Ycal \times \Xcal} \left( \theta(y,x)^{N \Psi(y,x;D)} \right)^{{\drm}y {\drm}x} \;,
+\end{IEEEeqnarray}
+a function only dependent on the data through the empirical statistic $\Psi(\Drm)$. As a result, $\uptheta | \{\Drm = D\} \sim \uptheta | \left\{ \uppsi = \Psi(D)\right\}$. This is a natural generalization of the results for the discrete-domain model process. Also, as shown in \ref{app:EP}, the random process $\uppsi \equiv \Psi(\Drm)$ given $\uptheta$ is an Empirical process. 
+
+Additionally, note that $\upthetam | \{\Drm = D\} \sim \upthetam | \big\{ \uppsim = \Psim(D)\big\}$. The model aggregation process is only dependent on the aggregation of the empirical distribution. These properties result from the independence of $\upthetam$ from $\upthetac$, a property that Dirichlet processes hold.
+
+Also, when an Empirical process $\uppsi \sim \EP(N,\theta)$ has a mean function which is characterized by a Dirichlet process $\uptheta \sim \DP(\alpha_0,\alpha)$, the posterior $\uptheta | \uppsi \sim \DP(\alpha_0 + N, \mu_{\uptheta | \uppsi})$, with
+\begin{IEEEeqnarray}{rCl}
+\mu_{\uptheta | \uppsi} & = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \alpha + \left(\frac{N}{\alpha_0+N}\right) \uppsi
+\end{IEEEeqnarray}
+
+
+
+
+
+\subsection{Proof that $\uppsi \equiv N^{-1} \sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DEP}
+
+\todohigh{FIXXX? Just by definition of DEP???}
+
+Next, it is demonstrated that the random process $\uppsi \equiv \Psi(\Drm) = N^{-1} \sum_{n=1}^N \delta\big( \cdot-\Drm_n \big)$ is a DEP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta(D_n)$ and $\uptheta \sim \DP(\alpha_0, \alpha)$. 
+
+Observe that $\uppsim(z) \equiv N^{-1} \sum_{n=1}^N \chi(\Drm_n;\Scal_z)$, where $\chi$ is the indicator function
+\begin{equation}
+\chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S.  \end{cases}
+\end{equation}
+and note that $\Prm\Big( \chi(\Drm_n;\Scal_z) = 1 \Big) = \int_{\Scal_z} \alpha(y) {\drm}y$. As the events $\Drm_n \in \Scal_z$ are independent, $\uppsim$ conditioned on the model $\uptheta$ is characterized by an Empirical distribution
+As such, $\uppsim$ conditioned on the model $\uptheta$ is characterized by an Empirical distribution 
+\begin{equation}
+\Prm_{\uppsim | \uptheta}(\psim | \theta) \equiv \Mcal(N \psim) \prod_{z \in \Zcal} \left( \thetam(z) ^{\psim(z)} \right)^{N} = \Emp\big( \psim; N,\thetam \big)
+\end{equation}
+of $N$ samples with parameters $\upthetam(z) \equiv \int_{\Scal_z} \uptheta(y) {\drm}y$, $z \in \Zcal$.
+
+By the aggregation property of the Dirichlet process $\uptheta$, the parameters of this Empirical distribution are characterized as $\upthetam \sim \Dir(\alpha_0,\alpham)$, and thus $\uppsim$ is drawn from a Dirichlet-Empirical PMF $\DE(N,\alpha_0,\alpham)$. As this aggregation property holds for any countable partition of $\Ycal$, $\uppsi$ is a Dirichlet-Empirical Process.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
