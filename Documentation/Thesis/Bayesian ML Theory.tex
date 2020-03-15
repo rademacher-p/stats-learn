@@ -1313,7 +1313,7 @@ PGR: DIR FIGS? for PDF asymptotics?
 
 
 
-The Bayesian distributions $\Prm_{\xrm | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm}$ can also be found from the posterior distributions $\prm_{\upthetam | \Drm}$ and $\prm_{\upthetac | \xrm,\Drm}$, respectively. As the Dirichlet assumption renders $\upthetam$ and $\upthetac$ independent, it can be shown that $\Prm_{\Yrm | \Xrm} = \Erm_{\upthetac}\big[ \Prm_{\Yrm | \Xrm,\upthetac} \big]$ and thus that $\upthetam$ is conditionally independent of $\Yrm$ given $\Xrm$. Furthermore, the Dirichlet distribution $\prm_{\upthetam}$ is a conjugate prior for $\Prm_{\Xrm | \upthetam}$. As a result, $\upthetam | \Drm \sim \Dir\big (\alpha_0 + N, \mu_{\upthetam | \Xrm} \big)$ and
+The Bayesian distributions $\Prm_{\xrm | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm}$ can also be found from the posterior distributions $\prm_{\upthetam | \Drm}$ and $\prm_{\upthetac | \xrm,\Drm}$, respectively. As the Dirichlet assumption renders $\upthetam$ and $\upthetac$ independent, it can be shown that $\Prm_{\Yrm | \Xrm} = \Erm_{\upthetac}\big[ \Prm_{\Yrm | \Xrm,\upthetac} \big]$ and thus that $\upthetam$ is conditionally independent of $\Yrm$ given $\Xrm$. Furthermore, the Dirichlet distribution $\prm_{\upthetam}$ is a conjugate prior for the likelihood $\Prm_{\Xrm | \upthetam}$. As a result, $\upthetam | \Drm \sim \Dir\big (\alpha_0 + N, \mu_{\upthetam | \Xrm} \big)$ and
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\xrm | \Drm}(D) & = & \mu_{\upthetam | \Drm}(D) \\
 & = & \mu_{\upthetam | \Xrm}(X) = \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpham + \left(\frac{N}{\alpha_0 + N}\right) \Psim(\Drm) \nonumber \;.
@@ -2499,23 +2499,24 @@ The conditional distribution when $\Xcal$ is a continuous space has notable diff
 
 \subsubsection{Via the Conditional Model Process}
 
-Using the properties detailed in Appendix \ref{app:DP_post}, it can be shown that the marginal process satisfies $\upthetam | \Drm \sim \upthetam | \Xrm \sim \DP(\alpha_0 + N, \mu_{\upthetam | \Xrm})$, where
+As the Dirichlet prior implies that $\upthetam$ is independent from $\upthetac$, the likelihood $\prm_{\Drm | \upthetam}$ is proportionate to $\prm_{\Xrm | \upthetam} = \bigotimes_{n=1}^N \upthetam$. Thus, using the properties detailed in Appendix \ref{app:DP_post}, it can be shown that the marginal process satisfies $\upthetam | \Drm \sim \upthetam | \Xrm \sim \DP(\alpha_0 + N, \mu_{\upthetam | \Xrm})$, where
 \begin{IEEEeqnarray}{rCl}
 \mu_{\upthetam | \Xrm} & = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \alpham + \left(\frac{N}{\alpha_0+N}\right) \Psim(\Xrm) \;.
 \end{IEEEeqnarray}
 
-Using the empirical statistic representation, observe that $\upthetam | \uppsim,\uppsic \sim \upthetam | \uppsim \sim \DP(\alpha_0 + N, \mu_{\upthetam | \uppsim})$, where
+Similarly, using the empirical statistic representation, the likelihood $\prm_{\uppsic,\uppsim | \upthetam}$ is proportionate to $\prm_{\uppsim | \upthetam} = \EP(N,\upthetam)$. As a result, observe that $\upthetam | \uppsim,\uppsic \sim \upthetam | \uppsim \sim \DP(\alpha_0 + N, \mu_{\upthetam | \uppsim})$, where
 \begin{IEEEeqnarray}{rCl}
 \mu_{\upthetam | \uppsim} & = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \alpham + \left(\frac{N}{\alpha_0+N}\right) \uppsim \;.
 \end{IEEEeqnarray}
 Recall that $\prm_{\xrm | \uppsi} \equiv \mu_{\upthetam | \uppsim}$.
 
-Also, it can be shown that $\upthetac(x) | \xrm,\Drm \sim \upthetac(x) | \Drm \sim \DP\Big(\delta(0)^{-1} \big(\alpha_0 \alpham(x) + N \Psim(x;\Drm) \big), \mu_{\upthetac(x) | \Drm} \Big)$, where
+
+The independence of the marginal and conditional models also implies that the likelihood $\prm_{\xrm,\Drm | \upthetac}$ is proportionate to $\prm_{\Yrm | \Xrm,\upthetac} = \bigotimes_{n=1}^N \upthetac(\Xrm_n)$. Thus, it can be shown that $\upthetac(x) | \xrm,\Drm \sim \upthetac(x) | \Drm \sim \DP\Big(\delta(0)^{-1} \big(\alpha_0 \alpham(x) + N \Psim(x;\Drm) \big), \mu_{\upthetac(x) | \Drm} \Big)$, where
 \begin{IEEEeqnarray}{rCl}
 \mu_{\upthetac(x) | \Drm} & = & \left(\frac{\alpha_0 \alpham(x)}{\alpha_0 \alpham(x)+N \Psim(x;\Drm)}\right) \alphac(x) + \left(\frac{N \Psim(x;\Drm)}{\alpha_0 \alpham(x)+N \Psim(x;\Drm)}\right) \Psic(x;\Drm) \nonumber \;.
 \end{IEEEeqnarray}
 
-Using the empirical statistic representation, observe that $\upthetac(x) | \xrm,\uppsim,\uppsic \sim \upthetac(x) | \uppsim(x),\uppsic(x) \sim \DP\Big( \delta(0)^{-1} \big(\alpha_0 \alpham(x) + N \uppsim(x) \big), \mu_{\upthetac(x) | \uppsim(x),\uppsic(x)} \Big)$, where
+Similarly, using the empirical statistic representation, the likelihood $\prm_{\xrm,\uppsic,\uppsim | \upthetac}$ is proportionate to $\prm_{\uppsic | \uppsim, \upthetam} = \bigotimes_{x \in \Xcal} \EP(N \uppsim(x), \upthetac(x))$. Consequently, observe that $\upthetac(x) | \xrm,\uppsim,\uppsic \sim \upthetac(x) | \uppsim(x),\uppsic(x) \sim \DP\Big( \delta(0)^{-1} \big(\alpha_0 \alpham(x) + N \uppsim(x) \big), \mu_{\upthetac(x) | \uppsim(x),\uppsic(x)} \Big)$, where
 \begin{IEEEeqnarray}{rCl}
 \mu_{\upthetac(x) | \uppsim(x),\uppsic(x)} & = & \left(\frac{\alpha_0 \alpham(x)}{\alpha_0 \alpham(x)+N \uppsim(x)}\right) \alphac(x) + \left(\frac{N \uppsim(x)}{\alpha_0 \alpham(x)+N \uppsim(x)}\right) \uppsic(x) \nonumber \;.
 \end{IEEEeqnarray}
@@ -3579,6 +3580,19 @@ of $N$ samples with parameters $\thetam$. Since the aggregation property is sati
 
 
 
+\subsection{Proof: $\uppsi \equiv N^{-1} \sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DEP}
+
+\todohigh{FIXXX? Just by definition of DEP???}
+
+Next, it is demonstrated that the random process $\uppsi \equiv \Psi(\Drm) = N^{-1} \sum_{n=1}^N \delta\big( \cdot-\Drm_n \big)$ is a DEP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta(D_n)$ and $\uptheta \sim \DP(\alpha_0, \alpha)$. 
+
+Define the aggregation $\uppsim$, where $\uppsim(z) \equiv \int_{\Scal_z} \uppsi(y) {\drm}y \equiv N^{-1} \sum_{n=1}^N \chi(\Drm_n;\Scal_z)$, and $\upthetam$, where $\upthetam(z) \equiv \int_{\Scal_z} \uptheta(y) {\drm}y$. 
+
+By the aggregation properties of Empirical and Dirichlet processes, $\uppsim | \uptheta$ and $\uptheta$ are Empirical and Dirichlet, respectively. As such, $\uppsim$ is Dirichlet-Empirical for all domain partitions and $\uppsi$ is a Dirichlet-Empirical process.
+
+
+
+
 
 \subsection{Proof: Model Posterior Process is Dirichlet} \label{app:DP_post}
 
@@ -3652,16 +3666,6 @@ Additionally, note that $\upthetam | \{\Drm = D\} \sim \upthetam | \big\{ \uppsi
 
 
 
-
-\subsection{Proof: $\uppsi \equiv N^{-1} \sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DEP}
-
-\todohigh{FIXXX? Just by definition of DEP???}
-
-Next, it is demonstrated that the random process $\uppsi \equiv \Psi(\Drm) = N^{-1} \sum_{n=1}^N \delta\big( \cdot-\Drm_n \big)$ is a DEP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta(D_n)$ and $\uptheta \sim \DP(\alpha_0, \alpha)$. 
-
-Define the aggregation $\uppsim$, where $\uppsim(z) \equiv \int_{\Scal_z} \uppsi(y) {\drm}y \equiv N^{-1} \sum_{n=1}^N \chi(\Drm_n;\Scal_z)$, and $\upthetam$, where $\upthetam(z) \equiv \int_{\Scal_z} \uptheta(y) {\drm}y$. 
-
-By the aggregation properties of Empirical and Dirichlet processes, $\uppsim | \uptheta$ and $\uptheta$ are Empirical and Dirichlet, respectively. As such, $\uppsim$ is Dirichlet-Empirical for all domain partitions and $\uppsi$ is a Dirichlet-Empirical process.
 
 
 
