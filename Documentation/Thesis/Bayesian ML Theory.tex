@@ -3002,58 +3002,10 @@ where the function $\mathcal{E}$ is defined in \eqref{eq:predictive_del_sq_cont}
 \todohigh{WIP WIP}
 
 
-Consider the trends of $\mathcal{E}$ for an upper-bounded $\alpham$. For values of $x$ not in the support of $\thetam$, $\uppsim(x) | \uptheta(x) \to 0$ and thus the moments trend to the expected bias outer product. However, for $x$ in the support of $\thetam$, the marginal model value can be non-zero and 
 
-PGR
-
+It is instructional to consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex_cont} with training data volume $N$ and with Dirichlet prior parameterization.
 
 
-It is instructional to consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization.
-
-
-First consider how the excess risk changes with the training volume $N$. For $N=0$, it is evident that the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$,  the expected squared bias between the clairvoyant and data-independent estimators. As $N$ tends to infinity, the binomial distribution controlling the scaling factors concentrates such that $\uppsim(x) \approx \thetam(x)$; thus for $\thetam(x) > 0$, the two expectations of interest tend to zero and thus $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable estimator property is a consequence of the full support of the Dirichlet prior, ensuring that the model posterior concentrates at the empirical PMF.
-
-Another interesting point regarding the dependency of the excess conditional risk on $N$ is that there may be a local maximum, depending on the learner parameterization. To demonstrate, consider the case of $|\Xcal| = 1$ - treating $N$ as a real number, there would be a maximum at 
-\begin{equation}
-N = \alpha_0 \left( 1 - 2 \alpha_0 \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2}{\Sigma_{\yrm | \xrm,\upthetac}} \right) \;.
-\end{equation}
-\todohi{CHECK, consider x dependency + below}
-Note that as the squared-bias of the prior mean increases relative to the clairvoyant estimator variance, the maximizing value decreases (even below zero). Thus, the worse the prior estimate, the more likely the excess squared-error will decrease monotonically with $N$. Conversely, if the prior estimate is accurate, a local maximum may occur and additional training data may (temporarily) compromise the estimator performance. Also consider the effect of prior concentration; informative priors with sufficiently high $\alpha_0$ will not have the local maxima.
-
-The excess risk at this potentially non-integral value would be 
-\begin{equation}
-\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \frac{\Sigma_{\yrm | \xrm,\uptheta}}{4 \alpha_0 \left( 1 - \alpha_0 \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2}{\Sigma_{\yrm | \xrm,\uptheta}} \right)} \;.
-\end{equation}
-
-PGR: better form above???
-
-Figures \ref{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased} and \ref{fig:Risk_cond_SE_Dir_N_leg_a0_biased} exemplify the excess conditional squared-error as a function of $N$ for estimators based on Dirichlet priors of varying concentration $\alpha_0$. The former shows local maxima for an unbiased estimator; note that higher concentration results in superior performance. The latter uses biased estimators and as such, learners based on low concentration achieve lower risk.
-\begin{figure}
-	\centering
-	\includegraphics[width=0.7\linewidth]{Risk_cond_SE_Dir_N_leg_a0_unbiased.pdf}
-	\caption{Conditional SE Risk versus $N$, unbiased Dirichlet estimators of varying concentration}
-	\label{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased}
-\end{figure}
-\begin{figure}
-	\centering
-	\includegraphics[width=0.7\linewidth]{Risk_cond_SE_Dir_N_leg_a0_biased.pdf}
-	\caption{Conditional SE Risk versus $N$, biased Dirichlet estimators of varying concentration}
-	\label{fig:Risk_cond_SE_Dir_N_leg_a0_biased}
-\end{figure}
-
-
-
-
-
-
-
-Next consider the effects of the Dirichlet prior parameters. The analysis will interpret the Dirichlet parameters as the conditional prior distributions $\alphac(x)$ and the corresponding concentrations $\alpha'(x) \equiv \alpha_0 \alpham(x)$. 
-
-First consider the conditional prior PMF's $\alphac(x)$; as shown, they manifest themselves in the risk through the squared estimator bias. It is clear that regardless of how the values $\alpha_0$ and $\alpham(x)$ are chosen, the best selections for these conditional priors must have first moments matching those of the corresponding clairvoyant predictive distributions $\Prm_{\yrm | \xrm,\uptheta}$ for each $x \in \Xcal$. The resultant estimators $\mu_{\yrm | \xrm}$ are unbiased and the excess conditional risk is equivalent to the first term in \eqref{eq:risk_cond_SE_dir_ex}, measuring additional variance due to model uncertainty.
-
-
-
-The other user-selected Dirichlet parameters manifest themselves in the conditional risk as $\alpha'(x)$, the concentrations of the corresponding conditional distributions $\upthetac(x)$; these values control important bias/variance trade-offs via the two scaling factors in \eqref{eq:risk_cond_SE_dir_ex}. First, consider the asymptotic trends.
 
 Consider how the excess risk tends as the priors become maximally concentrated. As $\alpha'(x) \to \infty$, the excess risk tends to $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, the expected conditional squared-error between the means of the Bayesian predictive PMF and the clairvoyant predictive PMF. This is intuitive given that the estimator tends toward a data-independent solution; analogous to the discussion in Section \ref{sec:predictive_est}, the estimator may be biased, but will have no variance due to the training data statistics.
 
