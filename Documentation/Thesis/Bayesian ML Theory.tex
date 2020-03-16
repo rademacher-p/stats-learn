@@ -2495,7 +2495,7 @@ and the conditional PDF of interest is
 \end{IEEEeqnarray}
 
 
-The conditional distribution when $\Xcal$ is a continuous space has notable differences from its form for a countable set $\Xcal$. Specifically, since $\Psim(x;D)$ is either zero or tends towards infinity, a non-impulsive prior mean $\alpha$ will result in convex coefficients that are zero or one. In this case, the distribution for a given observation $\xrm$ will be either strictly dependent on either the training data or the prior knowledge.
+The conditional distribution when $\Xcal$ is a continuous space has notable differences from its form for a countable set $\Xcal$. Specifically, since $\Psim(x;D)$ is either zero or tends towards infinity, an upper-bounded prior mean $\alpha$ will result in convex coefficients that are zero or one. In this case, the distribution for a given observation $\xrm$ will be either strictly dependent on either the training data or the prior knowledge; if any training data are observed satisfying $\Xrm_n = \xrm$, then the conditional empirical model will be used for prediction.
 
 
 
@@ -2638,7 +2638,7 @@ Observe that by the aggregation principle, $\uppsim \sim \DEP(N,\alpha_0,\alpham
 \uppsic(x) \big| \uppsim(x) \sim \DEP\left( \frac{N \uppsim(x)}{\delta(0)}, \frac{\alpha_0 \alpham(x)}{\delta(0)}, \alphac(x) \right)
 \end{equation}
 
-\todohigh{FIXXXX}
+
 
 
 
@@ -2697,6 +2697,7 @@ Note that by the aggregation property of Empirical distributions, the empirical 
 & = & \Bi\big(N \delta(0)^{-1} \psim(x); N, \delta(0)^{-1} \thetam(x)\big) \;,
 \end{IEEEeqnarray}
 where $\Bi$ is the binomial PMF.
+
 
 
 \todohigh{plots?}
@@ -3000,11 +3001,11 @@ where the function $\mathcal{E}$ is defined in \eqref{eq:predictive_del_sq_cont}
 
 \todohigh{WIP WIP}
 
-The excess conditional risk can thus be represented as the conditional expectation (with respect to $\Prm_{\xrm | \uptheta} = \upthetam$) of a sum of two functions of $\xrm$. The first function measures the additional variance beyond that of the clairvoyant estimator (i.e. the clairvoyant squared-error); like the clairvoyant risk, it depends on $\Sigma_{\yrm | \xrm,\upthetac}$, the conditional variance of the clairvoyant estimate for a given observation of $\xrm$. The second function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. This term alone is influenced by the data-independent Bayes predictive distribution $\Prm_{\yrm | \xrm} = \alphac(\xrm)$.
 
-These two second-order terms (of $y$) are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam(x)$ and $N$ via conditional expectations with respect to $\uppsim(x)$. By the aggregation property of Empirical distributions, $N \uppsim(x) | \upthetam(x) \sim \Bi \big(N,\upthetam(x)\big)$. Closed-forms have not been found for the function expectations of binomial random variables above.
+Consider the trends of $\mathcal{E}$ for an upper-bounded $\alpham$. For values of $x$ not in the support of $\thetam$, $\uppsim(x) | \uptheta(x) \to 0$ and thus the moments trend to the expected bias outer product. However, for $x$ in the support of $\thetam$, the marginal model value can be non-zero and 
 
-PGR: binomial inverse moment review citations?
+PGR
+
 
 
 It is instructional to consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization.
