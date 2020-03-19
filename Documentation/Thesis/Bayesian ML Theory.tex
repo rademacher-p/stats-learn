@@ -3002,6 +3002,15 @@ where the function $\mathcal{E}$ is defined in \eqref{eq:predictive_del_sq_cont}
 \todohigh{WIP WIP}
 
 
+Note that by the aggregation property of Empirical distributions, the empirical process $\uppsim(x)$ conditioned on the model $\upthetam(x)$ is distributed as
+\begin{IEEEeqnarray}{rCl}
+\prm_{\uppsim(x) | \upthetam(x)}\big(\psim(x) | \thetam(x) \big) & = & \Emp\Big( \big( \delta(0)^{-1} \psim(x),1 - \delta(0)^{-1} \psim(x)\big); N, \big( \delta(0)^{-1} \thetam(x), 1 - \delta(0)^{-1} \thetam(x)\big) \Big) \nonumber \\
+& = & \Bi\big(N \delta(0)^{-1} \psim(x); N, \delta(0)^{-1} \thetam(x)\big) \;,
+\end{IEEEeqnarray}
+where $\Bi$ is the binomial PMF.
+
+PGR
+
 
 It is instructional to consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex_cont} with training data volume $N$ and with Dirichlet prior parameterization.
 
