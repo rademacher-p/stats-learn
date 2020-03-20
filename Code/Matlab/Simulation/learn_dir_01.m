@@ -7,9 +7,9 @@ if (numel(Y) ~= size(alpha,1)) || (numel(X) ~= size(alpha,2))
     error('Set and Alpha sizes do not match.');
 end
 
-for m_x = 1:numel(X)
-    if x == X{m_x}
-        idx_x = m_x;
+for idx_x = 1:numel(X)
+    if X{idx_x} == x
+        break
     end
 end
 
