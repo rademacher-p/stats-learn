@@ -9,7 +9,7 @@ def simplex_grid(n=0, d=2):
 
     :param n: the number of points per dimension, minus one
     :param d: dimension of the simplex, plus one
-    :return: (m,d) array, where m is the total number of points
+    :return: (m,)+d array, where m is the total number of points
     """
 
     if d == 1:
@@ -32,4 +32,4 @@ def simplex_grid(n=0, d=2):
 
 
 # if __name__ == '__main__':
-#     print(simplex_grid(1, 3))
+#     print(simplex_grid(2, 3))
