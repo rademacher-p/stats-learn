@@ -4,9 +4,8 @@ Sim main.
 blah blah
 """
 
-
 import numpy as np
-from numpy.random import default_rng
+from numpy import random
 from scipy import stats
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -14,8 +13,9 @@ from mpl_toolkits.mplot3d import Axes3D
 from tensorflow_probability import distributions as tfd
 
 from simplex_grid import simplex_grid
+from rv_obj import deterministic
 
-rng = default_rng()
+rng = random.default_rng()
 
 #%% Continuous sets
 
@@ -46,12 +46,10 @@ Y = theta_c(X).rvs()
 plt.suptitle(f'Model, (X,Y) = ({X:.2f},{Y:.2f})')
 
 
-
 #%% Discrete sets
 
 Y_set = np.array(['a', 'b', 'c'])
-# Y_set = np.array(['a'])
-X_set = np.arange(1)
+X_set = np.arange(2)
 
 YX_set = np.array([(y, x) for y in Y_set for x in X_set],
                   dtype=[('y', Y_set.dtype), ('x', X_set.dtype)]).reshape(Y_set.shape + X_set.shape)
@@ -63,15 +61,15 @@ alpha = rng.uniform(1, 10, Y_set.shape + X_set.shape)
 t_plt = simplex_grid(10, alpha.size).reshape((-1,) + alpha.shape)
 
 
-# prior = stats.dirichlet(alpha.flatten())
-# prior_plt = prior.pdf(t_plt.reshape((-1, alpha.size)).T)
-# theta_pmf = prior.rvs().reshape(alpha.shape)
+prior = stats.dirichlet(alpha.flatten())
+# prior = deterministic()
+prior_plt = prior.pdf(t_plt.reshape((-1, alpha.size)).T)
+theta_pmf = prior.rvs().reshape(alpha.shape)
 
-prior = tfd.Dirichlet(alpha.flatten())
+# # prior = tfd.Dirichlet(alpha.flatten())
 # prior = tfd.Deterministic(rng.choice(t_plt).flatten())    # TODO: error, need multivariate
-prior_plt = prior.prob(t_plt.reshape((-1, alpha.size)))
-theta_pmf = prior.sample().numpy().reshape(alpha.shape)
-
+# prior_plt = prior.prob(t_plt.reshape((-1, alpha.size)))
+# theta_pmf = prior.sample().numpy().reshape(alpha.shape)
 
 
 if alpha.shape == (3, 1):
