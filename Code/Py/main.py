@@ -10,10 +10,10 @@ from scipy import stats
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-from tensorflow_probability import distributions as tfd
+# from tensorflow_probability import distributions as tfd
 
 from simplex_grid import simplex_grid
-from rv_obj import deterministic
+from rv_obj import deterministic_multi
 
 rng = random.default_rng()
 
@@ -58,13 +58,21 @@ YX_set = np.array([(y, x) for y in Y_set for x in X_set],
 # alpha = 5*np.ones(Y_set.shape + X_set.shape)
 alpha = rng.uniform(1, 10, Y_set.shape + X_set.shape)
 
-t_plt = simplex_grid(10, alpha.size).reshape((-1,) + alpha.shape)
+# t_plt = simplex_grid(10, alpha.size).reshape((-1,) + alpha.shape)
+t_plt = simplex_grid(10, alpha.shape)
 
 
-prior = stats.dirichlet(alpha.flatten())
-# prior = deterministic()
-prior_plt = prior.pdf(t_plt.reshape((-1, alpha.size)).T)
-theta_pmf = prior.rvs().reshape(alpha.shape)
+# prior = stats.dirichlet(alpha.flatten())
+# prior_plt = prior.pdf(t_plt.reshape((-1, alpha.size)).T)
+# theta_pmf = prior.rvs().reshape(alpha.shape)
+
+prior = deterministic_multi(rng.choice(t_plt))
+prior_plt = prior.pdf(t_plt)
+theta_pmf = prior.rvs()
+
+
+# TODO: pdf eval error for single sample
+
 
 # # prior = tfd.Dirichlet(alpha.flatten())
 # prior = tfd.Deterministic(rng.choice(t_plt).flatten())    # TODO: error, need multivariate
@@ -87,7 +95,7 @@ if alpha.shape == (3, 1):
 q = rng.choice(YX_set.flatten(), p=theta_pmf.flatten())
 
 z = stats.rv_discrete(name='z', values=(['a','b','c'], [.2,.5,.3]))     # cant handle non-integral values...
-z = tfd.Categorical(theta_pmf.flatten())    # only returns integers...
+# z = tfd.Categorical(theta_pmf.flatten())    # only returns integers...
 
 
 
