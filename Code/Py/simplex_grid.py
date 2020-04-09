@@ -12,7 +12,7 @@ def simplex_grid(n=0, shape=(2,)):
     """
 
     if type(shape) is not tuple:        # TODO: flexibility for int, float inputs?
-        raise ValueError('Input "shape" must be a tuple.')
+        raise ValueError('Input "shape" must be a tuple of ints.')
 
     d = np.prod(shape)
 
