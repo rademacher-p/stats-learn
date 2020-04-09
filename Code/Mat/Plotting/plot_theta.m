@@ -7,13 +7,14 @@ alpha_0_vec = 3*[100,.01];
 P_y = [1/3; 1/3; 1/3];
 % P_y = [.2; .3; .5];
 
+
 N_t = 121;
 
 clims = [0,1];
 
 m_size = [80];
 
-Theta = N_bar_set(numel(P_y),N_t)/N_t;
+Theta = N_bar_set(numel(P_y),N_t) / N_t;
 L_set = size(Theta,2);
 
 
@@ -44,7 +45,8 @@ PDF_dir = beta_multi(alpha)^-1 * prod(Theta.^((alpha-1)*ones(1,L_set)));
 
 
 
-sum(PDF_dir) / (N_t^2)
+sum(PDF_dir) / (N_t^(numel(P_y)-1))
+pause
 
 ii = find(isinf(PDF_dir)) %%%%%%%%%%
 % Theta(:,ii);

@@ -4,6 +4,8 @@ from scipy.stats import rv_continuous, rv_discrete
 from scipy.stats._multivariate import multi_rv_generic, multi_rv_frozen
 from scipy.special import gammaln, xlogy
 
+from utilities import outer_gen, diag_gen
+
 
 #%% Deterministic RV, multivariate
 
@@ -72,13 +74,9 @@ class DeterministicMultiGen(multi_rv_generic):
         val = _deterministic_multi_check_parameters(val)
         return val
 
-    def var(self, val):
+    def cov(self, val):
         val = _deterministic_multi_check_parameters(val)
         return np.zeros(2*val.shape)
-
-    def median(self, val):
-        val = _deterministic_multi_check_parameters(val)
-        return val
 
     def mode(self, val):
         val = _deterministic_multi_check_parameters(val)
@@ -93,6 +91,7 @@ class DeterministicMultiGen(multi_rv_generic):
             return np.broadcast_to(val[np.newaxis], (size,)+val.shape)
         else:
             raise TypeError("Input 'size' must be a positive integer.")
+
 
 deterministic_multi = DeterministicMultiGen()
 
@@ -111,11 +110,8 @@ class DeterministicMultiFrozen(multi_rv_frozen):
     def mean(self):
         return self._dist.mean(self.val)
 
-    def var(self):
-        return self._dist.var(self.val)
-
-    def median(self):
-        return self._dist.median(self.val)
+    def cov(self):
+        return self._dist.cov(self.val)
 
     def mode(self):
         return self._dist.mode(self.val)
@@ -128,10 +124,8 @@ class DeterministicMultiFrozen(multi_rv_frozen):
 
 def _dirichlet_multi_check_parameters(alpha):
     alpha = np.asarray(alpha)
-
     if np.min(alpha) <= 0:
         raise ValueError("All parameters must be greater than 0")
-
     return alpha
 
 
@@ -148,7 +142,6 @@ def _dirichlet_multi_check_input(alpha, x):
     if np.min(x) < 0:
         raise ValueError("Each entry in 'x' must be greater than or equal "
                          "to zero.")
-
     if np.max(x) > 1:
         raise ValueError("Each entry in 'x' must be smaller or equal one.")
 
@@ -170,7 +163,7 @@ def _dirichlet_multi_check_input(alpha, x):
 
 class DirichletMultiGen(multi_rv_generic):
 
-    # TODO: normalized alpha!?!?
+    # TODO: normalized alpha and concentration?!?!?
 
     def __init__(self, seed=None):
         super(DirichletMultiGen, self).__init__(seed)
@@ -199,17 +192,18 @@ class DirichletMultiGen(multi_rv_generic):
         alpha = _dirichlet_multi_check_parameters(alpha)
         return alpha / alpha.sum()
 
-    def var(self, alpha):
+    def cov(self, alpha):
         alpha = _dirichlet_multi_check_parameters(alpha)
-        return np.zeros(2*alpha.shape)
-
-    def median(self, alpha):
-        alpha = _dirichlet_multi_check_parameters(alpha)
-        return alpha
+        mean = self.mean(alpha)
+        return (diag_gen(mean) - outer_gen(mean, mean)) / alpha.sum()
 
     def mode(self, alpha):
         alpha = _dirichlet_multi_check_parameters(alpha)
-        return alpha
+        if np.min(alpha) <= 1:
+            raise NotImplementedError("Method currently supported for alpha > 1 only")
+            # TODO: complete with general formula
+        else:
+            return (alpha - 1) / (alpha.sum() - alpha.size)
 
     def rvs(self, alpha, size=None, random_state=None):
         alpha = _dirichlet_multi_check_parameters(alpha)
@@ -235,11 +229,8 @@ class DirichletMultiFrozen(multi_rv_frozen):
     def mean(self):
         return self._dist.mean(self.alpha)
 
-    def var(self):
-        return self._dist.var(self.alpha)
-
-    def median(self):
-        return self._dist.median(self.alpha)
+    def cov(self):
+        return self._dist.cov(self.alpha)
 
     def mode(self):
         return self._dist.mode(self.alpha)
@@ -248,47 +239,45 @@ class DirichletMultiFrozen(multi_rv_frozen):
         return self._dist.rvs(self.alpha, size, random_state)
 
 
+#%% Deterministic RV, univariate
 
-
-    # # %% Deterministic RV, univariate
-    #
-    # # TODO: depreciate in favor of multivariate?
-    #
-    # # def _deterministic_uni_check_parameters(val):
-    # #     val = np.asarray(val).squeeze()
-    # #     if val.size != 1:
-    # #         raise TypeError('Parameter must be singular.')
-    # #     return val
-    # #
-    # #
-    # # def _deterministic_uni_check_input(val, x):
-    # #     val = _deterministic_uni_check_parameters(val)
-    # #     x = np.asarray(x).squeeze()
-    # #     if x.shape != val.shape:
-    # #         raise TypeError(f'Input must be singular.')
-    # #     return x
-    #
-    # class DeterministicUniGen(rv_continuous):
-    #
-    #     def _cdf(self, x, *args):
-    #         return np.where(x < 0, 0., 1.)
-    #
-    #     def _pdf(self, x, *args):
-    #         return np.where(x != 0, 0., np.inf)
-    #
-    #     def _stats(self, *args, **kwds):
-    #         return 0., 0., 0., 0.
-    #
-    #     def _rvs(self, *args):
-    #         return np.zeros(self._size)
-    #
-    #     def median(self, *args, **kwds):
-    #         args, loc, scale = self._parse_args(*args, **kwds)
-    #         return float(loc)
-    #
-    #     def mode(self, *args, **kwds):  # TODO: cannot be accessed through Frozen RV, no method for rv_frozen
-    #         args, loc, scale = self._parse_args(*args, **kwds)
-    #         # loc, scale = map(np.asarray, (loc, scale))
-    #         return float(loc)
-    #
-    # deterministic_uni = DeterministicUniGen(name='deterministic')  # TODO: block non-singular inputs?
+# # TODO: depreciate in favor of multivariate?
+#
+# # def _deterministic_uni_check_parameters(val):
+# #     val = np.asarray(val).squeeze()
+# #     if val.size != 1:
+# #         raise TypeError('Parameter must be singular.')
+# #     return val
+# #
+# #
+# # def _deterministic_uni_check_input(val, x):
+# #     val = _deterministic_uni_check_parameters(val)
+# #     x = np.asarray(x).squeeze()
+# #     if x.shape != val.shape:
+# #         raise TypeError(f'Input must be singular.')
+# #     return x
+#
+# class DeterministicUniGen(rv_continuous):
+#
+#     def _cdf(self, x, *args):
+#         return np.where(x < 0, 0., 1.)
+#
+#     def _pdf(self, x, *args):
+#         return np.where(x != 0, 0., np.inf)
+#
+#     def _stats(self, *args, **kwds):
+#         return 0., 0., 0., 0.
+#
+#     def _rvs(self, *args):
+#         return np.zeros(self._size)
+#
+#     def median(self, *args, **kwds):
+#         args, loc, scale = self._parse_args(*args, **kwds)
+#         return float(loc)
+#
+#     def mode(self, *args, **kwds):  # TODO: cannot be accessed through Frozen RV, no method for rv_frozen
+#         args, loc, scale = self._parse_args(*args, **kwds)
+#         # loc, scale = map(np.asarray, (loc, scale))
+#         return float(loc)
+#
+# deterministic_uni = DeterministicUniGen(name='deterministic')  # TODO: block non-singular inputs?
