@@ -11,8 +11,10 @@ def simplex_grid(n=0, shape=(2,)):
     :return: (m,)+shape array, where m is the total number of points
     """
 
-    if type(shape) is not tuple:        # TODO: flexibility for int, float inputs?
-        raise ValueError('Input "shape" must be a tuple of ints.')
+    if type(shape) is not tuple:
+        raise ValueError("Input 'shape' must be a tuple of integers.")
+    elif not all([isinstance(x, int) for x in shape]):
+        raise ValueError("Elements of 'shape' must be integers.")
 
     d = np.prod(shape)
 
@@ -32,4 +34,4 @@ def simplex_grid(n=0, shape=(2,)):
     # if g.shape[0] != binom(n+d-1, d-1):
     #     raise ValueError('Error: Wrong number of set elements...')
 
-    return g.reshape((-1,)+shape) / n
+    return g.reshape((-1,) + shape) / n

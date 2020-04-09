@@ -50,7 +50,7 @@ plt.suptitle(f'Model, (X,Y) = ({X:.2f},{Y:.2f})')
 
 Y_set = np.array(['a', 'b', 'c'])
 # Y_set = np.array(['a', 'b'])
-X_set = np.arange(1)
+X_set = np.arange(2)
 
 YX_set = np.array([(y, x) for y in Y_set for x in X_set],
                   dtype=[('y', Y_set.dtype), ('x', X_set.dtype)]).reshape(Y_set.shape + X_set.shape)
@@ -59,14 +59,9 @@ YX_set = np.array([(y, x) for y in Y_set for x in X_set],
 # alpha = 5*np.ones(Y_set.shape + X_set.shape)
 alpha = rng.uniform(1, 10, Y_set.shape + X_set.shape)
 
-n_plt = 30
+n_plt = 10
 # t_plt = simplex_grid(n_plt, alpha.size).reshape((-1,) + alpha.shape)
 t_plt = simplex_grid(n_plt, alpha.shape)
-
-
-# prior = stats.dirichlet(alpha.flatten())
-# prior_plt = prior.pdf(t_plt.reshape((-1, alpha.size)).T)
-# theta_pmf = prior.rvs().reshape(alpha.shape)
 
 prior = dirichlet_multi(alpha)
 # prior = deterministic_multi(rng.choice(t_plt))
@@ -75,11 +70,6 @@ theta_pmf = prior.rvs()
 
 # prior_plt.sum() / (n_plt**(alpha.size-1))
 
-
-# # prior = tfd.Dirichlet(alpha.flatten())
-# prior = tfd.Deterministic(rng.choice(t_plt).flatten())    # TODO: error, need multivariate
-# prior_plt = prior.prob(t_plt.reshape((-1, alpha.size)))
-# theta_pmf = prior.sample().numpy().reshape(alpha.shape)
 
 # TODO: add plot methods to RV classes
 if alpha.shape == (3, 1):
@@ -94,8 +84,6 @@ if alpha.shape == (3, 1):
 q = rng.choice(YX_set.flatten(), p=theta_pmf.flatten())
 
 z = stats.rv_discrete(name='z', values=(['a', 'b', 'c'], [.2, .5, .3]))     # cant handle non-integral values...
-# z = tfd.Categorical(theta_pmf.flatten())    # only returns integers...
-
 
 
 # vals = YX_set
