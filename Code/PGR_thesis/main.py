@@ -12,9 +12,12 @@ import matplotlib.pyplot as plt
 # from tensorflow_probability import distributions as tfd
 
 from util.util import simplex_grid
-from rv_obj import dirichlet_multi
+from rv_obj import deterministic_multi, dirichlet_multi
 
 rng = random.default_rng()
+
+np.seterr(all='raise')
+
 
 #%% Continuous sets
 
@@ -49,30 +52,31 @@ plt.suptitle(f'Model, (X,Y) = ({X:.2f},{Y:.2f})')
 
 Y_set = np.array(['a', 'b', 'c'])
 # Y_set = np.array(['a', 'b'])
-X_set = np.arange(1)
+X_set = np.arange(2)
 
 YX_set = np.array([(y, x) for y in Y_set for x in X_set],
                   dtype=[('y', Y_set.dtype), ('x', X_set.dtype)]).reshape(Y_set.shape + X_set.shape)
 
+n_plt = 20
 
-# alpha = 5*np.ones(Y_set.shape + X_set.shape)
-# alpha = rng.uniform(1, 10, Y_set.shape + X_set.shape)
-alpha = rng.integers(2, 6, size=Y_set.shape + X_set.shape)
+# mean = dirichlet_multi.rvs(YX_set.size, np.ones(YX_set.shape)/YX_set.size)
+# prior = deterministic_multi(mean)
+# t_plt = simplex_grid(n_plt, YX_set.shape)
 
-n_plt = 100
-# t_plt = simplex_grid(n_plt, alpha.size).reshape((-1,) + alpha.shape)
-t_plt = simplex_grid(n_plt, alpha.shape)
+alpha_0 = 5
+mean = dirichlet_multi.rvs(YX_set.size, np.ones(YX_set.shape)/YX_set.size)
+prior = dirichlet_multi(alpha_0, mean)
+t_plt = simplex_grid(n_plt, YX_set.shape, mean < 1 / alpha_0)
 
-prior = dirichlet_multi(alpha)
-# prior = deterministic_multi(rng.choice(t_plt))
+
 prior_plt = prior.pdf(t_plt)
 theta_pmf = prior.rvs()
 
-# prior_plt.sum() / (n_plt**(alpha.size-1))
+# prior_plt.sum() / (n_plt**(mean.size-1))
 
 
 # TODO: add plot methods to RV classes
-if alpha.shape == (3, 1):
+if YX_set.shape == (3, 1):
     _, ax = plt.subplots(num='prior', clear=True, subplot_kw={'projection': '3d'})
     sc = ax.scatter(t_plt[:, 0], t_plt[:, 1], t_plt[:, 2], s=15, c=prior_plt)
     ax.view_init(35, 45)
@@ -87,7 +91,7 @@ z = stats.rv_discrete(name='z', values=(['a', 'b', 'c'], [.2, .5, .3]))     # ca
 
 
 # vals = YX_set
-vals = np.arange(alpha.size).reshape(alpha.shape)
+vals = np.arange(YX_set.size).reshape(YX_set.shape)
 # vals = list('asdfer')
 theta = stats.rv_discrete(name='theta', values=(vals, theta_pmf))
 

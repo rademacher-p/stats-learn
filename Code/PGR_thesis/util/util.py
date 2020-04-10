@@ -1,6 +1,7 @@
 import numpy as np
 # from scipy.special import binom
 
+#%% Mathematics
 
 def _outer_gen_2(x, y):
     x, y = np.asarray(x), np.asarray(y)
@@ -27,38 +28,65 @@ def diag_gen(x):
     return out
 
 
-def simplex_grid(n=1, shape=(2,)):
+#%% Plotting
+
+def simplex_grid(n=1, shape=(1,), hull_mask=None):
     """
     Generate a uniform grid over a simplex.
 
     :param n: the number of points per dimension, minus one
     :param shape: shape of the simplex samples
+    :param hull_mask: boolean array dictating which simplex edge boundaries to exclude
     :return: (m,)+shape array, where m is the total number of points
     """
 
     if type(n) is not int or n < 1:
         raise TypeError("Input 'n' must be a positive integer")
+
     if type(shape) is not tuple:
         raise TypeError("Input 'shape' must be a tuple of integers.")
     elif not all([isinstance(x, int) for x in shape]):
         raise TypeError("Elements of 'shape' must be integers.")
 
+    if hull_mask is None:
+        hull_mask = np.broadcast_to(False, np.prod(shape))
+    # elif hull_mask == 'all':
+    #     hull_mask = np.broadcast_to(True, np.prod(shape))
+    else:
+        hull_mask = np.asarray(hull_mask)
+        if hull_mask.shape != shape:
+            raise TypeError("Input 'hull_mask' must have same shape.")
+        elif not all([isinstance(x, np.bool_) for x in hull_mask.flatten()]):
+            raise TypeError("Elements of 'hull_mask' must be boolean.")
+        hull_mask = hull_mask.flatten()
+
     d = np.prod(shape)
 
     if d == 1:
-        return np.ones(1)
+        return np.array(1).reshape(shape)
 
-    g = np.arange(n+1)[:, np.newaxis]
-    while g.shape[1] < d-1:
-        gg = []
-        for s in g:
-            for k in np.arange(n+1 - s.sum()):
-                gg.append(np.append(s, k))
-        g = np.array(gg)
+    s = 1 if hull_mask[0] else 0
+    e = 0 if (d == 2 and hull_mask[1]) else 1
+    g = np.arange(s, n + e)[:, np.newaxis]
+    # g = np.arange(n + 1)[:, np.newaxis]
+
+    for i in range(1, d-1):
+        s = 1 if hull_mask[i] else 0
+        e = 0 if (i == d-2 and hull_mask[i+1]) else 1
+
+        g_new = []
+        for v in g:
+            # for k in np.arange(n+1 - g_i.sum()):
+            for k in np.arange(s, n + e - v.sum()):
+                g_new.append(np.append(v, k))
+        g = np.array(g_new)
 
     g = np.hstack((g, n - g.sum(axis=1)[:, np.newaxis]))
 
-    # if g.shape[0] != binom(n+d-1, d-1):
-    #     raise ValueError('Error: Wrong number of set elements...')
-
     return g.reshape((-1,) + shape) / n
+
+
+if __name__ == '__main__':
+    q = simplex_grid(3, (4,), [False, False, True, False])
+    print(q*3)
+
