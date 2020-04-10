@@ -8,12 +8,11 @@ import numpy as np
 from numpy import random
 from scipy import stats
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 # from tensorflow_probability import distributions as tfd
 
-from util import simplex_grid
-from rv_obj import deterministic_multi, dirichlet_multi
+from util.util import simplex_grid
+from rv_obj import dirichlet_multi
 
 rng = random.default_rng()
 
