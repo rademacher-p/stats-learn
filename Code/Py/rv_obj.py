@@ -4,7 +4,7 @@ from scipy.stats import rv_continuous, rv_discrete
 from scipy.stats._multivariate import multi_rv_generic, multi_rv_frozen
 from scipy.special import gammaln, xlogy
 
-from utilities import outer_gen, diag_gen
+from util import outer_gen, diag_gen
 
 
 #%% Deterministic RV, multivariate
@@ -23,7 +23,7 @@ def _deterministic_multi_check_input(x, val):
     elif x.ndim == val.ndim + 1 and x.shape[1:] == val.shape:
         size = x.shape[0]
     else:
-        raise TypeError(f'Input shape must be equal to {val.shape} or (i,)+{val.shape}.')
+        raise TypeError(f'Input shape must be equal to {val.shape} or (size,)+{val.shape}.')
 
     return x, size
 
@@ -86,11 +86,8 @@ class DeterministicMultiGen(multi_rv_generic):
         val = _deterministic_multi_check_parameters(val)
         if size is None:
             return val
-        elif isinstance(size, (np.int, np.float)) and size >= 1:
-            size = int(size)
-            return np.broadcast_to(val[np.newaxis], (size,)+val.shape)
         else:
-            raise TypeError("Input 'size' must be a positive integer.")
+            return np.broadcast_to(val, (size,) + val.shape)
 
 
 deterministic_multi = DeterministicMultiGen()
@@ -137,7 +134,7 @@ def _dirichlet_multi_check_input(alpha, x):
     elif x.ndim == alpha.ndim + 1 and x.shape[1:] == alpha.shape:
         size = x.shape[0]
     else:
-        raise TypeError(f'Input shape must be equal to {alpha.shape} or (i,)+{alpha.shape}.')
+        raise TypeError(f'Input shape must be equal to {alpha.shape} or (size,)+{alpha.shape}.')
 
     if np.min(x) < 0:
         raise ValueError("Each entry in 'x' must be greater than or equal "
@@ -146,11 +143,7 @@ def _dirichlet_multi_check_input(alpha, x):
         raise ValueError("Each entry in 'x' must be smaller or equal one.")
 
     # Check x_i > 0 or alpha_i > 1
-    xeq0 = (x == 0)
-    alphalt1 = (alpha < 1)
-    if size is not None:
-        alphalt1 = np.broadcast_to(alphalt1[np.newaxis], (size,) + alpha.shape)
-    if np.logical_and(xeq0, alphalt1).any():
+    if np.logical_and(x == 0, alpha < 1).any():
         raise ValueError("Each entry in 'x' must be greater than zero if its "
                          "alpha is less than one.")
 
@@ -173,20 +166,22 @@ class DirichletMultiGen(multi_rv_generic):
         alpha = _dirichlet_multi_check_parameters(alpha)
         return DirichletMultiFrozen(alpha, seed=seed)
 
-    def _pdf_single(self, x, alpha):
-        log_pdf = gammaln(np.sum(alpha)) - np.sum(gammaln(alpha)) + np.sum(xlogy(alpha - 1, x))
-        return np.exp(log_pdf)
-
-    def _pdf_vec(self, x, alpha):
-        return np.array([self._pdf_single(x_i, alpha) for x_i in x])
+    # def _pdf_single(self, x, alpha):
+    #     log_pdf = gammaln(np.sum(alpha)) - np.sum(gammaln(alpha)) + np.sum(xlogy(alpha - 1, x))
+    #     return np.exp(log_pdf)
+    #
+    # def _pdf_vec(self, x, alpha):
+    #     return np.array([self._pdf_single(x_i, alpha) for x_i in x])
 
     def pdf(self, x, alpha):        # TODO: efficient broadcasting like in _multivariate?
         alpha = _dirichlet_multi_check_parameters(alpha)
         x, size = _dirichlet_multi_check_input(alpha, x)
-        if size is None:
-            return self._pdf_single(x, alpha)
-        else:
-            return self._pdf_vec(x, alpha)
+        # if size is None:
+        #     return self._pdf_single(x, alpha)
+        # else:
+        #     return self._pdf_vec(x, alpha)
+        log_pdf = gammaln(np.sum(alpha)) - np.sum(gammaln(alpha)) + np.sum(xlogy(alpha - 1, x).reshape(size, -1), -1)
+        return np.exp(log_pdf)
 
     def mean(self, alpha):
         alpha = _dirichlet_multi_check_parameters(alpha)
@@ -195,7 +190,7 @@ class DirichletMultiGen(multi_rv_generic):
     def cov(self, alpha):
         alpha = _dirichlet_multi_check_parameters(alpha)
         mean = self.mean(alpha)
-        return (diag_gen(mean) - outer_gen(mean, mean)) / alpha.sum()
+        return (diag_gen(mean) - outer_gen(mean, mean)) / (alpha.sum() + 1)
 
     def mode(self, alpha):
         alpha = _dirichlet_multi_check_parameters(alpha)
@@ -241,7 +236,7 @@ class DirichletMultiFrozen(multi_rv_frozen):
 
 #%% Deterministic RV, univariate
 
-# # TODO: depreciate in favor of multivariate?
+# # TODO: depreciate, use DeterministicMultiGen?
 #
 # # def _deterministic_uni_check_parameters(val):
 # #     val = np.asarray(val).squeeze()
