@@ -2,7 +2,32 @@ import numpy as np
 # from scipy.special import binom
 
 
-def simplex_grid(n=0, shape=(2,)):
+def _outer_gen_2(x, y):
+    x, y = np.asarray(x), np.asarray(y)
+    x = x.reshape(x.shape + tuple(np.ones(y.ndim, dtype=int)))  # add singleton dimensions for broadcasting
+    return x*y
+
+
+def outer_gen(*args):
+    n_args = len(args)
+    if n_args < 2:
+        raise TypeError('At least two positional inputs are required.')
+
+    out = args[0]
+    for arg in args[1:]:
+        out = _outer_gen_2(out, arg)
+    return out
+
+
+def diag_gen(x):
+    x = np.asarray(x)
+    out = np.zeros(2*x.shape)
+    i = np.unravel_index(range(x.size), x.shape)
+    out[2*i] = x.flatten()
+    return out
+
+
+def simplex_grid(n=1, shape=(2,)):
     """
     Generate a uniform grid over a simplex.
 
@@ -11,10 +36,12 @@ def simplex_grid(n=0, shape=(2,)):
     :return: (m,)+shape array, where m is the total number of points
     """
 
+    if type(n) is not int or n < 1:
+        raise TypeError("Input 'n' must be a positive integer")
     if type(shape) is not tuple:
-        raise ValueError("Input 'shape' must be a tuple of integers.")
+        raise TypeError("Input 'shape' must be a tuple of integers.")
     elif not all([isinstance(x, int) for x in shape]):
-        raise ValueError("Elements of 'shape' must be integers.")
+        raise TypeError("Elements of 'shape' must be integers.")
 
     d = np.prod(shape)
 

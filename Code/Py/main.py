@@ -12,7 +12,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 # from tensorflow_probability import distributions as tfd
 
-from simplex_grid import simplex_grid
+from util import simplex_grid
 from rv_obj import deterministic_multi, dirichlet_multi
 
 rng = random.default_rng()
@@ -50,16 +50,17 @@ plt.suptitle(f'Model, (X,Y) = ({X:.2f},{Y:.2f})')
 
 Y_set = np.array(['a', 'b', 'c'])
 # Y_set = np.array(['a', 'b'])
-X_set = np.arange(2)
+X_set = np.arange(1)
 
 YX_set = np.array([(y, x) for y in Y_set for x in X_set],
                   dtype=[('y', Y_set.dtype), ('x', X_set.dtype)]).reshape(Y_set.shape + X_set.shape)
 
 
 # alpha = 5*np.ones(Y_set.shape + X_set.shape)
-alpha = rng.uniform(1, 10, Y_set.shape + X_set.shape)
+# alpha = rng.uniform(1, 10, Y_set.shape + X_set.shape)
+alpha = rng.integers(2, 6, size=Y_set.shape + X_set.shape)
 
-n_plt = 10
+n_plt = 100
 # t_plt = simplex_grid(n_plt, alpha.size).reshape((-1,) + alpha.shape)
 t_plt = simplex_grid(n_plt, alpha.shape)
 
