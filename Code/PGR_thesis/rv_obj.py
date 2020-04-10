@@ -1,10 +1,8 @@
 import numpy as np
-from scipy import stats
-from scipy.stats import rv_continuous, rv_discrete
 from scipy.stats._multivariate import multi_rv_generic, multi_rv_frozen
 from scipy.special import gammaln, xlogy
 
-from util import outer_gen, diag_gen
+from util.util import outer_gen, diag_gen
 
 
 #%% Deterministic RV, multivariate
