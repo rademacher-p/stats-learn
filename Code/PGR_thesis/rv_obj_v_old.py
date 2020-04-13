@@ -46,6 +46,7 @@ class DeterministicMultiGen(multi_rv_generic):
     def __call__(self, val):
         return DeterministicMultiFrozen(val)
 
+
     # def _cdf_single(self, x, val):
     #     return 1. if np.all(x >= val) else 0.
     #
@@ -55,21 +56,17 @@ class DeterministicMultiGen(multi_rv_generic):
 
     @staticmethod
     def _cdf(x, val):
-        x, size = _deterministic_multi_check_input(x, val)
         return np.where(np.all(x.reshape(-1, val.size) >= val.flatten(), axis=-1).squeeze(), 1., 0.)
 
-    @staticmethod   # TODO: classmethod?
+    @staticmethod
     def cdf(x, val):
         val = _deterministic_multi_check_parameters(val)
-        # x, size = _deterministic_multi_check_input(x, val)
-
+        x, size = _deterministic_multi_check_input(x, val)
         # if size is None:
         #     return self._cdf_single(x, val)
         # else:
         #     return self._cdf_vec(x, val)
-
-        # return np.where(np.all(x.reshape(-1, val.size) >= val.flatten(), axis=-1).squeeze(), 1., 0.)
-        return DeterministicMultiGen._cdf(x, val)
+        return np.where(np.all(x.reshape(-1, val.size) >= val.flatten(), axis=-1).squeeze(), 1., 0.)
 
     # def _pdf_single(self, x, val):
     #     return np.inf if np.all(x == val) else 0.
