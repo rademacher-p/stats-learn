@@ -86,7 +86,7 @@ def simplex_grid(n=1, shape=(1,), hull_mask=None):
     return g.reshape((-1,) + shape) / n
 
 
-if __name__ == '__main__':
-    q = simplex_grid(3, (4,), [False, False, True, False])
-    print(q*3)
+# if __name__ == '__main__':
+#     q = simplex_grid(3, (4,), [False, False, True, False])
+#     print(q*3)
 
