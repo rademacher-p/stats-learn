@@ -9,11 +9,12 @@ import numpy as np
 from numpy import random
 from scipy import stats
 import matplotlib.pyplot as plt
+# from mpl_toolkits.mplot3d import Axes3D
 
 # from tensorflow_probability import distributions as tfd
 
 from util.util import simplex_grid
-from rv_obj import deterministic_multi, dirichlet_multi
+from rv_obj import deterministic_multi, dirichlet_multi, discrete_multi
 
 rng = random.default_rng()
 
@@ -68,9 +69,9 @@ n_plt = 20
 # prior = deterministic_multi(mean)
 # t_plt = simplex_grid(n_plt, YX_set.shape)
 
-alpha_0 = 5
+alpha_0 = YX_set.size
 mean = dirichlet_multi.rvs(YX_set.size, np.ones(YX_set.shape) / YX_set.size)
-prior = dirichlet_multi(alpha_0, mean)
+prior = dirichlet_multi(alpha_0, mean, rng)
 t_plt = simplex_grid(n_plt, YX_set.shape, mean < 1 / alpha_0)
 
 
@@ -82,25 +83,27 @@ theta_pmf = prior.rvs()
 
 # TODO: add plot methods to RV classes
 if YX_set.shape == (3, 1):
-    _, ax = plt.subplots(num='prior', clear=True, subplot_kw={'projection': '3d'})
-    sc = ax.scatter(t_plt[:, 0], t_plt[:, 1], t_plt[:, 2], s=15, c=p_theta_plt)
-    ax.view_init(35, 45)
+    _, ax_prior = plt.subplots(num='prior', clear=True, subplot_kw={'projection': '3d'})
+    sc = ax_prior.scatter(t_plt[:, 0], t_plt[:, 1], t_plt[:, 2], s=15, c=p_theta_plt)
+    ax_prior.view_init(35, 45)
     plt.colorbar(sc)
-    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
+    ax_prior.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
+
+# TODO: marginal/conditinal models to alleviate structured array issues?
+
+theta = discrete_multi(YX_set, theta_pmf, rng)
 
 
-
-q = rng.choice(YX_set.flatten(), p=theta_pmf.flatten())
-
-z = stats.rv_discrete(name='z', values=(['a', 'b', 'c'], [.2, .5, .3]))     # cant handle non-integral values...
-
-
-# vals = YX_set
-vals = np.arange(YX_set.size).reshape(YX_set.shape)
-# vals = list('asdfer')
-theta = stats.rv_discrete(name='theta', values=(vals, theta_pmf))
+a, b = np.meshgrid(X_set, Y_set)
+_, ax_theta = plt.subplots(num='theta pmf', subplot_kw={'projection': '3d'}, clear=True)
+ax_theta.scatter(a, b, theta_pmf)
+ax_theta.set(xlabel='$x$', ylabel='$y$')
 
 plt.figure(num='theta_pmf', clear=True)
-plt.stem(vals.flatten(), theta.pmf(vals).flatten(), use_line_collection=True)
+plt.stem(theta.support.flatten(), theta.pmf.flatten(), use_line_collection=True)
+
+
+
+
 
 
