@@ -205,7 +205,6 @@ class DirichletMultiGen(multi_rv_generic):
 
     def __init__(self, seed=None):
         super(DirichletMultiGen, self).__init__(seed)
-        # self.__doc__ = doccer.docformat(self.__doc__, dirichlet_docdict_params)     # TODO: docstring?
 
     def __call__(self, alpha_0, mean, seed=None):
         return DirichletMultiFrozen(alpha_0, mean, seed=seed)
@@ -306,7 +305,8 @@ def _discrete_multi_check_parameters(support, pmf):
     if support.size != np.unique(support).size:
         raise ValueError("Input 'support' must have unique values")
 
-    if np.issubdtype(support.dtype, np.number):
+    # if np.issubdtype(support.dtype, np.number):
+    if all([np.issubdtype(support.dtype[i], np.number) for i in range(len(support.dtype))]):
         is_numeric = True
     else:
         is_numeric = False
@@ -337,7 +337,6 @@ class DiscreteMultiGen(multi_rv_generic):
 
     def __init__(self, seed=None):
         super(DiscreteMultiGen, self).__init__(seed)
-        # self.__doc__ = doccer.docformat(self.__doc__, dirichlet_docdict_params)     # TODO: docstring?
 
     def __call__(self, support, pmf, seed=None):
         return DiscreteMultiFrozen(support, pmf, seed=seed)

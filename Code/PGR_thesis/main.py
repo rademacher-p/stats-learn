@@ -1,24 +1,23 @@
 """
 Sim main.
 
-blah blah
+:-)
 """
+
 import itertools
 
 import numpy as np
 from numpy import random
 from scipy import stats
 import matplotlib.pyplot as plt
-# from mpl_toolkits.mplot3d import Axes3D
-
-# from tensorflow_probability import distributions as tfd
 
 from util.util import simplex_grid
 from rv_obj import deterministic_multi, dirichlet_multi, discrete_multi
 
+plt.style.use('seaborn')
+
 rng = random.default_rng()
 
-np.seterr(all='raise')
 
 
 #%% Continuous sets
@@ -52,27 +51,25 @@ plt.suptitle(f'Model, (X,Y) = ({X:.2f},{Y:.2f})')
 
 #%% Discrete sets
 
-Y_set = np.array(['a', 'b', 'c'])
 # Y_set = np.array(['a', 'b'])
-X_set = np.arange(2)
+Y_set = np.arange(2)
+X_set = np.arange(6).reshape(3, 2)
 
 
+YX_set = np.array(list(itertools.product(Y_set.flatten(), X_set.flatten())),
+                  dtype=[('y', Y_set.dtype), ('x', X_set.dtype)]).reshape(Y_set.shape + X_set.shape)
 # YX_set = np.array(list(itertools.product(Y_set, X_set))).reshape(Y_set.shape + X_set.shape)
 
-YX_set = np.array(list(itertools.product(Y_set, X_set)),
-                  dtype=[('y', Y_set.dtype), ('x', X_set.dtype)]).reshape(Y_set.shape + X_set.shape)
+n_plt = 5
 
+mean = dirichlet_multi.rvs(YX_set.size, np.ones(YX_set.shape)/YX_set.size)
+prior = deterministic_multi(mean)
+t_plt = simplex_grid(n_plt, YX_set.shape)
 
-n_plt = 20
-
-# mean = dirichlet_multi.rvs(YX_set.size, np.ones(YX_set.shape)/YX_set.size)
-# prior = deterministic_multi(mean)
-# t_plt = simplex_grid(n_plt, YX_set.shape)
-
-alpha_0 = YX_set.size
-mean = dirichlet_multi.rvs(YX_set.size, np.ones(YX_set.shape) / YX_set.size)
-prior = dirichlet_multi(alpha_0, mean, rng)
-t_plt = simplex_grid(n_plt, YX_set.shape, mean < 1 / alpha_0)
+# alpha_0 = YX_set.size
+# mean = dirichlet_multi.rvs(YX_set.size, np.ones(YX_set.shape) / YX_set.size)
+# prior = dirichlet_multi(alpha_0, mean, rng)
+# t_plt = simplex_grid(n_plt, YX_set.shape, mean < 1 / alpha_0)
 
 
 p_theta_plt = prior.pdf(t_plt)
@@ -93,16 +90,16 @@ if YX_set.shape == (3, 1):
 
 theta = discrete_multi(YX_set, theta_pmf, rng)
 
+theta.mean  # TODO: broken, tuple product
 
-a, b = np.meshgrid(X_set, Y_set)
-_, ax_theta = plt.subplots(num='theta pmf', subplot_kw={'projection': '3d'}, clear=True)
-ax_theta.scatter(a, b, theta_pmf)
+
+_, ax_theta = plt.subplots(num='theta pmf', clear=True, subplot_kw={'projection': '3d'})
+# ax_theta.scatter(YX_set['x'], YX_set['y'], theta_pmf, c=theta_pmf)
+ax_theta.bar3d(YX_set['x'].flatten(), YX_set['y'].flatten(), 0, 1, 1, theta_pmf.flatten(), shade=True)
 ax_theta.set(xlabel='$x$', ylabel='$y$')
 
-plt.figure(num='theta_pmf', clear=True)
-plt.stem(theta.support.flatten(), theta.pmf.flatten(), use_line_collection=True)
-
-
+# plt.figure(num='theta_pmf', clear=True)
+# plt.stem(theta.support.flatten(), theta.pmf.flatten(), use_line_collection=True)
 
 
 
