@@ -297,8 +297,11 @@ class DirichletMultiFrozen(multi_rv_frozen):
 #%% Discrete RV, multivariate (generalized)
 
 # TODO: modify for non-scalar elements?
+
 # TODO: use structured array to combine support and pmf?
 # TODO: pmf field/method naming conflict?
+
+# TODO: rename to FINITE?
 
 def _discrete_multi_check_parameters(support, pmf):
     support = np.asarray(support)
@@ -386,7 +389,7 @@ class DiscreteMultiGen(multi_rv_generic):
 
     def _rvs(self, support, pmf, size=None, random_state=None):
         random_state = self._get_random_state(random_state)
-        return random_state.choice(support, size, p=pmf)
+        return random_state.choice(support.flatten(), size, p=pmf.flatten())
 
     def rvs(self, support, pmf, size=None, random_state=None):
         support, pmf, _ = _discrete_multi_check_parameters(support, pmf)
