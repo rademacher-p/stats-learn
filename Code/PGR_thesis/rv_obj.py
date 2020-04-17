@@ -2,6 +2,8 @@
 Random element objects
 """
 
+# TODO: docstrings?
+
 import numpy as np
 from scipy.stats._multivariate import multi_rv_generic, multi_rv_frozen
 from scipy.special import gammaln, xlogy
@@ -10,14 +12,14 @@ import warnings
 from util.util import outer_gen, diag_gen
 
 
-def _multi_check_input_shape(x, shape):
+def _multi_check_input_shape(x, shape):     # TODO: generalize for n-dim?
     """Checks input shape for RV cdf/pdf calls"""
     x = np.asarray(x)
 
     if x.shape == shape:
         size = None
     elif x.ndim == len(shape) + 1 and x.shape[1:] == shape:
-        size = x.shape[0]
+        size = len(x)
     else:
         raise TypeError(f"Input 'x' shape must be equal to {shape} or (size,)+{shape}.")
 
@@ -34,153 +36,61 @@ def _deterministic_multi_check_parameters(val):
 
 
 def _deterministic_multi_check_input(x, shape):
-    x, size = _multi_check_input_shape(x, shape)
+    x, _ = _multi_check_input_shape(x, shape)
     if not np.issubdtype(x.dtype, np.number):
         raise TypeError("Input 'x' must be of numeric type.")
-    return x, size
+    return x
 
 
-class DeterministicMultiGen(multi_rv_generic):
-
-    def __init__(self, seed=None):
-        super(DeterministicMultiGen, self).__init__(seed)
-        # self.__doc__ = doccer.docformat(self.__doc__, dirichlet_docdict_params)     # TODO: docstring?
-
-    def __call__(self, val):
-        return DeterministicMultiFrozen(val)
-
-    # def _cdf_single(self, x, val):
-    #     return 1. if np.all(x >= val) else 0.
-    #
-    # def _cdf_vec(self, x, val):
-    #     return np.array([self._cdf_single(x_i, val) for x_i in x])
-    #     # np.vectorize(self._cdf_single, signature='(n,...,m),(n,...,m)->()')(x, val)  # TODO: np.vectorize?
-
-    @staticmethod
-    def _cdf(x, val):
-        x, _ = _deterministic_multi_check_input(x, val.shape)
-        return np.where(np.all(x.reshape(-1, val.size) >= val.flatten(), axis=-1).squeeze(), 1., 0.)
-
-    @staticmethod
-    def cdf(x, val):
-        val = _deterministic_multi_check_parameters(val)
-
-        # if size is None:
-        #     return self._cdf_single(x, val)
-        # else:
-        #     return self._cdf_vec(x, val)
-
-        return DeterministicMultiGen._cdf(x, val)
-
-    # def _pdf_single(self, x, val):
-    #     return np.inf if np.all(x == val) else 0.
-    #
-    # def _pdf_vec(self, x, val):
-    #     return np.array([self._pdf_single(x_i, val) for x_i in x])
-
-    @staticmethod
-    def _pdf(x, val):
-        x, _ = _deterministic_multi_check_input(x, val.shape)
-        return np.where(np.all(x.reshape(-1, val.size) == val.flatten(), axis=-1).squeeze(), np.inf, 0.)
-
-    @staticmethod
-    def pdf(x, val):
-        val = _deterministic_multi_check_parameters(val)
-
-        # if size is None:
-        #     return self._pdf_single(x, val)
-        # else:
-        #     return self._pdf_vec(x, val)
-
-        return DeterministicMultiGen._pdf(x, val)
-
-    @staticmethod
-    def _mean(val):
-        return val
-
-    @staticmethod
-    def mean(val):
-        val = _deterministic_multi_check_parameters(val)
-        return DeterministicMultiGen._mean(val)
-
-    @staticmethod
-    def _cov(val):
-        return np.zeros(2 * val.shape)
-
-    @staticmethod
-    def cov(val):
-        val = _deterministic_multi_check_parameters(val)
-        return DeterministicMultiGen._cov(val)
-
-    @staticmethod
-    def _mode(val):
-        return val
-
-    @staticmethod
-    def mode(val):
-        val = _deterministic_multi_check_parameters(val)
-        return DeterministicMultiGen._mode(val)
-
-    @staticmethod
-    def _rvs(val, size=None):
-        if size is None:
-            return val
-        else:
-            return np.broadcast_to(val, (size,) + val.shape)
-
-    @staticmethod
-    def rvs(val, size=None):
-        val = _deterministic_multi_check_parameters(val)
-        return DeterministicMultiGen._rvs(val, size)
-
-
-deterministic_multi = DeterministicMultiGen()
-
-
-class DeterministicMultiFrozen(multi_rv_frozen):
+class DeterministicPGR(object):
     def __init__(self, val):
         self.val = _deterministic_multi_check_parameters(val)
-        self._dist = DeterministicMultiGen()
 
     def cdf(self, x):
-        return self._dist._cdf(x, self.val)
+        x = _deterministic_multi_check_input(x, self.val.shape)
+        return np.where(np.all(x.reshape(-1, self.val.size) >= self.val.flatten(), axis=-1).squeeze(), 1., 0.)
 
     def pdf(self, x):
-        return self._dist._pdf(x, self.val)
+        x = _deterministic_multi_check_input(x, self.val.shape)
+        return np.where(np.all(x.reshape(-1, self.val.size) == self.val.flatten(), axis=-1).squeeze(), np.inf, 0.)
 
     @property
     def mean(self):
-        return self._dist._mean(self.val)
+        return self.val
 
     @property
     def cov(self):
-        return self._dist._cov(self.val)
+        return np.zeros(2 * self.val.shape)
 
     @property
     def mode(self):
-        return self._dist._mode(self.val)
+        return self.val
 
     def rvs(self, size=None):
-        return self._dist._rvs(self.val, size)
+        if size is None:
+            return self.val
+        else:
+            return np.broadcast_to(self.val, (size,) + self.val.shape)
 
 
 #%% Dirichlet RV, multivariate (generalized dimension)
 
-def _dirichlet_multi_check_parameters(alpha_0, mean):
+def _dirichlet_check_alpha_0(alpha_0):
     alpha_0 = np.asarray(alpha_0)
     if alpha_0.size > 1 or alpha_0 <= 0:
         raise ValueError("Concentration parameter must be a positive scalar")
+    return alpha_0
 
+
+def _dirichlet_check_mean(mean):
     mean = np.asarray(mean)
     if np.min(mean) < 0:
         raise ValueError("Each entry in 'mean' must be greater than or equal "
                          "to zero.")
-
     if np.abs(mean.sum() - 1.0) > 1e-9:
         raise ValueError("The input 'mean' must lie within the normal "
                          "simplex. but mean.sum() = %s." % mean.sum())
-
-    return alpha_0, mean
+    return mean
 
 
 def _dirichlet_multi_check_input(x, alpha_0, mean):
@@ -201,97 +111,65 @@ def _dirichlet_multi_check_input(x, alpha_0, mean):
     return x, size
 
 
-class DirichletMultiGen(multi_rv_generic):
-
-    def __init__(self, seed=None):
-        super(DirichletMultiGen, self).__init__(seed)
-
-    def __call__(self, alpha_0, mean, seed=None):
-        return DirichletMultiFrozen(alpha_0, mean, seed=seed)
-
-    # def _pdf_single(self, x, alpha):
-    #     log_pdf = gammaln(np.sum(alpha)) - np.sum(gammaln(alpha)) + np.sum(xlogy(alpha - 1, x))
-    #     return np.exp(log_pdf)
-    #
-    # def _pdf_vec(self, x, alpha):
-    #     return np.array([self._pdf_single(x_i, alpha) for x_i in x])
-
-    @staticmethod
-    def _pdf(x, alpha_0, mean):
-        x, size = _dirichlet_multi_check_input(x, alpha_0, mean)
-
-        log_pdf = gammaln(np.sum(alpha_0 * mean)) - np.sum(gammaln(alpha_0 * mean)) \
-                  + np.sum(xlogy(alpha_0 * mean - 1, x).reshape(size, -1), -1)
-        return np.exp(log_pdf)
-
-    @staticmethod
-    def pdf(x, alpha_0, mean):
-        alpha_0, mean = _dirichlet_multi_check_parameters(alpha_0, mean)
-
-        # if size is None:
-        #     return self._pdf_single(x, alpha)
-        # else:
-        #     return self._pdf_vec(x, alpha)
-
-        return DirichletMultiGen._pdf(x, alpha_0, mean)
-
-    @staticmethod
-    def _cov(alpha_0, mean):
-        return (diag_gen(mean) - outer_gen(mean, mean)) / (alpha_0 + 1)
-
-    @staticmethod
-    def cov(alpha_0, mean):
-        alpha_0, mean = _dirichlet_multi_check_parameters(alpha_0, mean)
-        return DirichletMultiGen._cov(alpha_0, mean)
-
-    @staticmethod
-    def _mode(alpha_0, mean):
-        if np.min(mean) <= 1 / alpha_0:
-            warnings.warn("No output. Method currently supported for mean > 1/alpha_0 only")
-            # TODO: complete with general formula
-            return None
-        else:
-            return (mean - 1 / alpha_0) / (1 - mean.size / alpha_0)
-
-    @staticmethod
-    def mode(alpha_0, mean):
-        alpha_0, mean = _dirichlet_multi_check_parameters(alpha_0, mean)
-        return DirichletMultiGen._mode(alpha_0, mean)
-
-    def _rvs(self, alpha_0, mean, size=None, random_state=None):
-        random_state = self._get_random_state(random_state)
-
-        if size is None:
-            return random_state.dirichlet(alpha_0 * mean.flatten()).reshape(mean.shape)
-        else:
-            return random_state.dirichlet(alpha_0 * mean.flatten(), size).reshape((size,)+mean.shape)
-
-    def rvs(self, alpha_0, mean, size=None, random_state=None):
-        alpha_0, mean = _dirichlet_multi_check_parameters(alpha_0, mean)
-        return self._rvs(alpha_0, mean, size, random_state)
-
-
-dirichlet_multi = DirichletMultiGen()
-
-
-class DirichletMultiFrozen(multi_rv_frozen):
+class DirichletPGR(multi_rv_generic):
     def __init__(self, alpha_0, mean, seed=None):
-        self.alpha_0, self.mean = _dirichlet_multi_check_parameters(alpha_0, mean)
-        self._dist = DirichletMultiGen(seed)
+        super().__init__(seed)
+        self._alpha_0 = _dirichlet_check_alpha_0(alpha_0)
+        self._mean = _dirichlet_check_mean(mean)
+        self._update_attr()
 
-    def pdf(self, x):
-        return self._dist._pdf(x, self.alpha_0, self.mean)
+    @property
+    def alpha_0(self):
+        return self._alpha_0
+
+    @alpha_0.setter
+    def alpha_0(self, alpha_0):
+        self._alpha_0 = _dirichlet_check_alpha_0(alpha_0)
+        self._update_attr()
+
+    @property
+    def mean(self):
+        return self._mean
+
+    @mean.setter
+    def mean(self, mean):
+        self._mean = _dirichlet_check_mean(mean)
+        self._update_attr()
+
+    def _update_attr(self):
+        self._cov = (diag_gen(self.mean) - outer_gen(self.mean, self.mean)) / (self.alpha_0 + 1)
+
+        if np.min(self.mean) <= 1 / self.alpha_0:
+            # TODO: complete with general formula
+            self._mode = None
+        else:
+            self._mode = (self.mean - 1 / self.alpha_0) / (1 - self.mean.size / self.alpha_0)
+
+        self._beta_inv = gammaln(np.sum(self.alpha_0 * self.mean)) - np.sum(gammaln(self.alpha_0 * self.mean))
 
     @property
     def cov(self):
-        return self._dist._cov(self.alpha_0, self.mean)
+        return self._cov
 
     @property
     def mode(self):
-        return self._dist._mode(self.alpha_0, self.mean)
+        if self._mode is None:
+            # warnings.warn("No output. Method currently supported for mean > 1/alpha_0 only")
+            raise ValueError("No output. Method currently supported for mean > 1/alpha_0 only")
+        return self._mode
+
+    def pdf(self, x):
+        x, size = _dirichlet_multi_check_input(x, self.alpha_0, self.mean)
+
+        log_pdf = self._beta_inv + np.sum(xlogy(self.alpha_0 * self.mean - 1, x).reshape(size, -1), -1)
+        return np.exp(log_pdf)
 
     def rvs(self, size=None, random_state=None):
-        return self._dist._rvs(self.alpha_0, self.mean, size, random_state)
+        random_state = self._get_random_state(random_state)
+        if size is None:
+            return random_state.dirichlet(self.alpha_0 * self.mean.flatten()).reshape(self.mean.shape)
+        else:
+            return random_state.dirichlet(self.alpha_0 * self.mean.flatten(), size).reshape((size,) + self.mean.shape)
 
 
 #%% Discrete RV, multivariate (generalized)
@@ -299,127 +177,117 @@ class DirichletMultiFrozen(multi_rv_frozen):
 # TODO: modify for non-scalar elements?
 
 # TODO: use structured array to combine support and pmf?
-# TODO: pmf field/method naming conflict?
 
-# TODO: rename to FINITE?
+def _discrete_check_parameters(supp, p):
+    supp = np.asarray(supp)
+    p = np.asarray(p)
 
-def _discrete_multi_check_parameters(support, pmf):
-    support = np.asarray(support)
-    if support.size != np.unique(support).size:
-        raise ValueError("Input 'support' must have unique values")
+    set_shape, data_shape = supp.shape[:p.ndim], supp.shape[p.ndim:]
+    if set_shape != p.shape:
+        raise ValueError("Leading shape values of 'supp' must equal the shape of 'pmf'.")
 
-    # if np.issubdtype(support.dtype, np.number):
-    if all([np.issubdtype(support.dtype[i], np.number) for i in range(len(support.dtype))]):
-        is_numeric = True
-    else:
-        is_numeric = False
+    # if pmf.shape != support.shape:
+    #     raise TypeError("Input 'pmf' must have the same shape as 'support'.")
 
-    pmf = np.asarray(pmf)
-    if pmf.shape != support.shape:
-        raise TypeError("Input 'pmf' must have the same shape as 'support'.")
+    # if len(data_shape) == 0:        # TODO: check?
+    #     supp_flat = supp.flatten()
+    # else:
+    #     supp_flat = supp.reshape((np.prod(set_shape), np.prod(data_shape)))
+    supp_flat = supp.reshape((np.prod(set_shape), -1))
 
-    if np.min(pmf) < 0:
+    # if support.size != np.unique(support).size:
+    if len(supp_flat) != len(np.unique(supp_flat, axis=0)):
+        raise ValueError("Input 'supp' must have unique values")
+
+    if np.min(p) < 0:
         raise ValueError("Each entry in 'pmf' must be greater than or equal "
                          "to zero.")
-    if np.abs(pmf.sum() - 1.0) > 1e-9:
+    if np.abs(p.sum() - 1.0) > 1e-9:
         raise ValueError("The input 'pmf' must lie within the normal "
-                         "simplex. but pmf.sum() = %s." % pmf.sum())
+                         "simplex. but pmf.sum() = %s." % p.sum())
 
-    return support, pmf, is_numeric
-
-
-def _discrete_multi_check_input(x, support):
-    x, size = _multi_check_input_shape(x, support.shape)
-    if not np.isin(x, support).all():
-        raise ValueError("Elements of input 'x' must be in the support set %s." % support)
-
-    return x, size
+    return supp, p
 
 
-class DiscreteMultiGen(multi_rv_generic):
+def _discrete_multi_check_input(x, supp):
+    x, size = _multi_check_input_shape(x, supp.shape)
+    if not np.isin(x, supp).all():
+        raise ValueError("Elements of input 'x' must be in the support set %s." % supp)
 
-    def __init__(self, seed=None):
-        super(DiscreteMultiGen, self).__init__(seed)
+    return x, size      # TODO: remove size?
 
-    def __call__(self, support, pmf, seed=None):
-        return DiscreteMultiFrozen(support, pmf, seed=seed)
 
-    @staticmethod
-    def _pmf(x, support, pmf):
-        x, size = _discrete_multi_check_input(x, support)
-        return pmf[x == support]
+class FinitePGR(multi_rv_generic):
+    def __init__(self, supp, p, seed=None):
+        super().__init__(seed)
+        self._supp, self._p = _discrete_check_parameters(supp, p)
+        self._update_attr()
 
-    @staticmethod
-    def pmf(x, support, pmf):
-        support, pmf, _ = _discrete_multi_check_parameters(support, pmf)
-        return DiscreteMultiGen._pmf(x, support, pmf)
+    @property
+    def supp(self):
+        return self._supp
 
-    @staticmethod
-    def _mean(support, pmf, is_numeric):
-        if is_numeric:
-            return (support * pmf).sum()
+    @supp.setter
+    def supp(self, supp):
+        self._supp, self._p = _discrete_check_parameters(supp, self.p)
+        self._update_attr()
+
+    @property
+    def p(self):
+        return self._p
+
+    @p.setter
+    def p(self, p):
+        self._supp, self._p = _discrete_check_parameters(self.supp, p)
+        self._update_attr()
+
+    def _update_attr(self):
+        # _, self._data_shape = self.supp.shape[:self.p.ndim], self.supp.shape[self.p.ndim:]
+        self._data_shape = self.supp.shape[self.p.ndim:]
+        self._supp_flat, self._p_flat = self.supp.reshape((np.prod(self.p.shape), -1)), self.p.flatten()
+
+        # if all([np.issubdtype(support.dtype[i], np.number) for i in range(len(support.dtype))]):
+        if np.issubdtype(self.supp.dtype, np.number):
+            # self._mean = (self.supp * np.broadcast_to(self.p, self.supp.shape)).sum()
+            mean_flat = (self._p_flat[:, np.newaxis] * self._supp_flat).sum(axis=0)
+            self._mean = mean_flat.reshape(self._data_shape)
+            ctr_flat = self._supp_flat - mean_flat
+            outer_flat = (ctr_flat.reshape(self.p.size, 1, -1) * ctr_flat[..., np.newaxis]).reshape(self.p.size, -1)
+            self._cov = (self._p_flat[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self._data_shape)
         else:
-            raise TypeError("Method only supported for numeric 'support'.")
+            self._mean = None
+            self._cov = None
 
-    @staticmethod
-    def mean(support, pmf):
-        support, pmf, is_numeric = _discrete_multi_check_parameters(support, pmf)
-        return DiscreteMultiGen._mean(support, pmf, is_numeric)
-
-    @staticmethod
-    def _cov(support, pmf, is_numeric):
-        if is_numeric:
-            return ((support - DiscreteMultiGen._mean(support, pmf))*2 * pmf).sum()
-        else:
-            raise TypeError("Method only supported for numeric 'support'.")
-
-    @staticmethod
-    def cov(support, pmf):
-        support, pmf, is_numeric = _discrete_multi_check_parameters(support, pmf)
-        return DiscreteMultiGen._cov(support, pmf, is_numeric)
-
-    @staticmethod
-    def _mode(support, pmf):
-        return support[np.argmax(pmf)]
-
-    @staticmethod
-    def mode(support, pmf):
-        support, pmf, _ = _discrete_multi_check_parameters(support, pmf)
-        return DiscreteMultiGen._mode(support, pmf)
-
-    def _rvs(self, support, pmf, size=None, random_state=None):
-        random_state = self._get_random_state(random_state)
-        return random_state.choice(support.flatten(), size, p=pmf.flatten())
-
-    def rvs(self, support, pmf, size=None, random_state=None):
-        support, pmf, _ = _discrete_multi_check_parameters(support, pmf)
-        return self._rvs(support, pmf, size, random_state)
-
-
-discrete_multi = DiscreteMultiGen()
-
-
-class DiscreteMultiFrozen(multi_rv_frozen):
-    def __init__(self, support, pmf, seed=None):
-        self.support, self.pmf, self.is_numeric = _discrete_multi_check_parameters(support, pmf)
-        self._dist = DiscreteMultiGen(seed)
-
-    def pmf(self, x):
-        return self._dist._pmf(x, self.support, self.pmf)
+        self._mode = self.supp.flatten()[np.argmax(self.p)]
 
     @property
     def mean(self):
-        return self._dist._mean(self.support, self.pmf, self.is_numeric)
+        if self._mean is None:
+            # warnings.warn("Method only supported for numeric 'supp'.")
+            raise TypeError("Method only supported for numeric 'supp'.")
+        return self._mean
 
     @property
     def cov(self):
-        return self._dist._cov(self.support, self.pmf, self.is_numeric)
+        if self._cov is None:
+            # warnings.warn("Method only supported for numeric 'supp'.")
+            raise TypeError("Method only supported for numeric 'supp'.")
+        return self._cov
 
     @property
     def mode(self):
-        return self._dist._mode(self.support, self.pmf)
+        return self._mode
+
+    def pmf(self, x):
+        x, _ = _discrete_multi_check_input(x, self.supp)
+        return self.p[x == self.supp]
 
     def rvs(self, size=None, random_state=None):
-        return self._dist._rvs(self.support, self.pmf, size, random_state)
-
+        random_state = self._get_random_state(random_state)
+        i = random_state.choice(self.p.size, size, p=self._p_flat)
+        if size is None:
+            return self._supp_flat[i].reshape(self._data_shape)
+        else:
+            return self._supp_flat[i].reshape((size,) + self._data_shape)
+        # return random_state.choice(self.supp.flatten(), size, p=self.p.flatten())
 
