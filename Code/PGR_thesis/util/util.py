@@ -33,11 +33,6 @@ def diag_gen(x):
 def simplex_grid(n=1, shape=(1,), hull_mask=None):
     """
     Generate a uniform grid over a simplex.
-
-    :param n: the number of points per dimension, minus one
-    :param shape: shape of the simplex samples
-    :param hull_mask: boolean array dictating which simplex edge boundaries to exclude
-    :return: (m,)+shape array, where m is the total number of points
     """
 
     if type(n) is not int or n < 1:
@@ -59,6 +54,10 @@ def simplex_grid(n=1, shape=(1,), hull_mask=None):
         elif not all([isinstance(x, np.bool_) for x in hull_mask.flatten()]):
             raise TypeError("Elements of 'hull_mask' must be boolean.")
         hull_mask = hull_mask.flatten()
+
+    if n < sum(hull_mask.flatten()):
+        raise ValueError("Input 'n' must meet or exceed the number of True values in 'hull_mask'.")
+
 
     d = np.prod(shape)
 
@@ -84,9 +83,4 @@ def simplex_grid(n=1, shape=(1,), hull_mask=None):
     g = np.hstack((g, n - g.sum(axis=1)[:, np.newaxis]))
 
     return g.reshape((-1,) + shape) / n
-
-
-# if __name__ == '__main__':
-#     q = simplex_grid(3, (4,), [False, False, True, False])
-#     print(q*3)
 
