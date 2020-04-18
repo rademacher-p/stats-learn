@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 from util.util import simplex_grid
 # from rv_obj import deterministic_multi, dirichlet_multi, discrete_multi
-from rv_obj import DeterministicPGR, DirichletPGR, FinitePGR
+from rv_obj import DeterministicRE, DirichletRE, FiniteRE
 
 # plt.style.use('seaborn')
 
@@ -86,10 +86,10 @@ Y_set = np.array(['a', 'b'])
 # Y_set = np.arange(3)
 # X_set = np.arange(1)
 # X_set = np.arange(6).reshape(3, 2)
-X_set = np.stack(np.meshgrid(np.arange(2), np.arange(2)), axis=-1)
-# X_set = np.random.random((2,2,2))
+# X_set = np.stack(np.meshgrid(np.arange(2), np.arange(2)), axis=-1)
+X_set = np.random.random((2,2,2))
 
-i_split_y, i_split_x = Y_set.ndim, X_set.ndim-1
+i_split_y, i_split_x = Y_set.ndim, X_set.ndim-0
 
 
 # YX_set = np.array(list(itertools.product(Y_set.flatten(), X_set.flatten())),
@@ -116,15 +116,15 @@ n_plt = 10
 
 # # val = dirichlet_multi.rvs(YX_set.size, np.ones(YX_set.shape)/YX_set.size)
 # # prior = deterministic_multi(val)
-# val = DirichletPGR(YX_set.size, np.ones(YX_set.shape)/YX_set.size).rvs()
-# prior = DeterministicPGR(val)
+# val = DirichletRE(YX_set.size, np.ones(YX_set.shape)/YX_set.size).rvs()
+# prior = DeterministicRE(val)
 # t_plt = simplex_grid(n_plt, YX_set.shape)
 
 alpha_0 = 10*YX_set.size
 # mean = dirichlet_multi.rvs(YX_set.size, np.ones(YX_set.shape) / YX_set.size)
-mean = DirichletPGR(YX_set.size, np.ones(YX_set.shape)/YX_set.size).rvs()
+mean = DirichletRE(YX_set.size, np.ones(YX_set.shape) / YX_set.size).rvs()
 # prior = dirichlet_multi(alpha_0, mean, rng)
-prior = DirichletPGR(alpha_0, mean, rng)
+prior = DirichletRE(alpha_0, mean, rng)
 # t_plt = simplex_grid(n_plt, YX_set.shape, hull_mask=(mean < 1 / alpha_0))
 
 
@@ -145,14 +145,17 @@ theta_pmf = prior.rvs()
 # TODO: marginal/conditional models to alleviate structured array issues?
 
 # theta = discrete_multi(YX_set, theta_pmf, rng)
-theta = FinitePGR(YX_set, theta_pmf, rng)
+theta = FiniteRE(YX_set, theta_pmf, rng)
+
+theta.rvs(6)
 
 ###
 theta_m_pmf = theta_pmf.reshape((-1,) + X_set_shape).sum(axis=0)
 # theta_m = discrete_multi(X_set, theta_m_pmf)
-theta_m = FinitePGR(X_set, theta_m_pmf)
+theta_m = FiniteRE(X_set, theta_m_pmf)
 theta_m.mean  # TODO: broken, tuple product
 theta_m.rvs()
+theta_m.pmf(theta_m.rvs(2))
 
 D = theta.rvs(10)
 
