@@ -86,10 +86,10 @@ Y_set = np.array(['a', 'b'])
 # Y_set = np.arange(3)
 # X_set = np.arange(1)
 # X_set = np.arange(6).reshape(3, 2)
-# X_set = np.stack(np.meshgrid(np.arange(2), np.arange(2)), axis=-1)
-X_set = np.random.random((2,2,2))
+X_set = np.stack(np.meshgrid(np.arange(2), np.arange(2)), axis=-1)
+# X_set = np.random.random((2,2,2))
 
-i_split_y, i_split_x = Y_set.ndim, X_set.ndim-0
+i_split_y, i_split_x = Y_set.ndim, X_set.ndim-2
 
 
 # YX_set = np.array(list(itertools.product(Y_set.flatten(), X_set.flatten())),
@@ -153,7 +153,7 @@ theta.rvs(6)
 theta_m_pmf = theta_pmf.reshape((-1,) + X_set_shape).sum(axis=0)
 # theta_m = discrete_multi(X_set, theta_m_pmf)
 theta_m = FiniteRE(X_set, theta_m_pmf)
-theta_m.mean  # TODO: broken, tuple product
+theta_m.mean
 theta_m.rvs()
 theta_m.pmf(theta_m.rvs(2))
 
