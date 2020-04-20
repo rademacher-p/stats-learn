@@ -38,11 +38,12 @@ def _check_data_shape(x, shape):
 
 
 class BaseRE(multi_rv_generic):
-    def __init__(self, *args, **kwargs):
-        super().__init__(kwargs['seed'])
+    def __init__(self, *args, seed=None, **kwargs):
+        # super().__init__(kwargs['seed'])
+        super().__init__(seed)
         self._update_attr(*args, **kwargs)
 
-    def _update_attr(self, *args, **kwargs):      # TODO: kwargs??
+    def _update_attr(self, *args, **kwargs):
         self._data_shape = None
         self._data_size = None
 
@@ -74,8 +75,7 @@ class BaseRE(multi_rv_generic):
 
 #%% Deterministic RV, multivariate
 
-# TODO: redundant, just use FiniteRE?
-# TODO: continuous domain version?
+# TODO: redundant, just use FiniteRE? or continuous domain version?
 
 class DeterministicRE(BaseRE):
     def __init__(self, val, seed=None):
@@ -91,7 +91,7 @@ class DeterministicRE(BaseRE):
         self._update_attr(val)
 
     # Base method overwrites
-    def _update_attr(self, val, **kwargs):      # TODO: *args?
+    def _update_attr(self, val):
         val = np.asarray(val)
         self._val = val
 
@@ -171,7 +171,7 @@ class FiniteRE(BaseRE):
         self._update_attr(self._supp, p)
 
     # Base method overwrites
-    def _update_attr(self, supp, p, **kwargs):
+    def _update_attr(self, supp, p):
         # self._supp, self._p = _discrete_check_parameters(supp, p)
         self._supp = np.asarray(supp)
         self._p = np.asarray(p)
@@ -210,7 +210,6 @@ class FiniteRE(BaseRE):
     def _rvs(self, size=(), random_state=None):
         i = random_state.choice(self.p.size, size, p=self._p_flat)
         return self._supp_flat[i].reshape(size + self._data_shape)
-
 
     def pmf(self, x):
         x, set_shape = _check_data_shape(x, self._data_shape)
@@ -270,7 +269,7 @@ def _dirichlet_multi_check_input(x, alpha_0, mean):
 
 class DirichletRE(BaseRE):
     def __init__(self, alpha_0, mean, seed=None):
-        super().__init__(alpha_0=alpha_0, mean=mean, seed=seed)
+        super().__init__(alpha_0, mean, seed=seed)
 
     # Input properties
     @property
@@ -290,11 +289,16 @@ class DirichletRE(BaseRE):
         self._update_attr(mean=mean)
 
     # Base method overwrites
-    def _update_attr(self, **kwargs):
+    def _update_attr(self, *args, **kwargs):
         if 'alpha_0' in kwargs.keys():
             self._alpha_0 = _dirichlet_check_alpha_0(kwargs['alpha_0'])
+        elif len(args) > 0:
+            self._alpha_0 = _dirichlet_check_alpha_0(args[0])
+
         if 'mean' in kwargs.keys():
             self._mean = _dirichlet_check_mean(kwargs['mean'])
+        elif len(args) > 1:
+            self._mean = _dirichlet_check_mean(args[1])
 
         self._data_shape = self._mean.shape
         self._data_size = self._mean.size
@@ -312,7 +316,6 @@ class DirichletRE(BaseRE):
     def _rvs(self, size=(), random_state=None):
         return random_state.dirichlet(self.alpha_0 * self.mean.flatten(), size).reshape(size + self._data_shape)
 
-
     def pdf(self, x):
         x, set_shape = _dirichlet_multi_check_input(x, self.alpha_0, self.mean)
 
@@ -325,7 +328,7 @@ class DirichletRE(BaseRE):
 a0 = 4
 m = np.random.random((3, 2))
 m = m / m.sum()
-d = DirichletRE(a0, m)
+d = DirichletRE(a0, m, rng)
 d.mean
 d.mode
 d.cov
