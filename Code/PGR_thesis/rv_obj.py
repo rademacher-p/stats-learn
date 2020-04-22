@@ -116,14 +116,16 @@ class DeterministicRE(BaseRE):
 
 
 
-rng = np.random.default_rng()
-a = np.arange(6).reshape(3, 2)
-# a = ['a','b','c']
-b = DeterministicRE(a[1], rng)
-b.mode
-b.mean
-b.cov
-b.pmf(b.rvs())
+# rng = np.random.default_rng()
+# a = np.arange(6).reshape(3, 2)
+# # a = ['a','b','c']
+# b = DeterministicRE(a[1], rng)
+# b.mode
+# b.mean
+# b.cov
+# b.pmf(b.rvs())
+
+
 
 #%% Discrete RV, multivariate (generalized)
 
@@ -221,11 +223,11 @@ class FiniteRE(BaseRE):
 
 
 
-s = np.random.random((4, 3, 2, 1))
-pp = np.random.random((4, 3))
-pp = pp / pp.sum()
-f = FiniteRE(s, pp)
-f.pmf(f.rvs())
+# s = np.random.random((4, 3, 2, 1))
+# pp = np.random.random((4, 3))
+# pp = pp / pp.sum()
+# f = FiniteRE(s, pp)
+# f.pmf(f.rvs())
 
 
 
@@ -325,13 +327,13 @@ class DirichletRE(BaseRE):
 
 
 
-a0 = 4
-m = np.random.random((3, 2))
-m = m / m.sum()
-d = DirichletRE(a0, m, rng)
-d.mean
-d.mode
-d.cov
-d.rvs()
-d.pdf(d.rvs())
-d.pdf(d.rvs(4).reshape((2, 2)+d.mean.shape))
+# a0 = 4
+# m = np.random.random((3, 2))
+# m = m / m.sum()
+# d = DirichletRE(a0, m, rng)
+# d.mean
+# d.mode
+# d.cov
+# d.rvs()
+# d.pdf(d.rvs())
+# d.pdf(d.rvs(4).reshape((2, 2)+d.mean.shape))
