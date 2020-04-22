@@ -19,7 +19,7 @@ from util.util import simplex_grid
 # from rv_obj import deterministic_multi, dirichlet_multi, discrete_multi
 from rv_obj import DeterministicRE, DirichletRE, FiniteRE
 
-# plt.style.use('seaborn')
+plt.style.use('seaborn')
 
 rng = random.default_rng()
 
@@ -89,7 +89,7 @@ Y_set = np.array(['a', 'b'])
 X_set = np.stack(np.meshgrid(np.arange(2), np.arange(2)), axis=-1)
 # X_set = np.random.random((2,2,2))
 
-i_split_y, i_split_x = Y_set.ndim, X_set.ndim-2
+i_split_y, i_split_x = Y_set.ndim, X_set.ndim-1
 
 
 # YX_set = np.array(list(itertools.product(Y_set.flatten(), X_set.flatten())),
@@ -204,22 +204,14 @@ class FiniteSetPrior(Prior):
         theta_pmf = self.dist.rvs()
         # theta_pmf_m = None
 
-        theta = discrete_multi(self.support, theta_pmf, self.random_state)
-        # theta_m = discrete_multi(self.support_x, theta_pmf_m, self.random_state)
+        theta = FiniteRE(self.support, theta_pmf, self.random_state)
+        # theta_m = FiniteRE(self.support_x, theta_pmf_m, self.random_state)
 
         return theta
 
-
-class DeterministicFinitePrior(FiniteSetPrior):     # TODO: make these classmethod generators? or just pass dist?
-    def __init__(self, val, support, seed=None):
-        dist = deterministic_multi(val)
-        super().__init__(dist, support, seed)
-
-
-class DirichletFinitePrior(FiniteSetPrior):
-    def __init__(self, alpha_0, mean, support, seed=None):
-        dist = dirichlet_multi(alpha_0, mean, seed)
-        super().__init__(dist, support, seed)
+    @classmethod
+    def dirichlet_prior(cls, alpha_0, mean, support, seed=None):
+        return cls(DirichletRE(alpha_0, mean), support, seed)
 
 
 class DatPriorDoe(Prior):
