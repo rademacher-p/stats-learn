@@ -144,7 +144,7 @@ class ModelSL:
         X = np.asarray(self.theta_x.rvs(size))
         if len(size) == 0:
             Y = self.theta_y_x(X).rvs()
-            D = np.array([(Y, X)], dtype=[('y', Y.dtype), ('x', X.dtype)]).reshape(size)
+            D = np.array([(Y, X)], dtype=[('y', Y.dtype), ('x', X.dtype)])
         else:
             Y = np.asarray([self.theta_y_x(x).rvs() for x in X])
             D = np.array(list(zip(Y, X)), dtype=[('y', Y.dtype), ('x', X.dtype)]).reshape(size)
