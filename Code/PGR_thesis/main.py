@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 
 
 # from rv_obj import deterministic_multi, dirichlet_multi, discrete_multi
-from rv_obj import DeterministicRE, DirichletRE, FiniteRE
+from rv_obj import BaseRE, DeterministicRE, DirichletRE, FiniteRE
 
 # plt.style.use('seaborn')  # cm?
 
@@ -90,24 +90,24 @@ X_set = np.stack(np.meshgrid(np.arange(2), np.arange(2)), axis=-1)
 
 i_split_y, i_split_x = Y_set.ndim, X_set.ndim-1
 
-
-# YX_set = np.array(list(itertools.product(Y_set.flatten(), X_set.flatten())),
-#                   dtype=[('y', Y_set.dtype), ('x', X_set.dtype)]).reshape(Y_set.shape + X_set.shape)
-
 Y_set_shape, Y_data_shape = Y_set.shape[:i_split_y], Y_set.shape[i_split_y:]
 X_set_shape, X_data_shape = X_set.shape[:i_split_x], X_set.shape[i_split_x:]
-
-# # tt = list(map(tuple, X_set.reshape((-1,) + X_data_shape)))
-# tt = [(x,) for x in X_set.reshape((-1,) + X_data_shape)]
-# # tt = list(X_set.reshape((-1,) + X_data_shape))
-# xx = np.array(tt, dtype=[('x', X_set.dtype, X_data_shape)]).reshape(X_set_shape)    ###
 
 _temp = list(itertools.product(Y_set.reshape((-1,) + Y_data_shape), X_set.reshape((-1,) + X_data_shape)))
 YX_set = np.array(_temp, dtype=[('y', Y_set.dtype, Y_data_shape),
                                 ('x', X_set.dtype, X_data_shape)]).reshape(Y_set_shape + X_set_shape)
 
+# YX_set = np.array(list(itertools.product(Y_set.flatten(), X_set.flatten())),
+#                   dtype=[('y', Y_set.dtype), ('x', X_set.dtype)]).reshape(Y_set.shape + X_set.shape)
+
 # YX_set = np.array(list(itertools.product(Y_set, X_set)),
 #                   dtype=[('y', Y_set.dtype, Y_data_shape), ('x', X_set.dtype, X_data_shape)]).reshape(Y_set_shape + X_set_shape)
+
+
+# # tt = list(map(tuple, X_set.reshape((-1,) + X_data_shape)))
+# tt = [(x,) for x in X_set.reshape((-1,) + X_data_shape)]
+# # tt = list(X_set.reshape((-1,) + X_data_shape))
+# xx = np.array(tt, dtype=[('x', X_set.dtype, X_data_shape)]).reshape(X_set_shape)    ###
 
 
 
@@ -120,36 +120,74 @@ mean = DirichletRE(YX_set.size, np.ones(YX_set.shape) / YX_set.size).rvs()
 prior = DirichletRE(alpha_0, mean, rng)
 
 theta = FiniteRE(YX_set, prior.rvs(), rng)
-D = theta.rvs(10)
 
-# ###
-# theta_m_pmf = theta_pmf.reshape((-1,) + X_set_shape).sum(axis=0)
+
+# theta_m_pmf = theta.p.reshape((-1,) + X_set_shape).sum(axis=0)
 # theta_m = FiniteRE(X_set, theta_m_pmf)
 # theta_m.mean
 # theta_m.rvs()
 # theta_m.pmf(theta_m.rvs(2))
 
 
-
 #%% Classes
 
-# TODO: marginal/conditional models to alleviate structured array issues?
+# TODO: make special rv classes for supervised learning structured arrays?
 
-class ModelSL:
-    def __init__(self, theta_x, theta_y_x):
-        self.theta_x = theta_x
-        self.theta_y_x = theta_y_x
+class Model(BaseRE):
+    def __init__(self, theta_x, theta_y_x, seed=None):
+        super().__init__(theta_x, theta_y_x, seed=seed)
 
-    def rvs(self, size=()):
-        X = np.asarray(self.theta_x.rvs(size))
+    @property
+    def theta_x(self):
+        return self._theta_x
+
+    @theta_x.setter
+    def theta_x(self, theta_x):
+        self._update_attr(theta_x=theta_x)
+
+    @property
+    def theta_y_x(self):
+        return self._theta_y_x
+
+    @theta_y_x.setter
+    def theta_y_x(self, theta_y_x):
+        self._update_attr(theta_y_x=theta_y_x)
+
+    def _update_attr(self, *args, **kwargs):
+        if 'theta_x' in kwargs.keys():
+            self._theta_x = kwargs['theta_x']
+            self.data_shape_x = self._theta_x.data_shape
+        elif len(args) > 0:
+            self._theta_x = args[0]
+            self.data_shape_x = self._theta_x.data_shape
+
+        if 'theta_y_x' in kwargs.keys():
+            self._theta_y_x = kwargs['theta_y_x']
+            self.data_shape_y = self._theta_y_x(self._theta_x.rvs()).data_shape
+        elif len(args) > 1:
+            self._theta_y_x = args[1]
+            self.data_shape_y = self._theta_y_x(self._theta_x.rvs()).data_shape
+
+    def _rvs(self, size=(), random_state=None):
+        X = np.asarray(self.theta_x.rvs(size, random_state))
         if len(size) == 0:
-            Y = self.theta_y_x(X).rvs()
-            D = np.array([(Y, X)], dtype=[('y', Y.dtype), ('x', X.dtype)])
+            Y = self.theta_y_x(X).rvs(size, random_state)
+            D = np.array((Y, X), dtype=[('y', Y.dtype, self.data_shape_y), ('x', X.dtype, self.data_shape_x)])
         else:
-            Y = np.asarray([self.theta_y_x(x).rvs() for x in X])
-            D = np.array(list(zip(Y, X)), dtype=[('y', Y.dtype), ('x', X.dtype)]).reshape(size)
+            Y = np.asarray([self.theta_y_x(x).rvs((), random_state) for x in X.reshape((-1,) + self.theta_x.data_shape)])\
+                .reshape(size + self.data_shape_y)
+            D = np.array(list(zip(Y.reshape((-1,) + self.data_shape_y), X.reshape((-1,) + self.data_shape_x))),
+                         dtype=[('y', Y.dtype, self.data_shape_y), ('x', X.dtype, self.data_shape_x)]).reshape(size)
 
         return D
+
+
+theta_m = DirichletRE(4, [.5, .5])
+def theta_c(x): return FiniteRE(['a', 'b'], x)
+
+t = Model(theta_m, theta_c)
+t.rvs()
+t.rvs(4)
 
 
 class Prior(multi_rv_generic):
@@ -168,12 +206,10 @@ class DatPriorDoe(Prior):
         theta_m = stats.beta(a, b)
         def theta_c(x): return stats.beta(5*x, 5*(1-x))     # TODO: just combine these in a rv_obj?
 
-        return ModelSL(theta_m, theta_c)
+        return Model(theta_m, theta_c)
 
-# TODO: make special rv classes for supervised learning structured arrays?
 
-t = DatPriorDoe(0, 1).random_model()
-t.rvs((4,))
+
 
 class FiniteSetPrior(Prior):
     def __init__(self, dist, support, seed=None):
