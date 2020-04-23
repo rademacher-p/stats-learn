@@ -45,8 +45,8 @@ class BaseRE(multi_rv_generic):
         self._update_attr(*args, **kwargs)
 
     def _update_attr(self, *args, **kwargs):
-        self._data_shape = None
-        self._data_size = None
+        self.data_shape = None
+        self.data_size = None
 
         self._mode = None
         self._mean = None
@@ -96,24 +96,24 @@ class DeterministicRE(BaseRE):
         val = np.asarray(val)
         self._val = val
 
-        self._data_shape = self._val.shape
-        self._data_size = self._val.size
+        self.data_shape = self._val.shape
+        self.data_size = self._val.size
 
         self._mode = self._val
         if np.issubdtype(self._val.dtype, np.number):
             self._mean = self._val
-            self._cov = np.zeros(2 * self._data_shape)
+            self._cov = np.zeros(2 * self.data_shape)
         else:
             # warnings.warn("Method only supported for numeric 'val'.")
             self._mean = None
             self._cov = None
 
     def _rvs(self, size=(), random_state=None):
-        return np.broadcast_to(self.val, size + self._data_shape)
+        return np.broadcast_to(self.val, size + self.data_shape)
 
     def pmf(self, x):
-        x, set_shape = _check_data_shape(x, self._data_shape)
-        return np.where(np.all(x.reshape(-1, self._data_size) == self.val.flatten(), axis=-1), 1., 0.).reshape(set_shape)
+        x, set_shape = _check_data_shape(x, self.data_shape)
+        return np.where(np.all(x.reshape(-1, self.data_size) == self.val.flatten(), axis=-1), 1., 0.).reshape(set_shape)
 
 
 
@@ -183,7 +183,8 @@ class FiniteRE(BaseRE):
         self._p = np.asarray(p)
 
         set_shape = self._supp.shape[:self._p.ndim]
-        self._data_shape = self._supp.shape[self._p.ndim:]
+        self.data_shape = self._supp.shape[self._p.ndim:]
+        # self.data_size = np.prod(self.data_shape)
 
         if set_shape != self._p.shape:
             raise ValueError("Leading shape values of 'supp' must equal the shape of 'p'.")
@@ -200,14 +201,14 @@ class FiniteRE(BaseRE):
             raise ValueError("The input 'pmf' must lie within the normal "
                              "simplex. but p.sum() = %s." % self._p.sum())
 
-        self._mode = self._supp_flat[np.argmax(self._p_flat)].reshape(self._data_shape)
+        self._mode = self._supp_flat[np.argmax(self._p_flat)].reshape(self.data_shape)
 
         if np.issubdtype(self.supp.dtype, np.number):
             mean_flat = (self._p_flat[:, np.newaxis] * self._supp_flat).sum(axis=0)
-            self._mean = mean_flat.reshape(self._data_shape)
+            self._mean = mean_flat.reshape(self.data_shape)
             ctr_flat = self._supp_flat - mean_flat
             outer_flat = (ctr_flat.reshape(self.p.size, 1, -1) * ctr_flat[..., np.newaxis]).reshape(self.p.size, -1)
-            self._cov = (self._p_flat[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self._data_shape)
+            self._cov = (self._p_flat[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self.data_shape)
         else:
             # warnings.warn("Method only supported for numeric 'supp'.")
             self._mean = None
@@ -215,10 +216,10 @@ class FiniteRE(BaseRE):
 
     def _rvs(self, size=(), random_state=None):
         i = random_state.choice(self.p.size, size, p=self._p_flat)
-        return self._supp_flat[i].reshape(size + self._data_shape)
+        return self._supp_flat[i].reshape(size + self.data_shape)
 
     def pmf(self, x):
-        x, set_shape = _check_data_shape(x, self._data_shape)
+        x, set_shape = _check_data_shape(x, self.data_shape)
 
         _out = []
         for x_i in x.reshape(int(np.prod(set_shape)), -1):
@@ -244,11 +245,11 @@ class FiniteRE(BaseRE):
 
 
 
-s = np.random.random((4, 3, 2, 1))
-pp = np.random.random((4, 3))
-pp = pp / pp.sum()
-f = FiniteRE(s, pp)
-f.pmf(f.rvs())
+# s = np.random.random((4, 3, 2, 1))
+# pp = np.random.random((4, 3))
+# pp = pp / pp.sum()
+# f = FiniteRE(s, pp)
+# f.pmf(f.rvs())
 
 
 
@@ -323,11 +324,11 @@ class DirichletRE(BaseRE):
         elif len(args) > 1:
             self._mean = _dirichlet_check_mean(args[1])
 
-        self._data_shape = self._mean.shape
-        self._data_size = self._mean.size
+        self.data_shape = self._mean.shape
+        self.data_size = self._mean.size
 
         if np.min(self.mean) > 1 / self.alpha_0:
-            self._mode = (self.mean - 1 / self.alpha_0) / (1 - self._data_size / self.alpha_0)
+            self._mode = (self.mean - 1 / self.alpha_0) / (1 - self.data_size / self.alpha_0)
         else:
             # warnings.warn("Mode method currently supported for mean > 1/alpha_0 only")
             self._mode = None       # TODO: complete with general formula
@@ -337,31 +338,31 @@ class DirichletRE(BaseRE):
         self._beta_inv = gammaln(np.sum(self.alpha_0 * self.mean)) - np.sum(gammaln(self.alpha_0 * self.mean))
 
     def _rvs(self, size=(), random_state=None):
-        return random_state.dirichlet(self.alpha_0 * self.mean.flatten(), size).reshape(size + self._data_shape)
+        return random_state.dirichlet(self.alpha_0 * self.mean.flatten(), size).reshape(size + self.data_shape)
 
     def pdf(self, x):
         x, set_shape = _dirichlet_multi_check_input(x, self.alpha_0, self.mean)
 
-        log_pdf = self._beta_inv + np.sum(xlogy(self.alpha_0 * self.mean - 1, x).reshape(-1, self._data_size), -1)
+        log_pdf = self._beta_inv + np.sum(xlogy(self.alpha_0 * self.mean - 1, x).reshape(-1, self.data_size), -1)
         return np.exp(log_pdf).reshape(set_shape)
 
     def plot_pdf(self, n_plt, ax=None):
 
-        if self._data_size in (2, 3):
-            x_plt = simplex_grid(n_plt, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
+        if self.data_size in (2, 3):
+            x_plt = simplex_grid(n_plt, self.data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
             p_theta_plt = self.pdf(x_plt)
-            x_plt.resize(x_plt.shape[0], self._data_size)
+            x_plt.resize(x_plt.shape[0], self.data_size)
 
-            # p_theta_plt.sum() / (n_plt ** (self._data_size - 1))
+            # p_theta_plt.sum() / (n_plt ** (self.data_size - 1))
 
-            if self._data_size == 2:
+            if self.data_size == 2:
                 if ax is None:
                     _, ax = plt.subplots()
 
                 plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=p_theta_plt)
                 plt.colorbar(plt_data)
                 ax.set(xlabel='$x_1$', ylabel='$x_2$')
-            elif self._data_size == 3:
+            elif self.data_size == 3:
                 if ax is None:
                     _, ax = plt.subplots(subplot_kw={'projection': '3d'})
 
