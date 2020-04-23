@@ -12,8 +12,9 @@ import warnings
 import numpy as np
 from scipy.stats._multivariate import multi_rv_generic
 from scipy.special import gammaln, xlogy
+import matplotlib.pyplot as plt
 
-from util.util import outer_gen, diag_gen
+from util.util import outer_gen, diag_gen, simplex_grid
 
 
 def _check_data_shape(x, shape):
@@ -152,6 +153,9 @@ class DeterministicRE(BaseRE):
 
 
 class FiniteRE(BaseRE):
+
+    # TODO: add plot methods!
+
     def __init__(self, supp, p, seed=None):
         super().__init__(supp, p, seed=seed)
 
@@ -221,13 +225,30 @@ class FiniteRE(BaseRE):
             _out.append(self._p_flat[np.all(x_i == self._supp_flat, axis=-1)])
         return np.asarray(_out).reshape(set_shape)
 
+    def plot_pmf(self, ax=None):
+        if self._p.ndim == 1:
+            if ax is None:
+                _, ax = plt.subplots()
+
+            plt_data = ax.stem(self._p, use_line_collection=True)
+            ax.set_xticks(range(self._p.size))
+            ax.set_xticklabels()
+
+        return plt_data
+
+        # _, ax_theta = plt.subplots(num='theta pmf', clear=True, subplot_kw={'projection': '3d'})
+        # # ax_theta.scatter(YX_set['x'], YX_set['y'], theta_pmf, c=theta_pmf)
+        # ax_theta.bar3d(YX_set['x'].flatten(), YX_set['y'].flatten(), 0, 1, 1, theta_pmf.flatten(), shade=True)
+        # ax_theta.set(xlabel='$x$', ylabel='$y$')
 
 
-# s = np.random.random((4, 3, 2, 1))
-# pp = np.random.random((4, 3))
-# pp = pp / pp.sum()
-# f = FiniteRE(s, pp)
-# f.pmf(f.rvs())
+
+
+s = np.random.random((4, 3, 2, 1))
+pp = np.random.random((4, 3))
+pp = pp / pp.sum()
+f = FiniteRE(s, pp)
+f.pmf(f.rvs())
 
 
 
@@ -323,6 +344,36 @@ class DirichletRE(BaseRE):
 
         log_pdf = self._beta_inv + np.sum(xlogy(self.alpha_0 * self.mean - 1, x).reshape(-1, self._data_size), -1)
         return np.exp(log_pdf).reshape(set_shape)
+
+    def plot_pdf(self, n_plt, ax=None):
+
+        if self._data_size in (2, 3):
+            x_plt = simplex_grid(n_plt, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
+            p_theta_plt = self.pdf(x_plt)
+            x_plt.resize(x_plt.shape[0], self._data_size)
+
+            # p_theta_plt.sum() / (n_plt ** (self._data_size - 1))
+
+            if self._data_size == 2:
+                if ax is None:
+                    _, ax = plt.subplots()
+
+                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=p_theta_plt)
+                plt.colorbar(plt_data)
+                ax.set(xlabel='$x_1$', ylabel='$x_2$')
+            elif self._data_size == 3:
+                if ax is None:
+                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+
+                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=p_theta_plt)
+                ax.view_init(35, 45)
+                plt.colorbar(plt_data)
+                ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
+
+            return plt_data
+
+        else:
+            raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
 
 
