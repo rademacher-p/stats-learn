@@ -9,17 +9,16 @@ import itertools
 import numpy as np
 from numpy import random
 from scipy import stats
-from scipy.stats._multivariate import multi_rv_generic, multi_rv_frozen
+from scipy.stats._multivariate import multi_rv_generic
 # from scipy._lib._util import check_random_state
 import matplotlib.pyplot as plt
 # from mpl_toolkits.mplot3d import Axes3D
 
 
-from util.util import simplex_grid
 # from rv_obj import deterministic_multi, dirichlet_multi, discrete_multi
 from rv_obj import DeterministicRE, DirichletRE, FiniteRE
 
-plt.style.use('seaborn')
+# plt.style.use('seaborn')  # cm?
 
 rng = random.default_rng()
 
@@ -98,10 +97,10 @@ i_split_y, i_split_x = Y_set.ndim, X_set.ndim-1
 Y_set_shape, Y_data_shape = Y_set.shape[:i_split_y], Y_set.shape[i_split_y:]
 X_set_shape, X_data_shape = X_set.shape[:i_split_x], X_set.shape[i_split_x:]
 
-# tt = list(map(tuple, X_set.reshape((-1,) + X_data_shape)))
-tt = [(x,) for x in X_set.reshape((-1,) + X_data_shape)]
-# tt = list(X_set.reshape((-1,) + X_data_shape))
-xx = np.array(tt, dtype=[('x', X_set.dtype, X_data_shape)]).reshape(X_set_shape)    ###
+# # tt = list(map(tuple, X_set.reshape((-1,) + X_data_shape)))
+# tt = [(x,) for x in X_set.reshape((-1,) + X_data_shape)]
+# # tt = list(X_set.reshape((-1,) + X_data_shape))
+# xx = np.array(tt, dtype=[('x', X_set.dtype, X_data_shape)]).reshape(X_set_shape)    ###
 
 _temp = list(itertools.product(Y_set.reshape((-1,) + Y_data_shape), X_set.reshape((-1,) + X_data_shape)))
 YX_set = np.array(_temp, dtype=[('y', Y_set.dtype, Y_data_shape),
@@ -112,78 +111,44 @@ YX_set = np.array(_temp, dtype=[('y', Y_set.dtype, Y_data_shape),
 
 
 
-n_plt = 10
 
-# # val = dirichlet_multi.rvs(YX_set.size, np.ones(YX_set.shape)/YX_set.size)
-# # prior = deterministic_multi(val)
 # val = DirichletRE(YX_set.size, np.ones(YX_set.shape)/YX_set.size).rvs()
 # prior = DeterministicRE(val)
-# t_plt = simplex_grid(n_plt, YX_set.shape)
 
 alpha_0 = 10*YX_set.size
-# mean = dirichlet_multi.rvs(YX_set.size, np.ones(YX_set.shape) / YX_set.size)
 mean = DirichletRE(YX_set.size, np.ones(YX_set.shape) / YX_set.size).rvs()
-# prior = dirichlet_multi(alpha_0, mean, rng)
 prior = DirichletRE(alpha_0, mean, rng)
-# t_plt = simplex_grid(n_plt, YX_set.shape, hull_mask=(mean < 1 / alpha_0))
 
-
-# p_theta_plt = prior.pdf(t_plt)
-theta_pmf = prior.rvs()
-
-# prior_plt.sum() / (n_plt**(mean.size-1))
-
-
-# TODO: add plot methods to RV classes
-# if YX_set.shape == (3, 1):
-#     _, ax_prior = plt.subplots(num='prior', clear=True, subplot_kw={'projection': '3d'})
-#     sc = ax_prior.scatter(t_plt[:, 0], t_plt[:, 1], t_plt[:, 2], s=15, c=p_theta_plt)
-#     ax_prior.view_init(35, 45)
-#     plt.colorbar(sc)
-#     ax_prior.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
-
-# TODO: marginal/conditional models to alleviate structured array issues?
-
-# theta = discrete_multi(YX_set, theta_pmf, rng)
-theta = FiniteRE(YX_set, theta_pmf, rng)
-
-theta.rvs(6)
-
-###
-theta_m_pmf = theta_pmf.reshape((-1,) + X_set_shape).sum(axis=0)
-# theta_m = discrete_multi(X_set, theta_m_pmf)
-theta_m = FiniteRE(X_set, theta_m_pmf)
-theta_m.mean
-theta_m.rvs()
-theta_m.pmf(theta_m.rvs(2))
-
+theta = FiniteRE(YX_set, prior.rvs(), rng)
 D = theta.rvs(10)
 
-# _, ax_theta = plt.subplots(num='theta pmf', clear=True, subplot_kw={'projection': '3d'})
-# # ax_theta.scatter(YX_set['x'], YX_set['y'], theta_pmf, c=theta_pmf)
-# ax_theta.bar3d(YX_set['x'].flatten(), YX_set['y'].flatten(), 0, 1, 1, theta_pmf.flatten(), shade=True)
-# ax_theta.set(xlabel='$x$', ylabel='$y$')
+# ###
+# theta_m_pmf = theta_pmf.reshape((-1,) + X_set_shape).sum(axis=0)
+# theta_m = FiniteRE(X_set, theta_m_pmf)
+# theta_m.mean
+# theta_m.rvs()
+# theta_m.pmf(theta_m.rvs(2))
 
-# plt.figure(num='theta_pmf', clear=True)
-# plt.stem(theta.support.flatten(), theta.pmf.flatten(), use_line_collection=True)
 
 
 #%% Classes
 
-class Model:
+# TODO: marginal/conditional models to alleviate structured array issues?
+
+class ModelSL:
     def __init__(self, theta_x, theta_y_x):
-        # self.theta = theta
         self.theta_x = theta_x
         self.theta_y_x = theta_y_x
 
-    def rvs(self, size=None):
-        X = self.theta_x.rvs(size).flatten()
-        if size is None:
+    def rvs(self, size=()):
+        X = np.asarray(self.theta_x.rvs(size))
+        if len(size) == 0:
             Y = self.theta_y_x(X).rvs()
+            D = np.array([(Y, X)], dtype=[('y', Y.dtype), ('x', X.dtype)]).reshape(size)
         else:
-            Y = np.array([self.theta_y_x(x).rvs() for x in X])
+            Y = np.asarray([self.theta_y_x(x).rvs() for x in X])
+            D = np.array(list(zip(Y, X)), dtype=[('y', Y.dtype), ('x', X.dtype)]).reshape(size)
 
-        D = np.array(list(zip(Y, X)), dtype=[('y', Y.dtype), ('x', X.dtype)]).reshape(size)
         return D
 
 
@@ -192,6 +157,23 @@ class Prior(multi_rv_generic):
         super(Prior, self).__init__(seed)
         self.dist = dist    # stats-like RV object
 
+
+class DatPriorDoe(Prior):
+    def __init__(self, loc, scale, seed=None):
+        dist = stats.rayleigh(loc, scale)
+        super().__init__(dist, seed)
+
+    def random_model(self):
+        a, b = self.dist.rvs(size=2)
+        theta_m = stats.beta(a, b)
+        def theta_c(x): return stats.beta(5*x, 5*(1-x))     # TODO: just combine these in a rv_obj?
+
+        return ModelSL(theta_m, theta_c)
+
+# TODO: make special rv classes for supervised learning structured arrays?
+
+t = DatPriorDoe(0, 1).random_model()
+t.rvs((4,))
 
 class FiniteSetPrior(Prior):
     def __init__(self, dist, support, seed=None):
@@ -214,19 +196,7 @@ class FiniteSetPrior(Prior):
         return cls(DirichletRE(alpha_0, mean), support, seed)
 
 
-class DatPriorDoe(Prior):
-    def __init__(self, loc, scale, seed=None):
-        dist = stats.rayleigh(loc, scale)
-        super().__init__(dist, seed)
 
-    def random_model(self):
-        a, b = self.dist.rvs(size=2)
-        theta_m = stats.beta(a, b)
-        def theta_c(x): return stats.beta(5*x, 5*(1-x))     # TODO: just combine these in a rv_obj?
-
-        return Model(theta_m, theta_c)
-
-# TODO: make special rv classes for supervised learning structured arrays?
 
 
 
