@@ -14,9 +14,7 @@ from scipy.stats._multivariate import multi_rv_generic
 import matplotlib.pyplot as plt
 # from mpl_toolkits.mplot3d import Axes3D
 
-
-# from rv_obj import deterministic_multi, dirichlet_multi, discrete_multi
-from rv_obj import BaseRE, DeterministicRE, DirichletRE, FiniteRE
+from RE_obj import BaseRE, DeterministicRE, DirichletRE, FiniteRE
 
 # plt.style.use('seaborn')  # cm?
 
@@ -133,62 +131,6 @@ theta = FiniteRE(YX_set, prior.rvs(), rng)
 
 # TODO: make special rv classes for supervised learning structured arrays?
 
-class Model(BaseRE):
-    def __init__(self, theta_x, theta_y_x, seed=None):
-        super().__init__(theta_x, theta_y_x, seed=seed)
-
-    @property
-    def theta_x(self):
-        return self._theta_x
-
-    @theta_x.setter
-    def theta_x(self, theta_x):
-        self._update_attr(theta_x=theta_x)
-
-    @property
-    def theta_y_x(self):
-        return self._theta_y_x
-
-    @theta_y_x.setter
-    def theta_y_x(self, theta_y_x):
-        self._update_attr(theta_y_x=theta_y_x)
-
-    def _update_attr(self, *args, **kwargs):
-        if 'theta_x' in kwargs.keys():
-            self._theta_x = kwargs['theta_x']
-            self.data_shape_x = self._theta_x.data_shape
-        elif len(args) > 0:
-            self._theta_x = args[0]
-            self.data_shape_x = self._theta_x.data_shape
-
-        if 'theta_y_x' in kwargs.keys():
-            self._theta_y_x = kwargs['theta_y_x']
-            self.data_shape_y = self._theta_y_x(self._theta_x.rvs()).data_shape
-        elif len(args) > 1:
-            self._theta_y_x = args[1]
-            self.data_shape_y = self._theta_y_x(self._theta_x.rvs()).data_shape
-
-    def _rvs(self, size=(), random_state=None):
-        X = np.asarray(self.theta_x.rvs(size, random_state))
-        if len(size) == 0:
-            Y = self.theta_y_x(X).rvs(size, random_state)
-            D = np.array((Y, X), dtype=[('y', Y.dtype, self.data_shape_y), ('x', X.dtype, self.data_shape_x)])
-        else:
-            Y = np.asarray([self.theta_y_x(x).rvs((), random_state) for x in X.reshape((-1,) + self.theta_x.data_shape)])\
-                .reshape(size + self.data_shape_y)
-            D = np.array(list(zip(Y.reshape((-1,) + self.data_shape_y), X.reshape((-1,) + self.data_shape_x))),
-                         dtype=[('y', Y.dtype, self.data_shape_y), ('x', X.dtype, self.data_shape_x)]).reshape(size)
-
-        return D
-
-
-theta_m = DirichletRE(4, [.5, .5])
-def theta_c(x): return FiniteRE(['a', 'b'], x)
-
-t = Model(theta_m, theta_c)
-t.rvs()
-t.rvs(4)
-
 
 class Prior(multi_rv_generic):
     def __init__(self, dist, seed=None):
@@ -233,10 +175,6 @@ class FiniteSetPrior(Prior):
 
 
 
-
-
-
-#%%
 
 # prior = DeterministicDiscretePrior(val=mean, support=YX_set, seed=rng)
 # prior = DirichletDiscretePrior(alpha_0, mean, support=YX_set, seed=rng)
