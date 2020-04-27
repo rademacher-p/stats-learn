@@ -77,7 +77,7 @@ class BaseRE(multi_rv_generic):
 
 #%% Deterministic
 
-# TODO: redundant, just use FiniteRE? or continuous domain version?
+# TODO: redundant, just use FiniteRE? or continuous domain version for integration?
 
 class DeterministicRE(BaseRE):
     """
@@ -131,8 +131,6 @@ class FiniteRE(BaseRE):
     """
     Generic RE drawn from a finite support set using an explicitly defined PMF.
     """
-
-    # TODO: add plot methods!
 
     def __init__(self, supp, p, seed=None):
         super().__init__(seed)
@@ -200,7 +198,7 @@ class FiniteRE(BaseRE):
         i = random_state.choice(self.p.size, size, p=self._p_flat)
         return self._supp_flat[i].reshape(size + self._data_shape)
 
-    def pmf(self, x):
+    def pmf(self, x):       # TODO: pmf single?
         x, set_shape = _check_data_shape(x, self._data_shape)
 
         _out = []
@@ -209,22 +207,31 @@ class FiniteRE(BaseRE):
         return np.asarray(_out).reshape(set_shape)
 
     def plot_pmf(self, ax=None):
-        return None
-        # if self._p.ndim == 1:
-        #     if ax is None:
-        #         _, ax = plt.subplots()
-        #
-        #     plt_data = ax.stem(self._p, use_line_collection=True)
-        #     ax.set_xticks(range(self._p.size))
-        #     ax.set_xticklabels()
-        #
-        # return plt_data
+        # return None
 
-        # _, ax_theta = plt.subplots(num='theta pmf', clear=True, subplot_kw={'projection': '3d'})
-        # # ax_theta.scatter(YX_set['x'], YX_set['y'], theta_pmf, c=theta_pmf)
-        # ax_theta.bar3d(YX_set['x'].flatten(), YX_set['y'].flatten(), 0, 1, 1, theta_pmf.flatten(), shade=True)
-        # ax_theta.set(xlabel='$x$', ylabel='$y$')
+        if self._p.ndim in [1, 2]:
+            if self._p.ndim == 1:
+                if ax is None:
+                    _, ax = plt.subplots()
+                    ax.set_xticks(range(self._p.size))
+                    ax.set_xticklabels(self._supp)
+                    ax.set(xlabel='$x$', ylabel='$\mathrm{P}_\mathrm{x}(x)$')
 
+                plt_data = ax.stem(self._p, use_line_collection=True)
+
+            elif self._p.ndim == 2:
+                if ax is None:
+                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+                    ax.set_xticks(range(self._p.size))
+                    ax.set_xticklabels(self._supp)
+                    ax.set(xlabel='$x$', ylabel='$\mathrm{P}_\mathrm{x}(x)$')
+
+                # plt_data = ax.bar3d(YX_set['x'].flatten(), YX_set['y'].flatten(), 0, 1, 1, self._p_flat, shade=True)
+                # TODO: incomplete, add 3-d
+            return plt_data
+
+        else:
+            raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
 
 
 
@@ -233,6 +240,9 @@ class FiniteRE(BaseRE):
 # pp = pp / pp.sum()
 # f = FiniteRE(s, pp)
 # f.pmf(f.rvs())
+
+# f = FiniteRE(['a','b','c'], [.3,.2,.5])
+# f.plot_pmf()
 
 
 
@@ -347,18 +357,23 @@ class DirichletRE(BaseRE):
             if self._data_size == 2:
                 if ax is None:
                     _, ax = plt.subplots()
+                    ax.set(xlabel='$x_1$', ylabel='$x_2$')
 
                 plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pdf_plt)
-                plt.colorbar(plt_data)
-                ax.set(xlabel='$x_1$', ylabel='$x_2$')
+
+                cbar = plt.colorbar(plt_data)
+                cbar.set_label('$\mathrm{p}_\mathrm{x}(x)$')
+
             elif self._data_size == 3:
                 if ax is None:
                     _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+                    ax.view_init(35, 45)
+                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
 
                 plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pdf_plt)
-                ax.view_init(35, 45)
-                plt.colorbar(plt_data)
-                ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
+
+                cbar = plt.colorbar(plt_data)
+                cbar.set_label('$\mathrm{p}_\mathrm{x}(x)$')
 
             return plt_data
 
@@ -366,16 +381,19 @@ class DirichletRE(BaseRE):
             raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
 
-# a0 = 4
-# m = np.random.random((3, 2))
-# m = m / m.sum()
-# d = DirichletRE(a0, m, rng)
+rng = np.random.default_rng()
+a0 = 4
+m = np.random.random((1,2))
+m = m / m.sum()
+d = DirichletRE(a0, m, rng)
+d.plot_pdf(30)
 # d.mean
 # d.mode
 # d.cov
 # d.rvs()
 # d.pdf(d.rvs())
 # d.pdf(d.rvs(4).reshape((2, 2)+d.mean.shape))
+
 
 
 #%% Supervised Learning classes
