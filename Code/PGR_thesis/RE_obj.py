@@ -48,7 +48,6 @@ class BaseRE(multi_rv_generic):
         self._mean = None
         self._cov = None
 
-
     @property
     def data_shape(self):
         return self._data_shape
@@ -171,9 +170,9 @@ class FiniteRE(BaseRE):
         if set_shape != self._p.shape:
             raise ValueError("Leading shape values of 'supp' must equal the shape of 'p'.")
 
-        self._supp_flat = self._supp.reshape((self._p.size, -1))
+        self._supp_flat = self._supp.reshape((self._p.size, -1), order='F')     # TODO: CHECK? other places???
         self._p_flat = self._p.flatten()
-        if len(self._supp_flat) != len(np.unique(self._supp_flat, axis=0)):
+        if len(self._supp_flat) != len(np.unique(self._supp_flat, axis=-1)):
             raise ValueError("Input 'supp' must have unique values")
 
         if np.min(self._p) < 0:
@@ -198,7 +197,7 @@ class FiniteRE(BaseRE):
         i = random_state.choice(self.p.size, size, p=self._p_flat)
         return self._supp_flat[i].reshape(size + self._data_shape)
 
-    def pmf(self, x):       # TODO: pmf single?
+    def pmf(self, x):
         x, set_shape = _check_data_shape(x, self._data_shape)
 
         _out = []
@@ -207,27 +206,32 @@ class FiniteRE(BaseRE):
         return np.asarray(_out).reshape(set_shape)
 
     def plot_pmf(self, ax=None):
-        # return None
 
-        if self._p.ndim in [1, 2]:
+        if self._p.ndim == 1 or self._p.ndim in [2, 3] and np.issubdtype(self.supp.dtype, np.number):
             if self._p.ndim == 1:
                 if ax is None:
                     _, ax = plt.subplots()
-                    ax.set_xticks(range(self._p.size))
-                    ax.set_xticklabels(self._supp)
                     ax.set(xlabel='$x$', ylabel='$\mathrm{P}_\mathrm{x}(x)$')
 
-                plt_data = ax.stem(self._p, use_line_collection=True)
+                plt_data = ax.stem(self._supp, self._p, use_line_collection=True)
 
             elif self._p.ndim == 2:
                 if ax is None:
                     _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                    ax.set_xticks(range(self._p.size))
-                    ax.set_xticklabels(self._supp)
-                    ax.set(xlabel='$x$', ylabel='$\mathrm{P}_\mathrm{x}(x)$')
+                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$\mathrm{P}_\mathrm{x}(x)$')
 
-                # plt_data = ax.bar3d(YX_set['x'].flatten(), YX_set['y'].flatten(), 0, 1, 1, self._p_flat, shade=True)
-                # TODO: incomplete, add 3-d
+                plt_data = ax.bar3d(self._supp[0].flatten(), self._supp[1].flatten(), 0, 1, 1, self._p_flat, shade=True)
+
+            elif self._p.ndim == 3:
+                if ax is None:
+                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
+
+                plt_data = ax.scatter(self._supp[..., 0], self._supp[..., 1], self._supp[..., 2], s=15, c=self._p)
+
+                c_bar = plt.colorbar(plt_data)
+                c_bar.set_label('$\mathrm{p}_\mathrm{x}(x)$')
+
             return plt_data
 
         else:
@@ -241,9 +245,12 @@ class FiniteRE(BaseRE):
 # f = FiniteRE(s, pp)
 # f.pmf(f.rvs())
 
-# f = FiniteRE(['a','b','c'], [.3,.2,.5])
+# s = np.stack(np.meshgrid([0,1],[0,1], [0,1]), axis=-1)
+# # s, p = ['a','b','c'], [.3,.2,.5]
+# p = np.random.random((2,2,2))
+# p = p / p.sum()
+# f = FiniteRE(s, p)
 # f.plot_pmf()
-
 
 
 #%% Dirichlet
@@ -372,8 +379,8 @@ class DirichletRE(BaseRE):
 
                 plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pdf_plt)
 
-                cbar = plt.colorbar(plt_data)
-                cbar.set_label('$\mathrm{p}_\mathrm{x}(x)$')
+                c_bar = plt.colorbar(plt_data)
+                c_bar.set_label('$\mathrm{p}_\mathrm{x}(x)$')
 
             return plt_data
 
@@ -381,12 +388,12 @@ class DirichletRE(BaseRE):
             raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
 
-rng = np.random.default_rng()
-a0 = 4
-m = np.random.random((1,2))
-m = m / m.sum()
-d = DirichletRE(a0, m, rng)
-d.plot_pdf(30)
+# rng = np.random.default_rng()
+# a0 = 4
+# m = np.random.random((1, 3))
+# m = m / m.sum()
+# d = DirichletRE(a0, m, rng)
+# d.plot_pdf(30)
 # d.mean
 # d.mode
 # d.cov
@@ -410,18 +417,12 @@ class ModelBase(BaseRE):
         self._data_shape_y = None
 
         self._mode_x = None
-        self._mode_y = None
-        self._mode_x_y = None
         self._mode_y_x = None
 
         self._mean_x = None
-        self._mean_y = None
-        self._mean_x_y = None
         self._mean_y_x = None
 
         self._cov_x = None
-        self._cov_y = None
-        self._cov_x_y = None
         self._cov_y_x = None
 
     @property
@@ -436,28 +437,12 @@ class ModelBase(BaseRE):
     def mode_x(self):
         return self._mode_x
 
-    @property
-    def mode_y(self):
-        return self._mode_y
-
-    @property
-    def mode_x_y(self):
-        return self._mode_x_y
-
     def mode_y_x(self, x):      # TODO: as method?
         return None
 
     @property
     def mean_x(self):
         return self._mean_x
-
-    @property
-    def mean_y(self):
-        return self._mean_y
-
-    @property
-    def mean_x_y(self):
-        return self._mean_x_y
 
     @property
     def mean_y_x(self):
@@ -468,17 +453,8 @@ class ModelBase(BaseRE):
         return self._cov_x
 
     @property
-    def cov_y(self):
-        return self._cov_y
-
-    @property
-    def cov_x_y(self):
-        return self._cov_x_y
-
-    @property
     def cov_y_x(self):
         return self._cov_y_x
-
 
 
 
@@ -555,10 +531,10 @@ class ModelCondX(ModelBase):
 
 
 
-model_x = DirichletRE(4, [.5, .5])
-def model_y_x(x): return FiniteRE(['a', 'b'], x)
+theta_m = DirichletRE(4, [.5, .5])
+def theta_c(x): return FiniteRE(['a', 'b'], x)
 
-t = ModelCondX(model_x, model_y_x)
+t = ModelCondX(theta_m, theta_c)
 t.rvs()
 t.rvs(4)
 t.mode_y_x(t.model_x.rvs())
