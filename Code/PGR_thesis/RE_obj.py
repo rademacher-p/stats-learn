@@ -2,12 +2,13 @@
 Random element objects
 """
 
-# TODO: add numeric subclasses of BaseRE? use __new__ to handle input parameter types?
-# TODO: add placeholder methods for pdf, pdf_single, etc.?
+# TODO: plot methods in Base classes?
+# TODO: add conditional RE object!!!
+
 # TODO: docstrings?
 
 
-import warnings
+# import warnings
 
 import numpy as np
 from scipy.stats._multivariate import multi_rv_generic
@@ -24,7 +25,7 @@ def _check_data_shape(x, shape):
 
     if x.shape == shape:
         set_shape = ()
-    elif len(shape) == 0:
+    elif shape == ():
         set_shape = x.shape
     elif x.shape[-len(shape):] == shape:
         set_shape = x.shape[:-len(shape)]
@@ -34,19 +35,28 @@ def _check_data_shape(x, shape):
     return x, set_shape
 
 
-class BaseRE(multi_rv_generic):
+def _vectorize_func(func, data_shape, shape_out):
+    def func_vec(x):
+        x, set_shape = _check_data_shape(x, data_shape)
+
+        _out = []
+        for x_i in x.reshape((-1,) + data_shape):
+            _out.append(func(x_i))
+        return np.asarray(_out).reshape(set_shape + shape_out)
+
+    return func_vec
+
+
+class GenericRE(multi_rv_generic):
     """
-    Base class for random element objects.
+    Base class for generic random element objects.
     """
 
     def __init__(self, seed=None):
         super().__init__(seed)
 
         self._data_shape = None
-
         self._mode = None
-        self._mean = None
-        self._cov = None
 
     @property
     def data_shape(self):
@@ -55,14 +65,6 @@ class BaseRE(multi_rv_generic):
     @property
     def mode(self):
         return self._mode
-
-    @property
-    def mean(self):
-        return self._mean
-
-    @property
-    def cov(self):
-        return self._cov
 
     def rvs(self, size=(), random_state=None):
         if type(size) is int:
@@ -74,14 +76,92 @@ class BaseRE(multi_rv_generic):
         return None
 
 
+class GenericRV(GenericRE):
+    """
+    Base class for generic random variable (numeric) objects.
+    """
+
+    def __init__(self, seed=None):
+        super().__init__(seed)
+        self._mean = None
+        self._cov = None
+
+    @property
+    def mean(self):
+        return self._mean
+
+    @property
+    def cov(self):
+        return self._cov
+
+
+class DiscreteRE(GenericRE):
+    """
+    Base class for discrete random element objects.
+    """
+
+    def __init__(self, seed=None):
+        super().__init__(seed)
+
+    def pmf(self, x):
+        x, set_shape = _check_data_shape(x, self._data_shape)
+        return self._pmf(x).reshape(set_shape)
+
+    def _pmf(self, x):
+        _out = []
+        for x_i in x.reshape((-1,) + self._data_shape):
+            _out.append(self._pmf_single(x_i))
+        return np.asarray(_out)         # returned array may be flattened
+
+    def _pmf_single(self, x):
+        return None
+
+
+class DiscreteRV(GenericRV, DiscreteRE):
+    """
+    Base class for discrete random variable (numeric) objects.
+    """
+    def __init__(self, seed=None):
+        super().__init__(seed)
+
+
+class ContinuousRV(GenericRV):
+    """
+    Base class for continuous random element objects.
+    """
+
+    def __init__(self, seed=None):
+        super().__init__(seed)
+
+    def pdf(self, x):
+        x, set_shape = _check_data_shape(x, self._data_shape)
+        return self._pdf(x).reshape(set_shape)
+
+    def _pdf(self, x):
+        _out = []
+        for x_i in x.reshape((-1,) + self._data_shape):
+            _out.append(self._pdf_single(x_i))
+        return np.asarray(_out)     # returned array may be flattened
+
+    def _pdf_single(self, x):
+        return None
+
+
 #%% Deterministic
 
-# TODO: redundant, just use FiniteRE? or continuous domain version for integration?
+# TODO: redundant, just use FiniteRE? or change to ContinuousRV for integration?
 
-class DeterministicRE(BaseRE):
+class DeterministicRE(DiscreteRE):
     """
     Deterministic random element.
     """
+
+    def __new__(cls, val, seed=None):
+        val = np.asarray(val)
+        if np.issubdtype(val.dtype, np.number):
+            return super().__new__(DeterministicRV)
+        else:
+            return super().__new__(cls)
 
     def __init__(self, val, seed=None):
         super().__init__(seed)
@@ -100,18 +180,33 @@ class DeterministicRE(BaseRE):
         self._data_size = self._val.size
 
         self._mode = self._val
-        if np.issubdtype(self._val.dtype, np.number):
-            self._mean = self._val
-            self._cov = np.zeros(2 * self._data_shape)
-        else:
-            del self._mean, self._cov       # TODO: del? or super None?
 
     def _rvs(self, size=(), random_state=None):
         return np.broadcast_to(self._val, size + self._data_shape)
 
-    def pmf(self, x):
-        x, set_shape = _check_data_shape(x, self._data_shape)
-        return np.where(np.all(x.reshape(-1, self._data_size) == self._val.flatten(), axis=-1), 1., 0.).reshape(set_shape)
+    # def _pmf(self, x):
+    #     return np.where(np.all(x.reshape(-1, self._data_size)
+    #                            == self._val.flatten(), axis=-1), 1., 0.)
+
+    def _pmf_single(self, x):
+        return 1. if (x == self.val).all() else 0.
+
+
+class DeterministicRV(DiscreteRV, DeterministicRE):
+    """
+    Deterministic random variable.
+    """
+
+    def __init__(self, val, seed=None):
+        super().__init__(seed)
+        self.val = val
+
+    @DeterministicRE.val.setter
+    def val(self, val):
+        DeterministicRE.val.fset(self, val)     # TODO: super instead?
+
+        self._mean = self._val
+        self._cov = np.zeros(2 * self._data_shape)
 
 
 # rng = np.random.default_rng()
@@ -126,10 +221,19 @@ class DeterministicRE(BaseRE):
 
 #%% Generic, finite support
 
-class FiniteRE(BaseRE):
+# TODO: reconsider support shape?
+
+class FiniteRE(DiscreteRE):
     """
     Generic RE drawn from a finite support set using an explicitly defined PMF.
     """
+
+    def __new__(cls, supp, p, seed=None):
+        supp = np.asarray(supp)
+        if np.issubdtype(supp.dtype, np.number):
+            return super().__new__(FiniteRV)
+        else:
+            return super().__new__(cls)
 
     def __init__(self, supp, p, seed=None):
         super().__init__(seed)
@@ -184,41 +288,54 @@ class FiniteRE(BaseRE):
 
         self._mode = self._supp_flat[np.argmax(self._p_flat)].reshape(self._data_shape)
 
-        if np.issubdtype(self.supp.dtype, np.number):
-            mean_flat = (self._p_flat[:, np.newaxis] * self._supp_flat).sum(axis=0)
-            self._mean = mean_flat.reshape(self._data_shape)
-            ctr_flat = self._supp_flat - mean_flat
-            outer_flat = (ctr_flat.reshape(self._p.size, 1, -1) * ctr_flat[..., np.newaxis]).reshape(self._p.size, -1)
-            self._cov = (self._p_flat[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self._data_shape)
-        else:
-            del self._mean, self._cov   # del? or super None?
-
     def _rvs(self, size=(), random_state=None):
         i = random_state.choice(self.p.size, size, p=self._p_flat)
         return self._supp_flat[i].reshape(size + self._data_shape)
 
-    def pmf(self, x):
-        x, set_shape = _check_data_shape(x, self._data_shape)
-
-        _out = []
-        for x_i in x.reshape(int(np.prod(set_shape)), -1):
-            _out.append(self._p_flat[np.all(x_i == self._supp_flat, axis=-1)])
-        return np.asarray(_out).reshape(set_shape)
+    def _pmf_single(self, x):
+        return self._p_flat[np.all(x.flatten() == self._supp_flat, axis=-1)]
 
     def plot_pmf(self, ax=None):
+        if self._p.ndim == 1:
+            if ax is None:
+                _, ax = plt.subplots()
+                ax.set(xlabel='$x$', ylabel=r'$\mathrm{P}_\mathrm{x}(x)$')
 
-        if self._p.ndim == 1 or self._p.ndim in [2, 3] and np.issubdtype(self.supp.dtype, np.number):
-            if self._p.ndim == 1:
-                if ax is None:
-                    _, ax = plt.subplots()
-                    ax.set(xlabel='$x$', ylabel='$\mathrm{P}_\mathrm{x}(x)$')
+            plt_data = ax.stem(self._supp, self._p, use_line_collection=True)
 
-                plt_data = ax.stem(self._supp, self._p, use_line_collection=True)
+            return plt_data
+        else:
+            raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
 
-            elif self._p.ndim == 2:
+
+class FiniteRV(DiscreteRV, FiniteRE):
+    """
+    Generic RV drawn from a finite support set using an explicitly defined PMF.
+    """
+
+    def __init__(self, supp, p, seed=None):
+        super(DiscreteRE, self).__init__(seed)
+        self._update_attr(supp, p)
+
+    def _update_attr(self, *args, **kwargs):
+        super()._update_attr(*args, **kwargs)
+
+        mean_flat = (self._p_flat[:, np.newaxis] * self._supp_flat).sum(axis=0)
+        self._mean = mean_flat.reshape(self._data_shape)
+
+        ctr_flat = self._supp_flat - mean_flat
+        outer_flat = (ctr_flat.reshape(self._p.size, 1, -1) * ctr_flat[..., np.newaxis]).reshape(self._p.size, -1)
+        self._cov = (self._p_flat[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self._data_shape)
+
+    def plot_pmf(self, ax=None):
+        if self._p.ndim == 1:
+            super().plot_pmf(self, ax)
+
+        elif self._p.ndim in [2, 3]:
+            if self._p.ndim == 2:
                 if ax is None:
                     _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$\mathrm{P}_\mathrm{x}(x)$')
+                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel=r'$\mathrm{P}_\mathrm{x}(x)$')
 
                 plt_data = ax.bar3d(self._supp[0].flatten(), self._supp[1].flatten(), 0, 1, 1, self._p_flat, shade=True)
 
@@ -230,7 +347,7 @@ class FiniteRE(BaseRE):
                 plt_data = ax.scatter(self._supp[..., 0], self._supp[..., 1], self._supp[..., 2], s=15, c=self._p)
 
                 c_bar = plt.colorbar(plt_data)
-                c_bar.set_label('$\mathrm{p}_\mathrm{x}(x)$')
+                c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
 
             return plt_data
 
@@ -238,19 +355,18 @@ class FiniteRE(BaseRE):
             raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
 
 
-
 # s = np.random.random((4, 3, 2, 1))
 # pp = np.random.random((4, 3))
 # pp = pp / pp.sum()
 # f = FiniteRE(s, pp)
 # f.pmf(f.rvs())
-
+#
 # s = np.stack(np.meshgrid([0,1],[0,1], [0,1]), axis=-1)
-# # s, p = ['a','b','c'], [.3,.2,.5]
-# p = np.random.random((2,2,2))
-# p = p / p.sum()
-# f = FiniteRE(s, p)
-# f.plot_pmf()
+# s, p = ['a','b','c'], [.3,.2,.5]
+# # p = np.random.random((2,2,2))
+# # p = p / p.sum()
+# f2 = FiniteRE(s, p)
+# f2.plot_pmf()
 
 
 #%% Dirichlet
@@ -273,9 +389,7 @@ def _dirichlet_check_mean(mean):
     return mean
 
 
-def _dirichlet_multi_check_input(x, alpha_0, mean):
-    x, set_shape = _check_data_shape(x, mean.shape)
-
+def _dirichlet_check_input(x, alpha_0, mean):
     if np.min(x) < 0:
         raise ValueError("Each entry in 'x' must be greater than or equal "
                          "to zero.")
@@ -288,10 +402,10 @@ def _dirichlet_multi_check_input(x, alpha_0, mean):
         raise ValueError("Each entry in 'x' must be greater than zero if its "
                          "mean is less than 1 / alpha_0.")
 
-    return x, set_shape
+    return x
 
 
-class DirichletRE(BaseRE):
+class DirichletRV(ContinuousRV):
     """
     Dirichlet random process, finite-domain realizations.
     """
@@ -346,11 +460,11 @@ class DirichletRE(BaseRE):
     def _rvs(self, size=(), random_state=None):
         return random_state.dirichlet(self.alpha_0 * self.mean.flatten(), size).reshape(size + self._data_shape)
 
-    def pdf(self, x):
-        x, set_shape = _dirichlet_multi_check_input(x, self.alpha_0, self.mean)
+    def _pdf(self, x):
+        x = _dirichlet_check_input(x, self.alpha_0, self.mean)
 
         log_pdf = self._beta_inv + np.sum(xlogy(self.alpha_0 * self.mean - 1, x).reshape(-1, self._data_size), -1)
-        return np.exp(log_pdf).reshape(set_shape)
+        return np.exp(log_pdf)
 
     def plot_pdf(self, n_plt, ax=None):
 
@@ -368,8 +482,8 @@ class DirichletRE(BaseRE):
 
                 plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pdf_plt)
 
-                cbar = plt.colorbar(plt_data)
-                cbar.set_label('$\mathrm{p}_\mathrm{x}(x)$')
+                c_bar = plt.colorbar(plt_data)
+                c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
 
             elif self._data_size == 3:
                 if ax is None:
@@ -380,7 +494,7 @@ class DirichletRE(BaseRE):
                 plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pdf_plt)
 
                 c_bar = plt.colorbar(plt_data)
-                c_bar.set_label('$\mathrm{p}_\mathrm{x}(x)$')
+                c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
 
             return plt_data
 
@@ -392,7 +506,7 @@ class DirichletRE(BaseRE):
 # a0 = 4
 # m = np.random.random((1, 3))
 # m = m / m.sum()
-# d = DirichletRE(a0, m, rng)
+# d = DirichletRV(a0, m, rng)
 # d.plot_pdf(30)
 # d.mean
 # d.mode
@@ -402,10 +516,9 @@ class DirichletRE(BaseRE):
 # d.pdf(d.rvs(4).reshape((2, 2)+d.mean.shape))
 
 
-
 #%% Supervised Learning classes
 
-class ModelBase(BaseRE):
+class ModelGeneric(GenericRE):
     """
     Base class for supervised learning data models.
     """
@@ -437,8 +550,9 @@ class ModelBase(BaseRE):
     def mode_x(self):
         return self._mode_x
 
-    def mode_y_x(self, x):      # TODO: as method?
-        return None
+    @property
+    def mode_y_x(self):      # TODO: as method?
+        return self._mode_y_x
 
     @property
     def mean_x(self):
@@ -457,8 +571,7 @@ class ModelBase(BaseRE):
         return self._cov_y_x
 
 
-
-class ModelCondX(ModelBase):
+class ModelCondX(ModelGeneric):
     def __init__(self, model_x, model_y_x, seed=None):
         super().__init__(seed)
         self._update_attr(model_x, model_y_x)
@@ -505,16 +618,9 @@ class ModelCondX(ModelBase):
     def _update_y_x(self):
         self._data_shape_y = self._model_y_x(self._model_x.rvs()).data_shape
 
-        # def _mode_y_x(self, x): return self._model_y_x(x).mode
-
-        # self._mode_y_x = self._model_y_x(x_sample).mode
-        # self._mean_y_x = self._model_y_x(x_sample).mean
-        # self._cov_y_x = self._model_y_x(x_sample).cov
-
-    def mode_y_x(self, x):              # TODO: vectorize?
-        return self._model_y_x(x).mode
-
-
+        self._mode_y_x = _vectorize_func(lambda x: self._model_y_x(x).mode, self._data_shape_x, self._data_shape_y)
+        self._mean_y_x = _vectorize_func(lambda x: self._model_y_x(x).mean, self._data_shape_x, self._data_shape_y)
+        self._cov_y_x = _vectorize_func(lambda x: self._model_y_x(x).cov, self._data_shape_x, 2 * self._data_shape_y)
 
     def _rvs(self, size=(), random_state=None):
         X = np.asarray(self.model_x.rvs(size, random_state))
@@ -522,19 +628,25 @@ class ModelCondX(ModelBase):
             Y = self.model_y_x(X).rvs(size, random_state)
             D = np.array((Y, X), dtype=[('y', Y.dtype, self.data_shape_y), ('x', X.dtype, self.data_shape_x)])
         else:
-            Y = np.asarray([self.model_y_x(x).rvs((), random_state) for x in X.reshape((-1,) + self.model_x._data_shape)])\
-                .reshape(size + self.data_shape_y)
+            Y = np.asarray([self.model_y_x(x).rvs((), random_state)
+                            for x in X.reshape((-1,) + self._data_shape_x)]).reshape(size + self.data_shape_y)
             D = np.array(list(zip(Y.reshape((-1,) + self.data_shape_y), X.reshape((-1,) + self.data_shape_x))),
                          dtype=[('y', Y.dtype, self.data_shape_y), ('x', X.dtype, self.data_shape_x)]).reshape(size)
 
         return D
 
 
+# theta_m = DirichletRV(8, [[.2, .1], [.3,.4]])
+theta_m = DirichletRV(8, [[.2, .1, .1], [.3, .1, .2]])
+# def theta_c(x): return FiniteRE(['a', 'b'], x)
+# def theta_c(x): return FiniteRE([0, 1], x)
+# def theta_c(x): return FiniteRE([[0, 1], [2, 3]], x)
+def theta_c(x): return FiniteRE(np.stack(np.meshgrid([0,1,2],[0,1]), axis=-1), x)
 
-theta_m = DirichletRE(4, [.5, .5])
-def theta_c(x): return FiniteRE(['a', 'b'], x)
 
 t = ModelCondX(theta_m, theta_c)
 t.rvs()
 t.rvs(4)
 t.mode_y_x(t.model_x.rvs())
+t.mean_y_x(t.model_x.rvs())
+t.cov_y_x(t.model_x.rvs())
