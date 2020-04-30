@@ -14,7 +14,7 @@ from scipy.stats._multivariate import multi_rv_generic
 import matplotlib.pyplot as plt
 # from mpl_toolkits.mplot3d import Axes3D
 
-from RE_obj import BaseRE, DeterministicRE, DirichletRE, FiniteRE
+from RE_obj import GenericRE, DeterministicRE, DirichletRV, FiniteRE
 
 # plt.style.use('seaborn')  # cm?
 
@@ -110,12 +110,12 @@ YX_set = np.array(_temp, dtype=[('y', Y_set.dtype, Y_data_shape),
 
 
 
-# val = DirichletRE(YX_set.size, np.ones(YX_set.shape)/YX_set.size).rvs()
+# val = DirichletRV(YX_set.size, np.ones(YX_set.shape)/YX_set.size).rvs()
 # prior = DeterministicRE(val)
 
 alpha_0 = 10*YX_set.size
-mean = DirichletRE(YX_set.size, np.ones(YX_set.shape) / YX_set.size).rvs()
-prior = DirichletRE(alpha_0, mean, rng)
+mean = DirichletRV(YX_set.size, np.ones(YX_set.shape) / YX_set.size).rvs()
+prior = DirichletRV(alpha_0, mean, rng)
 
 theta = FiniteRE(YX_set, prior.rvs(), rng)
 
@@ -171,7 +171,7 @@ class FiniteSetPrior(Prior):
 
     @classmethod
     def dirichlet_prior(cls, alpha_0, mean, support, seed=None):
-        return cls(DirichletRE(alpha_0, mean), support, seed)
+        return cls(DirichletRV(alpha_0, mean), support, seed)
 
 
 
