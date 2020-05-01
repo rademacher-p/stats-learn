@@ -4,7 +4,7 @@ Sim main.
 :-)
 """
 
-import itertools
+import itertools, functools, types
 
 import numpy as np
 from numpy import random
@@ -14,7 +14,7 @@ from scipy.stats._multivariate import multi_rv_generic
 import matplotlib.pyplot as plt
 # from mpl_toolkits.mplot3d import Axes3D
 
-from RE_obj import GenericRE, DeterministicRE, DirichletRV, FiniteRE
+from RE_obj import DeterministicRE, FiniteRE, DirichletRV, YcXModel
 
 # plt.style.use('seaborn')  # cm?
 
@@ -119,7 +119,6 @@ prior = DirichletRV(alpha_0, mean, rng)
 
 theta = FiniteRE(YX_set, prior.rvs(), rng)
 
-
 # theta_m_pmf = theta.p.reshape((-1,) + X_set_shape).sum(axis=0)
 # theta_m = FiniteRE(X_set, theta_m_pmf)
 # theta_m.mean
@@ -127,35 +126,63 @@ theta = FiniteRE(YX_set, prior.rvs(), rng)
 # theta_m.pmf(theta_m.rvs(2))
 
 
-#%% Classes
+class Prior:
+    def __init__(self, dist, model_cls):
+        self.dist = dist
+        self.model_cls = model_cls
 
-# TODO: make special rv classes for supervised learning structured arrays?
+        args = self.dist.rvs()
+        self.model = self.model_cls(p=args)
+
+    # def random_model(self):
+    #     args = self.dist.rvs()
+    #     return self.model_cls(p=args)
+
+    def randomize(self):
+        args = self.dist.rvs()
+        self.model.p = args
 
 
-class Prior(multi_rv_generic):
-    def __init__(self, dist, seed=None):
-        super(Prior, self).__init__(seed)
-        self.dist = dist    # stats-like RV object
+dist = DirichletRV(4, [.5, .5])
+class model_cls(FiniteRE):
+    __new__ = functools.partialmethod(FiniteRE.__new__, supp=['a', 'c'])
+    __init__ = functools.partialmethod(FiniteRE.__init__, supp=['a', 'c'])
+
+# a = model_cls(p=[.4,.6])
+
+d = Prior(dist, model_cls)
+# d.random_model()
 
 
-class DatPriorDoe(Prior):
-    def __init__(self, loc, scale, seed=None):
-        dist = stats.rayleigh(loc, scale)
-        super().__init__(dist, seed)
+
+class Prior2:
+    def __init__(self, dist, model_cls, model_kwargs):
+        self.dist = dist
+
+        class cls_frozen(model_cls):
+            __new__ = functools.partialmethod(model_cls.__new__, **model_kwargs)
+            __init__ = functools.partialmethod(model_cls.__init__, **model_kwargs)
+
+        self.cls_frozen = cls_frozen
 
     def random_model(self):
-        a, b = self.dist.rvs(size=2)
-        theta_m = stats.beta(a, b)
-        def theta_c(x): return stats.beta(5*x, 5*(1-x))     # TODO: just combine these in a rv_obj?
-
-        return Model(theta_m, theta_c)
+        args = self.dist.rvs()
+        return self.cls_frozen(p=args)
 
 
+dist = DirichletRV(4, [.5, .5])
+model_cls = FiniteRE
+model_kwargs = {'supp': ['d', 'e']}
+
+d = Prior2(dist, model_cls, model_kwargs)
+d.random_model()
 
 
-class FiniteSetPrior(Prior):
+
+
+class FiniteREPrior(Prior):
     def __init__(self, dist, support, seed=None):
-        super(FiniteSetPrior, self).__init__(dist, seed)
+        super().__init__(dist, seed)
         self.support = support
         # self.support_y = np.unique(support['y'])
         # self.support_x = np.unique(support['x'])
@@ -174,6 +201,20 @@ class FiniteSetPrior(Prior):
         return cls(DirichletRV(alpha_0, mean), support, seed)
 
 
+
+class DatPriorDoe(Prior):
+    def __init__(self, loc, scale):
+        dist = stats.rayleigh(loc, scale)
+        super().__init__(dist, seed)
+
+    def random_model(self):
+        a, b = self.dist.rvs(size=2)
+        theta_m = stats.beta(a, b)
+        def theta_c(x): return stats.beta(5*x, 5*(1-x))
+
+        return YcXModel(theta_m, theta_c)
+
+# s = DatPriorDoe(0, 1, rng)
 
 
 # prior = DeterministicDiscretePrior(val=mean, support=YX_set, seed=rng)

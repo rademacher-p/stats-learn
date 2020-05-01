@@ -2,9 +2,8 @@
 Random element objects
 """
 
-# TODO: plot methods in Base classes?
-# TODO: add conditional RE object!!!
-
+# TODO: setters allow RE/RV type switching. Remove?
+# TODO: add conditional RE object?
 # TODO: docstrings?
 
 
@@ -35,18 +34,6 @@ def _check_data_shape(x, shape):
     return x, set_shape
 
 
-def _vectorize_func(func, data_shape, shape_out):
-    def func_vec(x):
-        x, set_shape = _check_data_shape(x, data_shape)
-
-        _out = []
-        for x_i in x.reshape((-1,) + data_shape):
-            _out.append(func(x_i))
-        return np.asarray(_out).reshape(set_shape + shape_out)
-
-    return func_vec
-
-
 class GenericRE(multi_rv_generic):
     """
     Base class for generic random element objects.
@@ -70,6 +57,7 @@ class GenericRE(multi_rv_generic):
         if type(size) is int:
             size = (size,)
         random_state = self._get_random_state(random_state)
+
         return self._rvs(size, random_state)
 
     def _rvs(self, size=(), random_state=None):
@@ -100,9 +88,6 @@ class DiscreteRE(GenericRE):
     Base class for discrete random element objects.
     """
 
-    def __init__(self, seed=None):
-        super().__init__(seed)
-
     def pmf(self, x):
         x, set_shape = _check_data_shape(x, self._data_shape)
         return self._pmf(x).reshape(set_shape)
@@ -111,27 +96,22 @@ class DiscreteRE(GenericRE):
         _out = []
         for x_i in x.reshape((-1,) + self._data_shape):
             _out.append(self._pmf_single(x_i))
-        return np.asarray(_out)         # returned array may be flattened
+        return np.asarray(_out)         # returned array may be flattened over 'set_shape'
 
     def _pmf_single(self, x):
         return None
 
 
-class DiscreteRV(GenericRV, DiscreteRE):
+class DiscreteRV(DiscreteRE, GenericRV):
     """
     Base class for discrete random variable (numeric) objects.
     """
-    def __init__(self, seed=None):
-        super().__init__(seed)
 
 
 class ContinuousRV(GenericRV):
     """
     Base class for continuous random element objects.
     """
-
-    def __init__(self, seed=None):
-        super().__init__(seed)
 
     def pdf(self, x):
         x, set_shape = _check_data_shape(x, self._data_shape)
@@ -184,26 +164,22 @@ class DeterministicRE(DiscreteRE):
     def _rvs(self, size=(), random_state=None):
         return np.broadcast_to(self._val, size + self._data_shape)
 
-    # def _pmf(self, x):
-    #     return np.where(np.all(x.reshape(-1, self._data_size)
-    #                            == self._val.flatten(), axis=-1), 1., 0.)
+    def _pmf(self, x):
+        return np.where(np.all(x.reshape(-1, self._data_size) == self._val.flatten(), axis=-1), 1., 0.)
 
-    def _pmf_single(self, x):
-        return 1. if (x == self.val).all() else 0.
+    # def _pmf_single(self, x):
+    #     return 1. if (x == self.val).all() else 0.
 
 
-class DeterministicRV(DiscreteRV, DeterministicRE):
+class DeterministicRV(DeterministicRE, DiscreteRV):
     """
     Deterministic random variable.
     """
 
-    def __init__(self, val, seed=None):
-        super().__init__(seed)
-        self.val = val
-
     @DeterministicRE.val.setter
     def val(self, val):
-        DeterministicRE.val.fset(self, val)     # TODO: super instead?
+        DeterministicRE.val.fset(self, val)
+        # super(DeterministicRV, self.__class__).val.fset(self, val)    # TODO: super instead?
 
         self._mean = self._val
         self._cov = np.zeros(2 * self._data_shape)
@@ -308,14 +284,10 @@ class FiniteRE(DiscreteRE):
             raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
 
 
-class FiniteRV(DiscreteRV, FiniteRE):
+class FiniteRV(FiniteRE, DiscreteRV):
     """
     Generic RV drawn from a finite support set using an explicitly defined PMF.
     """
-
-    def __init__(self, supp, p, seed=None):
-        super(DiscreteRE, self).__init__(seed)
-        self._update_attr(supp, p)
 
     def _update_attr(self, *args, **kwargs):
         super()._update_attr(*args, **kwargs)
@@ -518,7 +490,20 @@ class DirichletRV(ContinuousRV):
 
 #%% Supervised Learning classes
 
-class ModelGeneric(GenericRE):
+def _vectorize_func(func, data_shape):
+    def func_vec(x):
+        x, set_shape = _check_data_shape(x, data_shape)
+
+        _out = []
+        for x_i in x.reshape((-1,) + data_shape):
+            _out.append(func(x_i))
+        _out = np.asarray(_out)
+        return _out.reshape(set_shape + _out.shape[1:])
+
+    return func_vec
+
+
+class GenericModel(multi_rv_generic):
     """
     Base class for supervised learning data models.
     """
@@ -531,12 +516,6 @@ class ModelGeneric(GenericRE):
 
         self._mode_x = None
         self._mode_y_x = None
-
-        self._mean_x = None
-        self._mean_y_x = None
-
-        self._cov_x = None
-        self._cov_y_x = None
 
     @property
     def data_shape_x(self):
@@ -551,27 +530,68 @@ class ModelGeneric(GenericRE):
         return self._mode_x
 
     @property
-    def mode_y_x(self):      # TODO: as method?
+    def mode_y_x(self):
         return self._mode_y_x
+
+    rvs = GenericRV.rvs
+
+    def _rvs(self, size=(), random_state=None):
+        return None
+
+
+class GenericModelRVx(GenericModel):
+    """
+    Base
+    """
+
+    def __init__(self, seed=None):
+        super().__init__(seed)
+        self._mean_x = None
+        self._cov_x = None
 
     @property
     def mean_x(self):
         return self._mean_x
 
     @property
-    def mean_y_x(self):
-        return self._mean_y_x
-
-    @property
     def cov_x(self):
         return self._cov_x
+
+
+class GenericModelRVy(GenericModel):
+    """
+    Base
+    """
+
+    def __init__(self, seed=None):
+        super().__init__(seed)
+        self._mean_y_x = None
+        self._cov_y_x = None
+
+    @property
+    def mean_y_x(self):
+        return self._mean_y_x
 
     @property
     def cov_y_x(self):
         return self._cov_y_x
 
 
-class ModelCondX(ModelGeneric):
+class YcXModel(GenericModel):
+
+    def __new__(cls, model_x, model_y_x, seed=None):
+        is_numeric_y_x = isinstance(model_y_x(model_x.rvs()), GenericRV)
+        if isinstance(model_x, GenericRV):
+            if is_numeric_y_x:
+                return super().__new__(YcXModelRVyx)
+            else:
+                return super().__new__(YcXModelRVx)
+        else:
+            if is_numeric_y_x:
+                return super().__new__(YcXModelRVy)
+            else:
+                return super().__new__(cls)
+
     def __init__(self, model_x, model_y_x, seed=None):
         super().__init__(seed)
         self._update_attr(model_x, model_y_x)
@@ -593,7 +613,6 @@ class ModelCondX(ModelGeneric):
         self._update_attr(model_y_x=model_y_x)
 
     def _update_attr(self, *args, **kwargs):
-
         if 'model_x' in kwargs.keys():
             self._model_x = kwargs['model_x']
             self._update_x()
@@ -610,17 +629,11 @@ class ModelCondX(ModelGeneric):
 
     def _update_x(self):
         self._data_shape_x = self._model_x.data_shape
-
         self._mode_x = self._model_x.mode
-        self._mean_x = self._model_x.mean
-        self._cov_x = self._model_x.cov
 
     def _update_y_x(self):
         self._data_shape_y = self._model_y_x(self._model_x.rvs()).data_shape
-
-        self._mode_y_x = _vectorize_func(lambda x: self._model_y_x(x).mode, self._data_shape_x, self._data_shape_y)
-        self._mean_y_x = _vectorize_func(lambda x: self._model_y_x(x).mean, self._data_shape_x, self._data_shape_y)
-        self._cov_y_x = _vectorize_func(lambda x: self._model_y_x(x).cov, self._data_shape_x, 2 * self._data_shape_y)
+        self._mode_y_x = _vectorize_func(lambda x: self._model_y_x(x).mode, self._data_shape_x)
 
     def _rvs(self, size=(), random_state=None):
         X = np.asarray(self.model_x.rvs(size, random_state))
@@ -636,17 +649,42 @@ class ModelCondX(ModelGeneric):
         return D
 
 
+class YcXModelRVx(YcXModel, GenericModelRVx):
+    def _update_x(self):
+        super()._update_x()
+        self._mean_x = self._model_x.mean
+        self._cov_x = self._model_x.cov
+
+
+class YcXModelRVy(YcXModel, GenericModelRVy):
+    def _update_y_x(self):
+        super()._update_y_x()
+        self._mean_y_x = _vectorize_func(lambda x: self._model_y_x(x).mean, self._data_shape_x)
+        self._cov_y_x = _vectorize_func(lambda x: self._model_y_x(x).cov, self._data_shape_x)
+
+
+class YcXModelRVyx(YcXModelRVx, YcXModelRVy):
+    pass
+
+
+
+
+
+
 # theta_m = DirichletRV(8, [[.2, .1], [.3,.4]])
-theta_m = DirichletRV(8, [[.2, .1, .1], [.3, .1, .2]])
-# def theta_c(x): return FiniteRE(['a', 'b'], x)
-# def theta_c(x): return FiniteRE([0, 1], x)
 # def theta_c(x): return FiniteRE([[0, 1], [2, 3]], x)
-def theta_c(x): return FiniteRE(np.stack(np.meshgrid([0,1,2],[0,1]), axis=-1), x)
+
+# theta_m = DirichletRV(8, [[.2, .1, .1], [.3, .1, .2]])
+# def theta_c(x): return FiniteRE(np.stack(np.meshgrid([0,1,2],[0,1]), axis=-1), x)
+
+# theta_m = DirichletRV(6, [.5, .5])
+# def theta_c(x): return FiniteRE(['a', 'b'], x)
+# # def theta_c(x): return FiniteRE([0, 1], x)
 
 
-t = ModelCondX(theta_m, theta_c)
-t.rvs()
-t.rvs(4)
-t.mode_y_x(t.model_x.rvs())
-t.mean_y_x(t.model_x.rvs())
-t.cov_y_x(t.model_x.rvs())
+# t = YcXModel(theta_m, theta_c)
+# t.rvs()
+# t.rvs(4)
+# t.mode_y_x(t.model_x.rvs(4))
+# t.mean_y_x(t.model_x.rvs(4))
+# t.cov_y_x(t.model_x.rvs(4))
