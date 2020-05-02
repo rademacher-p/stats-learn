@@ -3,6 +3,7 @@ Random element objects
 """
 
 # TODO: setters allow RE/RV type switching. Remove?
+# TODO: change rvs method name to RE?
 # TODO: add conditional RE object?
 # TODO: docstrings?
 
@@ -488,7 +489,7 @@ class DirichletRV(ContinuousRV):
 # d.pdf(d.rvs(4).reshape((2, 2)+d.mean.shape))
 
 
-#%% Supervised Learning classes
+#%% Supervised Learning
 
 def _vectorize_func(func, data_shape):
     def func_vec(x):
@@ -670,7 +671,6 @@ class YcXModelRVyx(YcXModelRVx, YcXModelRVy):
 
 
 
-
 # theta_m = DirichletRV(8, [[.2, .1], [.3,.4]])
 # def theta_c(x): return FiniteRE([[0, 1], [2, 3]], x)
 
@@ -688,3 +688,15 @@ class YcXModelRVyx(YcXModelRVx, YcXModelRVy):
 # t.mode_y_x(t.model_x.rvs(4))
 # t.mean_y_x(t.model_x.rvs(4))
 # t.cov_y_x(t.model_x.rvs(4))
+
+
+
+
+
+
+
+
+
+
+
+
