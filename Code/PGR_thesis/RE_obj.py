@@ -57,6 +57,8 @@ class GenericRE(multi_rv_generic):
     def rvs(self, size=(), random_state=None):
         if type(size) is int:
             size = (size,)
+        elif type(size) is not tuple:
+            raise TypeError("Input 'size' must be int or tuple.")
         random_state = self._get_random_state(random_state)
 
         return self._rvs(size, random_state)
@@ -251,9 +253,10 @@ class FiniteRE(DiscreteRE):
         if set_shape != self._p.shape:
             raise ValueError("Leading shape values of 'supp' must equal the shape of 'p'.")
 
-        self._supp_flat = self._supp.reshape((self._p.size, -1), order='F')     # TODO: CHECK? other places???
+        # self._supp_flat = self._supp.reshape((self._p.size, -1), order='F')     # TODO: CHECK? other places???
+        self._supp_flat = self._supp.reshape((self._p.size, -1))
         self._p_flat = self._p.flatten()
-        if len(self._supp_flat) != len(np.unique(self._supp_flat, axis=-1)):
+        if len(self._supp_flat) != len(np.unique(self._supp_flat, axis=0)):     # TODO: axis???
             raise ValueError("Input 'supp' must have unique values")
 
         if np.min(self._p) < 0:
@@ -270,7 +273,11 @@ class FiniteRE(DiscreteRE):
         return self._supp_flat[i].reshape(size + self._data_shape)
 
     def _pmf_single(self, x):
-        return self._p_flat[np.all(x.flatten() == self._supp_flat, axis=-1)]
+        eq_supp = np.all(x.flatten() == self._supp_flat, axis=-1)
+        if eq_supp.sum() != 1:
+            raise ValueError("Input 'x' must be lie in the support.")
+
+        return self._p_flat[eq_supp]
 
     def plot_pmf(self, ax=None):
         if self._p.ndim == 1:
@@ -328,18 +335,19 @@ class FiniteRV(FiniteRE, DiscreteRV):
             raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
 
 
-# s = np.random.random((4, 3, 2, 1))
-# pp = np.random.random((4, 3))
-# pp = pp / pp.sum()
-# f = FiniteRE(s, pp)
-# f.pmf(f.rvs())
-#
-# s = np.stack(np.meshgrid([0,1],[0,1], [0,1]), axis=-1)
-# s, p = ['a','b','c'], [.3,.2,.5]
-# # p = np.random.random((2,2,2))
-# # p = p / p.sum()
-# f2 = FiniteRE(s, p)
-# f2.plot_pmf()
+s = np.random.random((4, 3, 2, 2))
+pp = np.random.random((4, 3))
+pp = pp / pp.sum()
+f = FiniteRE(s, pp)
+f.pmf(f.rvs(4))
+
+s = np.stack(np.meshgrid([0,1],[0,1], [0,1]), axis=-1)
+s, p = ['a','b','c'], [.3,.2,.5]
+# p = np.random.random((2,2,2))
+# p = p / p.sum()
+f2 = FiniteRE(s, p)
+f2.pmf(f2.rvs(4))
+f2.plot_pmf()
 
 
 #%% Dirichlet
