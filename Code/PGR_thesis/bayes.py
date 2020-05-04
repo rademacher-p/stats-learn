@@ -4,7 +4,32 @@ from RE_obj import FiniteRE, DirichletRV
 
 #%% Priors
 
-def bayes_re(model_cls, model_kwargs, prior, func):
+def bayes_re(model_cls, prior, rand_kwargs, model_kwargs={}):
+    prior.rand_kwargs = types.MethodType(rand_kwargs, prior)
+
+    obj = model_cls(**model_kwargs, **prior.rand_kwargs())
+    obj.prior = prior
+
+    def random_model(self):
+        for attr, val in prior.rand_kwargs().items():
+            setattr(self, attr, val)
+    obj.random_model = types.MethodType(random_model, obj)
+
+    return obj
+
+model_cls = FiniteRE
+model_kwargs = {'supp': ['a', 'b']}
+
+prior = DirichletRV(4, [.4, .6])
+def rand_kwargs(self): return {'p': self.rvs()}
+
+c = bayes_re(model_cls, prior, rand_kwargs, model_kwargs)
+c.random_model()
+
+
+
+
+def bayes_re1(model_cls, model_kwargs, prior, func):
     obj = model_cls(**model_kwargs, **func(prior))
     obj.prior = prior
 
@@ -23,7 +48,7 @@ prior = DirichletRV(4, [.4, .6])
 def func(obj): return {'p': obj.rvs()}
 # def func(self): return {'p': self.rvs()}
 
-a = bayes_re(model_cls, model_kwargs, prior, func)
+a = bayes_re1(model_cls, model_kwargs, prior, func)
 a.random_model()
 
 
@@ -53,31 +78,11 @@ b.random_model()
 
 
 
-def bayes_re3(model_cls, model_kwargs, prior, func):
-    prior.func = types.MethodType(func, prior)
-
-    obj = model_cls(**model_kwargs, **prior.func())
-    obj.prior = prior
-
-    def rng_model(self):
-        for attr, val in prior.func().items():
-            setattr(self, attr, val)
-    obj.random_model = types.MethodType(rng_model, obj)
-
-    return obj
-
-model_cls = FiniteRE
-model_kwargs = {'supp': ['a', 'b']}
-
-prior = DirichletRV(4, [.4, .6])
-def func(self): return {'p': self.rvs()}
-
-c = bayes_re3(model_cls, model_kwargs, prior, func)
-c.random_model()
 
 
 
-#%% Boneyard...
+
+#%% Boneyard
 
 # class BayesRE:
 #     def __new__(cls, prior, model_cls, model_kwargs):

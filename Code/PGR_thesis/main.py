@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 # from mpl_toolkits.mplot3d import Axes3D
 
 from RE_obj import DeterministicRE, FiniteRE, DirichletRV, YcXModel
+from bayes import bayes_re
 
 # plt.style.use('seaborn')  # cm?
 
@@ -49,42 +50,41 @@ rng = random.default_rng()
 # plt.suptitle(f'Model, (X,Y) = ({X:.2f},{Y:.2f})')
 
 
-theta_m = stats.multivariate_normal(mean=[0, 0])
-def theta_c(x): return stats.multivariate_normal(mean=x)
-
-
-_, ax_theta_m = plt.subplots(num='theta_m', clear=True, subplot_kw={'projection': '3d'})
-
-x1_plot = np.linspace(-5, 5, 101, endpoint=True)
-x2_plot = np.linspace(-5, 5, 51, endpoint=True)
-X_plot = np.stack(np.meshgrid(x1_plot, x2_plot), axis=-1)
-
-ax_theta_m.plot_wireframe(X_plot[..., 0], X_plot[..., 1], theta_m.pdf(X_plot))
-# ax_prior[0].plot_wireframe(X_plot[0], X_plot[1], theta_m.pdf(t))
-plt.gca().set(title='Marginal Model', xlabel='$x$', ylabel=r'$p_{\theta_m}(x)$')
-
-X = theta_m.rvs()
-
-_, ax_theta_c = plt.subplots(num='theta_c', clear=True, subplot_kw={'projection': '3d'})
-
-y1_plot = np.linspace(-5, 5, 101, endpoint=True)
-y2_plot = np.linspace(-5, 5, 51, endpoint=True)
-Y_plot = np.stack(np.meshgrid(y1_plot, y2_plot), axis=-1)
-
-ax_theta_c.plot_wireframe(Y_plot[..., 0], Y_plot[..., 1], theta_c(X).pdf(Y_plot))
-plt.gca().set(title='Conditional Model', xlabel='$y$', ylabel=r'$p_{\theta_c}(y;x)$')
-
-Y = theta_c(X).rvs()
+# theta_m = stats.multivariate_normal(mean=[0, 0])
+# def theta_c(x): return stats.multivariate_normal(mean=x)
+#
+#
+# _, ax_theta_m = plt.subplots(num='theta_m', clear=True, subplot_kw={'projection': '3d'})
+#
+# x1_plot = np.linspace(-5, 5, 101, endpoint=True)
+# x2_plot = np.linspace(-5, 5, 51, endpoint=True)
+# X_plot = np.stack(np.meshgrid(x1_plot, x2_plot), axis=-1)
+#
+# ax_theta_m.plot_wireframe(X_plot[..., 0], X_plot[..., 1], theta_m.pdf(X_plot))
+# # ax_prior[0].plot_wireframe(X_plot[0], X_plot[1], theta_m.pdf(t))
+# plt.gca().set(title='Marginal Model', xlabel='$x$', ylabel=r'$p_{\theta_m}(x)$')
+#
+# X = theta_m.rvs()
+#
+# _, ax_theta_c = plt.subplots(num='theta_c', clear=True, subplot_kw={'projection': '3d'})
+#
+# y1_plot = np.linspace(-5, 5, 101, endpoint=True)
+# y2_plot = np.linspace(-5, 5, 51, endpoint=True)
+# Y_plot = np.stack(np.meshgrid(y1_plot, y2_plot), axis=-1)
+#
+# ax_theta_c.plot_wireframe(Y_plot[..., 0], Y_plot[..., 1], theta_c(X).pdf(Y_plot))
+# plt.gca().set(title='Conditional Model', xlabel='$y$', ylabel=r'$p_{\theta_c}(y;x)$')
+#
+# Y = theta_c(X).rvs()
 
 
 #%% Discrete sets
 
 Y_set = np.array(['a', 'b'])
-# Y_set = np.arange(3)
 # X_set = np.arange(1)
 # X_set = np.arange(6).reshape(3, 2)
-X_set = np.stack(np.meshgrid(np.arange(2), np.arange(2)), axis=-1)
-# X_set = np.random.random((2,2,2))
+X_set = np.stack(np.meshgrid(np.arange(2), np.arange(3)), axis=-1)
+# X_set = rng.random((2,3,2))
 
 i_split_y, i_split_x = Y_set.ndim, X_set.ndim-1
 
@@ -95,23 +95,9 @@ _temp = list(itertools.product(Y_set.reshape((-1,) + Y_data_shape), X_set.reshap
 YX_set = np.array(_temp, dtype=[('y', Y_set.dtype, Y_data_shape),
                                 ('x', X_set.dtype, X_data_shape)]).reshape(Y_set_shape + X_set_shape)
 
-# YX_set = np.array(list(itertools.product(Y_set.flatten(), X_set.flatten())),
-#                   dtype=[('y', Y_set.dtype), ('x', X_set.dtype)]).reshape(Y_set.shape + X_set.shape)
+X_set_s = np.array([(x,) for x in X_set.reshape((-1,) + X_data_shape)],
+                   dtype=[('x', X_set.dtype, X_data_shape)]).reshape(X_set_shape)
 
-# YX_set = np.array(list(itertools.product(Y_set, X_set)),
-#                   dtype=[('y', Y_set.dtype, Y_data_shape), ('x', X_set.dtype, X_data_shape)]).reshape(Y_set_shape + X_set_shape)
-
-
-# # tt = list(map(tuple, X_set.reshape((-1,) + X_data_shape)))
-# tt = [(x,) for x in X_set.reshape((-1,) + X_data_shape)]
-# # tt = list(X_set.reshape((-1,) + X_data_shape))
-# xx = np.array(tt, dtype=[('x', X_set.dtype, X_data_shape)]).reshape(X_set_shape)    ###
-
-
-
-
-# val = DirichletRV(YX_set.size, np.ones(YX_set.shape)/YX_set.size).rvs()
-# prior = DeterministicRE(val)
 
 alpha_0 = 10*YX_set.size
 mean = DirichletRV(YX_set.size, np.ones(YX_set.shape) / YX_set.size).rvs()
@@ -119,12 +105,35 @@ prior = DirichletRV(alpha_0, mean, rng)
 
 theta = FiniteRE(YX_set, prior.rvs(), rng)
 
-# theta_m_pmf = theta.p.reshape((-1,) + X_set_shape).sum(axis=0)
-# theta_m = FiniteRE(X_set, theta_m_pmf)
-# theta_m.mean
-# theta_m.rvs()
-# theta_m.pmf(theta_m.rvs(2))
+theta_m_pmf = theta.p.reshape((-1,) + X_set_shape).sum(axis=0)
+theta_m = FiniteRE(X_set, theta_m_pmf)
 
+
+
+#%% Sim
+
+model_cls = YcXModel
+# model_kwargs = {'model_x': None, 'model_y_x': None}
+
+alpha_0 = 10
+mean = np.ones(YX_set.shape) / YX_set.size
+prior = DirichletRV(alpha_0, mean)
+
+def rand_kwargs(self):
+    pmf = self.rvs()
+
+    pmf_x = pmf.reshape((-1,) + X_set_shape).sum(axis=0)
+    model_x = FiniteRE(X_set, pmf_x)
+
+    def model_y_x(x):
+        _temp = pmf.reshape(Y_set_shape + (-1,))[..., np.all(x.flatten() == model_x._supp_flat, axis=-1)]
+        pmf_y_x = _temp.reshape(Y_set_shape) / _temp.sum()
+        return FiniteRE(Y_set, pmf_y_x)
+
+    return {'model_x': model_x, 'model_y_x': model_y_x}
+
+c = bayes_re(model_cls, prior, rand_kwargs)
+c.random_model()
 
 
 
