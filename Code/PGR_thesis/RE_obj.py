@@ -1,20 +1,15 @@
 """
-Random element objects
+Random element objects.
 """
 
 # TODO: setters allow RE/RV type switching. Remove?
 # TODO: change rvs method name to RE?
-# TODO: add conditional RE object?
 # TODO: docstrings?
-
-
-# import warnings
 
 import numpy as np
 from scipy.stats._multivariate import multi_rv_generic
 from scipy.special import gammaln, xlogy
 import matplotlib.pyplot as plt
-
 from util.util import outer_gen, diag_gen, simplex_grid
 
 
@@ -34,6 +29,41 @@ def _check_data_shape(x, shape):
 
     return x, set_shape
 
+
+def _vectorize_func(func, data_shape):
+    def func_vec(x):
+        x, set_shape = _check_data_shape(x, data_shape)
+
+        _out = []
+        for x_i in x.reshape((-1,) + data_shape):
+            _out.append(func(x_i))
+        _out = np.asarray(_out)
+        return _out.reshape(set_shape + _out.shape[1:])
+
+    return func_vec
+
+
+def _check_valid_pmf(p, shape=None, full_support=False):
+    if shape is None:
+        p = np.asarray(p)
+        set_shape = ()
+    else:
+        p, set_shape = _check_data_shape(p, shape)
+
+    if full_support:
+        if np.min(p) <= 0:
+            raise ValueError("Each entry in 'p' must be greater than zero.")
+    else:
+        if np.min(p) < 0:
+            raise ValueError("Each entry in 'p' must be greater than or equal to zero.")
+
+    if (np.abs(p.reshape(set_shape + (-1,)).sum(-1) - 1.0) > 1e-9).any():
+        raise ValueError("The input 'p' must lie within the normal simplex, but p.sum() = %s." % p.sum())
+
+    return p
+
+
+#%% Base RE classes
 
 class GenericRE(multi_rv_generic):
     """
@@ -130,14 +160,14 @@ class ContinuousRV(GenericRV):
         return None
 
 
-#%% Deterministic
-
-# TODO: redundant, just use FiniteRE? or change to ContinuousRV for integration?
+#%% Specific RE's
 
 class DeterministicRE(DiscreteRE):
     """
     Deterministic random element.
     """
+
+    # TODO: redundant, just use FiniteRE? or change to ContinuousRV for integration?
 
     def __new__(cls, val, seed=None):
         val = np.asarray(val)
@@ -198,14 +228,12 @@ class DeterministicRV(DeterministicRE, DiscreteRV):
 # b.pmf(b.rvs())
 
 
-#%% Generic, finite support
-
-# TODO: reconsider support shape?
-
 class FiniteRE(DiscreteRE):
     """
     Generic RE drawn from a finite support set using an explicitly defined PMF.
     """
+
+    # TODO: reconsider support shape?
 
     def __new__(cls, supp, p, seed=None):
         supp = np.asarray(supp)
@@ -243,9 +271,9 @@ class FiniteRE(DiscreteRE):
             self._supp = np.asarray(args[0])
 
         if 'p' in kwargs.keys():
-            self._p = np.asarray(kwargs['p'])
+            self._p = _check_valid_pmf(kwargs['p'])
         elif len(args) > 1:
-            self._p = np.asarray(args[1])
+            self._p = _check_valid_pmf(args[1])
 
         set_shape = self._supp.shape[:self._p.ndim]
         self._data_shape = self._supp.shape[self._p.ndim:]
@@ -253,18 +281,10 @@ class FiniteRE(DiscreteRE):
         if set_shape != self._p.shape:
             raise ValueError("Leading shape values of 'supp' must equal the shape of 'p'.")
 
-        # self._supp_flat = self._supp.reshape((self._p.size, -1), order='F')     # TODO: CHECK? other places???
-        self._supp_flat = self._supp.reshape((self._p.size, -1))
+        self._supp_flat = self._supp.reshape((self._p.size, -1))        # TODO: order???
         self._p_flat = self._p.flatten()
         if len(self._supp_flat) != len(np.unique(self._supp_flat, axis=0)):     # TODO: axis???
             raise ValueError("Input 'supp' must have unique values")
-
-        if np.min(self._p) < 0:
-            raise ValueError("Each entry in 'p' must be greater than or equal "
-                             "to zero.")
-        if np.abs(self._p.sum() - 1.0) > 1e-9:
-            raise ValueError("The input 'pmf' must lie within the normal "
-                             "simplex. but p.sum() = %s." % self._p.sum())
 
         self._mode = self._supp_flat[np.argmax(self._p_flat)].reshape(self._data_shape)
 
@@ -335,53 +355,34 @@ class FiniteRV(FiniteRE, DiscreteRV):
             raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
 
 
-s = np.random.random((4, 3, 2, 2))
-pp = np.random.random((4, 3))
-pp = pp / pp.sum()
-f = FiniteRE(s, pp)
-f.pmf(f.rvs(4))
+# s = np.random.random((4, 3, 2, 2))
+# pp = np.random.random((4, 3))
+# pp = pp / pp.sum()
+# f = FiniteRE(s, pp)
+# f.pmf(f.rvs(4))
+#
+# s = np.stack(np.meshgrid([0,1],[0,1], [0,1]), axis=-1)
+# s, p = ['a','b','c'], [.3,.2,.5]
+# # p = np.random.random((2,2,2))
+# # p = p / p.sum()
+# f2 = FiniteRE(s, p)
+# f2.pmf(f2.rvs(4))
+# f2.plot_pmf()
 
-s = np.stack(np.meshgrid([0,1],[0,1], [0,1]), axis=-1)
-s, p = ['a','b','c'], [.3,.2,.5]
-# p = np.random.random((2,2,2))
-# p = p / p.sum()
-f2 = FiniteRE(s, p)
-f2.pmf(f2.rvs(4))
-f2.plot_pmf()
 
 
-#%% Dirichlet
-
-def _dirichlet_check_alpha_0(alpha_0):
-    alpha_0 = np.asarray(alpha_0)
-    if alpha_0.size > 1 or alpha_0 <= 0:
-        raise ValueError("Concentration parameter must be a positive scalar")
+def _dirichlet_check_alpha_0(alpha_0):      # TODO: delete? implicit type checking in subsequent code
+    # alpha_0 = np.asarray(alpha_0)
+    # if alpha_0.size > 1 or alpha_0 <= 0:
+    #     raise ValueError("Concentration parameter must be a positive scalar.")
     return alpha_0
 
 
-def _dirichlet_check_mean(mean):
-    mean = np.asarray(mean)
-    if np.min(mean) < 0:
-        raise ValueError("Each entry in 'mean' must be greater than or equal "
-                         "to zero.")
-    if np.abs(mean.sum() - 1.0) > 1e-9:
-        raise ValueError("The input 'mean' must lie within the normal "
-                         "simplex. but mean.sum() = %s." % mean.sum())
-    return mean
-
-
 def _dirichlet_check_input(x, alpha_0, mean):
-    if np.min(x) < 0:
-        raise ValueError("Each entry in 'x' must be greater than or equal "
-                         "to zero.")
-
-    if (np.abs(x.reshape(-1, mean.size).sum(-1) - 1.0) > 1e-9).any():
-        raise ValueError("The sample values in 'x' must lie within the normal "
-                         "simplex, but the sums = %s." % x.reshape(-1, mean.size).sum(-1).squeeze())
+    _check_valid_pmf(x, shape=mean.shape)
 
     if np.logical_and(x == 0, mean < 1 / alpha_0).any():
-        raise ValueError("Each entry in 'x' must be greater than zero if its "
-                         "mean is less than 1 / alpha_0.")
+        raise ValueError("Each entry in 'x' must be greater than zero if its mean is less than 1 / alpha_0.")
 
     return x
 
@@ -421,9 +422,9 @@ class DirichletRV(ContinuousRV):
             self._alpha_0 = _dirichlet_check_alpha_0(args[0])
 
         if 'mean' in kwargs.keys():
-            self._mean = _dirichlet_check_mean(kwargs['mean'])
+            self._mean = _check_valid_pmf(kwargs['mean'], full_support=True)
         elif len(args) > 1:
-            self._mean = _dirichlet_check_mean(args[1])
+            self._mean = _check_valid_pmf(args[1], full_support=True)
 
         self._data_shape = self._mean.shape
         self._data_size = self._mean.size
@@ -483,228 +484,94 @@ class DirichletRV(ContinuousRV):
             raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
 
-# rng = np.random.default_rng()
-# a0 = 4
-# m = np.random.random((1, 3))
-# m = m / m.sum()
-# d = DirichletRV(a0, m, rng)
-# d.plot_pdf(30)
-# d.mean
-# d.mode
-# d.cov
-# d.rvs()
-# d.pdf(d.rvs())
-# d.pdf(d.rvs(4).reshape((2, 2)+d.mean.shape))
+rng = np.random.default_rng()
+a0 = 4
+m = np.random.random((1, 3))
+m = m / m.sum()
+d = DirichletRV(a0, m, rng)
+d.plot_pdf(30)
+d.mean
+d.mode
+d.cov
+d.rvs()
+d.pdf(d.rvs())
+d.pdf(d.rvs(4).reshape((2, 2)+d.mean.shape))
 
 
-#%% Supervised Learning
 
-def _vectorize_func(func, data_shape):
-    def func_vec(x):
-        x, set_shape = _check_data_shape(x, data_shape)
-
-        _out = []
-        for x_i in x.reshape((-1,) + data_shape):
-            _out.append(func(x_i))
-        _out = np.asarray(_out)
-        return _out.reshape(set_shape + _out.shape[1:])
-
-    return func_vec
+def _empirical_check_n(n):      # TODO: delete? implicit type checking in subsequent code
+    return n
 
 
-class GenericModel(multi_rv_generic):
+def _empirical_check_input(x, n, mean):
+    _check_valid_pmf(x, shape=mean.shape)
+
+    # TODO: incomplete, check int
+
+    if np.logical_and(x == 0, mean < 1 / alpha_0).any():
+        raise ValueError("Each entry in 'x' must be greater than zero if its mean is less than 1 / alpha_0.")
+
+    return x
+
+
+class EmpiricalRE(DiscreteRV):
     """
-    Base class for supervised learning data models.
+    Empirical random process, finite-domain realizations.
     """
 
-    def __init__(self, seed=None):
+    def __init__(self, n, mean, seed=None):
         super().__init__(seed)
+        self._update_attr(n, mean)
 
-        self._data_shape_x = None
-        self._data_shape_y = None
+    # Input properties
+    @property
+    def n(self):
+        return self._n
 
-        self._mode_x = None
-        self._mode_y_x = None
+    @n.setter
+    def n(self, n):
+        self._update_attr(n=n)
 
     @property
-    def data_shape_x(self):
-        return self._data_shape_x
+    def mean(self):
+        return self._mean
 
-    @property
-    def data_shape_y(self):
-        return self._data_shape_y
+    @mean.setter
+    def mean(self, mean):
+        self._update_attr(mean=mean)
 
-    @property
-    def mode_x(self):
-        return self._mode_x
-
-    @property
-    def mode_y_x(self):
-        return self._mode_y_x
-
-    rvs = GenericRV.rvs
-
-    def _rvs(self, size=(), random_state=None):
-        return None
-
-
-class GenericModelRVx(GenericModel):
-    """
-    Base
-    """
-
-    def __init__(self, seed=None):
-        super().__init__(seed)
-        self._mean_x = None
-        self._cov_x = None
-
-    @property
-    def mean_x(self):
-        return self._mean_x
-
-    @property
-    def cov_x(self):
-        return self._cov_x
-
-
-class GenericModelRVy(GenericModel):
-    """
-    Base
-    """
-
-    def __init__(self, seed=None):
-        super().__init__(seed)
-        self._mean_y_x = None
-        self._cov_y_x = None
-
-    @property
-    def mean_y_x(self):
-        return self._mean_y_x
-
-    @property
-    def cov_y_x(self):
-        return self._cov_y_x
-
-
-class YcXModel(GenericModel):
-
-    def __new__(cls, model_x, model_y_x, seed=None):
-        is_numeric_y_x = isinstance(model_y_x(model_x.rvs()), GenericRV)
-        if isinstance(model_x, GenericRV):
-            if is_numeric_y_x:
-                return super().__new__(YcXModelRVyx)
-            else:
-                return super().__new__(YcXModelRVx)
-        else:
-            if is_numeric_y_x:
-                return super().__new__(YcXModelRVy)
-            else:
-                return super().__new__(cls)
-
-    def __init__(self, model_x, model_y_x, seed=None):
-        super().__init__(seed)
-        self._update_attr(model_x, model_y_x)
-
-    @property
-    def model_x(self):
-        return self._model_x
-
-    @model_x.setter
-    def model_x(self, model_x):
-        self._update_attr(model_x=model_x)
-
-    @property
-    def model_y_x(self):
-        return self._model_y_x
-
-    @model_y_x.setter
-    def model_y_x(self, model_y_x):
-        self._update_attr(model_y_x=model_y_x)
-
+    # Attribute Updates
     def _update_attr(self, *args, **kwargs):
-        if 'model_x' in kwargs.keys():
-            self._model_x = kwargs['model_x']
-            self._update_x()
+
+        if 'n' in kwargs.keys():
+            self._n = _empirical_check_n(kwargs['n'])
         elif len(args) > 0:
-            self._model_x = args[0]
-            self._update_x()
+            self._n = _empirical_check_n(args[0])
 
-        if 'model_y_x' in kwargs.keys():
-            self._model_y_x = kwargs['model_y_x']
-            self._update_y_x()
+        if 'mean' in kwargs.keys():
+            self._mean = _check_valid_pmf(kwargs['mean'])
         elif len(args) > 1:
-            self._model_y_x = args[1]
-            self._update_y_x()
+            self._mean = _check_valid_pmf(args[1])
 
-    def _update_x(self):
-        self._data_shape_x = self._model_x.data_shape
-        self._mode_x = self._model_x.mode
+        self._data_shape = self._mean.shape
+        self._data_size = self._mean.size
 
-    def _update_y_x(self):
-        self._data_shape_y = self._model_y_x(self._model_x.rvs()).data_shape
-        self._mode_y_x = _vectorize_func(lambda x: self._model_y_x(x).mode, self._data_shape_x)
+        if np.min(self.mean) > 1 / self.alpha_0:
+            self._mode = (self.mean - 1 / self.alpha_0) / (1 - self._data_size / self.alpha_0)
+        else:
+            # warnings.warn("Mode method currently supported for mean > 1/alpha_0 only")
+            self._mode = None       # TODO: complete with general formula
+
+        self._cov = (diag_gen(self.mean) - outer_gen(self.mean, self.mean)) / self.n
+
+        self._beta_inv = gammaln(np.sum(self.alpha_0 * self.mean)) - np.sum(gammaln(self.alpha_0 * self.mean))
 
     def _rvs(self, size=(), random_state=None):
-        X = np.asarray(self.model_x.rvs(size, random_state))
-        if len(size) == 0:
-            Y = self.model_y_x(X).rvs(size, random_state)
-            D = np.array((Y, X), dtype=[('y', Y.dtype, self.data_shape_y), ('x', X.dtype, self.data_shape_x)])
-        else:
-            Y = np.asarray([self.model_y_x(x).rvs((), random_state)
-                            for x in X.reshape((-1,) + self._data_shape_x)]).reshape(size + self.data_shape_y)
-            D = np.array(list(zip(Y.reshape((-1,) + self.data_shape_y), X.reshape((-1,) + self.data_shape_x))),
-                         dtype=[('y', Y.dtype, self.data_shape_y), ('x', X.dtype, self.data_shape_x)]).reshape(size)
+        return random_state.dirichlet(self.alpha_0 * self.mean.flatten(), size).reshape(size + self._data_shape)
 
-        return D
+    def _pdf(self, x):
+        x = _dirichlet_check_input(x, self.alpha_0, self.mean)
 
-
-class YcXModelRVx(YcXModel, GenericModelRVx):
-    def _update_x(self):
-        super()._update_x()
-        self._mean_x = self._model_x.mean
-        self._cov_x = self._model_x.cov
-
-
-class YcXModelRVy(YcXModel, GenericModelRVy):
-    def _update_y_x(self):
-        super()._update_y_x()
-        self._mean_y_x = _vectorize_func(lambda x: self._model_y_x(x).mean, self._data_shape_x)
-        self._cov_y_x = _vectorize_func(lambda x: self._model_y_x(x).cov, self._data_shape_x)
-
-
-class YcXModelRVyx(YcXModelRVx, YcXModelRVy):
-    pass
-
-
-
-
-
-# theta_m = DirichletRV(8, [[.2, .1], [.3,.4]])
-# def theta_c(x): return FiniteRE([[0, 1], [2, 3]], x)
-
-# theta_m = DirichletRV(8, [[.2, .1, .1], [.3, .1, .2]])
-# def theta_c(x): return FiniteRE(np.stack(np.meshgrid([0,1,2],[0,1]), axis=-1), x)
-
-# theta_m = DirichletRV(6, [.5, .5])
-# def theta_c(x): return FiniteRE(['a', 'b'], x)
-# # def theta_c(x): return FiniteRE([0, 1], x)
-
-
-# t = YcXModel(theta_m, theta_c)
-# t.rvs()
-# t.rvs(4)
-# t.mode_y_x(t.model_x.rvs(4))
-# t.mean_y_x(t.model_x.rvs(4))
-# t.cov_y_x(t.model_x.rvs(4))
-
-
-
-
-
-
-
-
-
-
-
+        log_pdf = self._beta_inv + np.sum(xlogy(self.alpha_0 * self.mean - 1, x).reshape(-1, self._data_size), -1)
+        return np.exp(log_pdf)
 

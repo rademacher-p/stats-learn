@@ -1,10 +1,18 @@
+"""
+Bayesian Prior objects.
+"""
+
 import types
+# import itertools, functools
 from RE_obj import FiniteRE, DirichletRV
 
 
 #%% Priors
 
-def bayes_re(model_cls, prior, rand_kwargs, model_kwargs={}):
+def bayes_re(model_cls, prior, rand_kwargs, model_kwargs=None):
+    if model_kwargs is None:
+        model_kwargs = {}
+
     prior.rand_kwargs = types.MethodType(rand_kwargs, prior)
 
     obj = model_cls(**model_kwargs, **prior.rand_kwargs())
