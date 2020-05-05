@@ -4,18 +4,21 @@ Sim main.
 :-)
 """
 
-import itertools, functools, types
+import itertools
 
 import numpy as np
 from numpy import random
-from scipy import stats
-from scipy.stats._multivariate import multi_rv_generic
-# from scipy._lib._util import check_random_state
 import matplotlib.pyplot as plt
+
+# from scipy import stats
+# from scipy.stats._multivariate import multi_rv_generic
+# from scipy._lib._util import check_random_state
 # from mpl_toolkits.mplot3d import Axes3D
 
-from RE_obj import DeterministicRE, FiniteRE, DirichletRV, YcXModel
+from RE_obj import DeterministicRE, FiniteRE, DirichletRV
+from SL_obj import YcXModel
 from bayes import bayes_re
+from loss_functions import loss_01, loss_se
 
 # plt.style.use('seaborn')  # cm?
 
@@ -84,33 +87,29 @@ Y_set = np.array(['a', 'b'])
 # X_set = np.arange(1)
 # X_set = np.arange(6).reshape(3, 2)
 X_set = np.stack(np.meshgrid(np.arange(2), np.arange(3)), axis=-1)
-# X_set = rng.random((2,3,2))
 
 i_split_y, i_split_x = Y_set.ndim, X_set.ndim-1
 
 Y_set_shape, Y_data_shape = Y_set.shape[:i_split_y], Y_set.shape[i_split_y:]
 X_set_shape, X_data_shape = X_set.shape[:i_split_x], X_set.shape[i_split_x:]
 
-_temp = list(itertools.product(Y_set.reshape((-1,) + Y_data_shape), X_set.reshape((-1,) + X_data_shape)))
-YX_set = np.array(_temp, dtype=[('y', Y_set.dtype, Y_data_shape),
-                                ('x', X_set.dtype, X_data_shape)]).reshape(Y_set_shape + X_set_shape)
+YX_set = np.array(list(itertools.product(Y_set.reshape((-1,) + Y_data_shape), X_set.reshape((-1,) + X_data_shape))),
+                  dtype=[('y', Y_set.dtype, Y_data_shape),
+                         ('x', X_set.dtype, X_data_shape)]).reshape(Y_set_shape + X_set_shape)
 
-X_set_s = np.array([(x,) for x in X_set.reshape((-1,) + X_data_shape)],
-                   dtype=[('x', X_set.dtype, X_data_shape)]).reshape(X_set_shape)
+# alpha_0 = 10*YX_set.size
+# mean = DirichletRV(YX_set.size, np.ones(YX_set.shape) / YX_set.size).rvs()
+# prior = DirichletRV(alpha_0, mean, rng)
+#
+# theta_pmf = prior.rvs()
+# theta = FiniteRE(YX_set, theta_pmf, rng)
+#
+# X_set_s = np.array([(x,) for x in X_set.reshape((-1,) + X_data_shape)],
+#                    dtype=[('x', X_set.dtype, X_data_shape)]).reshape(X_set_shape)
+#
+# theta_m_pmf = theta_pmf.reshape((-1,) + X_set_shape).sum(axis=0)
+# theta_m = FiniteRE(X_set_s['x'], theta_m_pmf)
 
-
-alpha_0 = 10*YX_set.size
-mean = DirichletRV(YX_set.size, np.ones(YX_set.shape) / YX_set.size).rvs()
-prior = DirichletRV(alpha_0, mean, rng)
-
-theta = FiniteRE(YX_set, prior.rvs(), rng)
-
-theta_m_pmf = theta.p.reshape((-1,) + X_set_shape).sum(axis=0)
-theta_m = FiniteRE(X_set, theta_m_pmf)
-
-
-
-#%% Sim
 
 model_cls = YcXModel
 # model_kwargs = {'model_x': None, 'model_y_x': None}
@@ -118,6 +117,7 @@ model_cls = YcXModel
 alpha_0 = 10
 mean = np.ones(YX_set.shape) / YX_set.size
 prior = DirichletRV(alpha_0, mean)
+
 
 def rand_kwargs(self):
     pmf = self.rvs()
@@ -132,9 +132,31 @@ def rand_kwargs(self):
 
     return {'model_x': model_x, 'model_y_x': model_y_x}
 
-c = bayes_re(model_cls, prior, rand_kwargs)
-c.random_model()
+
+theta = bayes_re(model_cls, prior, rand_kwargs)
+theta.random_model()
 
 
+#%% Sim
+
+N_mc = 100
+N = 10
+
+loss_fcn = loss_01
+
+loss_mc = np.empty(N_mc)
+for i_mc in range(N_mc):
+    theta.random_model()    # randomize model according to prior
+
+    # Generate data
+    D = theta.rvs(N)
+    d = theta.rvs()         # TODO: multiple novel observations?
+    y, x = d['y'], d['x']
+
+    # Train
+
+
+    # Evaluate
+    loss_mc[i_mc] = loss_fcn(decision_fcn(x), y)
 
 

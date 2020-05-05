@@ -28,6 +28,10 @@ def diag_gen(x):
     return out
 
 
+# def empirical_dist(D, set):       # TODO: add empirical dist generator!?
+
+
+
 #%% Plotting
 
 def simplex_grid(n=1, shape=(1,), hull_mask=None):
