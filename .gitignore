@@ -8,6 +8,12 @@ Code/Matlab/Old/
 
 ##### ABOVE: PGR additions
 
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
+
 ##### github/gitignore Tex 
 
 
