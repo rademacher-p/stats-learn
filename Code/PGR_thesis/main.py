@@ -19,6 +19,7 @@ from RE_obj import DeterministicRE, FiniteRE, DirichletRV
 from SL_obj import YcXModel
 from bayes import bayes_re
 from loss_functions import loss_01, loss_se
+from util.util import empirical_pmf
 
 # plt.style.use('seaborn')  # cm?
 
@@ -111,7 +112,11 @@ YX_set = np.array(list(itertools.product(Y_set.reshape((-1,) + Y_data_shape), X_
 # theta_m = FiniteRE(X_set_s['x'], theta_m_pmf)
 
 
-model_cls = YcXModel
+
+
+
+
+model_cls = YcXModel        # TODO: any constructor? use factory method on YcX?
 # model_kwargs = {'model_x': None, 'model_y_x': None}
 
 alpha_0 = 10
@@ -139,24 +144,25 @@ theta.random_model()
 
 #%% Sim
 
+# TODO: vectorize learners and losses!
+
 N_mc = 100
-N = 10
+N_train, N_test = 10, 10
 
 loss_fcn = loss_01
 
 loss_mc = np.empty(N_mc)
 for i_mc in range(N_mc):
-    theta.random_model()    # randomize model according to prior
+    theta.random_model()    # randomize model using prior
 
     # Generate data
-    D = theta.rvs(N)
-    d = theta.rvs()         # TODO: multiple novel observations?
-    y, x = d['y'], d['x']
+    D_train, D_test = theta.rvs(N_train), theta.rvs(N_test)
+
 
     # Train
 
 
     # Evaluate
-    loss_mc[i_mc] = loss_fcn(decision_fcn(x), y)
+    # loss_mc[i_mc] = loss_fcn(decision_fcn(x), y)
 
 
