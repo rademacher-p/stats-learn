@@ -1,18 +1,71 @@
 import numpy as np
 # from scipy.special import binom
 
-#%% Mathematics
 
-def _outer_gen_2(x, y):
-    x, y = np.asarray(x), np.asarray(y)
-    x = x.reshape(x.shape + tuple(np.ones(y.ndim, dtype=int)))  # add singleton dimensions for broadcasting
-    return x*y
+#%%
 
+def check_data_shape(x, shape):
+    x = np.asarray(x)
+
+    if x.shape == shape:
+        set_shape = ()
+    elif shape == ():
+        set_shape = x.shape
+    elif x.shape[-len(shape):] == shape:
+        set_shape = x.shape[:-len(shape)]
+    else:
+        raise TypeError("Trailing dimensions of 'shape' must be equal to the shape of 'x'.")
+
+    return x, set_shape
+
+
+def vectorize_x_func(func, data_shape):
+    def func_vec(x):
+        x, set_shape = check_data_shape(x, data_shape)
+
+        _out = []
+        for x_i in x.reshape((-1,) + data_shape):
+            _out.append(func(x_i))
+        _out = np.asarray(_out)
+
+        return _out.reshape(set_shape + _out.shape[1:])
+
+    return func_vec
+
+
+def empirical_pmf(d, supp, data_shape):
+    """Generates the empirical PMF for a data set."""
+
+    d, _set_shape = check_data_shape(d, data_shape)
+    n = int(np.prod(_set_shape))
+    d_flat = d.reshape(n, -1)
+
+    supp, supp_shape = check_data_shape(supp, data_shape)
+    n_supp = int(np.prod(supp_shape))
+    supp_flat = supp.reshape(n_supp, -1)
+
+    dist = np.zeros(n_supp)
+    for d_i in d_flat:
+        eq_supp = np.all(d_i.flatten() == supp_flat, axis=-1)
+        if eq_supp.sum() != 1:
+            raise ValueError("Data must be in the support.")
+
+        dist[eq_supp] += 1
+
+    return dist.reshape(supp_shape) / n
+
+
+#%% Math operators
 
 def outer_gen(*args):
     n_args = len(args)
     if n_args < 2:
         raise TypeError('At least two positional inputs are required.')
+
+    def _outer_gen_2(x, y):
+        x, y = np.asarray(x), np.asarray(y)
+        x = x.reshape(x.shape + tuple(np.ones(y.ndim, dtype=int)))  # add singleton dimensions for broadcasting
+        return x * y
 
     out = args[0]
     for arg in args[1:]:
@@ -28,8 +81,23 @@ def diag_gen(x):
     return out
 
 
-# def empirical_dist(D, set):       # TODO: add empirical dist generator!?
+def simplex_round(x):
+    x = np.asarray(x)
+    if x.min() < 0:
+        raise ValueError("Input values must be non-negative.")
+    elif x.sum() != 1:
+        raise ValueError("Input values must sum to one.")
 
+    out = np.zeros(x.size)
+    up = 1
+    for i, x_i in enumerate(x.flatten()):
+        if x_i < up / 2:
+            up -= x_i
+        else:
+            out[i] = 1
+            break
+
+    return out.reshape(x.shape)
 
 
 #%% Plotting
