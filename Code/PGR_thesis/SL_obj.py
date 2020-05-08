@@ -8,7 +8,7 @@ Supervised Learning base classes.
 import numpy as np
 from scipy.stats._multivariate import multi_rv_generic
 
-from RE_obj import BaseRV
+from RE_obj import BaseRV, FiniteRE
 from util.util import vectorize_x_func
 
 
@@ -17,8 +17,8 @@ class BaseModel(multi_rv_generic):
     Base class for supervised learning data models.
     """
 
-    def __init__(self, seed=None):
-        super().__init__(seed)
+    def __init__(self, rng=None):
+        super().__init__(rng)
 
         self._data_shape_x = None
         self._data_shape_y = None
@@ -54,8 +54,8 @@ class BaseModelRVx(BaseModel):
     Base
     """
 
-    def __init__(self, seed=None):
-        super().__init__(seed)
+    def __init__(self, rng=None):
+        super().__init__(rng)
         self._mean_x = None
         self._cov_x = None
 
@@ -73,8 +73,8 @@ class BaseModelRVy(BaseModel):
     Base
     """
 
-    def __init__(self, seed=None):
-        super().__init__(seed)
+    def __init__(self, rng=None):
+        super().__init__(rng)
         self._mean_y_x = None
         self._cov_y_x = None
 
@@ -89,7 +89,7 @@ class BaseModelRVy(BaseModel):
 
 class YcXModel(BaseModel):
 
-    def __new__(cls, model_x, model_y_x, seed=None):
+    def __new__(cls, model_x, model_y_x, rng=None):
         is_numeric_y_x = isinstance(model_y_x(model_x.rvs()), BaseRV)
         if isinstance(model_x, BaseRV):
             if is_numeric_y_x:
@@ -102,8 +102,8 @@ class YcXModel(BaseModel):
             else:
                 return super().__new__(cls)
 
-    def __init__(self, model_x, model_y_x, seed=None):
-        super().__init__(seed)
+    def __init__(self, model_x, model_y_x, rng=None):
+        super().__init__(rng)
         self._model_x = model_x
         self._update_x()
         self._model_y_x = model_y_x
@@ -149,8 +149,15 @@ class YcXModel(BaseModel):
         return d
 
     @classmethod
-    def finite_model(cls):
-        return None     # TODO: COMPLETE!
+    def finite_model(cls, supp_x, p_x, supp_y, p_y_x, rng):
+        model_x = FiniteRE(supp_x, p_x)
+
+        def model_y_x(x):
+            return FiniteRE(supp_y, p_y_x(x))
+
+        return cls(model_x, model_y_x, rng)
+
+    # TODO: add more factory constructors?
 
 
 class YcXModelRVx(YcXModel, BaseModelRVx):
