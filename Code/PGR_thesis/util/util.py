@@ -4,15 +4,15 @@ import numpy as np
 
 #%%
 
-def check_data_shape(x, shape):
+def check_data_shape(x, data_shape):
     x = np.asarray(x)
 
-    if x.shape == shape:
+    if x.shape == data_shape:
         set_shape = ()
-    elif shape == ():
+    elif data_shape == ():
         set_shape = x.shape
-    elif x.shape[-len(shape):] == shape:
-        set_shape = x.shape[:-len(shape)]
+    elif x.shape[-len(data_shape):] == data_shape:
+        set_shape = x.shape[:-len(data_shape)]
     else:
         raise TypeError("Trailing dimensions of 'shape' must be equal to the shape of 'x'.")
 

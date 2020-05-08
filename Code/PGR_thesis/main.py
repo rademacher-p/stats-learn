@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 from RE_obj import DeterministicRE, FiniteRE, DirichletRV
 from SL_obj import YcXModel
-from bayes import bayes_re
+from bayes import BayesRE, FiniteDirichletBayes
 from loss_functions import loss_01, loss_se
 from util.util import empirical_pmf
 
@@ -84,62 +84,52 @@ rng = random.default_rng()
 
 #%% Discrete sets
 
-Y_set = np.array(['a', 'b'])
-# X_set = np.arange(1)
-# X_set = np.arange(6).reshape(3, 2)
-X_set = np.stack(np.meshgrid(np.arange(2), np.arange(3)), axis=-1)
+supp_y = np.array(['a', 'b'])
+# supp_x = np.arange(1)
+# supp_x = np.arange(6).reshape(3, 2)
+supp_x = np.stack(np.meshgrid(np.arange(2), np.arange(3)), axis=-1)
 
-i_split_y, i_split_x = Y_set.ndim, X_set.ndim-1
+i_split_y, i_split_x = supp_y.ndim, supp_x.ndim - 1
 
-Y_set_shape, Y_data_shape = Y_set.shape[:i_split_y], Y_set.shape[i_split_y:]
-X_set_shape, X_data_shape = X_set.shape[:i_split_x], X_set.shape[i_split_x:]
+supp_shape_y, data_shape_y = supp_y.shape[:i_split_y], supp_y.shape[i_split_y:]
+supp_shape_x, data_shape_x = supp_x.shape[:i_split_x], supp_x.shape[i_split_x:]
 
-YX_set = np.array(list(itertools.product(Y_set.reshape((-1,) + Y_data_shape), X_set.reshape((-1,) + X_data_shape))),
-                  dtype=[('y', Y_set.dtype, Y_data_shape),
-                         ('x', X_set.dtype, X_data_shape)]).reshape(Y_set_shape + X_set_shape)
+supp_yx = np.array(list(itertools.product(supp_y.reshape((-1,) + data_shape_y), supp_x.reshape((-1,) + data_shape_x))),
+                   dtype=[('y', supp_y.dtype, data_shape_y),
+                         ('x', supp_x.dtype, data_shape_x)]).reshape(supp_shape_y + supp_shape_x)
 
-# alpha_0 = 10*YX_set.size
-# mean = DirichletRV(YX_set.size, np.ones(YX_set.shape) / YX_set.size).rvs()
+supp_xy = np.array(list(itertools.product(supp_x.reshape((-1,) + data_shape_x), supp_y.reshape((-1,) + data_shape_y))),
+                   dtype=[('x', supp_x.dtype, data_shape_x),
+                         ('y', supp_y.dtype, data_shape_y)]).reshape(supp_shape_x + supp_shape_y)
+
+supp_x_s = np.array(list(itertools.product(supp_x.reshape((-1,) + data_shape_x))),
+                    dtype=[('x', supp_x.dtype, data_shape_x)]).reshape(supp_shape_x)
+
+supp_y_s = np.array(list(itertools.product(supp_y.reshape((-1,) + data_shape_y))),
+                    dtype=[('y', supp_y.dtype, data_shape_y)]).reshape(supp_shape_y)
+
+
+# alpha_0 = 10 * supp_yx.size
+# mean = DirichletRV(supp_yx.size, np.ones(supp_yx.shape) / supp_yx.size).rvs()
 # prior = DirichletRV(alpha_0, mean, rng)
 #
 # theta_pmf = prior.rvs()
-# theta = FiniteRE(YX_set, theta_pmf, rng)
+# theta = FiniteRE(supp_yx, theta_pmf, rng)
 #
-# X_set_s = np.array([(x,) for x in X_set.reshape((-1,) + X_data_shape)],
-#                    dtype=[('x', X_set.dtype, X_data_shape)]).reshape(X_set_shape)
-#
-# theta_m_pmf = theta_pmf.reshape((-1,) + X_set_shape).sum(axis=0)
-# theta_m = FiniteRE(X_set_s['x'], theta_m_pmf)
+# theta_m_pmf = theta_pmf.reshape((-1,) + supp_shape_x).sum(axis=0)
+# theta_m = FiniteRE(supp_x_s['x'], theta_m_pmf)
+# theta_m_s = FiniteRE(supp_x_s, theta_m_pmf)
 
 
-
-
-
-
-model_cls = YcXModel        # TODO: any constructor? use factory method on YcX?
-# model_kwargs = {'model_x': None, 'model_y_x': None}
 
 alpha_0 = 10
-mean = np.ones(YX_set.shape) / YX_set.size
-prior = DirichletRV(alpha_0, mean)
+mean = np.ones(supp_x_s.shape + supp_y_s.shape) / (supp_x_s.size * supp_y_s.size)
+# prior = BayesRE.finite_dirichlet(supp_x_s, supp_y_s, alpha_0, mean, rng)
+prior = FiniteDirichletBayes(supp_x_s, supp_y_s, alpha_0, mean, rng)
 
+# theta = finite_bayes(supp_x_s, supp_y_s, alpha_0, mean, rng)
+# theta = finite_bayes2(supp_x_s, supp_y_s, alpha_0, mean, rng)
 
-def rand_kwargs(self):
-    pmf = self.rvs()
-
-    pmf_x = pmf.reshape((-1,) + X_set_shape).sum(axis=0)
-    model_x = FiniteRE(X_set, pmf_x)
-
-    def model_y_x(x):
-        _temp = pmf.reshape(Y_set_shape + (-1,))[..., np.all(x.flatten() == model_x._supp_flat, axis=-1)]
-        pmf_y_x = _temp.reshape(Y_set_shape) / _temp.sum()
-        return FiniteRE(Y_set, pmf_y_x)
-
-    return {'model_x': model_x, 'model_y_x': model_y_x}
-
-
-theta = bayes_re(model_cls, prior, rand_kwargs)
-theta.random_model()
 
 
 #%% Sim
@@ -153,7 +143,7 @@ loss_fcn = loss_01
 
 loss_mc = np.empty(N_mc)
 for i_mc in range(N_mc):
-    theta.random_model()    # randomize model using prior
+    theta = prior.random_model()    # randomize model using prior
 
     # Generate data
     D_train, D_test = theta.rvs(N_train), theta.rvs(N_test)

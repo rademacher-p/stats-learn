@@ -11,12 +11,12 @@ import matplotlib.pyplot as plt
 from util.util import check_data_shape, outer_gen, diag_gen, simplex_grid, simplex_round
 
 
-def check_valid_pmf(p, shape=None, full_support=False):
-    if shape is None:
+def check_valid_pmf(p, data_shape=None, full_support=False):
+    if data_shape is None:
         p = np.asarray(p)
         set_shape = ()
     else:
-        p, set_shape = check_data_shape(p, shape)
+        p, set_shape = check_data_shape(p, data_shape)
 
     if full_support:
         if np.min(p) <= 0:
@@ -38,8 +38,8 @@ class BaseRE(multi_rv_generic):
     Base class for generic random element objects.
     """
 
-    def __init__(self, seed=None):
-        super().__init__(seed)
+    def __init__(self, rng=None):
+        super().__init__(rng)      # may be None or int for legacy numpy rng
 
         self._data_shape = None
         self._mode = None
@@ -71,8 +71,8 @@ class BaseRV(BaseRE):
     Base class for generic random variable (numeric) objects.
     """
 
-    def __init__(self, seed=None):
-        super().__init__(seed)
+    def __init__(self, rng=None):
+        super().__init__(rng)
         self._mean = None
         self._cov = None
 
@@ -140,15 +140,15 @@ class DeterministicRE(DiscreteRE):
 
     # TODO: redundant, just use FiniteRE? or change to ContinuousRV for integration?
 
-    def __new__(cls, val, seed=None):
+    def __new__(cls, val, rng=None):
         val = np.asarray(val)
         if np.issubdtype(val.dtype, np.number):
             return super().__new__(DeterministicRV)
         else:
             return super().__new__(cls)
 
-    def __init__(self, val, seed=None):
-        super().__init__(seed)
+    def __init__(self, val, rng=None):
+        super().__init__(rng)
         self.val = val
 
     # Input properties
@@ -204,15 +204,15 @@ class FiniteRE(DiscreteRE):
     Generic RE drawn from a finite support set using an explicitly defined PMF.
     """
 
-    def __new__(cls, supp, p, seed=None):
+    def __new__(cls, supp, p, rng=None):
         supp = np.asarray(supp)
         if np.issubdtype(supp.dtype, np.number):
             return super().__new__(FiniteRV)
         else:
             return super().__new__(cls)
 
-    def __init__(self, supp, p, seed=None):
-        super().__init__(seed)
+    def __init__(self, supp, p, rng=None):
+        super().__init__(rng)
         self._supp = np.asarray(supp)
         self._p = check_valid_pmf(p)
         self._update_attr()
@@ -342,7 +342,7 @@ def _dirichlet_check_alpha_0(alpha_0):      # TODO: delete? implicit type checki
 
 
 def _dirichlet_check_input(x, alpha_0, mean):
-    x = check_valid_pmf(x, shape=mean.shape)
+    x = check_valid_pmf(x, data_shape=mean.shape)
 
     if np.logical_and(x == 0, mean < 1 / alpha_0).any():
         raise ValueError("Each entry in 'x' must be greater than zero if its mean is less than 1 / alpha_0.")
@@ -355,8 +355,8 @@ class DirichletRV(ContinuousRV):
     Dirichlet random process, finite-domain realizations.
     """
 
-    def __init__(self, alpha_0, mean, seed=None):
-        super().__init__(seed)
+    def __init__(self, alpha_0, mean, rng=None):
+        super().__init__(rng)
         self._alpha_0 = _dirichlet_check_alpha_0(alpha_0)
         self._mean = check_valid_pmf(mean, full_support=True)
         self._update_attr()
@@ -460,7 +460,7 @@ def _empirical_check_n(n):      # TODO: delete? implicit type checking in subseq
 
 
 def _empirical_check_input(x, n, mean):
-    x = check_valid_pmf(x, shape=mean.shape)
+    x = check_valid_pmf(x, data_shape=mean.shape)
 
     # if ((n * x) % 1 > 0).any():
     if (np.minimum((n * x) % 1, (-n * x) % 1) > 1e-9).any():
@@ -474,8 +474,8 @@ class EmpiricalRV(DiscreteRV):
     Empirical random process, finite-domain realizations.
     """
 
-    def __init__(self, n, mean, seed=None):
-        super().__init__(seed)
+    def __init__(self, n, mean, rng=None):
+        super().__init__(rng)
         self._n = _empirical_check_n(n)
         self._mean = check_valid_pmf(mean)
         self._update_attr()
@@ -572,8 +572,8 @@ class DirichletEmpiricalRV(DiscreteRV):
     Dirichlet-Empirical random process, finite-domain realizations.
     """
 
-    def __init__(self, n, alpha_0, mean, seed=None):
-        super().__init__(seed)
+    def __init__(self, n, alpha_0, mean, rng=None):
+        super().__init__(rng)
         self._n = _empirical_check_n(n)
         self._alpha_0 = _dirichlet_check_alpha_0(alpha_0)
         self._mean = check_valid_pmf(mean)
