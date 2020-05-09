@@ -171,9 +171,6 @@ class DeterministicRE(DiscreteRE):
     def _pmf(self, x):
         return np.where(np.all(x.reshape(-1, self._data_size) == self._val.flatten(), axis=-1), 1., 0.)
 
-    # def _pmf_single(self, x):
-    #     return 1. if (x == self.val).all() else 0.
-
 
 class DeterministicRV(DeterministicRE, DiscreteRV):
     """
@@ -260,7 +257,7 @@ class FiniteRE(DiscreteRE):
         if eq_supp.sum() != 1:
             raise ValueError("Input 'x' must be in the support.")
 
-        return self._p_flat[eq_supp]
+        return self._p_flat[eq_supp].squeeze()
 
     def plot_pmf(self, ax=None):
         if self._p.ndim == 1:
@@ -318,26 +315,26 @@ class FiniteRV(FiniteRE, DiscreteRV):
             raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
 
 
-# s = np.random.random((4, 3, 2, 2))
-# pp = np.random.random((4, 3))
-# pp = pp / pp.sum()
-# f = FiniteRE(s, pp)
-# f.pmf(f.rvs(4))
-#
-# s = np.stack(np.meshgrid([0,1],[0,1], [0,1]), axis=-1)
-# s, p = ['a','b','c'], [.3,.2,.5]
-# # p = np.random.random((2,2,2))
-# # p = p / p.sum()
-# f2 = FiniteRE(s, p)
-# f2.pmf(f2.rvs(4))
-# f2.plot_pmf()
+s = np.random.random((4, 3, 2, 2))
+pp = np.random.random((4, 3))
+pp = pp / pp.sum()
+f = FiniteRE(s, pp)
+f.pmf(f.rvs((4,5)))
+
+s = np.stack(np.meshgrid([0,1],[0,1], [0,1]), axis=-1)
+s, p = ['a','b','c'], [.3,.2,.5]
+# p = np.random.random((2,2,2))
+# p = p / p.sum()
+f2 = FiniteRE(s, p)
+f2.pmf(f2.rvs(4))
+f2.plot_pmf()
 
 
 
-def _dirichlet_check_alpha_0(alpha_0):      # TODO: delete? implicit type checking in subsequent code
-    # alpha_0 = np.asarray(alpha_0)
-    # if alpha_0.size > 1 or alpha_0 <= 0:
-    #     raise ValueError("Concentration parameter must be a positive scalar.")
+def _dirichlet_check_alpha_0(alpha_0):
+    alpha_0 = np.asarray(alpha_0)
+    if alpha_0.size > 1 or alpha_0 <= 0:
+        raise ValueError("Concentration parameter must be a positive scalar.")
     return alpha_0
 
 
@@ -455,7 +452,9 @@ class DirichletRV(ContinuousRV):
 
 
 
-def _empirical_check_n(n):      # TODO: delete? implicit type checking in subsequent code
+def _empirical_check_n(n):
+    if not isinstance(n, int) or n < 1:
+        raise ValueError("Input 'n' must be a positive integer.")
     return n
 
 

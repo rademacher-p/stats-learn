@@ -25,13 +25,14 @@ class BaseBayes:
         self.model_gen = model_gen
 
     def random_model(self):
-        return self.model_gen()
+        raise NotImplementedError("Method must be overwritten.")
+        pass
 
 
 class FiniteREBayes(BaseBayes):
     def __init__(self, supp_x, supp_y, prior, rng):
         self.supp_x = supp_x
-        self.supp_y = supp_y        # TODO: Assumed to be my SL structured array!
+        self.supp_y = supp_y        # Assumed to be my SL structured array!
 
         self._supp_shape_x = supp_x.shape
         self._supp_shape_y = supp_y.shape
@@ -42,6 +43,10 @@ class FiniteREBayes(BaseBayes):
         # model_kwargs = {'supp_x': supp_x['x'], 'supp_y': supp_y['y'], 'rng': rng}
         model_gen = functools.partial(YcXModel.finite_model, supp_x=supp_x['x'], supp_y=supp_y['y'], rng=rng)
         super().__init__(model_gen, prior)
+
+    def random_model(self):
+        raise NotImplementedError("Method must be overwritten.")
+        pass
 
 
 class FiniteDirichletBayes(FiniteREBayes):

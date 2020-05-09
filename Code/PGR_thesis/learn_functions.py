@@ -42,9 +42,9 @@ class BaseLearner:
 class DirichletClassifier(BaseLearner):
     def __init__(self, supp_x, supp_y, alpha_0, mean):
         super().__init__()
-        self.loss_fcn = loss_se
+        self.loss_fcn = loss_01
 
-        self.supp_x = supp_x        # TODO: Assumed to be my SL structured arrays!
+        self.supp_x = supp_x        # Assumed to be my SL structured arrays!
         self.supp_y = supp_y
 
         self._supp_shape_x = supp_x.shape
@@ -67,7 +67,8 @@ class DirichletClassifier(BaseLearner):
         self._mean_y_x = _mean_y_x
 
         self._posterior = None
-        self._model_gen = functools.partial(YcXModel.finite_model, supp_x=supp_x['x'], supp_y=supp_y['y'])
+        self._model_gen = functools.partial(YcXModel.finite_model, supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
+        self.fit()
 
     @property
     def mean_x(self):
@@ -77,16 +78,31 @@ class DirichletClassifier(BaseLearner):
     def posterior(self):
         return self._posterior
 
-    def fit(self, d):
-        emp_dist_x = empirical_pmf(d['x'], self.supp_x, self._data_shape_x)
+    def fit(self, d=np.array([])):
+        n = len(d)
 
-        def emp_dist_y_x(x):
-            d_match = d[np.all(x.flatten() == d['x'].reshape(len(d), -1), axis=-1)].squeeze()
-            return empirical_pmf(d_match, self.supp_y, self._data_shape_y)
+        if n == 0:
+            p_x, p_y_x = self._mean_x, self._mean_y_x
+            self._posterior = self._model_gen(p_x=p_x, p_y_x=p_y_x)
+        else:
 
-        # TODO: INCOMPLETE!!!!
+            emp_dist_x = empirical_pmf(d['x'], self.supp_x['x'], self._data_shape_x)
 
-        p_x = None
-        p_y_x = None
-        self._posterior = self._model_gen(p_x=p_x, p_y_x=p_y_x)
+            def emp_dist_y_x(x):
+                d_match = d[np.all(x.flatten() == d['x'].reshape(n, -1), axis=-1)].squeeze()
+                if d_match.size == 0:
+                    return np.empty(self._supp_shape_y)
+                return empirical_pmf(d_match['y'], self.supp_y['y'], self._data_shape_y)
 
+            c_prior_x = 1 / (1 + n / self.alpha_0)
+            p_x = c_prior_x * self._mean_x + (1 - c_prior_x) * emp_dist_x
+
+            def p_y_x(x):
+                i = (self.supp_x['x'].reshape(self._supp_shape_x + (-1,)) == x.flatten()).all(-1)
+                c_prior_y = 1 / (1 + (n * emp_dist_x[i]) / (self.alpha_0 * self._mean_x[i]))
+                return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist_y_x(x)
+
+            self._posterior = self._model_gen(p_x=p_x, p_y_x=p_y_x)
+
+    def _predict_single(self, x):
+        return self._posterior.mode_y_x(x)

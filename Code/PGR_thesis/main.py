@@ -17,8 +17,9 @@ import matplotlib.pyplot as plt
 
 from RE_obj import DeterministicRE, FiniteRE, DirichletRV
 from SL_obj import YcXModel
-from bayes import BayesRE, FiniteDirichletBayes
+from bayes import FiniteDirichletBayes
 from loss_functions import loss_01, loss_se
+from learn_functions import DirichletClassifier
 from util.util import empirical_pmf
 
 # plt.style.use('seaborn')  # cm?
@@ -137,9 +138,11 @@ prior = FiniteDirichletBayes(supp_x_s, supp_y_s, alpha_0, mean, rng)
 # TODO: vectorize learners and losses!
 
 N_mc = 100
-N_train, N_test = 10, 10
+N_train, N_test = 10, 1
 
-loss_fcn = loss_01
+# loss_fcn = loss_01
+
+learner = DirichletClassifier(supp_x_s, supp_y_s, alpha_0, mean)
 
 loss_mc = np.empty(N_mc)
 for i_mc in range(N_mc):
@@ -150,9 +153,10 @@ for i_mc in range(N_mc):
 
 
     # Train
-
+    learner.fit(D_train)
 
     # Evaluate
-    # loss_mc[i_mc] = loss_fcn(decision_fcn(x), y)
+    loss_mc[i_mc] = learner.evaluate(D_test)
 
+loss_emp = loss_mc.mean()
 
