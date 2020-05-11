@@ -39,10 +39,9 @@ class BaseLearner:
         return self.loss_fcn(self._predict_single(d['x']), d['y'])
 
 
-class DirichletClassifier(BaseLearner):
+class DirichletLearner(BaseLearner):
     def __init__(self, supp_x, supp_y, alpha_0, mean):
         super().__init__()
-        self.loss_fcn = loss_01
 
         self.supp_x = supp_x        # Assumed to be my SL structured arrays!
         self.supp_y = supp_y
@@ -104,5 +103,21 @@ class DirichletClassifier(BaseLearner):
 
             self._posterior = self._model_gen(p_x=p_x, p_y_x=p_y_x)
 
+
+class DirichletClassifier(DirichletLearner):
+    def __init__(self, supp_x, supp_y, alpha_0, mean):
+        super().__init__(supp_x, supp_y, alpha_0, mean)
+        self.loss_fcn = loss_01
+
     def _predict_single(self, x):
         return self._posterior.mode_y_x(x)
+
+
+class DirichletEstimator(DirichletLearner):
+    def __init__(self, supp_x, supp_y, alpha_0, mean):
+        super().__init__(supp_x, supp_y, alpha_0, mean)
+        self.loss_fcn = loss_se
+
+    def _predict_single(self, x):
+        return self._posterior.mean_y_x(x)
+

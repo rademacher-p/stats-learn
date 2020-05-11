@@ -19,6 +19,26 @@ def check_data_shape(x, data_shape):
     return x, set_shape
 
 
+def check_valid_pmf(p, data_shape=None, full_support=False):
+    if data_shape is None:
+        p = np.asarray(p)
+        set_shape = ()
+    else:
+        p, set_shape = check_data_shape(p, data_shape)
+
+    if full_support:
+        if np.min(p) <= 0:
+            raise ValueError("Each entry in 'p' must be positive.")
+    else:
+        if np.min(p) < 0:
+            raise ValueError("Each entry in 'p' must be non-negative.")
+
+    if (np.abs(p.reshape(set_shape + (-1,)).sum(-1) - 1.0) > 1e-9).any():
+        raise ValueError("The input 'p' must lie within the normal simplex, but p.sum() = %s." % p.sum())
+
+    return p
+
+
 def vectorize_x_func(func, data_shape):
     def func_vec(x):
         x, set_shape = check_data_shape(x, data_shape)
