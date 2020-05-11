@@ -8,27 +8,7 @@ import numpy as np
 from scipy.stats._multivariate import multi_rv_generic
 from scipy.special import gammaln, xlogy
 import matplotlib.pyplot as plt
-from util.util import check_data_shape, outer_gen, diag_gen, simplex_grid, simplex_round
-
-
-def check_valid_pmf(p, data_shape=None, full_support=False):
-    if data_shape is None:
-        p = np.asarray(p)
-        set_shape = ()
-    else:
-        p, set_shape = check_data_shape(p, data_shape)
-
-    if full_support:
-        if np.min(p) <= 0:
-            raise ValueError("Each entry in 'p' must be positive.")
-    else:
-        if np.min(p) < 0:
-            raise ValueError("Each entry in 'p' must be non-negative.")
-
-    if (np.abs(p.reshape(set_shape + (-1,)).sum(-1) - 1.0) > 1e-9).any():
-        raise ValueError("The input 'p' must lie within the normal simplex, but p.sum() = %s." % p.sum())
-
-    return p
+from util.util import check_data_shape, check_valid_pmf, outer_gen, diag_gen, simplex_grid, simplex_round
 
 
 #%% Base RE classes
@@ -315,19 +295,19 @@ class FiniteRV(FiniteRE, DiscreteRV):
             raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
 
 
-s = np.random.random((4, 3, 2, 2))
-pp = np.random.random((4, 3))
-pp = pp / pp.sum()
-f = FiniteRE(s, pp)
-f.pmf(f.rvs((4,5)))
-
-s = np.stack(np.meshgrid([0,1],[0,1], [0,1]), axis=-1)
-s, p = ['a','b','c'], [.3,.2,.5]
-# p = np.random.random((2,2,2))
-# p = p / p.sum()
-f2 = FiniteRE(s, p)
-f2.pmf(f2.rvs(4))
-f2.plot_pmf()
+# s = np.random.random((4, 3, 2, 2))
+# pp = np.random.random((4, 3))
+# pp = pp / pp.sum()
+# f = FiniteRE(s, pp)
+# f.pmf(f.rvs((4,5)))
+#
+# s = np.stack(np.meshgrid([0,1],[0,1], [0,1]), axis=-1)
+# s, p = ['a','b','c'], [.3,.2,.5]
+# # p = np.random.random((2,2,2))
+# # p = p / p.sum()
+# f2 = FiniteRE(s, p)
+# f2.pmf(f2.rvs(4))
+# f2.plot_pmf()
 
 
 

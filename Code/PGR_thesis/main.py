@@ -19,7 +19,7 @@ from RE_obj import DeterministicRE, FiniteRE, DirichletRV
 from SL_obj import YcXModel
 from bayes import FiniteDirichletBayes
 from loss_functions import loss_01, loss_se
-from learn_functions import DirichletClassifier
+from learn_functions import DirichletClassifier, DirichletEstimator
 from util.util import empirical_pmf
 
 # plt.style.use('seaborn')  # cm?
@@ -85,10 +85,11 @@ rng = random.default_rng()
 
 #%% Discrete sets
 
-supp_y = np.array(['a', 'b'])
-# supp_x = np.arange(1)
+# supp_y = np.array(['a', 'b'])
+supp_y = np.arange(2) / 2
+supp_x = np.arange(2) / 2
 # supp_x = np.arange(6).reshape(3, 2)
-supp_x = np.stack(np.meshgrid(np.arange(2), np.arange(3)), axis=-1)
+# supp_x = np.stack(np.meshgrid(np.arange(2), np.arange(3)), axis=-1)
 
 i_split_y, i_split_x = supp_y.ndim, supp_x.ndim - 1
 
@@ -123,7 +124,7 @@ supp_y_s = np.array(list(itertools.product(supp_y.reshape((-1,) + data_shape_y))
 
 
 
-alpha_0 = 10
+alpha_0 = 5
 mean = np.ones(supp_x_s.shape + supp_y_s.shape) / (supp_x_s.size * supp_y_s.size)
 # prior = BayesRE.finite_dirichlet(supp_x_s, supp_y_s, alpha_0, mean, rng)
 prior = FiniteDirichletBayes(supp_x_s, supp_y_s, alpha_0, mean, rng)
@@ -137,26 +138,23 @@ prior = FiniteDirichletBayes(supp_x_s, supp_y_s, alpha_0, mean, rng)
 
 # TODO: vectorize learners and losses!
 
-N_mc = 100
+N_mc = 5000
 N_train, N_test = 10, 1
 
-# loss_fcn = loss_01
+# learner = DirichletClassifier(supp_x_s, supp_y_s, alpha_0, mean)
+learner = DirichletEstimator(supp_x_s, supp_y_s, alpha_0, mean)
 
-learner = DirichletClassifier(supp_x_s, supp_y_s, alpha_0, mean)
 
 loss_mc = np.empty(N_mc)
 for i_mc in range(N_mc):
     theta = prior.random_model()    # randomize model using prior
 
-    # Generate data
     D_train, D_test = theta.rvs(N_train), theta.rvs(N_test)
 
-
-    # Train
     learner.fit(D_train)
 
-    # Evaluate
     loss_mc[i_mc] = learner.evaluate(D_test)
 
 loss_emp = loss_mc.mean()
 
+print(f"Loss: {loss_emp}")
