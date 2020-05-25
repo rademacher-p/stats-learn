@@ -40,6 +40,8 @@ class BaseLearner:
 
 
 class DirichletLearner(BaseLearner):
+    # TODO: initialization from marginal/conditional? full mean init as classmethod?
+    # TODO: initialization from SL object?
     def __init__(self, supp_x, supp_y, alpha_0, mean):
         super().__init__()
 
@@ -102,6 +104,10 @@ class DirichletLearner(BaseLearner):
                 return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist_y_x(x)
 
             self._posterior = self._model_gen(p_x=p_x, p_y_x=p_y_x)
+
+    @classmethod
+    def prior_gen(cls, bayes_model):
+        return cls(bayes_model.supp_x, bayes_model.supp_y, bayes_model.prior.alpha_0, bayes_model.prior.mean)
 
 
 class DirichletClassifier(DirichletLearner):

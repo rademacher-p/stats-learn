@@ -8,7 +8,7 @@ Supervised Learning base classes.
 import numpy as np
 from scipy.stats._multivariate import multi_rv_generic
 
-from RE_obj import BaseRV, FiniteRE
+from RE_obj import BaseRE, BaseRV, FiniteRE
 from util.util import vectorize_x_func
 
 
@@ -42,7 +42,7 @@ class BaseModel(multi_rv_generic):
     def mode_y_x(self):
         return self._mode_y_x
 
-    rvs = BaseRV.rvs
+    rvs = BaseRE.rvs
 
     def _rvs(self, size=(), random_state=None):
         raise NotImplementedError("Method must be overwritten.")
