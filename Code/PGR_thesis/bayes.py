@@ -5,6 +5,7 @@ Bayesian Prior objects.
 import types, functools
 # import itertools,
 import numpy as np
+# from scipy.stats._multivariate import multi_rv_generic
 
 from RE_obj import FiniteRE, DirichletRV
 from SL_obj import YcXModel
@@ -16,21 +17,21 @@ from SL_obj import YcXModel
 
 
 class BaseBayes:
-    def __init__(self, model_gen, prior):
-        # if model_kwargs is None:
-        #     model_kwargs = {}
+    def __init__(self, model_gen, model_kwargs=None, prior=None):
+        # super().__init__(rng)
 
+        if model_kwargs is None:
+            model_kwargs = {}
+
+        self.model_gen = functools.partial(model_gen, **model_kwargs)
         self.prior = prior
-        # self.model_gen = functools.partial(model_gen, **model_kwargs)
-        self.model_gen = model_gen
 
-    def random_model(self):
-        raise NotImplementedError("Method must be overwritten.")
-        pass
+    def random_model(self):     # TODO: defaults to deterministic prior!?
+        return self.model_gen()
 
 
 class FiniteREBayes(BaseBayes):
-    def __init__(self, supp_x, supp_y, prior, rng):
+    def __init__(self, supp_x, supp_y, prior, rng_model=None):     # TODO: rng check, None default?
         self.supp_x = supp_x
         self.supp_y = supp_y        # Assumed to be my SL structured array!
 
@@ -39,23 +40,23 @@ class FiniteREBayes(BaseBayes):
         self._data_shape_x = supp_x.dtype['x'].shape
         self._data_shape_y = supp_y.dtype['y'].shape
 
-        # model_gen = YcXModel.finite_model
-        # model_kwargs = {'supp_x': supp_x['x'], 'supp_y': supp_y['y'], 'rng': rng}
-        model_gen = functools.partial(YcXModel.finite_model, supp_x=supp_x['x'], supp_y=supp_y['y'], rng=rng)
-        super().__init__(model_gen, prior)
+        model_gen = YcXModel.finite_model
+        model_kwargs = {'supp_x': supp_x['x'], 'supp_y': supp_y['y'], 'rng': rng_model}
+        super().__init__(model_gen, model_kwargs, prior)
 
     def random_model(self):
         raise NotImplementedError("Method must be overwritten.")
-        pass
 
 
 class FiniteDirichletBayes(FiniteREBayes):
-    def __init__(self, supp_x, supp_y, alpha_0, mean, rng):
-        prior = DirichletRV(alpha_0, mean, rng)
-        super().__init__(supp_x, supp_y, prior, rng)
 
-    def random_model(self):
-        p = self.prior.rvs()        # TODO: generate using marginal/conditional independence??
+    # TODO: initialization from marginal/conditional? full mean init as classmethod?
+    def __init__(self, supp_x, supp_y, alpha_0, mean, rng_model=None, rng_prior=None):
+        prior = DirichletRV(alpha_0, mean, rng_prior)
+        super().__init__(supp_x, supp_y, prior, rng_model)
+
+    def random_model(self, rng=None):
+        p = self.prior.rvs(random_state=rng)        # TODO: generate using marginal/conditional independence??
 
         p_x = p.reshape(self._supp_shape_x + (-1,)).sum(axis=-1)
 
@@ -68,6 +69,34 @@ class FiniteDirichletBayes(FiniteREBayes):
 
         return self.model_gen(p_x=p_x, p_y_x=p_y_x)
 
+
+class FiniteDirichletBayes222(FiniteREBayes):
+
+    # TODO: initialization from marginal/conditional? full mean init as classmethod?
+    def __init__(self, supp_x, supp_y, alpha_0, mean_x, mean_y_x, rng_model=None, rng_prior=None):
+        prior_x = DirichletRV(alpha_0, mean_x, rng_prior)
+
+        def prior_y_x(x):
+            return DirichletRV(alpha_0*mean_x(x))
+        prior_y_x = None
+
+        prior = {'x': prior_x, 'y_x': prior_y_x}
+        super().__init__(supp_x, supp_y, prior, rng_model)
+
+    def random_model(self, rng=None):
+        p = self.prior.rvs(random_state=rng)        # TODO: generate using marginal/conditional independence??
+
+        # p_x = p.reshape(self._supp_shape_x + (-1,)).sum(axis=-1)
+        p_x = self.prior['x'].rvs(random_state=rng)
+
+        def p_y_x(x):
+            _p_flat = p.reshape((-1,) + self._supp_shape_y)
+            _p_slice = _p_flat[np.all(x.flatten()
+                                      == self.supp_x['x'].reshape(self.supp_x.size, -1), axis=-1)].squeeze(axis=0)
+            p_y = _p_slice / _p_slice.sum()
+            return p_y
+
+        return self.model_gen(p_x=p_x, p_y_x=p_y_x)
 
 
 
