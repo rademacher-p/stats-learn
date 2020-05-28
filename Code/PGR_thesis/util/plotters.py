@@ -1,4 +1,5 @@
 import numpy as np
+# from scipy.special import binom
 
 
 def simplex_grid(n=1, shape=(1,), hull_mask=None):

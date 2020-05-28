@@ -34,7 +34,7 @@ class BaseBayes:
 class FiniteREBayes(BaseBayes):
     def __init__(self, supp_x, supp_y, prior, rng_model=None):     # TODO: rng check, None default?
         self.supp_x = supp_x
-        self.supp_y = supp_y        # Assumed to be my SL structured array!
+        self.supp_y = supp_y        # TODO: Assumed to be my SL structured array!
 
         self._supp_shape_x = supp_x.shape
         self._supp_shape_y = supp_y.shape
@@ -42,7 +42,7 @@ class FiniteREBayes(BaseBayes):
         self._data_shape_y = supp_y.dtype['y'].shape
 
         model_gen = YcXModel.finite_model
-        model_kwargs = {'supp_x': supp_x['x'], 'supp_y': supp_y['y'], 'rng': rng_model}
+        model_kwargs = {'supp': supp_x['x'], 'supp_y': supp_y['y'], 'rng': rng_model}
         super().__init__(model_gen, model_kwargs, prior)
 
     def random_model(self):
@@ -94,16 +94,16 @@ class FiniteDirichletBayes(FiniteREBayes):
 #         return self.model_gen(**self.model_kwargs, **self.rand_kwargs(self.prior))
 #
 #     @classmethod
-#     def finite_dirichlet(cls, supp_x, supp_y, alpha_0, mean, rng):
+#     def finite_dirichlet(cls, supp, supp_y, alpha_0, mean, rng):
 #         prior = DirichletRV(alpha_0, mean)
 #
 #         def rand_kwargs(dist):
 #             p = dist.rvs()
 #
-#             p_x = p.reshape(supp_x.shape + (-1,)).sum(axis=-1)
+#             p_x = p.reshape(supp.shape + (-1,)).sum(axis=-1)
 #
 #             def p_y_x(x):
-#                 _temp = p.reshape((-1,) + supp_y.shape)[np.all(x.flatten() == supp_x['x'].reshape(supp_x.size, -1),
+#                 _temp = p.reshape((-1,) + supp_y.shape)[np.all(x.flatten() == supp['x'].reshape(supp.size, -1),
 #                                                                axis=-1)].squeeze(axis=0)
 #                 p_y = _temp / _temp.sum()
 #                 return p_y
@@ -111,7 +111,7 @@ class FiniteDirichletBayes(FiniteREBayes):
 #             return {'p_x': p_x, 'p_y_x': p_y_x}
 #
 #         model_gen = YcXModel.finite_model
-#         model_kwargs = {'supp_x': supp_x['x'], 'supp_y': supp_y['y'], 'rng': rng}
+#         model_kwargs = {'supp': supp['x'], 'supp_y': supp_y['y'], 'rng': rng}
 #
 #         return cls(prior, rand_kwargs, model_gen, model_kwargs)
 
@@ -145,7 +145,7 @@ class FiniteDirichletBayes(FiniteREBayes):
 # def finite_bayes(set_x_s, set_y_s, alpha_0, mean, rng):
 #
 #     model_gen = YcXModel.finite_model
-#     model_kwargs = {'set_x': set_x_s['x'], 'set_y': set_y_s['y'], 'rng': rng}
+#     model_kwargs = {'supp': set_x_s['x'], 'set_y': set_y_s['y'], 'rng': rng}
 #
 #     prior = DirichletRV(alpha_0, mean)
 #
@@ -185,7 +185,7 @@ class FiniteDirichletBayes(FiniteREBayes):
 # def finite_bayes2(set_x_s, set_y_s, alpha_0, mean, rng):
 #
 #     model_gen = functools.partial(YcXModel.finite_model,
-#                                   **{'set_x': set_x_s['x'], 'set_y': set_y_s['y'], 'rng': rng})
+#                                   **{'supp': set_x_s['x'], 'set_y': set_y_s['y'], 'rng': rng})
 #
 #     def rand_kwargs(self):
 #         p = self.rvs()

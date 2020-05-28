@@ -25,8 +25,8 @@ from util.generic import empirical_pmf
 supp_y = np.array(['a', 'b'])
 # supp_y = np.arange(2) / 2
 supp_x = np.arange(2) / 2
-# supp_x = np.arange(6).reshape(3, 2)
-# supp_x = np.stack(np.meshgrid(np.arange(2), np.arange(3)), axis=-1)
+# supp = np.arange(6).reshape(3, 2)
+# supp = np.stack(np.meshgrid(np.arange(2), np.arange(3)), axis=-1)
 
 i_split_y, i_split_x = supp_y.ndim, supp_x.ndim - 0
 
@@ -49,7 +49,7 @@ alpha_0 = 1
 
 # p_x = np.ones(supp_x_s.shape) / supp_x_s.size
 # def p_y_x(x): return np.ones(supp_y_s.shape) / supp_y_s.size
-# model_kwargs = {'supp_x': supp_x_s['x'], 'supp_y': supp_y_s['y'], 'p_x': p_x, 'p_y_x': p_y_x, 'rng': None}
+# model_kwargs = {'supp': supp_x_s['x'], 'supp_y': supp_y_s['y'], 'p_x': p_x, 'p_y_x': p_y_x, 'rng': None}
 # model_gen = YcXModel.finite_model
 # bayes_model = BaseBayes(model_gen, model_kwargs)
 

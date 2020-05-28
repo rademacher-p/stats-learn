@@ -332,7 +332,7 @@ def _dirichlet_check_input(x, alpha_0, mean):
 
 class DirichletRV(ContinuousRV):
     """
-    Dirichlet random process, finite-domain realizations.
+    Dirichlet random process, finite-supp realizations.
     """
 
     def __init__(self, alpha_0, mean, rng=None):
@@ -453,7 +453,7 @@ def _empirical_check_input(x, n, mean):
 
 class EmpiricalRV(DiscreteRV):
     """
-    Empirical random process, finite-domain realizations.
+    Empirical random process, finite-supp realizations.
     """
 
     def __init__(self, n, mean, rng=None):
@@ -551,7 +551,7 @@ class EmpiricalRV(DiscreteRV):
 
 class DirichletEmpiricalRV(DiscreteRV):
     """
-    Dirichlet-Empirical random process, finite-domain realizations.
+    Dirichlet-Empirical random process, finite-supp realizations.
     """
 
     def __init__(self, n, alpha_0, mean, rng=None):

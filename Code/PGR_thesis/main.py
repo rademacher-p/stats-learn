@@ -86,11 +86,11 @@ rng = random.default_rng()
 
 # supp_y = np.array(['a', 'b'])
 supp_y = np.arange(2) / 2
-supp_x = np.arange(2) / 2
-# supp_x = np.arange(6).reshape(3, 2)
-# supp_x = np.stack(np.meshgrid(np.arange(2), np.arange(3)), axis=-1)
+# supp = np.arange(2) / 2
+# supp = np.arange(6).reshape(3, 2)
+supp_x = np.stack(np.meshgrid(np.arange(2), np.arange(3)), axis=-1)
 
-i_split_y, i_split_x = supp_y.ndim, supp_x.ndim - 0
+i_split_y, i_split_x = supp_y.ndim, supp_x.ndim - 1
 
 supp_shape_y, data_shape_y = supp_y.shape[:i_split_y], supp_y.shape[i_split_y:]
 supp_shape_x, data_shape_x = supp_x.shape[:i_split_x], supp_x.shape[i_split_x:]
