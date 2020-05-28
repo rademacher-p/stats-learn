@@ -8,8 +8,10 @@ import numpy as np
 from scipy.stats._multivariate import multi_rv_generic
 from scipy.special import gammaln, xlogy
 import matplotlib.pyplot as plt
-from util.generic import check_data_shape, check_valid_pmf, outer_gen, diag_gen, simplex_grid, simplex_round
-from util.generic import FiniteFunc
+from util.generic import check_data_shape, check_valid_pmf
+from util.math import outer_gen, diag_gen, simplex_round
+from util.plotters import simplex_grid
+from util.func_obj import FiniteFunc
 
 
 #%% Base RE classes
