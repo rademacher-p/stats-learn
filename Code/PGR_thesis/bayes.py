@@ -2,8 +2,9 @@
 Bayesian Prior objects.
 """
 
-import types, functools
-# import itertools,
+import types
+import functools
+# import itertools
 import numpy as np
 # from scipy.stats._multivariate import multi_rv_generic
 
@@ -70,33 +71,7 @@ class FiniteDirichletBayes(FiniteREBayes):
         return self.model_gen(p_x=p_x, p_y_x=p_y_x)
 
 
-class FiniteDirichletBayes222(FiniteREBayes):
 
-    # TODO: initialization from marginal/conditional? full mean init as classmethod?
-    def __init__(self, supp_x, supp_y, alpha_0, mean_x, mean_y_x, rng_model=None, rng_prior=None):
-        prior_x = DirichletRV(alpha_0, mean_x, rng_prior)
-
-        def prior_y_x(x):
-            return DirichletRV(alpha_0*mean_x(x))
-        prior_y_x = None
-
-        prior = {'x': prior_x, 'y_x': prior_y_x}
-        super().__init__(supp_x, supp_y, prior, rng_model)
-
-    def random_model(self, rng=None):
-        p = self.prior.rvs(random_state=rng)        # TODO: generate using marginal/conditional independence??
-
-        # p_x = p.reshape(self._supp_shape_x + (-1,)).sum(axis=-1)
-        p_x = self.prior['x'].rvs(random_state=rng)
-
-        def p_y_x(x):
-            _p_flat = p.reshape((-1,) + self._supp_shape_y)
-            _p_slice = _p_flat[np.all(x.flatten()
-                                      == self.supp_x['x'].reshape(self.supp_x.size, -1), axis=-1)].squeeze(axis=0)
-            p_y = _p_slice / _p_slice.sum()
-            return p_y
-
-        return self.model_gen(p_x=p_x, p_y_x=p_y_x)
 
 
 
