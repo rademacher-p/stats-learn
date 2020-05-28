@@ -1,4 +1,6 @@
-import itertools, functools, math
+import itertools
+import functools
+import math
 
 import numpy as np
 from numpy import random
@@ -16,7 +18,7 @@ from SL_obj import YcXModel
 from bayes import BaseBayes, FiniteDirichletBayes
 from loss_functions import loss_01, loss_se
 from learn_functions import DirichletClassifier, DirichletEstimator
-from util.util import empirical_pmf
+from util.generic import empirical_pmf
 
 
 

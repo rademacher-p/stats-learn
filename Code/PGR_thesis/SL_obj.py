@@ -9,7 +9,7 @@ import numpy as np
 from scipy.stats._multivariate import multi_rv_generic
 
 from RE_obj import BaseRE, BaseRV, FiniteRE
-from util.util import vectorize_x_func
+from util.generic import vectorize_x_func
 
 
 class BaseModel(multi_rv_generic):

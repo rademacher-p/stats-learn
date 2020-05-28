@@ -1,11 +1,11 @@
 """
-Sim main.
+Main.
 
 :-)
 """
 
-import itertools, functools
-
+import itertools
+import functools
 import numpy as np
 from numpy import random
 import matplotlib.pyplot as plt
@@ -20,7 +20,7 @@ from SL_obj import YcXModel
 from bayes import BaseBayes, FiniteDirichletBayes
 from loss_functions import loss_01, loss_se
 from learn_functions import DirichletClassifier, DirichletEstimator
-from util.util import empirical_pmf
+from util.generic import empirical_pmf
 
 # plt.style.use('seaborn')  # cm?
 
@@ -97,11 +97,11 @@ supp_shape_x, data_shape_x = supp_x.shape[:i_split_x], supp_x.shape[i_split_x:]
 
 supp_yx = np.array(list(itertools.product(supp_y.reshape((-1,) + data_shape_y), supp_x.reshape((-1,) + data_shape_x))),
                    dtype=[('y', supp_y.dtype, data_shape_y),
-                         ('x', supp_x.dtype, data_shape_x)]).reshape(supp_shape_y + supp_shape_x)
+                          ('x', supp_x.dtype, data_shape_x)]).reshape(supp_shape_y + supp_shape_x)
 
 supp_xy = np.array(list(itertools.product(supp_x.reshape((-1,) + data_shape_x), supp_y.reshape((-1,) + data_shape_y))),
                    dtype=[('x', supp_x.dtype, data_shape_x),
-                         ('y', supp_y.dtype, data_shape_y)]).reshape(supp_shape_x + supp_shape_y)
+                          ('y', supp_y.dtype, data_shape_y)]).reshape(supp_shape_x + supp_shape_y)
 
 supp_x_s = np.array(list(itertools.product(supp_x.reshape((-1,) + data_shape_x))),
                     dtype=[('x', supp_x.dtype, data_shape_x)]).reshape(supp_shape_x)

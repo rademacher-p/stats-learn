@@ -4,7 +4,7 @@ Supervised learning functions.
 
 import numpy as np
 import functools
-from util.util import vectorize_x_func, empirical_pmf
+from util.generic import vectorize_x_func, empirical_pmf
 from loss_functions import loss_se, loss_01
 from SL_obj import YcXModel
 
