@@ -231,7 +231,7 @@ class FiniteRE(DiscreteRE):
         self._mode = self._supp_flat[np.argmax(self._p_flat)].reshape(self._data_shape)
 
     def _rvs(self, size=(), random_state=None):
-        i = random_state.choice(self.p.size, size, p=self._p_flat)
+        i = random_state.choice(self._p.size, size, p=self._p_flat)
         return self._supp_flat[i].reshape(size + self._data_shape)
 
     def _pmf_single(self, x):
@@ -251,7 +251,7 @@ class FiniteRE(DiscreteRE):
 
             return plt_data
         else:
-            raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
+            raise NotImplementedError('Plot method only implemented for 1-dimensional data.')
 
 
 class FiniteRV(FiniteRE, DiscreteRV):
@@ -266,7 +266,7 @@ class FiniteRV(FiniteRE, DiscreteRV):
         self._mean = mean_flat.reshape(self._data_shape)
 
         ctr_flat = self._supp_flat - mean_flat
-        outer_flat = (ctr_flat.reshape(self._p.size, 1, -1) * ctr_flat[..., np.newaxis]).reshape(self._p.size, -1)
+        outer_flat = (ctr_flat[:, np.newaxis] * ctr_flat[..., np.newaxis]).reshape(self._p.size, -1)
         self._cov = (self._p_flat[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self._data_shape)
 
     def plot_pmf(self, ax=None):
@@ -279,7 +279,8 @@ class FiniteRV(FiniteRE, DiscreteRV):
                     _, ax = plt.subplots(subplot_kw={'projection': '3d'})
                     ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel=r'$\mathrm{P}_\mathrm{x}(x)$')
 
-                plt_data = ax.bar3d(self._supp[0].flatten(), self._supp[1].flatten(), 0, 1, 1, self._p_flat, shade=True)
+                plt_data = ax.bar3d(self._supp[..., 0].flatten(),
+                                    self._supp[..., 1].flatten(), 0, 1, 1, self._p_flat, shade=True)
 
             elif self._p.ndim == 3:
                 if ax is None:
@@ -297,19 +298,19 @@ class FiniteRV(FiniteRE, DiscreteRV):
             raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
 
 
-# s = np.random.random((4, 3, 2, 2))
-# pp = np.random.random((4, 3))
-# pp = pp / pp.sum()
-# f = FiniteRE(s, pp)
-# f.pmf(f.rvs((4,5)))
-#
-# s = np.stack(np.meshgrid([0,1],[0,1], [0,1]), axis=-1)
-# s, p = ['a','b','c'], [.3,.2,.5]
-# # p = np.random.random((2,2,2))
-# # p = p / p.sum()
-# f2 = FiniteRE(s, p)
-# f2.pmf(f2.rvs(4))
-# f2.plot_pmf()
+s = np.random.random((4, 3, 2, 2))
+pp = np.random.random((4, 3))
+pp = pp / pp.sum()
+f = FiniteRE(s, pp)
+f.pmf(f.rvs((4,5)))
+
+s = np.stack(np.meshgrid([0,1],[0,1], [0,1]), axis=-1)
+s, p = ['a','b','c'], [.3,.2,.5]
+# p = np.random.random((2,2,2))
+# p = p / p.sum()
+f2 = FiniteRE(s, p)
+f2.pmf(f2.rvs(4))
+f2.plot_pmf()
 
 
 

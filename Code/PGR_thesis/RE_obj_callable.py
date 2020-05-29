@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from util.generic import check_data_shape, check_valid_pmf
 from util.math import outer_gen, diag_gen, simplex_round
 from util.plotters import simplex_grid
-from util.func_obj import FiniteFunc
+from util.func_obj import FiniteDomainFunc
 
 
 #%% Base RE classes
@@ -184,28 +184,27 @@ class FiniteRE(DiscreteRE):
     Generic RE drawn from a finite support set using an explicitly defined PMF.
     """
 
-    def __new__(cls, supp, p, rng=None):
-        supp = np.asarray(supp)
-        if np.issubdtype(supp.dtype, np.number):
+    def __new__(cls, pmf, rng=None):    # TODO: function type check
+        if np.issubdtype(pmf.supp.dtype, np.number):
             return super().__new__(FiniteRV)
         else:
             return super().__new__(cls)
 
-    def __init__(self, supp, p, rng=None):
+    def __init__(self, pmf, rng=None):
         super().__init__(rng)
-        self._supp = np.asarray(supp)
-        self._p = check_valid_pmf(p)
+        self.pmf = pmf
         self._update_attr()
+
+    @classmethod
+    def gen_func(cls, supp, p, rng=None):
+        p = np.asarray(p)
+        pmf = FiniteDomainFunc(supp, p, set_shape=p.shape)
+        return cls(pmf, rng)
 
     # Input properties
     @property
     def supp(self):
         return self._supp
-
-    @supp.setter
-    def supp(self, supp):
-        self._supp = np.asarray(supp)
-        self._update_attr()
 
     @property
     def p(self):
@@ -213,46 +212,31 @@ class FiniteRE(DiscreteRE):
 
     @p.setter
     def p(self, p):
-        self._p = check_valid_pmf(p)
+        self.pmf.val = p
         self._update_attr()
 
     # Attribute Updates
     def _update_attr(self):
-        set_shape = self._supp.shape[:self._p.ndim]
-        self._data_shape = self._supp.shape[self._p.ndim:]
+        self._supp = self.pmf.supp
+        self._p = check_valid_pmf(self.pmf(self._supp))
 
-        if set_shape != self._p.shape:
-            raise ValueError("Leading shape values of 'supp' must equal the shape of 'p'.")
+        self._data_shape = self.pmf._data_shape_x
+        self._supp_flat = self.pmf._supp_flat
 
-        self._supp_flat = self._supp.reshape((self._p.size, -1))
-        self._p_flat = self._p.flatten()
-        if len(self._supp_flat) != len(np.unique(self._supp_flat, axis=0)):
-            raise ValueError("Input 'supp' must have unique values")
-
-        self._mode = self._supp_flat[np.argmax(self._p_flat)].reshape(self._data_shape)
+        self._mode = self.pmf.mode
 
     def _rvs(self, size=(), random_state=None):
-        i = random_state.choice(self.p.size, size, p=self._p_flat)
+        i = random_state.choice(self._p.size, size, p=self._p.flatten())
         return self._supp_flat[i].reshape(size + self._data_shape)
 
-    def _pmf_single(self, x):
-        eq_supp = np.all(x.flatten() == self._supp_flat, axis=-1)
-        if eq_supp.sum() != 1:
-            raise ValueError("Input 'x' must be in the support.")
+    # def _pmf_single(self, x):
+    #     return self._func(x)
 
-        return self._p_flat[eq_supp].squeeze()
+    # def pmf(self, x):
+    #     return self._func(x)
 
     def plot_pmf(self, ax=None):
-        if self._p.ndim == 1:
-            if ax is None:
-                _, ax = plt.subplots()
-                ax.set(xlabel='$x$', ylabel=r'$\mathrm{P}_\mathrm{x}(x)$')
-
-            plt_data = ax.stem(self._supp, self._p, use_line_collection=True)
-
-            return plt_data
-        else:
-            raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
+        self.pmf.plot(ax)
 
 
 class FiniteRV(FiniteRE, DiscreteRV):
@@ -263,54 +247,24 @@ class FiniteRV(FiniteRE, DiscreteRV):
     def _update_attr(self):
         super()._update_attr()
 
-        mean_flat = (self._p_flat[:, np.newaxis] * self._supp_flat).sum(axis=0)
-        self._mean = mean_flat.reshape(self._data_shape)
-
-        ctr_flat = self._supp_flat - mean_flat
-        outer_flat = (ctr_flat.reshape(self._p.size, 1, -1) * ctr_flat[..., np.newaxis]).reshape(self._p.size, -1)
-        self._cov = (self._p_flat[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self._data_shape)
-
-    def plot_pmf(self, ax=None):
-        if self._p.ndim == 1:
-            super().plot_pmf(self, ax)
-
-        elif self._p.ndim in [2, 3]:
-            if self._p.ndim == 2:
-                if ax is None:
-                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel=r'$\mathrm{P}_\mathrm{x}(x)$')
-
-                plt_data = ax.bar3d(self._supp[0].flatten(), self._supp[1].flatten(), 0, 1, 1, self._p_flat, shade=True)
-
-            elif self._p.ndim == 3:
-                if ax is None:
-                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
-
-                plt_data = ax.scatter(self._supp[..., 0], self._supp[..., 1], self._supp[..., 2], s=15, c=self._p)
-
-                c_bar = plt.colorbar(plt_data)
-                c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
-
-            return plt_data
-
-        else:
-            raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
+        self._mean = self.pmf.mean
+        self._cov = self.pmf.cov
 
 
-# s = np.random.random((4, 3, 2, 2))
-# pp = np.random.random((4, 3))
-# pp = pp / pp.sum()
-# f = FiniteRE(s, pp)
-# f.pmf(f.rvs((4,5)))
-#
-# s = np.stack(np.meshgrid([0,1],[0,1], [0,1]), axis=-1)
+
+s = np.random.random((4, 3, 2, 2))
+pp = np.random.random((4, 3))
+pp = pp / pp.sum()
+f = FiniteRE.gen_func(s, pp)
+f.pmf(f.rvs((4,5)))
+# f.plot_pmf()
+
+s, p = np.stack(np.meshgrid([0,1],[0,1,2]), axis=-1), np.random.random((3,2))
 # s, p = ['a','b','c'], [.3,.2,.5]
-# # p = np.random.random((2,2,2))
-# # p = p / p.sum()
-# f2 = FiniteRE(s, p)
-# f2.pmf(f2.rvs(4))
-# f2.plot_pmf()
+p = p / p.sum()
+f2 = FiniteRE.gen_func(s, p)
+f2.pmf(f2.rvs(4))
+f2.plot_pmf()
 
 
 
