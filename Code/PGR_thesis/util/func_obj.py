@@ -1,7 +1,10 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from util.generic import check_data_shape, check_set_shape, vectorize_x_func
 
 # TODO: getter and setters?
+# TODO: plot methods
+
 
 class BaseFunc(object):
     # def __init__(self):
@@ -29,70 +32,147 @@ class DiscreteDomainFunc(BaseFunc):
 
 
 
-class FiniteDomainFunc(DiscreteDomainFunc):
-    def __init__(self, supp, f, set_shape=()):
+class FiniteDomainFunc(object):
 
-        self.set_shape = set_shape
-        self.set_size = int(np.prod(set_shape))
-        self.supp, self.data_shape_x = check_set_shape(supp, set_shape)
+    def __new__(cls, supp, val, set_shape=()):
+        supp = np.asarray(supp)
+        val = np.asarray(val)
+        if np.issubdtype(supp.dtype, np.number) and np.issubdtype(val.dtype, np.number):
+            return super().__new__(FiniteDomainNumericFunc)
+        else:
+            return super().__new__(cls)
 
-        self.f = f
+    def __init__(self, supp, val, set_shape=()):
 
-        self._supp_flat = self.supp.reshape(self.set_size, -1)
-        if len(np.unique(self._supp_flat, axis=0)) < self.set_size:
+        self._set_shape = set_shape
+        self._set_size = int(np.prod(set_shape))
+        self._supp, self._data_shape_x = check_set_shape(supp, set_shape)
+
+        self._val, self._data_shape_y = check_set_shape(val, set_shape)
+
+        self._supp_flat = self.supp.reshape(self._set_size, -1)
+        if len(np.unique(self._supp_flat, axis=0)) < self._set_size:
             raise ValueError("Support elements must be unique.")
 
-        self._mode = None
-        self._mean = None
-        self.update_attr()
+        self._update_attr()
 
-    def __call__(self, x):
-        return vectorize_x_func(self.f, self.data_shape_x)(x)
+    @property
+    def set_shape(self):
+        return self._set_shape
+
+    @property
+    def supp(self):
+        return self._supp
+
+    @property
+    def val(self):
+        return self._val
+
+    @val.setter
+    def val(self, val):
+        self._val, self._data_shape_y = check_set_shape(val, self._set_shape)
+        self._update_attr()
 
     @property
     def mode(self):
         return self._mode
 
+    def _update_attr(self):
+        self._val_flat = self._val.reshape(self._set_size, -1)
+
+        _temp = self._supp_flat[self._val_flat.argmax(0)].transpose()
+        self._mode = _temp.reshape(self._data_shape_x + self._data_shape_y)
+
+    def _f(self, x):
+        x_flat = np.asarray(x).flatten()
+        _out = self._val_flat[(x_flat == self._supp_flat).all(-1)].reshape(self._data_shape_y)
+        return _out  # exception if not in support
+
+    def __call__(self, x):
+        return vectorize_x_func(self._f, self._data_shape_x)(x)
+
+    def plot(self, ax=None):
+        if self._data_shape_y != ():
+            raise ValueError("Can only plot scalar-valued functions.")
+
+        if len(self.set_shape) == 1 and self._data_shape_x == ():
+            if ax is None:
+                _, ax = plt.subplots()
+                ax.set(xlabel='$x$', ylabel='$y$')
+
+            plt_data = ax.stem(self._supp, self._val, use_line_collection=True)
+
+            return plt_data
+        else:
+            raise NotImplementedError('Plot method only implemented for 1-dimensional data.')
+
+
+class FiniteDomainNumericFunc(FiniteDomainFunc):
+
+    def __init__(self, supp, val, set_shape=()):
+        super().__init__(supp, val, set_shape)
+
     @property
     def mean(self):
         return self._mean
 
-    def update_attr(self):
-        vals, data_shape_y = check_set_shape(self(self.supp), self.set_shape)
-        vals_flat = vals.reshape(self.set_size, -1)
+    @property
+    def cov(self):
+        return self._cov
 
-        self._mode = self._supp_flat[vals_flat.argmax(0)].reshape(data_shape_y + self.data_shape_x)     # TODO: dim order?
+    def _update_attr(self):
+        super()._update_attr()
 
+        _mean_flat = (self._supp_flat[..., np.newaxis] * self._val_flat[:, np.newaxis]).sum(0)
+        self._mean = _mean_flat.reshape(self._data_shape_x + self._data_shape_y)
 
-        _temp = (self._supp_flat[..., np.newaxis] * vals_flat[:, np.newaxis]).sum(0)
-        self._mean = _temp.reshape(self.data_shape_x + data_shape_y)
+        ctr_flat = self._supp_flat[..., np.newaxis] - _mean_flat[np.newaxis]
+        outer_flat = (ctr_flat[:, np.newaxis] * ctr_flat[:, :, np.newaxis])
+        _temp = (outer_flat * self._val_flat[:, np.newaxis, np.newaxis]).sum(axis=0)
+        self._cov = _temp.reshape(2 * self._data_shape_x + self._data_shape_y)
 
-    @classmethod
-    def gen_explicit(cls, supp, val, set_shape=()):
+    def plot(self, ax=None):
+        if self._data_shape_y != ():
+            raise ValueError("Can only plot scalar-valued functions.")
 
-        val, data_shape_y = check_set_shape(val, set_shape)
-        set_size = int(np.prod(set_shape))
-        val_flat = val.reshape(set_size, -1)
+        set_ndim = len(self.set_shape)
 
-        supp_flat = supp.reshape(set_size, -1)
+        if set_ndim == 1 and self._data_shape_x == ():
+            super().plot(self, ax)
 
-        def f(x):
-            x_flat = np.asarray(x).flatten()
-            _out = val_flat[(x_flat == supp_flat).all(-1)].reshape(data_shape_y)
-            return _out
-            # if _out.shape[0] == 1:
-            #     return _out.squeeze(0)
-            # else:
-            #     raise ValueError("Input is not in the function supp.")
+        elif set_ndim in [2, 3]:
+            if set_ndim == 2 and self._data_shape_x == (2,):
+                if ax is None:
+                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$y$')
 
-        return cls(supp, f, set_shape=set_shape)
+                plt_data = ax.bar3d(self._supp[..., 0].flatten(),
+                                    self._supp[..., 1].flatten(), 0, 1, 1, self._val_flat.flatten(), shade=True)
+
+            elif set_ndim == 3 and self._data_shape_x == (3,):
+                if ax is None:
+                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
+
+                plt_data = ax.scatter(self._supp[..., 0], self._supp[..., 1], self._supp[..., 2], s=15, c=self._val)
+
+                c_bar = plt.colorbar(plt_data)
+                c_bar.set_label('$y$')
+
+            else:
+                raise ValueError
+
+            return plt_data
+
+        else:
+            raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
 
 
 # #
 # supp_x = np.stack(np.meshgrid(np.arange(2), np.arange(3)), axis=-1)
-# val = np.random.random((3, 2))
+# val = np.random.random((3,))
 #
-# a = FiniteDomainFunc.gen_explicit(supp_x, val, set_shape=(3,2))
-# a(a.supp[1, 1])
-# a([a.supp[1, 1], a.supp[0, 1]])
+# a = FiniteDomainFunc(supp_x, val, set_shape=(3,))
 # a.mean
+# a.cov
+
