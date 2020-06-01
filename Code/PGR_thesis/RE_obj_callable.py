@@ -210,7 +210,7 @@ class FiniteRE(DiscreteRE):
     def p(self):
         return self._p
 
-    @p.setter
+    @p.setter   # TODO: pmf setter? or just p?
     def p(self, p):
         self.pmf.val = p
         self._update_attr()
@@ -252,19 +252,19 @@ class FiniteRV(FiniteRE, DiscreteRV):
 
 
 
-s = np.random.random((4, 3, 2, 2))
-pp = np.random.random((4, 3))
-pp = pp / pp.sum()
-f = FiniteRE.gen_func(s, pp)
-f.pmf(f.rvs((4,5)))
-# f.plot_pmf()
-
-s, p = np.stack(np.meshgrid([0,1],[0,1,2]), axis=-1), np.random.random((3,2))
-# s, p = ['a','b','c'], [.3,.2,.5]
-p = p / p.sum()
-f2 = FiniteRE.gen_func(s, p)
-f2.pmf(f2.rvs(4))
-f2.plot_pmf()
+# s = np.random.random((4, 3, 2, 2))
+# pp = np.random.random((4, 3))
+# pp = pp / pp.sum()
+# f = FiniteRE.gen_func(s, pp)
+# f.pmf(f.rvs((4,5)))
+# # f.plot_pmf()
+#
+# s, p = np.stack(np.meshgrid([0,1],[0,1,2]), axis=-1), np.random.random((3,2))
+# # s, p = ['a','b','c'], [.3,.2,.5]
+# p = p / p.sum()
+# f2 = FiniteRE.gen_func(s, p)
+# f2.pmf(f2.rvs(4))
+# f2.plot_pmf()
 
 
 
