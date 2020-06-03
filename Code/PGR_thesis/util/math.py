@@ -4,7 +4,7 @@ import numpy as np
 def outer_gen(*args):
     n_args = len(args)
     if n_args < 2:
-        raise TypeError('At least two positional inputs are required.')
+        return np.asarray(args[0])
 
     def _outer_gen_2(x, y):
         x, y = np.asarray(x), np.asarray(y)
