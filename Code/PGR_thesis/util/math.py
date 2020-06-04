@@ -1,20 +1,32 @@
+import functools
+import itertools
 import numpy as np
 
 
 def outer_gen(*args):
-    n_args = len(args)
-    if n_args < 2:
-        return np.asarray(args[0])
+    args = tuple(map(np.asarray, args))
+    if len(args) < 2:
+        return args[0]
 
-    def _outer_gen_2(x, y):
-        x, y = np.asarray(x), np.asarray(y)
-        x = x.reshape(x.shape + tuple(np.ones(y.ndim, dtype=int)))  # add singleton dimensions for broadcasting
-        return x * y
+    ix = np.ix_(*map(np.ravel, args))
+    _temp = functools.reduce(lambda x, y: x * y, ix)
+    return _temp.reshape(*itertools.chain(*map(np.shape, args)))
 
-    out = args[0]
-    for arg in args[1:]:
-        out = _outer_gen_2(out, arg)
-    return out
+
+# def outer_gen(*args):
+#     n_args = len(args)
+#     if n_args < 2:
+#         return np.asarray(args[0])
+#
+#     def _outer_gen_2(x, y):
+#         x, y = np.asarray(x), np.asarray(y)
+#         x = x.reshape(x.shape + tuple(np.ones(y.ndim, dtype=int)))  # add singleton dimensions for broadcasting
+#         return x * y
+#
+#     out = args[0]
+#     for arg in args[1:]:
+#         out = _outer_gen_2(out, arg)
+#     return out
 
 
 def diag_gen(x):
