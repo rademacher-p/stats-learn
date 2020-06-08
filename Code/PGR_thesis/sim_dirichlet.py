@@ -15,7 +15,7 @@ from main import learn_sim
 
 from RE_obj import DeterministicRE, FiniteRE, DirichletRV
 from SL_obj import YcXModel
-from bayes import BaseBayes, FiniteDirichletBayes
+from bayes import BaseBayes, DirichletYcXModelBayes
 from loss_functions import loss_01, loss_se
 from learn_functions import DirichletClassifier, DirichletEstimator
 from util.generic import empirical_pmf
@@ -70,7 +70,7 @@ for i, (n_train, alpha_0) in enumerate(itertools.product(n_train_plot, alpha_0_p
     print(f"Simulation {i+1}/{n_iter}")
 
     # bayes_model.prior.alpha_0 = alpha_0
-    bayes_model = FiniteDirichletBayes(supp_x_s, supp_y_s, alpha_0, mean, rng_prior=random.default_rng())
+    bayes_model = DirichletYcXModelBayes(supp_x_s, supp_y_s, alpha_0, mean, rng_prior=random.default_rng())
 
     learner = DirichletClassifier(supp_x_s, supp_y_s, alpha_0, mean)
     # learner = DirichletEstimator(supp_x_s, supp_y_s, alpha_0, mean)

@@ -17,7 +17,7 @@ from scipy import stats
 
 from RE_obj import DeterministicRE, FiniteRE, DirichletRV
 from SL_obj import YcXModel
-from bayes import BaseBayes, FiniteDirichletBayes
+from bayes import BaseBayes, DirichletYcXModelBayes
 from loss_functions import loss_01, loss_se
 from learn_functions import DirichletClassifier, DirichletEstimator
 from util.generic import empirical_pmf

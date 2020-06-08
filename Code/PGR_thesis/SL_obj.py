@@ -137,7 +137,7 @@ class YcXModel(BaseModel):
 
     def _rvs(self, size=(), random_state=None):
         d_x = np.asarray(self.model_x.rvs(size, random_state))
-        if len(size) == 0:
+        if size == ():
             d_y = self.model_y_x(d_x).rvs(size, random_state)
             d = np.array((d_y, d_x), dtype=[('y', d_y.dtype, self.data_shape_y), ('x', d_x.dtype, self.data_shape_x)])
         else:

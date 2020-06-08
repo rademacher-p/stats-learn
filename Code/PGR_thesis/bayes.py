@@ -16,7 +16,6 @@ from SL_obj import YcXModel
 
 # TODO: COMPLETE property set/get check, rework!
 
-
 class BaseBayes:
     def __init__(self, model_gen, model_kwargs=None, prior=None):
         # super().__init__(rng)
@@ -27,11 +26,11 @@ class BaseBayes:
         self.model_gen = functools.partial(model_gen, **model_kwargs)
         self.prior = prior
 
-    def random_model(self):     # TODO: defaults to deterministic prior!?
+    def random_model(self):     # defaults to deterministic prior!?
         return self.model_gen()
 
 
-class FiniteREBayes(BaseBayes):
+class YcXModelBayes(BaseBayes):
     def __init__(self, supp_x, supp_y, prior, rng_model=None):     # TODO: rng check, None default?
         self.supp_x = supp_x
         self.supp_y = supp_y        # TODO: Assumed to be my SL structured array!
@@ -49,7 +48,7 @@ class FiniteREBayes(BaseBayes):
         raise NotImplementedError("Method must be overwritten.")
 
 
-class FiniteDirichletBayes(FiniteREBayes):
+class DirichletYcXModelBayes(YcXModelBayes):
 
     # TODO: initialization from marginal/conditional? full mean init as classmethod?
     def __init__(self, supp_x, supp_y, alpha_0, mean, rng_model=None, rng_prior=None):
