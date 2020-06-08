@@ -15,9 +15,9 @@ from main import learn_sim
 
 from RE_obj import DeterministicRE, FiniteRE, DirichletRV
 from SL_obj import YcXModel
-from bayes import BaseBayes, DirichletYcXModelBayes
+from bayes import BaseBayes, DirichletFiniteYcXModelBayes
 from loss_functions import loss_01, loss_se
-from learn_functions import DirichletClassifier, DirichletEstimator
+from learn_functions import BayesClassifier, BayesEstimator
 from util.generic import empirical_pmf
 
 
@@ -69,11 +69,10 @@ n_iter = risk_plot.size
 for i, (n_train, alpha_0) in enumerate(itertools.product(n_train_plot, alpha_0_plot)):
     print(f"Simulation {i+1}/{n_iter}")
 
-    # bayes_model.prior.alpha_0 = alpha_0
-    bayes_model = DirichletYcXModelBayes(supp_x_s, supp_y_s, alpha_0, mean, rng_prior=random.default_rng())
+    bayes_model = DirichletFiniteYcXModelBayes(supp_x_s, supp_y_s, alpha_0, mean, rng_prior=random.default_rng())
 
-    learner = DirichletClassifier(supp_x_s, supp_y_s, alpha_0, mean)
-    # learner = DirichletEstimator(supp_x_s, supp_y_s, alpha_0, mean)
+    learner = BayesClassifier(bayes_model)
+    # learner = BayesEstimator(bayes_model)
 
     risk_plot[np.unravel_index([i], risk_plot.shape)] = learn_sim(bayes_model, learner, n_train, n_mc=1000, verbose=True)
 

@@ -6,7 +6,7 @@ Random element objects.
 
 import numpy as np
 from scipy.stats._multivariate import multi_rv_generic
-from scipy.special import gammaln, xlogy
+from scipy.special import gammaln, xlogy, xlog1py, betaln
 import matplotlib.pyplot as plt
 from util.generic import check_data_shape, check_valid_pmf
 from util.math import outer_gen, diag_gen, simplex_round
@@ -298,19 +298,19 @@ class FiniteRV(FiniteRE, DiscreteRV):
             raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
 
 
-s = np.random.random((4, 3, 2, 2))
-pp = np.random.random((4, 3))
-pp = pp / pp.sum()
-f = FiniteRE(s, pp)
-f.pmf(f.rvs((4,5)))
-
-s = np.stack(np.meshgrid([0,1],[0,1], [0,1]), axis=-1)
-s, p = ['a','b','c'], [.3,.2,.5]
-# p = np.random.random((2,2,2))
-# p = p / p.sum()
-f2 = FiniteRE(s, p)
-f2.pmf(f2.rvs(4))
-f2.plot_pmf()
+# s = np.random.random((4, 3, 2, 2))
+# pp = np.random.random((4, 3))
+# pp = pp / pp.sum()
+# f = FiniteRE(s, pp)
+# f.pmf(f.rvs((4,5)))
+#
+# s = np.stack(np.meshgrid([0,1],[0,1], [0,1]), axis=-1)
+# s, p = ['a','b','c'], [.3,.2,.5]
+# # p = np.random.random((2,2,2))
+# # p = p / p.sum()
+# f2 = FiniteRE(s, p)
+# f2.pmf(f2.rvs(4))
+# f2.plot_pmf()
 
 
 
@@ -658,3 +658,77 @@ class DirichletEmpiricalRV(DiscreteRV):
 # d.rvs()
 # d.pmf(d.rvs())
 # d.pmf(d.rvs(4).reshape((2, 2) + d.mean.shape))
+
+
+
+class BetaRV(ContinuousRV):
+    """
+    Beta random variable.
+    """
+
+    def __init__(self, a, b, rng=None):
+        super().__init__(rng)
+        if a <= 0 or b <= 0:
+            raise ValueError("Parameters must be strictly positive.")
+        self._a, self._b = a, b
+
+        self._data_shape = ()
+        self._update_attr()
+
+    # Input properties
+    @property
+    def a(self):
+        return self._a
+
+    @a.setter
+    def a(self, a):
+        if a <= 0:
+            raise ValueError
+        self._a = a
+        self._update_attr()
+
+    @property
+    def b(self):
+        return self._b
+
+    @b.setter
+    def b(self, b):
+        if b <= 0:
+            raise ValueError
+        self._b = b
+        self._update_attr()
+
+    # Attribute Updates
+    def _update_attr(self):
+        if self._a > 1:
+            if self._b > 1:
+                self._mode = (self._a - 1) / (self._a + self._b - 2)
+            else:
+                self._mode = 1
+        elif self._a <= 1:
+            if self._b > 1:
+                self._mode = 0
+            elif self._a == 1 and self._b == 1:
+                self._mode = 0      # any in unit interval
+            else:
+                self._mode = 0      # any in {0,1}
+
+        self._mean = self._a / (self._a + self._b)
+        self._cov = self._a * self._b / (self._a + self._b)**2 / (self._a + self._b + 1)
+
+    def _rvs(self, size=(), random_state=None):
+        return random_state.beta(self._a, self._b, size)
+
+    def _pdf(self, x):
+        log_pdf = xlog1py(self._b - 1.0, -x) + xlogy(self._a - 1.0, x) - betaln(self._a, self._b)
+        return np.exp(log_pdf)
+
+    def plot_pdf(self, n_plt, ax=None):
+        if ax is None:
+            _, ax = plt.subplots()
+            ax.set(xlabel='$x$', ylabel='$P_{\mathrm{x}}(x)$')
+
+        x_plt = np.linspace(0, 1, n_plt + 1, endpoint=True)
+        plt_data = ax.plot(x_plt, self.pdf(x_plt))
+        return plt_data
+
