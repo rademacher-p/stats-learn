@@ -17,9 +17,9 @@ from scipy import stats
 
 from RE_obj import DeterministicRE, FiniteRE, DirichletRV
 from SL_obj import YcXModel
-from bayes import BaseBayes, DirichletYcXModelBayes
+from bayes import BaseBayes, DirichletFiniteYcXModelBayes
 from loss_functions import loss_01, loss_se
-from learn_functions import DirichletClassifier, DirichletEstimator
+from learn_functions import BayesClassifier, BayesEstimator
 from util.generic import empirical_pmf
 
 # plt.style.use('seaborn')  # cm?
@@ -126,14 +126,14 @@ theta_m_s = FiniteRE(supp_x_s, theta_m_pmf)
 
 # TODO: vectorize learners and losses!
 
-def learn_sim(prior, learner, n_train=0, n_test=1, n_mc=1, verbose=False):
+def learn_sim(bayes_model, learner, n_train=0, n_test=1, n_mc=1, verbose=False):
     loss_mc = np.empty(n_mc)
     for i_mc in range(n_mc):
         if verbose:
             if i_mc % 100 == 0:
                 print(f"Iteration {i_mc}/{n_mc}", end='\r')
 
-        theta = prior.random_model()    # randomize model using prior
+        theta = bayes_model.random_model()    # randomize model using bayes_model
         d_train, d_test = theta.rvs(n_train), theta.rvs(n_test)     # generate train/test data
         learner.fit(d_train)        # train learner
         loss_mc[i_mc] = learner.evaluate(d_test)        # make decision and assess

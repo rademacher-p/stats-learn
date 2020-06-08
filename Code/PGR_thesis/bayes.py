@@ -10,9 +10,12 @@ import numpy as np
 
 from RE_obj import FiniteRE, DirichletRV
 from SL_obj import YcXModel
+from util.generic import empirical_pmf
 
 
 #%% Priors
+
+# TODO: Add deterministic DEP to effect a DP realization and sample!!
 
 # TODO: COMPLETE property set/get check, rework!
 
@@ -26,11 +29,32 @@ class BaseBayes:
         self.model_gen = functools.partial(model_gen, **model_kwargs)
         self.prior = prior
 
-    def random_model(self):     # defaults to deterministic prior!?
+    def random_model(self):     # defaults to deterministic bayes_model!?
         return self.model_gen()
 
 
-class YcXModelBayes(BaseBayes):
+class BetaModelBayes(BaseBayes):
+    def __init__(self, prior=None, rng_model=None):
+        model_gen = YcXModel.beta_model
+        model_kwargs = {'a': .9, 'b': .9, 'c': 5, 'rng': rng_model}
+        super().__init__(model_gen, model_kwargs, prior)
+
+    # def random_model(self):
+    #     raise NotImplementedError("Method must be overwritten.")
+
+
+# class NormalModelBayes(BaseBayes):
+#     def __init__(self, prior=None, rng_model=None):
+#         model_gen = YcXModel.norm_model
+#         model_kwargs = {'mean_x': 0, 'var_x': 1, 'var_y': 1, 'rng': rng_model}
+#         super().__init__(model_gen, model_kwargs, prior)
+#
+#     # def random_model(self):
+#     #     raise NotImplementedError("Method must be overwritten.")
+
+
+
+class FiniteYcXModelBayes(BaseBayes):
     def __init__(self, supp_x, supp_y, prior, rng_model=None):     # TODO: rng check, None default?
         self.supp_x = supp_x
         self.supp_y = supp_y        # TODO: Assumed to be my SL structured array!
@@ -41,26 +65,45 @@ class YcXModelBayes(BaseBayes):
         self._data_shape_y = supp_y.dtype['y'].shape
 
         model_gen = YcXModel.finite_model
-        model_kwargs = {'supp': supp_x['x'], 'supp_y': supp_y['y'], 'rng': rng_model}
+        model_kwargs = {'supp_x': supp_x['x'], 'supp_y': supp_y['y'], 'rng': rng_model}
         super().__init__(model_gen, model_kwargs, prior)
 
     def random_model(self):
         raise NotImplementedError("Method must be overwritten.")
 
 
-class DirichletYcXModelBayes(YcXModelBayes):
+class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 
     # TODO: initialization from marginal/conditional? full mean init as classmethod?
+
     def __init__(self, supp_x, supp_y, alpha_0, mean, rng_model=None, rng_prior=None):
         prior = DirichletRV(alpha_0, mean, rng_prior)
         super().__init__(supp_x, supp_y, prior, rng_model)
 
+        self.alpha_0 = self.prior.alpha_0
+        self.mean = self.prior.mean
+
+        self._mean_x = self.mean.reshape(self._supp_shape_x + (-1,)).sum(axis=-1)
+
+        def _mean_y_x(x):
+            x = np.asarray(x)
+            _mean_flat = self.mean.reshape((-1,) + self._supp_shape_y)
+            _mean_slice = _mean_flat[np.all(x.flatten()
+                                            == self.supp_x['x'].reshape(self.supp_x.size, -1), axis=-1)].squeeze(axis=0)
+            mean_y = _mean_slice / _mean_slice.sum()
+            return mean_y
+
+        self._mean_y_x = _mean_y_x
+
+        self._model_gen = functools.partial(YcXModel.finite_model, supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
+
     def random_model(self, rng=None):
-        p = self.prior.rvs(random_state=rng)        # TODO: generate using marginal/conditional independence??
+        p = self.prior.rvs(random_state=rng)
 
         p_x = p.reshape(self._supp_shape_x + (-1,)).sum(axis=-1)
 
         def p_y_x(x):
+            x = np.asarray(x)
             _p_flat = p.reshape((-1,) + self._supp_shape_y)
             _p_slice = _p_flat[np.all(x.flatten()
                                       == self.supp_x['x'].reshape(self.supp_x.size, -1), axis=-1)].squeeze(axis=0)
@@ -69,8 +112,31 @@ class DirichletYcXModelBayes(YcXModelBayes):
 
         return self.model_gen(p_x=p_x, p_y_x=p_y_x)
 
+    def posterior_mean(self, d):    # TODO: generalize method for base classes, full posterior object?
+        n = len(d)
 
+        if n == 0:
+            p_x, p_y_x = self._mean_x, self._mean_y_x
+        else:
+            emp_dist_x = empirical_pmf(d['x'], self.supp_x['x'], self._data_shape_x)
 
+            def emp_dist_y_x(x):
+                x = np.asarray(x)
+                d_match = d[np.all(x.flatten() == d['x'].reshape(n, -1), axis=-1)].squeeze()
+                if d_match.size == 0:
+                    return np.empty(self._supp_shape_y)
+                return empirical_pmf(d_match['y'], self.supp_y['y'], self._data_shape_y)
+
+            c_prior_x = 1 / (1 + n / self.alpha_0)
+            p_x = c_prior_x * self._mean_x + (1 - c_prior_x) * emp_dist_x
+
+            def p_y_x(x):
+                x = np.asarray(x)
+                i = (self.supp_x['x'].reshape(self._supp_shape_x + (-1,)) == x.flatten()).all(-1)
+                c_prior_y = 1 / (1 + (n * emp_dist_x[i]) / (self.alpha_0 * self._mean_x[i]))
+                return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist_y_x(x)
+
+        return self._model_gen(p_x=p_x, p_y_x=p_y_x)
 
 
 
@@ -78,23 +144,23 @@ class DirichletYcXModelBayes(YcXModelBayes):
 
 # ###
 # class BayesRE:
-#     def __init__(self, prior, rand_kwargs, model_gen, model_kwargs=None):
+#     def __init__(self, bayes_model, rand_kwargs, model_gen, model_kwargs=None):
 #         if model_kwargs is None:
 #             model_kwargs = {}
 #         self.model_kwargs = model_kwargs
 #
-#         # prior.rand_kwargs = types.MethodType(rand_kwargs, prior)
-#         self.prior = prior
+#         # bayes_model.rand_kwargs = types.MethodType(rand_kwargs, bayes_model)
+#         self.bayes_model = bayes_model
 #         self.rand_kwargs = rand_kwargs
 #
 #         self.model_gen = model_gen
 #
 #     def random_model(self):
-#         return self.model_gen(**self.model_kwargs, **self.rand_kwargs(self.prior))
+#         return self.model_gen(**self.model_kwargs, **self.rand_kwargs(self.bayes_model))
 #
 #     @classmethod
 #     def finite_dirichlet(cls, supp, supp_y, alpha_0, mean, rng):
-#         prior = DirichletRV(alpha_0, mean)
+#         bayes_model = DirichletRV(alpha_0, mean)
 #
 #         def rand_kwargs(dist):
 #             p = dist.rvs()
@@ -112,7 +178,7 @@ class DirichletYcXModelBayes(YcXModelBayes):
 #         model_gen = YcXModel.finite_model
 #         model_kwargs = {'supp': supp['x'], 'supp_y': supp_y['y'], 'rng': rng}
 #
-#         return cls(prior, rand_kwargs, model_gen, model_kwargs)
+#         return cls(bayes_model, rand_kwargs, model_gen, model_kwargs)
 
 
 
@@ -123,17 +189,17 @@ class DirichletYcXModelBayes(YcXModelBayes):
 
 
 
-# def bayes_re(model_gen, prior, rand_kwargs, model_kwargs=None):
+# def bayes_re(model_gen, bayes_model, rand_kwargs, model_kwargs=None):
 #     if model_kwargs is None:
 #         model_kwargs = {}
 #
-#     prior.rand_kwargs = types.MethodType(rand_kwargs, prior)
+#     bayes_model.rand_kwargs = types.MethodType(rand_kwargs, bayes_model)
 #
-#     obj = model_gen(**model_kwargs, **prior.rand_kwargs())
-#     obj.prior = prior
+#     obj = model_gen(**model_kwargs, **bayes_model.rand_kwargs())
+#     obj.bayes_model = bayes_model
 #
 #     def random_model(self):
-#         for attr, val in prior.rand_kwargs().items():
+#         for attr, val in bayes_model.rand_kwargs().items():
 #             setattr(self, attr, val)
 #
 #     obj.random_model = types.MethodType(random_model, obj)
@@ -146,7 +212,7 @@ class DirichletYcXModelBayes(YcXModelBayes):
 #     model_gen = YcXModel.finite_model
 #     model_kwargs = {'supp': set_x_s['x'], 'set_y': set_y_s['y'], 'rng': rng}
 #
-#     prior = DirichletRV(alpha_0, mean)
+#     bayes_model = DirichletRV(alpha_0, mean)
 #
 #
 #     def rand_kwargs(self):
@@ -162,18 +228,18 @@ class DirichletYcXModelBayes(YcXModelBayes):
 #
 #         return {'p_x': p_x, 'p_y_x': p_y_x}
 #
-#     return bayes_re(model_gen, prior, rand_kwargs, model_kwargs)
+#     return bayes_re(model_gen, bayes_model, rand_kwargs, model_kwargs)
 #
 #
 #
 #
-# def bayes_re2(model_gen, prior):
+# def bayes_re2(model_gen, bayes_model):
 #
-#     obj = model_gen(**prior.rand_kwargs())
-#     obj.prior = prior
+#     obj = model_gen(**bayes_model.rand_kwargs())
+#     obj.bayes_model = bayes_model
 #
 #     def random_model(self):
-#         for attr, val in prior.rand_kwargs().items():
+#         for attr, val in bayes_model.rand_kwargs().items():
 #             setattr(self, attr, val)
 #
 #     obj.random_model = types.MethodType(random_model, obj)
@@ -199,10 +265,10 @@ class DirichletYcXModelBayes(YcXModelBayes):
 #
 #         return {'p_x': p_x, 'p_y_x': p_y_x}
 #
-#     prior = DirichletRV(alpha_0, mean)
-#     prior.rand_kwargs = types.MethodType(rand_kwargs, prior)
+#     bayes_model = DirichletRV(alpha_0, mean)
+#     bayes_model.rand_kwargs = types.MethodType(rand_kwargs, bayes_model)
 #
-#     return bayes_re2(model_gen, prior)
+#     return bayes_re2(model_gen, bayes_model)
 
 
 
@@ -214,8 +280,8 @@ class DirichletYcXModelBayes(YcXModelBayes):
 #%% Boneyard
 
 # class BayesRE:
-#     def __new__(cls, prior, model_cls, model_kwargs):
-#         self.prior = prior
+#     def __new__(cls, bayes_model, model_cls, model_kwargs):
+#         self.bayes_model = bayes_model
 #
 #         class cls_frozen(model_cls):
 #             __new__ = functools.partialmethod(model_cls.__new__, **model_kwargs)
@@ -229,18 +295,18 @@ class DirichletYcXModelBayes(YcXModelBayes):
 
 # class FiniteREPrior(FiniteRE):
 #     def __new__(cls, supp, seed=None):
-#         cls.prior = DirichletRV(2, [.5, .5])
+#         cls.bayes_model = DirichletRV(2, [.5, .5])
 #         p = cls.rng_prior()
 #         return super().__new__(cls, supp, p, seed)
 #
 #     def __init__(self, supp, seed=None):
-#         # self.prior = DirichletRV(2, [.5, .5])
+#         # self.bayes_model = DirichletRV(2, [.5, .5])
 #         p = self.rng_prior()
 #         super().__init__(supp, p, seed)
 #
 #     @classmethod
 #     def rng_prior(cls):
-#         return cls.prior.rvs()
+#         return cls.bayes_model.rvs()
 #
 #     def random_model(self):
 #         self.p = self.rng_prior()
@@ -303,12 +369,12 @@ class DirichletYcXModelBayes(YcXModelBayes):
 #
 #
 # class BayesRE:
-#     def __init__(self, prior, model):
-#         self.prior = prior
+#     def __init__(self, bayes_model, model):
+#         self.bayes_model = bayes_model
 #         self.model = model
 #
 #     def random_model(self):
-#         self.prior.rvs()
+#         self.bayes_model.rvs()
 #         return None
 
 

@@ -6,9 +6,10 @@ Supervised Learning base classes.
 # TODO: docstrings?
 
 import numpy as np
+from scipy import stats
 from scipy.stats._multivariate import multi_rv_generic
 
-from RE_obj import BaseRE, BaseRV, FiniteRE
+from RE_obj import BaseRE, BaseRV, FiniteRE, DirichletRV, BetaRV
 from util.generic import vectorize_x_func
 
 
@@ -137,25 +138,36 @@ class YcXModel(BaseModel):
 
     def _rvs(self, size=(), random_state=None):
         d_x = np.asarray(self.model_x.rvs(size, random_state))
-        if size == ():
-            d_y = self.model_y_x(d_x).rvs(size, random_state)
-            d = np.array((d_y, d_x), dtype=[('y', d_y.dtype, self.data_shape_y), ('x', d_x.dtype, self.data_shape_x)])
-        else:
-            d_y = np.asarray([self.model_y_x(x).rvs((), random_state)
-                              for x in d_x.reshape((-1,) + self._data_shape_x)]).reshape(size + self.data_shape_y)
-            d = np.array(list(zip(d_y.reshape((-1,) + self.data_shape_y), d_x.reshape((-1,) + self.data_shape_x))),
-                         dtype=[('y', d_y.dtype, self.data_shape_y), ('x', d_x.dtype, self.data_shape_x)]).reshape(size)
+        d_y = np.asarray([self.model_y_x(x).rvs((), random_state)
+                          for x in d_x.reshape((-1,) + self._data_shape_x)]).reshape(size + self.data_shape_y)
+        d = np.array(list(zip(d_y.reshape((-1,) + self.data_shape_y), d_x.reshape((-1,) + self.data_shape_x))),
+                     dtype=[('y', d_y.dtype, self.data_shape_y), ('x', d_x.dtype, self.data_shape_x)]).reshape(size)
 
         return d
 
     @classmethod
-    def finite_model(cls, supp_x, p_x, supp_y, p_y_x, rng):
+    def finite_model(cls, supp_x, p_x, supp_y, p_y_x, rng=None):
         model_x = FiniteRE(supp_x, p_x)
 
-        def model_y_x(x):
-            return FiniteRE(supp_y, p_y_x(x))
+        def model_y_x(x): return FiniteRE(supp_y, p_y_x(x))
 
         return cls(model_x, model_y_x, rng)
+
+    @classmethod
+    def beta_model(cls, a, b, c, rng=None):       # TODO: generalize input
+        model_x = BetaRV(a, b)
+
+        def model_y_x(x): return BetaRV(c*x, c*(1-x))
+
+        return cls(model_x, model_y_x, rng)
+
+    # @classmethod
+    # def norm_model(cls, mean_x=0, var_x=1, var_y=1, rng=None):  # TODO: generalize input
+    #     model_x = stats.norm(loc=mean_x, scale=np.sqrt(var_x))
+    #
+    #     def model_y_x(x): return stats.norm(loc=x, scale=np.sqrt(var_y))
+    #
+    #     return cls(model_x, model_y_x, rng)
 
     # TODO: add more factory constructors?
 
@@ -178,16 +190,16 @@ class YcXModelRVyx(YcXModelRVx, YcXModelRVy):
     pass
 
 
-# theta_m = DirichletRV(8, [[.2, .1], [.3,.4]])
+# theta_m = DirichletRV(8, [[.2, .1], [.3, .4]])
 # def theta_c(x): return FiniteRE([[0, 1], [2, 3]], x)
-#
+
 # theta_m = DirichletRV(8, [[.2, .1, .1], [.3, .1, .2]])
 # def theta_c(x): return FiniteRE(np.stack(np.meshgrid([0,1,2],[0,1]), axis=-1), x)
-#
+
 # theta_m = DirichletRV(6, [.5, .5])
-# def theta_c(x): return FiniteRE(['a', 'b'], x)
-# # def theta_c(x): return FiniteRE([0, 1], x)
-#
+# # def theta_c(x): return FiniteRE(['a', 'b'], x)
+# def theta_c(x): return FiniteRE([0, 1], x)
+
 # t = YcXModel(theta_m, theta_c)
 # t.rvs()
 # t.rvs(4)
