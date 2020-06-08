@@ -67,7 +67,7 @@ class DirichletLearner(BaseLearner):
 
         self._mean_y_x = _mean_y_x
 
-        self._posterior = None
+        self._model_est = None
         self._model_gen = functools.partial(YcXModel.finite_model, supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
         self.fit()
 
@@ -76,15 +76,15 @@ class DirichletLearner(BaseLearner):
         return self._mean_x
 
     @property
-    def posterior(self):
-        return self._posterior
+    def model_est(self):
+        return self._model_est
 
     def fit(self, d=np.array([])):
         n = len(d)
 
         if n == 0:
             p_x, p_y_x = self._mean_x, self._mean_y_x
-            self._posterior = self._model_gen(p_x=p_x, p_y_x=p_y_x)
+            self._model_est = self._model_gen(p_x=p_x, p_y_x=p_y_x)
         else:
 
             emp_dist_x = empirical_pmf(d['x'], self.supp_x['x'], self._data_shape_x)
@@ -103,7 +103,7 @@ class DirichletLearner(BaseLearner):
                 c_prior_y = 1 / (1 + (n * emp_dist_x[i]) / (self.alpha_0 * self._mean_x[i]))
                 return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist_y_x(x)
 
-            self._posterior = self._model_gen(p_x=p_x, p_y_x=p_y_x)
+            self._model_est = self._model_gen(p_x=p_x, p_y_x=p_y_x)
 
     @classmethod
     def prior_gen(cls, bayes_model):
@@ -116,7 +116,7 @@ class DirichletClassifier(DirichletLearner):
         self.loss_fcn = loss_01
 
     def _predict_single(self, x):
-        return self._posterior.mode_y_x(x)
+        return self._model_est.mode_y_x(x)
 
 
 class DirichletEstimator(DirichletLearner):
@@ -125,5 +125,5 @@ class DirichletEstimator(DirichletLearner):
         self.loss_fcn = loss_se
 
     def _predict_single(self, x):
-        return self._posterior.mean_y_x(x)
+        return self._model_est.mean_y_x(x)
 

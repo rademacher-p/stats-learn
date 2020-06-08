@@ -6,11 +6,43 @@ from util.generic import check_data_shape, check_set_shape, vectorize_x_func
 # TODO: plot methods
 
 
+class BaseSupp(object):
+    pass
+
+
+class EuclideanSupp(BaseSupp):
+    def __init__(self, lims):
+        self.lims = np.asarray(lims)
+        if self.lims.ndim == 1:
+            self.lims = self.lims[np.newaxis]
+        elif self.lims.ndim != 2:
+            raise ValueError("Lims must be 2-D array.")
+        if self.lims.shape[1] != 2:
+            raise ValueError
+        if not (self.lims[:, 0] <= self.lims[:, 1]).all():
+            raise ValueError("Upper values must meet or exceed lower values:.")
+
+    @property
+    def ndim(self):
+        return len(self.lims)
+
+
+class FiniteSupp(BaseSupp):
+    def __init__(self, vals):
+        self.vals = np.asaray(vals)     # TODO: multidim?
+
+
+
+
+
 class BaseFunc(object):
     # def __init__(self):
     #     pass
 
     def __call__(self, x):
+        raise NotImplementedError
+
+    def __add__(self, other):
         raise NotImplementedError
 
 
@@ -86,7 +118,7 @@ class FiniteDomainFunc(object):
     def _f(self, x):
         x_flat = np.asarray(x).flatten()
         _out = self._val_flat[(x_flat == self._supp_flat).all(-1)].reshape(self._data_shape_y)
-        return _out  # exception if not in support
+        return _out  # TODO: exception if not in support
 
     def __call__(self, x):
         return vectorize_x_func(self._f, self._data_shape_x)(x)
@@ -175,4 +207,5 @@ class FiniteDomainNumericFunc(FiniteDomainFunc):
 # a = FiniteDomainFunc(supp_x, val, set_shape=(3,))
 # a.mean
 # a.cov
+
 
