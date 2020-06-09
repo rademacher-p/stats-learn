@@ -15,7 +15,7 @@ from main import learn_sim
 
 from RE_obj import DeterministicRE, FiniteRE, DirichletRV
 from SL_obj import YcXModel
-from bayes import BaseBayes, DirichletFiniteYcXModelBayes
+from bayes import BaseBayes, DirichletFiniteYcXModelBayes, DirichletFiniteYcXModelBayesOrig
 from loss_functions import loss_01, loss_se
 from learn_functions import BayesClassifier, BayesEstimator
 from util.generic import empirical_pmf

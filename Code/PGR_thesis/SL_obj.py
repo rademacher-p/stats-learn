@@ -9,7 +9,7 @@ import numpy as np
 from scipy import stats
 from scipy.stats._multivariate import multi_rv_generic
 
-from RE_obj import BaseRE, BaseRV, FiniteRE, DirichletRV, BetaRV
+from RE_obj_callable import BaseRE, BaseRV, FiniteRE, DirichletRV, BetaRV       # TODO: CALLABLE!!!!
 from util.generic import vectorize_x_func
 
 
@@ -146,15 +146,23 @@ class YcXModel(BaseModel):
         return d
 
     @classmethod
-    def finite_model(cls, supp_x, p_x, supp_y, p_y_x, rng=None):
-        model_x = FiniteRE(supp_x, p_x)
+    def finite_model_orig(cls, supp_x, p_x, supp_y, p_y_x, rng=None):        # TODO: DELETE
+        model_x = FiniteRE.gen_func(supp_x, p_x)
 
-        def model_y_x(x): return FiniteRE(supp_y, p_y_x(x))
+        def model_y_x(x): return FiniteRE.gen_func(supp_y, p_y_x(x))
 
         return cls(model_x, model_y_x, rng)
 
     @classmethod
-    def beta_model(cls, a, b, c, rng=None):       # TODO: generalize input
+    def finite_model(cls, pmf_x, pmf_y_x, rng=None):
+        model_x = FiniteRE(pmf_x)
+
+        def model_y_x(x): return FiniteRE(pmf_y_x(x))
+
+        return cls(model_x, model_y_x, rng)
+
+    @classmethod
+    def beta_model(cls, a, b, c, rng=None):
         model_x = BetaRV(a, b)
 
         def model_y_x(x): return BetaRV(c*x, c*(1-x))
@@ -162,14 +170,12 @@ class YcXModel(BaseModel):
         return cls(model_x, model_y_x, rng)
 
     # @classmethod
-    # def norm_model(cls, mean_x=0, var_x=1, var_y=1, rng=None):  # TODO: generalize input
+    # def norm_model(cls, mean_x=0, var_x=1, var_y=1, rng=None):
     #     model_x = stats.norm(loc=mean_x, scale=np.sqrt(var_x))
     #
     #     def model_y_x(x): return stats.norm(loc=x, scale=np.sqrt(var_y))
     #
     #     return cls(model_x, model_y_x, rng)
-
-    # TODO: add more factory constructors?
 
 
 class YcXModelRVx(YcXModel, BaseModelRVx):
@@ -191,15 +197,15 @@ class YcXModelRVyx(YcXModelRVx, YcXModelRVy):
 
 
 # theta_m = DirichletRV(8, [[.2, .1], [.3, .4]])
-# def theta_c(x): return FiniteRE([[0, 1], [2, 3]], x)
-
+# def theta_c(x): return FiniteRE.gen_func([[0, 1], [2, 3]], x)
+#
 # theta_m = DirichletRV(8, [[.2, .1, .1], [.3, .1, .2]])
-# def theta_c(x): return FiniteRE(np.stack(np.meshgrid([0,1,2],[0,1]), axis=-1), x)
-
+# def theta_c(x): return FiniteRE.gen_func(np.stack(np.meshgrid([0,1,2],[0,1]), axis=-1), x)
+#
 # theta_m = DirichletRV(6, [.5, .5])
-# # def theta_c(x): return FiniteRE(['a', 'b'], x)
-# def theta_c(x): return FiniteRE([0, 1], x)
-
+# # def theta_c(x): return FiniteRE.gen_func(['a', 'b'], x)
+# def theta_c(x): return FiniteRE.gen_func([0, 1], x)
+#
 # t = YcXModel(theta_m, theta_c)
 # t.rvs()
 # t.rvs(4)

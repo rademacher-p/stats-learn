@@ -120,7 +120,7 @@ class DeterministicRE(DiscreteRE):
     Deterministic random element.
     """
 
-    # TODO: redundant, just use FiniteRE? or change to ContinuousRV for integration?
+    # TODO: redundant, just use FiniteRE? or change to ContinuousRV for integration? General dirac mix?
 
     def __new__(cls, val, rng=None):
         val = np.asarray(val)
@@ -298,16 +298,16 @@ class FiniteRV(FiniteRE, DiscreteRV):
             raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
 
 
-# s = np.random.random((4, 3, 2, 2))
-# pp = np.random.random((4, 3))
+# s = np.random.random((1, 1, 2))
+# pp = np.random.random((1,))
 # pp = pp / pp.sum()
 # f = FiniteRE(s, pp)
 # f.pmf(f.rvs((4,5)))
 #
 # s = np.stack(np.meshgrid([0,1],[0,1], [0,1]), axis=-1)
-# s, p = ['a','b','c'], [.3,.2,.5]
-# # p = np.random.random((2,2,2))
-# # p = p / p.sum()
+# p = np.random.random((2,2,2))
+# p = p / p.sum()
+# # s, p = ['a','b','c'], [.3,.2,.5]
 # f2 = FiniteRE(s, p)
 # f2.pmf(f2.rvs(4))
 # f2.plot_pmf()
