@@ -6,7 +6,7 @@ Random element objects.
 
 import numpy as np
 from scipy.stats._multivariate import multi_rv_generic
-from scipy.special import gammaln, xlogy
+from scipy.special import gammaln, xlogy, xlog1py, betaln
 import matplotlib.pyplot as plt
 from util.generic import check_data_shape, check_valid_pmf
 from util.math import outer_gen, diag_gen, simplex_round
@@ -116,69 +116,6 @@ class ContinuousRV(BaseRV):
 
 #%% Specific RE's
 
-class DeterministicRE(DiscreteRE):
-    """
-    Deterministic random element.
-    """
-
-    # TODO: redundant, just use FiniteRE? or change to ContinuousRV for integration?
-
-    def __new__(cls, val, rng=None):
-        val = np.asarray(val)
-        if np.issubdtype(val.dtype, np.number):
-            return super().__new__(DeterministicRV)
-        else:
-            return super().__new__(cls)
-
-    def __init__(self, val, rng=None):
-        super().__init__(rng)
-        self.val = val
-
-    # Input properties
-    @property
-    def val(self):
-        return self._val
-
-    @val.setter
-    def val(self, val):
-        self._val = np.asarray(val)
-
-        self._data_shape = self._val.shape
-        self._data_size = self._val.size
-
-        self._mode = self._val
-
-    def _rvs(self, size=(), random_state=None):
-        return np.broadcast_to(self._val, size + self._data_shape)
-
-    def _pmf(self, x):
-        return np.where(np.all(x.reshape(-1, self._data_size) == self._val.flatten(), axis=-1), 1., 0.)
-
-
-class DeterministicRV(DeterministicRE, DiscreteRV):
-    """
-    Deterministic random variable.
-    """
-
-    @DeterministicRE.val.setter
-    def val(self, val):
-        DeterministicRE.val.fset(self, val)
-        # super(DeterministicRV, self.__class__).val.fset(self, val)    # TODO: super instead?
-
-        self._mean = self._val
-        self._cov = np.zeros(2 * self._data_shape)
-
-
-# rng = np.random.default_rng()
-# a = np.arange(6).reshape(3, 2)
-# # a = ['a','b','c']
-# b = DeterministicRE(a[1], rng)
-# b.mode
-# b.mean
-# b.cov
-# b.pmf(b.rvs())
-
-
 class FiniteRE(DiscreteRE):
     """
     Generic RE drawn from a finite support set using an explicitly defined PMF.
@@ -220,10 +157,10 @@ class FiniteRE(DiscreteRE):
         self._supp = self.pmf.supp
         self._p = check_valid_pmf(self.pmf(self._supp))
 
-        self._data_shape = self.pmf._data_shape_x
+        self._data_shape = self.pmf.data_shape_x
         self._supp_flat = self.pmf._supp_flat
 
-        self._mode = self.pmf.mode
+        self._mode = self.pmf.argmax
 
     def _rvs(self, size=(), random_state=None):
         i = random_state.choice(self._p.size, size, p=self._p.flatten())
@@ -247,8 +184,8 @@ class FiniteRV(FiniteRE, DiscreteRV):
     def _update_attr(self):
         super()._update_attr()
 
-        self._mean = self.pmf.mean
-        self._cov = self.pmf.cov
+        self._mean = self.pmf.m1
+        self._cov = self.pmf.m2c
 
 
 
@@ -275,6 +212,14 @@ def _dirichlet_check_alpha_0(alpha_0):
     return alpha_0
 
 
+def _check_func_pmf(f, full_support=False):
+    if full_support and f.min <= 0:
+        raise ValueError("Mean must be a valid PMF.")
+    if not full_support and f.min < 0:
+        raise ValueError("Mean must be a valid PMF.")
+    return f
+
+
 def _dirichlet_check_input(x, alpha_0, mean):
     x = check_valid_pmf(x, data_shape=mean.shape)
 
@@ -292,7 +237,11 @@ class DirichletRV(ContinuousRV):
     def __init__(self, alpha_0, mean, rng=None):
         super().__init__(rng)
         self._alpha_0 = _dirichlet_check_alpha_0(alpha_0)
-        self._mean = check_valid_pmf(mean, full_support=True)
+
+        if mean.data_shape_y != ():
+            raise ValueError("Mean must be scalar function.")
+        self._mean = _check_func_pmf(mean, full_support=True)
+
         self._update_attr()
 
     # Input properties
@@ -311,15 +260,18 @@ class DirichletRV(ContinuousRV):
 
     @mean.setter
     def mean(self, mean):
-        self._mean = check_valid_pmf(mean, full_support=True)
+        if mean.data_shape_y != ():
+            raise ValueError("Mean must be scalar function.")
+        self._mean = _check_func_pmf(mean, full_support=True)
+
         self._update_attr()
 
     # Attribute Updates
     def _update_attr(self):
-        self._data_shape = self._mean.shape
-        self._data_size = self._mean.size
+        self._data_shape = self._mean.data_shape_x
+        self._data_size = int(np.prod(self._data_shape))
 
-        if np.min(self._mean) > 1 / self._alpha_0:
+        if self._mean.min > 1 / self._alpha_0:
             self._mode = (self._mean - 1 / self._alpha_0) / (1 - self._data_size / self._alpha_0)
         else:
             # warnings.warn("Mode method currently supported for mean > 1/alpha_0 only")
@@ -612,3 +564,75 @@ class DirichletEmpiricalRV(DiscreteRV):
 # d.rvs()
 # d.pmf(d.rvs())
 # d.pmf(d.rvs(4).reshape((2, 2) + d.mean.shape))
+
+
+class BetaRV(ContinuousRV):
+    """
+    Beta random variable.
+    """
+
+    def __init__(self, a, b, rng=None):
+        super().__init__(rng)
+        if a <= 0 or b <= 0:
+            raise ValueError("Parameters must be strictly positive.")
+        self._a, self._b = a, b
+
+        self._data_shape = ()
+        self._update_attr()
+
+    # Input properties
+    @property
+    def a(self):
+        return self._a
+
+    @a.setter
+    def a(self, a):
+        if a <= 0:
+            raise ValueError
+        self._a = a
+        self._update_attr()
+
+    @property
+    def b(self):
+        return self._b
+
+    @b.setter
+    def b(self, b):
+        if b <= 0:
+            raise ValueError
+        self._b = b
+        self._update_attr()
+
+    # Attribute Updates
+    def _update_attr(self):
+        if self._a > 1:
+            if self._b > 1:
+                self._mode = (self._a - 1) / (self._a + self._b - 2)
+            else:
+                self._mode = 1
+        elif self._a <= 1:
+            if self._b > 1:
+                self._mode = 0
+            elif self._a == 1 and self._b == 1:
+                self._mode = 0      # any in unit interval
+            else:
+                self._mode = 0      # any in {0,1}
+
+        self._mean = self._a / (self._a + self._b)
+        self._cov = self._a * self._b / (self._a + self._b)**2 / (self._a + self._b + 1)
+
+    def _rvs(self, size=(), random_state=None):
+        return random_state.beta(self._a, self._b, size)
+
+    def _pdf(self, x):
+        log_pdf = xlog1py(self._b - 1.0, -x) + xlogy(self._a - 1.0, x) - betaln(self._a, self._b)
+        return np.exp(log_pdf)
+
+    def plot_pdf(self, n_plt, ax=None):
+        if ax is None:
+            _, ax = plt.subplots()
+            ax.set(xlabel='$x$', ylabel='$P_{\mathrm{x}}(x)$')
+
+        x_plt = np.linspace(0, 1, n_plt + 1, endpoint=True)
+        plt_data = ax.plot(x_plt, self.pdf(x_plt))
+        return plt_data

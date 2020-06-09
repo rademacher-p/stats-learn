@@ -124,8 +124,6 @@ theta_m_s = FiniteRE(supp_x_s, theta_m_pmf)
 
 #%% Sim
 
-# TODO: vectorize learners and losses!
-
 def learn_sim(bayes_model, learner, n_train=0, n_test=1, n_mc=1, verbose=False):
     loss_mc = np.empty(n_mc)
     for i_mc in range(n_mc):

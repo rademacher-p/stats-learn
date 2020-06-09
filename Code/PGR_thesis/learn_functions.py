@@ -9,7 +9,6 @@ from loss_functions import loss_se, loss_01
 from SL_obj import YcXModel
 
 # TODO: add method functionality to work with SKL, TF conventions?
-
 # TODO: COMPLETE property set/get check, rework!
 
 
@@ -39,7 +38,7 @@ class BaseLearner:
         return self.loss_fcn(self._predict_single(d['x']), d['y'])
 
 
-class BayesLearner(BaseLearner):        # TODO: its generic, not just Dirichlet!
+class BayesLearner(BaseLearner):
     def __init__(self, bayes_model):
         super().__init__()
         self.bayes_model = bayes_model
@@ -75,8 +74,6 @@ class BayesEstimator(BayesLearner):
 
 
 # class BayesLearner(BaseLearner):
-#     # TODO: initialization from marginal/conditional? full mean init as classmethod?
-#     # TODO: initialization from SL object?
 #     def __init__(self, supp_x, supp_y, alpha_0, mean):
 #         super().__init__()
 #
@@ -85,8 +82,8 @@ class BayesEstimator(BayesLearner):
 #
 #         self._supp_shape_x = supp_x.shape
 #         self._supp_shape_y = supp_y.shape
-#         self._data_shape_x = supp_x.dtype['x'].shape
-#         self._data_shape_y = supp_y.dtype['y'].shape
+#         self.data_shape_x = supp_x.dtype['x'].shape
+#         self.data_shape_y = supp_y.dtype['y'].shape
 #
 #         self.alpha_0 = alpha_0
 #         self.mean = mean
@@ -121,13 +118,13 @@ class BayesEstimator(BayesLearner):
         #     p_x, p_y_x = self._mean_x, self._mean_y_x
         # else:
         #
-        #     emp_dist_x = empirical_pmf(d['x'], self.supp_x['x'], self._data_shape_x)
+        #     emp_dist_x = empirical_pmf(d['x'], self.supp_x['x'], self.data_shape_x)
         #
         #     def emp_dist_y_x(x):
         #         d_match = d[np.all(x.flatten() == d['x'].reshape(n, -1), axis=-1)].squeeze()
         #         if d_match.size == 0:
         #             return np.empty(self._supp_shape_y)
-        #         return empirical_pmf(d_match['y'], self.supp_y['y'], self._data_shape_y)
+        #         return empirical_pmf(d_match['y'], self.supp_y['y'], self.data_shape_y)
         #
         #     c_prior_x = 1 / (1 + n / self.alpha_0)
         #     p_x = c_prior_x * self._mean_x + (1 - c_prior_x) * emp_dist_x

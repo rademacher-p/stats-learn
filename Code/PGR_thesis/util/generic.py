@@ -60,7 +60,10 @@ def vectorize_x_func(func, data_shape):
             _out.append(func(x_i))
         _out = np.asarray(_out)
 
-        return _out.reshape(set_shape + _out.shape[1:])
+        if len(_out) == 1:      # FIXME: new, check.
+            return _out[0]
+        else:
+            return _out.reshape(set_shape + _out.shape[1:])
 
     return func_vec
 
