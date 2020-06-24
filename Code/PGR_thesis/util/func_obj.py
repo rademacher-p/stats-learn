@@ -1,4 +1,5 @@
 import copy
+import operator
 import numpy as np
 import matplotlib.pyplot as plt
 from util.generic import check_data_shape, check_set_shape, vectorize_x_func
@@ -6,7 +7,7 @@ from util.generic import check_data_shape, check_set_shape, vectorize_x_func
 # TODO: getter and setters?
 # TODO: plot methods
 
-
+#%% Support objs
 class BaseSupp(object):
     pass
 
@@ -35,6 +36,7 @@ class FiniteSupp(BaseSupp):
 
 
 
+#%% Function objs
 
 class BaseFunc(object):
     # def __init__(self):
@@ -43,8 +45,8 @@ class BaseFunc(object):
     def __call__(self, x):
         raise NotImplementedError
 
-    def __add__(self, other):
-        raise NotImplementedError
+    # def __add__(self, other):
+    #     raise NotImplementedError
 
 
 class NumericRangeFunc(BaseFunc):
@@ -60,16 +62,26 @@ class NumericRangeFunc(BaseFunc):
         return self._mean
 
 
-class DiscreteDomainFunc(BaseFunc):
-    pass
+# class DiscreteDomainFunc(BaseFunc):
+#     pass
+
+
+#%% IN USE
+
+def diag_func(f):
+    if isinstance(f, FiniteDomainFunc):
+        f_out = copy.deepcopy(f)
+        f_out.__call__ = lambda x_1, x_2: f
 
 
 # TODO: scalar vs multi, numeric vs non
 
+
 class FiniteDomainFunc(object):
-    def __new__(cls, supp, val, set_shape=()):  # TODO: any object, not just numpy
+    def __new__(cls, supp, val, set_shape=None):  # TODO: any object, not just numpy
         supp = np.asarray(supp)
         val = np.asarray(val)
+
         if np.issubdtype(val.dtype, np.number):
             if np.issubdtype(supp.dtype, np.number):
                 return super().__new__(FiniteNumericDomainNumericFunc)
@@ -78,7 +90,9 @@ class FiniteDomainFunc(object):
         else:
             return super().__new__(cls)
 
-    def __init__(self, supp, val, set_shape=()):
+    def __init__(self, supp, val, set_shape=None):
+        if set_shape is None:
+            set_shape = val.shape
         self._set_shape = set_shape
         self._set_size = int(np.prod(set_shape))
 
@@ -123,43 +137,30 @@ class FiniteDomainFunc(object):
 
 class FiniteDomainNumericFunc(FiniteDomainFunc):
 
-    def __init__(self, supp, val, set_shape=()):
+    def __init__(self, supp, val, set_shape=None):
         super().__init__(supp, val, set_shape)
 
-    def __add__(self, other):
+    def _op_checker(self, other, op):
         if isinstance(other, FiniteDomainNumericFunc):
             if (self.supp == other.supp).all():
-                return FiniteDomainNumericFunc(self.supp, self.val + other.val, self.set_shape)
-        elif type(other) == int:
-            return FiniteDomainNumericFunc(self.supp, self.val + other, self.set_shape)
+                return FiniteDomainNumericFunc(self.supp, op(self.val, other.val), self.set_shape)
+        elif type(other) == float:
+            return FiniteDomainNumericFunc(self.supp, op(self.val, other), self.set_shape)
+
+    def __add__(self, other):
+        return self._op_checker(other, operator.add)
 
     def __sub__(self, other):
-        if isinstance(other, FiniteDomainNumericFunc):
-            if (self.supp == other.supp).all():
-                return FiniteDomainNumericFunc(self.supp, self.val - other.val, self.set_shape)
-        elif type(other) == int:
-            return FiniteDomainNumericFunc(self.supp, self.val - other, self.set_shape)
+        return self._op_checker(other, operator.sub)
 
     def __mul__(self, other):
-        if isinstance(other, FiniteDomainNumericFunc):
-            if (self.supp == other.supp).all():
-                return FiniteDomainNumericFunc(self.supp, self.val * other.val, self.set_shape)
-        elif type(other) == int:
-            return FiniteDomainNumericFunc(self.supp, self.val * other, self.set_shape)
+        return self._op_checker(other, operator.mul)
 
     def __truediv__(self, other):
-        if isinstance(other, FiniteDomainNumericFunc):
-            if (self.supp == other.supp).all():
-                return FiniteDomainNumericFunc(self.supp, self.val / other.val, self.set_shape)
-        elif type(other) == int:
-            return FiniteDomainNumericFunc(self.supp, self.val / other, self.set_shape)
+        return self._op_checker(other, operator.truediv)
 
     def __pow__(self, other):
-        if isinstance(other, FiniteDomainNumericFunc):
-            if (self.supp == other.supp).all():
-                return FiniteDomainNumericFunc(self.supp, self.val ** other.val, self.set_shape)
-        elif type(other) == int:
-            return FiniteDomainNumericFunc(self.supp, self.val ** other, self.set_shape)
+        return self._op_checker(other, operator.pow)
 
     @property
     def max(self):
@@ -213,7 +214,7 @@ class FiniteDomainNumericFunc(FiniteDomainFunc):
 
 
 class FiniteNumericDomainNumericFunc(FiniteDomainNumericFunc):
-    def __init__(self, supp, val, set_shape=()):
+    def __init__(self, supp, val, set_shape=None):
         super().__init__(supp, val, set_shape)
 
     @property
@@ -283,8 +284,8 @@ a.m2c
 
 supp_x = [[0,1], [1,1], [2,1]]
 set_shape = (3,)
-val = [1,2,3]
-# val = [FiniteDomainFunc(['a','b'], [8+i,9+i], (2,)) for i in range(3)]
+# val = [1,2,3]
+val = [FiniteDomainFunc(['a','b'], [8+i,9+i], (2,)) for i in range(3)]
 b = FiniteDomainFunc(supp_x, val, set_shape)
 b._f([2,1])
 b([2,1])

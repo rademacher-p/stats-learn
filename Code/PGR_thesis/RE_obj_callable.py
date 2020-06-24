@@ -135,7 +135,7 @@ class FiniteRE(DiscreteRE):
     @classmethod
     def gen_func(cls, supp, p, rng=None):
         p = np.asarray(p)
-        pmf = FiniteDomainFunc(supp, p, set_shape=p.shape)
+        pmf = FiniteDomainFunc(supp, p)
         return cls(pmf, rng)
 
     # Input properties
@@ -206,25 +206,33 @@ class FiniteRV(FiniteRE, DiscreteRV):
 
 
 def _dirichlet_check_alpha_0(alpha_0):
-    alpha_0 = np.asarray(alpha_0)
-    if alpha_0.size > 1 or alpha_0 <= 0:
+    # alpha_0 = np.asarray(alpha_0)
+    # if alpha_0.size > 1 or alpha_0 <= 0:
+    #     raise ValueError("Concentration parameter must be a positive scalar.")
+    if alpha_0 <= 0:
         raise ValueError("Concentration parameter must be a positive scalar.")
     return alpha_0
 
 
 def _check_func_pmf(f, full_support=False):
+    if f.data_shape_y != ():
+        raise ValueError("Must be scalar function.")
     if full_support and f.min <= 0:
-        raise ValueError("Mean must be a valid PMF.")
+        raise ValueError("Function range must be positive real.")
     if not full_support and f.min < 0:
-        raise ValueError("Mean must be a valid PMF.")
+        raise ValueError("Function range must be non-negative real.")
     return f
 
 
 def _dirichlet_check_input(x, alpha_0, mean):
-    x = check_valid_pmf(x, data_shape=mean.shape)
+    # x = check_valid_pmf(x, data_shape=mean.shape)
+    if not isinstance(x, type(mean)):
+        raise TypeError("Input must have same function type as mean.")
 
-    if np.logical_and(x == 0, mean < 1 / alpha_0).any():
-        raise ValueError("Each entry in 'x' must be greater than zero if its mean is less than 1 / alpha_0.")
+    # if np.logical_and(x == 0, mean < 1 / alpha_0).any():
+    if np.logical_and(x.val == 0, mean.val < 1 / alpha_0).any():
+        raise ValueError("Each element in 'x' must be greater than "
+                         "zero if the corresponding mean element is less than 1 / alpha_0.")
 
     return x
 
@@ -237,12 +245,15 @@ class DirichletRV(ContinuousRV):
     def __init__(self, alpha_0, mean, rng=None):
         super().__init__(rng)
         self._alpha_0 = _dirichlet_check_alpha_0(alpha_0)
-
-        if mean.data_shape_y != ():
-            raise ValueError("Mean must be scalar function.")
         self._mean = _check_func_pmf(mean, full_support=True)
 
         self._update_attr()
+
+    @classmethod
+    def gen_func(cls, alpha_0, supp, p, rng=None):
+        p = np.asarray(p)
+        mean = FiniteDomainFunc(supp, p)
+        return cls(alpha_0, mean, rng)
 
     # Input properties
     @property
@@ -260,84 +271,89 @@ class DirichletRV(ContinuousRV):
 
     @mean.setter
     def mean(self, mean):
-        if mean.data_shape_y != ():
-            raise ValueError("Mean must be scalar function.")
         self._mean = _check_func_pmf(mean, full_support=True)
-
         self._update_attr()
 
     # Attribute Updates
     def _update_attr(self):
-        self._data_shape = self._mean.data_shape_x
+        self._data_shape = self._mean.set_shape
         self._data_size = int(np.prod(self._data_shape))
 
         if self._mean.min > 1 / self._alpha_0:
             self._mode = (self._mean - 1 / self._alpha_0) / (1 - self._data_size / self._alpha_0)
         else:
-            # warnings.warn("Mode method currently supported for mean > 1/alpha_0 only")
+            # warnings.warn("Mode method currently supported for mean > 1/alpha_0 only")Myq.L
             self._mode = None       # TODO: complete with general formula
 
-        self._cov = (diag_gen(self._mean) - outer_gen(self._mean, self._mean)) / (self._alpha_0 + 1)
+        # TODO: IMPLEMENT COV
+        # self._cov = (diag_gen(self._mean) - outer_gen(self._mean, self._mean)) / (self._alpha_0 + 1)
 
-        self._log_pdf_coef = gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
+        self._log_pdf_coef = gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean.val))
 
     def _rvs(self, size=(), random_state=None):
-        return random_state.dirichlet(self._alpha_0 * self._mean.flatten(), size).reshape(size + self._data_shape)
+        vals = random_state.dirichlet(self._alpha_0 * self._mean.val.flatten(), size).reshape(size + self._data_shape)
+        if size == ():
+            return FiniteDomainFunc(self.mean.supp, vals)
+        else:
+            return [FiniteDomainFunc(self.mean.supp, val) for val in vals]
 
-    def _pdf(self, x):
+    def pdf(self, x):   # overwrites base methods...
         x = _dirichlet_check_input(x, self._alpha_0, self._mean)
 
-        log_pdf = self._log_pdf_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x).reshape(-1, self._data_size), -1)
+        log_pdf = self._log_pdf_coef + np.sum(xlogy(self._alpha_0 * self._mean.val - 1, x.val)
+                                              .reshape(-1, self._data_size), -1)
         return np.exp(log_pdf)
 
-    def plot_pdf(self, n_plt, ax=None):
+    # def plot_pdf(self, n_plt, ax=None):   TODO
+    #
+    #     if self._data_size in (2, 3):
+    #         x_plt = simplex_grid(n_plt, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
+    #         pdf_plt = self.pdf(x_plt)
+    #         x_plt.resize(x_plt.shape[0], self._data_size)
+    #
+    #         # pdf_plt.sum() / (n_plt ** (self._data_size - 1))
+    #
+    #         if self._data_size == 2:
+    #             if ax is None:
+    #                 _, ax = plt.subplots()
+    #                 ax.set(xlabel='$x_1$', ylabel='$x_2$')
+    #
+    #             plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pdf_plt)
+    #
+    #             c_bar = plt.colorbar(plt_data)
+    #             c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
+    #
+    #         elif self._data_size == 3:
+    #             if ax is None:
+    #                 _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+    #                 ax.view_init(35, 45)
+    #                 ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
+    #
+    #             plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pdf_plt)
+    #
+    #             c_bar = plt.colorbar(plt_data)
+    #             c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
+    #
+    #         return plt_data
+    #
+    #     else:
+    #         raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
-        if self._data_size in (2, 3):
-            x_plt = simplex_grid(n_plt, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
-            pdf_plt = self.pdf(x_plt)
-            x_plt.resize(x_plt.shape[0], self._data_size)
 
-            # pdf_plt.sum() / (n_plt ** (self._data_size - 1))
+rng = np.random.default_rng()
+a0 = 100
+supp = list('abc')
+val = np.random.random(3)
+val = val / val.sum()
+m = FiniteDomainFunc(supp, val)
+m('a')
 
-            if self._data_size == 2:
-                if ax is None:
-                    _, ax = plt.subplots()
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$')
-
-                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pdf_plt)
-
-                c_bar = plt.colorbar(plt_data)
-                c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
-
-            elif self._data_size == 3:
-                if ax is None:
-                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                    ax.view_init(35, 45)
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
-
-                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pdf_plt)
-
-                c_bar = plt.colorbar(plt_data)
-                c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
-
-            return plt_data
-
-        else:
-            raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
-
-
-# rng = np.random.default_rng()
-# a0 = 10
-# m = np.random.random((1, 3))
-# m = m / m.sum()
-# d = DirichletRV(a0, m, rng)
-# d.plot_pdf(80)
-# d.mean
-# d.mode
-# d.cov
-# d.rvs()
-# d.pdf(d.rvs())
-# d.pdf(d.rvs(4).reshape((2, 2)+d.mean.shape))
+d = DirichletRV(a0, m, rng)
+d.mean
+d.mode
+d.cov
+d.rvs()
+d.pdf(d.rvs())
 
 
 

@@ -8,10 +8,12 @@ import functools
 import numpy as np
 # from scipy.stats._multivariate import multi_rv_generic
 
-from RE_obj import FiniteRE, DirichletRV
+# from RE_obj import FiniteRE, DirichletRV
+from RE_obj_callable import FiniteRE, DirichletRV
 from SL_obj import YcXModel
 from util.generic import empirical_pmf
 
+from util.func_obj import FiniteDomainFunc
 
 #%% Priors
 
@@ -56,62 +58,43 @@ class BetaModelBayes(BaseBayes):
 #     #     raise NotImplementedError("Method must be overwritten.")
 
 
-class FiniteYcXModelBayes(BaseBayes):
-    def __init__(self, supp_x, supp_y, prior, rng_model=None):     # TODO: rng check, None default?
-        self.supp_x = supp_x
-        self.supp_y = supp_y        # TODO: Assumed to be my SL structured array!
+class DirichletFiniteYcXModelBayes(BaseBayes):
 
-        self._supp_shape_x = supp_x.shape
-        self._supp_shape_y = supp_y.shape
-        self._data_shape_x = supp_x.dtype['x'].shape
-        self._data_shape_y = supp_y.dtype['y'].shape
-
+    def __init__(self, alpha_0, mean_x, mean_y_x, rng_model=None, rng_prior=None):
         model_gen = YcXModel.finite_model
         model_kwargs = {'rng': rng_model}
-        # model_kwargs = {'supp_x': supp_x['x'], 'supp_y': supp_y['y'], 'rng': rng_model}
+        prior = {'p_x': DirichletRV(alpha_0, mean_x, rng_prior),
+                 'p_y_x': lambda x: DirichletRV(alpha_0, mean_y_x(x), rng_prior)}
         super().__init__(model_gen, model_kwargs, prior)
 
-    def random_model(self):
-        raise NotImplementedError("Method must be overwritten.")
+        # self.alpha_0 = alpha_0
 
+        self._mean_x = mean_x
+        self._mean_y_x = mean_y_x
 
-class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
-
-    # TODO: initialization from marginal/conditional? full mean init as classmethod?
-
-    def __init__(self, supp_x, supp_y, alpha_0, mean, rng_model=None, rng_prior=None):
-        prior = DirichletRV(alpha_0, mean, rng_prior)
-        super().__init__(supp_x, supp_y, prior, rng_model)
-
-        self.alpha_0 = self.prior.alpha_0
-        self.mean = self.prior.mean
-
-        self._mean_x = self.mean.reshape(self._supp_shape_x + (-1,)).sum(axis=-1)
-
-        def _mean_y_x(x):
-            x = np.asarray(x)
-            _mean_flat = self.mean.reshape((-1,) + self._supp_shape_y)
-            _mean_slice = _mean_flat[np.all(x.flatten()
-                                            == self.supp_x['x'].reshape(self.supp_x.size, -1), axis=-1)].squeeze(axis=0)
-            mean_y = _mean_slice / _mean_slice.sum()
-            return mean_y
-
-        self._mean_y_x = _mean_y_x
-
-        self._model_gen = functools.partial(YcXModel.finite_model, supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
+    # @classmethod
+    # def gen_func(cls, supp_x, supp_y, alpha_0, mean, rng_model=None, rng_prior=None):
+    #     p = np.asarray(p)
+    #     mean = FiniteDomainFunc(supp, p)
+    #     return cls(alpha_0, mean, rng)
 
     def random_model(self, rng=None):
-        p = self.prior.rvs(random_state=rng)
+        p_x = self.prior['p_x'].rvs(random_state=rng)
 
-        p_x = p.reshape(self._supp_shape_x + (-1,)).sum(axis=-1)
+        # p_y_x = self.prior['p_y_x'].rvs(random_state=rng)
+        val = []
+        for x in self._mean_x._supp_flat:
+            x_i = x.reshape(self._mean_x.data_shape_x)
+            val.append(self.prior['p_y_x'](x).rvs(random_state=rng))
+        p_y_x = FiniteDomainFunc(self._mean_x.supp, val)
 
-        def p_y_x(x):
-            x = np.asarray(x)
-            _p_flat = p.reshape((-1,) + self._supp_shape_y)
-            _p_slice = _p_flat[np.all(x.flatten()
-                                      == self.supp_x['x'].reshape(self.supp_x.size, -1), axis=-1)].squeeze(axis=0)
-            p_y = _p_slice / _p_slice.sum()
-            return p_y
+        # def p_y_x(x):
+        #     x = np.asarray(x)
+        #     _p_flat = p.reshape((-1,) + self._supp_shape_y)
+        #     _p_slice = _p_flat[np.all(x.flatten()
+        #                               == self.supp_x['x'].reshape(self.supp_x.size, -1), axis=-1)].squeeze(axis=0)
+        #     p_y = _p_slice / _p_slice.sum()
+        #     return p_y
 
         return self.model_gen(p_x=p_x, p_y_x=p_y_x)
 
@@ -139,95 +122,185 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
                 c_prior_y = 1 / (1 + (n * emp_dist_x[i]) / (self.alpha_0 * self._mean_x[i]))
                 return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist_y_x(x)
 
-        return self._model_gen(p_x=p_x, p_y_x=p_y_x)
-
-
-
-#%%
-class FiniteYcXModelBayesOrig(BaseBayes):
-    def __init__(self, supp_x, supp_y, prior, rng_model=None):     # TODO: rng check, None default?
-        self.supp_x = supp_x
-        self.supp_y = supp_y        # TODO: Assumed to be my SL structured array!
-
-        self._supp_shape_x = supp_x.shape
-        self._supp_shape_y = supp_y.shape
-        self._data_shape_x = supp_x.dtype['x'].shape
-        self._data_shape_y = supp_y.dtype['y'].shape
-
-        model_gen = YcXModel.finite_model_orig
-        model_kwargs = {'supp_x': supp_x['x'], 'supp_y': supp_y['y'], 'rng': rng_model}
-        super().__init__(model_gen, model_kwargs, prior)
-
-    def random_model(self):
-        raise NotImplementedError("Method must be overwritten.")
-
-
-class DirichletFiniteYcXModelBayesOrig(FiniteYcXModelBayesOrig):
-
-    # TODO: initialization from marginal/conditional? full mean init as classmethod?
-
-    def __init__(self, supp_x, supp_y, alpha_0, mean, rng_model=None, rng_prior=None):
-        prior = DirichletRV(alpha_0, mean, rng_prior)
-        super().__init__(supp_x, supp_y, prior, rng_model)
-
-        self.alpha_0 = self.prior.alpha_0
-        self.mean = self.prior.mean
-
-        self._mean_x = self.mean.reshape(self._supp_shape_x + (-1,)).sum(axis=-1)
-
-        def _mean_y_x(x):
-            x = np.asarray(x)
-            _mean_flat = self.mean.reshape((-1,) + self._supp_shape_y)
-            _mean_slice = _mean_flat[np.all(x.flatten()
-                                            == self.supp_x['x'].reshape(self.supp_x.size, -1), axis=-1)].squeeze(axis=0)
-            mean_y = _mean_slice / _mean_slice.sum()
-            return mean_y
-
-        self._mean_y_x = _mean_y_x
-
-        self._model_gen = functools.partial(YcXModel.finite_model_orig,
-                                            supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
-
-    def random_model(self, rng=None):
-        p = self.prior.rvs(random_state=rng)
-
-        p_x = p.reshape(self._supp_shape_x + (-1,)).sum(axis=-1)
-
-        def p_y_x(x):
-            x = np.asarray(x)
-            _p_flat = p.reshape((-1,) + self._supp_shape_y)
-            _p_slice = _p_flat[np.all(x.flatten()
-                                      == self.supp_x['x'].reshape(self.supp_x.size, -1), axis=-1)].squeeze(axis=0)
-            p_y = _p_slice / _p_slice.sum()
-            return p_y
-
         return self.model_gen(p_x=p_x, p_y_x=p_y_x)
 
-    def posterior_mean(self, d):
-        n = len(d)
 
-        if n == 0:
-            p_x, p_y_x = self._mean_x, self._mean_y_x
-        else:
-            emp_dist_x = empirical_pmf(d['x'], self.supp_x['x'], self._data_shape_x)
 
-            def emp_dist_y_x(x):
-                x = np.asarray(x)
-                d_match = d[np.all(x.flatten() == d['x'].reshape(n, -1), axis=-1)].squeeze()
-                if d_match.size == 0:
-                    return np.empty(self._supp_shape_y)
-                return empirical_pmf(d_match['y'], self.supp_y['y'], self._data_shape_y)
+# class FiniteYcXModelBayes(BaseBayes):
+#     def __init__(self, supp_x, supp_y, prior, rng_model=None):     # TODO: rng check, None default?
+#         self.supp_x = supp_x
+#         self.supp_y = supp_y        # TODO: Assumed to be my SL structured array!
+#
+#         self._supp_shape_x = supp_x.shape
+#         self._supp_shape_y = supp_y.shape
+#         self._data_shape_x = supp_x.dtype['x'].shape
+#         self._data_shape_y = supp_y.dtype['y'].shape
+#
+#         model_gen = YcXModel.finite_model_orig
+#         # model_kwargs = {'rng': rng_model}
+#         model_kwargs = {'supp_x': supp_x['x'], 'supp_y': supp_y['y'], 'rng': rng_model}
+#         super().__init__(model_gen, model_kwargs, prior)
+#
+#     def random_model(self):
+#         raise NotImplementedError("Method must be overwritten.")
+#
+#
+# class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
+#
+#     # TODO: initialization from marginal/conditional? full mean init as classmethod?
+#
+#     def __init__(self, supp_x, supp_y, alpha_0, mean, rng_model=None, rng_prior=None):
+#         prior = DirichletRV(alpha_0, mean, rng_prior)
+#         super().__init__(supp_x, supp_y, prior, rng_model)
+#
+#         self.alpha_0 = self.prior.alpha_0
+#         self.mean = self.prior.mean
+#
+#         self._mean_x = self.mean.reshape(self._supp_shape_x + (-1,)).sum(axis=-1)
+#
+#         def _mean_y_x(x):
+#             x = np.asarray(x)
+#             _mean_flat = self.mean.reshape((-1,) + self._supp_shape_y)
+#             _mean_slice = _mean_flat[np.all(x.flatten()
+#                                             == self.supp_x['x'].reshape(self.supp_x.size, -1), axis=-1)].squeeze(axis=0)
+#             mean_y = _mean_slice / _mean_slice.sum()
+#             return mean_y
+#
+#         self._mean_y_x = _mean_y_x
+#
+#         # self._model_gen = functools.partial(YcXModel.finite_model, supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
+#
+#     def random_model(self, rng=None):
+#         p = self.prior.rvs(random_state=rng)
+#
+#         p_x = p.reshape(self._supp_shape_x + (-1,)).sum(axis=-1)
+#
+#         def p_y_x(x):
+#             x = np.asarray(x)
+#             _p_flat = p.reshape((-1,) + self._supp_shape_y)
+#             _p_slice = _p_flat[np.all(x.flatten()
+#                                       == self.supp_x['x'].reshape(self.supp_x.size, -1), axis=-1)].squeeze(axis=0)
+#             p_y = _p_slice / _p_slice.sum()
+#             return p_y
+#
+#         return self.model_gen(p_x=p_x, p_y_x=p_y_x)
+#
+#     def posterior_mean(self, d):
+#         n = len(d)
+#
+#         if n == 0:
+#             p_x, p_y_x = self._mean_x, self._mean_y_x
+#         else:
+#             emp_dist_x = empirical_pmf(d['x'], self.supp_x['x'], self._data_shape_x)
+#
+#             def emp_dist_y_x(x):
+#                 x = np.asarray(x)
+#                 d_match = d[np.all(x.flatten() == d['x'].reshape(n, -1), axis=-1)].squeeze()
+#                 if d_match.size == 0:
+#                     return np.empty(self._supp_shape_y)
+#                 return empirical_pmf(d_match['y'], self.supp_y['y'], self._data_shape_y)
+#
+#             c_prior_x = 1 / (1 + n / self.alpha_0)
+#             p_x = c_prior_x * self._mean_x + (1 - c_prior_x) * emp_dist_x
+#
+#             def p_y_x(x):
+#                 x = np.asarray(x)
+#                 i = (self.supp_x['x'].reshape(self._supp_shape_x + (-1,)) == x.flatten()).all(-1)
+#                 c_prior_y = 1 / (1 + (n * emp_dist_x[i]) / (self.alpha_0 * self._mean_x[i]))
+#                 return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist_y_x(x)
+#
+#         return self.model_gen(p_x=p_x, p_y_x=p_y_x)
 
-            c_prior_x = 1 / (1 + n / self.alpha_0)
-            p_x = c_prior_x * self._mean_x + (1 - c_prior_x) * emp_dist_x
 
-            def p_y_x(x):
-                x = np.asarray(x)
-                i = (self.supp_x['x'].reshape(self._supp_shape_x + (-1,)) == x.flatten()).all(-1)
-                c_prior_y = 1 / (1 + (n * emp_dist_x[i]) / (self.alpha_0 * self._mean_x[i]))
-                return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist_y_x(x)
 
-        return self._model_gen(p_x=p_x, p_y_x=p_y_x)
+
+
+# #%%
+# class FiniteYcXModelBayesOrig(BaseBayes):
+#     def __init__(self, supp_x, supp_y, prior, rng_model=None):     # TODO: rng check, None default?
+#         self.supp_x = supp_x
+#         self.supp_y = supp_y        # TODO: Assumed to be my SL structured array!
+#
+#         self._supp_shape_x = supp_x.shape
+#         self._supp_shape_y = supp_y.shape
+#         self._data_shape_x = supp_x.dtype['x'].shape
+#         self._data_shape_y = supp_y.dtype['y'].shape
+#
+#         model_gen = YcXModel.finite_model_orig
+#         model_kwargs = {'supp_x': supp_x['x'], 'supp_y': supp_y['y'], 'rng': rng_model}
+#         super().__init__(model_gen, model_kwargs, prior)
+#
+#     def random_model(self):
+#         raise NotImplementedError("Method must be overwritten.")
+#
+#
+# class DirichletFiniteYcXModelBayesOrig(FiniteYcXModelBayesOrig):
+#
+#     # TODO: initialization from marginal/conditional? full mean init as classmethod?
+#
+#     def __init__(self, supp_x, supp_y, alpha_0, mean, rng_model=None, rng_prior=None):
+#         prior = DirichletRV(alpha_0, mean, rng_prior)
+#         super().__init__(supp_x, supp_y, prior, rng_model)
+#
+#         self.alpha_0 = self.prior.alpha_0
+#         self.mean = self.prior.mean
+#
+#         self._mean_x = self.mean.reshape(self._supp_shape_x + (-1,)).sum(axis=-1)
+#
+#         def _mean_y_x(x):
+#             x = np.asarray(x)
+#             _mean_flat = self.mean.reshape((-1,) + self._supp_shape_y)
+#             _mean_slice = _mean_flat[np.all(x.flatten()
+#                                             == self.supp_x['x'].reshape(self.supp_x.size, -1), axis=-1)].squeeze(axis=0)
+#             mean_y = _mean_slice / _mean_slice.sum()
+#             return mean_y
+#
+#         self._mean_y_x = _mean_y_x
+#
+#         self._model_gen = functools.partial(YcXModel.finite_model_orig,
+#                                             supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
+#
+#     def random_model(self, rng=None):
+#         p = self.prior.rvs(random_state=rng)
+#
+#         p_x = p.reshape(self._supp_shape_x + (-1,)).sum(axis=-1)
+#
+#         def p_y_x(x):
+#             x = np.asarray(x)
+#             _p_flat = p.reshape((-1,) + self._supp_shape_y)
+#             _p_slice = _p_flat[np.all(x.flatten()
+#                                       == self.supp_x['x'].reshape(self.supp_x.size, -1), axis=-1)].squeeze(axis=0)
+#             p_y = _p_slice / _p_slice.sum()
+#             return p_y
+#
+#         return self.model_gen(p_x=p_x, p_y_x=p_y_x)
+#
+#     def posterior_mean(self, d):
+#         n = len(d)
+#
+#         if n == 0:
+#             p_x, p_y_x = self._mean_x, self._mean_y_x
+#         else:
+#             emp_dist_x = empirical_pmf(d['x'], self.supp_x['x'], self._data_shape_x)
+#
+#             def emp_dist_y_x(x):
+#                 x = np.asarray(x)
+#                 d_match = d[np.all(x.flatten() == d['x'].reshape(n, -1), axis=-1)].squeeze()
+#                 if d_match.size == 0:
+#                     return np.empty(self._supp_shape_y)
+#                 return empirical_pmf(d_match['y'], self.supp_y['y'], self._data_shape_y)
+#
+#             c_prior_x = 1 / (1 + n / self.alpha_0)
+#             p_x = c_prior_x * self._mean_x + (1 - c_prior_x) * emp_dist_x
+#
+#             def p_y_x(x):
+#                 x = np.asarray(x)
+#                 i = (self.supp_x['x'].reshape(self._supp_shape_x + (-1,)) == x.flatten()).all(-1)
+#                 c_prior_y = 1 / (1 + (n * emp_dist_x[i]) / (self.alpha_0 * self._mean_x[i]))
+#                 return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist_y_x(x)
+#
+#         return self._model_gen(p_x=p_x, p_y_x=p_y_x)
+
 
 
 

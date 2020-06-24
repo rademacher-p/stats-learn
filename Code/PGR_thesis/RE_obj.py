@@ -43,7 +43,7 @@ class BaseRE(multi_rv_generic):
 
         return self._rvs(size, random_state)
 
-    def _rvs(self, size=(), random_state=None):
+    def _rvs(self, size=None, random_state=None):
         raise NotImplementedError("Method must be overwritten.")
         pass
 
@@ -325,7 +325,8 @@ def _dirichlet_check_input(x, alpha_0, mean):
     x = check_valid_pmf(x, data_shape=mean.shape)
 
     if np.logical_and(x == 0, mean < 1 / alpha_0).any():
-        raise ValueError("Each entry in 'x' must be greater than zero if its mean is less than 1 / alpha_0.")
+        raise ValueError("Each element in 'x' must be greater than "
+                         "zero if the corresponding mean element is less than 1 / alpha_0.")
 
     return x
 
