@@ -92,7 +92,7 @@ class FiniteDomainFunc(object):
 
     def __init__(self, supp, val, set_shape=None):
         if set_shape is None:
-            set_shape = val.shape
+            set_shape = np.array(val).shape
         self._set_shape = set_shape
         self._set_size = int(np.prod(set_shape))
 
@@ -154,6 +154,9 @@ class FiniteDomainNumericFunc(FiniteDomainFunc):
         return self._op_checker(other, operator.sub)
 
     def __mul__(self, other):
+        return self._op_checker(other, operator.mul)
+
+    def __rmul__(self, other):
         return self._op_checker(other, operator.mul)
 
     def __truediv__(self, other):
@@ -274,23 +277,23 @@ class FiniteNumericDomainNumericFunc(FiniteDomainNumericFunc):
 
 
 
+# #
+# supp_x = np.stack(np.meshgrid(np.arange(2), np.arange(3)), axis=-1)
+# val = np.random.random((3,4))
 #
-supp_x = np.stack(np.meshgrid(np.arange(2), np.arange(3)), axis=-1)
-val = np.random.random((3,4))
-
-a = FiniteDomainFunc(supp_x, val, set_shape=(3,))
-a.m1
-a.m2c
-
-supp_x = [[0,1], [1,1], [2,1]]
-set_shape = (3,)
-# val = [1,2,3]
-val = [FiniteDomainFunc(['a','b'], [8+i,9+i], (2,)) for i in range(3)]
-b = FiniteDomainFunc(supp_x, val, set_shape)
-b._f([2,1])
-b([2,1])
-b([[2,1],[0,1]])
-
-b.val
-(b+1).val
-(b-1).val
+# a = FiniteDomainFunc(supp_x, val, set_shape=(3,))
+# a.m1
+# a.m2c
+#
+# supp_x = [[0,1], [1,1], [2,1]]
+# set_shape = (3,)
+# # val = [1,2,3]
+# val = [FiniteDomainFunc(['a','b'], [8+i,9+i], (2,)) for i in range(3)]
+# b = FiniteDomainFunc(supp_x, val, set_shape)
+# b._f([2,1])
+# b([2,1])
+# b([[2,1],[0,1]])
+#
+# b.val
+# (b+1).val
+# (b-1).val

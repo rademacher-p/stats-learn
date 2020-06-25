@@ -154,10 +154,10 @@ class YcXModel(BaseModel):
         return cls(model_x, model_y_x, rng)
 
     @classmethod
-    def finite_model(cls, pmf_x, pmf_y_x, rng=None):
-        model_x = FiniteRE(pmf_x)
+    def finite_model(cls, p_x, p_y_x, rng=None):
+        model_x = FiniteRE(p_x)
 
-        def model_y_x(x): return FiniteRE(pmf_y_x(x))
+        def model_y_x(x): return FiniteRE(p_y_x(x))
 
         return cls(model_x, model_y_x, rng)
 

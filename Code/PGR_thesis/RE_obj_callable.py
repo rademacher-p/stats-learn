@@ -209,6 +209,7 @@ def _dirichlet_check_alpha_0(alpha_0):
     # alpha_0 = np.asarray(alpha_0)
     # if alpha_0.size > 1 or alpha_0 <= 0:
     #     raise ValueError("Concentration parameter must be a positive scalar.")
+    alpha_0 = float(alpha_0)
     if alpha_0 <= 0:
         raise ValueError("Concentration parameter must be a positive scalar.")
     return alpha_0

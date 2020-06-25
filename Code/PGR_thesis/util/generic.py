@@ -71,13 +71,16 @@ def vectorize_x_func(func, data_shape):
 def empirical_pmf(d, supp, data_shape):
     """Generates the empirical PMF for a data set."""
 
-    d, _set_shape = check_data_shape(d, data_shape)
-    n = int(np.prod(_set_shape))
-    d_flat = d.reshape(n, -1)
-
     supp, supp_shape = check_data_shape(supp, data_shape)
     n_supp = int(np.prod(supp_shape))
     supp_flat = supp.reshape(n_supp, -1)
+
+    if d.size == 0:
+        return np.zeros(supp_shape)
+
+    d, _set_shape = check_data_shape(d, data_shape)
+    n = int(np.prod(_set_shape))
+    d_flat = d.reshape(n, -1)
 
     dist = np.zeros(n_supp)
     for d_i in d_flat:
@@ -88,4 +91,3 @@ def empirical_pmf(d, supp, data_shape):
         dist[eq_supp] += 1
 
     return dist.reshape(supp_shape) / n
-
