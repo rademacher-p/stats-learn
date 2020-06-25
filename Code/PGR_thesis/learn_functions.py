@@ -50,7 +50,10 @@ class BayesLearner(BaseLearner):
     def posterior_mean(self):
         return self._posterior_mean
 
-    def fit(self, d=np.array([])):
+    def fit(self, d=None):
+        if d is None:
+            d = np.array([], dtype=[('y', '<f8', self.bayes_model._data_shape_y),
+                                    ('x', '<f8', self.bayes_model._data_shape_x)])
         self._posterior_mean = self.bayes_model.posterior_mean(d)
 
 
