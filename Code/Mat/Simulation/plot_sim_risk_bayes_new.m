@@ -7,7 +7,7 @@ clear;
 
 %%% Inputs
 
-en_emp = 0;
+en_emp = 1;
 N_mc = 1000;                  % Number of monte carlo iterations
 
 
@@ -16,7 +16,7 @@ N_mc = 1000;                  % Number of monte carlo iterations
 
 % Y = {'a';'b';'c';'d'};
 Y = num2cell((1:2)');
-X = num2cell((1:1)');
+X = num2cell((1:2)');
 
 fcn_prior = @dirrnd;
 
@@ -49,11 +49,11 @@ alpha_f_vec = cat(3,5*[.7;.3],10*[.7;.3],20*[.7;.3],40*[.7;.3]);
 % N = [0, 1, 10, 100]';
 % N = [0, 1, 2, 4]';
 % N = [0, 2, 4, 8]';
-N = (0:1:30)';
+N = (0:1:5)';
 
 alpha_0 = numel(Y)*numel(X);
 % alpha_0 = 10;
-% alpha_0 = [.1, 1, 10]';
+% alpha_0 = numel(Y)*numel(X)*[.1, 1, 10]';
 % alpha_0 = (.1:.1:20)';
 % alpha_0 = [.1; (1:20)'];
 

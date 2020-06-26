@@ -6,7 +6,7 @@ clear;
 
 %%% Inputs
 
-en_emp = 0;
+en_emp = 1;
 N_mc = 1000;                  % Number of monte carlo iterations
 
 
@@ -14,8 +14,8 @@ N_mc = 1000;                  % Number of monte carlo iterations
 % X = num2cell((1:1)'/1);             % input set
 
 % Y = {'a';'b';'c';'d'};
-Y = num2cell((1:3)');
-X = num2cell((1:1)');
+Y = num2cell((1:2)');
+X = num2cell((1:2)');
 
 fcn_prior = @dirrnd;
 
@@ -32,15 +32,15 @@ fcn_risk_a = @risk_min_dir_01;
 
 
 
-N = 1;
+% N = 1;
 % N = [0, 1, 10, 100]';
 % N = [0, 1, 2, 4]';
 % N = [0, 2, 4, 8]';
-% N = (0:1:50)';
+N = (0:1:5)';
 
-alpha_0 = .001*numel(Y)*numel(X);
+% alpha_0 = .001*numel(Y)*numel(X);
 % alpha_0 = 10;
-% alpha_0 = numel(Y)*numel(X)*[.1, 1, 10]';
+alpha_0 = numel(Y)*numel(X)*[.1, 1, 10]';
 % alpha_0 = (.1:.1:20)';
 
 P_x = ones(numel(X),1)/numel(X);
@@ -48,10 +48,10 @@ P_x = ones(numel(X),1)/numel(X);
 % P_x = [.5,.5; .7,.3; .9,.1]';
 % P_x = N_bar_set(numel(X),100)/100;
 
-% P_y_x = ones(numel(Y),numel(X))/numel(Y);
+P_y_x = ones(numel(Y),numel(X))/numel(Y);
 % P_y_x = [.8; .2]*ones(1,numel(X));
 % P_y_x = [.3,.7; .5,.5; .1,.9]';
-P_y_x = repmat(permute(N_bar_set(numel(Y),100)/100,[1,3,2]),[1,numel(X)]);
+% P_y_x = repmat(permute(N_bar_set(numel(Y),100)/100,[1,3,2]),[1,numel(X)]);
 
 
 
