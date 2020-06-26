@@ -99,24 +99,17 @@ class DirichletFiniteYcXModelBayesNew(BaseBayes):
         c_prior_x = 1 / (1 + n / self.alpha_0)
         p_x = c_prior_x * self._mean_x + (1 - c_prior_x) * emp_dist_x
 
-        # val = []  # FIXME: better way?
-        # for x_flat in self._mean_x._supp_flat:
-        #     d_match = d[np.all(x_flat == d['x'].reshape(n, -1), axis=-1)].squeeze()
-        #     val.append(self.prior['p_y_x'](x).rvs(random_state=rng))
-        # val = np.array(val).reshape(self._mean_x.set_shape)
-        # p_y_x = FiniteDomainFunc(self._supp_x, val)
-
         def emp_dist_y_x(x):
             x = np.asarray(x)
             d_match = d[np.all(x.flatten() == d['x'].reshape(n, -1), axis=-1)].squeeze()
             return FiniteDomainFunc(self._supp_y,
                                     empirical_pmf(d_match['y'], self._supp_y, self._data_shape_y))
 
-        def p_y_x(x):
+        def p_y_x(x):   # TODO: arithmetic of functionals?!?
             c_prior_y = 1 / (1 + (n * emp_dist_x(x)) / (self.alpha_0 * self._mean_x(x)))
             return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist_y_x(x)
 
-        return self.model_gen(p_x=p_x, p_y_x=p_y_x)
+        return self.model_gen(p_x=p_x, p_y_x=p_y_x)     # TODO: RE obj or just func obj?
 
 
 

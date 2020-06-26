@@ -27,8 +27,8 @@ from util.func_obj import FiniteDomainFunc
 supp_y = np.array(['a', 'b'])
 # supp_y = np.arange(2) / 2
 # supp_x = np.arange(2) / 2
-supp_x = np.arange(6).reshape(3, 2)
-supp_x = np.stack(np.meshgrid(np.arange(2), np.arange(3)), axis=-1)
+supp_x = np.arange(4).reshape(2, 2)
+# supp_x = np.stack(np.meshgrid(np.arange(2), np.arange(3)), axis=-1)
 
 i_split_y, i_split_x = supp_y.ndim, supp_x.ndim - 1
 
@@ -71,13 +71,13 @@ n_iter = risk_plot.size
 for i, (n_train, alpha_0) in enumerate(itertools.product(n_train_plot, alpha_0_plot)):
     print(f"Simulation {i+1}/{n_iter}")
 
-    # bayes_model = DirichletFiniteYcXModelBayes(supp_x_s, supp_y_s, alpha_0, mean, rng_prior=random.default_rng())
-    bayes_model = DirichletFiniteYcXModelBayesNew(alpha_0, mean_x, mean_y_x, rng_prior=random.default_rng())
+    bayes_model = DirichletFiniteYcXModelBayes(supp_x_s, supp_y_s, alpha_0, mean, rng_prior=random.default_rng())
+    # bayes_model = DirichletFiniteYcXModelBayesNew(alpha_0, mean_x, mean_y_x, rng_prior=random.default_rng())  # FIXME: fucked up?
 
     learner = BayesClassifier(bayes_model)
     # learner = BayesEstimator(bayes_model)
 
-    risk_plot[np.unravel_index([i], risk_plot.shape)] = learn_sim(bayes_model, learner, n_train, n_mc=100, verbose=True)
+    risk_plot[np.unravel_index([i], risk_plot.shape)] = learn_sim(bayes_model, learner, n_train, n_mc=1000, verbose=False)
 
 fig, ax = plt.subplots(num='risk', clear=True)
 ax.plot(n_train_plot, risk_plot)
