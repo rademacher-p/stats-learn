@@ -341,20 +341,20 @@ class DirichletRV(ContinuousRV):
     #         raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
 
-rng = np.random.default_rng()
-a0 = 100
-supp = list('abc')
-val = np.random.random(3)
-val = val / val.sum()
-m = FiniteDomainFunc(supp, val)
-m('a')
-
-d = DirichletRV(a0, m, rng)
-d.mean
-d.mode
-d.cov
-d.rvs()
-d.pdf(d.rvs())
+# rng = np.random.default_rng()
+# a0 = 100
+# supp = list('abc')
+# val = np.random.random(3)
+# val = val / val.sum()
+# m = FiniteDomainFunc(supp, val)
+# m('a')
+#
+# d = DirichletRV(a0, m, rng)
+# d.mean
+# d.mode
+# d.cov
+# d.rvs()
+# d.pdf(d.rvs())
 
 
 

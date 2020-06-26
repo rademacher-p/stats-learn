@@ -64,7 +64,7 @@ class DirichletFiniteYcXModelBayesNew(BaseBayes):
         model_gen = YcXModel.finite_model
         model_kwargs = {'rng': rng_model}
         prior = {'p_x': RE_obj_callable.DirichletRV(alpha_0, mean_x, rng_prior),
-                 'p_y_x': lambda x: RE_obj_callable.DirichletRV(alpha_0, mean_y_x(x), rng_prior)}
+                 'p_y_x': lambda x: RE_obj_callable.DirichletRV(alpha_0 * mean_x(x), mean_y_x(x), rng_prior)}
         super().__init__(model_gen, model_kwargs, prior)
 
         self.alpha_0 = alpha_0
@@ -111,11 +111,41 @@ class DirichletFiniteYcXModelBayesNew(BaseBayes):
 
         return self.model_gen(p_x=p_x, p_y_x=p_y_x)     # TODO: RE obj or just func obj?
 
+    def predictive_dist(self, d):
+        n = d.size
+        if n == 0:
+            return self._mean_y_x
+
+        # emp_dist_x = FiniteDomainFunc(self._supp_x,
+        #                               empirical_pmf(d['x'], self._supp_x, self._data_shape_x))
+        #
+        # c_prior_x = 1 / (1 + n / self.alpha_0)
+        # p_x = c_prior_x * self._mean_x + (1 - c_prior_x) * emp_dist_x
+
+        # def emp_dist_y_x(x):
+        #     x = np.asarray(x)
+        #     d_match = d[np.all(x.flatten() == d['x'].reshape(n, -1), axis=-1)].squeeze()
+        #     return FiniteDomainFunc(self._supp_y,
+        #                             empirical_pmf(d_match['y'], self._supp_y, self._data_shape_y))
+
+        def p_y_x(x):   # TODO: arithmetic of functionals?!?
+            x = np.asarray(x)
+            d_match = d[np.all(x.flatten() == d['x'].reshape(n, -1), axis=-1)].squeeze()
+            n_match = d_match.size
+            if n_match == 0:
+                return self._mean_y_x(x)
+
+            c_prior_y = 1 / (1 + n_match / (self.alpha_0 * self._mean_x(x)))
+            emp_dist = FiniteDomainFunc(self._supp_y, empirical_pmf(d_match['y'], self._supp_y, self._data_shape_y))
+            return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist
+
+        return p_y_x
+
 
 
 #%% Without func objects
 class FiniteYcXModelBayes(BaseBayes):
-    def __init__(self, supp_x, supp_y, prior, rng_model=None):     # TODO: rng check, None default?
+    def __init__(self, supp_x, supp_y, prior, rng_model=None):
         self.supp_x = supp_x
         self.supp_y = supp_y        # TODO: Assumed to be my SL structured array!
 

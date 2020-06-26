@@ -17,10 +17,10 @@ from scipy import stats
 
 from RE_obj import DeterministicRE, FiniteRE, DirichletRV
 from SL_obj import YcXModel
-from bayes import BaseBayes, DirichletFiniteYcXModelBayes
-from loss_functions import loss_01, loss_se
+from bayes import DirichletFiniteYcXModelBayes, DirichletFiniteYcXModelBayesNew
 from learn_functions import BayesClassifier, BayesEstimator
 from util.generic import empirical_pmf
+from util.func_obj import FiniteDomainFunc
 
 # plt.style.use('seaborn')  # cm?
 
@@ -84,13 +84,13 @@ rng = random.default_rng()
 
 #%% Discrete sets
 
-# supp_y = np.array(['a', 'b'])
-supp_y = np.arange(2) / 2
-# supp = np.arange(2) / 2
-# supp = np.arange(6).reshape(3, 2)
-supp_x = np.stack(np.meshgrid(np.arange(2), np.arange(3)), axis=-1)
+supp_y = np.array(['a', 'b'])
+# supp_y = np.arange(2) / 2
+supp_x = np.arange(2) / 2
+# supp_x = np.arange(6).reshape(3, 2)
+# supp_x = np.stack(np.meshgrid(np.arange(2), np.arange(3)), axis=-1)
 
-i_split_y, i_split_x = supp_y.ndim, supp_x.ndim - 1
+i_split_y, i_split_x = supp_y.ndim, supp_x.ndim - 0
 
 supp_shape_y, data_shape_y = supp_y.shape[:i_split_y], supp_y.shape[i_split_y:]
 supp_shape_x, data_shape_x = supp_x.shape[:i_split_x], supp_x.shape[i_split_x:]
@@ -110,16 +110,16 @@ supp_y_s = np.array(list(itertools.product(supp_y.reshape((-1,) + data_shape_y))
                     dtype=[('y', supp_y.dtype, data_shape_y)]).reshape(supp_shape_y)
 
 
-alpha_0 = 10 * supp_yx.size
-mean = DirichletRV(supp_yx.size, np.ones(supp_yx.shape) / supp_yx.size).rvs()
-prior = DirichletRV(alpha_0, mean, rng)
-
-theta_pmf = prior.rvs()
-theta = FiniteRE(supp_yx, theta_pmf, rng)
-
-theta_m_pmf = theta_pmf.reshape((-1,) + supp_shape_x).sum(axis=0)
-theta_m = FiniteRE(supp_x_s['x'], theta_m_pmf)
-theta_m_s = FiniteRE(supp_x_s, theta_m_pmf)
+# alpha_0 = 10 * supp_yx.size
+# mean = DirichletRV(supp_yx.size, np.ones(supp_yx.shape) / supp_yx.size).rvs()
+# prior = DirichletRV(alpha_0, mean, rng)
+#
+# theta_pmf = prior.rvs()
+# theta = FiniteRE(supp_yx, theta_pmf, rng)
+#
+# theta_m_pmf = theta_pmf.reshape((-1,) + supp_shape_x).sum(axis=0)
+# theta_m = FiniteRE(supp_x_s['x'], theta_m_pmf)
+# theta_m_s = FiniteRE(supp_x_s, theta_m_pmf)
 
 
 #%% Sim
@@ -136,6 +136,34 @@ def learn_sim(bayes_model, learner, n_train=0, n_test=1, n_mc=1, verbose=False):
         learner.fit(d_train)        # train learner
         loss_mc[i_mc] = learner.evaluate(d_test)        # make decision and assess
 
+        # print(theta.model_x.p)
+        # print(theta.model_y_x(0).p)
+        # print(d_test)
+        # print(learner.predict(d_test['x']), end='')
+
+    # print('')
+    # print(loss_mc)
+
     return loss_mc.mean()
 
 
+if __name__ == '__main__':
+    alpha_0 = alpha_0_plot = supp_x_s.size * supp_y_s.size
+
+    mean = np.ones(supp_x_s.shape + supp_y_s.shape) / (supp_x_s.size * supp_y_s.size)
+
+    mean_x = FiniteDomainFunc(supp_x, np.ones(supp_x_s.shape) / supp_x_s.size)
+
+    mean_y_x = FiniteDomainFunc(supp_x, np.full(supp_x_s.shape,
+                                                FiniteDomainFunc(supp_y, np.ones(supp_y_s.shape) / supp_y_s.size)))
+
+    # bayes_model = DirichletFiniteYcXModelBayes(supp_x_s, supp_y_s, alpha_0, mean,
+    #                                            rng_model=random.default_rng(6),
+    #                                            rng_prior=random.default_rng(5))
+    bayes_model = DirichletFiniteYcXModelBayesNew(alpha_0, mean_x, mean_y_x,
+                                                  rng_model=random.default_rng(6),
+                                                  rng_prior=random.default_rng(5))
+
+    learner = BayesClassifier(bayes_model)
+
+    learn_sim(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
