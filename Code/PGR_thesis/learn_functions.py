@@ -24,7 +24,7 @@ class BaseLearner:
         pass
 
     def predict(self, x):
-        return vectorize_x_func(self._predict_single, x)
+        return vectorize_x_func(self._predict_single, data_shape=self._data_shape_x)(x)
 
     def _predict_single(self, x):
         raise NotImplementedError("Method must be overwritten.")
@@ -42,8 +42,11 @@ class BayesLearner(BaseLearner):
     def __init__(self, bayes_model):
         super().__init__()
         self.bayes_model = bayes_model
+        self._data_shape_x = self.bayes_model._data_shape_x
+        self._data_shape_y = self.bayes_model._data_shape_y
 
-        self._posterior_mean = None
+        self._posterior_mean = None     # TODO: replace with predictive?
+        self._predictive_dist = None
         self.fit()
 
     @property
@@ -52,9 +55,10 @@ class BayesLearner(BaseLearner):
 
     def fit(self, d=None):
         if d is None:
-            d = np.array([], dtype=[('y', '<f8', self.bayes_model._data_shape_y),
-                                    ('x', '<f8', self.bayes_model._data_shape_x)])
-        self._posterior_mean = self.bayes_model.posterior_mean(d)
+            d = np.array([], dtype=[('x', '<f8', self._data_shape_x),
+                                    ('y', '<f8', self._data_shape_y)])
+        # self._posterior_mean = self.bayes_model.posterior_mean(d)
+        self._predictive_dist = self.bayes_model.predictive_dist(d)
 
 
 class BayesClassifier(BayesLearner):
@@ -63,7 +67,8 @@ class BayesClassifier(BayesLearner):
         self.loss_fcn = loss_01
 
     def _predict_single(self, x):
-        return self._posterior_mean.mode_y_x(x)
+        # return self._posterior_mean.mode_y_x(x)
+        return self._predictive_dist(x).argmax
 
 
 class BayesEstimator(BayesLearner):
@@ -72,7 +77,8 @@ class BayesEstimator(BayesLearner):
         self.loss_fcn = loss_se
 
     def _predict_single(self, x):
-        return self._posterior_mean.mean_y_x(x)
+        # return self._posterior_mean.mean_y_x(x)
+        return self._predictive_dist(x).m1
 
 
 

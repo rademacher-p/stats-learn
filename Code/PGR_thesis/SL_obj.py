@@ -140,8 +140,10 @@ class YcXModel(BaseModel):
         d_x = np.asarray(self.model_x.rvs(size, random_state))
         d_y = np.asarray([self.model_y_x(x).rvs((), random_state)
                           for x in d_x.reshape((-1,) + self._data_shape_x)]).reshape(size + self.data_shape_y)
-        d = np.array(list(zip(d_y.reshape((-1,) + self.data_shape_y), d_x.reshape((-1,) + self.data_shape_x))),
-                     dtype=[('y', d_y.dtype, self.data_shape_y), ('x', d_x.dtype, self.data_shape_x)]).reshape(size)
+        # d = np.array(list(zip(d_y.reshape((-1,) + self.data_shape_y), d_x.reshape((-1,) + self.data_shape_x))),
+        #              dtype=[('y', d_y.dtype, self.data_shape_y), ('x', d_x.dtype, self.data_shape_x)]).reshape(size)
+        d = np.array(list(zip(d_x.reshape((-1,) + self.data_shape_x), d_y.reshape((-1,) + self.data_shape_y))),
+                     dtype=[('x', d_x.dtype, self.data_shape_x), ('y', d_y.dtype, self.data_shape_y)]).reshape(size)
 
         return d
 
