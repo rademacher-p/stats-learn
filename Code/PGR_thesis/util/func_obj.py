@@ -68,10 +68,10 @@ class NumericRangeFunc(BaseFunc):
 
 #%% IN USE
 
-def diag_func(f):
-    if isinstance(f, FiniteDomainFunc):
-        f_out = copy.deepcopy(f)
-        f_out.__call__ = lambda x_1, x_2: f
+# def diag_func(f):
+#     if isinstance(f, FiniteDomainFunc):
+#         f_out = copy.deepcopy(f)
+#         f_out.__call__ = lambda x_1, x_2: f
 
 
 # TODO: scalar vs multi, numeric vs non
