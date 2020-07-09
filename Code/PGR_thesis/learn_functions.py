@@ -4,6 +4,7 @@ Supervised learning functions.
 
 import numpy as np
 import functools
+from math import floor
 from util.generic import vectorize_x_func, empirical_pmf
 from loss_functions import loss_se, loss_01
 from SL_obj import YcXModel
@@ -79,6 +80,40 @@ class BayesEstimator(BayesLearner):
     def _predict_single(self, x):
         # return self._posterior_mean.mean_y_x(x)
         return self._predictive_dist(x).m1
+
+
+# class DirichletFiniteClassifier(BaseLearner):
+#     def __init__(self, alpha_0, mean_y_x):
+#         super().__init__()
+#         self.loss_fcn = loss_01
+#
+#         self.alpha_0 = alpha_0
+#         self.mean_y_x = mean_y_x
+#
+#     def fit(self, d):
+#
+#
+#     def _predict_single(self, x):
+#         pass
+
+
+class BetaEstimatorTemp(BaseLearner):
+    def __init__(self, n_x=10):
+        super().__init__()
+        self.loss_fcn = loss_se
+        self.n_x = n_x
+        self.avg_y_x = np.zeros(n_x)
+
+    def fit(self, d):
+        delta = 1 / self.n_x
+        for i in range(self.n_x):
+            flag_match = np.logical_and(d['x'] >= i * delta, d['x'] < (i + 1) * delta)
+            if flag_match.any():
+                self.avg_y_x[i] = d[flag_match]['y'].mean()
+
+    def _predict_single(self, x):
+        i = floor(x * self.n_x)
+        return self.avg_y_x[i]
 
 
 

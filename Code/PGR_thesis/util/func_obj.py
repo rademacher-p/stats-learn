@@ -156,11 +156,17 @@ class FiniteDomainNumericFunc(FiniteDomainFunc):
     def __mul__(self, other):
         return self._op_checker(other, operator.mul)
 
-    def __rmul__(self, other):
-        return self._op_checker(other, operator.mul)
+    # def __rmul__(self, other):
+    #     return self._op_checker(other, operator.mul)
 
     def __truediv__(self, other):
         return self._op_checker(other, operator.truediv)
+
+    def __floordiv__(self, other):
+        return self._op_checker(other, operator.floordiv)
+
+    def __mod__(self, other):
+        return self._op_checker(other, operator.mod)
 
     def __pow__(self, other):
         return self._op_checker(other, operator.pow)

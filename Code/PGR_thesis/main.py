@@ -17,8 +17,8 @@ from scipy import stats
 
 from RE_obj import DeterministicRE, FiniteRE, DirichletRV
 from SL_obj import YcXModel
-from bayes import DirichletFiniteYcXModelBayes, DirichletFiniteYcXModelBayesNew
-from learn_functions import BayesClassifier, BayesEstimator
+from bayes import DirichletFiniteYcXModelBayes, DirichletFiniteYcXModelBayesNew, BetaModelBayes
+from learn_functions import BayesClassifier, BayesEstimator, BetaEstimatorTemp
 from util.generic import empirical_pmf
 from util.func_obj import FiniteDomainFunc
 
@@ -132,7 +132,11 @@ def learn_sim(bayes_model, learner, n_train=0, n_test=1, n_mc=1, verbose=False):
                 print(f"Iteration {i_mc}/{n_mc}", end='\r')
 
         theta = bayes_model.random_model()    # randomize model using bayes_model
-        d_train, d_test = theta.rvs(n_train), theta.rvs(n_test)     # generate train/test data
+
+        # d_train, d_test = theta.rvs(n_train), theta.rvs(n_test)     # generate train/test data
+        d = theta.rvs(n_train + n_test)
+        d_train, d_test = d[:n_train], d[n_train:]
+
         learner.fit(d_train)        # train learner
         loss_mc[i_mc] = learner.evaluate(d_test)        # make decision and assess
 
@@ -166,4 +170,12 @@ if __name__ == '__main__':
 
     learner = BayesClassifier(bayes_model)
 
-    learn_sim(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
+    loss = learn_sim(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
+
+
+if __name__ == '__main__':
+    bayes_model = BetaModelBayes()
+    learner = BetaEstimatorTemp(n_x=10)
+
+    loss = learn_sim(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
+    print(loss)

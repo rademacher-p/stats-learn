@@ -38,14 +38,12 @@ class BaseBayes:
         raise NotImplementedError
 
 
-# class BetaModelBayes(BaseBayes):
-#     def __init__(self, prior=None, rng_model=None):
-#         model_gen = YcXModel.beta_model
-#         model_kwargs = {'a': .9, 'b': .9, 'c': 5, 'rng': rng_model}
-#         super().__init__(model_gen, model_kwargs, prior)
-#
-#     # def random_model(self):
-#     #     raise NotImplementedError("Method must be overwritten.")
+class BetaModelBayes(BaseBayes):
+    def __init__(self, prior=None, rng_model=None):     # deterministic
+        model_gen = YcXModel.beta_model
+        model_kwargs = {'a': .9, 'b': .9, 'c': 5, 'rng': rng_model}
+        super().__init__(model_gen, model_kwargs, prior)
+
 
 
 # class NormalModelBayes(BaseBayes):
