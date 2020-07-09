@@ -38,8 +38,10 @@ class BaseRE(multi_rv_generic):
     def rvs(self, size=(), random_state=None):
         if type(size) is int:
             size = (size,)
-        elif type(size) is not tuple:
-            raise TypeError("Input 'size' must be int or tuple.")
+        elif not size == ():
+            raise TypeError("Input 'size' must be int or ().")
+        # elif type(size) is not tuple:
+        #     raise TypeError("Input 'size' must be int or tuple.")
         random_state = self._get_random_state(random_state)
 
         return self._rvs(size, random_state)
@@ -365,10 +367,12 @@ def _empirical_check_n(n):
 
 
 def _empirical_check_input(x, n, mean):
-    x = check_valid_pmf(x, data_shape=mean.shape)
+    # x = check_valid_pmf(x, data_shape=mean.shape)
+    if not isinstance(x, type(mean)):
+        raise TypeError("Input must have same function type as mean.")
 
-    # if ((n * x) % 1 > 0).any():
-    if (np.minimum((n * x) % 1, (-n * x) % 1) > 1e-9).any():
+    # if (np.minimum((n * x) % 1, (-n * x) % 1) > 1e-9).any():
+    if (np.minimum((n * x.val) % 1, (-n * x.val) % 1) > 1e-9).any():
         raise ValueError("Each entry in 'x' must be a multiple of 1/n.")
 
     return x
@@ -382,8 +386,14 @@ class EmpiricalRV(DiscreteRV):
     def __init__(self, n, mean, rng=None):
         super().__init__(rng)
         self._n = _empirical_check_n(n)
-        self._mean = check_valid_pmf(mean)
+        self._mean = _check_func_pmf(mean, full_support=False)
         self._update_attr()
+
+    @classmethod
+    def gen_func(cls, n, supp, p, rng=None):
+        p = np.asarray(p)
+        mean = FiniteDomainFunc(supp, p)
+        return cls(n, mean, rng)
 
     # Input properties
     @property
@@ -401,62 +411,68 @@ class EmpiricalRV(DiscreteRV):
 
     @mean.setter
     def mean(self, mean):
-        self._mean = check_valid_pmf(mean)
+        self._mean = _check_func_pmf(mean, full_support=True)
         self._update_attr()
 
     # Attribute Updates
     def _update_attr(self):
-        self._data_shape = self._mean.shape
+        self._data_shape = self._mean.set_shape
         self._data_size = self._mean.size
 
-        self._mode = ((self._n * self._mean) // 1) + simplex_round((self._n * self._mean) % 1)
+        self._mode = ((self._n * self._mean) // 1) + FiniteDomainFunc(self._mean.supp,
+                                                                      simplex_round((self._n * self._mean.val) % 1))
 
-        self._cov = (diag_gen(self._mean) - outer_gen(self._mean, self._mean)) / self._n
+        # TODO: IMPLEMENT COV
+        # self._cov = (diag_gen(self._mean) - outer_gen(self._mean, self._mean)) / self._n
 
         self._log_pmf_coef = gammaln(self._n + 1)
 
     def _rvs(self, size=(), random_state=None):
-        return random_state.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
+        vals = random_state.multinomial(self._n, self._mean.val.flatten(), size).reshape(size + self._data_shape)
+        if size == ():
+            return FiniteDomainFunc(self.mean.supp, vals)
+        else:
+            return [FiniteDomainFunc(self.mean.supp, val) for val in vals]
 
-    def _pmf(self, x):
+    def pmf(self, x):
         x = _empirical_check_input(x, self._n, self._mean)
 
-        log_pmf = self._log_pmf_coef + (xlogy(self._n * x, self._mean)
-                                        - gammaln(self._n * x + 1)).reshape(-1, self._data_size).sum(axis=-1)
+        log_pmf = self._log_pmf_coef + (xlogy(self._n * x.val, self._mean.val)
+                                        - gammaln(self._n * x.val + 1)).reshape(-1, self._data_size).sum(axis=-1)
         return np.exp(log_pmf)
 
-    def plot_pmf(self, ax=None):
-
-        if self._data_size in (2, 3):
-            x_plt = simplex_grid(self.n, self._data_shape)
-            pmf_plt = self.pmf(x_plt)
-            x_plt.resize(x_plt.shape[0], self._data_size)
-
-            if self._data_size == 2:
-                if ax is None:
-                    _, ax = plt.subplots()
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$')
-
-                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pmf_plt)
-
-                c_bar = plt.colorbar(plt_data)
-                c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
-
-            elif self._data_size == 3:
-                if ax is None:
-                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                    ax.view_init(35, 45)
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
-
-                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pmf_plt)
-
-                c_bar = plt.colorbar(plt_data)
-                c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
-
-            return plt_data
-
-        else:
-            raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
+    # def plot_pmf(self, ax=None):
+    #
+    #     if self._data_size in (2, 3):
+    #         x_plt = simplex_grid(self.n, self._data_shape)
+    #         pmf_plt = self.pmf(x_plt)
+    #         x_plt.resize(x_plt.shape[0], self._data_size)
+    #
+    #         if self._data_size == 2:
+    #             if ax is None:
+    #                 _, ax = plt.subplots()
+    #                 ax.set(xlabel='$x_1$', ylabel='$x_2$')
+    #
+    #             plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pmf_plt)
+    #
+    #             c_bar = plt.colorbar(plt_data)
+    #             c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
+    #
+    #         elif self._data_size == 3:
+    #             if ax is None:
+    #                 _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+    #                 ax.view_init(35, 45)
+    #                 ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
+    #
+    #             plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pmf_plt)
+    #
+    #             c_bar = plt.colorbar(plt_data)
+    #             c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
+    #
+    #         return plt_data
+    #
+    #     else:
+    #         raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
 # rng = np.random.default_rng()
 # n = 10
@@ -481,7 +497,7 @@ class DirichletEmpiricalRV(DiscreteRV):
         super().__init__(rng)
         self._n = _empirical_check_n(n)
         self._alpha_0 = _dirichlet_check_alpha_0(alpha_0)
-        self._mean = check_valid_pmf(mean)
+        self._mean = _check_func_pmf(mean, full_support=False)
         self._update_attr()
 
     # Input properties
@@ -509,7 +525,7 @@ class DirichletEmpiricalRV(DiscreteRV):
 
     @mean.setter
     def mean(self, mean):
-        self._mean = check_valid_pmf(mean)
+        self._mean = _check_func_pmf(mean, full_support=True)
         self._update_attr()
 
     # Attribute Updates
@@ -517,56 +533,57 @@ class DirichletEmpiricalRV(DiscreteRV):
         self._data_shape = self._mean.shape
         self._data_size = self._mean.size
 
-        # TODO: mode?
+        # TODO: mode? cov?
 
-        self._cov = ((1/self._n + 1/self._alpha_0) / (1 + 1/self._alpha_0)
-                     * (diag_gen(self._mean) - outer_gen(self._mean, self._mean)))
+        # self._cov = ((1/self._n + 1/self._alpha_0) / (1 + 1/self._alpha_0)
+        #              * (diag_gen(self._mean) - outer_gen(self._mean, self._mean)))
 
-        self._log_pmf_coef = (gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
+        self._log_pmf_coef = (gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean.val))
                               + gammaln(self._n + 1) - gammaln(self._alpha_0 + self._n))
 
     def _rvs(self, size=(), random_state=None):
-        return random_state.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
+        # return random_state.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
+        raise NotImplementedError
 
-    def _pmf(self, x):
+    def pmf(self, x):
         x = _empirical_check_input(x, self._n, self._mean)
 
-        log_pmf = self._log_pmf_coef + (gammaln(self._alpha_0 * self._mean + self._n * x)
+        log_pmf = self._log_pmf_coef + (gammaln(self._alpha_0 * self._mean.val + self._n * x)
                                         - gammaln(self._n * x + 1)).reshape(-1, self._data_size).sum(axis=-1)
         return np.exp(log_pmf)
 
-    def plot_pmf(self, ax=None):        # TODO: reused code. define simplex plotter outside!
-
-        if self._data_size in (2, 3):
-            x_plt = simplex_grid(self.n, self._data_shape)
-            pmf_plt = self.pmf(x_plt)
-            x_plt.resize(x_plt.shape[0], self._data_size)
-
-            if self._data_size == 2:
-                if ax is None:
-                    _, ax = plt.subplots()
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$')
-
-                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pmf_plt)
-
-                c_bar = plt.colorbar(plt_data)
-                c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
-
-            elif self._data_size == 3:
-                if ax is None:
-                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                    ax.view_init(35, 45)
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
-
-                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pmf_plt)
-
-                c_bar = plt.colorbar(plt_data)
-                c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
-
-            return plt_data
-
-        else:
-            raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
+    # def plot_pmf(self, ax=None):        # TODO: reused code. define simplex plotter outside!
+    #
+    #     if self._data_size in (2, 3):
+    #         x_plt = simplex_grid(self.n, self._data_shape)
+    #         pmf_plt = self.pmf(x_plt)
+    #         x_plt.resize(x_plt.shape[0], self._data_size)
+    #
+    #         if self._data_size == 2:
+    #             if ax is None:
+    #                 _, ax = plt.subplots()
+    #                 ax.set(xlabel='$x_1$', ylabel='$x_2$')
+    #
+    #             plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pmf_plt)
+    #
+    #             c_bar = plt.colorbar(plt_data)
+    #             c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
+    #
+    #         elif self._data_size == 3:
+    #             if ax is None:
+    #                 _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+    #                 ax.view_init(35, 45)
+    #                 ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
+    #
+    #             plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pmf_plt)
+    #
+    #             c_bar = plt.colorbar(plt_data)
+    #             c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
+    #
+    #         return plt_data
+    #
+    #     else:
+    #         raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
 # rng = np.random.default_rng()
 # n = 10
@@ -581,6 +598,127 @@ class DirichletEmpiricalRV(DiscreteRV):
 # d.rvs()
 # d.pmf(d.rvs())
 # d.pmf(d.rvs(4).reshape((2, 2) + d.mean.shape))
+
+
+class EmpiricalRP(DiscreteRV):      # CONTINUOUS
+    """
+    Empirical random process, continuous support.
+    """
+
+    def __init__(self, n, mean, rng=None):
+        super().__init__(rng)
+        self._n = _empirical_check_n(n)
+        if not isinstance(mean, BaseRE):
+            raise TypeError("Mean input must be an RE object.")
+        self._mean = mean
+        self._update_attr()
+
+    # Input properties
+    @property
+    def n(self):
+        return self._n
+
+    @n.setter
+    def n(self, n):
+        self._n = _empirical_check_n(n)
+        self._update_attr()
+
+    @property
+    def mean(self):
+        return self._mean
+
+    @mean.setter
+    def mean(self, mean):
+        if not isinstance(mean, BaseRE):
+            raise TypeError("Mean input must be an RE object.")
+        self._mean = mean
+        self._update_attr()
+
+    # Attribute Updates
+    def _update_attr(self):
+        self._data_shape = self._mean.data_shape
+        # self._data_size = self._mean.size
+
+        # self._mode = ((self._n * self._mean) // 1) + FiniteDomainFunc(self._mean.supp,
+        #                                                               simplex_round((self._n * self._mean.val) % 1))
+
+        # TODO: IMPLEMENT COV
+        # self._cov = (diag_gen(self._mean) - outer_gen(self._mean, self._mean)) / self._n
+
+        # self._log_pmf_coef = gammaln(self._n + 1)
+
+    def _rvs(self, size=(), random_state=None):
+        raise NotImplementedError   # FIXME
+
+        vals = random_state.multinomial(self._n, self._mean.val.flatten(), size).reshape(size + self._data_shape)
+        if size == ():
+            return FiniteDomainFunc(self.mean.supp, vals)
+        else:
+            return [FiniteDomainFunc(self.mean.supp, val) for val in vals]
+
+    # def pmf(self, x):
+    #     x = _empirical_check_input(x, self._n, self._mean)
+    #
+    #     log_pmf = self._log_pmf_coef + (xlogy(self._n * x.val, self._mean.val)
+    #                                     - gammaln(self._n * x.val + 1)).reshape(-1, self._data_size).sum(axis=-1)
+    #     return np.exp(log_pmf)
+
+
+
+class SampsDE(BaseRE):
+    """
+    FAKE samples from continuous DP realization
+    """
+
+    def __init__(self, n, alpha_0, mean, rng=None):
+        super().__init__(rng)
+        self._n = _empirical_check_n(n)
+        self._alpha_0 = _dirichlet_check_alpha_0(alpha_0)
+        if not isinstance(mean, BaseRE):
+            raise TypeError("Mean input must be an RE object.")
+        self._mean = mean
+        self._data_shape = mean.data_shape
+
+    # Input properties
+    @property
+    def n(self):
+        return self._n
+
+    @property
+    def alpha_0(self):
+        return self._alpha_0
+
+    @property
+    def mean(self):
+        return self._mean
+
+    def _rvs(self, size=(), random_state=None):
+        if size != ():
+            raise ValueError("Size input not used, 'n' is.")
+
+        emp = []
+        for n in range(self.n):
+            p_mean = 1 / (1 + n / self.alpha_0)
+            if random_state.choice([True, False], p=[p_mean, 1-p_mean]):
+                # Sample from mean dist
+                emp.append([self.mean.rvs(), 1])
+            else:
+                # Sample from empirical dist
+                cnts = [s[1] for s in emp]
+                probs = np.array(cnts) / sum(cnts)
+                i = random_state.choice(range(len(emp)), p=probs)
+                emp[i][1] += 1
+
+        out = [np.broadcast_to(s, (c, *self.data_shape)) for s, c in emp]
+        return np.concatenate(out)
+
+
+s, p = ['a','b','c'], np.array([.3,.2,.5])
+p = p / p.sum()
+m = FiniteRE.gen_func(s, p)
+dd = SampsDE(10, 5, m)
+print(dd.rvs())
+
 
 
 class BetaRV(ContinuousRV):

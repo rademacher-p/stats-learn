@@ -604,7 +604,8 @@ class DirichletEmpiricalRV(DiscreteRV):
                               + gammaln(self._n + 1) - gammaln(self._alpha_0 + self._n))
 
     def _rvs(self, size=(), random_state=None):
-        return random_state.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
+        # return random_state.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
+        raise NotImplementedError
 
     def _pmf(self, x):
         x = _empirical_check_input(x, self._n, self._mean)
