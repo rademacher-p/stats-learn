@@ -2632,9 +2632,14 @@ We have the Dirichlet-Empirical process $\uppsi \equiv \Psi(\Drm) \sim \DEP(N,\a
 \mu_{\uppsi} & = & \alpha 
 \end{IEEEeqnarray}
 and
-\begin{IEEEeqnarray}{L}
-\Erm_{\uppsi}\big[ \uppsi(y,x) \uppsi(y',x') \big] \\
-\qquad = \frac{\alpha_0^{-1} + N^{-1}}{1 + \alpha_0^{-1}} \alpha(y,x) \delta(y-y') \delta(x-x') + \frac{1 - N^{-1}}{1 + \alpha_0^{-1}} \alpha(y,x) \alpha(y',x')  \nonumber \;.
+\begin{IEEEeqnarray}{rCl}
+\Erm_{\uppsi}\big[ \uppsi(y,x) \uppsi(y',x') \big] & = & \frac{\alpha_0^{-1} + N^{-1}}{1 + \alpha_0^{-1}} \alpha(y,x) \delta(y-y') \delta(x-x') \nonumber \\
+&& \quad + \frac{1 - N^{-1}}{1 + \alpha_0^{-1}} \alpha(y,x) \alpha(y',x')
+\end{IEEEeqnarray}
+and covariance function
+\begin{IEEEeqnarray}{rCl}
+\Sigma_{\uppsi} & = & \frac{\alpha_0^{-1} + N^{-1}}{1 + \alpha_0^{-1}} \big( \diag(\alpha) - \alpha \otimes \alpha \big) \\
+& = & \left(1 + \frac{\alpha_0}{N}\right) \Sigma_{\uptheta} \nonumber \;.
 \end{IEEEeqnarray}
 
 Observe that by the aggregation principle, $\uppsim \sim \DEP(N,\alpha_0,\alpham)$ is a DEP over the set $\Xcal$. Additionally, the 1-dimensional subsets conditioned on the marginalized DEP are characterized as
@@ -2675,8 +2680,8 @@ To aid characterization of the estimator, define the random process $\Delta(\xrm
 \begin{IEEEeqnarray}{L} \label{eq:predictive_cov_cont}
 \mathrm{Cov}(\xrm,\uppsim,\upthetac) = \Crm_{\uppsic | \uppsim,\upthetac} \big[\prm_{\yrm | \xrm,\uppsim,\uppsic}(\xrm,\uppsim,\uppsic) \big] \\
 \quad = \left( \frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)} \right)^2 \Sigma_{\uppsic(\xrm) | \uppsim(\xrm),\upthetac(\xrm)} \nonumber \\
-\quad = \left( 1 + \frac{\alpha_0 \alpham(\xrm)}{N \uppsim(\xrm)} \right)^{-2} \Sigma_{\uppsic(\xrm) | \uppsim(\xrm),\upthetac(\xrm)}(y,y') \nonumber \\
-\quad = \frac{\delta(0) N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \Big( \diag\big(\upthetac(y;\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \nonumber \;,
+\quad = \left( 1 + \frac{\alpha_0 \alpham(\xrm)}{N \uppsim(\xrm)} \right)^{-2} \Sigma_{\uppsic(\xrm) | \uppsim(\xrm),\upthetac(\xrm)} \nonumber \\
+\quad = \frac{\delta(0) N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \nonumber \;,
 \end{IEEEeqnarray}
 
 
@@ -2690,7 +2695,7 @@ Also of interest, the conditional expectation of $\mathcal{E}(\xrm,\uppsim,\upth
 \begin{IEEEeqnarray}{L} \label{eq:predictive_E_del_sq_cont}
 \Erm_{\xrm,\uppsim | \upthetam}\Big[ \mathcal{E}(\xrm,\uppsim,\upthetac) \Big] \\
 \quad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right)^2 \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big)  \right] \nonumber \\
-\qquad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\delta(0) N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \right] \Big( \diag\big(\upthetac(y;\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \right] \nonumber \\
+\qquad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\delta(0) N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \right] \nonumber \\
 \quad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(1 + \frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm)}\right)^{-2} \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \right] \nonumber \\
 \qquad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(1 + \frac{\alpha_0 \alpham(\xrm)}{N \uppsim(\xrm)}\right)^{-2} \right] \Sigma_{\uppsic(\xrm) | \uppsim(\xrm),\upthetac(\xrm)} \right] \nonumber \;.
 \end{IEEEeqnarray}
@@ -2724,7 +2729,7 @@ PGR: COPIED, incomplete
 & = & \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)}\right) \int_{\Ycal} \alphac(y;\xrm) \Lcal(h,y) {\drm}y \nonumber \\
 && \qquad + \left(\frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)}\right) \int_{\Ycal} \Psic(y;\xrm;\Drm) \Lcal(h,y) {\drm}y \nonumber \\
 & = & \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)}\right) \Erm_{\yrm | \xrm}\big[ \Lcal(h,\yrm) \big] \nonumber \\
-&& \qquad + \left(\frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)}\right) \frac{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \Lcal\big( h,\Yrm_n \big)}{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big)} \nonumber \;.
+&& \qquad + \left(\frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)}\right) \frac{\sum_{n=1}^N \delta\big[\xrm, \Xrm_n\big] \Lcal\big( h,\Yrm_n \big)}{\sum_{n=1}^N \delta\big[\xrm, \Xrm_n\big]} \nonumber \;.
 \end{IEEEeqnarray}
 
 
@@ -2753,7 +2758,7 @@ f^*(\xrm;\Drm) & = & \mu_{\yrm | \xrm,\Drm}  = \Erm_{\uptheta | \xrm,\Drm} \left
 & = & \left( \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)} \right) \int_{\Ycal} y \alphac(y;\xrm) {\drm}y \nonumber \\
 && \quad + \left( \frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)} \right) \int_{\Ycal} y \Psic(y;\xrm;\Drm) {\drm}y \nonumber \\
 & = & \left( \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)} \right) \mu_{\yrm | \xrm} \nonumber \\
-&& \quad + \left( \frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)} \right) \frac{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \Yrm_n}{\sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big)} \nonumber \;.
+&& \quad + \left( \frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)} \right) \frac{\sum_{n=1}^N \delta\big[\xrm, \Xrm_n\big] \Yrm_n}{\sum_{n=1}^N \delta\big[\xrm, \Xrm_n\big]} \nonumber \;.
 \end{IEEEeqnarray}
 
 
@@ -2768,7 +2773,7 @@ Generalizing from the basic model discussion, we again have
 \end{IEEEeqnarray}
 where we choose to perform the expectation over $\uppsi$. 
 
-The conditional varance is now
+The conditional variance is now
 \begin{IEEEeqnarray}{rCl}
 \Sigma_{\yrm | \xrm,\uppsi} & = & \Erm_{\yrm | \xrm,\uppsi}\big[ \yrm^2 \big]
 - \mu_{\yrm | \xrm,\uppsi}^2 \;.
@@ -3003,7 +3008,7 @@ Using the random process $\Delta(\xrm,\uppsim,\uppsic,\upthetac) \equiv \prm_{\y
 \end{IEEEeqnarray}
 where the function $\mathcal{E}$ is defined in \eqref{eq:predictive_del_sq_cont}. 
 
-\todohigh{WIP WIP}
+\todohigh{WIP WIP - copied stuff below}
 
 
 Note that by the aggregation property of Empirical distributions, the empirical process $\uppsim(x)$ conditioned on the model $\upthetam(x)$ is distributed as
@@ -3759,7 +3764,7 @@ where
 \begin{equation}
 \mu_{\upthetam | \Drm} = \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpham + \left(\frac{N}{\alpha_0 + N}\right) \Psim(D) 
 \end{equation}
-and $\Psim(z;D) = \int_{\Scal_z} \Psi(y;D) {\drm}y = N^{-1} \sum_{n=1}^N \chi(D_n;\Scal_z)$. $\chi$ is the indicator function
+and $\Psim(z;D) = \int_{\Scal_z} \Psi(y;D) {\drm}y = N^{-1} \sum_{n=1}^N \chi(D_n;\Scal_z)$. Note that $\chi$ is the indicator function
 \begin{equation}
 \chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S.  \end{cases}
 \end{equation}
