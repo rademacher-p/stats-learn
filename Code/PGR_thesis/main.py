@@ -151,10 +151,10 @@ def learn_sim(bayes_model, learner, n_train=0, n_test=1, n_mc=1, verbose=False):
     return loss_mc.mean()
 
 
-if __name__ == '__main__':
+def main():
     alpha_0 = alpha_0_plot = supp_x_s.size * supp_y_s.size
 
-    mean = np.ones(supp_x_s.shape + supp_y_s.shape) / (supp_x_s.size * supp_y_s.size)
+    # mean = np.ones(supp_x_s.shape + supp_y_s.shape) / (supp_x_s.size * supp_y_s.size)
 
     mean_x = FiniteDomainFunc(supp_x, np.ones(supp_x_s.shape) / supp_x_s.size)
 
@@ -172,10 +172,13 @@ if __name__ == '__main__':
 
     loss = learn_sim(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
 
-
-if __name__ == '__main__':
+    #
     bayes_model = BetaModelBayes()
     learner = BetaEstimatorTemp(n_x=10)
 
     loss = learn_sim(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
     print(loss)
+
+
+if __name__ == '__main__':
+    main()

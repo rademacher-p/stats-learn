@@ -51,7 +51,7 @@ def check_valid_pmf(p, data_shape=None, full_support=False):
     return p
 
 
-def vectorize_x_func(func, data_shape):
+def vectorize_x_func(func, data_shape):     # TODO: as decorator?
     def func_vec(x):
         x, set_shape = check_data_shape(x, data_shape)
 
