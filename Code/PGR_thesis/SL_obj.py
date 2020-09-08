@@ -9,7 +9,8 @@ import numpy as np
 from scipy import stats
 from scipy.stats._multivariate import multi_rv_generic
 
-from RE_obj_callable import BaseRE, BaseRV, FiniteRE, DirichletRV, BetaRV       # TODO: CALLABLE!!!!
+from RE_obj import NormalRV
+from RE_obj_callable import BaseRE, BaseRV, FiniteRE, DirichletRV, BetaRV       # TODO: note - CALLABLE!!!!
 from util.generic import vectorize_x_func
 
 
@@ -171,13 +172,22 @@ class YcXModel(BaseModel):
 
         return cls(model_x, model_y_x, rng)
 
-    # @classmethod
-    # def norm_model(cls, mean_x=0, var_x=1, var_y=1, rng=None):
-    #     model_x = stats.norm(loc=mean_x, scale=np.sqrt(var_x))
-    #
-    #     def model_y_x(x): return stats.norm(loc=x, scale=np.sqrt(var_y))
-    #
-    #     return cls(model_x, model_y_x, rng)
+    # TODO: subclass, overwrite methods for efficiency?
+
+    @classmethod
+    def norm_model(cls, mean_x=0, cov_x=1, funcs=None, weights=(0,), cov_y_x=1, rng=None):
+        model_x = NormalRV(mean_x, cov_x)
+
+        if funcs is None:
+            funcs = [lambda x: 1]
+
+        def mean_y_x(x):
+            return sum(weights[i] * funcs[i](x) for i in range(len(weights)))
+
+        def model_y_x(x):
+            return NormalRV(mean_y_x(x), cov_y_x)
+
+        return cls(model_x, model_y_x, rng)
 
 
 class YcXModelRVx(YcXModel, BaseModelRVx):

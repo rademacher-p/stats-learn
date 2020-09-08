@@ -5,11 +5,13 @@ Random element objects.
 # TODO: docstrings?
 
 import numpy as np
-from scipy.stats._multivariate import multi_rv_generic
+
+from scipy.stats._multivariate import multi_rv_generic, _PSD
 from scipy.special import gammaln, xlogy, xlog1py, betaln
 import matplotlib.pyplot as plt
+
 from util.generic import check_data_shape, check_valid_pmf
-from util.math import outer_gen, diag_gen, simplex_round
+from util.math import outer_gen, diag_gen, simplex_round, inverse, determinant
 from util.plotters import simplex_grid
 
 
@@ -311,7 +313,6 @@ class FiniteRV(FiniteRE, DiscreteRV):
 # f2 = FiniteRE(s, p)
 # f2.pmf(f2.rvs(4))
 # f2.plot_pmf()
-
 
 
 def _dirichlet_check_alpha_0(alpha_0):
@@ -733,4 +734,100 @@ class BetaRV(ContinuousRV):
         x_plt = np.linspace(0, 1, n_plt + 1, endpoint=True)
         plt_data = ax.plot(x_plt, self.pdf(x_plt))
         return plt_data
+
+
+class NormalRV(ContinuousRV):
+    def __init__(self, mean, cov, rng=None):
+        super().__init__(rng)
+        self.mean = np.array(mean)
+        self.cov = np.array(cov)
+
+        # self._inv_cov = None
+        # self._psd = None
+
+    @property
+    def mean(self):
+        return self._mean
+
+    @mean.setter
+    def mean(self, mean):
+        self._mean = np.array(mean)
+        self._data_shape = self._mean.shape
+        self._data_size = self._mean.size
+
+    @property
+    def cov(self):
+        return self._cov
+
+    @cov.setter
+    def cov(self, cov):
+        self._cov = np.array(cov)
+        if self._cov.shape != self._data_shape * 2:
+            raise ValueError(f"Covariance array shape must be {self._data_shape * 2}.")
+
+        # self._psd = _PSD(self._cov)
+        # self._log_pdf_coef = -0.5 * (self._psd.rank * np.log(2 * np.pi) + self._psd.log_pdet)
+
+        self._inv_cov = inverse(self._cov)
+        _log_det_cov = np.log(determinant(self._cov))
+        self._log_pdf_coef = -0.5 * (self._data_size * np.log(2 * np.pi) + _log_det_cov)
+
+    @property
+    def mode(self):
+        return self.mean
+
+    def _rvs(self, size=(), random_state=None):
+        if self._data_shape == ():
+            return random_state.normal(self._mean, np.sqrt(self._cov), size).reshape(size + self._data_shape)
+        else:
+            return random_state.multivariate_normal(self._mean, self._cov, size).reshape(size + self._data_shape)
+
+    def _pdf(self, x):
+        dev = x.reshape(-1, *self._data_shape) - self._mean
+        inner_white = np.array([(outer_gen(dev_i, np.ones(self._data_shape)) * self._inv_cov
+                                * outer_gen(np.ones(self._data_shape), dev_i)).sum() for dev_i in dev])
+        # inner_white = np.sum(np.square(np.dot(dev, self._psd.U)), axis=-1)
+
+        log_pdf = self._log_pdf_coef + -0.5 * inner_white
+        return np.exp(log_pdf)
+
+    def plot_pdf(self, x_plt=None, ax=None):
+        _delta = 0.01
+
+        if self._data_size == 1:
+            if x_plt is None:
+                lims = self._mean - 3*np.sqrt(self._cov), self._mean + 3*np.sqrt(self._cov)
+                n_plt = int(round((lims[1]-lims[0]) / _delta))
+                x_plt = np.linspace(*lims, n_plt, endpoint=True)
+
+            if ax is None:
+                _, ax = plt.subplots()
+                ax.set(xlabel='$x_1$', ylabel='$p$')
+
+            ax.plot(x_plt, self.pdf(x_plt))
+            ax.set(xlabel='$x$', ylabel='$p$')
+
+        elif self._data_size == 2:
+            if x_plt is None:
+                lims = [(self._mean[i] - 3 * np.sqrt(self._cov[i, i]), self._mean[i] + 3 * np.sqrt(self._cov[i, i]))
+                        for i in range(2)]
+                n_plt = int(round((lims[0][1] - lims[0][0]) / _delta)), int(round((lims[1][1] - lims[1][0]) / _delta))
+                x0_plt = np.linspace(*lims[0], n_plt[0], endpoint=True)
+                x1_plt = np.linspace(*lims[1], n_plt[1], endpoint=True)
+                x_plt = np.stack(np.meshgrid(x0_plt, x1_plt), axis=-1)
+
+            if ax is None:
+                _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+                ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$p$')
+
+            ax.plot_wireframe(x_plt[..., 0], x_plt[..., 1], self.pdf(x_plt))
+        else:
+            raise NotImplementedError('Plot method only supported for 1- and 2-dimensional data.')
+
+
+mean_, cov_ = np.ones(2), np.eye(2)
+# mean_, cov_ = 1, 1
+norm = NormalRV(mean_, cov_)
+norm.rvs(5)
+norm.plot_pdf()
 
