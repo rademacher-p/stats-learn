@@ -10,8 +10,7 @@ def outer_gen(*args):
 
     ix = np.ix_(*map(np.ravel, args))
     _temp = functools.reduce(lambda x, y: x * y, ix)
-    return _temp.reshape(*itertools.chain(*map(np.shape, args)))
-
+    return _temp.reshape(tuple(itertools.chain(*map(np.shape, args))))
 
 # def outer_gen(*args):
 #     n_args = len(args)
@@ -35,6 +34,22 @@ def diag_gen(x):
     i = np.unravel_index(range(x.size), x.shape)
     out[2*i] = x.flatten()
     return out
+
+
+def inverse(x):
+    x = np.array(x)
+    if x.shape == ():
+        return 1 / x
+    else:
+        return np.linalg.inv(x)
+
+
+def determinant(x):
+    x = np.array(x)
+    if x.shape == ():
+        return x
+    else:
+        return np.linalg.det(x)
 
 
 def simplex_round(x):

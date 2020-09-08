@@ -12,8 +12,8 @@ import RE_obj
 import RE_obj_callable
 from SL_obj import YcXModel
 from util.generic import empirical_pmf
-
 from util.func_obj import FiniteDomainFunc
+from util.math import inverse, determinant
 
 #%% Priors
 
@@ -26,7 +26,9 @@ class BaseBayes:
         # super().__init__(rng)
 
         if model_kwargs is None:
-            model_kwargs = {}
+            self.model_kwargs = {}
+        else:
+            self.model_kwargs = model_kwargs
 
         self.model_gen = functools.partial(model_gen, **model_kwargs)
         self.prior = prior
@@ -35,6 +37,9 @@ class BaseBayes:
         return self.model_gen()
 
     def posterior_mean(self, d):  # TODO: generalize method for base classes, full posterior object?
+        raise NotImplementedError
+
+    def predictive_dist(self, d):
         raise NotImplementedError
 
 
@@ -46,14 +51,40 @@ class BetaModelBayes(BaseBayes):
 
 
 
-# class NormalModelBayes(BaseBayes):
-#     def __init__(self, prior=None, rng_model=None):
-#         model_gen = YcXModel.norm_model
-#         model_kwargs = {'mean_x': 0, 'var_x': 1, 'var_y': 1, 'rng': rng_model}
-#         super().__init__(model_gen, model_kwargs, prior)
-#
-#     # def random_model(self):
-#     #     raise NotImplementedError("Method must be overwritten.")
+class NormalModelBayes(BaseBayes):
+    def __init__(self, mean_x=0, cov_x=1, funcs=None, mean_theta=np.zeros(1), cov_theta=np.eye(1), cov_y_x=1, rng_model=None):
+        self.mean_theta = mean_theta
+        self.cov_theta = cov_theta
+
+        if funcs is None:
+            def power_func(i):
+                return lambda x: x**i
+            self.funcs = [power_func(i) for i in range(len(self.mean_theta))]
+        else:
+            self.funcs = funcs
+
+        model_gen = YcXModel.norm_model
+        model_kwargs = {'mean_x': mean_x, 'cov_x': cov_x, 'funcs': funcs, 'cov_y_x': cov_y_x, 'rng': rng_model}
+        prior = RE_obj.NormalRV(self.mean_theta, self.cov_theta)
+        super().__init__(model_gen, model_kwargs, prior)
+
+    def random_model(self):
+        theta = self.prior.rvs()
+        return self.model_gen(weights=theta)
+
+    def posterior_mean(self, d):
+        psi = np.array([[func(x_i) for func in self.funcs] for x_i in d['x']])
+        _temp = sum((psi_i[np.newaxis] * inverse(self.model_kwargs['cov_y_x']) * psi_i).sum() for psi_i in psi)
+        cov_post = inverse(inverse(self.cov_theta) + _temp)
+
+        _temp = sum(psi_i[np.newaxis] * inverse(self.model_kwargs['cov_y_x']) * d[i]['y']
+                    for i, psi_i in enumerate(psi))
+        theta_mean_post = cov_post * (inverse(self.cov_theta) * self.mean_theta + _temp)
+
+        return self.model_gen(weights=theta_mean_post)
+
+    def predictive_dist(self, d):
+        return None
 
 
 class DirichletFiniteYcXModelBayesNew(BaseBayes):

@@ -38,10 +38,10 @@ class BaseRE(multi_rv_generic):
     def rvs(self, size=(), random_state=None):
         if type(size) is int:
             size = (size,)
-        elif not size == ():
-            raise TypeError("Input 'size' must be int or ().")
-        # elif type(size) is not tuple:
-        #     raise TypeError("Input 'size' must be int or tuple.")
+        # elif not size == ():
+        #     raise TypeError("Input 'size' must be int or ().")
+        elif type(size) is not tuple:
+            raise TypeError("Input 'size' must be int or tuple.")
         random_state = self._get_random_state(random_state)
 
         return self._rvs(size, random_state)

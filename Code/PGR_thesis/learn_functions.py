@@ -46,13 +46,16 @@ class BayesLearner(BaseLearner):
         self._data_shape_x = self.bayes_model._data_shape_x
         self._data_shape_y = self.bayes_model._data_shape_y
 
-        self._posterior_mean = None     # TODO: replace with predictive?
+        # self._posterior_mean = None     # TODO: replace with predictive?
         self._predictive_dist = None
         self.fit()
 
-    @property
-    def posterior_mean(self):
-        return self._posterior_mean
+    # @property
+    # def posterior_mean(self):
+    #     return self._posterior_mean
+
+    def predictive_dist(self, x):
+        return self._predictive_dist(x)
 
     def fit(self, d=None):
         if d is None:
