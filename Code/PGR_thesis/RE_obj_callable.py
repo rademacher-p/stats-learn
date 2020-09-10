@@ -713,11 +713,11 @@ class SampsDE(BaseRE):
         return np.concatenate(out)
 
 
-s, p = ['a','b','c'], np.array([.3,.2,.5])
-p = p / p.sum()
-m = FiniteRE.gen_func(s, p)
-dd = SampsDE(10, 5, m)
-print(dd.rvs())
+# s, p = ['a','b','c'], np.array([.3,.2,.5])
+# p = p / p.sum()
+# m = FiniteRE.gen_func(s, p)
+# dd = SampsDE(10, 5, m)
+# print(dd.rvs())
 
 
 

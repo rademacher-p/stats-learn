@@ -15,9 +15,9 @@ from scipy import stats
 # from scipy._lib._util import check_random_state
 # from mpl_toolkits.mplot3d import Axes3D
 
-from RE_obj import DeterministicRE, FiniteRE, DirichletRV
+from RE_obj import DeterministicRE, FiniteRE, DirichletRV, NormalRV
 from SL_obj import YcXModel
-from bayes import DirichletFiniteYcXModelBayes, DirichletFiniteYcXModelBayesNew, BetaModelBayes
+from bayes import DirichletFiniteYcXModelBayes, DirichletFiniteYcXModelBayesNew, BetaModelBayes, NormalModelBayes
 from learn_functions import BayesClassifier, BayesEstimator, BetaEstimatorTemp
 from util.generic import empirical_pmf
 from util.func_obj import FiniteDomainFunc
@@ -135,7 +135,7 @@ def learn_sim(bayes_model, learner, n_train=0, n_test=1, n_mc=1, verbose=False):
 
         # d_train, d_test = theta.rvs(n_train), theta.rvs(n_test)     # generate train/test data
         d = theta.rvs(n_train + n_test)
-        d_train, d_test = d[:n_train], d[n_train:]
+        d_train, d_test = d[:n_train], d[n_train:]      # TODO: np.split?
 
         learner.fit(d_train)        # train learner
         loss_mc[i_mc] = learner.evaluate(d_test)        # make decision and assess
@@ -152,29 +152,32 @@ def learn_sim(bayes_model, learner, n_train=0, n_test=1, n_mc=1, verbose=False):
 
 
 def main():
-    alpha_0 = alpha_0_plot = supp_x_s.size * supp_y_s.size
-
-    # mean = np.ones(supp_x_s.shape + supp_y_s.shape) / (supp_x_s.size * supp_y_s.size)
-
-    mean_x = FiniteDomainFunc(supp_x, np.ones(supp_x_s.shape) / supp_x_s.size)
-
-    mean_y_x = FiniteDomainFunc(supp_x, np.full(supp_x_s.shape,
-                                                FiniteDomainFunc(supp_y, np.ones(supp_y_s.shape) / supp_y_s.size)))
-
-    # bayes_model = DirichletFiniteYcXModelBayes(supp_x_s, supp_y_s, alpha_0, mean,
-    #                                            rng_model=random.default_rng(6),
-    #                                            rng_prior=random.default_rng(5))
-    bayes_model = DirichletFiniteYcXModelBayesNew(alpha_0, mean_x, mean_y_x,
-                                                  rng_model=random.default_rng(6),
-                                                  rng_prior=random.default_rng(5))
-
-    learner = BayesClassifier(bayes_model)
-
-    loss = learn_sim(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
-
+    # alpha_0 = alpha_0_plot = supp_x_s.size * supp_y_s.size
     #
-    bayes_model = BetaModelBayes()
-    learner = BetaEstimatorTemp(n_x=10)
+    # # mean = np.ones(supp_x_s.shape + supp_y_s.shape) / (supp_x_s.size * supp_y_s.size)
+    #
+    # mean_x = FiniteDomainFunc(supp_x, np.ones(supp_x_s.shape) / supp_x_s.size)
+    #
+    # mean_y_x = FiniteDomainFunc(supp_x, np.full(supp_x_s.shape,
+    #                                             FiniteDomainFunc(supp_y, np.ones(supp_y_s.shape) / supp_y_s.size)))
+    #
+    # # bayes_model = DirichletFiniteYcXModelBayes(supp_x_s, supp_y_s, alpha_0, mean,
+    # #                                            rng_model=random.default_rng(6),
+    # #                                            rng_prior=random.default_rng(5))
+    # bayes_model = DirichletFiniteYcXModelBayesNew(alpha_0, mean_x, mean_y_x,
+    #                                               rng_model=random.default_rng(6),
+    #                                               rng_prior=random.default_rng(5))
+    #
+    # learner = BayesClassifier(bayes_model)
+    #
+    # loss = learn_sim(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
+
+    # bayes_model = BetaModelBayes()
+    # learner = BetaEstimatorTemp(n_x=10)
+
+    bayes_model = NormalModelBayes(model_x=NormalRV(), funcs=None, mean_theta=np.zeros(3), cov_theta=np.eye(3),
+                                   cov_y_x=np.eye(2), rng_model=None)
+    learner = BayesEstimator(bayes_model)
 
     loss = learn_sim(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
     print(loss)

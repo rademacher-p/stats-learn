@@ -10,7 +10,7 @@ from scipy.stats._multivariate import multi_rv_generic, _PSD
 from scipy.special import gammaln, xlogy, xlog1py, betaln
 import matplotlib.pyplot as plt
 
-from util.generic import check_data_shape, check_valid_pmf
+from util.generic import check_rng, check_data_shape, check_valid_pmf
 from util.math import outer_gen, diag_gen, simplex_round, inverse, determinant
 from util.plotters import simplex_grid
 
@@ -36,8 +36,10 @@ class BaseRE(multi_rv_generic):
     def mode(self):
         return self._mode
 
-    def rvs(self, size=(), random_state=None):
-        if type(size) is int:
+    def rvs(self, size=None, random_state=None):
+        if size is None:
+            size = ()
+        elif type(size) is int:
             size = (size,)
         elif type(size) is not tuple:
             raise TypeError("Input 'size' must be int or tuple.")
@@ -737,7 +739,7 @@ class BetaRV(ContinuousRV):
 
 
 class NormalRV(ContinuousRV):
-    def __init__(self, mean, cov, rng=None):
+    def __init__(self, mean=0, cov=1, rng=None):
         super().__init__(rng)
         self.mean = np.array(mean)
         self.cov = np.array(cov)
@@ -796,9 +798,10 @@ class NormalRV(ContinuousRV):
 
         if self._data_size == 1:
             if x_plt is None:
-                lims = self._mean - 3*np.sqrt(self._cov), self._mean + 3*np.sqrt(self._cov)
+                # lims = self._mean.item() - 3*np.sqrt(self._cov.item()), self._mean.item() + 3*np.sqrt(self._cov.item())
+                lims = self._mean.item() + np.array([-1, 1]) * 3*np.sqrt(self._cov.item())
                 n_plt = int(round((lims[1]-lims[0]) / _delta))
-                x_plt = np.linspace(*lims, n_plt, endpoint=True)
+                x_plt = np.linspace(*lims, n_plt, endpoint=True).reshape(n_plt, *self._data_shape)
 
             if ax is None:
                 _, ax = plt.subplots()
@@ -825,7 +828,8 @@ class NormalRV(ContinuousRV):
             raise NotImplementedError('Plot method only supported for 1- and 2-dimensional data.')
 
 
-mean_, cov_ = np.ones(2), np.eye(2)
+mean_, cov_ = np.ones(1), np.eye(1)
+# mean_, cov_ = np.ones(2), np.eye(2)
 # mean_, cov_ = 1, 1
 norm = NormalRV(mean_, cov_)
 norm.rvs(5)
