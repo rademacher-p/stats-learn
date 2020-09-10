@@ -20,6 +20,14 @@ class BaseLearner:
 
         self.loss_fcn = None
 
+    @property
+    def data_shape_x(self):
+        return self._data_shape_x
+
+    @property
+    def data_shape_y(self):
+        return self._data_shape_y
+
     def fit(self, d):
         raise NotImplementedError("Method must be overwritten.")
         pass
@@ -43,8 +51,9 @@ class BayesLearner(BaseLearner):
     def __init__(self, bayes_model):
         super().__init__()
         self.bayes_model = bayes_model
-        self._data_shape_x = self.bayes_model._data_shape_x
-        self._data_shape_y = self.bayes_model._data_shape_y
+
+        self._data_shape_x = self.bayes_model.data_shape_x
+        self._data_shape_y = self.bayes_model.data_shape_y
 
         # self._posterior_mean = None     # TODO: replace with predictive?
         self._predictive_dist = None
@@ -72,7 +81,7 @@ class BayesClassifier(BayesLearner):
 
     def _predict_single(self, x):
         # return self._posterior_mean.mode_y_x(x)
-        return self._predictive_dist(x).argmax
+        return self._predictive_dist(x).mode    # TODO: argmax?
 
 
 class BayesEstimator(BayesLearner):
@@ -82,7 +91,7 @@ class BayesEstimator(BayesLearner):
 
     def _predict_single(self, x):
         # return self._posterior_mean.mean_y_x(x)
-        return self._predictive_dist(x).m1
+        return self._predictive_dist(x).mean        # TODO: m1?
 
 
 # class DirichletFiniteClassifier(BaseLearner):

@@ -1,4 +1,30 @@
+from numbers import Integral
 import numpy as np
+
+
+def check_rng(rng=None):
+    """
+    Return a random number generator.
+
+    Parameters
+    ----------
+    rng : int or RandomState or Generator, optional
+        Random number generator seed or object.
+
+    Returns
+    -------
+    Generator
+
+    """
+
+    if rng is None:
+        return np.random.default_rng()
+    elif isinstance(rng, (Integral, np.integer)):
+        return np.random.default_rng(rng)
+    elif isinstance(rng, np.random.Generator) or isinstance(rng, np.random.RandomState):
+        return rng
+    else:
+        raise TypeError("Input must be None, int, or a valid NumPy random number generator.")
 
 
 def check_data_shape(x, data_shape=()):

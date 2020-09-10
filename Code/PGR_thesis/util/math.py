@@ -5,7 +5,7 @@ import numpy as np
 
 def outer_gen(*args):
     args = tuple(map(np.asarray, args))
-    if len(args) < 2:
+    if len(args) == 1:
         return args[0]
 
     ix = np.ix_(*map(np.ravel, args))
@@ -50,6 +50,39 @@ def determinant(x):
         return x
     else:
         return np.linalg.det(x)
+
+
+def inner_prod(x, y, w=None):       # TODO: decompose weight and do colored norm?
+    x, y = np.array(x), np.array(y)
+
+    # if x.shape == () and y.shape == ():
+    #     if w is None:
+    #         return x * y
+    #     else:
+    #         return x * np.array(w) * y
+    if x.ndim == 0 or y.ndim == 0:
+        if w is None:
+            return x * y
+        else:
+            w = np.array(w)
+            if w.ndim != 0:
+                raise ValueError
+            else:
+                return x * np.array(w) * y
+    else:
+        if x.shape[0] != y.shape[0]:
+            raise ValueError("Inputs must have the same leading shape value.")
+
+        if w is None:
+            return np.moveaxis(x, 0, -1) @ y
+        else:
+            w = np.array(w)
+            if w.shape == () and x.ndim == 1 and y.ndim == 1:
+                return x[..., np.newaxis] * w * y
+            elif w.shape != 2 * x.shape[:1]:
+                raise ValueError(f"Weighting matrix must have shape {2 * x.shape[0]}.")
+            else:
+                return np.moveaxis(x, 0, -1) @ w @ y
 
 
 def simplex_round(x):

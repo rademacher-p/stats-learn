@@ -3,7 +3,6 @@ Supervised Learning base classes.
 """
 
 # TODO: add conditional RE object?
-# TODO: docstrings?
 
 import numpy as np
 from scipy import stats
@@ -11,7 +10,7 @@ from scipy.stats._multivariate import multi_rv_generic
 
 from RE_obj import NormalRV
 from RE_obj_callable import BaseRE, BaseRV, FiniteRE, DirichletRV, BetaRV       # TODO: note - CALLABLE!!!!
-from util.generic import vectorize_x_func
+from util.generic import vectorize_x_func, check_data_shape
 
 
 class BaseModel(multi_rv_generic):
@@ -44,6 +43,16 @@ class BaseModel(multi_rv_generic):
     def mode_y_x(self):
         return self._mode_y_x
 
+    # def mode_y_x(self, x):        # TODO: avoid callable properties approach?
+    #     x, set_shape = check_data_shape(x, self._data_shape_x)
+    #
+    #     _out = []
+    #     for x_i in x.reshape((-1,) + self._data_shape_x):
+    #         _out.append(self._mode_y_x(x_i))
+    #     return np.asarray(_out)  # returned array may be flattened over 'set_shape'
+    #
+    #     return self._mode_y_x(x).reshape(set_shape)
+
     rvs = BaseRE.rvs
 
     def _rvs(self, size=(), random_state=None):
@@ -52,10 +61,6 @@ class BaseModel(multi_rv_generic):
 
 
 class BaseModelRVx(BaseModel):
-    """
-    Base
-    """
-
     def __init__(self, rng=None):
         super().__init__(rng)
         self._mean_x = None
@@ -71,10 +76,6 @@ class BaseModelRVx(BaseModel):
 
 
 class BaseModelRVy(BaseModel):
-    """
-    Base
-    """
-
     def __init__(self, rng=None):
         super().__init__(rng)
         self._mean_y_x = None
@@ -175,8 +176,7 @@ class YcXModel(BaseModel):
     # TODO: subclass, overwrite methods for efficiency?
 
     @classmethod
-    def norm_model(cls, mean_x=0, cov_x=1, funcs=None, weights=(0,), cov_y_x=1, rng=None):
-        model_x = NormalRV(mean_x, cov_x)
+    def norm_model(cls, model_x=NormalRV(), funcs=None, weights=(0,), cov_y_x=1, rng=None):
 
         if funcs is None:
             funcs = [lambda x: 1]
