@@ -84,33 +84,35 @@ def vectorize_func(func, data_shape):
         _out = []
         for x_i in x.reshape((-1,) + data_shape):
             _out.append(func(x_i))
-        _out = np.asarray(_out)
+        _out = np.array(_out)
 
         if len(_out) == 1:      # FIXME: new, check.
             return _out[0]
         else:
-            return _out.reshape(set_shape + _out.shape[1:])
+            out_shape = _out.shape[1:]
+            return _out.reshape(set_shape + out_shape)
 
     return func_vec
 
 
-# def vectorize_func_dec(data_shape):     # TODO: use?
-#     def wrapper(func):
-#         def func_vec(x):
-#             x, set_shape = check_data_shape(x, data_shape)
-#
-#             _out = []
-#             for x_i in x.reshape((-1,) + data_shape):
-#                 _out.append(func(x_i))
-#             _out = np.asarray(_out)
-#
-#             if len(_out) == 1:      # FIXME: new, check.
-#                 return _out[0]
-#             else:
-#                 return _out.reshape(set_shape + _out.shape[1:])
-#
-#         return func_vec
-#     return wrapper
+def vectorize_func_dec(data_shape):     # TODO: use?
+    def wrapper(func):
+        def func_vec(x):
+            x, set_shape = check_data_shape(x, data_shape)
+
+            _out = []
+            for x_i in x.reshape((-1,) + data_shape):
+                _out.append(func(x_i))
+            _out = np.asarray(_out)
+
+            if len(_out) == 1:      # FIXME: new, check.
+                return _out[0]
+            else:
+                out_shape = _out.shape[1:]
+                return _out.reshape(set_shape + out_shape)
+
+        return func_vec
+    return wrapper
 
 
 def empirical_pmf(d, supp, data_shape):
