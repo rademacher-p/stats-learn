@@ -124,26 +124,32 @@ supp_y_s = np.array(list(itertools.product(supp_y.reshape((-1,) + data_shape_y))
 
 #%% Sim
 
-def learn_sim(bayes_model, learner, n_train=0, n_test=1, n_mc=1, verbose=False):
+def learn_sim(bayes_model, learner, n_train=0, n_test=1):
+    theta = bayes_model.random_model()  # randomize model using bayes_model
+
+    d = theta.rvs(n_train + n_test)  # generate train/test data
+    d_train, d_test = np.split(d, [n_train])
+
+    learner.fit(d_train)  # train learner
+
+    # learner.plot_param_dist()
+
+    # print(theta.model_x.p)
+    # print(theta.model_y_x(0).p)
+    # print(d_test)
+    # print(learner.predict(d_test['x']), end='')
+
+    return learner.evaluate(d_test)  # make decision and assess
+
+
+def learn_sim_mc(bayes_model, learner, n_train=0, n_test=1, n_mc=1, verbose=False):
     loss_mc = np.empty(n_mc)
     for i_mc in range(n_mc):
         if verbose:
             if i_mc % 100 == 0:
                 print(f"Iteration {i_mc}/{n_mc}", end='\r')
 
-        theta = bayes_model.random_model()    # randomize model using bayes_model
-
-        # d_train, d_test = theta.rvs(n_train), theta.rvs(n_test)     # generate train/test data
-        d = theta.rvs(n_train + n_test)
-        d_train, d_test = d[:n_train], d[n_train:]      # TODO: np.split?
-
-        learner.fit(d_train)        # train learner
-        loss_mc[i_mc] = learner.evaluate(d_test)        # make decision and assess
-
-        # print(theta.model_x.p)
-        # print(theta.model_y_x(0).p)
-        # print(d_test)
-        # print(learner.predict(d_test['x']), end='')
+        loss_mc[i_mc] = learn_sim(bayes_model, learner, n_train, n_test)
 
     # print('')
     # print(loss_mc)
@@ -170,16 +176,17 @@ def main():
     #
     # learner = BayesClassifier(bayes_model)
     #
-    # loss = learn_sim(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
+    # loss = learn_sim_mc(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
 
     # bayes_model = BetaModelBayes()
     # learner = BetaEstimatorTemp(n_x=10)
 
-    bayes_model = NormalModelBayes(model_x=NormalRV(), funcs=None, mean_theta=np.zeros(3), cov_theta=np.eye(3),
+    bayes_model = NormalModelBayes(model_x=NormalRV(), basis_y_x=None, mean_theta=np.zeros(2), cov_theta=np.eye(2),
                                    cov_y_x=np.eye(2), rng_model=None)
     learner = BayesEstimator(bayes_model)
 
-    loss = learn_sim(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
+    loss = learn_sim(bayes_model, learner, n_train=100, n_test=1)
+    # loss = learn_sim_mc(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
     print(loss)
 
 

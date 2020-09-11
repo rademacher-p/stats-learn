@@ -2,7 +2,7 @@ import copy
 import operator
 import numpy as np
 import matplotlib.pyplot as plt
-from util.generic import check_data_shape, check_set_shape, vectorize_x_func
+from util.generic import check_data_shape, check_set_shape, vectorize_func
 
 # TODO: getter and setters?
 # TODO: plot methods
@@ -132,7 +132,7 @@ class FiniteDomainFunc(object):
         return _out     # TODO: exception if not in support
 
     def __call__(self, x):
-        return vectorize_x_func(self._f, self.data_shape_x)(x)
+        return vectorize_func(self._f, self.data_shape_x)(x)
 
 
 class FiniteDomainNumericFunc(FiniteDomainFunc):
