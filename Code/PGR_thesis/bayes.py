@@ -159,12 +159,12 @@ class DirichletFiniteYcXModelBayesNew(BaseBayes):
         self._data_shape_y = mean_y_x.val.flatten()[0].data_shape_x
 
     def random_model(self, rng=None):
-        p_x = self.prior['p_x'].rvs(random_state=rng)
+        p_x = self.prior['p_x'].rvs(rng=rng)
 
         val = []        # FIXME: better way?
         for x_flat in self._mean_x._supp_flat:
             x = x_flat.reshape(self._data_shape_x)
-            val.append(self.prior['p_y_x'](x).rvs(random_state=rng))
+            val.append(self.prior['p_y_x'](x).rvs(rng=rng))
         val = np.array(val).reshape(self._mean_x.set_shape)
         p_y_x = FiniteDomainFunc(self._supp_x, val)
 
@@ -263,7 +263,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
         # self._model_gen = functools.partial(YcXModel.finite_model, supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
 
     def random_model(self, rng=None):
-        p = self.prior.rvs(random_state=rng)
+        p = self.prior.rvs(rng=rng)
 
         p_x = p.reshape(self._supp_shape_x + (-1,)).sum(axis=-1)
 
@@ -351,7 +351,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #                                             supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
 #
 #     def random_model(self, rng=None):
-#         p = self.prior.rvs(random_state=rng)
+#         p = self.prior.rvs(rng=rng)
 #
 #         p_x = p.reshape(self._supp_shape_x + (-1,)).sum(axis=-1)
 #
@@ -648,8 +648,8 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #         theta_pmf = self.dist.rvs()
 #         # theta_pmf_m = None
 #
-#         theta = FiniteRE(self.support, theta_pmf, self.random_state)
-#         # theta_m = FiniteRE(self.support_x, theta_pmf_m, self.random_state)
+#         theta = FiniteRE(self.support, theta_pmf, self.rng)
+#         # theta_m = FiniteRE(self.support_x, theta_pmf_m, self.rng)
 #
 #         return theta
 #

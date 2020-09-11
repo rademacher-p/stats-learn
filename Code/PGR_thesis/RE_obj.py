@@ -6,24 +6,23 @@ Random element objects.
 
 import numpy as np
 
-from scipy.stats._multivariate import multi_rv_generic, _PSD
 from scipy.special import gammaln, xlogy, xlog1py, betaln
 import matplotlib.pyplot as plt
 
-from util.generic import check_rng, check_data_shape, check_valid_pmf
+from util.generic import check_rng, check_data_shape, check_valid_pmf, vectorize_func, vectorize_func_dec
 from util.math import outer_gen, diag_gen, simplex_round, inverse, determinant
 from util.plot import simplex_grid
 
 
 #%% Base RE classes
 
-class BaseRE(multi_rv_generic):
+class BaseRE:
     """
     Base class for generic random element objects.
     """
 
     def __init__(self, rng=None):
-        super().__init__(rng)      # may be None or int for legacy numpy rng
+        self.rng = check_rng(rng)
 
         self._data_shape = None
         self._mode = None
@@ -36,18 +35,39 @@ class BaseRE(multi_rv_generic):
     def mode(self):
         return self._mode
 
-    def rvs(self, size=None, random_state=None):
+    def pf(self, x):
+        return vectorize_func(self._pf_single, self._data_shape)(x)
+
+        # x, set_shape = check_data_shape(x, self._data_shape)
+        # return self._pf(x).reshape(set_shape)
+
+    # def _pf(self, x):
+    #     _out = []
+    #     for x_i in x.reshape((-1,) + self._data_shape):
+    #         _out.append(self._pf_single(x_i))
+    #     return np.asarray(_out)         # returned array may be flattened over 'set_shape'
+
+    def _pf_single(self, x):
+        raise NotImplementedError("Method must be overwritten.")
+        pass
+
+    def plot_pf(self, ax=None):
+        raise NotImplementedError
+        pass
+
+    def rvs(self, size=None, rng=None):
         if size is None:
             size = ()
         elif type(size) is int:
             size = (size,)
         elif type(size) is not tuple:
             raise TypeError("Input 'size' must be int or tuple.")
-        random_state = self._get_random_state(random_state)
 
-        return self._rvs(size, random_state)
+        rng = self.rng if rng is None else check_rng(rng)
 
-    def _rvs(self, size=None, random_state=None):
+        return self._rvs(size, rng)
+
+    def _rvs(self, size=None, rng=None):
         raise NotImplementedError("Method must be overwritten.")
         pass
 
@@ -71,61 +91,9 @@ class BaseRV(BaseRE):
         return self._cov
 
 
-class DiscreteRE(BaseRE):
-    """
-    Base class for discrete random element objects.
-    """
-
-    def pf(self, x):
-        return self.pmf(x)
-
-    def pmf(self, x):
-        x, set_shape = check_data_shape(x, self._data_shape)
-        return self._pmf(x).reshape(set_shape)
-
-    def _pmf(self, x):
-        _out = []
-        for x_i in x.reshape((-1,) + self._data_shape):
-            _out.append(self._pmf_single(x_i))
-        return np.asarray(_out)         # returned array may be flattened over 'set_shape'
-
-    def _pmf_single(self, x):
-        raise NotImplementedError("Method must be overwritten.")
-        pass
-
-
-class DiscreteRV(DiscreteRE, BaseRV):
-    """
-    Base class for discrete random variable (numeric) objects.
-    """
-
-
-class ContinuousRV(BaseRV):
-    """
-    Base class for continuous random element objects.
-    """
-
-    def pf(self, x):
-        return self.pdf(x)
-
-    def pdf(self, x):
-        x, set_shape = check_data_shape(x, self._data_shape)
-        return self._pdf(x).reshape(set_shape)
-
-    def _pdf(self, x):
-        _out = []
-        for x_i in x.reshape((-1,) + self._data_shape):
-            _out.append(self._pdf_single(x_i))
-        return np.asarray(_out)     # returned array may be flattened
-
-    def _pdf_single(self, x):
-        raise NotImplementedError("Method must be overwritten.")
-        pass
-
-
 #%% Specific RE's
 
-class DeterministicRE(DiscreteRE):
+class DeterministicRE(BaseRE):
     """
     Deterministic random element.
     """
@@ -157,14 +125,17 @@ class DeterministicRE(DiscreteRE):
 
         self._mode = self._val
 
-    def _rvs(self, size=(), random_state=None):
+    def _rvs(self, size=(), rng=None):
         return np.broadcast_to(self._val, size + self._data_shape)
 
-    def _pmf(self, x):
-        return np.where(np.all(x.reshape(-1, self._data_size) == self._val.flatten(), axis=-1), 1., 0.)
+    # def pf(self, x):
+    #     return np.where(np.all(x.reshape(-1, self._data_size) == self._val.flatten(), axis=-1), 1., 0.)
+
+    def _pf_single(self, x):
+        return 1. if np.all(np.array(x) == self._val) else 0.
 
 
-class DeterministicRV(DeterministicRE, DiscreteRV):
+class DeterministicRV(DeterministicRE, BaseRV):
     """
     Deterministic random variable.
     """
@@ -188,13 +159,13 @@ class DeterministicRV(DeterministicRE, DiscreteRV):
 # b.pmf(b.rvs())
 
 
-class FiniteRE(DiscreteRE):
+class FiniteRE(BaseRE):
     """
     Generic RE drawn from a finite support set using an explicitly defined PMF.
     """
 
     def __new__(cls, supp, p, rng=None):
-        supp = np.asarray(supp)
+        supp = np.array(supp)
         if np.issubdtype(supp.dtype, np.number):
             return super().__new__(FiniteRV)
         else:
@@ -202,7 +173,7 @@ class FiniteRE(DiscreteRE):
 
     def __init__(self, supp, p, rng=None):
         super().__init__(rng)
-        self._supp = np.asarray(supp)
+        self._supp = np.array(supp)
         self._p = check_valid_pmf(p)
         self._update_attr()
 
@@ -213,7 +184,7 @@ class FiniteRE(DiscreteRE):
 
     @supp.setter
     def supp(self, supp):
-        self._supp = np.asarray(supp)
+        self._supp = np.array(supp)
         self._update_attr()
 
     @property
@@ -240,18 +211,18 @@ class FiniteRE(DiscreteRE):
 
         self._mode = self._supp_flat[np.argmax(self._p_flat)].reshape(self._data_shape)
 
-    def _rvs(self, size=(), random_state=None):
-        i = random_state.choice(self._p.size, size, p=self._p_flat)
+    def _rvs(self, size=(), rng=None):
+        i = rng.choice(self._p.size, size, p=self._p_flat)
         return self._supp_flat[i].reshape(size + self._data_shape)
 
-    def _pmf_single(self, x):
+    def _pf_single(self, x):
         eq_supp = np.all(x.flatten() == self._supp_flat, axis=-1)
         if eq_supp.sum() != 1:
             raise ValueError("Input 'x' must be in the support.")
 
         return self._p_flat[eq_supp].squeeze()
 
-    def plot_pmf(self, ax=None):
+    def plot_pf(self, ax=None):
         if self._p.ndim == 1:
             if ax is None:
                 _, ax = plt.subplots()
@@ -264,7 +235,7 @@ class FiniteRE(DiscreteRE):
             raise NotImplementedError('Plot method only implemented for 1-dimensional data.')
 
 
-class FiniteRV(FiniteRE, DiscreteRV):
+class FiniteRV(FiniteRE, BaseRV):
     """
     Generic RV drawn from a finite support set using an explicitly defined PMF.
     """
@@ -279,28 +250,28 @@ class FiniteRV(FiniteRE, DiscreteRV):
         outer_flat = (ctr_flat[:, np.newaxis] * ctr_flat[..., np.newaxis]).reshape(self._p.size, -1)
         self._cov = (self._p_flat[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self._data_shape)
 
-    def plot_pmf(self, ax=None):
+    def plot_pf(self, ax=None):
         if self._p.ndim == 1:
-            super().plot_pmf(self, ax)
+            super().plot_pf(ax)
 
-        elif self._p.ndim in [2, 3]:
-            if self._p.ndim == 2:
-                if ax is None:
-                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel=r'$\mathrm{P}_\mathrm{x}(x)$')
+        elif self._p.ndim == 2:
+            if ax is None:
+                _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+                ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel=r'$\mathrm{P}_\mathrm{x}(x)$')
 
-                plt_data = ax.bar3d(self._supp[..., 0].flatten(),
-                                    self._supp[..., 1].flatten(), 0, 1, 1, self._p_flat, shade=True)
+            plt_data = ax.bar3d(self._supp[..., 0].flatten(),
+                                self._supp[..., 1].flatten(), 0, 1, 1, self._p_flat, shade=True)
+            return plt_data
 
-            elif self._p.ndim == 3:
-                if ax is None:
-                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
+        elif self._p.ndim == 3:
+            if ax is None:
+                _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+                ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
 
-                plt_data = ax.scatter(self._supp[..., 0], self._supp[..., 1], self._supp[..., 2], s=15, c=self._p)
+            plt_data = ax.scatter(self._supp[..., 0], self._supp[..., 1], self._supp[..., 2], s=15, c=self._p)
 
-                c_bar = plt.colorbar(plt_data)
-                c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
+            c_bar = plt.colorbar(plt_data)
+            c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
 
             return plt_data
 
@@ -340,7 +311,7 @@ def _dirichlet_check_input(x, alpha_0, mean):
     return x
 
 
-class DirichletRV(ContinuousRV):
+class DirichletRV(BaseRV):
     """
     Dirichlet random process, finite-supp realizations.
     """
@@ -385,23 +356,25 @@ class DirichletRV(ContinuousRV):
 
         self._log_pdf_coef = gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
 
-    def _rvs(self, size=(), random_state=None):
-        return random_state.dirichlet(self._alpha_0 * self._mean.flatten(), size).reshape(size + self._data_shape)
+    def _rvs(self, size=(), rng=None):
+        return rng.dirichlet(self._alpha_0 * self._mean.flatten(), size).reshape(size + self._data_shape)
 
-    def _pdf(self, x):
+    def pf(self, x):
+        x, set_shape = check_data_shape(x, self._data_shape)        # FIXME
         x = _dirichlet_check_input(x, self._alpha_0, self._mean)
 
-        log_pdf = self._log_pdf_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x).reshape(-1, self._data_size), -1)
+        log_pdf = self._log_pdf_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x)
+                                              .reshape(-1, self._data_size), -1).reshape(set_shape)
         return np.exp(log_pdf)
 
-    def plot_pdf(self, x_plt=None, ax=None):
+    def plot_pf(self, x_plt=None, ax=None):
 
         if self._data_size in (2, 3):
             if x_plt is None:
                 x_plt = simplex_grid(40, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
             # x_plt = simplex_grid(n_plt, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
 
-            pdf_plt = self.pdf(x_plt)
+            pdf_plt = self.pf(x_plt)
             x_plt.resize(x_plt.shape[0], self._data_size)
 
             # pdf_plt.sum() / (n_plt ** (self._data_size - 1))
@@ -416,6 +389,8 @@ class DirichletRV(ContinuousRV):
                 c_bar = plt.colorbar(plt_data)
                 c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
 
+                return plt_data
+
             elif self._data_size == 3:
                 if ax is None:
                     _, ax = plt.subplots(subplot_kw={'projection': '3d'})
@@ -427,7 +402,7 @@ class DirichletRV(ContinuousRV):
                 c_bar = plt.colorbar(plt_data)
                 c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
 
-            return plt_data
+                return plt_data
 
         else:
             raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
@@ -447,7 +422,6 @@ class DirichletRV(ContinuousRV):
 # d.pdf(d.rvs(4).reshape((2, 2)+d.mean.shape))
 
 
-
 def _empirical_check_n(n):
     if not isinstance(n, int) or n < 1:
         raise ValueError("Input 'n' must be a positive integer.")
@@ -464,7 +438,7 @@ def _empirical_check_input(x, n, mean):
     return x
 
 
-class EmpiricalRV(DiscreteRV):
+class EmpiricalRV(BaseRV):
     """
     Empirical random process, finite-supp realizations.
     """
@@ -505,21 +479,22 @@ class EmpiricalRV(DiscreteRV):
 
         self._log_pmf_coef = gammaln(self._n + 1)
 
-    def _rvs(self, size=(), random_state=None):
-        return random_state.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
+    def _rvs(self, size=(), rng=None):
+        return rng.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
 
-    def _pmf(self, x):
+    def pf(self, x):
+        x, set_shape = check_data_shape(x, self._data_shape)
         x = _empirical_check_input(x, self._n, self._mean)
 
         log_pmf = self._log_pmf_coef + (xlogy(self._n * x, self._mean)
                                         - gammaln(self._n * x + 1)).reshape(-1, self._data_size).sum(axis=-1)
-        return np.exp(log_pmf)
+        return np.exp(log_pmf).reshape(set_shape)
 
-    def plot_pmf(self, ax=None):
+    def plot_pf(self, ax=None):
 
         if self._data_size in (2, 3):
             x_plt = simplex_grid(self.n, self._data_shape)
-            pmf_plt = self.pmf(x_plt)
+            pmf_plt = self.pf(x_plt)
             x_plt.resize(x_plt.shape[0], self._data_size)
 
             if self._data_size == 2:
@@ -532,6 +507,8 @@ class EmpiricalRV(DiscreteRV):
                 c_bar = plt.colorbar(plt_data)
                 c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
 
+                return plt_data
+
             elif self._data_size == 3:
                 if ax is None:
                     _, ax = plt.subplots(subplot_kw={'projection': '3d'})
@@ -543,7 +520,7 @@ class EmpiricalRV(DiscreteRV):
                 c_bar = plt.colorbar(plt_data)
                 c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
 
-            return plt_data
+                return plt_data
 
         else:
             raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
@@ -562,7 +539,7 @@ class EmpiricalRV(DiscreteRV):
 # d.pmf(d.rvs(4).reshape((2, 2) + d.mean.shape))
 
 
-class DirichletEmpiricalRV(DiscreteRV):
+class DirichletEmpiricalRV(BaseRV):
     """
     Dirichlet-Empirical random process, finite-supp realizations.
     """
@@ -615,22 +592,23 @@ class DirichletEmpiricalRV(DiscreteRV):
         self._log_pmf_coef = (gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
                               + gammaln(self._n + 1) - gammaln(self._alpha_0 + self._n))
 
-    def _rvs(self, size=(), random_state=None):
-        # return random_state.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
+    def _rvs(self, size=(), rng=None):
+        # return rng.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
         raise NotImplementedError
 
-    def _pmf(self, x):
+    def pf(self, x):
+        x, set_shape = check_data_shape(x, self._data_shape)
         x = _empirical_check_input(x, self._n, self._mean)
 
         log_pmf = self._log_pmf_coef + (gammaln(self._alpha_0 * self._mean + self._n * x)
                                         - gammaln(self._n * x + 1)).reshape(-1, self._data_size).sum(axis=-1)
-        return np.exp(log_pmf)
+        return np.exp(log_pmf).reshape(set_shape)
 
     def plot_pmf(self, ax=None):        # TODO: reused code. define simplex plotter outside!
 
         if self._data_size in (2, 3):
             x_plt = simplex_grid(self.n, self._data_shape)
-            pmf_plt = self.pmf(x_plt)
+            pmf_plt = self.pf(x_plt)
             x_plt.resize(x_plt.shape[0], self._data_size)
 
             if self._data_size == 2:
@@ -643,6 +621,8 @@ class DirichletEmpiricalRV(DiscreteRV):
                 c_bar = plt.colorbar(plt_data)
                 c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
 
+                return plt_data
+
             elif self._data_size == 3:
                 if ax is None:
                     _, ax = plt.subplots(subplot_kw={'projection': '3d'})
@@ -654,7 +634,7 @@ class DirichletEmpiricalRV(DiscreteRV):
                 c_bar = plt.colorbar(plt_data)
                 c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
 
-            return plt_data
+                return plt_data
 
         else:
             raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
@@ -675,7 +655,7 @@ class DirichletEmpiricalRV(DiscreteRV):
 
 
 
-class BetaRV(ContinuousRV):
+class BetaRV(BaseRV):
     """
     Beta random variable.
     """
@@ -730,10 +710,10 @@ class BetaRV(ContinuousRV):
         self._mean = self._a / (self._a + self._b)
         self._cov = self._a * self._b / (self._a + self._b)**2 / (self._a + self._b + 1)
 
-    def _rvs(self, size=(), random_state=None):
-        return random_state.beta(self._a, self._b, size)
+    def _rvs(self, size=(), rng=None):
+        return rng.beta(self._a, self._b, size)
 
-    def _pdf(self, x):
+    def _pdf(self, x):      # FIXME FIXME
         log_pdf = xlog1py(self._b - 1.0, -x) + xlogy(self._a - 1.0, x) - betaln(self._a, self._b)
         return np.exp(log_pdf)
 
@@ -747,7 +727,7 @@ class BetaRV(ContinuousRV):
         return plt_data
 
 
-class NormalRV(ContinuousRV):
+class NormalRV(BaseRV):
     def __init__(self, mean=0, cov=1, rng=None):
         super().__init__(rng)
         self.mean = np.array(mean)
@@ -790,11 +770,11 @@ class NormalRV(ContinuousRV):
     def mode(self):
         return self.mean
 
-    def _rvs(self, size=(), random_state=None):
+    def _rvs(self, size=(), rng=None):
         if self._data_shape == ():
-            return random_state.normal(self._mean, np.sqrt(self._cov), size).reshape(size + self._data_shape)
+            return rng.normal(self._mean, np.sqrt(self._cov), size).reshape(size + self._data_shape)
         else:
-            return random_state.multivariate_normal(self._mean, self._cov, size).reshape(size + self._data_shape)
+            return rng.multivariate_normal(self._mean, self._cov, size).reshape(size + self._data_shape)
 
     def _pdf(self, x):
         dev = x.reshape(-1, *self._data_shape) - self._mean
