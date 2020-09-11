@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 from util.generic import check_rng, check_data_shape, check_valid_pmf
 from util.math import outer_gen, diag_gen, simplex_round, inverse, determinant
-from util.plotters import simplex_grid
+from util.plot import simplex_grid
 
 
 #%% Base RE classes
@@ -76,6 +76,9 @@ class DiscreteRE(BaseRE):
     Base class for discrete random element objects.
     """
 
+    def pf(self, x):
+        return self.pmf(x)
+
     def pmf(self, x):
         x, set_shape = check_data_shape(x, self._data_shape)
         return self._pmf(x).reshape(set_shape)
@@ -101,6 +104,9 @@ class ContinuousRV(BaseRV):
     """
     Base class for continuous random element objects.
     """
+
+    def pf(self, x):
+        return self.pdf(x)
 
     def pdf(self, x):
         x, set_shape = check_data_shape(x, self._data_shape)
@@ -388,10 +394,13 @@ class DirichletRV(ContinuousRV):
         log_pdf = self._log_pdf_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x).reshape(-1, self._data_size), -1)
         return np.exp(log_pdf)
 
-    def plot_pdf(self, n_plt, ax=None):
+    def plot_pdf(self, x_plt=None, ax=None):
 
         if self._data_size in (2, 3):
-            x_plt = simplex_grid(n_plt, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
+            if x_plt is None:
+                x_plt = simplex_grid(40, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
+            # x_plt = simplex_grid(n_plt, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
+
             pdf_plt = self.pdf(x_plt)
             x_plt.resize(x_plt.shape[0], self._data_size)
 
@@ -747,6 +756,9 @@ class NormalRV(ContinuousRV):
         # self._inv_cov = None
         # self._psd = None
 
+    def __repr__(self):
+        return f"NormalRV(mean={self.mean}, cov={self.cov})"
+
     @property
     def mean(self):
         return self._mean
@@ -808,7 +820,6 @@ class NormalRV(ContinuousRV):
                 ax.set(xlabel='$x_1$', ylabel='$p$')
 
             ax.plot(x_plt, self.pdf(x_plt))
-            ax.set(xlabel='$x$', ylabel='$p$')
 
         elif self._data_size == 2:
             if x_plt is None:
@@ -823,15 +834,16 @@ class NormalRV(ContinuousRV):
                 _, ax = plt.subplots(subplot_kw={'projection': '3d'})
                 ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$p$')
 
-            ax.plot_wireframe(x_plt[..., 0], x_plt[..., 1], self.pdf(x_plt))
+            # ax.plot_wireframe(x_plt[..., 0], x_plt[..., 1], self.pdf(x_plt))
+            ax.plot_surface(x_plt[..., 0], x_plt[..., 1], self.pdf(x_plt), cmap=plt.cm.viridis)
         else:
             raise NotImplementedError('Plot method only supported for 1- and 2-dimensional data.')
 
 
-mean_, cov_ = np.ones(1), np.eye(1)
-# mean_, cov_ = np.ones(2), np.eye(2)
-# mean_, cov_ = 1, 1
-norm = NormalRV(mean_, cov_)
-norm.rvs(5)
-norm.plot_pdf()
+# mean_, cov_ = np.ones(1), np.eye(1)
+# # mean_, cov_ = np.ones(2), np.eye(2)
+# # mean_, cov_ = 1, 1
+# norm = NormalRV(mean_, cov_)
+# norm.rvs(5)
+# norm.plot_pdf()
 

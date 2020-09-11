@@ -10,7 +10,7 @@ from scipy.stats._multivariate import multi_rv_generic
 
 from RE_obj import NormalRV
 from RE_obj_callable import BaseRE, BaseRV, FiniteRE, DirichletRV, BetaRV       # TODO: note - CALLABLE!!!!
-from util.generic import vectorize_x_func, check_data_shape
+from util.generic import vectorize_func, check_data_shape
 
 
 class BaseModel(multi_rv_generic):
@@ -40,7 +40,8 @@ class BaseModel(multi_rv_generic):
         return self._mode_x
 
     @property
-    def mode_y_x(self):
+    def mode_y_x(self):     # TODO: vectorization in setters?
+        # vectorize_func(lambda x: self._model_y_x(x).mode, self._data_shape_x)
         return self._mode_y_x
 
     # def mode_y_x(self, x):        # TODO: avoid callable properties approach?
@@ -136,7 +137,7 @@ class YcXModel(BaseModel):
 
     def _update_y_x(self):
         self._data_shape_y = self._model_y_x(self._model_x.rvs()).data_shape
-        self._mode_y_x = vectorize_x_func(lambda x: self._model_y_x(x).mode, self._data_shape_x)
+        self._mode_y_x = vectorize_func(lambda x: self._model_y_x(x).mode, self._data_shape_x)
 
     def _rvs(self, size=(), random_state=None):
         d_x = np.asarray(self.model_x.rvs(size, random_state))
@@ -176,16 +177,11 @@ class YcXModel(BaseModel):
     # TODO: subclass, overwrite methods for efficiency?
 
     @classmethod
-    def norm_model(cls, model_x=NormalRV(), funcs=None, weights=(0,), cov_y_x=1, rng=None):
-
-        if funcs is None:
-            funcs = [lambda x: 1]
-
-        def mean_y_x(x):
-            return sum(weights[i] * funcs[i](x) for i in range(len(weights)))
+    def norm_model(cls, model_x=NormalRV(), basis_y_x=(lambda x: 1,), weights=(0,), cov_y_x=1, rng=None):
 
         def model_y_x(x):
-            return NormalRV(mean_y_x(x), cov_y_x)
+            mean_y_x = sum(weight * func(x) for weight, func in zip(weights, basis_y_x))
+            return NormalRV(mean_y_x, cov_y_x)
 
         return cls(model_x, model_y_x, rng)
 
@@ -200,8 +196,8 @@ class YcXModelRVx(YcXModel, BaseModelRVx):
 class YcXModelRVy(YcXModel, BaseModelRVy):
     def _update_y_x(self):
         super()._update_y_x()
-        self._mean_y_x = vectorize_x_func(lambda x: self._model_y_x(x).mean, self._data_shape_x)
-        self._cov_y_x = vectorize_x_func(lambda x: self._model_y_x(x).cov, self._data_shape_x)
+        self._mean_y_x = vectorize_func(lambda x: self._model_y_x(x).mean, self._data_shape_x)
+        self._cov_y_x = vectorize_func(lambda x: self._model_y_x(x).cov, self._data_shape_x)
 
 
 class YcXModelRVyx(YcXModelRVx, YcXModelRVy):
@@ -224,3 +220,47 @@ class YcXModelRVyx(YcXModelRVx, YcXModelRVy):
 # t.mode_y_x(t.model_x.rvs(4))
 # t.mean_y_x(t.model_x.rvs(4))
 # t.cov_y_x(t.model_x.rvs(4))
+
+
+class NormalRVModel(BaseModelRVx, BaseModelRVy):
+    def __init__(self, model_x=NormalRV(), basis_y_x=(lambda x: 1,), weights=(0,), cov_y_x=1, rng=None):
+        super().__init__(rng)
+
+        self.model_x = model_x
+        self.basis_y_x = basis_y_x
+        self.weights = weights
+        self.cov_y_x = cov_y_x
+
+        # def mean_y_x(x):
+        #     return sum(weight * func(x) for weight, func in zip(weights, basis_y_x))
+
+        self._mean_y_x = vectorize_func(lambda x: self._model_y_x(x).mean, self._data_shape_x)
+
+        def model_y_x(x):
+            mean_y_x = sum(weight * func(x) for weight, func in zip(weights, basis_y_x))
+            return NormalRV(mean_y_x, cov_y_x)
+
+    @property
+    def model_x(self):
+        return self._model_x
+
+    @model_x.setter
+    def model_x(self, model_x):
+        self._model_x = model_x
+
+        self._data_shape_x = self._model_x.data_shape
+        self._mode_x = self._model_x.mode
+
+        self._mean_x = self._model_x.mean
+        self._cov_x = self._model_x.cov
+
+    @BaseModelRVy.cov_y_x.setter
+    def cov_y_x(self, cov_y_x):
+        self._cov_y_x = np.array(cov_y_x)
+        _temp = self._cov_y_x.shape
+        self._data_shape_y = _temp[:int(len(_temp) / 2)]
+
+    def mean_y_x(self, x):      # TODO: single private version here, vectorized version in superclass?
+        return sum(weight * func(x) for weight, func in zip(self.weights, self.basis_y_x))
+
+

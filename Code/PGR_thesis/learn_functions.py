@@ -2,10 +2,13 @@
 Supervised learning functions.
 """
 
-import numpy as np
 import functools
 from math import floor
-from util.generic import vectorize_x_func, empirical_pmf
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+from util.generic import vectorize_func, empirical_pmf
 from loss_functions import loss_se, loss_01
 from SL_obj import YcXModel
 
@@ -33,7 +36,7 @@ class BaseLearner:
         pass
 
     def predict(self, x):
-        return vectorize_x_func(self._predict_single, data_shape=self._data_shape_x)(x)
+        return vectorize_func(self._predict_single, data_shape=self._data_shape_x)(x)
 
     def _predict_single(self, x):
         raise NotImplementedError("Method must be overwritten.")
@@ -55,23 +58,24 @@ class BayesLearner(BaseLearner):
         self._data_shape_x = self.bayes_model.data_shape_x
         self._data_shape_y = self.bayes_model.data_shape_y
 
-        # self._posterior_mean = None     # TODO: replace with predictive?
-        self._predictive_dist = None
+        self.prior = self.bayes_model.prior
+        self.posterior = None
+        self.predictive_dist = None
+        self.posterior_model = None
+
         self.fit()
-
-    # @property
-    # def posterior_mean(self):
-    #     return self._posterior_mean
-
-    def predictive_dist(self, x):
-        return self._predictive_dist(x)
 
     def fit(self, d=None):
         if d is None:
             d = np.array([], dtype=[('x', '<f8', self._data_shape_x),
                                     ('y', '<f8', self._data_shape_y)])
-        # self._posterior_mean = self.bayes_model.posterior_mean(d)
-        self._predictive_dist = self.bayes_model.predictive_dist(d)
+
+        self.posterior, self.predictive_dist, self.posterior_model = self.bayes_model.fit(d)
+
+    def plot_param_dist(self, ax_prior=None, ax_posterior=None):    # TODO: improve or delete
+        self.prior.plot_pdf(ax=ax_prior)
+        self.posterior.plot_pdf(ax=ax_posterior)
+
 
 
 class BayesClassifier(BayesLearner):
@@ -80,8 +84,8 @@ class BayesClassifier(BayesLearner):
         self.loss_fcn = loss_01
 
     def _predict_single(self, x):
-        # return self._posterior_mean.mode_y_x(x)
-        return self._predictive_dist(x).mode    # TODO: argmax?
+        # return self.posterior_model.mode_y_x(x)
+        return self.predictive_dist(x).mode    # TODO: argmax?
 
 
 class BayesEstimator(BayesLearner):
@@ -90,8 +94,8 @@ class BayesEstimator(BayesLearner):
         self.loss_fcn = loss_se
 
     def _predict_single(self, x):
-        # return self._posterior_mean.mean_y_x(x)
-        return self._predictive_dist(x).mean        # TODO: m1?
+        # return self.posterior_model.mean_y_x(x)
+        return self.predictive_dist(x).mean        # TODO: m1?
 
 
 # class DirichletFiniteClassifier(BaseLearner):
@@ -164,7 +168,7 @@ class BetaEstimatorTemp(BaseLearner):
 #         return self._mean_x
 #
 #     @property
-#     def posterior_mean(self):
+#     def posterior_model(self):
 #         return self._posterior_mean
 #
 #     def fit(self, d=np.array([])):

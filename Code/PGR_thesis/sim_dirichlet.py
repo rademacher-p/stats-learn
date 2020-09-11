@@ -11,7 +11,7 @@ from scipy import stats
 # from scipy._lib._util import check_random_state
 # from mpl_toolkits.mplot3d import Axes3D
 
-from main import learn_sim
+from main import learn_sim_mc
 
 from RE_obj import DeterministicRE, FiniteRE, DirichletRV
 from SL_obj import YcXModel
@@ -76,7 +76,7 @@ for i, (n_train, alpha_0) in enumerate(itertools.product(n_train_plot, alpha_0_p
     learner = BayesClassifier(bayes_model)
     # learner = BayesEstimator(bayes_model)
 
-    risk_plot[np.unravel_index([i], risk_plot.shape)] = learn_sim(bayes_model, learner, n_train, n_mc=2000, verbose=False)
+    risk_plot[np.unravel_index([i], risk_plot.shape)] = learn_sim_mc(bayes_model, learner, n_train, n_mc=2000, verbose=False)
 
 fig, ax = plt.subplots(num='risk', clear=True)
 ax.plot(n_train_plot, risk_plot)

@@ -48,8 +48,8 @@ class BaseBayes:
     def random_model(self):     # defaults to deterministic bayes_model!?
         return self.model_gen()
 
-    def posterior_mean(self, d):  # TODO: generalize method for base classes, full posterior object?
-        raise NotImplementedError
+    # def posterior_model(self, d):  # TODO: generalize method for base classes, full posterior object?
+    #     raise NotImplementedError
 
     def predictive_dist(self, d):
         raise NotImplementedError
@@ -66,20 +66,20 @@ class BetaModelBayes(BaseBayes):
 
 
 class NormalModelBayes(BaseBayes):
-    def __init__(self, model_x=RE_obj.NormalRV(), funcs=None, mean_theta=np.zeros(1), cov_theta=np.eye(1), cov_y_x=1, rng_model=None):
+    def __init__(self, model_x=RE_obj.NormalRV(), basis_y_x=None, mean_theta=np.zeros(1), cov_theta=np.eye(1), cov_y_x=1, rng_model=None):
         _temp = np.array(cov_y_x).shape
         _data_shape_y = _temp[:int(len(_temp) / 2)]
 
         self.mean_theta = mean_theta
         self.cov_theta = cov_theta
 
-        if funcs is None:
+        if basis_y_x is None:
             def power_func(i):
                 return lambda x: np.full(_data_shape_y, x)**i
-            funcs = [power_func(i) for i in range(len(self.mean_theta))]
+            basis_y_x = tuple(power_func(i) for i in range(len(self.mean_theta)))
 
         model_gen = YcXModel.norm_model
-        model_kwargs = {'model_x': model_x, 'funcs': funcs, 'cov_y_x': cov_y_x, 'rng': rng_model}
+        model_kwargs = {'model_x': model_x, 'basis_y_x': basis_y_x, 'cov_y_x': cov_y_x, 'rng': rng_model}
         prior = RE_obj.NormalRV(self.mean_theta, self.cov_theta)
         super().__init__(model_gen, model_kwargs, prior)
 
@@ -90,31 +90,55 @@ class NormalModelBayes(BaseBayes):
         theta = self.prior.rvs()
         return self.model_gen(weights=theta)
 
-    def posterior_mean(self, d):
+    def posterior(self, d):
         if len(d) == 0:
-            theta_posterior_mean = self.mean_theta
+            return self.prior
         else:
-            psi = np.array([np.array([func(x_i) for func in self.model_kwargs['funcs']]).T for x_i in d['x']])
+            psi = np.array([np.array([func(x_i) for func in self.model_kwargs['basis_y_x']]).T for x_i in d['x']])
 
-            # _temp = sum(np.matmul(psi_i.T, np.matmul(inverse(self.model_kwargs['cov_y_x']), psi_i)) for psi_i in psi)
-            # _temp = sum((psi_i.T[..., np.newaxis, np.newaxis] *
-            #              inverse(self.model_kwargs['cov_y_x'])[np.newaxis, ..., np.newaxis] * psi_i).sum((1, 2)) for psi_i in psi)
             _temp = sum(inner_prod(psi_i, psi_i, inverse(self.model_kwargs['cov_y_x'])) for psi_i in psi)
-            cov_post = inverse(inverse(self.cov_theta) + _temp)
+            cov_theta_post = inverse(inverse(self.cov_theta) + _temp)
 
-            # _temp = sum(np.matmul(psi_i.T, np.matmul(inverse(self.model_kwargs['cov_y_x']), d[i]['y']))
-            #             for i, psi_i in enumerate(psi))
-            # _temp = sum((psi_i.T[..., np.newaxis, np.newaxis] *
-            #              inverse(self.model_kwargs['cov_y_x'])[np.newaxis, ..., np.newaxis] * d[i]['y']).sum((1, 2))
-            #             for i, psi_i in enumerate(psi))
             _temp = sum(inner_prod(psi_i, y, inverse(self.model_kwargs['cov_y_x'])) for psi_i, y in zip(psi, d['y']))
-            theta_posterior_mean = cov_post @ (inverse(self.cov_theta) @ self.mean_theta + _temp)
+            mean_theta_post = cov_theta_post @ (inverse(self.cov_theta) @ self.mean_theta + _temp)
 
-        return self.model_gen(weights=theta_posterior_mean)
+            return RE_obj.NormalRV(mean_theta_post, cov_theta_post)
+
+    def posterior_2_predictive(self, posterior):
+        def model_y_x(x):
+            mean_y_x = sum(weight * func(x) for weight, func in zip(posterior.mean, self.model_kwargs['basis_y_x']))
+            psi_x = np.array([func(x) for func in self.model_kwargs['basis_y_x']]).T
+            cov_y_x = self.model_kwargs['cov_y_x'] + inner_prod(psi_x.T, psi_x.T, posterior.cov)
+
+            return RE_obj.NormalRV(mean_y_x, cov_y_x)
+
+        return model_y_x
 
     def predictive_dist(self, d):
-        return self.posterior_mean(d).model_y_x
-        # return RE_obj.NormalRV(mean=theta_posterior_mean, cov=self.model_kwargs['cov_y_x'])
+        posterior = self.posterior(d)
+        return self.posterior_2_predictive(posterior)
+        # def model_y_x(x):
+        #     mean_y_x = sum(weight * func(x) for weight, func in zip(posterior.mean, self.model_kwargs['basis_y_x']))
+        #     psi_x = np.array([func(x) for func in self.model_kwargs['basis_y_x']]).T
+        #     cov_y_x = self.model_kwargs['cov_y_x'] + inner_prod(psi_x.T, psi_x.T, posterior.cov)
+        #
+        #     return RE_obj.NormalRV(mean_y_x, cov_y_x)
+        #
+        # return model_y_x
+
+    def predictive_2_model(self, predictive_dist):
+        return YcXModel(model_x=self.model_kwargs['model_x'], model_y_x=predictive_dist)
+
+    def posterior_model(self, d):
+        predictive_dist = self.predictive_dist(d)
+        return self.predictive_2_model(predictive_dist)
+        # return YcXModel(self.model_kwargs['model_x'], self.predictive_dist(d))
+
+    def fit(self, d):       # TODO: option for number of outputs?
+        posterior = self.posterior(d)
+        predictive_dist = self.posterior_2_predictive(posterior)
+        posterior_model = self.predictive_2_model(predictive_dist)
+        return posterior, predictive_dist, posterior_model
 
 
 class DirichletFiniteYcXModelBayesNew(BaseBayes):
@@ -185,7 +209,11 @@ class DirichletFiniteYcXModelBayesNew(BaseBayes):
             emp_dist = FiniteDomainFunc(self._supp_y, empirical_pmf(d_match['y'], self._supp_y, self._data_shape_y))
             return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist
 
-        return p_y_x
+        # return p_y_x
+
+        def model_y_x(x):
+            return RE_obj_callable.FiniteRE(p_y_x(x))
+        return model_y_x
 
 
 
@@ -337,7 +365,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #
 #         return self.model_gen(p_x=p_x, p_y_x=p_y_x)
 #
-#     def posterior_mean(self, d):
+#     def posterior_model(self, d):
 #         n = len(d)
 #
 #         if n == 0:
