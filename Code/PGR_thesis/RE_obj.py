@@ -36,16 +36,7 @@ class BaseRE:
         return self._mode
 
     def pf(self, x):
-        return vectorize_func(self._pf_single, self._data_shape)(x)
-
-        # x, set_shape = check_data_shape(x, self._data_shape)
-        # return self._pf(x).reshape(set_shape)
-
-    # def _pf(self, x):
-    #     _out = []
-    #     for x_i in x.reshape((-1,) + self._data_shape):
-    #         _out.append(self._pf_single(x_i))
-    #     return np.asarray(_out)         # returned array may be flattened over 'set_shape'
+        return vectorize_func(self._pf_single, self._data_shape)(x)     # TODO: decorator?
 
     def _pf_single(self, x):
         raise NotImplementedError("Method must be overwritten.")
@@ -156,7 +147,7 @@ class DeterministicRV(DeterministicRE, BaseRV):
 # b.mode
 # b.mean
 # b.cov
-# b.pmf(b.rvs())
+# b.pf(b.rvs(8))
 
 
 class FiniteRE(BaseRE):
@@ -283,15 +274,15 @@ class FiniteRV(FiniteRE, BaseRV):
 # pp = np.random.random((1,))
 # pp = pp / pp.sum()
 # f = FiniteRE(s, pp)
-# f.pmf(f.rvs((4,5)))
+# f.pf(f.rvs((4, 5)))
 #
-# s = np.stack(np.meshgrid([0,1],[0,1], [0,1]), axis=-1)
-# p = np.random.random((2,2,2))
+# s = np.stack(np.meshgrid([0, 1], [0, 1], [0, 1]), axis=-1)
+# p = np.random.random((2, 2, 2))
 # p = p / p.sum()
 # # s, p = ['a','b','c'], [.3,.2,.5]
 # f2 = FiniteRE(s, p)
-# f2.pmf(f2.rvs(4))
-# f2.plot_pmf()
+# f2.pf(f2.rvs(4))
+# f2.plot_pf()
 
 
 def _dirichlet_check_alpha_0(alpha_0):
@@ -302,13 +293,13 @@ def _dirichlet_check_alpha_0(alpha_0):
 
 
 def _dirichlet_check_input(x, alpha_0, mean):
-    x = check_valid_pmf(x, data_shape=mean.shape)
+    x, set_shape = check_valid_pmf(x, data_shape=mean.shape)
 
     if np.logical_and(x == 0, mean < 1 / alpha_0).any():
         raise ValueError("Each element in 'x' must be greater than "
                          "zero if the corresponding mean element is less than 1 / alpha_0.")
 
-    return x
+    return x, set_shape
 
 
 class DirichletRV(BaseRV):
@@ -354,18 +345,17 @@ class DirichletRV(BaseRV):
 
         self._cov = (diag_gen(self._mean) - outer_gen(self._mean, self._mean)) / (self._alpha_0 + 1)
 
-        self._log_pdf_coef = gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
+        self._log_pf_coef = gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
 
     def _rvs(self, size=(), rng=None):
         return rng.dirichlet(self._alpha_0 * self._mean.flatten(), size).reshape(size + self._data_shape)
 
     def pf(self, x):
-        x, set_shape = check_data_shape(x, self._data_shape)        # FIXME
-        x = _dirichlet_check_input(x, self._alpha_0, self._mean)
+        x, set_shape = _dirichlet_check_input(x, self._alpha_0, self._mean)
 
-        log_pdf = self._log_pdf_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x)
-                                              .reshape(-1, self._data_size), -1).reshape(set_shape)
-        return np.exp(log_pdf)
+        log_pf = self._log_pf_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x)
+                                            .reshape(-1, self._data_size), -1).reshape(set_shape)
+        return np.exp(log_pf)
 
     def plot_pf(self, x_plt=None, ax=None):
 
@@ -374,17 +364,17 @@ class DirichletRV(BaseRV):
                 x_plt = simplex_grid(40, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
             # x_plt = simplex_grid(n_plt, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
 
-            pdf_plt = self.pf(x_plt)
+            pf_plt = self.pf(x_plt)
             x_plt.resize(x_plt.shape[0], self._data_size)
 
-            # pdf_plt.sum() / (n_plt ** (self._data_size - 1))
+            # pf_plt.sum() / (n_plt ** (self._data_size - 1))
 
             if self._data_size == 2:
                 if ax is None:
                     _, ax = plt.subplots()
                     ax.set(xlabel='$x_1$', ylabel='$x_2$')
 
-                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pdf_plt)
+                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pf_plt)
 
                 c_bar = plt.colorbar(plt_data)
                 c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
@@ -397,7 +387,7 @@ class DirichletRV(BaseRV):
                     ax.view_init(35, 45)
                     ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
 
-                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pdf_plt)
+                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pf_plt)
 
                 c_bar = plt.colorbar(plt_data)
                 c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
@@ -413,13 +403,13 @@ class DirichletRV(BaseRV):
 # m = np.random.random((1, 3))
 # m = m / m.sum()
 # d = DirichletRV(a0, m, rng)
-# d.plot_pdf(80)
+# d.plot_pf()
 # d.mean
 # d.mode
 # d.cov
 # d.rvs()
-# d.pdf(d.rvs())
-# d.pdf(d.rvs(4).reshape((2, 2)+d.mean.shape))
+# d.pf(d.rvs())
+# d.pf(d.rvs(4).reshape((2, 2)+d.mean.shape))
 
 
 def _empirical_check_n(n):
@@ -429,13 +419,13 @@ def _empirical_check_n(n):
 
 
 def _empirical_check_input(x, n, mean):
-    x = check_valid_pmf(x, data_shape=mean.shape)
+    x, set_shape = check_valid_pmf(x, data_shape=mean.shape)
 
     # if ((n * x) % 1 > 0).any():
     if (np.minimum((n * x) % 1, (-n * x) % 1) > 1e-9).any():
         raise ValueError("Each entry in 'x' must be a multiple of 1/n.")
 
-    return x
+    return x, set_shape
 
 
 class EmpiricalRV(BaseRV):
@@ -473,28 +463,27 @@ class EmpiricalRV(BaseRV):
         self._data_shape = self._mean.shape
         self._data_size = self._mean.size
 
-        self._mode = ((self._n * self._mean) // 1) + simplex_round((self._n * self._mean) % 1)
+        self._mode = ((self._n * self._mean) // 1) + simplex_round((self._n * self._mean) % 1)  # FIXME: broken
 
         self._cov = (diag_gen(self._mean) - outer_gen(self._mean, self._mean)) / self._n
 
-        self._log_pmf_coef = gammaln(self._n + 1)
+        self._log_pf_coef = gammaln(self._n + 1)
 
     def _rvs(self, size=(), rng=None):
         return rng.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
 
     def pf(self, x):
-        x, set_shape = check_data_shape(x, self._data_shape)
-        x = _empirical_check_input(x, self._n, self._mean)
+        x, set_shape = _empirical_check_input(x, self._n, self._mean)
 
-        log_pmf = self._log_pmf_coef + (xlogy(self._n * x, self._mean)
+        log_pf = self._log_pf_coef + (xlogy(self._n * x, self._mean)
                                         - gammaln(self._n * x + 1)).reshape(-1, self._data_size).sum(axis=-1)
-        return np.exp(log_pmf).reshape(set_shape)
+        return np.exp(log_pf).reshape(set_shape)
 
     def plot_pf(self, ax=None):
 
         if self._data_size in (2, 3):
             x_plt = simplex_grid(self.n, self._data_shape)
-            pmf_plt = self.pf(x_plt)
+            pf_plt = self.pf(x_plt)
             x_plt.resize(x_plt.shape[0], self._data_size)
 
             if self._data_size == 2:
@@ -502,7 +491,7 @@ class EmpiricalRV(BaseRV):
                     _, ax = plt.subplots()
                     ax.set(xlabel='$x_1$', ylabel='$x_2$')
 
-                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pmf_plt)
+                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pf_plt)
 
                 c_bar = plt.colorbar(plt_data)
                 c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
@@ -515,7 +504,7 @@ class EmpiricalRV(BaseRV):
                     ax.view_init(35, 45)
                     ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
 
-                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pmf_plt)
+                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pf_plt)
 
                 c_bar = plt.colorbar(plt_data)
                 c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
@@ -527,16 +516,17 @@ class EmpiricalRV(BaseRV):
 
 # rng = np.random.default_rng()
 # n = 10
-# m = np.random.random((1, 3))
+# # m = np.random.random((1, 3))
+# m = np.random.default_rng().integers(10, size=(1, 3))
 # m = m / m.sum()
 # d = EmpiricalRV(n, m, rng)
-# d.plot_pmf()
+# d.plot_pf()
 # d.mean
 # d.mode
 # d.cov
 # d.rvs()
-# d.pmf(d.rvs())
-# d.pmf(d.rvs(4).reshape((2, 2) + d.mean.shape))
+# d.pf(d.rvs())
+# d.pf(d.rvs(4).reshape((2, 2) + d.mean.shape))
 
 
 class DirichletEmpiricalRV(BaseRV):
@@ -589,26 +579,25 @@ class DirichletEmpiricalRV(BaseRV):
         self._cov = ((1/self._n + 1/self._alpha_0) / (1 + 1/self._alpha_0)
                      * (diag_gen(self._mean) - outer_gen(self._mean, self._mean)))
 
-        self._log_pmf_coef = (gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
-                              + gammaln(self._n + 1) - gammaln(self._alpha_0 + self._n))
+        self._log_pf_coef = (gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
+                             + gammaln(self._n + 1) - gammaln(self._alpha_0 + self._n))
 
     def _rvs(self, size=(), rng=None):
         # return rng.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
         raise NotImplementedError
 
     def pf(self, x):
-        x, set_shape = check_data_shape(x, self._data_shape)
-        x = _empirical_check_input(x, self._n, self._mean)
+        x, set_shape = _empirical_check_input(x, self._n, self._mean)
 
-        log_pmf = self._log_pmf_coef + (gammaln(self._alpha_0 * self._mean + self._n * x)
-                                        - gammaln(self._n * x + 1)).reshape(-1, self._data_size).sum(axis=-1)
-        return np.exp(log_pmf).reshape(set_shape)
+        log_pf = self._log_pf_coef + (gammaln(self._alpha_0 * self._mean + self._n * x) - gammaln(self._n * x + 1))\
+            .reshape(-1, self._data_size).sum(axis=-1)
+        return np.exp(log_pf).reshape(set_shape)
 
-    def plot_pmf(self, ax=None):        # TODO: reused code. define simplex plotter outside!
+    def plot_pf(self, ax=None):        # TODO: reused code. define simplex plotter outside!
 
         if self._data_size in (2, 3):
             x_plt = simplex_grid(self.n, self._data_shape)
-            pmf_plt = self.pf(x_plt)
+            pf_plt = self.pf(x_plt)
             x_plt.resize(x_plt.shape[0], self._data_size)
 
             if self._data_size == 2:
@@ -616,7 +605,7 @@ class DirichletEmpiricalRV(BaseRV):
                     _, ax = plt.subplots()
                     ax.set(xlabel='$x_1$', ylabel='$x_2$')
 
-                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pmf_plt)
+                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pf_plt)
 
                 c_bar = plt.colorbar(plt_data)
                 c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
@@ -629,7 +618,7 @@ class DirichletEmpiricalRV(BaseRV):
                     ax.view_init(35, 45)
                     ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
 
-                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pmf_plt)
+                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pf_plt)
 
                 c_bar = plt.colorbar(plt_data)
                 c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
@@ -639,20 +628,16 @@ class DirichletEmpiricalRV(BaseRV):
         else:
             raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
-# rng = np.random.default_rng()
+# rng_ = np.random.default_rng()
 # n = 10
 # a0 = 600
 # m = np.ones((1, 3))
 # m = m / m.sum()
-# d = DirichletEmpiricalRV(n, a0, m, rng)
-# d.plot_pmf()
+# d = DirichletEmpiricalRV(n, a0, m, rng_)
+# d.plot_pf()
 # d.mean
 # d.mode
 # d.cov
-# d.rvs()
-# d.pmf(d.rvs())
-# d.pmf(d.rvs(4).reshape((2, 2) + d.mean.shape))
-
 
 
 class BetaRV(BaseRV):
@@ -713,17 +698,18 @@ class BetaRV(BaseRV):
     def _rvs(self, size=(), rng=None):
         return rng.beta(self._a, self._b, size)
 
-    def _pdf(self, x):      # FIXME FIXME
-        log_pdf = xlog1py(self._b - 1.0, -x) + xlogy(self._a - 1.0, x) - betaln(self._a, self._b)
-        return np.exp(log_pdf)
+    def pf(self, x):
+        log_pf = xlog1py(self._b - 1.0, -x) + xlogy(self._a - 1.0, x) - betaln(self._a, self._b)
+        return np.exp(log_pf)
 
-    def plot_pdf(self, n_plt, ax=None):
+    def plot_pf(self, x_plt=None, ax=None):
+        if x_plt is None:
+            x_plt = np.linspace(0, 1, 101, endpoint=True)
         if ax is None:
             _, ax = plt.subplots()
-            ax.set(xlabel='$x$', ylabel='$P_{\mathrm{x}}(x)$')
+            ax.set(xlabel='$x$', ylabel=r'$\mathrm{P}_\mathrm{x}(x)$')
 
-        x_plt = np.linspace(0, 1, n_plt + 1, endpoint=True)
-        plt_data = ax.plot(x_plt, self.pdf(x_plt))
+        plt_data = ax.plot(x_plt, self.pf(x_plt))
         return plt_data
 
 
@@ -760,11 +746,11 @@ class NormalRV(BaseRV):
             raise ValueError(f"Covariance array shape must be {self._data_shape * 2}.")
 
         # self._psd = _PSD(self._cov)
-        # self._log_pdf_coef = -0.5 * (self._psd.rank * np.log(2 * np.pi) + self._psd.log_pdet)
+        # self._log_pf_coef = -0.5 * (self._psd.rank * np.log(2 * np.pi) + self._psd.log_pdet)
 
         self._inv_cov = inverse(self._cov)
         _log_det_cov = np.log(determinant(self._cov))
-        self._log_pdf_coef = -0.5 * (self._data_size * np.log(2 * np.pi) + _log_det_cov)
+        self._log_pf_coef = -0.5 * (self._data_size * np.log(2 * np.pi) + _log_det_cov)
 
     @property
     def mode(self):
@@ -776,21 +762,22 @@ class NormalRV(BaseRV):
         else:
             return rng.multivariate_normal(self._mean, self._cov, size).reshape(size + self._data_shape)
 
-    def _pdf(self, x):
+    def pf(self, x):
+        x, set_shape = check_data_shape(x, self._data_shape)
+
         dev = x.reshape(-1, *self._data_shape) - self._mean
         inner_white = np.array([(outer_gen(dev_i, np.ones(self._data_shape)) * self._inv_cov
                                 * outer_gen(np.ones(self._data_shape), dev_i)).sum() for dev_i in dev])
         # inner_white = np.sum(np.square(np.dot(dev, self._psd.U)), axis=-1)
 
-        log_pdf = self._log_pdf_coef + -0.5 * inner_white
-        return np.exp(log_pdf)
+        log_pf = self._log_pf_coef + -0.5 * inner_white.reshape(set_shape)
+        return np.exp(log_pf)
 
-    def plot_pdf(self, x_plt=None, ax=None):
+    def plot_pf(self, x_plt=None, ax=None):
         _delta = 0.01
 
         if self._data_size == 1:
             if x_plt is None:
-                # lims = self._mean.item() - 3*np.sqrt(self._cov.item()), self._mean.item() + 3*np.sqrt(self._cov.item())
                 lims = self._mean.item() + np.array([-1, 1]) * 3*np.sqrt(self._cov.item())
                 n_plt = int(round((lims[1]-lims[0]) / _delta))
                 x_plt = np.linspace(*lims, n_plt, endpoint=True).reshape(n_plt, *self._data_shape)
@@ -799,7 +786,7 @@ class NormalRV(BaseRV):
                 _, ax = plt.subplots()
                 ax.set(xlabel='$x_1$', ylabel='$p$')
 
-            ax.plot(x_plt, self.pdf(x_plt))
+            ax.plot(x_plt, self.pf(x_plt))
 
         elif self._data_size == 2:
             if x_plt is None:
@@ -814,8 +801,8 @@ class NormalRV(BaseRV):
                 _, ax = plt.subplots(subplot_kw={'projection': '3d'})
                 ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$p$')
 
-            # ax.plot_wireframe(x_plt[..., 0], x_plt[..., 1], self.pdf(x_plt))
-            ax.plot_surface(x_plt[..., 0], x_plt[..., 1], self.pdf(x_plt), cmap=plt.cm.viridis)
+            # ax.plot_wireframe(x_plt[..., 0], x_plt[..., 1], self.pf(x_plt))
+            ax.plot_surface(x_plt[..., 0], x_plt[..., 1], self.pf(x_plt), cmap=plt.cm.viridis)
         else:
             raise NotImplementedError('Plot method only supported for 1- and 2-dimensional data.')
 
@@ -825,5 +812,4 @@ class NormalRV(BaseRV):
 # # mean_, cov_ = 1, 1
 # norm = NormalRV(mean_, cov_)
 # norm.rvs(5)
-# norm.plot_pdf()
-
+# norm.plot_pf()
