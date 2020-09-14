@@ -86,10 +86,10 @@ def inner_prod(x, y, w=None):       # TODO: decompose weight and do colored norm
 
 
 def simplex_round(x):
-    x = np.asarray(x)
+    x = np.array(x)
     if x.min() < 0:
         raise ValueError("Input values must be non-negative.")
-    elif x.sum() != 1:
+    elif not np.isclose(x.sum(), 1):
         raise ValueError("Input values must sum to one.")
 
     out = np.zeros(x.size)

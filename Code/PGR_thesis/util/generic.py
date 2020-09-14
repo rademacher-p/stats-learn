@@ -74,7 +74,10 @@ def check_valid_pmf(p, data_shape=None, full_support=False):
     if (np.abs(p.reshape(set_shape + (-1,)).sum(-1) - 1.0) > 1e-9).any():
         raise ValueError("The input 'p' must lie within the normal simplex, but p.sum() = %s." % p.sum())
 
-    return p
+    if data_shape is None:
+        return p
+    else:
+        return p, set_shape
 
 
 def vectorize_func(func, data_shape):
