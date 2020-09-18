@@ -3,9 +3,9 @@ Random element objects.
 """
 
 # TODO: docstrings?
+# TODO: do ABC or PyCharm bug?
 
 import numpy as np
-
 from scipy.special import gammaln, xlogy, xlog1py, betaln
 import matplotlib.pyplot as plt
 
@@ -353,9 +353,8 @@ class DirichletRV(BaseRV):
     def pf(self, x):
         x, set_shape = _dirichlet_check_input(x, self._alpha_0, self._mean)
 
-        log_pf = self._log_pf_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x)
-                                            .reshape(-1, self._data_size), -1).reshape(set_shape)
-        return np.exp(log_pf)
+        log_pf = self._log_pf_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x).reshape(-1, self._data_size), -1)
+        return np.exp(log_pf).reshape(set_shape)
 
     def plot_pf(self, x_plt=None, ax=None):
 
@@ -476,7 +475,7 @@ class EmpiricalRV(BaseRV):
         x, set_shape = _empirical_check_input(x, self._n, self._mean)
 
         log_pf = self._log_pf_coef + (xlogy(self._n * x, self._mean)
-                                        - gammaln(self._n * x + 1)).reshape(-1, self._data_size).sum(axis=-1)
+                                      - gammaln(self._n * x + 1)).reshape(-1, self._data_size).sum(axis=-1)
         return np.exp(log_pf).reshape(set_shape)
 
     def plot_pf(self, ax=None):
@@ -714,7 +713,7 @@ class BetaRV(BaseRV):
 
 
 class NormalRV(BaseRV):
-    def __init__(self, mean=0, cov=1, rng=None):
+    def __init__(self, mean=0., cov=1., rng=None):
         super().__init__(rng)
         self.mean = np.array(mean)
         self.cov = np.array(cov)
@@ -774,27 +773,29 @@ class NormalRV(BaseRV):
         return np.exp(log_pf)
 
     def plot_pf(self, x_plt=None, ax=None):
-        _delta = 0.01
+        # _delta = 0.01
+        n_plt = 100
 
         if self._data_size == 1:
             if x_plt is None:
                 lims = self._mean.item() + np.array([-1, 1]) * 3*np.sqrt(self._cov.item())
-                n_plt = int(round((lims[1]-lims[0]) / _delta))
+                # n_plt = int(round((lims[1]-lims[0]) / _delta))
                 x_plt = np.linspace(*lims, n_plt, endpoint=True).reshape(n_plt, *self._data_shape)
 
             if ax is None:
                 _, ax = plt.subplots()
                 ax.set(xlabel='$x_1$', ylabel='$p$')
 
-            ax.plot(x_plt, self.pf(x_plt))
+            plt_data = ax.plot(x_plt, self.pf(x_plt))
+            return plt_data
 
         elif self._data_size == 2:
             if x_plt is None:
                 lims = [(self._mean[i] - 3 * np.sqrt(self._cov[i, i]), self._mean[i] + 3 * np.sqrt(self._cov[i, i]))
                         for i in range(2)]
-                n_plt = int(round((lims[0][1] - lims[0][0]) / _delta)), int(round((lims[1][1] - lims[1][0]) / _delta))
-                x0_plt = np.linspace(*lims[0], n_plt[0], endpoint=True)
-                x1_plt = np.linspace(*lims[1], n_plt[1], endpoint=True)
+                # n_plt = int(round((lims[0][1] - lims[0][0]) / _delta)), int(round((lims[1][1] - lims[1][0]) / _delta))
+                x0_plt = np.linspace(*lims[0], n_plt, endpoint=True)
+                x1_plt = np.linspace(*lims[1], n_plt, endpoint=True)
                 x_plt = np.stack(np.meshgrid(x0_plt, x1_plt), axis=-1)
 
             if ax is None:
@@ -802,13 +803,15 @@ class NormalRV(BaseRV):
                 ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$p$')
 
             # ax.plot_wireframe(x_plt[..., 0], x_plt[..., 1], self.pf(x_plt))
-            ax.plot_surface(x_plt[..., 0], x_plt[..., 1], self.pf(x_plt), cmap=plt.cm.viridis)
+            plt_data = ax.plot_surface(x_plt[..., 0], x_plt[..., 1], self.pf(x_plt), cmap=plt.cm.viridis)
+
+            return plt_data
         else:
             raise NotImplementedError('Plot method only supported for 1- and 2-dimensional data.')
 
 
-# mean_, cov_ = np.ones(1), np.eye(1)
-# # mean_, cov_ = np.ones(2), np.eye(2)
+# # mean_, cov_ = np.ones(1), np.eye(1)
+# mean_, cov_ = np.ones(2), np.eye(2)
 # # mean_, cov_ = 1, 1
 # norm = NormalRV(mean_, cov_)
 # norm.rvs(5)
