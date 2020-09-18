@@ -36,7 +36,7 @@ class BaseRE:
         return self._mode
 
     def pf(self, x):
-        return vectorize_func(self._pf_single, self._data_shape)(x)     # TODO: decorator?
+        return vectorize_func(self._pf_single, self._data_shape)(x)     # TODO: decorator? better way?
 
     def _pf_single(self, x):
         raise NotImplementedError("Method must be overwritten.")

@@ -24,8 +24,6 @@ from util.math import inverse, determinant, inner_prod
 
 class BaseBayes:
     def __init__(self, model_gen, model_kwargs=None, prior=None):
-        # super().__init__(rng)
-
         self._data_shape_x = None
         self._data_shape_y = None
 
