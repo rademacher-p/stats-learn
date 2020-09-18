@@ -5,15 +5,16 @@ Bayesian Prior objects.
 import types
 import functools
 # import itertools
+
 import numpy as np
 # from scipy.stats._multivariate import multi_rv_generic
 
 import RE_obj
 import RE_obj_callable
-from SL_obj import YcXModel
+from SL_obj import YcXModel, NormalRVModel
 from util.generic import empirical_pmf
-
 from util.func_obj import FiniteDomainFunc
+from util.math import inverse, determinant, inner_prod
 
 #%% Priors
 
@@ -23,18 +24,32 @@ from util.func_obj import FiniteDomainFunc
 
 class BaseBayes:
     def __init__(self, model_gen, model_kwargs=None, prior=None):
-        # super().__init__(rng)
+        self._data_shape_x = None
+        self._data_shape_y = None
 
         if model_kwargs is None:
-            model_kwargs = {}
+            self.model_kwargs = {}
+        else:
+            self.model_kwargs = model_kwargs
 
         self.model_gen = functools.partial(model_gen, **model_kwargs)
         self.prior = prior
 
+    @property
+    def data_shape_x(self):
+        return self._data_shape_x
+
+    @property
+    def data_shape_y(self):
+        return self._data_shape_y
+
     def random_model(self):     # defaults to deterministic bayes_model!?
         return self.model_gen()
 
-    def posterior_mean(self, d):  # TODO: generalize method for base classes, full posterior object?
+    # def posterior_model(self, d):  # TODO: generalize method for base classes, full posterior object?
+    #     raise NotImplementedError
+
+    def predictive_dist(self, d):
         raise NotImplementedError
 
 
@@ -44,20 +59,81 @@ class BetaModelBayes(BaseBayes):
         model_kwargs = {'a': .9, 'b': .9, 'c': 5, 'rng': rng_model}
         super().__init__(model_gen, model_kwargs, prior)
 
+        self._data_shape_x = ()
+        self._data_shape_y = ()
 
 
-# class NormalModelBayes(BaseBayes):
-#     def __init__(self, prior=None, rng_model=None):
-#         model_gen = YcXModel.norm_model
-#         model_kwargs = {'mean_x': 0, 'var_x': 1, 'var_y': 1, 'rng': rng_model}
-#         super().__init__(model_gen, model_kwargs, prior)
-#
-#     # def random_model(self):
-#     #     raise NotImplementedError("Method must be overwritten.")
+class NormalModelBayes(BaseBayes):
+    def __init__(self, model_x=RE_obj.NormalRV(), basis_y_x=None, mean_theta=np.zeros(1), cov_theta=np.eye(1), cov_y_x=1, rng_model=None):
+        _temp = np.array(cov_y_x).shape
+        _data_shape_y = _temp[:int(len(_temp) / 2)]
+
+        self.mean_theta = mean_theta
+        self.cov_theta = cov_theta
+
+        if basis_y_x is None:
+            def power_func(i):
+                return lambda x: np.full(_data_shape_y, x)**i
+            basis_y_x = tuple(power_func(i) for i in range(len(self.mean_theta)))
+
+        # model_gen = YcXModel.norm_model
+        model_gen = NormalRVModel
+        model_kwargs = {'model_x': model_x, 'basis_y_x': basis_y_x, 'cov_y_x': cov_y_x, 'rng': rng_model}
+        prior = RE_obj.NormalRV(self.mean_theta, self.cov_theta)
+        super().__init__(model_gen, model_kwargs, prior)
+
+        self._data_shape_x = model_x.data_shape
+        self._data_shape_y = _data_shape_y
+
+    def random_model(self):
+        theta = self.prior.rvs()
+        return self.model_gen(weights=theta)
+
+    def posterior(self, d):
+        if len(d) == 0:
+            return self.prior
+        else:
+            psi = np.array([np.array([func(x_i) for func in self.model_kwargs['basis_y_x']]).T for x_i in d['x']])
+
+            _temp = sum(inner_prod(psi_i, psi_i, inverse(self.model_kwargs['cov_y_x'])) for psi_i in psi)
+            cov_theta_post = inverse(inverse(self.cov_theta) + _temp)
+
+            _temp = sum(inner_prod(psi_i, y, inverse(self.model_kwargs['cov_y_x'])) for psi_i, y in zip(psi, d['y']))
+            mean_theta_post = cov_theta_post @ (inverse(self.cov_theta) @ self.mean_theta + _temp)
+
+            return RE_obj.NormalRV(mean_theta_post, cov_theta_post)
+
+    def posterior_2_predictive(self, posterior):
+        def model_y_x(x):
+            mean_y_x = sum(weight * func(x) for weight, func in zip(posterior.mean, self.model_kwargs['basis_y_x']))
+            psi_x = np.array([func(x) for func in self.model_kwargs['basis_y_x']]).T
+            cov_y_x = self.model_kwargs['cov_y_x'] + inner_prod(psi_x.T, psi_x.T, posterior.cov)
+
+            return RE_obj.NormalRV(mean_y_x, cov_y_x)
+
+        return model_y_x
+
+    def predictive_dist(self, d):
+        posterior = self.posterior(d)
+        return self.posterior_2_predictive(posterior)
+
+    def predictive_2_model(self, predictive_dist):
+        return YcXModel(model_x=self.model_kwargs['model_x'], model_y_x=predictive_dist)
+
+    def posterior_model(self, d):
+        predictive_dist = self.predictive_dist(d)
+        return self.predictive_2_model(predictive_dist)
+        # return YcXModel(self.model_kwargs['model_x'], self.predictive_dist(d))
+
+    def fit(self, d):       # TODO: option for number of outputs?
+        posterior = self.posterior(d)
+        predictive_dist = self.posterior_2_predictive(posterior)
+        posterior_model = self.predictive_2_model(predictive_dist)
+        return posterior, predictive_dist, posterior_model
 
 
+#%%
 class DirichletFiniteYcXModelBayesNew(BaseBayes):
-
     def __init__(self, alpha_0, mean_x, mean_y_x, rng_model=None, rng_prior=None):
         model_gen = YcXModel.finite_model
         model_kwargs = {'rng': rng_model}
@@ -75,12 +151,12 @@ class DirichletFiniteYcXModelBayesNew(BaseBayes):
         self._data_shape_y = mean_y_x.val.flatten()[0].data_shape_x
 
     def random_model(self, rng=None):
-        p_x = self.prior['p_x'].rvs(random_state=rng)
+        p_x = self.prior['p_x'].rvs(rng=rng)
 
         val = []        # FIXME: better way?
         for x_flat in self._mean_x._supp_flat:
             x = x_flat.reshape(self._data_shape_x)
-            val.append(self.prior['p_y_x'](x).rvs(random_state=rng))
+            val.append(self.prior['p_y_x'](x).rvs(rng=rng))
         val = np.array(val).reshape(self._mean_x.set_shape)
         p_y_x = FiniteDomainFunc(self._supp_x, val)
 
@@ -125,13 +201,22 @@ class DirichletFiniteYcXModelBayesNew(BaseBayes):
             emp_dist = FiniteDomainFunc(self._supp_y, empirical_pmf(d_match['y'], self._supp_y, self._data_shape_y))
             return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist
 
-        return p_y_x
+        # return p_y_x
+
+        def model_y_x(x):
+            return RE_obj_callable.FiniteRE(p_y_x(x))
+        return model_y_x
 
 
 
 #%% Without func objects
 class FiniteYcXModelBayes(BaseBayes):
     def __init__(self, supp_x, supp_y, prior, rng_model=None):
+        model_gen = YcXModel.finite_model_orig
+        # model_kwargs = {'rng': rng_model}
+        model_kwargs = {'supp_x': supp_x['x'], 'supp_y': supp_y['y'], 'rng': rng_model}
+        super().__init__(model_gen, model_kwargs, prior)
+
         self.supp_x = supp_x
         self.supp_y = supp_y        # TODO: Assumed to be my SL structured array!
 
@@ -139,11 +224,6 @@ class FiniteYcXModelBayes(BaseBayes):
         self._supp_shape_y = supp_y.shape
         self._data_shape_x = supp_x.dtype['x'].shape
         self._data_shape_y = supp_y.dtype['y'].shape
-
-        model_gen = YcXModel.finite_model_orig
-        # model_kwargs = {'rng': rng_model}
-        model_kwargs = {'supp_x': supp_x['x'], 'supp_y': supp_y['y'], 'rng': rng_model}
-        super().__init__(model_gen, model_kwargs, prior)
 
     def random_model(self):
         raise NotImplementedError("Method must be overwritten.")
@@ -175,7 +255,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
         # self._model_gen = functools.partial(YcXModel.finite_model, supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
 
     def random_model(self, rng=None):
-        p = self.prior.rvs(random_state=rng)
+        p = self.prior.rvs(rng=rng)
 
         p_x = p.reshape(self._supp_shape_x + (-1,)).sum(axis=-1)
 
@@ -263,7 +343,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #                                             supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
 #
 #     def random_model(self, rng=None):
-#         p = self.prior.rvs(random_state=rng)
+#         p = self.prior.rvs(rng=rng)
 #
 #         p_x = p.reshape(self._supp_shape_x + (-1,)).sum(axis=-1)
 #
@@ -277,7 +357,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #
 #         return self.model_gen(p_x=p_x, p_y_x=p_y_x)
 #
-#     def posterior_mean(self, d):
+#     def posterior_model(self, d):
 #         n = len(d)
 #
 #         if n == 0:
@@ -560,8 +640,8 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #         theta_pmf = self.dist.rvs()
 #         # theta_pmf_m = None
 #
-#         theta = FiniteRE(self.support, theta_pmf, self.random_state)
-#         # theta_m = FiniteRE(self.support_x, theta_pmf_m, self.random_state)
+#         theta = FiniteRE(self.support, theta_pmf, self.rng)
+#         # theta_m = FiniteRE(self.support_x, theta_pmf_m, self.rng)
 #
 #         return theta
 #
