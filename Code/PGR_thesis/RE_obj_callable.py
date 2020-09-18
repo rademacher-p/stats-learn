@@ -10,7 +10,7 @@ from scipy.special import gammaln, xlogy, xlog1py, betaln
 import matplotlib.pyplot as plt
 from util.generic import check_data_shape, check_valid_pmf
 from util.math import outer_gen, diag_gen, simplex_round
-from util.plotters import simplex_grid
+from util.plot import simplex_grid
 from util.func_obj import FiniteDomainFunc
 
 
@@ -38,10 +38,10 @@ class BaseRE(multi_rv_generic):
     def rvs(self, size=(), random_state=None):
         if type(size) is int:
             size = (size,)
-        elif not size == ():
-            raise TypeError("Input 'size' must be int or ().")
-        # elif type(size) is not tuple:
-        #     raise TypeError("Input 'size' must be int or tuple.")
+        # elif not size == ():
+        #     raise TypeError("Input 'size' must be int or ().")
+        elif type(size) is not tuple:
+            raise TypeError("Input 'size' must be int or tuple.")
         random_state = self._get_random_state(random_state)
 
         return self._rvs(size, random_state)
@@ -75,6 +75,9 @@ class DiscreteRE(BaseRE):
     Base class for discrete random element objects.
     """
 
+    def pf(self, x):
+        return self.pmf(x)
+
     def pmf(self, x):
         x, set_shape = check_data_shape(x, self._data_shape)
         return self._pmf(x).reshape(set_shape)
@@ -100,6 +103,9 @@ class ContinuousRV(BaseRV):
     """
     Base class for continuous random element objects.
     """
+
+    def pf(self, x):
+        return self.pdf(x)
 
     def pdf(self, x):
         x, set_shape = check_data_shape(x, self._data_shape)
@@ -307,9 +313,12 @@ class DirichletRV(ContinuousRV):
                                               .reshape(-1, self._data_size), -1)
         return np.exp(log_pdf)
 
-    # def plot_pdf(self, n_plt, ax=None):   TODO
+    # def plot_pdf(self, x_plt, ax=None):   TODO
     #
     #     if self._data_size in (2, 3):
+    #                     if x_plt is None:
+    #                 x_plt = simplex_grid(40, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
+    #             # x_plt = simplex_grid(n_plt, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
     #         x_plt = simplex_grid(n_plt, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
     #         pdf_plt = self.pdf(x_plt)
     #         x_plt.resize(x_plt.shape[0], self._data_size)
@@ -542,7 +551,7 @@ class DirichletEmpiricalRV(DiscreteRV):
                               + gammaln(self._n + 1) - gammaln(self._alpha_0 + self._n))
 
     def _rvs(self, size=(), random_state=None):
-        # return random_state.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
+        # return rng.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
         raise NotImplementedError
 
     def pmf(self, x):
@@ -713,11 +722,11 @@ class SampsDE(BaseRE):
         return np.concatenate(out)
 
 
-s, p = ['a','b','c'], np.array([.3,.2,.5])
-p = p / p.sum()
-m = FiniteRE.gen_func(s, p)
-dd = SampsDE(10, 5, m)
-print(dd.rvs())
+# s, p = ['a','b','c'], np.array([.3,.2,.5])
+# p = p / p.sum()
+# m = FiniteRE.gen_func(s, p)
+# dd = SampsDE(10, 5, m)
+# print(dd.rvs())
 
 
 

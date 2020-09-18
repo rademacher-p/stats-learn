@@ -1,7 +1,10 @@
 """
 Loss functions.
 """
+
 import numpy as np
+
+# TODO: vectorize?
 
 
 def loss_se(y_est, y):
