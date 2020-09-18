@@ -40,10 +40,10 @@ class BaseModel(multi_rv_generic):
         return self._mode_x
 
     # @property
-    # def mode_y_x(self):     # TODO: vectorization in setters?
+    # def mode_y_x(self):
     #     return self._mode_y_x
 
-    def mode_y_x(self, x):        # TODO: avoid callable properties approach?
+    def mode_y_x(self, x):
         return vectorize_func(self._mode_y_x_single, self._data_shape_x)(x)
 
     def _mode_y_x_single(self, x):
@@ -245,10 +245,8 @@ class NormalRVModel(BaseModelRVx, BaseModelRVy):
         self.basis_y_x = basis_y_x
         self.weights = weights
 
-        # self._cov_y_x_const = np.array(cov_y_x)
         self._cov_y_x_single = lambda x: np.array(cov_y_x)
 
-        # _temp = self._cov_y_x_const.shape
         _temp = self._cov_y_x_single(model_x.rvs()).shape
         self._data_shape_y = _temp[:int(len(_temp) / 2)]
 
@@ -270,21 +268,11 @@ class NormalRVModel(BaseModelRVx, BaseModelRVy):
 
     def model_y_x(self, x):
         mean = self._mean_y_x_single(x)
-        # cov = self._cov_y_x_const
         cov = self._cov_y_x_single(x)
         return NormalRV(mean, cov)
 
-    # @BaseModelRVy.cov_y_x.setter
-    # def cov_y_x(self, cov_y_x):
-    #     self._cov_y_x = np.array(cov_y_x)
-    #     _temp = self._cov_y_x.shape
-    #     self._data_shape_y = _temp[:int(len(_temp) / 2)]
-
     def _mean_y_x_single(self, x):
         return sum(weight * func(x) for weight, func in zip(self.weights, self.basis_y_x))
-
-    # def _cov_y_x_single(self, x):
-    #     return self._cov_y_x_const
 
     _rvs = YcXModel._rvs
 

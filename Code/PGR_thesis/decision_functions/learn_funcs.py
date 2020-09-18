@@ -9,19 +9,27 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from util.generic import vectorize_func, empirical_pmf
-from loss_functions import loss_se, loss_01
+from loss_funcs import loss_se, loss_01
 from SL_obj import YcXModel
 
 # TODO: add method functionality to work with SKL, TF conventions?
 # TODO: COMPLETE property set/get check, rework!
 
 
-class BaseLearner:
-    def __init__(self):
+class BaseDecisionFunc:
+    # def __new__(cls, loss_func):
+    #     if loss_func == loss_01:
+    #         return super().__new__(BaseClassifier)
+    #     elif loss_func == loss_se:
+    #         return super().__new__(BaseRegressor)
+    #     else:
+    #         return super().__new__(cls)
+
+    def __init__(self, loss_func):
+        self.loss_func = loss_func
+
         self._data_shape_x = None
         self._data_shape_y = None
-
-        self.loss_fcn = None
 
     @property
     def data_shape_x(self):
@@ -31,10 +39,6 @@ class BaseLearner:
     def data_shape_y(self):
         return self._data_shape_y
 
-    def fit(self, d):
-        raise NotImplementedError("Method must be overwritten.")
-        pass
-
     def predict(self, x):
         return vectorize_func(self._predict_single, data_shape=self._data_shape_x)(x)
 
@@ -43,16 +47,43 @@ class BaseLearner:
         pass
 
     def evaluate(self, d):
-        loss = np.array([self._evaluate_single(d_i) for d_i in d])
+        # loss = np.array([self._evaluate_single(d_i['x'], d_i['y']) for d_i in d])
+        # loss = np.array([self._evaluate_single(x, y) for x, y in zip(d['x'], d['y'])])
+        loss = np.array([self.loss_func(h, y) for h, y in zip(self.predict(d['x']), d['y'])])
         return loss.mean()
 
-    def _evaluate_single(self, d):
-        return self.loss_fcn(self._predict_single(d['x']), d['y'])
+    # def _evaluate_single(self, x, y):
+    #     return self.loss_func(self._predict_single(x), y)
 
 
-class BayesLearner(BaseLearner):
-    def __init__(self, bayes_model):
-        super().__init__()
+class BaseClassifier(BaseDecisionFunc):
+    def __init__(self):
+        super().__init__(loss_01)
+
+
+class BaseRegressor(BaseDecisionFunc):
+    def __init__(self):
+        super().__init__(loss_se)
+
+
+class DecisionFromModel(BaseDecisionFunc):
+    def __init__(self, model, loss_func):
+        super().__init__(loss_func)
+        self.model = model
+
+        self._data_shape_x = self.model.data_shape_x
+        self._data_shape_y = self.model.data_shape_y
+
+
+class BaseLearner(BaseDecisionFunc):
+    def fit(self, d):
+        raise NotImplementedError("Method must be overwritten.")
+        pass
+
+
+class BaseBayesLearner(BaseLearner):
+    def __init__(self, bayes_model, loss_func):
+        super().__init__(loss_func)
         self.bayes_model = bayes_model
 
         self._data_shape_x = self.bayes_model.data_shape_x
@@ -72,38 +103,57 @@ class BayesLearner(BaseLearner):
 
         self.posterior, self.predictive_dist, self.posterior_model = self.bayes_model.fit(d)
 
-    def plot_param_dists(self, ax_prior=None, ax_posterior=None):    # TODO: improve or delete
-        self.prior.plot_pf(ax=ax_prior)
+    def plot_param_dist(self, ax_prior=None, ax_posterior=None):    # TODO: improve or delete
+        plt_prior = self.prior.plot_pf(ax=ax_prior)
+        ax_prior = plt_prior.axes
+        ax_posterior = ax_prior
         self.posterior.plot_pf(ax=ax_posterior)
 
-    def plot_predictive_means(self):
-        raise NotImplementedError     # TODO
+    def plot_prediction(self, x_plt, ax=None):
+        # self.predictive_dist.plot_pf(ax=ax)
+
+        # plt_data = self.posterior_model.model_x.plot_pf()
+        # ax = plt_data.axes
+        # plt_data.remove()
+
+        if ax is None:
+            _, ax = plt.subplots()
+            ax.set(xlabel='$x$', ylabel='$\hat{y}$')
+        plt_data = ax.plot(x_plt, self.predict(x_plt))
+
+        return plt_data
 
 
-class BayesClassifier(BayesLearner):
+class BayesClassifier(BaseBayesLearner):
     def __init__(self, bayes_model):
         super().__init__(bayes_model)
         self.loss_fcn = loss_01
 
+    def predict(self, x):
+        return self.posterior_model.mode_y_x(x)
+
     def _predict_single(self, x):
-        # return self.posterior_model.mode_y_x(x)
+        # return self.posterior_model._mode_y_x_single(x)
         return self.predictive_dist(x).mode    # TODO: argmax?
 
 
-class BayesEstimator(BayesLearner):
+class BayesEstimator(BaseBayesLearner):
     def __init__(self, bayes_model):
         super().__init__(bayes_model)
         self.loss_fcn = loss_se
 
+    def predict(self, x):
+        return self.posterior_model.mean_y_x(x)
+
     def _predict_single(self, x):
-        # return self.posterior_model.mean_y_x(x)
+        # return self.posterior_model._mean_y_x_single(x)
         return self.predictive_dist(x).mean        # TODO: m1?
 
 
 # class DirichletFiniteClassifier(BaseLearner):
 #     def __init__(self, alpha_0, mean_y_x):
 #         super().__init__()
-#         self.loss_fcn = loss_01
+#         self.loss_func = loss_01
 #
 #         self.alpha_0 = alpha_0
 #         self.mean_y_x = mean_y_x
@@ -134,7 +184,7 @@ class BetaEstimatorTemp(BaseLearner):
         return self.avg_y_x[i]
 
 
-# class BayesLearner(BaseLearner):
+# class BaseBayesLearner(BaseLearner):
 #     def __init__(self, supp_x, supp_y, alpha_0, mean):
 #         super().__init__()
 #
@@ -202,19 +252,19 @@ class BetaEstimatorTemp(BaseLearner):
 #     #     return cls(bayes_model.supp_x, bayes_model.supp_y, bayes_model.prior.alpha_0, bayes_model.prior.mean)
 #
 #
-# class BayesClassifier(BayesLearner):
+# class BayesClassifier(BaseBayesLearner):
 #     def __init__(self, supp_x, supp_y, alpha_0, mean):
 #         super().__init__(supp_x, supp_y, alpha_0, mean)
-#         self.loss_fcn = loss_01
+#         self.loss_func = loss_01
 #
 #     def _predict_single(self, x):
 #         return self._posterior_mean.mode_y_x(x)
 #
 #
-# class BayesEstimator(BayesLearner):
+# class BayesEstimator(BaseBayesLearner):
 #     def __init__(self, supp_x, supp_y, alpha_0, mean):
 #         super().__init__(supp_x, supp_y, alpha_0, mean)
-#         self.loss_fcn = loss_se
+#         self.loss_func = loss_se
 #
 #     def _predict_single(self, x):
 #         return self._posterior_mean.mean_y_x(x)
