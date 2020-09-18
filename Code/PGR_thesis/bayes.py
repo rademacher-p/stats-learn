@@ -11,7 +11,7 @@ import numpy as np
 
 import RE_obj
 import RE_obj_callable
-from SL_obj import YcXModel
+from SL_obj import YcXModel, NormalRVModel
 from util.generic import empirical_pmf
 from util.func_obj import FiniteDomainFunc
 from util.math import inverse, determinant, inner_prod
@@ -78,7 +78,8 @@ class NormalModelBayes(BaseBayes):
                 return lambda x: np.full(_data_shape_y, x)**i
             basis_y_x = tuple(power_func(i) for i in range(len(self.mean_theta)))
 
-        model_gen = YcXModel.norm_model
+        # model_gen = YcXModel.norm_model
+        model_gen = NormalRVModel
         model_kwargs = {'model_x': model_x, 'basis_y_x': basis_y_x, 'cov_y_x': cov_y_x, 'rng': rng_model}
         prior = RE_obj.NormalRV(self.mean_theta, self.cov_theta)
         super().__init__(model_gen, model_kwargs, prior)
@@ -117,14 +118,6 @@ class NormalModelBayes(BaseBayes):
     def predictive_dist(self, d):
         posterior = self.posterior(d)
         return self.posterior_2_predictive(posterior)
-        # def model_y_x(x):
-        #     mean_y_x = sum(weight * func(x) for weight, func in zip(posterior.mean, self.model_kwargs['basis_y_x']))
-        #     psi_x = np.array([func(x) for func in self.model_kwargs['basis_y_x']]).T
-        #     cov_y_x = self.model_kwargs['cov_y_x'] + inner_prod(psi_x.T, psi_x.T, posterior.cov)
-        #
-        #     return RE_obj.NormalRV(mean_y_x, cov_y_x)
-        #
-        # return model_y_x
 
     def predictive_2_model(self, predictive_dist):
         return YcXModel(model_x=self.model_kwargs['model_x'], model_y_x=predictive_dist)
@@ -141,6 +134,7 @@ class NormalModelBayes(BaseBayes):
         return posterior, predictive_dist, posterior_model
 
 
+#%%
 class DirichletFiniteYcXModelBayesNew(BaseBayes):
     def __init__(self, alpha_0, mean_x, mean_y_x, rng_model=None, rng_prior=None):
         model_gen = YcXModel.finite_model

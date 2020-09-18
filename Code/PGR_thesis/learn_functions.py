@@ -72,10 +72,12 @@ class BayesLearner(BaseLearner):
 
         self.posterior, self.predictive_dist, self.posterior_model = self.bayes_model.fit(d)
 
-    def plot_param_dist(self, ax_prior=None, ax_posterior=None):    # TODO: improve or delete
-        self.prior.plot_pdf(ax=ax_prior)
-        self.posterior.plot_pdf(ax=ax_posterior)
+    def plot_param_dists(self, ax_prior=None, ax_posterior=None):    # TODO: improve or delete
+        self.prior.plot_pf(ax=ax_prior)
+        self.posterior.plot_pf(ax=ax_posterior)
 
+    def plot_predictive_means(self):
+        raise NotImplementedError     # TODO
 
 
 class BayesClassifier(BayesLearner):
@@ -130,7 +132,6 @@ class BetaEstimatorTemp(BaseLearner):
     def _predict_single(self, x):
         i = floor(x * self.n_x)
         return self.avg_y_x[i]
-
 
 
 # class BayesLearner(BaseLearner):

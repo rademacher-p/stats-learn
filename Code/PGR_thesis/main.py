@@ -132,7 +132,7 @@ def learn_sim(bayes_model, learner, n_train=0, n_test=1):
 
     learner.fit(d_train)  # train learner
 
-    # learner.plot_param_dist()
+    learner.plot_param_dists()
 
     # print(theta.model_x.p)
     # print(theta.model_y_x(0).p)
