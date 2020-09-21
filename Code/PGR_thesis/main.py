@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 from RE_obj import NormalRV
 from bayes import NormalModelBayes
-from decision_functions.learn_funcs import BayesEstimator
+from decision_functions.learn_funcs import BaseBayesLearner
 
 plt.style.use('seaborn')
 
@@ -184,6 +184,7 @@ def main():
     bayes_model = NormalModelBayes(model_x=NormalRV(), basis_y_x=None, mean_theta=np.zeros(2), cov_theta=np.eye(2),
                                    cov_y_x=5, rng_model=None)
     learner = BayesEstimator(bayes_model)
+    # learner = BaseBayesLearner(bayes_model,)
 
     loss = learn_eval(bayes_model, learner, n_train=5, n_test=1)
     # loss = learn_eval_mc_bayes(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
