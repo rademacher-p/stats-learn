@@ -16,6 +16,11 @@ from SL_obj import YcXModel
 # TODO: COMPLETE property set/get check, rework!
 
 
+# FIXME FIXME: infer learner type from loss_func? use same model attribute for both optimal and bayesian learners!
+
+
+#%% Decision Functions
+
 class BaseDecisionFunc:
     # def __new__(cls, loss_func):
     #     if loss_func == loss_01:
@@ -25,8 +30,9 @@ class BaseDecisionFunc:
     #     else:
     #         return super().__new__(cls)
 
-    def __init__(self, loss_func):
-        self.loss_func = loss_func
+    def __init__(self):
+        self.model = None
+        self.loss_func = None
 
         self._data_shape_x = None
         self._data_shape_y = None
@@ -58,12 +64,20 @@ class BaseDecisionFunc:
 
 class BaseClassifier(BaseDecisionFunc):
     def __init__(self):
-        super().__init__(loss_01)
+        super().__init__()
+        self.loss_func = loss_01
+
+    def predict(self, x):
+        return self.model.mode_y_x(x)
 
 
 class BaseRegressor(BaseDecisionFunc):
     def __init__(self):
-        super().__init__(loss_se)
+        super().__init__()
+        self.loss_func = loss_se
+
+    def predict(self, x):
+        return self.model.mean_y_x(x)
 
 
 class DecisionFromModel(BaseDecisionFunc):
@@ -75,6 +89,8 @@ class DecisionFromModel(BaseDecisionFunc):
         self._data_shape_y = self.model.data_shape_y
 
 
+#%% Learning Functions
+
 class BaseLearner(BaseDecisionFunc):
     def fit(self, d):
         raise NotImplementedError("Method must be overwritten.")
@@ -82,9 +98,10 @@ class BaseLearner(BaseDecisionFunc):
 
 
 class BaseBayesLearner(BaseLearner):
-    def __init__(self, bayes_model, loss_func):
-        super().__init__(loss_func)
+    def __init__(self, bayes_model):
+        super().__init__()
         self.bayes_model = bayes_model
+        self.model = None
 
         self._data_shape_x = self.bayes_model.data_shape_x
         self._data_shape_y = self.bayes_model.data_shape_y
@@ -92,7 +109,6 @@ class BaseBayesLearner(BaseLearner):
         self.prior = self.bayes_model.prior
         self.posterior = None
         self.predictive_dist = None
-        self.posterior_model = None
 
         self.fit()
 
@@ -101,7 +117,7 @@ class BaseBayesLearner(BaseLearner):
             d = np.array([], dtype=[('x', '<f8', self._data_shape_x),
                                     ('y', '<f8', self._data_shape_y)])
 
-        self.posterior, self.predictive_dist, self.posterior_model = self.bayes_model.fit(d)
+        self.posterior, self.predictive_dist, self.model = self.bayes_model.fit(d)
 
     def plot_param_dist(self, ax_prior=None, ax_posterior=None):    # TODO: improve or delete
         plt_prior = self.prior.plot_pf(ax=ax_prior)
@@ -124,31 +140,31 @@ class BaseBayesLearner(BaseLearner):
         return plt_data
 
 
-class BayesClassifier(BaseBayesLearner):
-    def __init__(self, bayes_model):
-        super().__init__(bayes_model)
-        self.loss_fcn = loss_01
+# class BayesClassifier(BaseBayesLearner):
+#     def __init__(self, bayes_model):
+#         super().__init__(bayes_model)
+#
+#     def predict(self, x):
+#         return self.model.mode_y_x(x)
+#
+#     # def _predict_single(self, x):
+#     #     # return self.posterior_model._mode_y_x_single(x)
+#     #     return self.predictive_dist(x).mode    # TODO: argmax?
+#
+#
+# class BayesEstimator(BaseBayesLearner):
+#     def __init__(self, bayes_model):
+#         super().__init__(bayes_model)
+#
+#     def predict(self, x):
+#         return self.model.mean_y_x(x)
+#
+#     # def _predict_single(self, x):
+#     #     # return self.posterior_model._mean_y_x_single(x)
+#     #     return self.predictive_dist(x).mean        # TODO: m1?
 
-    def predict(self, x):
-        return self.posterior_model.mode_y_x(x)
 
-    def _predict_single(self, x):
-        # return self.posterior_model._mode_y_x_single(x)
-        return self.predictive_dist(x).mode    # TODO: argmax?
-
-
-class BayesEstimator(BaseBayesLearner):
-    def __init__(self, bayes_model):
-        super().__init__(bayes_model)
-        self.loss_fcn = loss_se
-
-    def predict(self, x):
-        return self.posterior_model.mean_y_x(x)
-
-    def _predict_single(self, x):
-        # return self.posterior_model._mean_y_x_single(x)
-        return self.predictive_dist(x).mean        # TODO: m1?
-
+#%%
 
 # class DirichletFiniteClassifier(BaseLearner):
 #     def __init__(self, alpha_0, mean_y_x):
