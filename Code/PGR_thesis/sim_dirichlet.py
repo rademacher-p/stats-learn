@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from main import learn_eval_mc_bayes
 
 from bayes import DirichletFiniteYcXModelBayesNew
-from decision_functions.learn_funcs import BayesClassifier
+from decision_functions.learn_funcs import ModelClassifier
 
 from util.func_obj import FiniteDomainFunc
 
@@ -67,10 +67,11 @@ for i, (n_train, alpha_0) in enumerate(itertools.product(n_train_plot, alpha_0_p
     # bayes_model = DirichletFiniteYcXModelBayes(supp_x_s, supp_y_s, alpha_0, mean, rng_prior=random.default_rng())
     bayes_model = DirichletFiniteYcXModelBayesNew(alpha_0, mean_x, mean_y_x, rng_prior=random.default_rng())
 
-    learner = BayesClassifier(bayes_model)
+    learner = ModelClassifier(bayes_model)
     # learner = BayesEstimator(bayes_model)
 
-    risk_plot[np.unravel_index([i], risk_plot.shape)] = learn_eval_mc_bayes(bayes_model, learner, n_train, n_mc=2000, verbose=False)
+    risk_plot[np.unravel_index([i], risk_plot.shape)] = learn_eval_mc_bayes(learner, bayes_model, n_train, n_mc=2000,
+                                                                            verbose=False)
 
 fig, ax = plt.subplots(num='risk', clear=True)
 ax.plot(n_train_plot, risk_plot)

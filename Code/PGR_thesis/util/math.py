@@ -1,6 +1,20 @@
 import functools
 import itertools
+
 import numpy as np
+
+from util.generic import check_data_shape
+
+
+# def mean(x, data_shape):
+#     x, set_shape = check_data_shape(x, data_shape)
+#     return x.reshape(-1, *data_shape).mean(0)
+#
+#
+# def cov(x, data_shape):
+#     x, set_shape = check_data_shape(x, data_shape)
+#     data_size = int(np.prod(data_shape))
+#     np.cov(x.reshape(-1, data_size), rowvar=False).reshape(2 * data_shape)
 
 
 def outer_gen(*args):

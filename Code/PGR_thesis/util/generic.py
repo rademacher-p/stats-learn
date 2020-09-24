@@ -1,4 +1,7 @@
 from numbers import Integral
+from collections.abc import Sequence
+from functools import wraps
+
 import numpy as np
 
 
@@ -116,6 +119,17 @@ def vectorize_func_dec(data_shape):     # TODO: use?
 
         return func_vec
     return wrapper
+
+
+def vectorize_first_arg(func):
+    @wraps(func)
+    def func_wrap(*args, **kwargs):
+        if isinstance(args[0], Sequence):
+            return list(func(arg, *args[1:], **kwargs) for arg in args[0])
+        else:
+            return func(*args, **kwargs)
+
+    return func_wrap
 
 
 def empirical_pmf(d, supp, data_shape):

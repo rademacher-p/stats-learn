@@ -6,20 +6,19 @@ Supervised Learning base classes.
 
 import numpy as np
 from scipy import stats
-from scipy.stats._multivariate import multi_rv_generic
 
-from RE_obj import NormalRV
-from RE_obj_callable import BaseRE, BaseRV, FiniteRE, DirichletRV, BetaRV       # TODO: note - CALLABLE!!!!
-from util.generic import vectorize_func, check_data_shape
+from RE_obj import BaseRE, BaseRV, NormalRV
+from RE_obj_callable import FiniteRE, DirichletRV, BetaRV       # TODO: note - CALLABLE!!!!
+from util.generic import check_rng, vectorize_func, check_data_shape
 
 
-class BaseModel(multi_rv_generic):
+class BaseModel:
     """
     Base class for supervised learning data models.
     """
 
     def __init__(self, rng=None):
-        super().__init__(rng)
+        self.rng = check_rng(rng)
 
         self._data_shape_x = None
         self._data_shape_y = None
@@ -52,7 +51,7 @@ class BaseModel(multi_rv_generic):
 
     rvs = BaseRE.rvs
 
-    def _rvs(self, size=(), rng=None):
+    def _rvs(self, size=()):
         raise NotImplementedError("Method must be overwritten.")
         pass
 
@@ -150,9 +149,9 @@ class YcXModel(BaseModel):
         # self._mode_y_x = vectorize_func(lambda x: self._model_y_x(x).mode, self._data_shape_x)
         self._mode_y_x_single = lambda x: self._model_y_x(x).mode
 
-    def _rvs(self, size=(), rng=None):
-        d_x = np.array(self.model_x.rvs(size, rng))
-        d_y = np.array([self.model_y_x(x).rvs((), rng)
+    def _rvs(self, size=()):
+        d_x = np.array(self.model_x.rvs(size, self.rng))
+        d_y = np.array([self.model_y_x(x).rvs((), self.rng)
                         for x in d_x.reshape((-1,) + self._data_shape_x)]).reshape(size + self.data_shape_y)
 
         # d = np.array(list(zip(d_y.reshape((-1,) + self.data_shape_y), d_x.reshape((-1,) + self.data_shape_x))),

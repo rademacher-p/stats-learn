@@ -22,7 +22,7 @@ class BaseRE:
     """
 
     def __init__(self, rng=None):
-        self.rng = check_rng(rng)
+        self.rng = check_rng(rng)       # TODO: want scipy subclass for seed control functionality?
 
         self._data_shape = None
         self._mode = None
@@ -54,11 +54,13 @@ class BaseRE:
         elif type(size) is not tuple:
             raise TypeError("Input 'size' must be int or tuple.")
 
-        rng = self.rng if rng is None else check_rng(rng)
+        if rng is not None:
+            self.rng = check_rng(rng)
+        # rng = self.rng if rng is None else check_rng(rng)
 
-        return self._rvs(size, rng)
+        return self._rvs(size)
 
-    def _rvs(self, size=None, rng=None):
+    def _rvs(self, size=None):
         raise NotImplementedError("Method must be overwritten.")
         pass
 
@@ -116,7 +118,7 @@ class DeterministicRE(BaseRE):
 
         self._mode = self._val
 
-    def _rvs(self, size=(), rng=None):
+    def _rvs(self, size=()):
         return np.broadcast_to(self._val, size + self._data_shape)
 
     # def pf(self, x):
@@ -202,8 +204,8 @@ class FiniteRE(BaseRE):
 
         self._mode = self._supp_flat[np.argmax(self._p_flat)].reshape(self._data_shape)
 
-    def _rvs(self, size=(), rng=None):
-        i = rng.choice(self._p.size, size, p=self._p_flat)
+    def _rvs(self, size=()):
+        i = self.rng.choice(self._p.size, size, p=self._p_flat)
         return self._supp_flat[i].reshape(size + self._data_shape)
 
     def _pf_single(self, x):
@@ -347,8 +349,8 @@ class DirichletRV(BaseRV):
 
         self._log_pf_coef = gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
 
-    def _rvs(self, size=(), rng=None):
-        return rng.dirichlet(self._alpha_0 * self._mean.flatten(), size).reshape(size + self._data_shape)
+    def _rvs(self, size=()):
+        return self.rng.dirichlet(self._alpha_0 * self._mean.flatten(), size).reshape(size + self._data_shape)
 
     def pf(self, x):
         x, set_shape = _dirichlet_check_input(x, self._alpha_0, self._mean)
@@ -468,8 +470,8 @@ class EmpiricalRV(BaseRV):
 
         self._log_pf_coef = gammaln(self._n + 1)
 
-    def _rvs(self, size=(), rng=None):
-        return rng.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
+    def _rvs(self, size=()):
+        return self.rng.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
 
     def pf(self, x):
         x, set_shape = _empirical_check_input(x, self._n, self._mean)
@@ -581,7 +583,7 @@ class DirichletEmpiricalRV(BaseRV):
         self._log_pf_coef = (gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
                              + gammaln(self._n + 1) - gammaln(self._alpha_0 + self._n))
 
-    def _rvs(self, size=(), rng=None):
+    def _rvs(self, size=()):
         # return rng.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
         raise NotImplementedError
 
@@ -694,8 +696,8 @@ class BetaRV(BaseRV):
         self._mean = self._a / (self._a + self._b)
         self._cov = self._a * self._b / (self._a + self._b)**2 / (self._a + self._b + 1)
 
-    def _rvs(self, size=(), rng=None):
-        return rng.beta(self._a, self._b, size)
+    def _rvs(self, size=()):
+        return self.rng.beta(self._a, self._b, size)
 
     def pf(self, x):
         log_pf = xlog1py(self._b - 1.0, -x) + xlogy(self._a - 1.0, x) - betaln(self._a, self._b)
@@ -755,11 +757,11 @@ class NormalRV(BaseRV):
     def mode(self):
         return self.mean
 
-    def _rvs(self, size=(), rng=None):
+    def _rvs(self, size=()):
         if self._data_shape == ():
-            return rng.normal(self._mean, np.sqrt(self._cov), size).reshape(size + self._data_shape)
+            return self.rng.normal(self._mean, np.sqrt(self._cov), size).reshape(size + self._data_shape)
         else:
-            return rng.multivariate_normal(self._mean, self._cov, size).reshape(size + self._data_shape)
+            return self.rng.multivariate_normal(self._mean, self._cov, size).reshape(size + self._data_shape)
 
     def pf(self, x):
         x, set_shape = check_data_shape(x, self._data_shape)
