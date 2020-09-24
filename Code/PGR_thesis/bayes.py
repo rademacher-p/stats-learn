@@ -12,7 +12,7 @@ import numpy as np
 import RE_obj
 import RE_obj_callable
 from SL_obj import YcXModel, NormalRVModel
-from util.generic import empirical_pmf
+from util.generic import empirical_pmf, check_rng
 from util.func_obj import FiniteDomainFunc
 from util.math import inverse, determinant, inner_prod
 
@@ -23,7 +23,7 @@ from util.math import inverse, determinant, inner_prod
 
 
 class BaseBayes:
-    def __init__(self, model_gen, model_kwargs=None, prior=None):
+    def __init__(self, model_gen, model_kwargs=None, prior=None, rng=None):
         self._data_shape_x = None
         self._data_shape_y = None
 
@@ -35,6 +35,8 @@ class BaseBayes:
         self.model_gen = functools.partial(model_gen, **model_kwargs)
         self.prior = prior
 
+        self.rng = check_rng(rng)
+
     @property
     def data_shape_x(self):
         return self._data_shape_x
@@ -43,8 +45,10 @@ class BaseBayes:
     def data_shape_y(self):
         return self._data_shape_y
 
-    def random_model(self):     # defaults to deterministic bayes_model!?
-        return self.model_gen()
+    def random_model(self, rng=None, **kwargs):     # defaults to deterministic bayes_model!?
+        if rng is not None:
+            self.rng = check_rng(rng)
+        return self.model_gen(**kwargs)     # FIXME
 
     # def posterior_model(self, d):  # TODO: generalize method for base classes, full posterior object?
     #     raise NotImplementedError
@@ -53,14 +57,14 @@ class BaseBayes:
         raise NotImplementedError
 
 
-class BetaModelBayes(BaseBayes):
-    def __init__(self, prior=None, rng_model=None):     # deterministic
-        model_gen = YcXModel.beta_model
-        model_kwargs = {'a': .9, 'b': .9, 'c': 5, 'rng': rng_model}
-        super().__init__(model_gen, model_kwargs, prior)
-
-        self._data_shape_x = ()
-        self._data_shape_y = ()
+# class BetaModelBayes(BaseBayes):
+#     def __init__(self, prior=None, rng_model=None):     # deterministic
+#         model_gen = YcXModel.beta_model
+#         model_kwargs = {'a': .9, 'b': .9, 'c': 5, 'rng': rng_model}
+#         super().__init__(model_gen, model_kwargs, prior)
+#
+#         self._data_shape_x = ()
+#         self._data_shape_y = ()
 
 
 class NormalModelBayes(BaseBayes):
@@ -85,8 +89,9 @@ class NormalModelBayes(BaseBayes):
         self._data_shape_x = model_x.data_shape
         self._data_shape_y = _data_shape_y
 
-    def random_model(self):
-        theta = self.prior.rvs()
+    def random_model(self, rng=None):
+        theta = self.prior.rvs(rng=rng)
+        # return super().model_gen(weights=theta)   # FIXME
         return self.model_gen(weights=theta)
 
     def posterior(self, d):
@@ -125,11 +130,11 @@ class NormalModelBayes(BaseBayes):
         return self.predictive_2_model(predictive_dist)
         # return YcXModel(self.model_kwargs['model_x'], self.predictive_dist(d))
 
-    def fit(self, d):       # TODO: option for number of outputs?
+    def fit(self, d):
         posterior = self.posterior(d)
         predictive_dist = self.posterior_2_predictive(posterior)
         posterior_model = self.predictive_2_model(predictive_dist)
-        return posterior, predictive_dist, posterior_model
+        return posterior, posterior_model
 
 
 #%%

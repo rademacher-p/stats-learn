@@ -1,10 +1,10 @@
 """
 Main.
-
-:-)
 """
 
 import itertools
+from collections.abc import Sequence
+
 import numpy as np
 from numpy import random
 import matplotlib.pyplot as plt
@@ -13,11 +13,14 @@ import matplotlib.pyplot as plt
 # from scipy._lib._util import check_random_state
 # from mpl_toolkits.mplot3d import Axes3D
 
+from util.generic import vectorize_first_arg
 from RE_obj import NormalRV
+from SL_obj import NormalRVModel
 from bayes import NormalModelBayes
-from decision_functions.learn_funcs import BaseBayesLearner
+from decision_functions.learn_funcs import BayesPredictor, BayesClassifier, BayesRegressor, \
+    ModelPredictor, ModelClassifier, ModelRegressor
 
-plt.style.use('seaborn')
+# plt.style.use('seaborn')
 
 rng = random.default_rng()
 
@@ -119,32 +122,33 @@ supp_y_s = np.array(list(itertools.product(supp_y.reshape((-1,) + data_shape_y))
 
 #%% Sim
 
-def learn_eval(model, learner, n_train=0, n_test=1):
-    d = model.rvs(n_train + n_test)  # generate train/test data
-    d_train, d_test = np.split(d, [n_train])
-
-    learner.fit(d_train)  # train learner
-
-    learner.plot_param_dist()
-    x_plt = np.linspace(-3, 3, 101)
-    learner.plot_prediction(x_plt)
-
-    return learner.evaluate(d_test)  # make decision and assess
-
-
-def learn_eval_mc(model, learner, n_train=0, n_test=1, n_mc=1, verbose=False):
-    loss_mc = np.empty(n_mc)
-    for i_mc in range(n_mc):
-        if verbose:
-            if i_mc % 100 == 0:
-                print(f"Iteration {i_mc}/{n_mc}", end='\r')
-
-        loss_mc[i_mc] = learn_eval(model, learner, n_train, n_test)
-
-    return loss_mc.mean()
+# @vectorize_first_arg
+# def learn_eval(learner, model, n_train=0, n_test=1, return_learner=False):
+#     d = model.rvs(n_train + n_test)  # generate train/test data
+#     d_train, d_test = np.split(d, [n_train])
+#
+#     learner.fit(d_train)  # train learner
+#     loss = learner.evaluate(d_test)      # make decision and assess
+#
+#     if return_learner:
+#         return loss, learner
+#     else:
+#         return loss
 
 
-def learn_eval_mc_bayes(bayes_model, learner, n_train=0, n_test=1, n_mc=1, verbose=False):
+# def learn_eval_mc(learner, model, n_train=0, n_test=1, n_mc=1, verbose=False):
+#     loss_mc = np.empty(n_mc)
+#     for i_mc in range(n_mc):
+#         if verbose:
+#             if i_mc % 100 == 0:
+#                 print(f"Iteration {i_mc}/{n_mc}", end='\r')
+#
+#         loss_mc[i_mc] = learn_eval(learner, model, n_train, n_test)
+#
+#     return loss_mc.mean()
+
+
+def learn_eval_mc_bayes(learner, bayes_model, n_train=0, n_test=1, n_mc=1, verbose=False):
     loss_mc = np.empty(n_mc)
     for i_mc in range(n_mc):
         if verbose:
@@ -152,7 +156,7 @@ def learn_eval_mc_bayes(bayes_model, learner, n_train=0, n_test=1, n_mc=1, verbo
                 print(f"Iteration {i_mc}/{n_mc}", end='\r')
 
         model = bayes_model.random_model()  # randomize model using bayes_model
-        loss_mc[i_mc] = learn_eval(model, learner, n_train, n_test)
+        loss_mc[i_mc] = learn_eval(learner, model, n_train, n_test)
 
     return loss_mc.mean()
 
@@ -174,21 +178,43 @@ def main():
     #                                               rng_model=random.default_rng(6),
     #                                               rng_prior=random.default_rng(5))
     #
-    # learner = BayesClassifier(bayes_model)
+    # learner = ModelClassifier(bayes_model)
     #
     # loss = learn_eval_mc_bayes(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
 
     # bayes_model = BetaModelBayes()
     # learner = BetaEstimatorTemp(n_x=10)
 
-    bayes_model = NormalModelBayes(model_x=NormalRV(), basis_y_x=None, mean_theta=np.zeros(2), cov_theta=np.eye(2),
-                                   cov_y_x=5, rng_model=None)
-    learner = BayesEstimator(bayes_model)
-    # learner = BaseBayesLearner(bayes_model,)
+    model = NormalRVModel(model_x=NormalRV(), basis_y_x=(lambda x: 1., lambda x: x), weights=(1., 1.),
+                          cov_y_x=1., rng=None)
 
-    loss = learn_eval(bayes_model, learner, n_train=5, n_test=1)
+    bayes_model = NormalModelBayes(model_x=NormalRV(), basis_y_x=(lambda x: 1., lambda x: x),
+                                   mean_theta=np.zeros(2), cov_theta=np.eye(2), cov_y_x=1, rng_model=None)
+
+    learners = [ModelRegressor(model, name='opt'),
+                BayesRegressor(bayes_model, name='learn')]
+    # learners = learners[1]
+
+    # losses, learners = learn_eval(learners, model, n_train=10, n_test=1)
+    # plt_data = plot_predictions(learners, np.linspace(-3, 3, 101))
+
+    learn_out = learn_eval(learners, model, n_train=10, n_test=1, return_learner=False)
+    losses = learn_out
+    # try:
+    #     losses, learners = list(zip(*learn_out))
+    # except TypeError:
+    #     losses, learners = learn_out
+
+    _, ax = plt.subplots()
+    plt_data = ModelPredictor.plot_predictions(learners, np.linspace(-3, 3, 101), ax=ax)
+    ax.legend()
+
+    # if isinstance(learner, BayesPredictor):
+    #     learner.plot_param_dist()
+
     # loss = learn_eval_mc_bayes(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
-    print(loss)
+
+    print(losses)
 
 
 if __name__ == '__main__':

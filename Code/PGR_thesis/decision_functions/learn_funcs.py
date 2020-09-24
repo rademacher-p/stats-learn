@@ -8,9 +8,10 @@ from math import floor
 import numpy as np
 import matplotlib.pyplot as plt
 
-from util.generic import vectorize_func, empirical_pmf
+import util
+from util.generic import vectorize_func, empirical_pmf, vectorize_first_arg, check_data_shape
 from loss_funcs import loss_se, loss_01
-from SL_obj import YcXModel
+from SL_obj import BaseModel, BaseModelRVy, YcXModel
 
 # TODO: add method functionality to work with SKL, TF conventions?
 # TODO: COMPLETE property set/get check, rework!
@@ -19,37 +20,50 @@ from SL_obj import YcXModel
 # FIXME FIXME: infer learner type from loss_func? use same model attribute for both optimal and bayesian learners!
 
 
-#%% Decision Functions
+#%%
+class ClassifierMixin:
+    model: BaseModel
 
-class BaseDecisionFunc:
-    # def __new__(cls, loss_func):
-    #     if loss_func == loss_01:
-    #         return super().__new__(BaseClassifier)
-    #     elif loss_func == loss_se:
-    #         return super().__new__(BaseRegressor)
-    #     else:
-    #         return super().__new__(cls)
+    def predict(self, x):
+        return self.model.mode_y_x(x)   # TODO: argmax?
 
-    def __init__(self):
-        self.model = None
-        self.loss_func = None
 
-        self._data_shape_x = None
-        self._data_shape_y = None
+class RegressorMixin:
+    model: BaseModelRVy
+
+    def predict(self, x):
+        return self.model.mean_y_x(x)   # TODO: m1?
+
+
+#%%
+class ModelPredictor:
+    def __init__(self, loss_func, model, name=None):
+        self.loss_func = loss_func
+        self.model = model
+
+        if name is None:
+            self.name = 'model'
+        elif isinstance(name, str):
+            self.name = name
+        else:
+            raise TypeError
 
     @property
     def data_shape_x(self):
-        return self._data_shape_x
+        return self.model.data_shape_x
 
     @property
     def data_shape_y(self):
-        return self._data_shape_y
+        return self.model.data_shape_y
+
+    def fit(self, d):
+        pass
 
     def predict(self, x):
-        return vectorize_func(self._predict_single, data_shape=self._data_shape_x)(x)
+        return vectorize_func(self._predict_single, data_shape=self.data_shape_x)(x)
 
     def _predict_single(self, x):
-        raise NotImplementedError("Method must be overwritten.")
+        raise NotImplementedError("Method must be overwritten.")    # TODO: numeric approx with loss and predictive!?
         pass
 
     def evaluate(self, d):
@@ -61,71 +75,7 @@ class BaseDecisionFunc:
     # def _evaluate_single(self, x, y):
     #     return self.loss_func(self._predict_single(x), y)
 
-
-class BaseClassifier(BaseDecisionFunc):
-    def __init__(self):
-        super().__init__()
-        self.loss_func = loss_01
-
-    def predict(self, x):
-        return self.model.mode_y_x(x)
-
-
-class BaseRegressor(BaseDecisionFunc):
-    def __init__(self):
-        super().__init__()
-        self.loss_func = loss_se
-
-    def predict(self, x):
-        return self.model.mean_y_x(x)
-
-
-class DecisionFromModel(BaseDecisionFunc):
-    def __init__(self, model, loss_func):
-        super().__init__(loss_func)
-        self.model = model
-
-        self._data_shape_x = self.model.data_shape_x
-        self._data_shape_y = self.model.data_shape_y
-
-
-#%% Learning Functions
-
-class BaseLearner(BaseDecisionFunc):
-    def fit(self, d):
-        raise NotImplementedError("Method must be overwritten.")
-        pass
-
-
-class BaseBayesLearner(BaseLearner):
-    def __init__(self, bayes_model):
-        super().__init__()
-        self.bayes_model = bayes_model
-        self.model = None
-
-        self._data_shape_x = self.bayes_model.data_shape_x
-        self._data_shape_y = self.bayes_model.data_shape_y
-
-        self.prior = self.bayes_model.prior
-        self.posterior = None
-        self.predictive_dist = None
-
-        self.fit()
-
-    def fit(self, d=None):
-        if d is None:
-            d = np.array([], dtype=[('x', '<f8', self._data_shape_x),
-                                    ('y', '<f8', self._data_shape_y)])
-
-        self.posterior, self.predictive_dist, self.model = self.bayes_model.fit(d)
-
-    def plot_param_dist(self, ax_prior=None, ax_posterior=None):    # TODO: improve or delete
-        plt_prior = self.prior.plot_pf(ax=ax_prior)
-        ax_prior = plt_prior.axes
-        ax_posterior = ax_prior
-        self.posterior.plot_pf(ax=ax_posterior)
-
-    def plot_prediction(self, x_plt, ax=None):
+    def plot_prediction(self, x, ax=None):
         # self.predictive_dist.plot_pf(ax=ax)
 
         # plt_data = self.posterior_model.model_x.plot_pf()
@@ -135,33 +85,127 @@ class BaseBayesLearner(BaseLearner):
         if ax is None:
             _, ax = plt.subplots()
             ax.set(xlabel='$x$', ylabel='$\hat{y}$')
-        plt_data = ax.plot(x_plt, self.predict(x_plt))
+
+        plt_data = ax.plot(x, self.predict(x), label=self.name)
+        ax.grid(True)
 
         return plt_data
 
+    @classmethod
+    def plot_predictions(cls, predictors, x, ax=None):
+        if ax is None:
+            _, ax = plt.subplots()
 
-# class BayesClassifier(BaseBayesLearner):
-#     def __init__(self, bayes_model):
-#         super().__init__(bayes_model)
-#
-#     def predict(self, x):
-#         return self.model.mode_y_x(x)
-#
-#     # def _predict_single(self, x):
-#     #     # return self.posterior_model._mode_y_x_single(x)
-#     #     return self.predictive_dist(x).mode    # TODO: argmax?
-#
-#
-# class BayesEstimator(BaseBayesLearner):
-#     def __init__(self, bayes_model):
-#         super().__init__(bayes_model)
-#
-#     def predict(self, x):
-#         return self.model.mean_y_x(x)
-#
-#     # def _predict_single(self, x):
-#     #     # return self.posterior_model._mean_y_x_single(x)
-#     #     return self.predictive_dist(x).mean        # TODO: m1?
+        plt_data = []
+        for predictor in predictors:
+            plt_data_ = predictor.plot_prediction(x, ax)
+            plt_data.append(plt_data_[0])
+        return plt_data
+
+
+class ModelClassifier(ClassifierMixin, ModelPredictor):
+    def __init__(self, model, name=None):
+        super().__init__(loss_01, model, name)
+
+
+class ModelRegressor(RegressorMixin, ModelPredictor):
+    def __init__(self, model, name=None):
+        super().__init__(loss_se, model, name)
+
+
+#%% Learning Functions
+
+class BayesPredictor(ModelPredictor):
+    def __init__(self, loss_func, bayes_model, name=None):
+        super().__init__(loss_func, model=None, name=name)
+
+        self.bayes_model = bayes_model
+
+        self.prior = self.bayes_model.prior
+        self.posterior = None
+
+        self.fit()
+
+    @property
+    def data_shape_x(self):
+        return self.bayes_model.data_shape_x
+
+    @property
+    def data_shape_y(self):
+        return self.bayes_model.data_shape_y
+
+    def fit(self, d=None):
+        if d is None:
+            d = np.array([], dtype=[('x', '<f8', self.data_shape_x),
+                                    ('y', '<f8', self.data_shape_y)])
+
+        self.posterior, self.model = self.bayes_model.fit(d)
+
+    def plot_param_dist(self, ax_prior=None, ax_posterior=None):    # TODO: improve or delete
+        plt_prior = self.prior.plot_pf(ax=ax_prior)
+        ax_prior = plt_prior.axes
+        ax_posterior = ax_prior
+        self.posterior.plot_pf(ax=ax_posterior)
+
+    def model_eval(self, model, n_train=0, n_test=1, n_mc=1, rng=None):
+        loss = np.empty(n_mc)
+        for i_mc in range(n_mc):
+            d = model.rvs(n_train + n_test, rng)  # generate train/test data
+            d_train, d_test = np.split(d, [n_train])
+
+            self.fit(d_train)  # train learner
+            loss[i_mc] = self.evaluate(d_test)  # make decision and assess
+
+        return loss.squeeze()
+
+    def predict_stats(self, model, x, do_cov=False, do_plot=False, ax=None, n_train=0, n_test=1, n_mc=1):
+        losses = np.empty(n_mc)
+        _y = []
+        for i_mc in range(n_mc):
+            losses[i_mc] = self.model_eval(model, n_train, n_test)
+            _y.append(self.predict(x))
+        y = np.array(_y)
+
+        # Compute mean and variance
+        y_mean = y.mean(0)
+        out = (y_mean,)
+        if do_cov:
+            n_dim_y = len(self.data_shape_y)
+            set_shape = y_mean.shape[:-n_dim_y]
+
+            y_del = y - y_mean
+            y_1 = y_del.reshape(n_mc, *set_shape, *self.data_shape_y, *(1 for _ in range(n_dim_y)))
+            y_2 = y_del.reshape(n_mc, *set_shape, *(1 for _ in range(n_dim_y)), *self.data_shape_y)
+            y_cov = (y_1 * y_2).mean(0).reshape(*set_shape, *2*self.data_shape_y)       # biased estimate
+            out += (y_cov,)
+
+        if do_plot:
+            if ax is None:
+                _, ax = plt.subplots()
+                ax.set(xlabel='$x$', ylabel='$\hat{y}$')
+            if do_cov:
+                plt_data = ax.errorbar(x, y_mean, yerr=np.sqrt(y_cov))
+            else:
+                plt_data = ax.plot(x, y_mean)
+            out += (plt_data,)
+
+        return out
+
+    # # FIXME
+    # def predict_whatev(self, model, x, do_std=False, ax=None, n_train=0, n_test=1, n_mc=1):
+    #     eval_out = self.model_eval(model, n_train, n_test, return_learner=True)
+    #     losses, trained_learners = zip(*eval_out)
+    #     self.predict_stats(trained_learners, x, do_std, do_plot=True, ax=ax)
+
+
+class BayesClassifier(ClassifierMixin, BayesPredictor):
+    def __init__(self, bayes_model, name=None):
+        super().__init__(loss_01, bayes_model, name)
+
+
+class BayesRegressor(RegressorMixin, BayesPredictor):
+    def __init__(self, bayes_model, name=None):
+        super().__init__(loss_se, bayes_model, name)
 
 
 #%%
@@ -181,14 +225,14 @@ class BaseBayesLearner(BaseLearner):
 #         pass
 
 
-class BetaEstimatorTemp(BaseLearner):
+class BetaEstimatorTemp(BayesPredictor):
     def __init__(self, n_x=10):
         super().__init__()
         self.loss_fcn = loss_se
         self.n_x = n_x
         self.avg_y_x = np.zeros(n_x)
 
-    def fit(self, d):
+    def fit(self, d=None):
         delta = 1 / self.n_x
         for i in range(self.n_x):
             flag_match = np.logical_and(d['x'] >= i * delta, d['x'] < (i + 1) * delta)
@@ -200,7 +244,7 @@ class BetaEstimatorTemp(BaseLearner):
         return self.avg_y_x[i]
 
 
-# class BaseBayesLearner(BaseLearner):
+# class BayesPredictor(BaseLearner):
 #     def __init__(self, supp_x, supp_y, alpha_0, mean):
 #         super().__init__()
 #
@@ -268,7 +312,7 @@ class BetaEstimatorTemp(BaseLearner):
 #     #     return cls(bayes_model.supp_x, bayes_model.supp_y, bayes_model.prior.alpha_0, bayes_model.prior.mean)
 #
 #
-# class BayesClassifier(BaseBayesLearner):
+# class ModelClassifier(BayesPredictor):
 #     def __init__(self, supp_x, supp_y, alpha_0, mean):
 #         super().__init__(supp_x, supp_y, alpha_0, mean)
 #         self.loss_func = loss_01
@@ -277,7 +321,7 @@ class BetaEstimatorTemp(BaseLearner):
 #         return self._posterior_mean.mode_y_x(x)
 #
 #
-# class BayesEstimator(BaseBayesLearner):
+# class BayesEstimator(BayesPredictor):
 #     def __init__(self, supp_x, supp_y, alpha_0, mean):
 #         super().__init__(supp_x, supp_y, alpha_0, mean)
 #         self.loss_func = loss_se
@@ -285,3 +329,10 @@ class BetaEstimatorTemp(BaseLearner):
 #     def _predict_single(self, x):
 #         return self._posterior_mean.mean_y_x(x)
 
+
+def main():
+    pass
+
+
+if __name__ == '__main__':
+    main()
