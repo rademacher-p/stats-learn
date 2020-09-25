@@ -1784,7 +1784,7 @@ Evaluation of the excess risk for an estimator based on the Dirichlet prior will
 \begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
 \quad \equiv \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm,\uppsim,\uppsic | \upthetam,\upthetac} \Big[ \Delta(y; \xrm;\uppsim,\uppsic,\upthetac) \Delta(y'; \xrm;\uppsim,\uppsic,\upthetac) \Big] \nonumber \\
-\quad = \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm,\uppsim | \upthetam}\Big[ \mathcal{E}(y,y' ; \xrm,\uppsim,\upthetac) \Big] \nonumber \\
+\quad = \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \mathcal{E}(y,y' ; \xrm,\upthetam,\upthetac) \nonumber \\
 \quad = \Erm_{\xrm | \upthetam}\left[ \Sigma_{\yrm | \xrm,\upthetac} \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \right] \right] \nonumber \\
 \qquad \qquad + \Erm_{\xrm | \upthetam}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right)^2 \right] \right] \nonumber \;,
 %\quad = \Erm_{\xrm | \uptheta}\left[ \Sigma_{\yrm | \xrm,\uptheta} \Erm_{\uppsim(\xrm) | \uptheta}\left[ \frac{\alpha_0^{-2} \uppsim(\xrm)}{\big( \Prm_{\xrm}(\xrm) + \alpha_0^{-1} \uppsim(\xrm) \big)^2} \right] \right] \nonumber \\
@@ -1792,6 +1792,7 @@ Evaluation of the excess risk for an estimator based on the Dirichlet prior will
 \end{IEEEeqnarray}
 where the function $\mathcal{E}$ is defined in \eqref{eq:predictive_del_sq}. 
 
+\todolo{note use of new model estimation formulas!}
 \todomid{use weight notation from conf paper? add theta dependency to lambda}
 
 The excess conditional risk can thus be represented as the conditional expectation (with respect to $\Prm_{\xrm | \uptheta} = \upthetam$) of a sum of two functions of $\xrm$. The first function measures the additional variance beyond that of the clairvoyant estimator (i.e. the clairvoyant squared-error); like the clairvoyant risk, it depends on $\Sigma_{\yrm | \xrm,\upthetac}$, the conditional variance of the clairvoyant estimate for a given observation of $\xrm$. The second function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. This term alone is influenced by the data-independent Bayes predictive distribution $\Prm_{\yrm | \xrm} = \alphac(\xrm)$.

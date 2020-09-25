@@ -6,7 +6,7 @@ import itertools
 from collections.abc import Sequence
 
 import numpy as np
-from numpy import random
+from numpy.random import default_rng
 import matplotlib.pyplot as plt
 
 # from scipy.stats._multivariate import multi_rv_generic
@@ -21,9 +21,6 @@ from decision_functions.learn_funcs import BayesPredictor, BayesClassifier, Baye
     ModelPredictor, ModelClassifier, ModelRegressor
 
 # plt.style.use('seaborn')
-
-rng = random.default_rng()
-
 
 
 #%% Continuous sets
@@ -172,11 +169,11 @@ def main():
     #                                             FiniteDomainFunc(supp_y, np.ones(supp_y_s.shape) / supp_y_s.size)))
     #
     # # bayes_model = DirichletFiniteYcXModelBayes(supp_x_s, supp_y_s, alpha_0, mean,
-    # #                                            rng_model=random.default_rng(6),
-    # #                                            rng_prior=random.default_rng(5))
+    # #                                            rng_model=default_rng(6),
+    # #                                            rng_prior=default_rng(5))
     # bayes_model = DirichletFiniteYcXModelBayesNew(alpha_0, mean_x, mean_y_x,
-    #                                               rng_model=random.default_rng(6),
-    #                                               rng_prior=random.default_rng(5))
+    #                                               rng_model=default_rng(6),
+    #                                               rng_prior=default_rng(5))
     #
     # learner = ModelClassifier(bayes_model)
     #
@@ -185,36 +182,63 @@ def main():
     # bayes_model = BetaModelBayes()
     # learner = BetaEstimatorTemp(n_x=10)
 
-    model = NormalRVModel(model_x=NormalRV(), basis_y_x=(lambda x: 1., lambda x: x), weights=(1., 1.),
-                          cov_y_x=1., rng=None)
+    # model_x = NormalRV(mean=0., cov=1.)
+    # x_plt = np.linspace(-3, 3, 101)
 
-    bayes_model = NormalModelBayes(model_x=NormalRV(), basis_y_x=(lambda x: 1., lambda x: x),
-                                   mean_theta=np.zeros(2), cov_theta=np.eye(2), cov_y_x=1, rng_model=None)
+    model_x = NormalRV(mean=np.zeros(2), cov=np.eye(2))
+    x1_plot = np.linspace(-3, 3, 101, endpoint=True)
+    x2_plot = np.linspace(-3, 3, 81, endpoint=True)
+    x_plt = np.stack(np.meshgrid(x1_plot, x2_plot), axis=-1)
 
-    learners = [ModelRegressor(model, name='opt'),
-                BayesRegressor(bayes_model, name='learn')]
-    # learners = learners[1]
+    model = NormalRVModel(model_x=model_x, basis_y_x=None,      # (lambda x: 1., lambda x: x)
+                          weights=np.ones(2), cov_y_x=1., rng=None)
+
+    # bayes_models = [NormalModelBayes(model_x=NormalRV(), basis_y_x=(lambda x: 1., lambda x: x), cov_y_x=1,
+    #                                  rng_model=None, mean_prior=np.zeros(2), cov_prior=np.eye(2)),
+    #                 NormalModelBayes(model_x=NormalRV(), basis_y_x=(lambda x: 1., lambda x: x), cov_y_x=1,
+    #                                  rng_model=None, mean_prior=np.zeros(2), cov_prior=0.01*np.eye(2)),
+    #                 ]
+
+    bayes_models = {f'learn: {_cov}': NormalModelBayes(model_x=model_x, basis_y_x=None,
+                                                       cov_y_x=1., mean_prior=np.zeros(2), cov_prior=_cov*np.eye(2))
+                    for _cov in [0.1, 10]}
+
+    # learners = [BayesRegressor(bayes_model, name=f'learn_{n}').fit_from_model(model, n)]
+    predictors = [ModelRegressor(model, name='opt'),
+                  *(BayesRegressor(bayes_model, name=name) for name, bayes_model in bayes_models.items()),
+                  ]
+
+    losses = []
+    for predictor in predictors:
+        predictor.fit_from_model(model, n_train=5, rng=200)
+        loss = predictor.evaluate_from_model(model, n_test=10, n_mc=20, rng=100)
+        losses.append(loss)
+
+        if isinstance(predictor, BayesPredictor):
+            predictor.plot_param_dist(ax_prior=None)
+            plt.gca().set(title=predictor.name)
+
+            predictor.prediction_stats(x=x_plt, model=model,
+                                       n_train=10, n_mc=20, do_cov=True, do_plot=True, ax=None, rng=None)
+            plt.gca().set(title=predictor.name)
+
+    print(losses)
+
+    _, ax = plt.subplots()
+    plt_data = ModelPredictor.plot_predictions(predictors, x=x_plt, ax=ax)
+    ax.legend()
+    ax.grid(True)
 
     # losses, learners = learn_eval(learners, model, n_train=10, n_test=1)
-    # plt_data = plot_predictions(learners, np.linspace(-3, 3, 101))
 
-    learn_out = learn_eval(learners, model, n_train=10, n_test=1, return_learner=False)
-    losses = learn_out
+    # learn_out = learn_eval(learners, model, n_train=10, n_test=1, return_learner=False)
+    # losses = learn_out
     # try:
     #     losses, learners = list(zip(*learn_out))
     # except TypeError:
     #     losses, learners = learn_out
 
-    _, ax = plt.subplots()
-    plt_data = ModelPredictor.plot_predictions(learners, np.linspace(-3, 3, 101), ax=ax)
-    ax.legend()
-
-    # if isinstance(learner, BayesPredictor):
-    #     learner.plot_param_dist()
-
     # loss = learn_eval_mc_bayes(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
-
-    print(losses)
 
 
 if __name__ == '__main__':

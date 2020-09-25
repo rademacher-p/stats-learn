@@ -11,31 +11,32 @@ import matplotlib.pyplot as plt
 import util
 from util.generic import vectorize_func, empirical_pmf, vectorize_first_arg, check_data_shape
 from loss_funcs import loss_se, loss_01
-from SL_obj import BaseModel, BaseModelRVy, YcXModel
+from SL_obj import BaseModel, MixinRVy, YcXModel
+
 
 # TODO: add method functionality to work with SKL, TF conventions?
 # TODO: COMPLETE property set/get check, rework!
 
 
-# FIXME FIXME: infer learner type from loss_func? use same model attribute for both optimal and bayesian learners!
+# TODO: infer learner type from loss_func? use same model attribute for both optimal and bayesian learners!
 
 
-#%%
+# %%
 class ClassifierMixin:
     model: BaseModel
 
     def predict(self, x):
-        return self.model.mode_y_x(x)   # TODO: argmax?
+        return self.model.mode_y_x(x)  # TODO: argmax?
 
 
 class RegressorMixin:
-    model: BaseModelRVy
+    model: MixinRVy
 
     def predict(self, x):
-        return self.model.mean_y_x(x)   # TODO: m1?
+        return self.model.mean_y_x(x)  # TODO: m1?
 
 
-#%%
+# %%
 class ModelPredictor:
     def __init__(self, loss_func, model, name=None):
         self.loss_func = loss_func
@@ -48,6 +49,9 @@ class ModelPredictor:
         else:
             raise TypeError
 
+    def __repr__(self):
+        return self.__class__.__name__ + f"(model={self.model})"
+
     @property
     def data_shape_x(self):
         return self.model.data_shape_x
@@ -56,14 +60,20 @@ class ModelPredictor:
     def data_shape_y(self):
         return self.model.data_shape_y
 
-    def fit(self, d):
-        pass
+    # def fit(self, d):
+    #     pass
 
     def predict(self, x):
         return vectorize_func(self._predict_single, data_shape=self.data_shape_x)(x)
 
     def _predict_single(self, x):
-        raise NotImplementedError("Method must be overwritten.")    # TODO: numeric approx with loss and predictive!?
+        raise NotImplementedError("Method must be overwritten.")  # TODO: numeric approx with loss and predictive!?
+        pass
+
+    def fit(self, d=None):
+        pass
+
+    def fit_from_model(self, model, n_train=0, rng=None):
         pass
 
     def evaluate(self, d):
@@ -75,30 +85,41 @@ class ModelPredictor:
     # def _evaluate_single(self, x, y):
     #     return self.loss_func(self._predict_single(x), y)
 
-    def plot_prediction(self, x, ax=None):
-        # self.predictive_dist.plot_pf(ax=ax)
+    def evaluate_from_model(self, model, n_test=1, n_mc=1, rng=None):
+        """Average empirical risk achieved from a given data model."""
 
-        # plt_data = self.posterior_model.model_x.plot_pf()
-        # ax = plt_data.axes
-        # plt_data.remove()
+        model.rng = rng
+        loss = np.empty(n_mc)
+        for i_mc in range(n_mc):
+            d = model.rvs(n_test)  # generate train/test data
+            loss[i_mc] = self.evaluate(d)  # make decision and assess
+
+        return loss.mean()
+
+    def plot_predict(self, x, ax=None):
+        """Plot prediction function."""
+        # TODO: get 'x' default from model_x.plot_pf plot_data.axes?
 
         if ax is None:
             _, ax = plt.subplots()
-            ax.set(xlabel='$x$', ylabel='$\hat{y}$')
+            ax.set(xlabel='$x$', ylabel='$\\hat{y}(x)$')
+            ax.grid(True)
 
         plt_data = ax.plot(x, self.predict(x), label=self.name)
-        ax.grid(True)
 
         return plt_data
 
     @classmethod
-    def plot_predictions(cls, predictors, x, ax=None):
+    def plot_predictions(cls, predictors, x, ax=None):  # TODO: improve or remove?
+        """Plot multiple prediction functions on a single axes."""
+
         if ax is None:
             _, ax = plt.subplots()
+            ax.grid(True)
 
         plt_data = []
         for predictor in predictors:
-            plt_data_ = predictor.plot_prediction(x, ax)
+            plt_data_ = predictor.plot_predict(x, ax)
             plt_data.append(plt_data_[0])
         return plt_data
 
@@ -113,7 +134,7 @@ class ModelRegressor(RegressorMixin, ModelPredictor):
         super().__init__(loss_se, model, name)
 
 
-#%% Learning Functions
+# %% Learning Functions
 
 class BayesPredictor(ModelPredictor):
     def __init__(self, loss_func, bayes_model, name=None):
@@ -141,61 +162,87 @@ class BayesPredictor(ModelPredictor):
 
         self.posterior, self.model = self.bayes_model.fit(d)
 
-    def plot_param_dist(self, ax_prior=None, ax_posterior=None):    # TODO: improve or delete
-        plt_prior = self.prior.plot_pf(ax=ax_prior)
-        ax_prior = plt_prior.axes
-        ax_posterior = ax_prior
-        self.posterior.plot_pf(ax=ax_posterior)
+    def fit_from_model(self, model, n_train=0, rng=None):
+        d = model.rvs(n_train, rng=rng)  # generate train/test data
+        self.fit(d)  # train learner
 
-    def model_eval(self, model, n_train=0, n_test=1, n_mc=1, rng=None):
-        loss = np.empty(n_mc)
-        for i_mc in range(n_mc):
-            d = model.rvs(n_train + n_test, rng)  # generate train/test data
-            d_train, d_test = np.split(d, [n_train])
+    # def fiteval_from_model(self, model, n_train=0, n_test=1, n_mc=1, rng=None):
+    #     """Average empirical risk achieved from a given data model."""
+    #
+    #     model.rng = rng
+    #     loss = np.empty(n_mc)
+    #     for i_mc in range(n_mc):
+    #         d = model.rvs(n_train + n_test)  # generate train/test data
+    #         d_train, d_test = np.split(d, [n_train])
+    #
+    #         self.fit(d_train)  # train learner
+    #         loss[i_mc] = self.evaluate(d_test)  # make decision and assess
+    #
+    #     return loss.mean()
 
-            self.fit(d_train)  # train learner
-            loss[i_mc] = self.evaluate(d_test)  # make decision and assess
+    def prediction_stats(self, x, model, n_train=0, n_mc=1, do_cov=False, do_plot=False, ax=None, rng=None):
+        """Get mean and covariance of prediction function for a given data model."""
 
-        return loss.squeeze()
-
-    def predict_stats(self, model, x, do_cov=False, do_plot=False, ax=None, n_train=0, n_test=1, n_mc=1):
-        losses = np.empty(n_mc)
+        model.rng = rng
         _y = []
         for i_mc in range(n_mc):
-            losses[i_mc] = self.model_eval(model, n_train, n_test)
+            self.fit(model.rvs(n_train))
             _y.append(self.predict(x))
         y = np.array(_y)
 
-        # Compute mean and variance
+        # Compute mean and variance     # TODO: just implement for scalar...?
         y_mean = y.mean(0)
         out = (y_mean,)
         if do_cov:
             n_dim_y = len(self.data_shape_y)
-            set_shape = y_mean.shape[:-n_dim_y]
+            set_shape = y_mean.shape[:-n_dim_y] if n_dim_y > 1 else y_mean.shape
 
             y_del = y - y_mean
             y_1 = y_del.reshape(n_mc, *set_shape, *self.data_shape_y, *(1 for _ in range(n_dim_y)))
             y_2 = y_del.reshape(n_mc, *set_shape, *(1 for _ in range(n_dim_y)), *self.data_shape_y)
-            y_cov = (y_1 * y_2).mean(0).reshape(*set_shape, *2*self.data_shape_y)       # biased estimate
+            y_cov = (y_1 * y_2).mean(0).reshape(*set_shape, *2 * self.data_shape_y)  # biased estimate
+
+            y_std = np.sqrt(y_cov)
             out += (y_cov,)
 
         if do_plot:
-            if ax is None:
-                _, ax = plt.subplots()
-                ax.set(xlabel='$x$', ylabel='$\hat{y}$')
-            if do_cov:
-                plt_data = ax.errorbar(x, y_mean, yerr=np.sqrt(y_cov))
+            if self.data_shape_y == ():
+                if self.data_shape_x == ():
+                    if ax is None:
+                        _, ax = plt.subplots()
+                        ax.set(xlabel='$x$', ylabel='$\\hat{y}(x)$')
+                        ax.grid(True)
+
+                    plt_data = ax.plot(x, y_mean)
+                    if do_cov:
+                        # plt_data_std = ax.errorbar(x, y_mean, yerr=y_std)
+                        plt_data_std = ax.fill_between(x, y_mean - y_std, y_mean + y_std, alpha=0.5)
+                        plt_data = (plt_data, plt_data_std)
+
+                elif self.data_shape_x == (2,):
+                    if ax is None:
+                        _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+                        ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$\\hat{y}(x)$')
+
+                    plt_data = ax.plot_surface(x[..., 0], x[..., 1], y_mean, cmap=plt.cm.viridis)
+                    if do_cov:
+                        plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y_mean - y_std, cmap=plt.cm.viridis)
+                        plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y_mean + y_std, cmap=plt.cm.viridis)
+                        plt_data = (plt_data, (plt_data_lo, plt_data_hi))
+                else:
+                    raise ValueError("Predictor data 'x' must have shape () or (2,).")
             else:
-                plt_data = ax.plot(x, y_mean)
+                raise ValueError("Target data 'y' must have shape ().")
+
             out += (plt_data,)
 
         return out
 
-    # # FIXME
-    # def predict_whatev(self, model, x, do_std=False, ax=None, n_train=0, n_test=1, n_mc=1):
-    #     eval_out = self.model_eval(model, n_train, n_test, return_learner=True)
-    #     losses, trained_learners = zip(*eval_out)
-    #     self.predict_stats(trained_learners, x, do_std, do_plot=True, ax=ax)
+    def plot_param_dist(self, ax_prior=None):  # TODO: improve or remove?
+        plt_prior = self.prior.plot_pf(ax=ax_prior)
+        ax_prior = plt_prior.axes
+        ax_posterior = ax_prior
+        self.posterior.plot_pf(ax=ax_posterior)
 
 
 class BayesClassifier(ClassifierMixin, BayesPredictor):
@@ -208,7 +255,7 @@ class BayesRegressor(RegressorMixin, BayesPredictor):
         super().__init__(loss_se, bayes_model, name)
 
 
-#%%
+# %%
 
 # class DirichletFiniteClassifier(BaseLearner):
 #     def __init__(self, alpha_0, mean_y_x):
@@ -225,23 +272,23 @@ class BayesRegressor(RegressorMixin, BayesPredictor):
 #         pass
 
 
-class BetaEstimatorTemp(BayesPredictor):
-    def __init__(self, n_x=10):
-        super().__init__()
-        self.loss_fcn = loss_se
-        self.n_x = n_x
-        self.avg_y_x = np.zeros(n_x)
-
-    def fit(self, d=None):
-        delta = 1 / self.n_x
-        for i in range(self.n_x):
-            flag_match = np.logical_and(d['x'] >= i * delta, d['x'] < (i + 1) * delta)
-            if flag_match.any():
-                self.avg_y_x[i] = d[flag_match]['y'].mean()
-
-    def _predict_single(self, x):
-        i = floor(x * self.n_x)
-        return self.avg_y_x[i]
+# class BetaEstimatorTemp(BayesPredictor):
+#     def __init__(self, n_x=10):
+#         super().__init__()
+#         self.loss_fcn = loss_se
+#         self.n_x = n_x
+#         self.avg_y_x = np.zeros(n_x)
+#
+#     def fit(self, d=None):
+#         delta = 1 / self.n_x
+#         for i in range(self.n_x):
+#             flag_match = np.logical_and(d['x'] >= i * delta, d['x'] < (i + 1) * delta)
+#             if flag_match.any():
+#                 self.avg_y_x[i] = d[flag_match]['y'].mean()
+#
+#     def _predict_single(self, x):
+#         i = floor(x * self.n_x)
+#         return self.avg_y_x[i]
 
 
 # class BayesPredictor(BaseLearner):
@@ -285,27 +332,27 @@ class BetaEstimatorTemp(BayesPredictor):
 #     def fit(self, d=np.array([])):
 #         n = len(d)
 #
-        # if n == 0:
-        #     p_x, p_y_x = self._mean_x, self._mean_y_x
-        # else:
-        #
-        #     emp_dist_x = empirical_pmf(d['x'], self.supp_x['x'], self.data_shape_x)
-        #
-        #     def emp_dist_y_x(x):
-        #         d_match = d[np.all(x.flatten() == d['x'].reshape(n, -1), axis=-1)].squeeze()
-        #         if d_match.size == 0:
-        #             return np.empty(self._supp_shape_y)
-        #         return empirical_pmf(d_match['y'], self.supp_y['y'], self.data_shape_y)
-        #
-        #     c_prior_x = 1 / (1 + n / self.alpha_0)
-        #     p_x = c_prior_x * self._mean_x + (1 - c_prior_x) * emp_dist_x
-        #
-        #     def p_y_x(x):
-        #         i = (self.supp_x['x'].reshape(self._supp_shape_x + (-1,)) == x.flatten()).all(-1)
-        #         c_prior_y = 1 / (1 + (n * emp_dist_x[i]) / (self.alpha_0 * self._mean_x[i]))
-        #         return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist_y_x(x)
-        #
-        # self._posterior_mean = self._model_gen(p_x=p_x, p_y_x=p_y_x)
+# if n == 0:
+#     p_x, p_y_x = self._mean_x, self._mean_y_x
+# else:
+#
+#     emp_dist_x = empirical_pmf(d['x'], self.supp_x['x'], self.data_shape_x)
+#
+#     def emp_dist_y_x(x):
+#         d_match = d[np.all(x.flatten() == d['x'].reshape(n, -1), axis=-1)].squeeze()
+#         if d_match.size == 0:
+#             return np.empty(self._supp_shape_y)
+#         return empirical_pmf(d_match['y'], self.supp_y['y'], self.data_shape_y)
+#
+#     c_prior_x = 1 / (1 + n / self.alpha_0)
+#     p_x = c_prior_x * self._mean_x + (1 - c_prior_x) * emp_dist_x
+#
+#     def p_y_x(x):
+#         i = (self.supp_x['x'].reshape(self._supp_shape_x + (-1,)) == x.flatten()).all(-1)
+#         c_prior_y = 1 / (1 + (n * emp_dist_x[i]) / (self.alpha_0 * self._mean_x[i]))
+#         return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist_y_x(x)
+#
+# self._posterior_mean = self._model_gen(p_x=p_x, p_y_x=p_y_x)
 #
 #     # @classmethod
 #     # def prior_gen(cls, bayes_model):

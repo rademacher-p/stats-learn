@@ -22,10 +22,20 @@ class BaseRE:
     """
 
     def __init__(self, rng=None):
-        self.rng = check_rng(rng)       # TODO: want scipy subclass for seed control functionality?
+        self._rng = check_rng(rng)       # TODO: want scipy subclass for seed control functionality?
 
         self._data_shape = None
+        self._data_size = None
         self._mode = None
+
+    @property
+    def rng(self):
+        return self._rng
+
+    @rng.setter
+    def rng(self, rng):
+        if rng is not None:
+            self._rng = check_rng(rng)
 
     @property
     def data_shape(self):
@@ -54,9 +64,7 @@ class BaseRE:
         elif type(size) is not tuple:
             raise TypeError("Input 'size' must be int or tuple.")
 
-        if rng is not None:
-            self.rng = check_rng(rng)
-        # rng = self.rng if rng is None else check_rng(rng)
+        self.rng = rng
 
         return self._rvs(size)
 
@@ -65,7 +73,17 @@ class BaseRE:
         pass
 
 
-class BaseRV(BaseRE):
+class MixinRV:
+    @property
+    def mean(self):
+        return self._mean
+
+    @property
+    def cov(self):
+        return self._cov
+
+
+class BaseRV(MixinRV, BaseRE):
     """
     Base class for generic random variable (numeric) objects.
     """
@@ -128,7 +146,7 @@ class DeterministicRE(BaseRE):
         return 1. if np.all(np.array(x) == self._val) else 0.
 
 
-class DeterministicRV(DeterministicRE, BaseRV):
+class DeterministicRV(MixinRV, DeterministicRE):
     """
     Deterministic random variable.
     """
@@ -191,8 +209,8 @@ class FiniteRE(BaseRE):
 
     # Attribute Updates
     def _update_attr(self):
-        set_shape = self._supp.shape[:self._p.ndim]
-        self._data_shape = self._supp.shape[self._p.ndim:]
+        set_shape, self._data_shape = self._supp.shape[:self._p.ndim], self._supp.shape[self._p.ndim:]
+        self._data_size = int(np.prod(self._data_shape))
 
         if set_shape != self._p.shape:
             raise ValueError("Leading shape values of 'supp' must equal the shape of 'p'.")
@@ -228,7 +246,7 @@ class FiniteRE(BaseRE):
             raise NotImplementedError('Plot method only implemented for 1-dimensional data.')
 
 
-class FiniteRV(FiniteRE, BaseRV):
+class FiniteRV(MixinRV, FiniteRE):
     """
     Generic RV drawn from a finite support set using an explicitly defined PMF.
     """
@@ -653,6 +671,7 @@ class BetaRV(BaseRV):
         self._a, self._b = a, b
 
         self._data_shape = ()
+        self._data_size = 1
         self._update_attr()
 
     # Input properties
