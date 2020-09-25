@@ -18,13 +18,22 @@ class BaseModel:
     """
 
     def __init__(self, rng=None):
-        self.rng = check_rng(rng)
+        self._rng = check_rng(rng)
 
         self._data_shape_x = None
         self._data_shape_y = None
 
         self._mode_x = None
         self._mode_y_x = None
+
+    @property
+    def rng(self):
+        return self._rng
+
+    @rng.setter
+    def rng(self, rng):
+        if rng is not None:
+            self._rng = check_rng(rng)
 
     @property
     def data_shape_x(self):
@@ -56,11 +65,10 @@ class BaseModel:
         pass
 
 
-class BaseModelRVx(BaseModel):
-    def __init__(self, rng=None):
-        super().__init__(rng)
-        self._mean_x = None
-        self._cov_x = None
+class MixinRVx:     # TODO: avoid inspection error by defining init, calling explicitly after normal MRO init!?
+    # def __init__(self):
+    #     self._mean_x = None
+    #     self._cov_x = None
 
     @property
     def mean_x(self):
@@ -71,11 +79,10 @@ class BaseModelRVx(BaseModel):
         return self._cov_x
 
 
-class BaseModelRVy(BaseModel):
-    def __init__(self, rng=None):
-        super().__init__(rng)
-        self._mean_y_x = None
-        self._cov_y_x = None
+class MixinRVy:
+    # def __init__(self):
+    #     self._mean_y_x = None
+    #     self._cov_y_x = None
 
     # @property
     # def mean_y_x(self):
@@ -100,8 +107,51 @@ class BaseModelRVy(BaseModel):
         pass
 
 
-class YcXModel(BaseModel):
+# class BaseModelRVx(BaseModel):
+#     def __init__(self, rng=None):
+#         super().__init__(rng)
+#         self._mean_x = None
+#         self._cov_x = None
+#
+#     @property
+#     def mean_x(self):
+#         return self._mean_x
+#
+#     @property
+#     def cov_x(self):
+#         return self._cov_x
+#
+#
+# class BaseModelRVy(BaseModel):
+#     def __init__(self, rng=None):
+#         super().__init__(rng)
+#         self._mean_y_x = None
+#         self._cov_y_x = None
+#
+#     # @property
+#     # def mean_y_x(self):
+#     #     return self._mean_y_x
+#
+#     def mean_y_x(self, x):
+#         return vectorize_func(self._mean_y_x_single, self._data_shape_x)(x)
+#
+#     def _mean_y_x_single(self, x):
+#         raise NotImplementedError
+#         pass
+#
+#     # @property
+#     # def cov_y_x(self):
+#     #     return self._cov_y_x
+#
+#     def cov_y_x(self, x):
+#         return vectorize_func(self._cov_y_x_single, self._data_shape_x)(x)
+#
+#     def _cov_y_x_single(self, x):
+#         raise NotImplementedError
+#         pass
 
+
+class YcXModel(BaseModel):
     def __new__(cls, model_x, model_y_x, rng=None):
         is_numeric_y_x = isinstance(model_y_x(model_x.rvs()), BaseRV)
         if isinstance(model_x, BaseRV):
@@ -197,14 +247,14 @@ class YcXModel(BaseModel):
         return cls(model_x, model_y_x, rng)
 
 
-class YcXModelRVx(YcXModel, BaseModelRVx):
+class YcXModelRVx(MixinRVx, YcXModel):
     def _update_x(self):
         super()._update_x()
         self._mean_x = self._model_x.mean
         self._cov_x = self._model_x.cov
 
 
-class YcXModelRVy(YcXModel, BaseModelRVy):
+class YcXModelRVy(MixinRVy, YcXModel):
     def _update_y_x(self):
         super()._update_y_x()
         # self._mean_y_x = vectorize_func(lambda x: self._model_y_x(x).mean, self._data_shape_x)
@@ -235,21 +285,38 @@ class YcXModelRVyx(YcXModelRVx, YcXModelRVy):
 # t.cov_y_x(t.model_x.rvs(4))
 
 
-class NormalRVModel(BaseModelRVx, BaseModelRVy):
+class NormalRVModel(MixinRVx, MixinRVy, BaseModel):
     def __init__(self, model_x=NormalRV(), basis_y_x=(lambda x: 1.,), weights=(0.,),
                  cov_y_x=1., rng=None):
         super().__init__(rng)
 
         self.model_x = model_x
-        self.basis_y_x = basis_y_x
-        self.weights = weights
+        self.weights = np.array(weights)
+        self._cov_y_x_arg = np.array(cov_y_x)
 
-        self._cov_y_x_single = lambda x: np.array(cov_y_x)
-
-        _temp = self._cov_y_x_single(model_x.rvs()).shape
+        if callable(cov_y_x):
+            self._cov_y_x_single = cov_y_x
+            _temp = self._cov_y_x_single(model_x.rvs()).shape
+        else:
+            self._cov_y_x_single = lambda x: self._cov_y_x_arg
+            _temp = self._cov_y_x_arg.shape
         self._data_shape_y = _temp[:int(len(_temp) / 2)]
 
         self._mode_y_x_single = self._mean_y_x_single
+
+        # self.basis_y_x = basis_y_x
+        if basis_y_x is None:
+            def power_func(i):
+                # return lambda x: np.full(_data_shape_y, x) ** i
+                return lambda x: np.full(self._data_shape_y, (x ** i).sum())
+
+            self.basis_y_x = tuple(power_func(i) for i in range(len(self.weights)))
+        else:
+            self.basis_y_x = basis_y_x
+
+    def __repr__(self):
+        return f"NormalRVModel(model_x={self.model_x}, basis_y_x={self.basis_y_x}, " \
+               f"weights={self.weights}, cov_y_x={self._cov_y_x_arg})"
 
     @property
     def model_x(self):
