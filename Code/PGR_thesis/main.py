@@ -182,13 +182,13 @@ def main():
     # bayes_model = BetaModelBayes()
     # learner = BetaEstimatorTemp(n_x=10)
 
-    # model_x = NormalRV(mean=0., cov=1.)
-    # x_plt = np.linspace(-3, 3, 101)
+    model_x = NormalRV(mean=0., cov=1.)
+    x_plt = np.linspace(-3, 3, 101)
 
-    model_x = NormalRV(mean=np.zeros(2), cov=np.eye(2))
-    x1_plot = np.linspace(-3, 3, 101, endpoint=True)
-    x2_plot = np.linspace(-3, 3, 81, endpoint=True)
-    x_plt = np.stack(np.meshgrid(x1_plot, x2_plot), axis=-1)
+    # model_x = NormalRV(mean=np.zeros(2), cov=np.eye(2))
+    # x1_plot = np.linspace(-3, 3, 101, endpoint=True)
+    # x2_plot = np.linspace(-3, 3, 81, endpoint=True)
+    # x_plt = np.stack(np.meshgrid(x1_plot, x2_plot), axis=-1)
 
     model = NormalRVModel(model_x=model_x, basis_y_x=None,      # (lambda x: 1., lambda x: x)
                           weights=np.ones(2), cov_y_x=1., rng=None)
@@ -215,7 +215,7 @@ def main():
         losses.append(loss)
 
         if isinstance(predictor, BayesPredictor):
-            predictor.plot_param_dist(ax_prior=None)
+            predictor.plot_param_dist(ax_prior=None)        # FIXME FIXME: z_lim ERROR????
             plt.gca().set(title=predictor.name)
 
             predictor.prediction_stats(x=x_plt, model=model,
