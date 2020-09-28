@@ -139,11 +139,11 @@ class DeterministicRE(BaseRE):
     def _rvs(self, size=()):
         return np.broadcast_to(self._val, size + self._data_shape)
 
-    # def pf(self, x):
-    #     return np.where(np.all(x.reshape(-1, self._data_size) == self._val.flatten(), axis=-1), 1., 0.)
+    def pf(self, x):
+        return np.where(np.all(x.reshape(-1, self._data_size) == self._val.flatten(), axis=-1), 1., 0.)
 
-    def _pf_single(self, x):
-        return 1. if np.all(np.array(x) == self._val) else 0.
+    # def _pf_single(self, x):
+    #     return 1. if np.all(np.array(x) == self._val) else 0.
 
 
 class DeterministicRV(MixinRV, DeterministicRE):
@@ -831,9 +831,17 @@ class NormalRV(BaseRV):
             raise NotImplementedError('Plot method only supported for 1- and 2-dimensional data.')
 
 
-# # mean_, cov_ = np.ones(1), np.eye(1)
-# mean_, cov_ = np.ones(2), np.eye(2)
-# # mean_, cov_ = 1, 1
-# norm = NormalRV(mean_, cov_)
-# norm.rvs(5)
-# norm.plot_pf()
+# mean_, cov_ = 1., 1.
+mean_, cov_ = np.ones(2), np.eye(2)
+norm = NormalRV(mean_, cov_)
+norm.rvs(5)
+plt_data = norm.plot_pf()
+
+delta = 0.01
+# x = np.arange(-4, 4, delta)
+x = np.stack(np.meshgrid(np.arange(-4, 4, delta), np.arange(-4, 4, delta)), axis=-1)
+
+y = norm.pf(x)
+print(delta**2*y.sum())
+
+pass        # FIXME FIXME: NormalRV.pf SLOW. FIX with scipy code.
