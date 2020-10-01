@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 # from scipy.special import binom
 
@@ -16,9 +18,9 @@ def simplex_grid(n=1, shape=(1,), hull_mask=None):
         raise TypeError("Elements of 'shape' must be integers.")
 
     if hull_mask is None:
-        hull_mask = np.broadcast_to(False, np.prod(shape))
+        hull_mask = np.broadcast_to(False, math.prod(shape))
     # elif hull_mask == 'all':
-    #     hull_mask = np.broadcast_to(True, np.prod(shape))
+    #     hull_mask = np.broadcast_to(True, math.prod(shape))
     else:
         hull_mask = np.asarray(hull_mask)
         if hull_mask.shape != shape:
@@ -30,7 +32,7 @@ def simplex_grid(n=1, shape=(1,), hull_mask=None):
     if n < sum(hull_mask.flatten()):
         raise ValueError("Input 'n' must meet or exceed the number of True values in 'hull_mask'.")
 
-    d = np.prod(shape)
+    d = math.prod(shape)
 
     if d == 1:
         return np.array(1).reshape(shape)

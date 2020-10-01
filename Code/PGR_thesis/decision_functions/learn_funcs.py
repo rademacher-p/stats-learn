@@ -4,8 +4,10 @@ Supervised learning functions.
 
 import functools
 from math import floor
+from collections import Sequence
 
 import numpy as np
+from scipy.stats import mode
 import matplotlib.pyplot as plt
 
 import util
@@ -77,15 +79,10 @@ class ModelPredictor:
         pass
 
     def evaluate(self, d):
-        # loss = np.array([self._evaluate_single(d_i['x'], d_i['y']) for d_i in d])
-        # loss = np.array([self._evaluate_single(x, y) for x, y in zip(d['x'], d['y'])])
-        loss = np.array([self.loss_func(h, y) for h, y in zip(self.predict(d['x']), d['y'])])
+        loss = self.loss_func(self.predict(d['x']), d['y'], data_shape=self.data_shape_y)
         return loss.mean()
 
-    # def _evaluate_single(self, x, y):
-    #     return self.loss_func(self._predict_single(x), y)
-
-    def evaluate_from_model(self, model, n_test=1, n_mc=1, rng=None):
+    def evaluate_from_model(self, model, n_test=1, n_mc=1, rng=None):       # TODO: move MC looping elsewhere?
         """Average empirical risk achieved from a given data model."""
 
         model.rng = rng
@@ -96,9 +93,20 @@ class ModelPredictor:
 
         return loss.mean()
 
+    # def evaluate_from_model(self, model, n_test=1, rng=None):
+    #     """Average empirical risk achieved from a given data model."""
+    #
+    #     d = model.rvs(n_test, rng=rng)  # generate train/test data
+    #     loss = self.evaluate(d)  # make decision and assess
+    #
+    #     return loss
+
     def plot_predict(self, x, ax=None):
         """Plot prediction function."""
         # TODO: get 'x' default from model_x.plot_pf plot_data.axes?
+
+        if self.data_shape_x not in ((), (1,)):
+            raise NotImplementedError
 
         if ax is None:
             _, ax = plt.subplots()
@@ -180,69 +188,53 @@ class BayesPredictor(ModelPredictor):
     #
     #     return loss.mean()
 
-    def prediction_stats(self, x, model, n_train=0, n_mc=1, do_cov=False, do_plot=False, ax=None, rng=None):
-        """Get mean and covariance of prediction function for a given data model."""
-
-        model.rng = rng
-        _y = []
-        for i_mc in range(n_mc):
-            self.fit(model.rvs(n_train))
-            _y.append(self.predict(x))
-        y = np.array(_y)
-
-        # Compute mean and variance     # TODO: just implement for scalar...?
-        y_mean = y.mean(0)
-        out = (y_mean,)
-        if do_cov:
-            n_dim_y = len(self.data_shape_y)
-            set_shape = y_mean.shape[:-n_dim_y] if n_dim_y > 1 else y_mean.shape
-
-            y_del = y - y_mean
-            y_1 = y_del.reshape(n_mc, *set_shape, *self.data_shape_y, *(1 for _ in range(n_dim_y)))
-            y_2 = y_del.reshape(n_mc, *set_shape, *(1 for _ in range(n_dim_y)), *self.data_shape_y)
-            y_cov = (y_1 * y_2).mean(0).reshape(*set_shape, *2 * self.data_shape_y)  # biased estimate
-
-            y_std = np.sqrt(y_cov)
-            out += (y_cov,)
-
-        if do_plot:
-            if self.data_shape_y == ():
-                if self.data_shape_x == ():
-                    if ax is None:
-                        _, ax = plt.subplots()
-                        ax.set(xlabel='$x$', ylabel='$\\hat{y}(x)$')
-                        ax.grid(True)
-
-                    plt_data = ax.plot(x, y_mean)
-                    if do_cov:
-                        # plt_data_std = ax.errorbar(x, y_mean, yerr=y_std)
-                        plt_data_std = ax.fill_between(x, y_mean - y_std, y_mean + y_std, alpha=0.5)
-                        plt_data = (plt_data, plt_data_std)
-
-                elif self.data_shape_x == (2,):
-                    if ax is None:
-                        _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                        ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$\\hat{y}(x)$')
-
-                    plt_data = ax.plot_surface(x[..., 0], x[..., 1], y_mean, cmap=plt.cm.viridis)
-                    if do_cov:
-                        plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y_mean - y_std, cmap=plt.cm.viridis)
-                        plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y_mean + y_std, cmap=plt.cm.viridis)
-                        plt_data = (plt_data, (plt_data_lo, plt_data_hi))
-                else:
-                    raise ValueError("Predictor data 'x' must have shape () or (2,).")
-            else:
-                raise ValueError("Target data 'y' must have shape ().")
-
-            out += (plt_data,)
-
-        return out
-
     def plot_param_dist(self, ax_prior=None):  # TODO: improve or remove?
         plt_prior = self.prior.plot_pf(ax=ax_prior)
         ax_prior = plt_prior.axes
         ax_posterior = ax_prior
         self.posterior.plot_pf(ax=ax_posterior)
+
+    def prediction_stats(self, x, model, n_train=0, n_mc=1, stats=('mode',), rng=None):
+        """Get mean and covariance of prediction function for a given data model."""
+
+        x, set_shape = check_data_shape(x, self.data_shape_x)
+
+        model.rng = rng
+        y = np.empty((n_mc, *set_shape, *self.data_shape_y))
+        for i_mc in range(n_mc):
+            self.fit_from_model(model, n_train)
+            # self.fit(model.rvs(n_train))
+            y[i_mc] = self.predict(x)
+
+        stats = {stat: None for stat in stats}
+
+        if 'mode' in stats.keys():
+            stats['mode'] = mode(y, axis=0)
+
+        if 'median' in stats.keys():
+            stats['median'] = np.median(y, axis=0)
+
+        if 'mean' in stats.keys():
+            stats['mean'] = y.mean(0)
+
+        if 'cov' in stats.keys() or 'std' in stats.keys():
+            try:
+                y_mean = stats['mean']
+            except KeyError:
+                y_mean = y.mean(0)
+
+            y_del = y - y_mean
+            y_1 = y_del.reshape(n_mc, *set_shape, *self.data_shape_y, *(1 for _ in self.data_shape_y))
+            y_2 = y_del.reshape(n_mc, *set_shape, *(1 for _ in self.data_shape_y), *self.data_shape_y)
+            # y_cov = (y_1 * y_2).mean(0).reshape(*set_shape, *2 * self.data_shape_y)  # biased estimate
+            y_cov = (y_1 * y_2).mean(0)  # biased estimate
+
+            if 'cov' in stats.keys():
+                stats['cov'] = y_cov
+            if 'std' in stats.keys():
+                stats['std'] = np.sqrt(y_cov)
+
+        return stats
 
 
 class BayesClassifier(ClassifierMixin, BayesPredictor):
@@ -253,6 +245,43 @@ class BayesClassifier(ClassifierMixin, BayesPredictor):
 class BayesRegressor(RegressorMixin, BayesPredictor):
     def __init__(self, bayes_model, name=None):
         super().__init__(loss_se, bayes_model, name)
+
+    def plot_predict_stats(self, x, model, n_train=0, n_mc=1, do_std=False, ax=None, rng=None):
+        stats = ('mean', 'std') if do_std else ('mean',)
+        stats = self.prediction_stats(x, model, n_train, n_mc, stats=stats, rng=rng)
+        y_mean = stats['mean']
+        if do_std:
+            y_std = stats['std']
+
+        if self.data_shape_y == ():
+            if self.data_shape_x == ():
+                if ax is None:
+                    _, ax = plt.subplots()
+                    ax.set(xlabel='$x$', ylabel='$\\hat{y}(x)$')
+                    ax.grid(True)
+
+                plt_data = ax.plot(x, y_mean)
+                if do_std:
+                    # plt_data_std = ax.errorbar(x, y_mean, yerr=y_std)
+                    plt_data_std = ax.fill_between(x, y_mean - y_std, y_mean + y_std, alpha=0.5)
+                    plt_data = (plt_data, plt_data_std)
+
+            elif self.data_shape_x == (2,):
+                if ax is None:
+                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$\\hat{y}(x)$')
+
+                plt_data = ax.plot_surface(x[..., 0], x[..., 1], y_mean, cmap=plt.cm.viridis)
+                if do_std:
+                    plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y_mean - y_std, cmap=plt.cm.viridis)
+                    plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y_mean + y_std, cmap=plt.cm.viridis)
+                    plt_data = (plt_data, (plt_data_lo, plt_data_hi))
+            else:
+                raise ValueError("Predictor data 'x' must have shape () or (2,).")
+        else:
+            raise ValueError("Target data 'y' must have shape ().")
+
+        return plt_data
 
 
 # %%

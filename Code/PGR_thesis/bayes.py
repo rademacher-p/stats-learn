@@ -23,7 +23,7 @@ from util.math import inverse, determinant, inner_prod
 
 
 class BaseBayes:
-    def __init__(self, model_gen, model_kwargs=None, prior=None):
+    def __init__(self, model_gen, model_kwargs=None, prior=None, rng=None):
         self._data_shape_x = None
         self._data_shape_y = None
 
@@ -32,8 +32,13 @@ class BaseBayes:
         else:
             self.model_kwargs = model_kwargs        # TODO: use setattr() for easier access?
 
-        self.model_gen = functools.partial(model_gen, **model_kwargs)
+        # self.model_gen = functools.partial(model_gen, **self.model_kwargs)
+        self.model_gen = model_gen
         self.prior = prior
+
+        self._rng = check_rng(rng)
+        self.model_kwargs.update(rng=self._rng)
+        self.prior.rng = self._rng
 
     @property
     def data_shape_x(self):
@@ -43,8 +48,20 @@ class BaseBayes:
     def data_shape_y(self):
         return self._data_shape_y
 
-    def random_model(self):     # defaults to deterministic bayes_model!?
-        return self.model_gen()
+    @property
+    def rng(self):
+        return self._rng
+
+    @rng.setter
+    def rng(self, rng):
+        if rng is not None:
+            self._rng = check_rng(rng)
+            self.model_kwargs.update(rng=self._rng)
+            self.prior.rng = self._rng
+
+    def random_model(self, rng=None):
+        self.rng = rng
+        # return self.model_gen()     # defaults to deterministic bayes_model!?
 
     # def posterior_model(self, d):  # TODO: generalize method for base classes, full posterior object?
     #     raise NotImplementedError
@@ -65,7 +82,7 @@ class BaseBayes:
 
 class NormalModelBayes(BaseBayes):
     def __init__(self, model_x=RE_obj.NormalRV(), basis_y_x=None, cov_y_x=1, rng_model=None, mean_prior=np.zeros(1),
-                 cov_prior=np.eye(1), rng_prior=None):
+                 cov_prior=np.eye(1), rng_prior=None, rng=None):
 
         _temp = np.array(cov_y_x).shape
         _data_shape_y = _temp[:int(len(_temp) / 2)]
@@ -81,16 +98,17 @@ class NormalModelBayes(BaseBayes):
 
         # model_gen = YcXModel.norm_model
         model_gen = NormalRVModel
-        model_kwargs = {'model_x': model_x, 'basis_y_x': basis_y_x, 'cov_y_x': cov_y_x, 'rng': rng_model}
-        prior = RE_obj.NormalRV(self.mean_prior, self.cov_prior, rng=rng_prior)
-        super().__init__(model_gen, model_kwargs, prior)
+        model_kwargs = {'model_x': model_x, 'basis_y_x': basis_y_x, 'cov_y_x': cov_y_x, 'rng': None}
+        prior = RE_obj.NormalRV(self.mean_prior, self.cov_prior, rng=None)
+        super().__init__(model_gen, model_kwargs, prior, rng)
 
         self._data_shape_x = model_x.data_shape
         self._data_shape_y = _data_shape_y
 
-    def random_model(self, rng=None):
-        weights = self.prior.rvs(rng=rng)
-        return self.model_gen(weights=weights)
+    def random_model(self, rng=None):       # FIXME: rng rework for true reproducibility?
+        super().random_model(rng)
+        weights = self.prior.rvs()
+        return self.model_gen(weights=weights, **self.model_kwargs)
 
     def posterior(self, d):
         if len(d) == 0:
@@ -106,7 +124,7 @@ class NormalModelBayes(BaseBayes):
 
             return RE_obj.NormalRV(mean_post, cov_post)
 
-    def posterior_2_predictive(self, posterior):
+    def _posterior_2_predictive(self, posterior):
         def model_y_x(x):
             mean_y_x = sum(weight * func(x) for weight, func in zip(posterior.mean, self.model_kwargs['basis_y_x']))
             psi_x = np.array([func(x) for func in self.model_kwargs['basis_y_x']]).T
@@ -118,29 +136,46 @@ class NormalModelBayes(BaseBayes):
 
     def predictive_dist(self, d):
         posterior = self.posterior(d)
-        return self.posterior_2_predictive(posterior)
+        return self._posterior_2_predictive(posterior)
 
-    def predictive_2_model(self, predictive_dist):
-        return YcXModel(model_x=self.model_kwargs['model_x'], model_y_x=predictive_dist)
+    # def _predictive_2_model(self, predictive_dist):
+    #     return YcXModel(model_x=self.model_kwargs['model_x'], model_y_x=predictive_dist)
 
-    def posterior_model(self, d):
-        # predictive_dist = self.predictive_dist(d)
-        # return self.predictive_2_model(predictive_dist)
-
-        posterior = self.posterior(d)
-
+    def _posterior_2_model(self, posterior):
         def cov_y_x(x):
             psi_x = np.array([func(x) for func in self.model_kwargs['basis_y_x']]).T
             return self.model_kwargs['cov_y_x'] + inner_prod(psi_x.T, psi_x.T, posterior.cov)
 
-        kwargs = self.model_kwargs.copy().update(weights=posterior.mean, cov_y_x=cov_y_x, rng=None)
+        kwargs = self.model_kwargs.copy()
+        kwargs.update(weights=posterior.mean, cov_y_x=cov_y_x, rng=None)
+
         return NormalRVModel(**kwargs)
+
+    def posterior_model(self, d):
+        # predictive_dist = self.predictive_dist(d)
+        # return self._predictive_2_model(predictive_dist)
+
+        posterior = self.posterior(d)
+        return self._posterior_2_model(posterior)
 
     def fit(self, d):
         posterior = self.posterior(d)
-        predictive_dist = self.posterior_2_predictive(posterior)
-        posterior_model = self.predictive_2_model(predictive_dist)
+        # predictive_dist = self._posterior_2_predictive(posterior)
+        # posterior_model = self._predictive_2_model(predictive_dist)
+        posterior_model = self._posterior_2_model(posterior)
         return posterior, posterior_model
+
+
+
+# bayes_model = NormalModelBayes(basis_y_x=None, cov_y_x=1., mean_prior=np.zeros(2), cov_prior=np.eye(2), rng=100)
+# for _ in range(2):
+#     model = bayes_model.random_model(rng=None)
+#     print(model.weights)
+#     rvs = model.rvs(2)
+#     print(rvs)
+
+
+
 
 
 #%% TODO FIXME

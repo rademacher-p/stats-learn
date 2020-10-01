@@ -5,6 +5,8 @@ Random element objects.
 # TODO: docstrings?
 # TODO: do ABC or PyCharm bug?
 
+import math
+
 import numpy as np
 from scipy.stats._multivariate import _PSD
 from scipy.special import gammaln, xlogy, xlog1py, betaln
@@ -211,7 +213,7 @@ class FiniteRE(BaseRE):
     # Attribute Updates
     def _update_attr(self):
         set_shape, self._data_shape = self._supp.shape[:self._p.ndim], self._supp.shape[self._p.ndim:]
-        self._data_size = int(np.prod(self._data_shape))
+        self._data_size = math.prod(self._data_shape)
 
         if set_shape != self._p.shape:
             raise ValueError("Leading shape values of 'supp' must equal the shape of 'p'.")
@@ -816,7 +818,7 @@ class NormalRV(BaseRV):
             if x_plt is None:
                 lims = self._mean.item() + np.array([-1, 1]) * 3*np.sqrt(self._cov.item())
                 # n_plt = int(round((lims[1]-lims[0]) / _delta))
-                x_plt = np.linspace(*lims, n_plt, endpoint=True).reshape(n_plt, *self._data_shape)
+                x_plt = np.linspace(*lims, n_plt, endpoint=False).reshape(n_plt, *self._data_shape)
 
             if ax is None:
                 _, ax = plt.subplots()
@@ -830,8 +832,8 @@ class NormalRV(BaseRV):
                 lims = [(self._mean[i] - 3 * np.sqrt(self._cov[i, i]), self._mean[i] + 3 * np.sqrt(self._cov[i, i]))
                         for i in range(2)]
                 # n_plt = int(round((lims[0][1] - lims[0][0]) / _delta)), int(round((lims[1][1] - lims[1][0]) / _delta))
-                x0_plt = np.linspace(*lims[0], n_plt, endpoint=True)
-                x1_plt = np.linspace(*lims[1], n_plt, endpoint=True)
+                x0_plt = np.linspace(*lims[0], n_plt, endpoint=False)
+                x1_plt = np.linspace(*lims[1], n_plt, endpoint=False)
                 x_plt = np.stack(np.meshgrid(x0_plt, x1_plt), axis=-1)
 
             if ax is None:
@@ -840,6 +842,9 @@ class NormalRV(BaseRV):
 
             # ax.plot_wireframe(x_plt[..., 0], x_plt[..., 1], self.pf(x_plt))
             plt_data = ax.plot_surface(x_plt[..., 0], x_plt[..., 1], self.pf(x_plt), cmap=plt.cm.viridis)
+
+            # delta = (x_plt[0, 1, 0] - x_plt[0, 0, 0]) * (x_plt[1, 0, 1] - x_plt[0, 0, 1])
+            # print(delta * self.pf(x_plt).sum())
 
             return plt_data
         else:
