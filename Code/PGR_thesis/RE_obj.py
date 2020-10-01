@@ -6,6 +6,7 @@ Random element objects.
 # TODO: do ABC or PyCharm bug?
 
 import numpy as np
+from scipy.stats._multivariate import _PSD
 from scipy.special import gammaln, xlogy, xlog1py, betaln
 import matplotlib.pyplot as plt
 
@@ -736,8 +737,12 @@ class BetaRV(BaseRV):
 class NormalRV(BaseRV):
     def __init__(self, mean=0., cov=1., rng=None):
         super().__init__(rng)
-        self.mean = np.array(mean)
-        self.cov = np.array(cov)
+        _mean = np.array(mean)
+        self._data_shape = _mean.shape
+        self._data_size = _mean.size
+
+        self.mean = mean
+        self.cov = cov
 
         # self._inv_cov = None
         # self._psd = None
@@ -752,8 +757,9 @@ class NormalRV(BaseRV):
     @mean.setter
     def mean(self, mean):
         self._mean = np.array(mean)
-        self._data_shape = self._mean.shape
-        self._data_size = self._mean.size
+        if self._mean.shape != self._data_shape:
+            raise ValueError(f"Mean array shape must be {self._data_shape}.")
+        self._mean_flat = self._mean.flatten()
 
     @property
     def cov(self):
@@ -764,13 +770,20 @@ class NormalRV(BaseRV):
         self._cov = np.array(cov)
         if self._cov.shape != self._data_shape * 2:
             raise ValueError(f"Covariance array shape must be {self._data_shape * 2}.")
+        self._cov_flat = self._cov.reshape(2 * (self._data_size,))
 
         # self._psd = _PSD(self._cov)
         # self._log_pf_coef = -0.5 * (self._psd.rank * np.log(2 * np.pi) + self._psd.log_pdet)
 
-        self._inv_cov = inverse(self._cov)
-        _log_det_cov = np.log(determinant(self._cov))
-        self._log_pf_coef = -0.5 * (self._data_size * np.log(2 * np.pi) + _log_det_cov)
+        # self._inv_cov = inverse(self._cov)
+        # _log_det_cov = np.log(determinant(self._cov))
+        # self._inv_cov = np.linalg.inv(self._cov)
+        # _log_det_cov = np.log(np.linalg.det(self._cov))
+        # self._log_pf_coef = -0.5 * (self._data_size * np.log(2 * np.pi) + _log_det_cov)
+
+        psd = _PSD(self._cov_flat, allow_singular=False)
+        self.prec_U = psd.U
+        self._log_pf_coef = -0.5 * (psd.rank * np.log(2 * np.pi) + psd.log_pdet)
 
     @property
     def mode(self):
@@ -785,12 +798,14 @@ class NormalRV(BaseRV):
     def pf(self, x):
         x, set_shape = check_data_shape(x, self._data_shape)
 
-        dev = x.reshape(-1, *self._data_shape) - self._mean
-        inner_white = np.array([(outer_gen(dev_i, np.ones(self._data_shape)) * self._inv_cov
-                                * outer_gen(np.ones(self._data_shape), dev_i)).sum() for dev_i in dev])
+        dev = x.reshape(-1, self._data_size) - self._mean_flat
+        maha = np.sum(np.square(np.dot(dev, self.prec_U)), axis=-1)
+
+        # inner_white = np.array([(outer_gen(dev_i, np.ones(self._data_shape)) * self._inv_cov
+        #                         * outer_gen(np.ones(self._data_shape), dev_i)).sum() for dev_i in dev])
         # inner_white = np.sum(np.square(np.dot(dev, self._psd.U)), axis=-1)
 
-        log_pf = self._log_pf_coef + -0.5 * inner_white.reshape(set_shape)
+        log_pf = self._log_pf_coef + -0.5 * maha.reshape(set_shape)
         return np.exp(log_pf)
 
     def plot_pf(self, x_plt=None, ax=None):
@@ -832,16 +847,14 @@ class NormalRV(BaseRV):
 
 
 # mean_, cov_ = 1., 1.
-mean_, cov_ = np.ones(2), np.eye(2)
-norm = NormalRV(mean_, cov_)
-norm.rvs(5)
-plt_data = norm.plot_pf()
-
-delta = 0.01
-# x = np.arange(-4, 4, delta)
-x = np.stack(np.meshgrid(np.arange(-4, 4, delta), np.arange(-4, 4, delta)), axis=-1)
-
-y = norm.pf(x)
-print(delta**2*y.sum())
-
-pass        # FIXME FIXME: NormalRV.pf SLOW. FIX with scipy code.
+# # mean_, cov_ = np.ones(2), np.eye(2)
+# norm = NormalRV(mean_, cov_)
+# norm.rvs(5)
+# plt_data = norm.plot_pf()
+#
+# delta = 0.01
+# # x = np.arange(-4, 4, delta)
+# x = np.stack(np.meshgrid(np.arange(-4, 4, delta), np.arange(-4, 4, delta)), axis=-1)
+#
+# y = norm.pf(x)
+# print(delta**2*y.sum())
