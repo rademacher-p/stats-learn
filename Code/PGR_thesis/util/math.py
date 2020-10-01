@@ -1,5 +1,6 @@
 import functools
 import itertools
+import math
 
 import numpy as np
 
@@ -13,7 +14,7 @@ from util.generic import check_data_shape
 #
 # def cov(x, data_shape):
 #     x, set_shape = check_data_shape(x, data_shape)
-#     data_size = int(np.prod(data_shape))
+#     data_size = math.prod(data_shape)
 #     np.cov(x.reshape(-1, data_size), rowvar=False).reshape(2 * data_shape)
 
 

@@ -1,7 +1,10 @@
 import copy
 import operator
+import math
+
 import numpy as np
 import matplotlib.pyplot as plt
+
 from util.generic import check_data_shape, check_set_shape, vectorize_func
 
 # TODO: getter and setters?
@@ -94,7 +97,7 @@ class FiniteDomainFunc(object):
         if set_shape is None:
             set_shape = np.array(val).shape
         self._set_shape = set_shape
-        self._set_size = int(np.prod(set_shape))
+        self._set_size = math.prod(set_shape)
 
         self._supp, self.data_shape_x = check_set_shape(supp, set_shape)
         self._val, self.data_shape_y = check_set_shape(val, set_shape)

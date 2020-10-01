@@ -1,6 +1,8 @@
 from numbers import Integral
 from collections.abc import Sequence
 from functools import wraps
+from copy import deepcopy
+import math
 
 import numpy as np
 
@@ -25,6 +27,7 @@ def check_rng(rng=None):
     elif isinstance(rng, (Integral, np.integer)):
         return np.random.default_rng(rng)
     elif isinstance(rng, np.random.Generator) or isinstance(rng, np.random.RandomState):
+        # return deepcopy(rng)        # TODO: implement input to reference, not copy?
         return rng
     else:
         raise TypeError("Input must be None, int, or a valid NumPy random number generator.")
@@ -136,14 +139,14 @@ def empirical_pmf(d, supp, data_shape):
     """Generates the empirical PMF for a data set."""
 
     supp, supp_shape = check_data_shape(supp, data_shape)
-    n_supp = int(np.prod(supp_shape))
+    n_supp = math.prod(supp_shape)
     supp_flat = supp.reshape(n_supp, -1)
 
     if d.size == 0:
         return np.zeros(supp_shape)
 
     d, _set_shape = check_data_shape(d, data_shape)
-    n = int(np.prod(_set_shape))
+    n = math.prod(_set_shape)
     d_flat = d.reshape(n, -1)
 
     dist = np.zeros(n_supp)

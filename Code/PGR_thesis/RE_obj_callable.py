@@ -3,6 +3,7 @@ Random element objects.
 """
 
 # TODO: docstrings?
+import math
 
 import numpy as np
 from scipy.stats._multivariate import multi_rv_generic
@@ -286,7 +287,7 @@ class DirichletRV(ContinuousRV):
     # Attribute Updates
     def _update_attr(self):
         self._data_shape = self._mean.set_shape
-        self._data_size = int(np.prod(self._data_shape))
+        self._data_size = math.prod(self._data_shape)
 
         if self._mean.min > 1 / self._alpha_0:
             self._mode = (self._mean - 1 / self._alpha_0) / (1 - self._data_size / self._alpha_0)

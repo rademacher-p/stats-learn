@@ -119,69 +119,49 @@ supp_y_s = np.array(list(itertools.product(supp_y.reshape((-1,) + data_shape_y))
 
 #%% Sim
 
-# @vectorize_first_arg
-# def learn_eval(learner, model, n_train=0, n_test=1, return_learner=False):
-#     d = model.rvs(n_train + n_test)  # generate train/test data
-#     d_train, d_test = np.split(d, [n_train])
-#
-#     learner.fit(d_train)  # train learner
-#     loss = learner.evaluate(d_test)      # make decision and assess
-#
-#     if return_learner:
-#         return loss, learner
-#     else:
-#         return loss
+# TODO: want RNG seeding for identical fit/eval data
+# TODO: split learning funcs from eval funcs for fixed predictors?
+# TODO: need MC results for fitting
+
+def predictor_compare(predictors, model, n_train, n_test, rng=None):
+    d = model.rvs(n_train + n_test, rng=rng)  # generate train/test data
+    d_train, d_test = np.split(d, [n_train])
+
+    losses = np.empty(len(predictors))
+    for idx, predictor in enumerate(predictors):
+        predictor.fit(d_train)
+        losses[idx] = predictor.evaluate(d_test)
+    return losses
 
 
-# def learn_eval_mc(learner, model, n_train=0, n_test=1, n_mc=1, verbose=False):
-#     loss_mc = np.empty(n_mc)
-#     for i_mc in range(n_mc):
-#         if verbose:
-#             if i_mc % 100 == 0:
-#                 print(f"Iteration {i_mc}/{n_mc}", end='\r')
-#
-#         loss_mc[i_mc] = learn_eval(learner, model, n_train, n_test)
-#
-#     return loss_mc.mean()
-
-
-def learn_eval_mc_bayes(learner, bayes_model, n_train=0, n_test=1, n_mc=1, verbose=False):
-    loss_mc = np.empty(n_mc)
+def predictor_compare_mc(predictors, model, n_train=0, n_test=1, n_mc=1, rng=None):
+    model.rng = rng
+    loss_mc = np.empty((n_mc, len(predictors)))
     for i_mc in range(n_mc):
-        if verbose:
-            if i_mc % 100 == 0:
-                print(f"Iteration {i_mc}/{n_mc}", end='\r')
+        loss_mc[i_mc] = predictor_compare(predictors, model, n_train, n_test, rng=None)
+    return loss_mc.mean(0)
 
-        model = bayes_model.random_model()  # randomize model using bayes_model
-        loss_mc[i_mc] = learn_eval(learner, model, n_train, n_test)
 
-    return loss_mc.mean()
+def predictor_compare_mc_bayes(predictors, bayes_model, n_train=0, n_test=1, n_mc=1, rng=None):
+    bayes_model.rng = rng
+    loss_mc = np.empty((n_mc, len(predictors)))
+    for i_mc in range(n_mc):
+        model = bayes_model.random_model()
+        loss_mc[i_mc] = predictor_compare(predictors, model, n_train, n_test)
+    return loss_mc.mean(0)
+
+
+# def predictor_eval_2(predictors, model, rng_fit=None, rng_eval=None):
+#     losses = []
+#     for predictor in predictors:
+#         predictor.fit_from_model(model, n_train=5, rng=rng_fit)
+#         loss = predictor.evaluate_from_model(model, n_test=10, n_mc=15, rng=rng_eval)
+#         losses.append(loss)
+#
+#     return losses
 
 
 def main():
-    # alpha_0 = alpha_0_plot = supp_x_s.size * supp_y_s.size
-    #
-    # # mean = np.ones(supp_x_s.shape + supp_y_s.shape) / (supp_x_s.size * supp_y_s.size)
-    #
-    # mean_x = FiniteDomainFunc(supp_x, np.ones(supp_x_s.shape) / supp_x_s.size)
-    #
-    # mean_y_x = FiniteDomainFunc(supp_x, np.full(supp_x_s.shape,
-    #                                             FiniteDomainFunc(supp_y, np.ones(supp_y_s.shape) / supp_y_s.size)))
-    #
-    # # bayes_model = DirichletFiniteYcXModelBayes(supp_x_s, supp_y_s, alpha_0, mean,
-    # #                                            rng_model=default_rng(6),
-    # #                                            rng_prior=default_rng(5))
-    # bayes_model = DirichletFiniteYcXModelBayesNew(alpha_0, mean_x, mean_y_x,
-    #                                               rng_model=default_rng(6),
-    #                                               rng_prior=default_rng(5))
-    #
-    # learner = ModelClassifier(bayes_model)
-    #
-    # loss = learn_eval_mc_bayes(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
-
-    # bayes_model = BetaModelBayes()
-    # learner = BetaEstimatorTemp(n_x=10)
-
     model_x = NormalRV(mean=0., cov=1.)
     x_plt = np.linspace(-3, 3, 101)
 
@@ -193,39 +173,32 @@ def main():
     model = NormalRVModel(model_x=model_x, basis_y_x=None,      # (lambda x: 1., lambda x: x)
                           weights=np.ones(2), cov_y_x=1., rng=None)
 
-    # bayes_models = [NormalModelBayes(model_x=NormalRV(), basis_y_x=(lambda x: 1., lambda x: x), cov_y_x=1,
-    #                                  rng_model=None, mean_prior=np.zeros(2), cov_prior=np.eye(2)),
-    #                 NormalModelBayes(model_x=NormalRV(), basis_y_x=(lambda x: 1., lambda x: x), cov_y_x=1,
-    #                                  rng_model=None, mean_prior=np.zeros(2), cov_prior=0.01*np.eye(2)),
-    #                 ]
-
     bayes_models = {f'learn: {_cov}': NormalModelBayes(model_x=model_x, basis_y_x=None,
                                                        cov_y_x=1., mean_prior=np.zeros(2), cov_prior=_cov*np.eye(2))
                     for _cov in [0.1, 10]}
 
-    # learners = [BayesRegressor(bayes_model, name=f'learn_{n}').fit_from_model(model, n)]
     predictors = [ModelRegressor(model, name='opt'),
                   *(BayesRegressor(bayes_model, name=name) for name, bayes_model in bayes_models.items()),
                   ]
 
-    losses = []
-    for predictor in predictors:
-        predictor.fit_from_model(model, n_train=5, rng=200)
-        loss = predictor.evaluate_from_model(model, n_test=10, n_mc=20, rng=100)
-        losses.append(loss)
-
-        if isinstance(predictor, BayesPredictor):
-            predictor.plot_param_dist(ax_prior=None)        # FIXME FIXME: z_lim ERROR????
-            plt.gca().set(title=predictor.name)
-
-            predictor.prediction_stats(x=x_plt, model=model,
-                                       n_train=10, n_mc=20, do_cov=True, do_plot=True, ax=None, rng=None)
-            plt.gca().set(title=predictor.name)
-
+    # Risk sim
+    losses = predictor_compare_mc(predictors, model, n_train=10, n_test=1, n_mc=20, rng=100)
     print(losses)
 
+    losses = predictor_compare_mc_bayes(predictors, bayes_models['learn: 0.1'], n_train=10, n_test=1, n_mc=3, rng=200)
+    print(losses)
+
+    # Plotting
+    for predictor in predictors:
+        if isinstance(predictor, BayesRegressor):
+            # predictor.plot_param_dist(ax_prior=None)
+            # plt.gca().set(title=predictor.name)
+
+            predictor.plot_predict_stats(x_plt, model, n_train=10, n_mc=20, do_std=True, ax=None, rng=None)
+            plt.gca().set(title=predictor.name)
+
     _, ax = plt.subplots()
-    plt_data = ModelPredictor.plot_predictions(predictors, x=x_plt, ax=ax)
+    plt_data = ModelPredictor.plot_predictions(predictors, x=x_plt, ax=ax)      # TODO: move, just call instance methods
     ax.legend()
     ax.grid(True)
 
@@ -239,6 +212,31 @@ def main():
     #     losses, learners = learn_out
 
     # loss = learn_eval_mc_bayes(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
+
+
+# def main():
+#     alpha_0 = alpha_0_plot = supp_x_s.size * supp_y_s.size
+#
+#     # mean = np.ones(supp_x_s.shape + supp_y_s.shape) / (supp_x_s.size * supp_y_s.size)
+#
+#     mean_x = FiniteDomainFunc(supp_x, np.ones(supp_x_s.shape) / supp_x_s.size)
+#
+#     mean_y_x = FiniteDomainFunc(supp_x, np.full(supp_x_s.shape,
+#                                                 FiniteDomainFunc(supp_y, np.ones(supp_y_s.shape) / supp_y_s.size)))
+#
+#     # bayes_model = DirichletFiniteYcXModelBayes(supp_x_s, supp_y_s, alpha_0, mean,
+#     #                                            rng_model=default_rng(6),
+#     #                                            rng_prior=default_rng(5))
+#     bayes_model = DirichletFiniteYcXModelBayesNew(alpha_0, mean_x, mean_y_x,
+#                                                   rng_model=default_rng(6),
+#                                                   rng_prior=default_rng(5))
+#
+#     learner = ModelClassifier(bayes_model)
+#
+#     loss = learn_eval_mc_bayes(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
+#
+#     bayes_model = BetaModelBayes()
+#     learner = BetaEstimatorTemp(n_x=10)
 
 
 if __name__ == '__main__':
