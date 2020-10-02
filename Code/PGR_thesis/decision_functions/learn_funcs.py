@@ -206,11 +206,15 @@ class BayesPredictor(ModelPredictor):
     #
     #     return loss.mean()
 
-    def plot_param_dist(self, ax_prior=None):  # TODO: improve or remove?
-        plt_prior = self.prior.plot_pf(ax=ax_prior)
-        ax_prior = plt_prior.axes
-        ax_posterior = ax_prior
-        self.posterior.plot_pf(ax=ax_posterior)
+    def plot_param_dist(self, x=None, ax_prior=None):  # TODO: improve or remove?
+        if x is None:
+            x = self.prior.x_default
+
+        plt_prior = self.prior.plot_pf(x, ax=ax_prior)
+        # ax_posterior= plt_prior.axes
+        ax_posterior = plt.gca()
+        # ax_posterior = None
+        self.posterior.plot_pf(x, ax=ax_posterior)
 
     def prediction_stats(self, x, model, n_train=0, n_mc=1, stats=('mode',), rng=None):
         """Get mean and covariance of prediction function for a given data model."""

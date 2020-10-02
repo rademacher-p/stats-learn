@@ -13,7 +13,7 @@ from scipy.special import gammaln, xlogy, xlog1py, betaln
 import matplotlib.pyplot as plt
 
 from util.generic import check_rng, check_data_shape, check_valid_pmf, vectorize_func, vectorize_func_dec
-from util.math import outer_gen, diag_gen, simplex_round, inverse, determinant
+from util.math import outer_gen, diag_gen, simplex_round
 from util.plot import simplex_grid
 
 
@@ -367,15 +367,15 @@ class DirichletRV(BaseRV):
         log_pf = self._log_pf_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x).reshape(-1, self.size), -1)
         return np.exp(log_pf).reshape(set_shape)
 
-    def plot_pf(self, x_plt=None, ax=None):
+    def plot_pf(self, x=None, ax=None):
         n_plt = 40
 
         if self.size in (2, 3):
-            if x_plt is None:
-                x_plt = simplex_grid(n_plt, self._shape, hull_mask=(self.mean < 1 / self.alpha_0))
+            if x is None:
+                x = simplex_grid(n_plt, self._shape, hull_mask=(self.mean < 1 / self.alpha_0))
 
-            pf_plt = self.pf(x_plt)
-            x_plt.resize(x_plt.shape[0], self.size)
+            pf_plt = self.pf(x)
+            x.resize(x.shape[0], self.size)
 
             # pf_plt.sum() / (n_plt ** (self._size - 1))
 
@@ -384,7 +384,7 @@ class DirichletRV(BaseRV):
                     _, ax = plt.subplots()
                     ax.set(xlabel='$x_1$', ylabel='$x_2$')
 
-                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pf_plt)
+                plt_data = ax.scatter(x[:, 0], x[:, 1], s=15, c=pf_plt)
 
                 c_bar = plt.colorbar(plt_data)
                 c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
@@ -397,7 +397,7 @@ class DirichletRV(BaseRV):
                     ax.view_init(35, 45)
                     ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
 
-                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pf_plt)
+                plt_data = ax.scatter(x[:, 0], x[:, 1], x[:, 2], s=15, c=pf_plt)
 
                 c_bar = plt.colorbar(plt_data)
                 c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
@@ -710,14 +710,14 @@ class BetaRV(BaseRV):
         log_pf = xlog1py(self._b - 1.0, -x) + xlogy(self._a - 1.0, x) - betaln(self._a, self._b)
         return np.exp(log_pf)
 
-    def plot_pf(self, x_plt=None, ax=None):
-        if x_plt is None:
-            x_plt = np.linspace(0, 1, 101, endpoint=True)
+    def plot_pf(self, x=None, ax=None):
+        if x is None:
+            x = np.linspace(0, 1, 101, endpoint=True)
         if ax is None:
             _, ax = plt.subplots()
             ax.set(xlabel='$x$', ylabel=r'$\mathrm{P}_\mathrm{x}(x)$')
 
-        plt_data = ax.plot(x_plt, self.pf(x_plt))
+        plt_data = ax.plot(x, self.pf(x))
         return plt_data
 
 
@@ -747,6 +747,8 @@ class NormalRV(BaseRV):
             raise ValueError(f"Mean array shape must be {self._shape}.")
         self._mean_flat = self._mean.flatten()
 
+        self._mode = self._mean
+
     @property
     def cov(self):
         return self._cov
@@ -771,10 +773,6 @@ class NormalRV(BaseRV):
         self.prec_U = psd.U
         self._log_pf_coef = -0.5 * (psd.rank * np.log(2 * np.pi) + psd.log_pdet)
 
-    @property
-    def mode(self):
-        return self.mean
-
     def _rvs(self, size=()):
         return self.rng.multivariate_normal(self._mean_flat, self._cov_flat, size).reshape(size + self._shape)
         # if self._shape == ():
@@ -795,41 +793,59 @@ class NormalRV(BaseRV):
         log_pf = self._log_pf_coef + -0.5 * maha.reshape(set_shape)
         return np.exp(log_pf)
 
-    def plot_pf(self, x_plt=None, ax=None):
-        # _delta = 0.01
+    @property
+    def x_default(self):
         n_plt = 100
 
         if self.size == 1:
-            if x_plt is None:
-                lims = self._mean.item() + np.array([-1, 1]) * 3*np.sqrt(self._cov.item())
-                # n_plt = int(round((lims[1]-lims[0]) / _delta))
-                x_plt = np.linspace(*lims, n_plt, endpoint=False).reshape(n_plt, *self._shape)
+            lims = self._mean.item() + np.array([-1, 1]) * 3 * np.sqrt(self._cov.item())
+            x = np.linspace(*lims, n_plt, endpoint=False).reshape(n_plt, *self._shape)
+        elif self.size == 2:
+            lims = [(self._mean[i] - 3 * np.sqrt(self._cov[i, i]), self._mean[i] + 3 * np.sqrt(self._cov[i, i]))
+                    for i in range(2)]
+            x0_plt = np.linspace(*lims[0], n_plt, endpoint=False)
+            x1_plt = np.linspace(*lims[1], n_plt, endpoint=False)
+            x = np.stack(np.meshgrid(x0_plt, x1_plt), axis=-1)
+        else:
+            raise NotImplementedError('Plot method only supported for 1- and 2-dimensional data.')
+
+        return x
+
+    def plot_pf(self, x=None, ax=None):
+        # _delta = 0.01
+        n_plt = 100
+
+        if x is None:
+            x = self.x_default
+
+        if self.size == 1:
+            # if x is None:
+            #     lims = self._mean.item() + np.array([-1, 1]) * 3*np.sqrt(self._cov.item())
+            #     # n_plt = int(round((lims[1]-lims[0]) / _delta))
+            #     x = np.linspace(*lims, n_plt, endpoint=False).reshape(n_plt, *self._shape)
 
             if ax is None:
                 _, ax = plt.subplots()
                 ax.set(xlabel='$x_1$', ylabel='$p$')
 
-            plt_data = ax.plot(x_plt, self.pf(x_plt))
+            plt_data = ax.plot(x, self.pf(x))
             return plt_data
 
         elif self.size == 2:
-            if x_plt is None:
-                lims = [(self._mean[i] - 3 * np.sqrt(self._cov[i, i]), self._mean[i] + 3 * np.sqrt(self._cov[i, i]))
-                        for i in range(2)]
-                # n_plt = int(round((lims[0][1] - lims[0][0]) / _delta)), int(round((lims[1][1] - lims[1][0]) / _delta))
-                x0_plt = np.linspace(*lims[0], n_plt, endpoint=False)
-                x1_plt = np.linspace(*lims[1], n_plt, endpoint=False)
-                x_plt = np.stack(np.meshgrid(x0_plt, x1_plt), axis=-1)
+            # if x is None:
+            #     lims = [(self._mean[i] - 3 * np.sqrt(self._cov[i, i]), self._mean[i] + 3 * np.sqrt(self._cov[i, i]))
+            #             for i in range(2)]
+            #     # n_plt = int(round((lims[0][1] - lims[0][0]) / _delta)), int(round((lims[1][1] - lims[1][0]) / _delta))
+            #     x0_plt = np.linspace(*lims[0], n_plt, endpoint=False)
+            #     x1_plt = np.linspace(*lims[1], n_plt, endpoint=False)
+            #     x = np.stack(np.meshgrid(x0_plt, x1_plt), axis=-1)
 
             if ax is None:
                 _, ax = plt.subplots(subplot_kw={'projection': '3d'})
                 ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$p$')
 
-            # ax.plot_wireframe(x_plt[..., 0], x_plt[..., 1], self.pf(x_plt))
-            plt_data = ax.plot_surface(x_plt[..., 0], x_plt[..., 1], self.pf(x_plt), cmap=plt.cm.viridis)
-
-            # delta = (x_plt[0, 1, 0] - x_plt[0, 0, 0]) * (x_plt[1, 0, 1] - x_plt[0, 0, 1])
-            # print(delta * self.pf(x_plt).sum())
+            # ax.plot_wireframe(x[..., 0], x[..., 1], self.pf(x))
+            plt_data = ax.plot_surface(x[..., 0], x[..., 1], self.pf(x), cmap=plt.cm.viridis)
 
             return plt_data
         else:
