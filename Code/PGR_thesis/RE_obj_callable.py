@@ -314,15 +314,15 @@ class DirichletRV(ContinuousRV):
                                               .reshape(-1, self._data_size), -1)
         return np.exp(log_pdf)
 
-    # def plot_pdf(self, x_plt, ax=None):   TODO
+    # def plot_pdf(self, x, ax=None):   TODO
     #
     #     if self._size in (2, 3):
-    #                     if x_plt is None:
-    #                 x_plt = simplex_grid(40, self._shape, hull_mask=(self.mean < 1 / self.alpha_0))
-    #             # x_plt = simplex_grid(n_plt, self._shape, hull_mask=(self.mean < 1 / self.alpha_0))
-    #         x_plt = simplex_grid(n_plt, self._shape, hull_mask=(self.mean < 1 / self.alpha_0))
-    #         pdf_plt = self.pdf(x_plt)
-    #         x_plt.resize(x_plt.shape[0], self._size)
+    #                     if x is None:
+    #                 x = simplex_grid(40, self._shape, hull_mask=(self.mean < 1 / self.alpha_0))
+    #             # x = simplex_grid(n_plt, self._shape, hull_mask=(self.mean < 1 / self.alpha_0))
+    #         x = simplex_grid(n_plt, self._shape, hull_mask=(self.mean < 1 / self.alpha_0))
+    #         pdf_plt = self.pdf(x)
+    #         x.resize(x.shape[0], self._size)
     #
     #         # pdf_plt.sum() / (n_plt ** (self._size - 1))
     #
@@ -331,7 +331,7 @@ class DirichletRV(ContinuousRV):
     #                 _, ax = plt.subplots()
     #                 ax.set(xlabel='$x_1$', ylabel='$x_2$')
     #
-    #             plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pdf_plt)
+    #             plt_data = ax.scatter(x[:, 0], x[:, 1], s=15, c=pdf_plt)
     #
     #             c_bar = plt.colorbar(plt_data)
     #             c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
@@ -342,7 +342,7 @@ class DirichletRV(ContinuousRV):
     #                 ax.view_init(35, 45)
     #                 ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
     #
-    #             plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pdf_plt)
+    #             plt_data = ax.scatter(x[:, 0], x[:, 1], x[:, 2], s=15, c=pdf_plt)
     #
     #             c_bar = plt.colorbar(plt_data)
     #             c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
@@ -454,16 +454,16 @@ class EmpiricalRV(DiscreteRV):
     # def plot_pmf(self, ax=None):
     #
     #     if self._size in (2, 3):
-    #         x_plt = simplex_grid(self.n, self._shape)
-    #         pmf_plt = self.pmf(x_plt)
-    #         x_plt.resize(x_plt.shape[0], self._size)
+    #         x = simplex_grid(self.n, self._shape)
+    #         pmf_plt = self.pmf(x)
+    #         x.resize(x.shape[0], self._size)
     #
     #         if self._size == 2:
     #             if ax is None:
     #                 _, ax = plt.subplots()
     #                 ax.set(xlabel='$x_1$', ylabel='$x_2$')
     #
-    #             plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pmf_plt)
+    #             plt_data = ax.scatter(x[:, 0], x[:, 1], s=15, c=pmf_plt)
     #
     #             c_bar = plt.colorbar(plt_data)
     #             c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
@@ -474,7 +474,7 @@ class EmpiricalRV(DiscreteRV):
     #                 ax.view_init(35, 45)
     #                 ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
     #
-    #             plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pmf_plt)
+    #             plt_data = ax.scatter(x[:, 0], x[:, 1], x[:, 2], s=15, c=pmf_plt)
     #
     #             c_bar = plt.colorbar(plt_data)
     #             c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
@@ -565,16 +565,16 @@ class DirichletEmpiricalRV(DiscreteRV):
     # def plot_pmf(self, ax=None):        # TODO: reused code. define simplex plotter outside!
     #
     #     if self._size in (2, 3):
-    #         x_plt = simplex_grid(self.n, self._shape)
-    #         pmf_plt = self.pmf(x_plt)
-    #         x_plt.resize(x_plt.shape[0], self._size)
+    #         x = simplex_grid(self.n, self._shape)
+    #         pmf_plt = self.pmf(x)
+    #         x.resize(x.shape[0], self._size)
     #
     #         if self._size == 2:
     #             if ax is None:
     #                 _, ax = plt.subplots()
     #                 ax.set(xlabel='$x_1$', ylabel='$x_2$')
     #
-    #             plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pmf_plt)
+    #             plt_data = ax.scatter(x[:, 0], x[:, 1], s=15, c=pmf_plt)
     #
     #             c_bar = plt.colorbar(plt_data)
     #             c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
@@ -585,7 +585,7 @@ class DirichletEmpiricalRV(DiscreteRV):
     #                 ax.view_init(35, 45)
     #                 ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
     #
-    #             plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pmf_plt)
+    #             plt_data = ax.scatter(x[:, 0], x[:, 1], x[:, 2], s=15, c=pmf_plt)
     #
     #             c_bar = plt.colorbar(plt_data)
     #             c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')

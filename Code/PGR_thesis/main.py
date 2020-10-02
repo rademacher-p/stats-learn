@@ -168,14 +168,14 @@ def main():
     # model_x = NormalRV(mean=np.zeros(2), cov=np.eye(2))
     # x1_plot = np.linspace(-3, 3, 101, endpoint=True)
     # x2_plot = np.linspace(-3, 3, 81, endpoint=True)
-    # x_plt = np.stack(np.meshgrid(x1_plot, x2_plot), axis=-1)
+    # x = np.stack(np.meshgrid(x1_plot, x2_plot), axis=-1)
 
     model = NormalRVModel(model_x=model_x, basis_y_x=None,      # (lambda x: 1., lambda x: x)
                           weights=np.ones(2), cov_y_x=1., rng=None)
 
-    bayes_models = {r'$C_{\theta} = $' + str(_cov): NormalModelBayes(model_x=model_x, basis_y_x=None,
-                                                       cov_y_x=1., mean_prior=np.zeros(2), cov_prior=_cov*np.eye(2))
-                    for _cov in [0.1, 10]}
+    bayes_models = {r'$C_{\theta} = $' + str(_cov): NormalModelBayes(model_x=model_x, basis_y_x=None, cov_y_x=1.,
+                                                                     mean_prior=np.zeros(2), cov_prior=_cov*np.eye(2))
+                    for _cov in [0.1]}
 
     predictors = [
         ModelRegressor(model, name=r'$f_{opt}$'),
@@ -193,17 +193,19 @@ def main():
     # Plotting
     subplot_kw = {'projection': '3d'} if model_x.shape == (2,) else {}
     _, ax = plt.subplots(subplot_kw=subplot_kw)
+    # _, ax_prior = plt.subplots(subplot_kw={'projection': '3d'})
     for predictor in predictors:
         predictor.plot_predict_stats(x_plt, model, n_train=10, n_mc=20, do_std=True, ax=ax, rng=None)
-        # predictor.plot_predict(x_plt, ax)
+        # predictor.plot_predict(x, ax)
 
-        # if isinstance(predictor, ModelRegressor):
-        #     predictor.plot_predict(x_plt, ax=ax)
-        # elif isinstance(predictor, BayesRegressor):
-        #     # predictor.plot_param_dist(ax_prior=None)
-        #     # plt.gca().set(title=predictor.name)
-        #
-        #     predictor.plot_predict_stats(x_plt, model, n_train=10, n_mc=20, do_std=True, ax=ax, rng=None)
+        if isinstance(predictor, ModelRegressor):
+            # predictor.plot_predict(x, ax=ax)
+            pass
+        elif isinstance(predictor, BayesRegressor):
+            predictor.plot_param_dist(ax_prior=None)    # FIXME: error and colorbar mismatch
+            # plt.gca().set(title=predictor.name)
+
+            # predictor.plot_predict_stats(x, model, n_train=10, n_mc=20, do_std=True, ax=ax, rng=None)
 
         # plt.gca().set(title=predictor.name)
     ax.legend()

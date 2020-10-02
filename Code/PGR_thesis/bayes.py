@@ -8,13 +8,14 @@ import functools
 
 import numpy as np
 # from scipy.stats._multivariate import multi_rv_generic
+from scipy.stats._multivariate import _PSD
 
 import RE_obj
 import RE_obj_callable
 from SL_obj import YcXModel, NormalRVModel
 from util.generic import empirical_pmf, check_rng
 from util.func_obj import FiniteDomainFunc
-from util.math import inverse, determinant, inner_prod
+from util.math import inverse, inner_prod
 
 #%% Priors
 
@@ -24,14 +25,16 @@ from util.math import inverse, determinant, inner_prod
 
 class BaseBayes:
     def __init__(self, model_gen, model_kwargs=None, prior=None, rng=None):
-        # self._data_shape_x = None
-        # self._data_shape_y = None
         self._shape = {'x': None, 'y': None}
 
         if model_kwargs is None:
             self.model_kwargs = {}
         else:
-            self.model_kwargs = model_kwargs        # TODO: use setattr() for easier access?
+            self.model_kwargs = model_kwargs
+
+        # Copy all model parameters to object
+        for key, val in self.model_kwargs.items():
+            setattr(self, key, val)
 
         # self.model_gen = functools.partial(model_gen, **self.model_kwargs)
         self.model_gen = model_gen
@@ -44,14 +47,6 @@ class BaseBayes:
     shape = property(lambda self: self._shape)
     size = property(lambda self: {key: math.prod(val) for key, val in self._shape.items()})
     ndim = property(lambda self: {key: len(val) for key, val in self._shape.items()})
-
-    # @property
-    # def data_shape_x(self):
-    #     return self._data_shape_x
-    #
-    # @property
-    # def data_shape_y(self):
-    #     return self._data_shape_y
 
     @property
     def rng(self):
@@ -86,8 +81,8 @@ class BaseBayes:
 
 
 class NormalModelBayes(BaseBayes):
-    def __init__(self, model_x=RE_obj.NormalRV(), basis_y_x=None, cov_y_x=1, rng_model=None, mean_prior=np.zeros(1),
-                 cov_prior=np.eye(1), rng_prior=None, rng=None):
+    def __init__(self, model_x=RE_obj.NormalRV(), basis_y_x=None, cov_y_x=1,
+                 mean_prior=np.zeros(1), cov_prior=np.eye(1), rng=None):
 
         _temp = np.array(cov_y_x).shape
         _shape_y = _temp[:int(len(_temp) / 2)]
@@ -102,37 +97,62 @@ class NormalModelBayes(BaseBayes):
 
         # model_gen = YcXModel.norm_model
         model_gen = NormalRVModel
-        model_kwargs = {'model_x': model_x, 'basis_y_x': basis_y_x, 'cov_y_x': cov_y_x, 'rng': None}
+        model_kwargs = {'model_x': model_x, 'basis_y_x': basis_y_x, 'cov_y_x': np.array(cov_y_x), 'rng': None}
         prior = RE_obj.NormalRV(self.mean_prior, self.cov_prior, rng=None)
         super().__init__(model_gen, model_kwargs, prior, rng)
 
         self._shape['x'] = model_x.shape
         self._shape['y'] = _shape_y
 
-    def random_model(self, rng=None):       # FIXME: rng rework for true reproducibility?
+        #
+        psd = _PSD(self.cov_y_x.reshape(2*(self.size['y'],)), allow_singular=False)
+        self._prec_U_y_x = psd.U
+
+        self._cov_prior_inv = np.linalg.inv(self.cov_prior.reshape(2*(self.prior.size,)))
+
+    def random_model(self, rng=None):
         super().random_model(rng)
         weights = self.prior.rvs()
         return self.model_gen(weights=weights, **self.model_kwargs)
 
+    # def posterior(self, d):
+    #     if len(d) == 0:
+    #         return self.prior
+    #     else:
+    #         psi = np.array([np.array([func(x_i) for func in self.basis_y_x]).T for x_i in d['x']])
+    #
+    #         _temp = sum(inner_prod(psi_i, psi_i, inverse(self.cov_y_x)) for psi_i in psi)
+    #         cov_post = inverse(inverse(self.cov_prior) + _temp)
+    #
+    #         _temp = sum(inner_prod(psi_i, y, inverse(self.cov_y_x)) for psi_i, y in zip(psi, d['y']))
+    #         mean_post = cov_post @ (inverse(self.cov_prior) @ self.mean_prior + _temp)
+    #
+    #         return RE_obj.NormalRV(mean_post, cov_post)
+
     def posterior(self, d):
-        if len(d) == 0:
+        n = len(d)
+        if n == 0:
             return self.prior
         else:
-            psi = np.array([np.array([func(x_i) for func in self.model_kwargs['basis_y_x']]).T for x_i in d['x']])
+            psi = np.array([np.array([func(x_i) for func in self.basis_y_x])
+                            for x_i in d['x']]).reshape((n, self.prior.size, self.size['y']))
 
-            _temp = sum(inner_prod(psi_i, psi_i, inverse(self.model_kwargs['cov_y_x'])) for psi_i in psi)
-            cov_post = inverse(inverse(self.cov_prior) + _temp)
+            psi_white = np.dot(psi, self._prec_U_y_x)
+            _temp = sum(psi_i @ psi_i.T for psi_i in psi_white)
+            cov_post_inv = self._cov_prior_inv + _temp
+            cov_post = np.linalg.inv(cov_post_inv)
 
-            _temp = sum(inner_prod(psi_i, y, inverse(self.model_kwargs['cov_y_x'])) for psi_i, y in zip(psi, d['y']))
-            mean_post = cov_post @ (inverse(self.cov_prior) @ self.mean_prior + _temp)
+            y_white = np.dot(d['y'].reshape(-1, self.size['y']), self._prec_U_y_x)
+            _temp = sum(psi_i @ y_i for psi_i, y_i in zip(psi_white, y_white))
+            mean_post = cov_post @ (self._cov_prior_inv @ self.mean_prior + _temp)
 
             return RE_obj.NormalRV(mean_post, cov_post)
 
     def _posterior_2_predictive(self, posterior):
         def model_y_x(x):
-            mean_y_x = sum(weight * func(x) for weight, func in zip(posterior.mean, self.model_kwargs['basis_y_x']))
-            psi_x = np.array([func(x) for func in self.model_kwargs['basis_y_x']]).T
-            cov_y_x = self.model_kwargs['cov_y_x'] + inner_prod(psi_x.T, psi_x.T, posterior.cov)
+            mean_y_x = sum(weight * func(x) for weight, func in zip(posterior.mean, self.basis_y_x))
+            psi_x = np.array([func(x) for func in self.basis_y_x]).T
+            cov_y_x = self.cov_y_x + inner_prod(psi_x.T, psi_x.T, posterior.cov)
 
             return RE_obj.NormalRV(mean_y_x, cov_y_x)
 
@@ -147,8 +167,8 @@ class NormalModelBayes(BaseBayes):
 
     def _posterior_2_model(self, posterior):
         def cov_y_x(x):
-            psi_x = np.array([func(x) for func in self.model_kwargs['basis_y_x']]).T
-            return self.model_kwargs['cov_y_x'] + inner_prod(psi_x.T, psi_x.T, posterior.cov)
+            psi_x = np.array([func(x) for func in self.basis_y_x]).T
+            return self.cov_y_x + inner_prod(psi_x.T, psi_x.T, posterior.cov)
 
         kwargs = self.model_kwargs.copy()
         kwargs.update(weights=posterior.mean, cov_y_x=cov_y_x, rng=None)
