@@ -38,7 +38,7 @@ def check_data_shape(x, data_shape=()):
 
     if data_shape == ():
         set_shape = x.shape
-    # elif x.shape == data_shape:
+    # elif x.shape == shape:
     #     set_shape = ()
     elif x.shape[-len(data_shape):] == data_shape:
         set_shape = x.shape[:-len(data_shape)]
@@ -52,9 +52,9 @@ def check_set_shape(x, set_shape=()):
     x = np.asarray(x)
 
     # if set_shape == ():
-    #     data_shape = x.shape
+    #     shape = x.shape
     # elif x.shape == set_shape:
-    #     data_shape = ()
+    #     shape = ()
     if x.shape[:len(set_shape)] == set_shape:
         data_shape = x.shape[len(set_shape):]
     else:

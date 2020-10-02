@@ -7,15 +7,15 @@ import numpy as np
 from util.generic import check_data_shape
 
 
-# def mean(x, data_shape):
-#     x, set_shape = check_data_shape(x, data_shape)
-#     return x.reshape(-1, *data_shape).mean(0)
+# def mean(x, shape):
+#     x, set_shape = check_data_shape(x, shape)
+#     return x.reshape(-1, *shape).mean(0)
 #
 #
-# def cov(x, data_shape):
-#     x, set_shape = check_data_shape(x, data_shape)
-#     data_size = math.prod(data_shape)
-#     np.cov(x.reshape(-1, data_size), rowvar=False).reshape(2 * data_shape)
+# def cov(x, shape):
+#     x, set_shape = check_data_shape(x, shape)
+#     data_size = math.prod(shape)
+#     np.cov(x.reshape(-1, data_size), rowvar=False).reshape(2 * shape)
 
 
 def outer_gen(*args):

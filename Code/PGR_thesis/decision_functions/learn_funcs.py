@@ -54,19 +54,23 @@ class ModelPredictor:
     def __repr__(self):
         return self.__class__.__name__ + f"(model={self.model})"
 
-    @property
-    def data_shape_x(self):
-        return self.model.data_shape_x
+    shape = property(lambda self: self.model.shape)
+    size = property(lambda self: self.model.size)
+    ndim = property(lambda self: self.model.ndim)
 
-    @property
-    def data_shape_y(self):
-        return self.model.data_shape_y
+    # @property
+    # def data_shape_x(self):
+    #     return self.model.data_shape_x
+    #
+    # @property
+    # def data_shape_y(self):
+    #     return self.model.data_shape_y
 
     # def fit(self, d):
     #     pass
 
     def predict(self, x):
-        return vectorize_func(self._predict_single, data_shape=self.data_shape_x)(x)
+        return vectorize_func(self._predict_single, data_shape=self.shape['x'])(x)
 
     def _predict_single(self, x):
         raise NotImplementedError("Method must be overwritten.")  # TODO: numeric approx with loss and predictive!?
@@ -79,7 +83,7 @@ class ModelPredictor:
         pass
 
     def evaluate(self, d):
-        loss = self.loss_func(self.predict(d['x']), d['y'], data_shape=self.data_shape_y)
+        loss = self.loss_func(self.predict(d['x']), d['y'], data_shape=self.shape['y'])
         return loss.mean()
 
     def evaluate_from_model(self, model, n_test=1, n_mc=1, rng=None):       # TODO: move MC looping elsewhere?
@@ -105,7 +109,7 @@ class ModelPredictor:
         """Plot prediction function."""
         # TODO: get 'x' default from model_x.plot_pf plot_data.axes?
 
-        if self.data_shape_x not in ((), (1,)):
+        if self.shape['x'] not in ((), (1,)):
             raise NotImplementedError
 
         if ax is None:
@@ -155,18 +159,22 @@ class BayesPredictor(ModelPredictor):
 
         self.fit()
 
-    @property
-    def data_shape_x(self):
-        return self.bayes_model.data_shape_x
+    # @property
+    # def data_shape_x(self):
+    #     return self.bayes_model.data_shape_x
+    #
+    # @property
+    # def data_shape_y(self):
+    #     return self.bayes_model.data_shape_y
 
-    @property
-    def data_shape_y(self):
-        return self.bayes_model.data_shape_y
+    shape = property(lambda self: self.bayes_model.shape)
+    size = property(lambda self: self.bayes_model.size)
+    ndim = property(lambda self: self.bayes_model.ndim)
 
     def fit(self, d=None):
         if d is None:
-            d = np.array([], dtype=[('x', '<f8', self.data_shape_x),
-                                    ('y', '<f8', self.data_shape_y)])
+            d = np.array([], dtype=[('x', '<f8', self.shape['x']),
+                                    ('y', '<f8', self.shape['y'])])
 
         self.posterior, self.model = self.bayes_model.fit(d)
 
@@ -197,10 +205,10 @@ class BayesPredictor(ModelPredictor):
     def prediction_stats(self, x, model, n_train=0, n_mc=1, stats=('mode',), rng=None):
         """Get mean and covariance of prediction function for a given data model."""
 
-        x, set_shape = check_data_shape(x, self.data_shape_x)
+        x, set_shape = check_data_shape(x, self.shape['x'])
 
         model.rng = rng
-        y = np.empty((n_mc, *set_shape, *self.data_shape_y))
+        y = np.empty((n_mc, *set_shape, *self.shape['y']))
         for i_mc in range(n_mc):
             self.fit_from_model(model, n_train)
             # self.fit(model.rvs(n_train))
@@ -224,9 +232,9 @@ class BayesPredictor(ModelPredictor):
                 y_mean = y.mean(0)
 
             y_del = y - y_mean
-            y_1 = y_del.reshape(n_mc, *set_shape, *self.data_shape_y, *(1 for _ in self.data_shape_y))
-            y_2 = y_del.reshape(n_mc, *set_shape, *(1 for _ in self.data_shape_y), *self.data_shape_y)
-            # y_cov = (y_1 * y_2).mean(0).reshape(*set_shape, *2 * self.data_shape_y)  # biased estimate
+            y_1 = y_del.reshape(n_mc, *set_shape, *self.shape['y'], *(1 for _ in self.shape['y']))
+            y_2 = y_del.reshape(n_mc, *set_shape, *(1 for _ in self.shape['y']), *self.shape['y'])
+            # y_cov = (y_1 * y_2).mean(0).reshape(*set_shape, *2 * self.shape['y])  # biased estimate
             y_cov = (y_1 * y_2).mean(0)  # biased estimate
 
             if 'cov' in stats.keys():
@@ -253,8 +261,8 @@ class BayesRegressor(RegressorMixin, BayesPredictor):
         if do_std:
             y_std = stats['std']
 
-        if self.data_shape_y == ():
-            if self.data_shape_x == ():
+        if self.shape['y'] == ():
+            if self.shape['x'] == ():
                 if ax is None:
                     _, ax = plt.subplots()
                     ax.set(xlabel='$x$', ylabel='$\\hat{y}(x)$')
@@ -266,7 +274,7 @@ class BayesRegressor(RegressorMixin, BayesPredictor):
                     plt_data_std = ax.fill_between(x, y_mean - y_std, y_mean + y_std, alpha=0.5)
                     plt_data = (plt_data, plt_data_std)
 
-            elif self.data_shape_x == (2,):
+            elif self.shape['x'] == (2,):
                 if ax is None:
                     _, ax = plt.subplots(subplot_kw={'projection': '3d'})
                     ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$\\hat{y}(x)$')

@@ -235,7 +235,7 @@ def _check_func_pmf(f, full_support=False):
 
 
 def _dirichlet_check_input(x, alpha_0, mean):
-    # x = check_valid_pmf(x, data_shape=mean.shape)
+    # x = check_valid_pmf(x, shape=mean.shape)
     if not isinstance(x, type(mean)):
         raise TypeError("Input must have same function type as mean.")
 
@@ -316,17 +316,17 @@ class DirichletRV(ContinuousRV):
 
     # def plot_pdf(self, x_plt, ax=None):   TODO
     #
-    #     if self._data_size in (2, 3):
+    #     if self._size in (2, 3):
     #                     if x_plt is None:
-    #                 x_plt = simplex_grid(40, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
-    #             # x_plt = simplex_grid(n_plt, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
-    #         x_plt = simplex_grid(n_plt, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
+    #                 x_plt = simplex_grid(40, self._shape, hull_mask=(self.mean < 1 / self.alpha_0))
+    #             # x_plt = simplex_grid(n_plt, self._shape, hull_mask=(self.mean < 1 / self.alpha_0))
+    #         x_plt = simplex_grid(n_plt, self._shape, hull_mask=(self.mean < 1 / self.alpha_0))
     #         pdf_plt = self.pdf(x_plt)
-    #         x_plt.resize(x_plt.shape[0], self._data_size)
+    #         x_plt.resize(x_plt.shape[0], self._size)
     #
-    #         # pdf_plt.sum() / (n_plt ** (self._data_size - 1))
+    #         # pdf_plt.sum() / (n_plt ** (self._size - 1))
     #
-    #         if self._data_size == 2:
+    #         if self._size == 2:
     #             if ax is None:
     #                 _, ax = plt.subplots()
     #                 ax.set(xlabel='$x_1$', ylabel='$x_2$')
@@ -336,7 +336,7 @@ class DirichletRV(ContinuousRV):
     #             c_bar = plt.colorbar(plt_data)
     #             c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
     #
-    #         elif self._data_size == 3:
+    #         elif self._size == 3:
     #             if ax is None:
     #                 _, ax = plt.subplots(subplot_kw={'projection': '3d'})
     #                 ax.view_init(35, 45)
@@ -377,7 +377,7 @@ def _empirical_check_n(n):
 
 
 def _empirical_check_input(x, n, mean):
-    # x = check_valid_pmf(x, data_shape=mean.shape)
+    # x = check_valid_pmf(x, shape=mean.shape)
     if not isinstance(x, type(mean)):
         raise TypeError("Input must have same function type as mean.")
 
@@ -453,12 +453,12 @@ class EmpiricalRV(DiscreteRV):
 
     # def plot_pmf(self, ax=None):
     #
-    #     if self._data_size in (2, 3):
-    #         x_plt = simplex_grid(self.n, self._data_shape)
+    #     if self._size in (2, 3):
+    #         x_plt = simplex_grid(self.n, self._shape)
     #         pmf_plt = self.pmf(x_plt)
-    #         x_plt.resize(x_plt.shape[0], self._data_size)
+    #         x_plt.resize(x_plt.shape[0], self._size)
     #
-    #         if self._data_size == 2:
+    #         if self._size == 2:
     #             if ax is None:
     #                 _, ax = plt.subplots()
     #                 ax.set(xlabel='$x_1$', ylabel='$x_2$')
@@ -468,7 +468,7 @@ class EmpiricalRV(DiscreteRV):
     #             c_bar = plt.colorbar(plt_data)
     #             c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
     #
-    #         elif self._data_size == 3:
+    #         elif self._size == 3:
     #             if ax is None:
     #                 _, ax = plt.subplots(subplot_kw={'projection': '3d'})
     #                 ax.view_init(35, 45)
@@ -552,7 +552,7 @@ class DirichletEmpiricalRV(DiscreteRV):
                               + gammaln(self._n + 1) - gammaln(self._alpha_0 + self._n))
 
     def _rvs(self, size=(), random_state=None):
-        # return rng.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
+        # return rng.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._shape) / self._n
         raise NotImplementedError
 
     def pmf(self, x):
@@ -564,12 +564,12 @@ class DirichletEmpiricalRV(DiscreteRV):
 
     # def plot_pmf(self, ax=None):        # TODO: reused code. define simplex plotter outside!
     #
-    #     if self._data_size in (2, 3):
-    #         x_plt = simplex_grid(self.n, self._data_shape)
+    #     if self._size in (2, 3):
+    #         x_plt = simplex_grid(self.n, self._shape)
     #         pmf_plt = self.pmf(x_plt)
-    #         x_plt.resize(x_plt.shape[0], self._data_size)
+    #         x_plt.resize(x_plt.shape[0], self._size)
     #
-    #         if self._data_size == 2:
+    #         if self._size == 2:
     #             if ax is None:
     #                 _, ax = plt.subplots()
     #                 ax.set(xlabel='$x_1$', ylabel='$x_2$')
@@ -579,7 +579,7 @@ class DirichletEmpiricalRV(DiscreteRV):
     #             c_bar = plt.colorbar(plt_data)
     #             c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
     #
-    #         elif self._data_size == 3:
+    #         elif self._size == 3:
     #             if ax is None:
     #                 _, ax = plt.subplots(subplot_kw={'projection': '3d'})
     #                 ax.view_init(35, 45)
@@ -647,7 +647,7 @@ class EmpiricalRP(DiscreteRV):      # CONTINUOUS
     # Attribute Updates
     def _update_attr(self):
         self._data_shape = self._mean.data_shape
-        # self._data_size = self._mean.size
+        # self._size = self._mean.size
 
         # self._mode = ((self._n * self._mean) // 1) + FiniteDomainFunc(self._mean.supp,
         #                                                               simplex_round((self._n * self._mean.val) % 1))
@@ -660,7 +660,7 @@ class EmpiricalRP(DiscreteRV):      # CONTINUOUS
     def _rvs(self, size=(), random_state=None):
         raise NotImplementedError   # FIXME
 
-        vals = random_state.multinomial(self._n, self._mean.val.flatten(), size).reshape(size + self._data_shape)
+        vals = random_state.multinomial(self._n, self._mean.val.flatten(), size).reshape(size + self._shape)
         if size == ():
             return FiniteDomainFunc(self.mean.supp, vals)
         else:
@@ -670,7 +670,7 @@ class EmpiricalRP(DiscreteRV):      # CONTINUOUS
     #     x = _empirical_check_input(x, self._n, self._mean)
     #
     #     log_pmf = self._log_pmf_coef + (xlogy(self._n * x.val, self._mean.val)
-    #                                     - gammaln(self._n * x.val + 1)).reshape(-1, self._data_size).sum(axis=-1)
+    #                                     - gammaln(self._n * x.val + 1)).reshape(-1, self._size).sum(axis=-1)
     #     return np.exp(log_pmf)
 
 
