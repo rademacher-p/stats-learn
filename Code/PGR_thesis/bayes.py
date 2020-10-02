@@ -2,9 +2,9 @@
 Bayesian Prior objects.
 """
 
+import math
 import types
 import functools
-# import itertools
 
 import numpy as np
 # from scipy.stats._multivariate import multi_rv_generic
@@ -24,8 +24,9 @@ from util.math import inverse, determinant, inner_prod
 
 class BaseBayes:
     def __init__(self, model_gen, model_kwargs=None, prior=None, rng=None):
-        self._data_shape_x = None
-        self._data_shape_y = None
+        # self._data_shape_x = None
+        # self._data_shape_y = None
+        self._shape = {'x': None, 'y': None}
 
         if model_kwargs is None:
             self.model_kwargs = {}
@@ -40,13 +41,17 @@ class BaseBayes:
         self.model_kwargs.update(rng=self._rng)
         self.prior.rng = self._rng
 
-    @property
-    def data_shape_x(self):
-        return self._data_shape_x
+    shape = property(lambda self: self._shape)
+    size = property(lambda self: {key: math.prod(val) for key, val in self._shape})
+    ndim = property(lambda self: {key: len(val) for key, val in self._shape})
 
-    @property
-    def data_shape_y(self):
-        return self._data_shape_y
+    # @property
+    # def data_shape_x(self):
+    #     return self._data_shape_x
+    #
+    # @property
+    # def data_shape_y(self):
+    #     return self._data_shape_y
 
     @property
     def rng(self):
@@ -85,15 +90,14 @@ class NormalModelBayes(BaseBayes):
                  cov_prior=np.eye(1), rng_prior=None, rng=None):
 
         _temp = np.array(cov_y_x).shape
-        _data_shape_y = _temp[:int(len(_temp) / 2)]
+        _shape_y = _temp[:int(len(_temp) / 2)]
 
         self.mean_prior = np.array(mean_prior)
         self.cov_prior = np.array(cov_prior)
 
         if basis_y_x is None:
             def power_func(i):
-                # return lambda x: np.full(_data_shape_y, x) ** i
-                return lambda x: np.full(_data_shape_y, (x**i).sum())
+                return lambda x: np.full(_shape_y, (x**i).sum())
             basis_y_x = tuple(power_func(i) for i in range(len(self.mean_prior)))
 
         # model_gen = YcXModel.norm_model
@@ -102,8 +106,8 @@ class NormalModelBayes(BaseBayes):
         prior = RE_obj.NormalRV(self.mean_prior, self.cov_prior, rng=None)
         super().__init__(model_gen, model_kwargs, prior, rng)
 
-        self._data_shape_x = model_x.data_shape
-        self._data_shape_y = _data_shape_y
+        self._shape['x'] = model_x.shape
+        self._shape['y'] = _shape_y
 
     def random_model(self, rng=None):       # FIXME: rng rework for true reproducibility?
         super().random_model(rng)
@@ -178,7 +182,7 @@ class NormalModelBayes(BaseBayes):
 
 
 
-#%% TODO FIXME
+#%% TODO FIXME: rework, fix shape attributes...
 
 class DirichletFiniteYcXModelBayesNew(BaseBayes):
     def __init__(self, alpha_0, mean_x, mean_y_x, rng_model=None, rng_prior=None):

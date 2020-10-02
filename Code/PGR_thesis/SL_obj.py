@@ -4,6 +4,8 @@ Supervised Learning base classes.
 
 # TODO: add conditional RE object?
 
+import math
+
 import numpy as np
 from scipy import stats
 
@@ -20,8 +22,9 @@ class BaseModel:
     def __init__(self, rng=None):
         self._rng = check_rng(rng)
 
-        self._data_shape_x = None
-        self._data_shape_y = None
+        # self._data_shape_x = None
+        # self._data_shape_y = None
+        self._shape = {'x': None, 'y': None}
 
         self._mode_x = None
         self._mode_y_x = None
@@ -35,13 +38,17 @@ class BaseModel:
         if rng is not None:
             self._rng = check_rng(rng)
 
-    @property
-    def data_shape_x(self):
-        return self._data_shape_x
+    shape = property(lambda self: self._shape)
+    size = property(lambda self: {key: math.prod(val) for key, val in self._shape})
+    ndim = property(lambda self: {key: len(val) for key, val in self._shape})
 
-    @property
-    def data_shape_y(self):
-        return self._data_shape_y
+    # @property
+    # def data_shape_x(self):
+    #     return self._data_shape_x
+    #
+    # @property
+    # def data_shape_y(self):
+    #     return self._data_shape_y
 
     @property
     def mode_x(self):
@@ -52,7 +59,7 @@ class BaseModel:
     #     return self._mode_y_x
 
     def mode_y_x(self, x):
-        return vectorize_func(self._mode_y_x_single, self._data_shape_x)(x)
+        return vectorize_func(self._mode_y_x_single, self._shape['x'])(x)
 
     def _mode_y_x_single(self, x):
         raise NotImplementedError
@@ -89,7 +96,7 @@ class MixinRVy:
     #     return self._mean_y_x
 
     def mean_y_x(self, x):
-        return vectorize_func(self._mean_y_x_single, self._data_shape_x)(x)
+        return vectorize_func(self._mean_y_x_single, self._shape['x'])(x)
 
     def _mean_y_x_single(self, x):
         raise NotImplementedError
@@ -100,7 +107,7 @@ class MixinRVy:
     #     return self._cov_y_x
 
     def cov_y_x(self, x):
-        return vectorize_func(self._cov_y_x_single, self._data_shape_x)(x)
+        return vectorize_func(self._cov_y_x_single, self._shape['x'])(x)
 
     def _cov_y_x_single(self, x):
         raise NotImplementedError
@@ -133,7 +140,7 @@ class MixinRVy:
 #     #     return self._mean_y_x
 #
 #     def mean_y_x(self, x):
-#         return vectorize_func(self._mean_y_x_single, self._data_shape_x)(x)
+#         return vectorize_func(self._mean_y_x_single, self._shape['x'])(x)
 #
 #     def _mean_y_x_single(self, x):
 #         raise NotImplementedError
@@ -144,7 +151,7 @@ class MixinRVy:
 #     #     return self._cov_y_x
 #
 #     def cov_y_x(self, x):
-#         return vectorize_func(self._cov_y_x_single, self._data_shape_x)(x)
+#         return vectorize_func(self._cov_y_x_single, self._shape['x'])(x)
 #
 #     def _cov_y_x_single(self, x):
 #         raise NotImplementedError
@@ -191,23 +198,21 @@ class YcXModel(BaseModel):
         self._update_y_x()
 
     def _update_x(self):
-        self._data_shape_x = self._model_x.data_shape
+        self._shape['x'] = self._model_x.shape
         self._mode_x = self._model_x.mode
 
     def _update_y_x(self):
-        self._data_shape_y = self._model_y_x(self._model_x.rvs()).data_shape
-        # self._mode_y_x = vectorize_func(lambda x: self._model_y_x(x).mode, self._data_shape_x)
+        self._shape['y'] = self._model_y_x(self._model_x.rvs()).shape
+        # self._mode_y_x = vectorize_func(lambda x: self._model_y_x(x).mode, self._shape['x'])
         self._mode_y_x_single = lambda x: self._model_y_x(x).mode
 
     def _rvs(self, size=()):
         d_x = np.array(self.model_x.rvs(size, self.rng))
         d_y = np.array([self.model_y_x(x).rvs((), self.rng)
-                        for x in d_x.reshape((-1,) + self._data_shape_x)]).reshape(size + self.data_shape_y)
+                        for x in d_x.reshape((-1,) + self.shape['x'])]).reshape(size + self.shape['y'])
 
-        # d = np.array(list(zip(d_y.reshape((-1,) + self.data_shape_y), d_x.reshape((-1,) + self.data_shape_x))),
-        #              dtype=[('y', d_y.dtype, self.data_shape_y), ('x', d_x.dtype, self.data_shape_x)]).reshape(size)
-        d = np.array(list(zip(d_x.reshape((-1,) + self.data_shape_x), d_y.reshape((-1,) + self.data_shape_y))),
-                     dtype=[('x', d_x.dtype, self.data_shape_x), ('y', d_y.dtype, self.data_shape_y)]).reshape(size)
+        d = np.array(list(zip(d_x.reshape((-1,) + self.shape['x']), d_y.reshape((-1,) + self.shape['y']))),
+                     dtype=[('x', d_x.dtype, self._shape['x']), ('y', d_y.dtype, self._shape['y'])]).reshape(size)
 
         return d
 
@@ -257,8 +262,8 @@ class YcXModelRVx(MixinRVx, YcXModel):
 class YcXModelRVy(MixinRVy, YcXModel):
     def _update_y_x(self):
         super()._update_y_x()
-        # self._mean_y_x = vectorize_func(lambda x: self._model_y_x(x).mean, self._data_shape_x)
-        # self._cov_y_x = vectorize_func(lambda x: self._model_y_x(x).cov, self._data_shape_x)
+        # self._mean_y_x = vectorize_func(lambda x: self._model_y_x(x).mean, self._shape['x'])
+        # self._cov_y_x = vectorize_func(lambda x: self._model_y_x(x).cov, self._shape['x'])
         self._mean_y_x_single = lambda x: self._model_y_x(x).mean
         self._cov_y_x_single = lambda x: self._model_y_x(x).cov
 
@@ -300,15 +305,14 @@ class NormalRVModel(MixinRVx, MixinRVy, BaseModel):
         else:
             self._cov_y_x_single = lambda x: self._cov_y_x_arg
             _temp = self._cov_y_x_arg.shape
-        self._data_shape_y = _temp[:int(len(_temp) / 2)]
+        self._shape['y'] = _temp[:int(len(_temp) / 2)]
 
         self._mode_y_x_single = self._mean_y_x_single
 
         # self.basis_y_x = basis_y_x
         if basis_y_x is None:
             def power_func(i):
-                # return lambda x: np.full(_data_shape_y, x) ** i
-                return lambda x: np.full(self._data_shape_y, (x ** i).sum())
+                return lambda x: np.full(self.shape['y'], (x ** i).sum())
 
             self.basis_y_x = tuple(power_func(i) for i in range(len(self.weights)))
         else:
@@ -326,7 +330,7 @@ class NormalRVModel(MixinRVx, MixinRVy, BaseModel):
     def model_x(self, model_x):
         self._model_x = model_x
 
-        self._data_shape_x = self._model_x.data_shape
+        self._shape['x'] = self._model_x.shape
         self._mode_x = self._model_x.mode
 
         self._mean_x = self._model_x.mean

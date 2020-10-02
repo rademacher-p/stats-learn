@@ -27,9 +27,14 @@ class BaseRE:
     def __init__(self, rng=None):
         self._rng = check_rng(rng)       # TODO: want scipy subclass for seed control functionality?
 
-        self._data_shape = None
-        self._data_size = None
+        self._shape = None
         self._mode = None
+
+    shape = property(lambda self: self._shape)
+    size = property(lambda self: math.prod(self._shape))
+    ndim = property(lambda self: len(self._shape))
+
+    mode = property(lambda self: self._mode)
 
     @property
     def rng(self):
@@ -40,16 +45,8 @@ class BaseRE:
         if rng is not None:
             self._rng = check_rng(rng)
 
-    @property
-    def data_shape(self):
-        return self._data_shape
-
-    @property
-    def mode(self):
-        return self._mode
-
     def pf(self, x):
-        return vectorize_func(self._pf_single, self._data_shape)(x)     # TODO: decorator? better way?
+        return vectorize_func(self._pf_single, self._shape)(x)     # TODO: decorator? better way?
 
     def _pf_single(self, x):
         raise NotImplementedError("Method must be overwritten.")
@@ -77,13 +74,17 @@ class BaseRE:
 
 
 class MixinRV:
-    @property
-    def mean(self):
-        return self._mean
 
-    @property
-    def cov(self):
-        return self._cov
+    mean = property(lambda self: self._mean)
+    cov = property(lambda self: self._cov)
+
+    # @property
+    # def mean(self):
+    #     return self._mean
+    #
+    # @property
+    # def cov(self):
+    #     return self._cov
 
 
 class BaseRV(MixinRV, BaseRE):
@@ -96,13 +97,13 @@ class BaseRV(MixinRV, BaseRE):
         self._mean = None
         self._cov = None
 
-    @property
-    def mean(self):
-        return self._mean
-
-    @property
-    def cov(self):
-        return self._cov
+    # @property
+    # def mean(self):
+    #     return self._mean
+    #
+    # @property
+    # def cov(self):
+    #     return self._cov
 
 
 #%% Specific RE's
@@ -133,17 +134,14 @@ class DeterministicRE(BaseRE):
     @val.setter
     def val(self, val):
         self._val = np.asarray(val)
-
-        self._data_shape = self._val.shape
-        self._data_size = self._val.size
-
+        self._shape = self._val.shape
         self._mode = self._val
 
     def _rvs(self, size=()):
-        return np.broadcast_to(self._val, size + self._data_shape)
+        return np.broadcast_to(self._val, size + self._shape)
 
     def pf(self, x):
-        return np.where(np.all(x.reshape(-1, self._data_size) == self._val.flatten(), axis=-1), 1., 0.)
+        return np.where(np.all(x.reshape(-1, self.size) == self._val.flatten(), axis=-1), 1., 0.)
 
     # def _pf_single(self, x):
     #     return 1. if np.all(np.array(x) == self._val) else 0.
@@ -160,7 +158,7 @@ class DeterministicRV(MixinRV, DeterministicRE):
         # super(DeterministicRV, self.__class__).val.fset(self, val)    # TODO: super instead?
 
         self._mean = self._val
-        self._cov = np.zeros(2 * self._data_shape)
+        self._cov = np.zeros(2 * self._shape)
 
 
 # rng = np.random.default_rng()
@@ -212,8 +210,7 @@ class FiniteRE(BaseRE):
 
     # Attribute Updates
     def _update_attr(self):
-        set_shape, self._data_shape = self._supp.shape[:self._p.ndim], self._supp.shape[self._p.ndim:]
-        self._data_size = math.prod(self._data_shape)
+        set_shape, self._shape = self._supp.shape[:self._p.ndim], self._supp.shape[self._p.ndim:]
 
         if set_shape != self._p.shape:
             raise ValueError("Leading shape values of 'supp' must equal the shape of 'p'.")
@@ -223,11 +220,11 @@ class FiniteRE(BaseRE):
         if len(self._supp_flat) != len(np.unique(self._supp_flat, axis=0)):
             raise ValueError("Input 'supp' must have unique values")
 
-        self._mode = self._supp_flat[np.argmax(self._p_flat)].reshape(self._data_shape)
+        self._mode = self._supp_flat[np.argmax(self._p_flat)].reshape(self._shape)
 
     def _rvs(self, size=()):
         i = self.rng.choice(self._p.size, size, p=self._p_flat)
-        return self._supp_flat[i].reshape(size + self._data_shape)
+        return self._supp_flat[i].reshape(size + self._shape)
 
     def _pf_single(self, x):
         eq_supp = np.all(x.flatten() == self._supp_flat, axis=-1)
@@ -258,11 +255,11 @@ class FiniteRV(MixinRV, FiniteRE):
         super()._update_attr()
 
         mean_flat = (self._p_flat[:, np.newaxis] * self._supp_flat).sum(axis=0)
-        self._mean = mean_flat.reshape(self._data_shape)
+        self._mean = mean_flat.reshape(self._shape)
 
         ctr_flat = self._supp_flat - mean_flat
         outer_flat = (ctr_flat[:, np.newaxis] * ctr_flat[..., np.newaxis]).reshape(self._p.size, -1)
-        self._cov = (self._p_flat[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self._data_shape)
+        self._cov = (self._p_flat[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self._shape)
 
     def plot_pf(self, ax=None):
         if self._p.ndim == 1:
@@ -357,11 +354,10 @@ class DirichletRV(BaseRV):
 
     # Attribute Updates
     def _update_attr(self):
-        self._data_shape = self._mean.shape
-        self._data_size = self._mean.size
+        self._shape = self._mean.shape
 
         if np.min(self._mean) > 1 / self._alpha_0:
-            self._mode = (self._mean - 1 / self._alpha_0) / (1 - self._data_size / self._alpha_0)
+            self._mode = (self._mean - 1 / self._alpha_0) / (1 - self.size / self._alpha_0)
         else:
             # warnings.warn("Mode method currently supported for mean > 1/alpha_0 only")
             self._mode = None       # TODO: complete with general formula
@@ -371,27 +367,27 @@ class DirichletRV(BaseRV):
         self._log_pf_coef = gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
 
     def _rvs(self, size=()):
-        return self.rng.dirichlet(self._alpha_0 * self._mean.flatten(), size).reshape(size + self._data_shape)
+        return self.rng.dirichlet(self._alpha_0 * self._mean.flatten(), size).reshape(size + self._shape)
 
     def pf(self, x):
         x, set_shape = _dirichlet_check_input(x, self._alpha_0, self._mean)
 
-        log_pf = self._log_pf_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x).reshape(-1, self._data_size), -1)
+        log_pf = self._log_pf_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x).reshape(-1, self.size), -1)
         return np.exp(log_pf).reshape(set_shape)
 
     def plot_pf(self, x_plt=None, ax=None):
 
-        if self._data_size in (2, 3):
+        if self.size in (2, 3):
             if x_plt is None:
-                x_plt = simplex_grid(40, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
-            # x_plt = simplex_grid(n_plt, self._data_shape, hull_mask=(self.mean < 1 / self.alpha_0))
+                x_plt = simplex_grid(40, self._shape, hull_mask=(self.mean < 1 / self.alpha_0))
+            # x_plt = simplex_grid(n_plt, self._shape, hull_mask=(self.mean < 1 / self.alpha_0))
 
             pf_plt = self.pf(x_plt)
-            x_plt.resize(x_plt.shape[0], self._data_size)
+            x_plt.resize(x_plt.shape[0], self.size)
 
-            # pf_plt.sum() / (n_plt ** (self._data_size - 1))
+            # pf_plt.sum() / (n_plt ** (self._size - 1))
 
-            if self._data_size == 2:
+            if self.size == 2:
                 if ax is None:
                     _, ax = plt.subplots()
                     ax.set(xlabel='$x_1$', ylabel='$x_2$')
@@ -403,7 +399,7 @@ class DirichletRV(BaseRV):
 
                 return plt_data
 
-            elif self._data_size == 3:
+            elif self.size == 3:
                 if ax is None:
                     _, ax = plt.subplots(subplot_kw={'projection': '3d'})
                     ax.view_init(35, 45)
@@ -482,8 +478,7 @@ class EmpiricalRV(BaseRV):
 
     # Attribute Updates
     def _update_attr(self):
-        self._data_shape = self._mean.shape
-        self._data_size = self._mean.size
+        self._shape = self._mean.shape
 
         self._mode = ((self._n * self._mean) // 1) + simplex_round((self._n * self._mean) % 1)  # FIXME: broken
 
@@ -492,23 +487,23 @@ class EmpiricalRV(BaseRV):
         self._log_pf_coef = gammaln(self._n + 1)
 
     def _rvs(self, size=()):
-        return self.rng.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
+        return self.rng.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._shape) / self._n
 
     def pf(self, x):
         x, set_shape = _empirical_check_input(x, self._n, self._mean)
 
         log_pf = self._log_pf_coef + (xlogy(self._n * x, self._mean)
-                                      - gammaln(self._n * x + 1)).reshape(-1, self._data_size).sum(axis=-1)
+                                      - gammaln(self._n * x + 1)).reshape(-1, self.size).sum(axis=-1)
         return np.exp(log_pf).reshape(set_shape)
 
     def plot_pf(self, ax=None):
 
-        if self._data_size in (2, 3):
-            x_plt = simplex_grid(self.n, self._data_shape)
+        if self.size in (2, 3):
+            x_plt = simplex_grid(self.n, self._shape)
             pf_plt = self.pf(x_plt)
-            x_plt.resize(x_plt.shape[0], self._data_size)
+            x_plt.resize(x_plt.shape[0], self.size)
 
-            if self._data_size == 2:
+            if self.size == 2:
                 if ax is None:
                     _, ax = plt.subplots()
                     ax.set(xlabel='$x_1$', ylabel='$x_2$')
@@ -520,7 +515,7 @@ class EmpiricalRV(BaseRV):
 
                 return plt_data
 
-            elif self._data_size == 3:
+            elif self.size == 3:
                 if ax is None:
                     _, ax = plt.subplots(subplot_kw={'projection': '3d'})
                     ax.view_init(35, 45)
@@ -593,8 +588,7 @@ class DirichletEmpiricalRV(BaseRV):
 
     # Attribute Updates
     def _update_attr(self):
-        self._data_shape = self._mean.shape
-        self._data_size = self._mean.size
+        self._shape = self._mean.shape
 
         # TODO: mode?
 
@@ -605,24 +599,24 @@ class DirichletEmpiricalRV(BaseRV):
                              + gammaln(self._n + 1) - gammaln(self._alpha_0 + self._n))
 
     def _rvs(self, size=()):
-        # return rng.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._data_shape) / self._n
+        # return rng.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._shape) / self._n
         raise NotImplementedError
 
     def pf(self, x):
         x, set_shape = _empirical_check_input(x, self._n, self._mean)
 
         log_pf = self._log_pf_coef + (gammaln(self._alpha_0 * self._mean + self._n * x) - gammaln(self._n * x + 1))\
-            .reshape(-1, self._data_size).sum(axis=-1)
+            .reshape(-1, self.size).sum(axis=-1)
         return np.exp(log_pf).reshape(set_shape)
 
     def plot_pf(self, ax=None):        # TODO: reused code. define simplex plotter outside!
 
-        if self._data_size in (2, 3):
-            x_plt = simplex_grid(self.n, self._data_shape)
+        if self.size in (2, 3):
+            x_plt = simplex_grid(self.n, self._shape)
             pf_plt = self.pf(x_plt)
-            x_plt.resize(x_plt.shape[0], self._data_size)
+            x_plt.resize(x_plt.shape[0], self.size)
 
-            if self._data_size == 2:
+            if self.size == 2:
                 if ax is None:
                     _, ax = plt.subplots()
                     ax.set(xlabel='$x_1$', ylabel='$x_2$')
@@ -634,7 +628,7 @@ class DirichletEmpiricalRV(BaseRV):
 
                 return plt_data
 
-            elif self._data_size == 3:
+            elif self.size == 3:
                 if ax is None:
                     _, ax = plt.subplots(subplot_kw={'projection': '3d'})
                     ax.view_init(35, 45)
@@ -673,8 +667,7 @@ class BetaRV(BaseRV):
             raise ValueError("Parameters must be strictly positive.")
         self._a, self._b = a, b
 
-        self._data_shape = ()
-        self._data_size = 1
+        self._shape = ()
         self._update_attr()
 
     # Input properties
@@ -740,8 +733,7 @@ class NormalRV(BaseRV):
     def __init__(self, mean=0., cov=1., rng=None):
         super().__init__(rng)
         _mean = np.array(mean)
-        self._data_shape = _mean.shape
-        self._data_size = _mean.size
+        self._shape = _mean.shape
 
         self.mean = mean
         self.cov = cov
@@ -759,8 +751,8 @@ class NormalRV(BaseRV):
     @mean.setter
     def mean(self, mean):
         self._mean = np.array(mean)
-        if self._mean.shape != self._data_shape:
-            raise ValueError(f"Mean array shape must be {self._data_shape}.")
+        if self._mean.shape != self._shape:
+            raise ValueError(f"Mean array shape must be {self._shape}.")
         self._mean_flat = self._mean.flatten()
 
     @property
@@ -770,9 +762,9 @@ class NormalRV(BaseRV):
     @cov.setter
     def cov(self, cov):
         self._cov = np.array(cov)
-        if self._cov.shape != self._data_shape * 2:
-            raise ValueError(f"Covariance array shape must be {self._data_shape * 2}.")
-        self._cov_flat = self._cov.reshape(2 * (self._data_size,))
+        if self._cov.shape != self._shape * 2:
+            raise ValueError(f"Covariance array shape must be {self._shape * 2}.")
+        self._cov_flat = self._cov.reshape(2 * (self.size,))
 
         # self._psd = _PSD(self._cov)
         # self._log_pf_coef = -0.5 * (self._psd.rank * np.log(2 * np.pi) + self._psd.log_pdet)
@@ -781,7 +773,7 @@ class NormalRV(BaseRV):
         # _log_det_cov = np.log(determinant(self._cov))
         # self._inv_cov = np.linalg.inv(self._cov)
         # _log_det_cov = np.log(np.linalg.det(self._cov))
-        # self._log_pf_coef = -0.5 * (self._data_size * np.log(2 * np.pi) + _log_det_cov)
+        # self._log_pf_coef = -0.5 * (self._size * np.log(2 * np.pi) + _log_det_cov)
 
         psd = _PSD(self._cov_flat, allow_singular=False)
         self.prec_U = psd.U
@@ -792,19 +784,20 @@ class NormalRV(BaseRV):
         return self.mean
 
     def _rvs(self, size=()):
-        if self._data_shape == ():
-            return self.rng.normal(self._mean, np.sqrt(self._cov), size).reshape(size + self._data_shape)
-        else:
-            return self.rng.multivariate_normal(self._mean, self._cov, size).reshape(size + self._data_shape)
+        return self.rng.multivariate_normal(self._mean_flat, self._cov_flat, size).reshape(size + self._shape)
+        # if self._shape == ():
+        #     return self.rng.normal(self._mean, np.sqrt(self._cov), size).reshape(size + self._shape)
+        # else:
+        #     return self.rng.multivariate_normal(self._mean, self._cov, size).reshape(size + self._shape)
 
     def pf(self, x):
-        x, set_shape = check_data_shape(x, self._data_shape)
+        x, set_shape = check_data_shape(x, self._shape)
 
-        dev = x.reshape(-1, self._data_size) - self._mean_flat
+        dev = x.reshape(-1, self.size) - self._mean_flat
         maha = np.sum(np.square(np.dot(dev, self.prec_U)), axis=-1)
 
-        # inner_white = np.array([(outer_gen(dev_i, np.ones(self._data_shape)) * self._inv_cov
-        #                         * outer_gen(np.ones(self._data_shape), dev_i)).sum() for dev_i in dev])
+        # inner_white = np.array([(outer_gen(dev_i, np.ones(self._shape)) * self._inv_cov
+        #                         * outer_gen(np.ones(self._shape), dev_i)).sum() for dev_i in dev])
         # inner_white = np.sum(np.square(np.dot(dev, self._psd.U)), axis=-1)
 
         log_pf = self._log_pf_coef + -0.5 * maha.reshape(set_shape)
@@ -814,11 +807,11 @@ class NormalRV(BaseRV):
         # _delta = 0.01
         n_plt = 100
 
-        if self._data_size == 1:
+        if self.size == 1:
             if x_plt is None:
                 lims = self._mean.item() + np.array([-1, 1]) * 3*np.sqrt(self._cov.item())
                 # n_plt = int(round((lims[1]-lims[0]) / _delta))
-                x_plt = np.linspace(*lims, n_plt, endpoint=False).reshape(n_plt, *self._data_shape)
+                x_plt = np.linspace(*lims, n_plt, endpoint=False).reshape(n_plt, *self._shape)
 
             if ax is None:
                 _, ax = plt.subplots()
@@ -827,7 +820,7 @@ class NormalRV(BaseRV):
             plt_data = ax.plot(x_plt, self.pf(x_plt))
             return plt_data
 
-        elif self._data_size == 2:
+        elif self.size == 2:
             if x_plt is None:
                 lims = [(self._mean[i] - 3 * np.sqrt(self._cov[i, i]), self._mean[i] + 3 * np.sqrt(self._cov[i, i]))
                         for i in range(2)]
