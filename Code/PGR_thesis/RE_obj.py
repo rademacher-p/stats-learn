@@ -97,14 +97,6 @@ class BaseRV(MixinRV, BaseRE):
         self._mean = None
         self._cov = None
 
-    # @property
-    # def mean(self):
-    #     return self._mean
-    #
-    # @property
-    # def cov(self):
-    #     return self._cov
-
 
 #%% Specific RE's
 
@@ -376,11 +368,11 @@ class DirichletRV(BaseRV):
         return np.exp(log_pf).reshape(set_shape)
 
     def plot_pf(self, x_plt=None, ax=None):
+        n_plt = 40
 
         if self.size in (2, 3):
             if x_plt is None:
-                x_plt = simplex_grid(40, self._shape, hull_mask=(self.mean < 1 / self.alpha_0))
-            # x_plt = simplex_grid(n_plt, self._shape, hull_mask=(self.mean < 1 / self.alpha_0))
+                x_plt = simplex_grid(n_plt, self._shape, hull_mask=(self.mean < 1 / self.alpha_0))
 
             pf_plt = self.pf(x_plt)
             x_plt.resize(x_plt.shape[0], self.size)
