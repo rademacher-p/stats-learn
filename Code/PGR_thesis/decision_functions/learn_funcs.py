@@ -3,7 +3,7 @@ Supervised learning functions.
 """
 
 import functools
-from math import floor
+import math
 from collections import Sequence
 
 import numpy as np
@@ -20,7 +20,7 @@ from SL_obj import BaseModel, MixinRVy, YcXModel
 # TODO: COMPLETE property set/get check, rework!
 
 
-# TODO: infer learner type from loss_func? use same model attribute for both optimal and bayesian learners!
+# TODO: same learning/evaluation API for fixed and Bayesian learners!?
 
 
 # %%
@@ -107,32 +107,34 @@ class ModelPredictor:
 
     def plot_predict(self, x, ax=None):
         """Plot prediction function."""
+        return self._plotting(x, self.predict(x), ax)
+
+    def _plotting(self, x, y, ax=None):
         # TODO: get 'x' default from model_x.plot_pf plot_data.axes?
 
-        if self.shape['x'] not in ((), (1,)):
+        x, set_shape = check_data_shape(x, self.shape['x'])
+
+        if self.ndim['y'] == 0:
+            if self.shape['x'] == () and len(set_shape) == 1:
+                if ax is None:
+                    _, ax = plt.subplots()
+                    ax.set(xlabel='$x$', ylabel='$\\hat{y}(x)$')
+                    ax.grid(True)
+
+                plt_data = ax.plot(x, y, label=self.name)
+
+            elif self.shape['x'] == (2,) and len(set_shape) == 2:
+                if ax is None:
+                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$\\hat{y}(x)$')
+
+                plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, cmap=plt.cm.viridis)
+
+            else:
+                raise NotImplementedError
+        else:
             raise NotImplementedError
 
-        if ax is None:
-            _, ax = plt.subplots()
-            ax.set(xlabel='$x$', ylabel='$\\hat{y}(x)$')
-            ax.grid(True)
-
-        plt_data = ax.plot(x, self.predict(x), label=self.name)
-
-        return plt_data
-
-    @classmethod
-    def plot_predictions(cls, predictors, x, ax=None):  # TODO: improve or remove?
-        """Plot multiple prediction functions on a single axes."""
-
-        if ax is None:
-            _, ax = plt.subplots()
-            ax.grid(True)
-
-        plt_data = []
-        for predictor in predictors:
-            plt_data_ = predictor.plot_predict(x, ax)
-            plt_data.append(plt_data_[0])
         return plt_data
 
 
@@ -144,6 +146,14 @@ class ModelClassifier(ClassifierMixin, ModelPredictor):
 class ModelRegressor(RegressorMixin, ModelPredictor):
     def __init__(self, model, name=None):
         super().__init__(loss_se, model, name)
+
+    def plot_predict_stats(self, x, model, n_train=0, n_mc=1, do_std=False, ax=None, rng=None):
+        y = self.predict(x)
+        plt_data = self._plotting(x, y, ax)
+        if do_std:
+            ax.fill_between(x, y, y, alpha=0.5)
+
+        return plt_data
 
 
 # %% Learning Functions
@@ -223,24 +233,40 @@ class BayesPredictor(ModelPredictor):
             stats['median'] = np.median(y, axis=0)
 
         if 'mean' in stats.keys():
-            stats['mean'] = y.mean(0)
+            stats['mean'] = y.mean(axis=0)
 
-        if 'cov' in stats.keys() or 'std' in stats.keys():
-            try:
-                y_mean = stats['mean']
-            except KeyError:
-                y_mean = y.mean(0)
+        if 'std' in stats.keys():
+            if self.ndim['y'] == 0:
+                stats['std'] = y.std(axis=0)
+            else:
+                raise ValueError("Standard deviation is only supported for singular data shapes.")
 
-            y_del = y - y_mean
-            y_1 = y_del.reshape(n_mc, *set_shape, *self.shape['y'], *(1 for _ in self.shape['y']))
-            y_2 = y_del.reshape(n_mc, *set_shape, *(1 for _ in self.shape['y']), *self.shape['y'])
-            # y_cov = (y_1 * y_2).mean(0).reshape(*set_shape, *2 * self.shape['y])  # biased estimate
-            y_cov = (y_1 * y_2).mean(0)  # biased estimate
+        if 'cov' in stats.keys():
+            if self.size['y'] == 1:
+                # _temp = y.reshape(n_mc, -1).var(axis=0)
+                _temp = y.var(axis=0)
+            else:
+                _temp = np.moveaxis(y.reshape((n_mc, math.prod(set_shape), self.size['y'])), 0, -1)
+                _temp = np.array([np.cov(t) for t in _temp])
 
-            if 'cov' in stats.keys():
-                stats['cov'] = y_cov
-            if 'std' in stats.keys():
-                stats['std'] = np.sqrt(y_cov)
+            stats['cov'] = _temp.reshape(set_shape + 2*self.shape['y'])
+
+        # if 'cov' in stats.keys() or 'std' in stats.keys():
+        #     try:
+        #         y_mean = stats['mean']
+        #     except KeyError:
+        #         y_mean = y.mean(axis=0)
+        #
+        #     y_del = y - y_mean
+        #     y_1 = y_del.reshape(n_mc, *set_shape, *self.shape['y'], *(1 for _ in self.shape['y']))
+        #     y_2 = y_del.reshape(n_mc, *set_shape, *(1 for _ in self.shape['y']), *self.shape['y'])
+        #     # y_cov = (y_1 * y_2).mean(0).reshape(*set_shape, *2 * self.shape['y'])  # biased estimate
+        #     y_cov = (y_1 * y_2).mean(0)  # biased estimate
+        #
+        #     if 'cov' in stats.keys():
+        #         stats['cov'] = y_cov
+        #     if 'std' in stats.keys():
+        #         stats['std'] = np.sqrt(y_cov)
 
         return stats
 
@@ -258,38 +284,92 @@ class BayesRegressor(RegressorMixin, BayesPredictor):
         stats = ('mean', 'std') if do_std else ('mean',)
         stats = self.prediction_stats(x, model, n_train, n_mc, stats=stats, rng=rng)
         y_mean = stats['mean']
+        # if do_std:
+        #     y_std = stats['std']
+
+        plt_data = self._plotting(x, y_mean, ax)
+
         if do_std:
             y_std = stats['std']
-
-        if self.shape['y'] == ():
+            ax = plt.gca()
             if self.shape['x'] == ():
-                if ax is None:
-                    _, ax = plt.subplots()
-                    ax.set(xlabel='$x$', ylabel='$\\hat{y}(x)$')
-                    ax.grid(True)
-
-                plt_data = ax.plot(x, y_mean)
-                if do_std:
-                    # plt_data_std = ax.errorbar(x, y_mean, yerr=y_std)
-                    plt_data_std = ax.fill_between(x, y_mean - y_std, y_mean + y_std, alpha=0.5)
-                    plt_data = (plt_data, plt_data_std)
+                # plt_data_std = ax.errorbar(x, y_mean, yerr=y_std)
+                plt_data_std = ax.fill_between(x, y_mean - y_std, y_mean + y_std, alpha=0.5)
+                plt_data = (plt_data, plt_data_std)
 
             elif self.shape['x'] == (2,):
-                if ax is None:
-                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$\\hat{y}(x)$')
-
-                plt_data = ax.plot_surface(x[..., 0], x[..., 1], y_mean, cmap=plt.cm.viridis)
-                if do_std:
-                    plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y_mean - y_std, cmap=plt.cm.viridis)
-                    plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y_mean + y_std, cmap=plt.cm.viridis)
-                    plt_data = (plt_data, (plt_data_lo, plt_data_hi))
+                plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y_mean - y_std, cmap=plt.cm.viridis)
+                plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y_mean + y_std, cmap=plt.cm.viridis)
+                plt_data = (plt_data, (plt_data_lo, plt_data_hi))
             else:
-                raise ValueError("Predictor data 'x' must have shape () or (2,).")
+                raise NotImplementedError
         else:
-            raise ValueError("Target data 'y' must have shape ().")
+            raise NotImplementedError
+
+        # x, set_shape = check_data_shape(x, self.shape['x'])
+        #
+        # if self.shape['y'] == ():
+        #     if self.shape['x'] == () and len(set_shape) == 1:
+        #         plt_data = self._plotting(x, y_mean, ax)
+        #         if do_std:
+        #             ax = plt.gca()
+        #             # plt_data_std = ax.errorbar(x, y_mean, yerr=y_std)
+        #             plt_data_std = ax.fill_between(x, y_mean - y_std, y_mean + y_std, alpha=0.5)
+        #             plt_data = (plt_data, plt_data_std)
+        #
+        #     elif self.shape['x'] == (2,) and len(set_shape) == 2:
+        #         plt_data = self._plotting(x, y_mean, ax)
+        #         if do_std:
+        #             ax = plt.gca()
+        #             plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y_mean - y_std, cmap=plt.cm.viridis)
+        #             plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y_mean + y_std, cmap=plt.cm.viridis)
+        #             plt_data = (plt_data, (plt_data_lo, plt_data_hi))
+        #     else:
+        #         raise NotImplementedError
+        # else:
+        #     raise NotImplementedError
 
         return plt_data
+
+
+    # def plot_predict_stats(self, x, model, n_train=0, n_mc=1, do_std=False, ax=None, rng=None):
+    #     stats = ('mean', 'std') if do_std else ('mean',)
+    #     stats = self.prediction_stats(x, model, n_train, n_mc, stats=stats, rng=rng)
+    #     y_mean = stats['mean']
+    #     if do_std:
+    #         y_std = stats['std']
+    #
+    #     x, set_shape = check_data_shape(x, self.shape['x'])
+    #
+    #     if self.shape['y'] == ():
+    #         if self.shape['x'] == ():
+    #             if ax is None:
+    #                 _, ax = plt.subplots()
+    #                 ax.set(xlabel='$x$', ylabel='$\\hat{y}(x)$')
+    #                 ax.grid(True)
+    #
+    #             plt_data = ax.plot(x, y_mean)
+    #             if do_std:
+    #                 # plt_data_std = ax.errorbar(x, y_mean, yerr=y_std)
+    #                 plt_data_std = ax.fill_between(x, y_mean - y_std, y_mean + y_std, alpha=0.5)
+    #                 plt_data = (plt_data, plt_data_std)
+    #
+    #         elif self.shape['x'] == (2,):
+    #             if ax is None:
+    #                 _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+    #                 ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$\\hat{y}(x)$')
+    #
+    #             plt_data = ax.plot_surface(x[..., 0], x[..., 1], y_mean, cmap=plt.cm.viridis)
+    #             if do_std:
+    #                 plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y_mean - y_std, cmap=plt.cm.viridis)
+    #                 plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y_mean + y_std, cmap=plt.cm.viridis)
+    #                 plt_data = (plt_data, (plt_data_lo, plt_data_hi))
+    #         else:
+    #             raise NotImplementedError
+    #     else:
+    #         raise NotImplementedError
+    #
+    #     return plt_data
 
 
 # %%

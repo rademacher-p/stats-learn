@@ -147,7 +147,7 @@ def predictor_compare_mc_bayes(predictors, bayes_model, n_train=0, n_test=1, n_m
     loss_mc = np.empty((n_mc, len(predictors)))
     for i_mc in range(n_mc):
         model = bayes_model.random_model()
-        loss_mc[i_mc] = predictor_compare(predictors, model, n_train, n_test)
+        loss_mc[i_mc] = predictor_compare(predictors, model, n_train, n_test, rng=None)
     return loss_mc.mean(0)
 
 
@@ -163,7 +163,7 @@ def predictor_compare_mc_bayes(predictors, bayes_model, n_train=0, n_test=1, n_m
 
 def main():
     model_x = NormalRV(mean=0., cov=1.)
-    x_plt = np.linspace(-3, 3, 101)
+    x_plt = np.linspace(-3, 3, 100, endpoint=False)
 
     # model_x = NormalRV(mean=np.zeros(2), cov=np.eye(2))
     # x1_plot = np.linspace(-3, 3, 101, endpoint=True)
@@ -173,45 +173,41 @@ def main():
     model = NormalRVModel(model_x=model_x, basis_y_x=None,      # (lambda x: 1., lambda x: x)
                           weights=np.ones(2), cov_y_x=1., rng=None)
 
-    bayes_models = {f'learn: {_cov}': NormalModelBayes(model_x=model_x, basis_y_x=None,
+    bayes_models = {r'$C_{\theta} = $' + str(_cov): NormalModelBayes(model_x=model_x, basis_y_x=None,
                                                        cov_y_x=1., mean_prior=np.zeros(2), cov_prior=_cov*np.eye(2))
                     for _cov in [0.1, 10]}
 
-    predictors = [ModelRegressor(model, name='opt'),
-                  *(BayesRegressor(bayes_model, name=name) for name, bayes_model in bayes_models.items()),
-                  ]
+    predictors = [
+        ModelRegressor(model, name=r'$f_{opt}$'),
+        *(BayesRegressor(bayes_model, name=name) for name, bayes_model in bayes_models.items()),
+    ]
 
     # Risk sim
-    losses = predictor_compare_mc(predictors, model, n_train=10, n_test=1, n_mc=20, rng=100)
+    losses = predictor_compare_mc(predictors, model, n_train=10, n_test=1, n_mc=20, rng=None)
     print(losses)
 
-    losses = predictor_compare_mc_bayes(predictors, bayes_models['learn: 0.1'], n_train=10, n_test=1, n_mc=3, rng=200)
-    print(losses)
+    # losses = predictor_compare_mc_bayes(predictors, bayes_models['learn: 0.1'],
+    #                                     n_train=10, n_test=1, n_mc=3, rng=None)
+    # print(losses)
 
     # Plotting
+    subplot_kw = {'projection': '3d'} if model_x.shape == (2,) else {}
+    _, ax = plt.subplots(subplot_kw=subplot_kw)
     for predictor in predictors:
-        if isinstance(predictor, BayesRegressor):
-            # predictor.plot_param_dist(ax_prior=None)
-            # plt.gca().set(title=predictor.name)
+        predictor.plot_predict_stats(x_plt, model, n_train=10, n_mc=20, do_std=True, ax=ax, rng=None)
+        # predictor.plot_predict(x_plt, ax)
 
-            predictor.plot_predict_stats(x_plt, model, n_train=10, n_mc=20, do_std=True, ax=None, rng=None)
-            plt.gca().set(title=predictor.name)
+        # if isinstance(predictor, ModelRegressor):
+        #     predictor.plot_predict(x_plt, ax=ax)
+        # elif isinstance(predictor, BayesRegressor):
+        #     # predictor.plot_param_dist(ax_prior=None)
+        #     # plt.gca().set(title=predictor.name)
+        #
+        #     predictor.plot_predict_stats(x_plt, model, n_train=10, n_mc=20, do_std=True, ax=ax, rng=None)
 
-    _, ax = plt.subplots()
-    plt_data = ModelPredictor.plot_predictions(predictors, x=x_plt, ax=ax)      # TODO: move, just call instance methods
+        # plt.gca().set(title=predictor.name)
     ax.legend()
     ax.grid(True)
-
-    # losses, learners = learn_eval(learners, model, n_train=10, n_test=1)
-
-    # learn_out = learn_eval(learners, model, n_train=10, n_test=1, return_learner=False)
-    # losses = learn_out
-    # try:
-    #     losses, learners = list(zip(*learn_out))
-    # except TypeError:
-    #     losses, learners = learn_out
-
-    # loss = learn_eval_mc_bayes(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
 
 
 # def main():

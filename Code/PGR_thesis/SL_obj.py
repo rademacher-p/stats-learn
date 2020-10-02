@@ -39,8 +39,8 @@ class BaseModel:
             self._rng = check_rng(rng)
 
     shape = property(lambda self: self._shape)
-    size = property(lambda self: {key: math.prod(val) for key, val in self._shape})
-    ndim = property(lambda self: {key: len(val) for key, val in self._shape})
+    size = property(lambda self: {key: math.prod(val) for key, val in self._shape.items()})
+    ndim = property(lambda self: {key: len(val) for key, val in self._shape.items()})
 
     # @property
     # def data_shape_x(self):
