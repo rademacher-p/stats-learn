@@ -151,7 +151,16 @@ class ModelRegressor(RegressorMixin, ModelPredictor):
         y = self.predict(x)
         plt_data = self._plotting(x, y, ax)
         if do_std:
-            ax.fill_between(x, y, y, alpha=0.5)
+            ax = plt.gca()
+            if self.shape['x'] == ():
+                ax.fill_between(x, y, y, alpha=0.5)
+
+            elif self.shape['x'] == (2,):
+                pass
+            else:
+                raise NotImplementedError
+        else:
+            raise NotImplementedError
 
         return plt_data
 
@@ -164,8 +173,8 @@ class BayesPredictor(ModelPredictor):
 
         self.bayes_model = bayes_model
 
-        self.prior = self.bayes_model.prior
-        self.posterior = None
+        # self.prior = self.bayes_model.prior
+        # self.posterior = None
 
         self.fit()
 
@@ -181,12 +190,21 @@ class BayesPredictor(ModelPredictor):
     size = property(lambda self: self.bayes_model.size)
     ndim = property(lambda self: self.bayes_model.ndim)
 
-    def fit(self, d=None):
+    # @property
+    # def prior(self):
+    #     return self.bayes_model.prior
+    #
+    # @property
+    # def posterior(self):
+    #     return self.bayes_model.posterior
+
+    def fit(self, d=None, warm_start=False):
         if d is None:
             d = np.array([], dtype=[('x', '<f8', self.shape['x']),
                                     ('y', '<f8', self.shape['y'])])
 
-        self.posterior, self.model = self.bayes_model.fit(d)
+        # self.posterior, self.model = self.bayes_model.fit(d)
+        self.model = self.bayes_model.fit(d, warm_start)
 
     def fit_from_model(self, model, n_train=0, rng=None):
         d = model.rvs(n_train, rng=rng)  # generate train/test data
@@ -210,10 +228,10 @@ class BayesPredictor(ModelPredictor):
         if x is None:
             x = self.prior.x_default
 
-        plt_prior = self.prior.plot_pf(x, ax=ax_prior)
+        self.prior.plot_pf(x, ax=ax_prior)
         # ax_posterior= plt_prior.axes
-        ax_posterior = plt.gca()
-        # ax_posterior = None
+        # ax_posterior = plt.gca()
+        ax_posterior = None
         self.posterior.plot_pf(x, ax=ax_posterior)
 
     def prediction_stats(self, x, model, n_train=0, n_mc=1, stats=('mode',), rng=None):
@@ -334,46 +352,6 @@ class BayesRegressor(RegressorMixin, BayesPredictor):
         #     raise NotImplementedError
 
         return plt_data
-
-
-    # def plot_predict_stats(self, x, model, n_train=0, n_mc=1, do_std=False, ax=None, rng=None):
-    #     stats = ('mean', 'std') if do_std else ('mean',)
-    #     stats = self.prediction_stats(x, model, n_train, n_mc, stats=stats, rng=rng)
-    #     y_mean = stats['mean']
-    #     if do_std:
-    #         y_std = stats['std']
-    #
-    #     x, set_shape = check_data_shape(x, self.shape['x'])
-    #
-    #     if self.shape['y'] == ():
-    #         if self.shape['x'] == ():
-    #             if ax is None:
-    #                 _, ax = plt.subplots()
-    #                 ax.set(xlabel='$x$', ylabel='$\\hat{y}(x)$')
-    #                 ax.grid(True)
-    #
-    #             plt_data = ax.plot(x, y_mean)
-    #             if do_std:
-    #                 # plt_data_std = ax.errorbar(x, y_mean, yerr=y_std)
-    #                 plt_data_std = ax.fill_between(x, y_mean - y_std, y_mean + y_std, alpha=0.5)
-    #                 plt_data = (plt_data, plt_data_std)
-    #
-    #         elif self.shape['x'] == (2,):
-    #             if ax is None:
-    #                 _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-    #                 ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$\\hat{y}(x)$')
-    #
-    #             plt_data = ax.plot_surface(x[..., 0], x[..., 1], y_mean, cmap=plt.cm.viridis)
-    #             if do_std:
-    #                 plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y_mean - y_std, cmap=plt.cm.viridis)
-    #                 plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y_mean + y_std, cmap=plt.cm.viridis)
-    #                 plt_data = (plt_data, (plt_data_lo, plt_data_hi))
-    #         else:
-    #             raise NotImplementedError
-    #     else:
-    #         raise NotImplementedError
-    #
-    #     return plt_data
 
 
 # %%
