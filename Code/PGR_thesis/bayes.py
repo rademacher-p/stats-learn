@@ -15,7 +15,6 @@ import RE_obj_callable
 from SL_obj import YcXModel, NormalRVModel
 from util.generic import empirical_pmf, check_rng
 from util.func_obj import FiniteDomainFunc
-from util.math import inverse, inner_prod
 
 #%% Priors
 
@@ -32,13 +31,13 @@ class BaseBayes:
         else:
             self.model_kwargs = model_kwargs
 
-        # Copy all model parameters to object
-        for key, val in self.model_kwargs.items():
-            setattr(self, key, val)
+        # for key, val in self.model_kwargs.items():
+        #     setattr(self, key, val)     # Copy all model parameters to object
 
         # self.model_gen = functools.partial(model_gen, **self.model_kwargs)
         self.model_gen = model_gen
         self.prior = prior
+        self.posterior = None
 
         self._rng = check_rng(rng)
         self.model_kwargs.update(rng=self._rng)
@@ -66,8 +65,12 @@ class BaseBayes:
     # def posterior_model(self, d):  # TODO: generalize method for base classes, full posterior object?
     #     raise NotImplementedError
 
-    def predictive_dist(self, d):
+    def fit(self, d, warm_start=False):
         raise NotImplementedError
+
+    # def predictive_dist(self, d):
+    #     raise NotImplementedError
+    #     pass
 
 
 # class BetaModelBayes(BaseBayes):
@@ -90,104 +93,128 @@ class NormalModelBayes(BaseBayes):
         self.mean_prior = np.array(mean_prior)
         self.cov_prior = np.array(cov_prior)
 
+        self.model_x = model_x
         if basis_y_x is None:
             def power_func(i):
                 return lambda x: np.full(_shape_y, (x**i).sum())
-            basis_y_x = tuple(power_func(i) for i in range(len(self.mean_prior)))
+            self.basis_y_x = tuple(power_func(i) for i in range(len(self.mean_prior)))
+        else:
+            self.basis_y_x = basis_y_x
+        self.cov_y_x = np.array(cov_y_x)
 
         # model_gen = YcXModel.norm_model
         model_gen = NormalRVModel
-        model_kwargs = {'model_x': model_x, 'basis_y_x': basis_y_x, 'cov_y_x': np.array(cov_y_x), 'rng': None}
+        model_kwargs = {'model_x': self.model_x, 'basis_y_x': self.basis_y_x, 'cov_y_x': self.cov_y_x, 'rng': None}
         prior = RE_obj.NormalRV(self.mean_prior, self.cov_prior, rng=None)
         super().__init__(model_gen, model_kwargs, prior, rng)
 
         self._shape['x'] = model_x.shape
         self._shape['y'] = _shape_y
 
-        #
+        # Linear algebra persistent values
         psd = _PSD(self.cov_y_x.reshape(2*(self.size['y'],)), allow_singular=False)
         self._prec_U_y_x = psd.U
+        self._cov_prior_inv = np.linalg.inv(self.cov_prior)
 
-        self._cov_prior_inv = np.linalg.inv(self.cov_prior.reshape(2*(self.prior.size,)))
+        self._reset()
 
     def random_model(self, rng=None):
         super().random_model(rng)
         weights = self.prior.rvs()
         return self.model_gen(weights=weights, **self.model_kwargs)
 
-    # def posterior(self, d):
-    #     if len(d) == 0:
-    #         return self.prior
-    #     else:
-    #         psi = np.array([np.array([func(x_i) for func in self.basis_y_x]).T for x_i in d['x']])
-    #
-    #         _temp = sum(inner_prod(psi_i, psi_i, inverse(self.cov_y_x)) for psi_i in psi)
-    #         cov_post = inverse(inverse(self.cov_prior) + _temp)
-    #
-    #         _temp = sum(inner_prod(psi_i, y, inverse(self.cov_y_x)) for psi_i, y in zip(psi, d['y']))
-    #         mean_post = cov_post @ (inverse(self.cov_prior) @ self.mean_prior + _temp)
-    #
-    #         return RE_obj.NormalRV(mean_post, cov_post)
+    def _reset(self):
+        self._cov_post_inv = self._cov_prior_inv.copy()
+        self._mean_post_temp = (self._cov_prior_inv @ self.mean_prior).copy()
+        self.posterior = self.prior
 
-    def posterior(self, d):
+    def fit(self, d, warm_start=False):
+        if not warm_start:
+            self._reset()
+
         n = len(d)
-        if n == 0:
-            return self.prior
-        else:
+        if n > 0:
             psi = np.array([np.array([func(x_i) for func in self.basis_y_x])
                             for x_i in d['x']]).reshape((n, self.prior.size, self.size['y']))
-
             psi_white = np.dot(psi, self._prec_U_y_x)
-            _temp = sum(psi_i @ psi_i.T for psi_i in psi_white)
-            cov_post_inv = self._cov_prior_inv + _temp
-            cov_post = np.linalg.inv(cov_post_inv)
+            self._cov_post_inv += sum(psi_i @ psi_i.T for psi_i in psi_white)
 
-            y_white = np.dot(d['y'].reshape(-1, self.size['y']), self._prec_U_y_x)
-            _temp = sum(psi_i @ y_i for psi_i, y_i in zip(psi_white, y_white))
-            mean_post = cov_post @ (self._cov_prior_inv @ self.mean_prior + _temp)
+            y_white = np.dot(d['y'].reshape(n, self.size['y']), self._prec_U_y_x)
+            self._mean_post_temp += sum(psi_i @ y_i for psi_i, y_i in zip(psi_white, y_white))
 
-            return RE_obj.NormalRV(mean_post, cov_post)
+            cov_post = np.linalg.inv(self._cov_post_inv)
+            mean_post = cov_post @ self._mean_post_temp
 
-    def _posterior_2_predictive(self, posterior):
-        def model_y_x(x):
-            mean_y_x = sum(weight * func(x) for weight, func in zip(posterior.mean, self.basis_y_x))
-            psi_x = np.array([func(x) for func in self.basis_y_x]).T
-            cov_y_x = self.cov_y_x + inner_prod(psi_x.T, psi_x.T, posterior.cov)
+            self.posterior = RE_obj.NormalRV(mean_post, cov_post)
 
-            return RE_obj.NormalRV(mean_y_x, cov_y_x)
+        def cov_y_x(x):
+            psi_x = np.array([func(x) for func in self.basis_y_x]).reshape(self.prior.size, self.size['y'])
+            return self.cov_y_x + (psi_x.T @ self.posterior.cov @ psi_x).reshape(2 * self.shape['y'])
 
-        return model_y_x
+        kwargs = self.model_kwargs.copy()
+        kwargs.update(weights=self.posterior.mean, cov_y_x=cov_y_x, rng=None)
 
-    def predictive_dist(self, d):
-        posterior = self.posterior(d)
-        return self._posterior_2_predictive(posterior)
+        return NormalRVModel(**kwargs)
+
+
+    # def posterior(self, d):
+    #     n = len(d)
+    #     if n == 0:
+    #         return self.prior
+    #     else:
+    #         psi = np.array([np.array([func(x_i) for func in self.basis_y_x])
+    #                         for x_i in d['x']]).reshape((n, self.prior.size, self.size['y']))
+    #
+    #         psi_white = np.dot(psi, self._prec_U_y_x)
+    #         cov_post_inv = self._cov_prior_inv + sum(psi_i @ psi_i.T for psi_i in psi_white)
+    #         cov_post = np.linalg.inv(cov_post_inv)
+    #
+    #         y_white = np.dot(d['y'].reshape(-1, self.size['y']), self._prec_U_y_x)
+    #         _temp = sum(psi_i @ y_i for psi_i, y_i in zip(psi_white, y_white))
+    #         mean_post = cov_post @ (self._cov_prior_inv @ self.mean_prior + _temp)
+    #
+    #         return RE_obj.NormalRV(mean_post, cov_post)
+    #
+    # def _posterior_2_model(self, posterior):
+    #     def cov_y_x(x):
+    #         psi_x = np.array([func(x) for func in self.basis_y_x]).reshape(self.prior.size, self.size['y'])
+    #         return self.cov_y_x + (psi_x.T @ posterior.cov @ psi_x).reshape(2 * self.shape['y'])
+    #
+    #     kwargs = self.model_kwargs.copy()
+    #     kwargs.update(weights=posterior.mean, cov_y_x=cov_y_x, rng=None)
+    #
+    #     return NormalRVModel(**kwargs)
+    #
+    # def posterior_model(self, d):
+    #     posterior = self.posterior(d)
+    #     return self._posterior_2_model(posterior)
+    #
+    # def fit(self, d):
+    #     posterior = self.posterior(d)
+    #     # predictive_dist = self._posterior_2_predictive(posterior)
+    #     # posterior_model = self._predictive_2_model(predictive_dist)
+    #     posterior_model = self._posterior_2_model(posterior)
+    #     return posterior, posterior_model
+
+    # def _posterior_2_predictive(self, posterior):
+    #     def model_y_x(x):
+    #         mean_y_x = sum(weight * func(x) for weight, func in zip(posterior.mean, self.basis_y_x))
+    #         # psi_x = np.array([func(x) for func in self.basis_y_x]).T
+    #         # cov_y_x = self.cov_y_x + inner_prod(psi_x.T, psi_x.T, posterior.cov)    # TODO
+    #         psi_x = np.array([func(x) for func in self.basis_y_x]).reshape(self.prior.size, self.size['y'])
+    #         cov_y_x = self.cov_y_x + (psi_x.T @ posterior.cov @ psi_x).reshape(2 * self.shape['y'])
+    #
+    #         return RE_obj.NormalRV(mean_y_x, cov_y_x)
+    #
+    #     return model_y_x
+
+    # def predictive_dist(self, d):
+    #     posterior = self.posterior(d)
+    #     return self._posterior_2_predictive(posterior)
 
     # def _predictive_2_model(self, predictive_dist):
     #     return YcXModel(model_x=self.model_kwargs['model_x'], model_y_x=predictive_dist)
 
-    def _posterior_2_model(self, posterior):
-        def cov_y_x(x):
-            psi_x = np.array([func(x) for func in self.basis_y_x]).T
-            return self.cov_y_x + inner_prod(psi_x.T, psi_x.T, posterior.cov)
-
-        kwargs = self.model_kwargs.copy()
-        kwargs.update(weights=posterior.mean, cov_y_x=cov_y_x, rng=None)
-
-        return NormalRVModel(**kwargs)
-
-    def posterior_model(self, d):
-        # predictive_dist = self.predictive_dist(d)
-        # return self._predictive_2_model(predictive_dist)
-
-        posterior = self.posterior(d)
-        return self._posterior_2_model(posterior)
-
-    def fit(self, d):
-        posterior = self.posterior(d)
-        # predictive_dist = self._posterior_2_predictive(posterior)
-        # posterior_model = self._predictive_2_model(predictive_dist)
-        posterior_model = self._posterior_2_model(posterior)
-        return posterior, posterior_model
 
 
 
@@ -197,9 +224,6 @@ class NormalModelBayes(BaseBayes):
 #     print(model.weights)
 #     rvs = model.rvs(2)
 #     print(rvs)
-
-
-
 
 
 #%% TODO FIXME: rework, fix shape attributes...
