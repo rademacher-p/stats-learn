@@ -10,9 +10,9 @@ import numpy as np
 # from scipy.stats._multivariate import multi_rv_generic
 from scipy.stats._multivariate import _PSD
 
-import RE_obj
+from random_elements import Normal, Dirichlet
 import RE_obj_callable
-from SL_obj import YcXModel, NormalRVModel
+from models import DataConditional, NormalRegressor as NormalRegressorModel
 from util.generic import empirical_pmf, check_rng
 from util.func_obj import FiniteDomainFunc
 
@@ -22,7 +22,7 @@ from util.func_obj import FiniteDomainFunc
 # TODO: COMPLETE property set/get check, rework!
 
 
-class BaseBayes:
+class Base:
     def __init__(self, model_gen, model_kwargs=None, prior=None, rng=None):
         self._shape = {'x': None, 'y': None}
 
@@ -73,9 +73,9 @@ class BaseBayes:
     #     pass
 
 
-# class BetaModelBayes(BaseBayes):
+# class BetaModelBayes(Base):
 #     def __init__(self, prior=None, rng_model=None):     # deterministic
-#         model_gen = YcXModel.beta_model
+#         model_gen = DataConditional.beta_model
 #         model_kwargs = {'a': .9, 'b': .9, 'c': 5, 'rng': rng_model}
 #         super().__init__(model_gen, model_kwargs, prior)
 #
@@ -83,8 +83,8 @@ class BaseBayes:
 #         self._data_shape_y = ()
 
 
-class NormalModelBayes(BaseBayes):
-    def __init__(self, model_x=RE_obj.NormalRV(), basis_y_x=None, cov_y_x=1,
+class NormalRegressor(Base):
+    def __init__(self, model_x=Normal(), basis_y_x=None, cov_y_x=1,
                  mean_prior=np.zeros(1), cov_prior=np.eye(1), rng=None):
 
         _temp = np.array(cov_y_x).shape
@@ -102,10 +102,9 @@ class NormalModelBayes(BaseBayes):
             self.basis_y_x = basis_y_x
         self.cov_y_x = np.array(cov_y_x)
 
-        # model_gen = YcXModel.norm_model
-        model_gen = NormalRVModel
+        model_gen = NormalRegressorModel
         model_kwargs = {'model_x': self.model_x, 'basis_y_x': self.basis_y_x, 'cov_y_x': self.cov_y_x, 'rng': None}
-        prior = RE_obj.NormalRV(self.mean_prior, self.cov_prior, rng=None)
+        prior = Normal(self.mean_prior, self.cov_prior, rng=None)
         super().__init__(model_gen, model_kwargs, prior, rng)
 
         self._shape['x'] = model_x.shape
@@ -145,7 +144,7 @@ class NormalModelBayes(BaseBayes):
             cov_post = np.linalg.inv(self._cov_post_inv)
             mean_post = cov_post @ self._mean_post_temp
 
-            self.posterior = RE_obj.NormalRV(mean_post, cov_post)
+            self.posterior = Normal(mean_post, cov_post)
 
         def cov_y_x(x):
             psi_x = np.array([func(x) for func in self.basis_y_x]).reshape(self.prior.size, self.size['y'])
@@ -154,7 +153,7 @@ class NormalModelBayes(BaseBayes):
         kwargs = self.model_kwargs.copy()
         kwargs.update(weights=self.posterior.mean, cov_y_x=cov_y_x, rng=None)
 
-        return NormalRVModel(**kwargs)
+        return NormalRegressorModel(**kwargs)
 
     # def posterior(self, d):
     #     n = len(d)
@@ -172,7 +171,7 @@ class NormalModelBayes(BaseBayes):
     #         _temp = sum(psi_i @ y_i for psi_i, y_i in zip(psi_white, y_white))
     #         mean_post = cov_post @ (self._cov_prior_inv @ self.mean_prior + _temp)
     #
-    #         return RE_obj.NormalRV(mean_post, cov_post)
+    #         return RE_obj.Normal(mean_post, cov_post)
     #
     # def _posterior_2_model(self, posterior):
     #     def cov_y_x(x):
@@ -182,7 +181,7 @@ class NormalModelBayes(BaseBayes):
     #     kwargs = self.model_kwargs.copy()
     #     kwargs.update(weights=posterior.mean, cov_y_x=cov_y_x, rng=None)
     #
-    #     return NormalRVModel(**kwargs)
+    #     return NormalRegressor(**kwargs)
     #
     # def posterior_model(self, d):
     #     posterior = self.posterior(d)
@@ -203,7 +202,7 @@ class NormalModelBayes(BaseBayes):
     #         psi_x = np.array([func(x) for func in self.basis_y_x]).reshape(self.prior.size, self.size['y'])
     #         cov_y_x = self.cov_y_x + (psi_x.T @ posterior.cov @ psi_x).reshape(2 * self.shape['y'])
     #
-    #         return RE_obj.NormalRV(mean_y_x, cov_y_x)
+    #         return RE_obj.Normal(mean_y_x, cov_y_x)
     #
     #     return model_y_x
 
@@ -212,12 +211,10 @@ class NormalModelBayes(BaseBayes):
     #     return self._posterior_2_predictive(posterior)
 
     # def _predictive_2_model(self, predictive_dist):
-    #     return YcXModel(model_x=self.model_kwargs['model_x'], model_y_x=predictive_dist)
+    #     return DataConditional(model_x=self.model_kwargs['model_x'], model_y_x=predictive_dist)
 
 
-
-
-# bayes_model = NormalModelBayes(basis_y_x=None, cov_y_x=1., mean_prior=np.zeros(2), cov_prior=np.eye(2), rng=100)
+# bayes_model = NormalRegressor(basis_y_x=None, cov_y_x=1., mean_prior=np.zeros(2), cov_prior=np.eye(2), rng=100)
 # for _ in range(2):
 #     model = bayes_model.random_model(rng=None)
 #     print(model.weights)
@@ -227,9 +224,9 @@ class NormalModelBayes(BaseBayes):
 
 #%% TODO FIXME: rework, fix shape attributes...
 
-class DirichletFiniteYcXModelBayesNew(BaseBayes):
+class DirichletFiniteYcXModelBayesNew(Base):
     def __init__(self, alpha_0, mean_x, mean_y_x, rng_model=None, rng_prior=None):
-        model_gen = YcXModel.finite_model
+        model_gen = DataConditional.finite_model
         model_kwargs = {'rng': rng_model}
         prior = {'p_x': RE_obj_callable.DirichletRV(alpha_0, mean_x, rng_prior),
                  'p_y_x': lambda x: RE_obj_callable.DirichletRV(alpha_0 * mean_x(x), mean_y_x(x), rng_prior)}
@@ -304,9 +301,9 @@ class DirichletFiniteYcXModelBayesNew(BaseBayes):
 
 
 #%% Without func objects
-class FiniteYcXModelBayes(BaseBayes):
+class FiniteYcXModelBayes(Base):
     def __init__(self, supp_x, supp_y, prior, rng_model=None):
-        model_gen = YcXModel.finite_model_orig
+        model_gen = DataConditional.finite_model_orig
         # model_kwargs = {'rng': rng_model}
         model_kwargs = {'supp_x': supp_x['x'], 'supp_y': supp_y['y'], 'rng': rng_model}
         super().__init__(model_gen, model_kwargs, prior)
@@ -328,7 +325,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
     # TODO: initialization from marginal/conditional? full mean init as classmethod?
 
     def __init__(self, supp_x, supp_y, alpha_0, mean, rng_model=None, rng_prior=None):
-        prior = RE_obj.DirichletRV(alpha_0, mean, rng_prior)
+        prior = Dirichlet(alpha_0, mean, rng_prior)
         super().__init__(supp_x, supp_y, prior, rng_model)
 
         self.alpha_0 = self.prior.alpha_0
@@ -346,7 +343,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 
         self._mean_y_x = _mean_y_x
 
-        # self._model_gen = functools.partial(YcXModel.finite_model, supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
+        # self._model_gen = functools.partial(DataConditional.finite_model, supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
 
     def random_model(self, rng=None):
         p = self.prior.rvs(rng=rng)
@@ -392,7 +389,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 
 
 # #%%
-# class FiniteYcXModelBayesOrig(BaseBayes):
+# class FiniteYcXModelBayesOrig(Base):
 #     def __init__(self, supp_x, supp_y, prior, rng_model=None):     # TODO: rng check, None default?
 #         self.supp_x = supp_x
 #         self.supp_y = supp_y        # TODO: Assumed to be my SL structured array!
@@ -402,7 +399,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #         self._data_shape_x = supp_x.dtype['x'].shape
 #         self._data_shape_y = supp_y.dtype['y'].shape
 #
-#         model_gen = YcXModel.finite_model_orig
+#         model_gen = DataConditional.finite_model_orig
 #         model_kwargs = {'supp_x': supp_x['x'], 'supp_y': supp_y['y'], 'rng': rng_model}
 #         super().__init__(model_gen, model_kwargs, prior)
 #
@@ -415,7 +412,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #     # TODO: initialization from marginal/conditional? full mean init as classmethod?
 #
 #     def __init__(self, supp_x, supp_y, alpha_0, mean, rng_model=None, rng_prior=None):
-#         prior = DirichletRV(alpha_0, mean, rng_prior)
+#         prior = Dirichlet(alpha_0, mean, rng_prior)
 #         super().__init__(supp_x, supp_y, prior, rng_model)
 #
 #         self.alpha_0 = self.prior.alpha_0
@@ -433,7 +430,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #
 #         self._mean_y_x = _mean_y_x
 #
-#         self._model_gen = functools.partial(YcXModel.finite_model_orig,
+#         self._model_gen = functools.partial(DataConditional.finite_model_orig,
 #                                             supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
 #
 #     def random_model(self, rng=None):
@@ -500,7 +497,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #
 #     @classmethod
 #     def finite_dirichlet(cls, supp, supp_y, alpha_0, mean, rng):
-#         bayes_model = DirichletRV(alpha_0, mean)
+#         bayes_model = Dirichlet(alpha_0, mean)
 #
 #         def rand_kwargs(dist):
 #             p = dist.rvs()
@@ -515,7 +512,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #
 #             return {'p_x': p_x, 'p_y_x': p_y_x}
 #
-#         model_gen = YcXModel.finite_model
+#         model_gen = DataConditional.finite_model
 #         model_kwargs = {'supp': supp['x'], 'supp_y': supp_y['y'], 'rng': rng}
 #
 #         return cls(bayes_model, rand_kwargs, model_gen, model_kwargs)
@@ -549,10 +546,10 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #
 # def finite_bayes(set_x_s, set_y_s, alpha_0, mean, rng):
 #
-#     model_gen = YcXModel.finite_model
+#     model_gen = DataConditional.finite_model
 #     model_kwargs = {'supp': set_x_s['x'], 'set_y': set_y_s['y'], 'rng': rng}
 #
-#     bayes_model = DirichletRV(alpha_0, mean)
+#     bayes_model = Dirichlet(alpha_0, mean)
 #
 #
 #     def rand_kwargs(self):
@@ -589,7 +586,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #
 # def finite_bayes2(set_x_s, set_y_s, alpha_0, mean, rng):
 #
-#     model_gen = functools.partial(YcXModel.finite_model,
+#     model_gen = functools.partial(DataConditional.finite_model,
 #                                   **{'supp': set_x_s['x'], 'set_y': set_y_s['y'], 'rng': rng})
 #
 #     def rand_kwargs(self):
@@ -605,7 +602,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #
 #         return {'p_x': p_x, 'p_y_x': p_y_x}
 #
-#     bayes_model = DirichletRV(alpha_0, mean)
+#     bayes_model = Dirichlet(alpha_0, mean)
 #     bayes_model.rand_kwargs = types.MethodType(rand_kwargs, bayes_model)
 #
 #     return bayes_re2(model_gen, bayes_model)
@@ -635,12 +632,12 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 
 # class FiniteREPrior(FiniteRE):
 #     def __new__(cls, supp, seed=None):
-#         cls.bayes_model = DirichletRV(2, [.5, .5])
+#         cls.bayes_model = Dirichlet(2, [.5, .5])
 #         p = cls.rng_prior()
 #         return super().__new__(cls, supp, p, seed)
 #
 #     def __init__(self, supp, seed=None):
-#         # self.bayes_model = DirichletRV(2, [.5, .5])
+#         # self.bayes_model = Dirichlet(2, [.5, .5])
 #         p = self.rng_prior()
 #         super().__init__(supp, p, seed)
 #
@@ -672,7 +669,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #         self.model.p = args
 #
 #
-# dist = DirichletRV(4, [.5, .5])
+# dist = Dirichlet(4, [.5, .5])
 # class model_cls(FiniteRE):
 #     __new__ = functools.partialmethod(FiniteRE.__new__, supp=['a', 'c'])
 #     __init__ = functools.partialmethod(FiniteRE.__init__, supp=['a', 'c'])
@@ -699,7 +696,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #         return self.cls_frozen(p=args)
 #
 #
-# dist = DirichletRV(4, [.5, .5])
+# dist = Dirichlet(4, [.5, .5])
 # model_cls = FiniteRE
 # model_kwargs = {'supp': ['d', 'e']}
 #
@@ -741,7 +738,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #
 #     @classmethod
 #     def dirichlet_prior(cls, alpha_0, mean, support, seed=None):
-#         return cls(DirichletRV(alpha_0, mean), support, seed)
+#         return cls(Dirichlet(alpha_0, mean), support, seed)
 #
 #
 #
@@ -755,4 +752,4 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #         theta_m = stats.beta(a, b)
 #         def theta_c(x): return stats.beta(5*x, 5*(1-x))
 #
-#         return YcXModel(theta_m, theta_c)
+#         return DataConditional(theta_m, theta_c)

@@ -6,6 +6,7 @@ Random element objects.
 # TODO: do ABC or PyCharm bug?
 
 import math
+from typing import Optional
 from numbers import Integral
 
 import numpy as np
@@ -20,7 +21,7 @@ from util.plot import simplex_grid
 
 #%% Base RE classes
 
-class BaseRE:
+class Base:
     """
     Base class for generic random element objects.
     """
@@ -75,20 +76,22 @@ class BaseRE:
 
 
 class MixinRV:
+    _mean: Optional[np.ndarray]
+    _cov: Optional[np.ndarray]
 
-    mean = property(lambda self: self._mean)
-    cov = property(lambda self: self._cov)
+    # mean = property(lambda self: self._mean)
+    # cov = property(lambda self: self._cov)
 
-    # @property
-    # def mean(self):
-    #     return self._mean
-    #
-    # @property
-    # def cov(self):
-    #     return self._cov
+    @property
+    def mean(self):
+        return self._mean
+
+    @property
+    def cov(self):
+        return self._cov
 
 
-class BaseRV(MixinRV, BaseRE):
+class BaseRV(MixinRV, Base):
     """
     Base class for generic random variable (numeric) objects.
     """
@@ -101,7 +104,7 @@ class BaseRV(MixinRV, BaseRE):
 
 #%% Specific RE's
 
-class DeterministicRE(BaseRE):
+class DeterministicRE(Base):
     """
     Deterministic random element.
     """
@@ -126,7 +129,7 @@ class DeterministicRE(BaseRE):
 
     @val.setter
     def val(self, val):
-        self._val = np.asarray(val)
+        self._val = np.array(val)
         self._shape = self._val.shape
         self._mode = self._val
 
@@ -164,7 +167,7 @@ class DeterministicRV(MixinRV, DeterministicRE):
 # b.pf(b.rvs(8))
 
 
-class FiniteRE(BaseRE):
+class FiniteRE(Base):
     """
     Generic RE drawn from a finite support set using an explicitly defined PMF.
     """
@@ -315,7 +318,7 @@ def _dirichlet_check_input(x, alpha_0, mean):
     return x, set_shape
 
 
-class DirichletRV(BaseRV):
+class Dirichlet(BaseRV):
     """
     Dirichlet random process, finite-supp realizations.
     """
@@ -413,7 +416,7 @@ class DirichletRV(BaseRV):
 # a0 = 10
 # m = np.random.random((1, 3))
 # m = m / m.sum()
-# d = DirichletRV(a0, m, rng)
+# d = Dirichlet(a0, m, rng)
 # d.plot_pf()
 # d.mean
 # d.mode
@@ -439,7 +442,7 @@ def _empirical_check_input(x, n, mean):
     return x, set_shape
 
 
-class EmpiricalRV(BaseRV):
+class Empirical(BaseRV):
     """
     Empirical random process, finite-supp realizations.
     """
@@ -529,7 +532,7 @@ class EmpiricalRV(BaseRV):
 # # m = np.random.random((1, 3))
 # m = np.random.default_rng().integers(10, size=(1, 3))
 # m = m / m.sum()
-# d = EmpiricalRV(n, m, rng)
+# d = Empirical(n, m, rng)
 # d.plot_pf()
 # d.mean
 # d.mode
@@ -539,7 +542,7 @@ class EmpiricalRV(BaseRV):
 # d.pf(d.rvs(4).reshape((2, 2) + d.mean.shape))
 
 
-class DirichletEmpiricalRV(BaseRV):
+class DirichletEmpirical(BaseRV):
     """
     Dirichlet-Empirical random process, finite-supp realizations.
     """
@@ -642,14 +645,14 @@ class DirichletEmpiricalRV(BaseRV):
 # a0 = 600
 # m = np.ones((1, 3))
 # m = m / m.sum()
-# d = DirichletEmpiricalRV(n, a0, m, rng_)
+# d = DirichletEmpirical(n, a0, m, rng_)
 # d.plot_pf()
 # d.mean
 # d.mode
 # d.cov
 
 
-class BetaRV(BaseRV):
+class Beta(BaseRV):
     """
     Beta random variable.
     """
@@ -722,7 +725,7 @@ class BetaRV(BaseRV):
         return plt_data
 
 
-class NormalRV(BaseRV):
+class Normal(BaseRV):
     def __init__(self, mean=0., cov=1., rng=None):
         super().__init__(rng)
         _mean = np.array(mean)
@@ -855,7 +858,7 @@ class NormalRV(BaseRV):
 
 # mean_, cov_ = 1., 1.
 # # mean_, cov_ = np.ones(2), np.eye(2)
-# norm = NormalRV(mean_, cov_)
+# norm = Normal(mean_, cov_)
 # norm.rvs(5)
 # plt_data = norm.plot_pf()
 #

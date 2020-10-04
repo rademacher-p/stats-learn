@@ -361,7 +361,7 @@ class DirichletRV(ContinuousRV):
 # m = FiniteDomainFunc(supp, val)
 # m('a')
 #
-# d = DirichletRV(a0, m, rng)
+# d = Dirichlet(a0, m, rng)
 # d.mean
 # d.mode
 # d.cov
@@ -488,7 +488,7 @@ class EmpiricalRV(DiscreteRV):
 # n = 10
 # m = np.random.random((1, 3))
 # m = m / m.sum()
-# d = EmpiricalRV(n, m, rng)
+# d = Empirical(n, m, rng)
 # d.plot_pmf()
 # d.mean
 # d.mode
@@ -600,7 +600,7 @@ class DirichletEmpiricalRV(DiscreteRV):
 # a0 = 600
 # m = np.ones((1, 3))
 # m = m / m.sum()
-# d = DirichletEmpiricalRV(n, a0, m, rng)
+# d = DirichletEmpirical(n, a0, m, rng)
 # d.plot_pmf()
 # d.mean
 # d.mode

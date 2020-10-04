@@ -41,8 +41,8 @@ alpha_0 = 1
 # p_x = np.ones(supp_x_s.shape) / supp_x_s.size
 # def p_y_x(x): return np.ones(supp_y_s.shape) / supp_y_s.size
 # model_kwargs = {'supp': supp_x_s['x'], 'supp_y': supp_y_s['y'], 'p_x': p_x, 'p_y_x': p_y_x, 'rng': None}
-# model_gen = YcXModel.finite_model
-# bayes_model = BaseBayes(model_gen, model_kwargs)
+# model_gen = DataConditional.finite_model
+# bayes_model = Base(model_gen, model_kwargs)
 
 
 

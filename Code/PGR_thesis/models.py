@@ -9,25 +9,21 @@ import math
 import numpy as np
 from scipy import stats
 
-from RE_obj import BaseRE, BaseRV, NormalRV
+from random_elements import Base, BaseRV, Normal
 from RE_obj_callable import FiniteRE, DirichletRV, BetaRV       # TODO: note - CALLABLE!!!!
 from util.generic import check_rng, vectorize_func, check_data_shape
 
 
-class BaseModel:
+class Base:
     """
     Base class for supervised learning data models.
     """
 
     def __init__(self, rng=None):
         self._rng = check_rng(rng)
-
-        # self._data_shape_x = None
-        # self._data_shape_y = None
         self._shape = {'x': None, 'y': None}
 
         self._mode_x = None
-        self._mode_y_x = None
 
     @property
     def rng(self):
@@ -42,21 +38,9 @@ class BaseModel:
     size = property(lambda self: {key: math.prod(val) for key, val in self._shape.items()})
     ndim = property(lambda self: {key: len(val) for key, val in self._shape.items()})
 
-    # @property
-    # def data_shape_x(self):
-    #     return self._data_shape_x
-    #
-    # @property
-    # def data_shape_y(self):
-    #     return self._data_shape_y
-
     @property
     def mode_x(self):
         return self._mode_x
-
-    # @property
-    # def mode_y_x(self):
-    #     return self._mode_y_x
 
     def mode_y_x(self, x):
         return vectorize_func(self._mode_y_x_single, self._shape['x'])(x)
@@ -65,46 +49,33 @@ class BaseModel:
         raise NotImplementedError
         pass
 
-    rvs = BaseRE.rvs
+    rvs = Base.rvs
 
     def _rvs(self, size=()):
         raise NotImplementedError("Method must be overwritten.")
         pass
 
 
-class MixinRVx:     # TODO: avoid inspection error by defining init, calling explicitly after normal MRO init!?
-    # def __init__(self):
-    #     self._mean_x = None
-    #     self._cov_x = None
+class MixinRVx:
+    mean_x = property(lambda self: self._mean_x)
+    cov_x = property(lambda self: self._cov_x)
 
-    @property
-    def mean_x(self):
-        return self._mean_x
-
-    @property
-    def cov_x(self):
-        return self._cov_x
+    # @property
+    # def mean_x(self):
+    #     return self._mean_x
+    #
+    # @property
+    # def cov_x(self):
+    #     return self._cov_x
 
 
 class MixinRVy:
-    # def __init__(self):
-    #     self._mean_y_x = None
-    #     self._cov_y_x = None
-
-    # @property
-    # def mean_y_x(self):
-    #     return self._mean_y_x
-
     def mean_y_x(self, x):
         return vectorize_func(self._mean_y_x_single, self._shape['x'])(x)
 
     def _mean_y_x_single(self, x):
         raise NotImplementedError
         pass
-
-    # @property
-    # def cov_y_x(self):
-    #     return self._cov_y_x
 
     def cov_y_x(self, x):
         return vectorize_func(self._cov_y_x_single, self._shape['x'])(x)
@@ -114,61 +85,17 @@ class MixinRVy:
         pass
 
 
-# class BaseModelRVx(BaseModel):
-#     def __init__(self, rng=None):
-#         super().__init__(rng)
-#         self._mean_x = None
-#         self._cov_x = None
-#
-#     @property
-#     def mean_x(self):
-#         return self._mean_x
-#
-#     @property
-#     def cov_x(self):
-#         return self._cov_x
-#
-#
-# class BaseModelRVy(BaseModel):
-#     def __init__(self, rng=None):
-#         super().__init__(rng)
-#         self._mean_y_x = None
-#         self._cov_y_x = None
-#
-#     # @property
-#     # def mean_y_x(self):
-#     #     return self._mean_y_x
-#
-#     def mean_y_x(self, x):
-#         return vectorize_func(self._mean_y_x_single, self._shape['x'])(x)
-#
-#     def _mean_y_x_single(self, x):
-#         raise NotImplementedError
-#         pass
-#
-#     # @property
-#     # def cov_y_x(self):
-#     #     return self._cov_y_x
-#
-#     def cov_y_x(self, x):
-#         return vectorize_func(self._cov_y_x_single, self._shape['x'])(x)
-#
-#     def _cov_y_x_single(self, x):
-#         raise NotImplementedError
-#         pass
-
-
-class YcXModel(BaseModel):
+class DataConditional(Base):
     def __new__(cls, model_x, model_y_x, rng=None):
         is_numeric_y_x = isinstance(model_y_x(model_x.rvs()), BaseRV)
         if isinstance(model_x, BaseRV):
             if is_numeric_y_x:
-                return super().__new__(YcXModelRVyx)
+                return super().__new__(DataConditionalRVyx)
             else:
-                return super().__new__(YcXModelRVx)
+                return super().__new__(DataConditionalRVx)
         else:
             if is_numeric_y_x:
-                return super().__new__(YcXModelRVy)
+                return super().__new__(DataConditionalRVy)
             else:
                 return super().__new__(cls)
 
@@ -232,34 +159,23 @@ class YcXModel(BaseModel):
 
         return cls(model_x, model_y_x, rng)
 
-    @classmethod
-    def beta_model(cls, a, b, c, rng=None):
-        model_x = BetaRV(a, b)
-
-        def model_y_x(x): return BetaRV(c*x, c*(1-x))
-
-        return cls(model_x, model_y_x, rng)
-
-    # TODO: subclass, overwrite methods for efficiency?
-
-    @classmethod
-    def norm_model(cls, model_x=NormalRV(), basis_y_x=(lambda x: 1,), weights=(0,), cov_y_x=1, rng=None):
-
-        def model_y_x(x):
-            mean_y_x = sum(weight * func(x) for weight, func in zip(weights, basis_y_x))
-            return NormalRV(mean_y_x, cov_y_x)
-
-        return cls(model_x, model_y_x, rng)
+    # @classmethod
+    # def beta_model(cls, a, b, c, rng=None):
+    #     model_x = BetaRV(a, b)
+    #
+    #     def model_y_x(x): return BetaRV(c*x, c*(1-x))
+    #
+    #     return cls(model_x, model_y_x, rng)
 
 
-class YcXModelRVx(MixinRVx, YcXModel):
+class DataConditionalRVx(MixinRVx, DataConditional):
     def _update_x(self):
         super()._update_x()
         self._mean_x = self._model_x.mean
         self._cov_x = self._model_x.cov
 
 
-class YcXModelRVy(MixinRVy, YcXModel):
+class DataConditionalRVy(MixinRVy, DataConditional):
     def _update_y_x(self):
         super()._update_y_x()
         # self._mean_y_x = vectorize_func(lambda x: self._model_y_x(x).mean, self._shape['x'])
@@ -268,21 +184,21 @@ class YcXModelRVy(MixinRVy, YcXModel):
         self._cov_y_x_single = lambda x: self._model_y_x(x).cov
 
 
-class YcXModelRVyx(YcXModelRVx, YcXModelRVy):
+class DataConditionalRVyx(DataConditionalRVx, DataConditionalRVy):       # TODO: diamond problem?
     pass
 
 
-# theta_m = DirichletRV(8, [[.2, .1], [.3, .4]])
+# theta_m = Dirichlet(8, [[.2, .1], [.3, .4]])
 # def theta_c(x): return FiniteRE.gen_func([[0, 1], [2, 3]], x)
 #
-# theta_m = DirichletRV(8, [[.2, .1, .1], [.3, .1, .2]])
+# theta_m = Dirichlet(8, [[.2, .1, .1], [.3, .1, .2]])
 # def theta_c(x): return FiniteRE.gen_func(np.stack(np.meshgrid([0,1,2],[0,1]), axis=-1), x)
 #
-# theta_m = DirichletRV(6, [.5, .5])
+# theta_m = Dirichlet(6, [.5, .5])
 # # def theta_c(x): return FiniteRE.gen_func(['a', 'b'], x)
 # def theta_c(x): return FiniteRE.gen_func([0, 1], x)
 #
-# t = YcXModel(theta_m, theta_c)
+# t = DataConditional(theta_m, theta_c)
 # t.rvs()
 # t.rvs(4)
 # t.mode_y_x(t.model_x.rvs(4))
@@ -290,8 +206,8 @@ class YcXModelRVyx(YcXModelRVx, YcXModelRVy):
 # t.cov_y_x(t.model_x.rvs(4))
 
 
-class NormalRVModel(MixinRVx, MixinRVy, BaseModel):
-    def __init__(self, model_x=NormalRV(), basis_y_x=(lambda x: 1.,), weights=(0.,),
+class NormalRegressor(MixinRVx, MixinRVy, Base):
+    def __init__(self, model_x=Normal(), basis_y_x=(lambda x: 1.,), weights=(0.,),
                  cov_y_x=1., rng=None):
         super().__init__(rng)
 
@@ -309,7 +225,6 @@ class NormalRVModel(MixinRVx, MixinRVy, BaseModel):
 
         self._mode_y_x_single = self._mean_y_x_single
 
-        # self.basis_y_x = basis_y_x
         if basis_y_x is None:
             def power_func(i):
                 return lambda x: np.full(self.shape['y'], (x ** i).sum())
@@ -339,14 +254,14 @@ class NormalRVModel(MixinRVx, MixinRVy, BaseModel):
     def model_y_x(self, x):
         mean = self._mean_y_x_single(x)
         cov = self._cov_y_x_single(x)
-        return NormalRV(mean, cov)
+        return Normal(mean, cov)
 
     def _mean_y_x_single(self, x):
         return sum(weight * func(x) for weight, func in zip(self.weights, self.basis_y_x))
 
-    _rvs = YcXModel._rvs
+    _rvs = DataConditional._rvs
 
 
-# g = NormalRVModel(basis_y_x=(lambda x: x,), weights=(1,), cov_y_x=.01)
+# g = NormalRegressor(basis_y_x=(lambda x: x,), weights=(1,), cov_y_x=.01)
 # r = g.rvs(100)
 # # plt.plot(r['x'], r['y'], '.')
