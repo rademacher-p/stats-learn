@@ -14,11 +14,11 @@ import matplotlib.pyplot as plt
 # from mpl_toolkits.mplot3d import Axes3D
 
 from util.generic import vectorize_first_arg
-from RE_obj import NormalRV, BetaRV
-from SL_obj import NormalRVModel
-from bayes import NormalModelBayes
-from decision_functions.learn_funcs import BayesPredictor, BayesClassifier, BayesRegressor, \
-    ModelPredictor, ModelClassifier, ModelRegressor
+from random_elements import Normal, Beta
+from models import NormalRegressor as NormalRegressorModel
+from bayes import NormalRegressor as NormalRegressorBayes
+from decision_functions.learn_funcs import (BayesPredictor, BayesClassifier, BayesRegressor,
+                                            ModelPredictor, ModelClassifier, ModelRegressor)
 
 # plt.style.use('seaborn')
 
@@ -106,8 +106,8 @@ supp_y_s = np.array(list(itertools.product(supp_y.reshape((-1,) + data_shape_y))
 
 
 # alpha_0 = 10 * supp_yx.size
-# mean = DirichletRV(supp_yx.size, np.ones(supp_yx.shape) / supp_yx.size).rvs()
-# prior = DirichletRV(alpha_0, mean, rng)
+# mean = Dirichlet(supp_yx.size, np.ones(supp_yx.shape) / supp_yx.size).rvs()
+# prior = Dirichlet(alpha_0, mean, rng)
 #
 # theta_pmf = prior.rvs()
 # theta = FiniteRE(supp_yx, theta_pmf, rng)
@@ -162,22 +162,23 @@ def predictor_compare_mc_bayes(predictors, bayes_model, n_train=0, n_test=1, n_m
 
 
 def main():
-    model_x = NormalRV(mean=0., cov=1.)
+    model_x = Normal(mean=0., cov=1.)
     x_plt = np.linspace(-3, 3, 100, endpoint=False)
 
-    # model_x = NormalRV(mean=np.zeros(2), cov=np.eye(2))
+    # model_x = Normal(mean=np.zeros(2), cov=np.eye(2))
     # x1_plot = np.linspace(-3, 3, 101, endpoint=True)
     # x2_plot = np.linspace(-3, 3, 81, endpoint=True)
     # x_plt = np.stack(np.meshgrid(x1_plot, x2_plot), axis=-1)
 
-    # model_x = BetaRV(a=1, b=1)
+    # model_x = Beta(a=1, b=1)
     # x_plt = np.linspace(0, 1, 100, endpoint=False)
 
-    model = NormalRVModel(model_x=model_x, basis_y_x=None,      # (lambda x: 1., lambda x: x)
-                          weights=np.ones(2), cov_y_x=1., rng=None)
+    model = NormalRegressorModel(model_x=model_x, basis_y_x=None,  # (lambda x: 1., lambda x: x)
+                                 weights=np.ones(2), cov_y_x=1., rng=None)
 
-    bayes_models = {r'$C_{\theta} = $' + str(_cov): NormalModelBayes(model_x=model_x, basis_y_x=None, cov_y_x=1.,
-                                                                     mean_prior=np.zeros(2), cov_prior=_cov*np.eye(2))
+    bayes_models = {r'$C_{\theta} = $' + str(_cov): NormalRegressorBayes(model_x=model_x, basis_y_x=None, cov_y_x=1.,
+                                                                         mean_prior=np.zeros(2),
+                                                                         cov_prior=_cov*np.eye(2))
                     for _cov in [0.1, 10]}
 
     predictors = [
@@ -231,7 +232,7 @@ def main():
     # axn.grid(True)
 
     _, ax = plt.subplots()
-    pr = predictors[2]
+    pr = predictors[1]
     pr.plot_predict_stats(x_plt, model, n_train=[0, 5, 10], n_mc=50, do_std=True, ax=ax, rng=None)
     ax.grid(True)
 

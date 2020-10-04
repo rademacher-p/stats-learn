@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import util
 from util.generic import vectorize_func, empirical_pmf, vectorize_first_arg, check_data_shape
 from loss_funcs import loss_se, loss_01
-from SL_obj import BaseModel, MixinRVy, YcXModel
+from models import Base as BaseModel, MixinRVy, DataConditional
 
 
 # TODO: add method functionality to work with SKL, TF conventions?
@@ -380,7 +380,7 @@ class BayesRegressor(RegressorMixin, BayesPredictor):
 #
 #         self._mean_y_x = _mean_y_x
 #
-#         self._model_gen = functools.partial(YcXModel.finite_model, supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
+#         self._model_gen = functools.partial(DataConditional.finite_model, supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
 #         self._posterior_mean = None
 #         self.fit()
 #
