@@ -216,6 +216,26 @@ def main():
     ax.grid(True)
 
 
+    # _, axn = plt.subplots()
+    # pr = predictors[1]
+    # for n_train in [5, 10, 15]:
+    #     pr.fit_from_model(model, n_train)
+    #     pr.plot_predict(x_plt, ax=axn)
+    # axn.grid(True)
+    #
+    # _, axn = plt.subplots()
+    # pr = predictors[1]
+    # for _ in range(3):
+    #     pr.fit_from_model(model, n_train=5, warm_start=True)
+    #     pr.plot_predict(x_plt, ax=axn)
+    # axn.grid(True)
+
+    _, ax = plt.subplots()
+    pr = predictors[2]
+    pr.plot_predict_stats(x_plt, model, n_train=[0, 5, 10], n_mc=50, do_std=True, ax=ax, rng=None)
+    ax.grid(True)
+
+
 # def main():
 #     alpha_0 = alpha_0_plot = supp_x_s.size * supp_y_s.size
 #
