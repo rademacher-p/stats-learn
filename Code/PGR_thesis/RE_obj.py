@@ -6,6 +6,7 @@ Random element objects.
 # TODO: do ABC or PyCharm bug?
 
 import math
+from numbers import Integral
 
 import numpy as np
 from scipy.stats._multivariate import _PSD
@@ -59,9 +60,9 @@ class BaseRE:
     def rvs(self, size=None, rng=None):
         if size is None:
             size = ()
-        elif type(size) is int:
+        elif isinstance(size, (Integral, np.integer)):
             size = (size,)
-        elif type(size) is not tuple:
+        elif not isinstance(size, tuple):
             raise TypeError("Input 'size' must be int or tuple.")
 
         self.rng = rng

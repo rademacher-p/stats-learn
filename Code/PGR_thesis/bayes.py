@@ -112,8 +112,8 @@ class NormalModelBayes(BaseBayes):
         self._shape['y'] = _shape_y
 
         # Linear algebra persistent values
-        psd = _PSD(self.cov_y_x.reshape(2*(self.size['y'],)), allow_singular=False)
-        self._prec_U_y_x = psd.U
+        _psd = _PSD(self.cov_y_x.reshape(2*(self.size['y'],)), allow_singular=False)
+        self._prec_U_y_x = _psd.U
         self._cov_prior_inv = np.linalg.inv(self.cov_prior)
 
         self._reset()
@@ -155,7 +155,6 @@ class NormalModelBayes(BaseBayes):
         kwargs.update(weights=self.posterior.mean, cov_y_x=cov_y_x, rng=None)
 
         return NormalRVModel(**kwargs)
-
 
     # def posterior(self, d):
     #     n = len(d)
