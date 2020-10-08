@@ -27,7 +27,7 @@ class Base:
     """
 
     def __init__(self, rng=None):
-        self._rng = rng
+        self.rng = rng
 
         self._shape = None
         self._mode = None

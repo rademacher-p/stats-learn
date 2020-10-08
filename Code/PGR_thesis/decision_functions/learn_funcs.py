@@ -6,6 +6,8 @@ import functools
 import math
 from numbers import Integral
 from collections import Sequence
+from itertools import product
+
 
 import numpy as np
 from scipy.stats import mode
@@ -66,10 +68,10 @@ class ModelPredictor:
         raise NotImplementedError("Method must be overwritten.")  # TODO: numeric approx with loss and predictive!?
         pass
 
-    def fit(self, d=None):
+    def fit(self, d=None, warm_start=False):
         pass
 
-    def fit_from_model(self, model, n_train=0, rng=None):
+    def fit_from_model(self, model, n_train=0, rng=None, warm_start=False):
         pass
 
     def evaluate(self, d):
@@ -95,14 +97,13 @@ class ModelPredictor:
     #
     #     return loss
 
-    def plot_predict(self, x, ax=None):
-        """Plot prediction function."""
-        return self._plotter(x, self.predict(x), ax)
-
-    def _plotter(self, x, y, ax=None):
+    def plotter(self, x, y, y_std=None, ax=None, label=None):
         # TODO: get 'x' default from model_x.plot_pf plot_data.axes?
 
         x, set_shape = check_data_shape(x, self.shape['x'])
+
+        if label is None:
+            label = self.name
 
         if self.ndim['y'] == 0:
             if self.shape['x'] == () and len(set_shape) == 1:
@@ -111,7 +112,11 @@ class ModelPredictor:
                     ax.set(xlabel='$x$', ylabel='$\\hat{y}(x)$')
                     ax.grid(True)
 
-                plt_data = ax.plot(x, y, label=self.name)
+                plt_data = ax.plot(x, y, label=label)
+                if y_std is not None:
+                    # plt_data_std = ax.errorbar(x, y_mean, yerr=y_std)
+                    plt_data_std = ax.fill_between(x, y - y_std, y + y_std, alpha=0.5)
+                    plt_data = (plt_data, plt_data_std)
 
             elif self.shape['x'] == (2,) and len(set_shape) == 2:
                 if ax is None:
@@ -119,6 +124,10 @@ class ModelPredictor:
                     ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$\\hat{y}(x)$')
 
                 plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, cmap=plt.cm.viridis)
+                if y_std is not None:
+                    plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y - y_std, cmap=plt.cm.viridis)
+                    plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y + y_std, cmap=plt.cm.viridis)
+                    plt_data = (plt_data, (plt_data_lo, plt_data_hi))
 
             else:
                 raise NotImplementedError
@@ -126,6 +135,125 @@ class ModelPredictor:
             raise NotImplementedError
 
         return plt_data
+
+    def plot_predict(self, x, ax=None):
+        """Plot prediction function."""
+        return self.plotter(x, self.predict(x), ax=ax)
+
+    @staticmethod
+    def prediction_stats(predictors, x, model, n_train=(0,), n_mc=1, stats=('mode',), rng=None):
+
+        shape, size, ndim = predictors[0].shape, predictors[0].size, predictors[0].ndim
+        if not all(predictor.shape == shape for predictor in predictors[1:]):
+            raise ValueError("All models must have same shape.")
+
+        x, set_shape = check_data_shape(x, shape['x'])
+        n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
+        model.rng = rng
+
+        # Initialize NumPy output array
+        _samp, dtype = (), []
+        for stat in stats:
+            if stat in ('mode', 'median', 'mean'):
+                stat_shape = set_shape + shape['y']
+            elif stat in ('std', 'cov'):
+                stat_shape = set_shape + 2 * shape['y']
+            else:
+                raise ValueError
+            _samp += (np.empty(stat_shape),)
+            dtype.append((stat, np.float, stat_shape))  # TODO: dtype float? need model dtype attribute?!
+        _data = [[_samp for _ in predictors] for _ in n_train_delta]
+        y_stats = np.array(_data, dtype=dtype)
+
+        # Generate random data and make predictions
+        y = np.empty((n_mc, *y_stats.shape, *set_shape, *shape['y']))
+        for i_mc in range(n_mc):
+            for i_n, n_ in enumerate(n_train_delta):
+                d = model.rvs(n_)
+                for i_p, predictor in enumerate(predictors):
+                    warm_start = False if i_n == 0 else True  # resets learner for new iteration
+                    predictor.fit(d, warm_start=warm_start)
+                    y[i_mc, i_n, i_p] = predictor.predict(x)
+
+        if 'mode' in stats:
+            y_stats['mode'] = mode(y, axis=0)
+
+        if 'median' in stats:
+            y_stats['median'] = np.median(y, axis=0)
+
+        if 'mean' in stats:
+            y_stats['mean'] = y.mean(axis=0)
+
+        if 'std' in stats:
+            if ndim['y'] == 0:
+                y_stats['std'] = y.std(axis=0)
+            else:
+                raise ValueError("Standard deviation is only supported for singular data shapes.")
+
+        if 'cov' in stats:
+            if size['y'] == 1:
+                _temp = y.var(axis=0)
+            else:
+                _temp = np.moveaxis(y.reshape((n_mc, math.prod(set_shape), size['y'])), 0, -1)
+                _temp = np.array([np.cov(t) for t in _temp])
+
+            y_stats['cov'] = _temp.reshape(set_shape + 2 * shape['y'])
+
+        return y_stats
+
+    @classmethod
+    def plot_compare_stats(cls, predictors, x, model, n_train=(0,), n_mc=1, do_std=False, ax=None, rng=None):
+
+        if not isinstance(predictors, Sequence):
+            predictors = [predictors]
+
+        if isinstance(n_train, (Integral, np.integer)):
+            n_train = [n_train]
+        stats = ('mean', 'std') if do_std else ('mean',)    # TODO: generalize for mode, etc.
+
+        y_stats = cls.prediction_stats(predictors, x, model, n_train, n_mc, stats, rng)
+
+        if len(n_train) == 1:
+            y_stats = y_stats.squeeze(axis=0)
+            labels = [p.name for p in predictors]
+            p_iter = predictors
+        else:
+            if len(predictors) == 1:
+                y_stats = y_stats.squeeze(axis=1)
+                labels = [f"N = {n}" for n in n_train]
+                p_iter = len(n_train) * predictors
+            else:
+                raise ValueError
+
+        out = []
+        for predictor, y_stat, label in zip(p_iter, y_stats, labels):
+            y_mean = y_stat['mean']
+            y_std = y_stat['std'] if do_std else None
+            plt_data = predictor.plotter(x, y_mean, y_std, ax, label)
+            out.append(plt_data)
+
+        return out
+
+    def plot_predict_stats(self, x, model, n_train=0, n_mc=1, do_std=False, ax=None, rng=None):
+        # if isinstance(n_train, (Integral, np.integer)):
+        #     n_train = [n_train]
+        return self.plot_compare_stats(self, x, model, n_train, n_mc, do_std, ax, rng)    # FIXME
+
+        # if isinstance(n_train, (Integral, np.integer)):
+        #     n_train = [n_train]
+        # stats = ('mean', 'std') if do_std else ('mean',)        # TODO: generalize for mode, etc.
+        #
+        # y_stats = self.prediction_stats([self], x, model, n_train, n_mc, stats, rng).squeeze(axis=1)
+        #
+        # labels = [f"N = {n}" for n in n_train] if len(y_stats) > 1 else [self.name]
+        # plt_data = []
+        # for y_stat, label in zip(y_stats, labels):
+        #     y_mean = y_stat['mean']
+        #     y_std = y_stat['std'] if do_std else None
+        #     plt_data_ = self.plotter(x, y=y_mean, y_std=y_std, ax=ax, label=label)
+        #     plt_data.append(plt_data_)
+        #
+        # return plt_data
 
 
 class ModelClassifier(ClassifierMixin, ModelPredictor):
@@ -137,22 +265,22 @@ class ModelRegressor(RegressorMixin, ModelPredictor):
     def __init__(self, model, name=None):
         super().__init__(loss_se, model, name)
 
-    def plot_predict_stats(self, x, model, n_train=0, n_mc=1, do_std=False, ax=None, rng=None):
-        y = self.predict(x)
-        plt_data = self._plotter(x, y, ax)
-        if do_std:
-            ax = plt.gca()
-            if self.shape['x'] == ():
-                ax.fill_between(x, y, y, alpha=0.5)
-
-            elif self.shape['x'] == (2,):
-                pass
-            else:
-                raise NotImplementedError
-        else:
-            raise NotImplementedError
-
-        return plt_data
+    # def plot_predict_stats(self, x, model, n_train=0, n_mc=1, do_std=False, ax=None, rng=None):
+    #     y = self.predict(x)
+    #     plt_data = self.plotter(x, y, ax)
+    #     if do_std:
+    #         ax = plt.gca()
+    #         if self.shape['x'] == ():
+    #             ax.fill_between(x, y, y, alpha=0.5)
+    #
+    #         elif self.shape['x'] == (2,):
+    #             pass
+    #         else:
+    #             raise NotImplementedError
+    #     else:
+    #         raise NotImplementedError
+    #
+    #     return plt_data
 
 
 # %% Learning Functions
@@ -216,61 +344,61 @@ class BayesPredictor(ModelPredictor):
         ax_posterior = None
         self.posterior.plot_pf(x, ax=ax_posterior)
 
-    def prediction_stats(self, x, model, n_train=0, n_mc=1, stats=('mode',), rng=None):
-        """Get mean and covariance of prediction function for a given data model."""
-
-        x, set_shape = check_data_shape(x, self.shape['x'])
-
-        if isinstance(n_train, (Integral, np.integer)):
-            n_train = [n_train]
-        n_train = np.array(n_train)
-        n_train_delta = np.diff(np.concatenate(([0], n_train)))
-
-        model.rng = rng
-        y_n = np.empty((len(n_train), n_mc, *set_shape, *self.shape['y']))
-        for i_mc in range(n_mc):
-            for i_n, n_ in enumerate(n_train_delta):
-                warm_start = False if i_n == 0 else True
-                self.fit_from_model(model, n_train=n_, warm_start=warm_start)
-                y_n[i_n, i_mc] = self.predict(x)
-
-        # y = np.empty((n_mc, *set_shape, *self.shape['y']))
-        # for i_mc in range(n_mc):
-        #     self.fit_from_model(model, n_train)
-        #     y[i_mc] = self.predict(x)
-
-        out = []
-        for y in y_n:
-            stats = {stat: None for stat in stats}
-
-            if 'mode' in stats.keys():
-                stats['mode'] = mode(y, axis=0)
-
-            if 'median' in stats.keys():
-                stats['median'] = np.median(y, axis=0)
-
-            if 'mean' in stats.keys():
-                stats['mean'] = y.mean(axis=0)
-
-            if 'std' in stats.keys():
-                if self.ndim['y'] == 0:
-                    stats['std'] = y.std(axis=0)
-                else:
-                    raise ValueError("Standard deviation is only supported for singular data shapes.")
-
-            if 'cov' in stats.keys():
-                if self.size['y'] == 1:
-                    _temp = y.var(axis=0)
-                else:
-                    _temp = np.moveaxis(y.reshape((n_mc, math.prod(set_shape), self.size['y'])), 0, -1)
-                    _temp = np.array([np.cov(t) for t in _temp])
-
-                stats['cov'] = _temp.reshape(set_shape + 2 * self.shape['y'])
-
-            out.append(stats)
-
-        # return stats
-        return out
+    # def prediction_stats_old(self, x, model, n_train=0, n_mc=1, stats=('mode',), rng=None):     # FIXME
+    #     """Get mean and covariance of prediction function for a given data model."""
+    #
+    #     x, set_shape = check_data_shape(x, self.shape['x'])
+    #
+    #     if isinstance(n_train, (Integral, np.integer)):
+    #         n_train = [n_train]
+    #     n_train = np.array(n_train)
+    #     n_train_delta = np.diff(np.concatenate(([0], n_train)))
+    #
+    #     model.rng = rng
+    #     y_seq = np.empty((len(n_train), n_mc, *set_shape, *self.shape['y']))
+    #     for i_mc in range(n_mc):
+    #         for i_n, n_ in enumerate(n_train_delta):
+    #             warm_start = False if i_n == 0 else True    # resets learner for new iteration
+    #             self.fit_from_model(model, n_train=n_, warm_start=warm_start)
+    #             y_seq[i_n, i_mc] = self.predict(x)
+    #
+    #     # y = np.empty((n_mc, *set_shape, *self.shape['y']))
+    #     # for i_mc in range(n_mc):
+    #     #     self.fit_from_model(model, n_train)
+    #     #     y[i_mc] = self.predict(x)
+    #
+    #     out = []
+    #     for y in y_seq:
+    #         stats = {stat: None for stat in stats}
+    #
+    #         if 'mode' in stats.keys():
+    #             stats['mode'] = mode(y, axis=0)
+    #
+    #         if 'median' in stats.keys():
+    #             stats['median'] = np.median(y, axis=0)
+    #
+    #         if 'mean' in stats.keys():
+    #             stats['mean'] = y.mean(axis=0)
+    #
+    #         if 'std' in stats.keys():
+    #             if self.ndim['y'] == 0:
+    #                 stats['std'] = y.std(axis=0)
+    #             else:
+    #                 raise ValueError("Standard deviation is only supported for singular data shapes.")
+    #
+    #         if 'cov' in stats.keys():
+    #             if self.size['y'] == 1:
+    #                 _temp = y.var(axis=0)
+    #             else:
+    #                 _temp = np.moveaxis(y.reshape((n_mc, math.prod(set_shape), self.size['y'])), 0, -1)
+    #                 _temp = np.array([np.cov(t) for t in _temp])
+    #
+    #             stats['cov'] = _temp.reshape(set_shape + 2 * self.shape['y'])
+    #
+    #         out.append(stats)
+    #
+    #     # return stats
+    #     return out
 
 
 class BayesClassifier(ClassifierMixin, BayesPredictor):
@@ -282,35 +410,36 @@ class BayesRegressor(RegressorMixin, BayesPredictor):
     def __init__(self, bayes_model, name=None):
         super().__init__(loss_se, bayes_model, name)
 
-    def plot_predict_stats(self, x, model, n_train=0, n_mc=1, do_std=False, ax=None, rng=None):
-
-        if isinstance(n_train, (Integral, np.integer)):
-            n_train = (n_train,)
-
-        stat_str = ('mean', 'std') if do_std else ('mean',)
-        stats_seq = self.prediction_stats(x, model, n_train, n_mc, stats=stat_str, rng=rng)
-
-        for stats in stats_seq:
-            y_mean = stats['mean']
-
-            plt_data = self._plotter(x, y_mean, ax)
-
-            if do_std:
-                y_std = stats['std']
-                ax = plt.gca()
-                if self.shape['x'] == ():
-                    # plt_data_std = ax.errorbar(x, y_mean, yerr=y_std)
-                    plt_data_std = ax.fill_between(x, y_mean - y_std, y_mean + y_std, alpha=0.5)
-                    plt_data = (plt_data, plt_data_std)
-
-                elif self.shape['x'] == (2,):
-                    plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y_mean - y_std, cmap=plt.cm.viridis)
-                    plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y_mean + y_std, cmap=plt.cm.viridis)
-                    plt_data = (plt_data, (plt_data_lo, plt_data_hi))
-                else:
-                    raise NotImplementedError
-            else:
-                raise NotImplementedError
+        # FIXME
+        # stat_str = ('mean', 'std') if do_std else ('mean',)
+        # stats_seq = self.prediction_stats(x, model, n_train, n_mc, stats=stat_str, rng=rng)
+        #
+        # if len(stats_seq) == 1:
+        #     labels = [self.name]
+        # else:
+        #     labels = [f"N = {n}" for n in n_train]
+        #
+        # for stats, label in zip(stats_seq, labels):
+        #     y_mean = stats['mean']
+        #
+        #     plt_data = self.plotter(x, y_mean, ax, label=label)
+        #
+        #     if do_std:
+        #         y_std = stats['std']
+        #         ax = plt.gca()
+        #         if self.shape['x'] == ():
+        #             # plt_data_std = ax.errorbar(x, y_mean, yerr=y_std)
+        #             plt_data_std = ax.fill_between(x, y_mean - y_std, y_mean + y_std, alpha=0.5)
+        #             plt_data = (plt_data, plt_data_std)
+        #
+        #         elif self.shape['x'] == (2,):
+        #             plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y_mean - y_std, cmap=plt.cm.viridis)
+        #             plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y_mean + y_std, cmap=plt.cm.viridis)
+        #             plt_data = (plt_data, (plt_data_lo, plt_data_hi))
+        #         else:
+        #             raise NotImplementedError
+        #     else:
+        #         raise NotImplementedError
 
         # return plt_data
 
