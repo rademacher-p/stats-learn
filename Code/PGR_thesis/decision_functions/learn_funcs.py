@@ -59,9 +59,6 @@ class ModelPredictor:
     size = property(lambda self: self.model.size)
     ndim = property(lambda self: self.model.ndim)
 
-    # def fit(self, d):
-    #     pass
-
     def predict(self, x):
         return vectorize_func(self._predict_single, data_shape=self.shape['x'])(x)
 
@@ -223,13 +220,13 @@ class BayesPredictor(ModelPredictor):
         """Get mean and covariance of prediction function for a given data model."""
 
         x, set_shape = check_data_shape(x, self.shape['x'])
-        model.rng = rng
+
         if isinstance(n_train, (Integral, np.integer)):
             n_train = [n_train]
         n_train = np.array(n_train)
-
         n_train_delta = np.diff(np.concatenate(([0], n_train)))
 
+        model.rng = rng
         y_n = np.empty((len(n_train), n_mc, *set_shape, *self.shape['y']))
         for i_mc in range(n_mc):
             for i_n, n_ in enumerate(n_train_delta):

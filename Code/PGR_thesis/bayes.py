@@ -23,7 +23,7 @@ from util.func_obj import FiniteDomainFunc
 
 
 class Base:
-    def __init__(self, model_gen, model_kwargs=None, prior=None, rng=None):
+    def __init__(self, model_cls, model_kwargs=None, prior=None, rng=None):
         self._shape = {'x': None, 'y': None}
 
         if model_kwargs is None:
@@ -34,14 +34,11 @@ class Base:
         # for key, val in self.model_kwargs.items():
         #     setattr(self, key, val)     # Copy all model parameters to object
 
-        # self.model_gen = functools.partial(model_gen, **self.model_kwargs)
-        self.model_gen = model_gen
+        self.model_cls = model_cls      # TODO: model_cls?
         self.prior = prior
         self.posterior = None
 
-        self._rng = check_rng(rng)
-        self.model_kwargs.update(rng=self._rng)
-        self.prior.rng = self._rng
+        self.rng = rng      # setter binds RNG to model and prior
 
     shape = property(lambda self: self._shape)
     size = property(lambda self: {key: math.prod(val) for key, val in self._shape.items()})
@@ -53,14 +50,23 @@ class Base:
 
     @rng.setter
     def rng(self, rng):
-        if rng is not None:
-            self._rng = check_rng(rng)
-            self.model_kwargs.update(rng=self._rng)
-            self.prior.rng = self._rng
+        self._rng = check_rng(rng)
+        self.model_kwargs.update(rng=self._rng)
+        self.prior.rng = self._rng
 
     def random_model(self, rng=None):
-        self.rng = rng
-        # return self.model_gen()     # defaults to deterministic bayes_model!?
+        model_kwargs = self.model_kwargs.copy()     # TODO: need copy?
+        if rng is None:
+            rand_kwargs = self.random_kwargs()
+        else:
+            rng = check_rng(rng)
+            model_kwargs.update(rng=rng)
+            rand_kwargs = self.random_kwargs(rng)
+
+        return self.model_cls(**model_kwargs, **rand_kwargs)   # defaults to deterministic bayes_model?
+
+    def random_kwargs(self, rng=None):
+        raise NotImplementedError
 
     # def posterior_model(self, d):  # TODO: generalize method for base classes, full posterior object?
     #     raise NotImplementedError
@@ -84,7 +90,7 @@ class Base:
 
 
 class NormalRegressor(Base):
-    def __init__(self, model_x=Normal(), basis_y_x=None, cov_y_x=1,
+    def __init__(self, model_x=Normal(), basis_y_x=None, cov_y_x=1.,
                  mean_prior=np.zeros(1), cov_prior=np.eye(1), rng=None):
 
         _temp = np.array(cov_y_x).shape
@@ -111,16 +117,14 @@ class NormalRegressor(Base):
         self._shape['y'] = _shape_y
 
         # Linear algebra persistent values
-        _psd = _PSD(self.cov_y_x.reshape(2*(self.size['y'],)), allow_singular=False)
+        _psd = _PSD(self.cov_y_x.reshape(2 * (self.size['y'],)), allow_singular=False)
         self._prec_U_y_x = _psd.U
         self._cov_prior_inv = np.linalg.inv(self.cov_prior)
 
         self._reset()
 
-    def random_model(self, rng=None):
-        super().random_model(rng)
-        weights = self.prior.rvs()
-        return self.model_gen(weights=weights, **self.model_kwargs)
+    def random_kwargs(self, rng=None):
+        return {'weights': self.prior.rvs(rng=rng)}
 
     def _reset(self):
         self._cov_post_inv = self._cov_prior_inv.copy()
@@ -218,7 +222,7 @@ class NormalRegressor(Base):
 # for _ in range(2):
 #     model = bayes_model.random_model(rng=None)
 #     print(model.weights)
-#     rvs = model.rvs(2)
+#     rvs = model.rvs(2, rng=None)
 #     print(rvs)
 
 

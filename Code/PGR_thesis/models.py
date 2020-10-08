@@ -9,7 +9,7 @@ import math
 import numpy as np
 from scipy import stats
 
-from random_elements import Base, BaseRV, Normal
+from random_elements import Base as BaseRE, BaseRV, Normal
 from RE_obj_callable import FiniteRE, DirichletRV, BetaRV       # TODO: note - CALLABLE!!!!
 from util.generic import check_rng, vectorize_func, check_data_shape
 
@@ -20,7 +20,7 @@ class Base:
     """
 
     def __init__(self, rng=None):
-        self._rng = check_rng(rng)
+        self._rng = rng
         self._shape = {'x': None, 'y': None}
 
         self._mode_x = None
@@ -31,8 +31,7 @@ class Base:
 
     @rng.setter
     def rng(self, rng):
-        if rng is not None:
-            self._rng = check_rng(rng)
+        self._rng = check_rng(rng)
 
     shape = property(lambda self: self._shape)
     size = property(lambda self: {key: math.prod(val) for key, val in self._shape.items()})
@@ -49,9 +48,9 @@ class Base:
         raise NotImplementedError
         pass
 
-    rvs = Base.rvs
+    rvs = BaseRE.rvs
 
-    def _rvs(self, size=()):
+    def _rvs(self, size, rng):
         raise NotImplementedError("Method must be overwritten.")
         pass
 
@@ -133,9 +132,9 @@ class DataConditional(Base):
         # self._mode_y_x = vectorize_func(lambda x: self._model_y_x(x).mode, self._shape['x'])
         self._mode_y_x_single = lambda x: self._model_y_x(x).mode
 
-    def _rvs(self, size=()):
-        d_x = np.array(self.model_x.rvs(size, self.rng))
-        d_y = np.array([self.model_y_x(x).rvs((), self.rng)
+    def _rvs(self, size, rng):
+        d_x = np.array(self.model_x.rvs(size, rng))
+        d_y = np.array([self.model_y_x(x).rvs((), rng)
                         for x in d_x.reshape((-1,) + self.shape['x'])]).reshape(size + self.shape['y'])
 
         d = np.array(list(zip(d_x.reshape((-1,) + self.shape['x']), d_y.reshape((-1,) + self.shape['y']))),
