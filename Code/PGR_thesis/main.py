@@ -195,46 +195,32 @@ def main():
     # print(losses)
 
     # Plotting
+
     subplot_kw = {'projection': '3d'} if model_x.shape == (2,) else {}
     _, ax = plt.subplots(subplot_kw=subplot_kw)
-    # _, ax_prior = plt.subplots(subplot_kw={'projection': '3d'})
-    for predictor in predictors:
-        predictor.plot_predict_stats(x_plt, model, n_train=10, n_mc=50, do_std=True, ax=ax, rng=None)
-        # predictor.plot_predict(x, ax)
-
-        if isinstance(predictor, ModelRegressor):
-            # predictor.plot_predict(x, ax=ax)
-            pass
-        elif isinstance(predictor, BayesRegressor):
-            pass
-            # predictor.plot_param_dist(ax_prior=None)    # FIXME: weird exception and colorbar mismatch
-            # plt.gca().set(title=predictor.name)
-
-            # predictor.plot_predict_stats(x, model, n_train=10, n_mc=20, do_std=True, ax=ax, rng=None)
-
-        # plt.gca().set(title=predictor.name)
+    n_train = 10
+    ModelPredictor.plot_compare_stats(predictors, x_plt, model, n_train, n_mc=50, do_std=True, ax=ax, rng=None)
     ax.legend()
     ax.grid(True)
-
+    ax.set_title(f'N = {n_train}')
 
     # _, axn = plt.subplots()
     # pr = predictors[1]
-    # for n_train in [5, 10, 15]:
-    #     pr.fit_from_model(model, n_train)
+    # for n_train in np.full(10, 4):
+    #     pr.fit_from_model(model, n_train, warm_start=True)
     #     pr.plot_predict(x_plt, ax=axn)
     # axn.grid(True)
-    #
-    # _, axn = plt.subplots()
-    # pr = predictors[1]
-    # for _ in range(3):
-    #     pr.fit_from_model(model, n_train=5, warm_start=True)
-    #     pr.plot_predict(x_plt, ax=axn)
-    # axn.grid(True)
+    # axn.legend(np.cumsum(n_train))
+    # axn.set_title(f"{pr.name}, different N")
 
-    _, ax = plt.subplots()
+    subplot_kw = {'projection': '3d'} if model_x.shape == (2,) else {}
+    _, ax = plt.subplots(subplot_kw=subplot_kw)
     pr = predictors[1]
-    pr.plot_predict_stats(x_plt, model, n_train=[0, 5, 10], n_mc=50, do_std=True, ax=ax, rng=None)
+    n_train = [0, 5, 10, 50]
+    pr.plot_predict_stats(x_plt, model, n_train, n_mc=50, do_std=True, ax=ax, rng=None)
     ax.grid(True)
+    ax.legend()
+    ax.set_title(f"{pr.name}")
 
 
 # def main():
