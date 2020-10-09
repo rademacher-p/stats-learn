@@ -204,14 +204,16 @@ def main():
     ax.grid(True)
     ax.set_title(f'N = {n_train}')
 
-    # _, axn = plt.subplots()
-    # pr = predictors[1]
-    # for n_train in np.full(10, 4):
-    #     pr.fit_from_model(model, n_train, warm_start=True)
-    #     pr.plot_predict(x_plt, ax=axn)
-    # axn.grid(True)
-    # axn.legend(np.cumsum(n_train))
-    # axn.set_title(f"{pr.name}, different N")
+    _, axn = plt.subplots()
+    pr = predictors[1]
+    n_c = 0
+    for n_train in np.full(6, 5):
+        pr.fit_from_model(model, n_train, warm_start=True)
+        n_c += n_train
+        pr.plot_predict(x_plt, ax=axn, label=f"N = {n_c}")
+    axn.grid(True)
+    axn.legend()
+    axn.set_title(f"{pr.name}")
 
     subplot_kw = {'projection': '3d'} if model_x.shape == (2,) else {}
     _, ax = plt.subplots(subplot_kw=subplot_kw)

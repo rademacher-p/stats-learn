@@ -730,8 +730,7 @@ class Beta(BaseRV):
 class Normal(BaseRV):
     def __init__(self, mean=0., cov=1., rng=None):
         super().__init__(rng)
-        _mean = np.array(mean)
-        self._shape = _mean.shape
+        self._shape = np.array(mean).shape
 
         self.mean = mean
         self.cov = cov
