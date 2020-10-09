@@ -207,20 +207,21 @@ class DataConditionalRVyx(DataConditionalRVx, DataConditionalRVy):       # TODO:
 
 class NormalRegressor(MixinRVx, MixinRVy, Base):
     def __init__(self, model_x=Normal(), basis_y_x=(lambda x: 1.,), weights=(0.,),
-                 cov_y_x=1., rng=None):
+                 cov_y_x_single=1., rng=None):
         super().__init__(rng)
 
         self.model_x = model_x
         self.weights = np.array(weights)
-        self._cov_y_x_arg = np.array(cov_y_x)
 
-        if callable(cov_y_x):
-            self._cov_y_x_single = cov_y_x
-            _temp = self._cov_y_x_single(model_x.rvs()).shape
-        else:
-            self._cov_y_x_single = lambda x: self._cov_y_x_arg
-            _temp = self._cov_y_x_arg.shape
-        self._shape['y'] = _temp[:int(len(_temp) / 2)]
+        self.cov_y_x_single = cov_y_x_single
+        # if callable(cov_y_x):
+        #     self._cov_func = True
+        #     self._cov_y_x_single = cov_y_x
+        # else:
+        #     self._cov_func = False
+        #     self._cov_y_x_single = lambda x: np.array(cov_y_x)
+        # _temp = self._cov_y_x_single(model_x.rvs()).shape
+        # self._shape['y'] = _temp[:int(len(_temp) / 2)]
 
         self._mode_y_x_single = self._mean_y_x_single
 
@@ -234,7 +235,7 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):
 
     def __repr__(self):
         return f"NormalRVModel(model_x={self.model_x}, basis_y_x={self.basis_y_x}, " \
-               f"weights={self.weights}, cov_y_x={self._cov_y_x_arg})"
+               f"weights={self.weights}, cov_y_x={self._cov_repr})"
 
     @property
     def model_x(self):
@@ -249,6 +250,26 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):
 
         self._mean_x = self._model_x.mean
         self._cov_x = self._model_x.cov
+
+    def cov_y_x(self, x):
+        return vectorize_func(self.cov_y_x_single, self._shape['x'])(x)
+
+    @property
+    def cov_y_x_single(self):
+        return self._cov_y_x_single
+
+    @cov_y_x_single.setter
+    def cov_y_x_single(self, val):
+        if callable(val):
+            self._cov_repr = val
+            self._cov_y_x_single = self._cov_repr
+            _temp = self._cov_y_x_single(self.model_x.rvs()).shape
+        else:
+            self._cov_repr = np.array(val)
+            self._cov_y_x_single = lambda x: self._cov_repr
+            _temp = self._cov_repr.shape
+
+        self._shape['y'] = _temp[:int(len(_temp) / 2)]
 
     def model_y_x(self, x):
         mean = self._mean_y_x_single(x)
