@@ -97,7 +97,7 @@ class ModelPredictor:
     #
     #     return loss
 
-    def plotter(self, x, y, y_std=None, ax=None, label=None):
+    def plot_xy(self, x, y, y_std=None, ax=None, label=None):
         # TODO: get 'x' default from model_x.plot_pf plot_data.axes?
 
         x, set_shape = check_data_shape(x, self.shape['x'])
@@ -136,7 +136,7 @@ class ModelPredictor:
     def plot_predict(self, x, ax=None, label=None):
         """Plot prediction function."""
         label = self.name if label is None else label
-        return self.plotter(x, self.predict(x), ax=ax, label=label)
+        return self.plot_xy(x, self.predict(x), ax=ax, label=label)
 
     @staticmethod
     def prediction_stats(predictors, x, model, n_train=(0,), n_mc=1, stats=('mode',), rng=None):
@@ -166,8 +166,8 @@ class ModelPredictor:
         # Generate random data and make predictions
         y = np.empty((n_mc, *y_stats.shape, *set_shape, *shape['y']))
         for i_mc in range(n_mc):
-            for i_n, n_ in enumerate(n_train_delta):
-                d = model.rvs(n_)
+            for i_n, n_tr in enumerate(n_train_delta):
+                d = model.rvs(n_tr)
                 for i_p, predictor in enumerate(predictors):
                     warm_start = False if i_n == 0 else True  # resets learner for new iteration
                     predictor.fit(d, warm_start=warm_start)
@@ -227,7 +227,7 @@ class ModelPredictor:
         for predictor, y_stat, label in zip(p_iter, y_stats, labels):
             y_mean = y_stat['mean']
             y_std = y_stat['std'] if do_std else None
-            plt_data = predictor.plotter(x, y_mean, y_std, ax, label)
+            plt_data = predictor.plot_xy(x, y_mean, y_std, ax, label)
             out.append(plt_data)
 
         return out
@@ -248,10 +248,67 @@ class ModelPredictor:
         # for y_stat, label in zip(y_stats, labels):
         #     y_mean = y_stat['mean']
         #     y_std = y_stat['std'] if do_std else None
-        #     plt_data_ = self.plotter(x, y=y_mean, y_std=y_std, ax=ax, label=label)
+        #     plt_data_ = self.plot_xy(x, y=y_mean, y_std=y_std, ax=ax, label=label)
         #     plt_data.append(plt_data_)
         #
         # return plt_data
+
+    @staticmethod   # FIXME
+    def compare_eval(predictors, model, n_train=(0,), n_test=1, n_mc=1, rng=None):
+        # TODO: code redundancy?
+
+        shape, size, ndim = predictors[0].shape, predictors[0].size, predictors[0].ndim
+        if not all(predictor.shape == shape for predictor in predictors[1:]):
+            raise ValueError("All models must have same shape.")
+
+        n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
+        model.rng = rng
+
+        # Generate random data and make predictions
+        loss = np.empty((n_mc, len(n_train_delta), len(predictors)))
+        for i_mc in range(n_mc):
+            d_test = model.rvs(n_test)
+            for i_n, n_tr in enumerate(n_train_delta):
+                d_train = model.rvs(n_tr)
+                for i_p, predictor in enumerate(predictors):
+                    warm_start = False if i_n == 0 else True  # resets learner for new iteration
+                    predictor.fit(d_train, warm_start=warm_start)
+                    loss[i_mc, i_n, i_p] = predictor.evaluate(d_test)
+
+        return loss.mean(axis=0)
+
+    @classmethod
+    def plot_compare_eval(cls, predictors, model, n_train=(0,), n_test=1, n_mc=1, ax=None, rng=None):
+
+        # if not isinstance(predictors, Sequence):
+        #     predictors = [predictors]
+
+        if isinstance(n_train, (Integral, np.integer)):
+            n_train = [n_train]
+
+        if ax is None:
+            _, ax = plt.subplots()
+            ax.set(ylabel='Loss')
+            ax.grid(True)
+
+        loss = cls.compare_eval(predictors, model, n_train, n_test, n_mc, rng)
+
+        if loss.shape[0] > loss.shape[1]:
+            loss = np.transpose(loss)
+            x_plt = n_train
+            labels = [p.name for p in predictors]
+            ax.set(xlabel='N')
+        else:
+            labels = [f"N = {n}" for n in n_train]
+            x_plt = range(len(predictors))
+            ax.set(xlabel='Predictors')     # TODO
+
+        out = []
+        for loss_plt, label in zip(loss, labels):
+            plt_data = ax.plot(x_plt, loss_plt, label=label)
+            out.append(plt_data)
+
+        return out
 
 
 class ModelClassifier(ClassifierMixin, ModelPredictor):
@@ -392,7 +449,7 @@ class BayesRegressor(RegressorMixin, BayesPredictor):
         # for stats, label in zip(stats_seq, labels):
         #     y_mean = stats['mean']
         #
-        #     plt_data = self.plotter(x, y_mean, ax, label=label)
+        #     plt_data = self.plot_xy(x, y_mean, ax, label=label)
         #
         #     if do_std:
         #         y_std = stats['std']

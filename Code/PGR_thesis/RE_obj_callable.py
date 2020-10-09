@@ -562,7 +562,7 @@ class DirichletEmpiricalRV(DiscreteRV):
                                         - gammaln(self._n * x + 1)).reshape(-1, self._data_size).sum(axis=-1)
         return np.exp(log_pmf)
 
-    # def plot_pmf(self, ax=None):        # TODO: reused code. define simplex plotter outside!
+    # def plot_pmf(self, ax=None):        # TODO: reused code. define simplex plot_xy outside!
     #
     #     if self._size in (2, 3):
     #         x = simplex_grid(self.n, self._shape)
