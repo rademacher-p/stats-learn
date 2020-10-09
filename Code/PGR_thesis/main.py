@@ -187,8 +187,14 @@ def main():
     ]
 
     # Risk sim
-    losses = predictor_compare_mc(predictors, model, n_train=10, n_test=1, n_mc=20, rng=None)
+
+    # losses = predictor_compare_mc(predictors, model, n_train=10, n_test=1, n_mc=100, rng=None)
+    losses = ModelPredictor.compare_eval(predictors, model, n_train=(10,), n_test=1, n_mc=100, rng=None)
     print(losses)
+
+    ModelPredictor.plot_compare_eval(predictors, model, n_train=(10,), n_test=1, n_mc=100, ax=None, rng=None)
+    ModelPredictor.plot_compare_eval(predictors, model, n_train=np.arange(10), n_test=1, n_mc=500, ax=None, rng=None)
+
 
     # losses = predictor_compare_mc_bayes(predictors, bayes_models['learn: 0.1'],
     #                                     n_train=10, n_test=1, n_mc=3, rng=None)
@@ -224,6 +230,9 @@ def main():
     ax.grid(True)
     ax.legend()
     ax.set_title(f"{pr.name}")
+
+
+
 
 
 # def main():

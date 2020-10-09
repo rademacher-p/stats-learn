@@ -607,7 +607,7 @@ class DirichletEmpirical(BaseRV):
             .reshape(-1, self.size).sum(axis=-1)
         return np.exp(log_pf).reshape(set_shape)
 
-    def plot_pf(self, ax=None):        # TODO: reused code. define simplex plotter outside!
+    def plot_pf(self, ax=None):        # TODO: reused code. define simplex plot_xy outside!
 
         if self.size in (2, 3):
             x_plt = simplex_grid(self.n, self._shape)
