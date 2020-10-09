@@ -102,9 +102,6 @@ class ModelPredictor:
 
         x, set_shape = check_data_shape(x, self.shape['x'])
 
-        if label is None:
-            label = self.name
-
         if self.ndim['y'] == 0:
             if self.shape['x'] == () and len(set_shape) == 1:
                 if ax is None:
@@ -136,9 +133,10 @@ class ModelPredictor:
 
         return plt_data
 
-    def plot_predict(self, x, ax=None):
+    def plot_predict(self, x, ax=None, label=None):
         """Plot prediction function."""
-        return self.plotter(x, self.predict(x), ax=ax)
+        label = self.name if label is None else label
+        return self.plotter(x, self.predict(x), ax=ax, label=label)
 
     @staticmethod
     def prediction_stats(predictors, x, model, n_train=(0,), n_mc=1, stats=('mode',), rng=None):
@@ -204,8 +202,8 @@ class ModelPredictor:
     @classmethod
     def plot_compare_stats(cls, predictors, x, model, n_train=(0,), n_mc=1, do_std=False, ax=None, rng=None):
 
-        if not isinstance(predictors, Sequence):
-            predictors = [predictors]
+        # if not isinstance(predictors, Sequence):
+        #     predictors = [predictors]
 
         if isinstance(n_train, (Integral, np.integer)):
             n_train = [n_train]
@@ -237,11 +235,11 @@ class ModelPredictor:
     def plot_predict_stats(self, x, model, n_train=0, n_mc=1, do_std=False, ax=None, rng=None):
         # if isinstance(n_train, (Integral, np.integer)):
         #     n_train = [n_train]
-        return self.plot_compare_stats(self, x, model, n_train, n_mc, do_std, ax, rng)    # FIXME
+        return self.plot_compare_stats([self], x, model, n_train, n_mc, do_std, ax, rng)    # FIXME
 
         # if isinstance(n_train, (Integral, np.integer)):
         #     n_train = [n_train]
-        # stats = ('mean', 'std') if do_std else ('mean',)        # TODO: generalize for mode, etc.
+        # stats = ('mean', 'std') if do_std else ('mean',)
         #
         # y_stats = self.prediction_stats([self], x, model, n_train, n_mc, stats, rng).squeeze(axis=1)
         #
@@ -265,23 +263,6 @@ class ModelRegressor(RegressorMixin, ModelPredictor):
     def __init__(self, model, name=None):
         super().__init__(loss_se, model, name)
 
-    # def plot_predict_stats(self, x, model, n_train=0, n_mc=1, do_std=False, ax=None, rng=None):
-    #     y = self.predict(x)
-    #     plt_data = self.plotter(x, y, ax)
-    #     if do_std:
-    #         ax = plt.gca()
-    #         if self.shape['x'] == ():
-    #             ax.fill_between(x, y, y, alpha=0.5)
-    #
-    #         elif self.shape['x'] == (2,):
-    #             pass
-    #         else:
-    #             raise NotImplementedError
-    #     else:
-    #         raise NotImplementedError
-    #
-    #     return plt_data
-
 
 # %% Learning Functions
 
@@ -290,31 +271,21 @@ class BayesPredictor(ModelPredictor):
         super().__init__(loss_func, model=None, name=name)
 
         self.bayes_model = bayes_model
-
-        # self.prior = self.bayes_model.prior
-        # self.posterior = None
-
         self.fit()
 
-    shape = property(lambda self: self.bayes_model.shape)
-    size = property(lambda self: self.bayes_model.size)
-    ndim = property(lambda self: self.bayes_model.ndim)
+    # shape = property(lambda self: self.bayes_model.shape)
+    # size = property(lambda self: self.bayes_model.size)
+    # ndim = property(lambda self: self.bayes_model.ndim)
 
-    @property
-    def prior(self):
-        return self.bayes_model.prior
-
-    @property
-    def posterior(self):
-        return self.bayes_model.posterior
+    prior = property(lambda self: self.bayes_model.prior)
+    posterior = property(lambda self: self.bayes_model.posterior)
+    # model = property(lambda self: self.bayes_model.posterior_model)
 
     def fit(self, d=None, warm_start=False):
-        if d is None:
-            d = np.array([], dtype=[('x', '<f8', self.shape['x']),
-                                    ('y', '<f8', self.shape['y'])])
-
         # self.posterior, self.model = self.bayes_model.fit(d)
-        self.model = self.bayes_model.fit(d, warm_start)
+
+        self.bayes_model.fit(d, warm_start)
+        self.model = self.bayes_model.posterior_model
 
     def fit_from_model(self, model, n_train=0, rng=None, warm_start=False):
         d = model.rvs(n_train, rng=rng)  # generate train/test data
