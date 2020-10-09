@@ -174,7 +174,7 @@ def main():
     # x_plt = np.linspace(0, 1, 100, endpoint=False)
 
     model = NormalRegressorModel(model_x=model_x, basis_y_x=None,  # (lambda x: 1., lambda x: x)
-                                 weights=np.ones(2), cov_y_x=1., rng=None)
+                                 weights=np.ones(2), cov_y_x_single=1., rng=None)
 
     bayes_models = {r'$C_{\theta} = $' + str(_cov): NormalRegressorBayes(model_x=model_x, basis_y_x=None, cov_y_x=1.,
                                                                          mean_prior=np.zeros(2),
@@ -206,8 +206,9 @@ def main():
 
     _, axn = plt.subplots()
     pr = predictors[1]
+    pr.fit()
     n_c = 0
-    for n_train in np.full(6, 5):
+    for n_train in [0, 5, 10, 40]:
         pr.fit_from_model(model, n_train, warm_start=True)
         n_c += n_train
         pr.plot_predict(x_plt, ax=axn, label=f"N = {n_c}")

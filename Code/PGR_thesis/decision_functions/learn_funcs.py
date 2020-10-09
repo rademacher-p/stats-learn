@@ -271,6 +271,7 @@ class BayesPredictor(ModelPredictor):
         super().__init__(loss_func, model=None, name=name)
 
         self.bayes_model = bayes_model
+
         self.fit()
 
     # shape = property(lambda self: self.bayes_model.shape)
@@ -282,8 +283,6 @@ class BayesPredictor(ModelPredictor):
     # model = property(lambda self: self.bayes_model.posterior_model)
 
     def fit(self, d=None, warm_start=False):
-        # self.posterior, self.model = self.bayes_model.fit(d)
-
         self.bayes_model.fit(d, warm_start)
         self.model = self.bayes_model.posterior_model
 
