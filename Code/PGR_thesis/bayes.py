@@ -130,7 +130,7 @@ class NormalRegressor(Base):
                  mean_prior=np.zeros(1), cov_prior=np.eye(1), rng=None):
 
         # Prior
-        prior = Normal(mean_prior, cov_prior)
+        prior = Normal(mean_prior, cov_prior)       # TODO: make property or undo posterior and model
         super().__init__(prior, rng)
         if self.prior.ndim > 1:
             raise ValueError
@@ -141,7 +141,7 @@ class NormalRegressor(Base):
 
         self._cov_prior_inv = np.linalg.inv(self.cov_prior)
 
-        if basis_y_x is None:
+        if basis_y_x is None:   # TODO: getter/setter
             def power_func(i):
                 return lambda x: np.full(self.shape['y'], (x ** i).sum())
 
@@ -150,7 +150,7 @@ class NormalRegressor(Base):
             self.basis_y_x = basis_y_x
 
         # Learning
-        self._reset()
+        self._reset()       # FIXME: already called in setters!!
 
     def _reset(self):
         self._posterior = Normal(self.mean_prior, self.cov_prior)
@@ -169,6 +169,8 @@ class NormalRegressor(Base):
         self._model_x = val
         self._shape['x'] = val.shape
 
+        self._reset()   # TODO: call either reset or update in every setter!
+
     @property
     def cov_y_x(self):
         return self._cov_y_x
@@ -181,6 +183,8 @@ class NormalRegressor(Base):
         self._shape['y'] = _temp[:int(len(_temp) / 2)]
 
         self._prec_U_y_x = _PSD(self._cov_y_x.reshape(2 * (self.size['y'],)), allow_singular=False).U
+
+        self._reset()
 
     # Prior parameters
     @property
