@@ -3,7 +3,6 @@ Main.
 """
 
 import itertools
-from collections.abc import Sequence
 
 import numpy as np
 from numpy.random import default_rng
@@ -163,15 +162,15 @@ def predictor_compare_mc_bayes(predictors, bayes_model, n_train=0, n_test=1, n_m
 
 def main():
     model_x = Normal(mean=0., cov=1.)
-    x_plt = np.linspace(-3, 3, 100, endpoint=False)
+    x = np.linspace(-3, 3, 100, endpoint=False)
 
     # model_x = Normal(mean=np.zeros(2), cov=np.eye(2))
     # x1_plot = np.linspace(-3, 3, 101, endpoint=True)
     # x2_plot = np.linspace(-3, 3, 81, endpoint=True)
-    # x_plt = np.stack(np.meshgrid(x1_plot, x2_plot), axis=-1)
+    # x = np.stack(np.meshgrid(x1_plot, x2_plot), axis=-1)
 
     # model_x = Beta(a=1, b=1)
-    # x_plt = np.linspace(0, 1, 100, endpoint=False)
+    # x = np.linspace(0, 1, 100, endpoint=False)
 
     model = NormalRegressorModel(model_x=model_x, basis_y_x=None,  # (lambda x: 1., lambda x: x)
                                  weights=np.ones(2), cov_y_x_single=1., rng=None)
@@ -192,46 +191,40 @@ def main():
     losses = ModelPredictor.compare_eval(predictors, model, n_train=(10,), n_test=1, n_mc=100, rng=None)
     print(losses)
 
-    ModelPredictor.plot_compare_eval(predictors, model, n_train=(10,), n_test=1, n_mc=100, ax=None, rng=None)
-    ModelPredictor.plot_compare_eval(predictors, model, n_train=np.arange(10), n_test=1, n_mc=500, ax=None, rng=None)
-
+    # ModelPredictor.plot_compare_eval(predictors, model, n_train=(5, 10), n_test=1, n_mc=100, ax=None, rng=None)
+    # ModelPredictor.plot_compare_eval(predictors, model, n_train=np.arange(10), n_test=1, n_mc=500, ax=None, rng=None)
 
     # losses = predictor_compare_mc_bayes(predictors, bayes_models['learn: 0.1'],
     #                                     n_train=10, n_test=1, n_mc=3, rng=None)
     # print(losses)
 
     # Plotting
+    predictors = [
+        ModelRegressor(model, name=r'$f_{opt}$'),
+        BayesRegressor(NormalRegressorBayes(model_x=model_x, basis_y_x=None,
+                                            cov_y_x=1., mean_prior=np.zeros(2), cov_prior=0.1*np.eye(2)), name='Bayes'),
+    ]
+    params = [
+        {},
+        {'cov_prior': [0.1*np.eye(2), 10*np.eye(2)]},
+    ]
+    ModelPredictor.plot_compare_stats(predictors, x, model, params, n_train=10, n_mc=100, do_std=True, ax=None, rng=None)
 
-    subplot_kw = {'projection': '3d'} if model_x.shape == (2,) else {}
-    _, ax = plt.subplots(subplot_kw=subplot_kw)
-    n_train = 10
-    ModelPredictor.plot_compare_stats(predictors, x_plt, model, n_train, n_mc=50, do_std=True, ax=ax, rng=None)
-    ax.legend()
-    ax.grid(True)
-    ax.set_title(f'N = {n_train}')
+    # ModelPredictor.plot_compare_stats(predictors, x, model, n_train=10, n_mc=100, do_std=True, ax=None, rng=None)
 
-    _, axn = plt.subplots()
     pr = predictors[1]
-    pr.fit()
-    n_c = 0
-    for n_train in [0, 5, 10, 40]:
-        pr.fit_from_model(model, n_train, warm_start=True)
-        n_c += n_train
-        pr.plot_predict(x_plt, ax=axn, label=f"N = {n_c}")
-    axn.grid(True)
-    axn.legend()
-    axn.set_title(f"{pr.name}")
-
-    subplot_kw = {'projection': '3d'} if model_x.shape == (2,) else {}
-    _, ax = plt.subplots(subplot_kw=subplot_kw)
-    pr = predictors[1]
-    n_train = [0, 5, 10, 50]
-    pr.plot_predict_stats(x_plt, model, n_train, n_mc=50, do_std=True, ax=ax, rng=None)
-    ax.grid(True)
-    ax.legend()
-    ax.set_title(f"{pr.name}")
 
 
+    # single predictor methods
+
+    pr.plot_predict_stats_param(x, model, n_train=[0, 5, 10, 50], n_mc=100, do_std=True, ax=None, rng=None)
+
+    # params = None
+    # params = {'weights': [m * np.ones(2) for m in [.1, .5, 1]]}
+    params = {'cov_prior': [c * np.eye(2) for c in [.1, 1, 10]],
+              # 'mean_prior': [m * np.ones(2) for m in [.1, .5, 1]],
+              }
+    pr.plot_predict_stats_param(x, model, params=params, n_train=[10], n_mc=100, do_std=True)
 
 
 

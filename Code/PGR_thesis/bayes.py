@@ -20,18 +20,19 @@ from util.func_obj import FiniteDomainFunc
 #%% Priors
 
 # TODO: Add deterministic DEP to effect a DP realization and sample!!
-# TODO: COMPLETE property set/get check, rework!
 
 
 class Base:
+    param_names = ()
+
     def __init__(self, prior=None, rng=None):
         self._shape = {'x': None, 'y': None}
 
         self.prior = prior
         self.prior.rng = rng
 
-        self._posterior = None
-        self._posterior_model = None
+        self.posterior = None
+        self.posterior_model = None
 
     shape = property(lambda self: self._shape)
     size = property(lambda self: {key: math.prod(val) for key, val in self._shape.items()})
@@ -50,13 +51,13 @@ class Base:
     def _fit(self, d, warm_start=False):
         raise NotImplementedError
 
-    @property
-    def posterior(self):
-        return self._posterior
-
-    @property
-    def posterior_model(self):
-        return self._posterior_model
+    # @property
+    # def posterior(self):
+    #     return self._posterior
+    #
+    # @property
+    # def posterior_model(self):
+    #     return self._posterior_model
 
 
 # class Base:
@@ -91,7 +92,7 @@ class Base:
 #         self.prior.rng = self._rng
 #
 #     def random_model(self, rng=None):
-#         model_kwargs = self.model_kwargs.copy()     # TODO: need copy?
+#         model_kwargs = self.model_kwargs.copy()
 #         if rng is None:
 #             rand_kwargs = self.random_kwargs()
 #         else:
@@ -126,57 +127,74 @@ class Base:
 
 
 class NormalRegressor(Base):
+    # param_names = ('model_x', 'basis_y_x', 'cov_y_x', 'mean_prior', 'cov_prior')
+
     def __init__(self, model_x=Normal(), basis_y_x=None, cov_y_x=1.,
                  mean_prior=np.zeros(1), cov_prior=np.eye(1), rng=None):
 
         # Prior
-        prior = Normal(mean_prior, cov_prior)       # TODO: make property or undo posterior and model
+        prior = Normal(mean_prior, cov_prior)
         super().__init__(prior, rng)
         if self.prior.ndim > 1:
             raise ValueError
 
-        # Model
-        self.model_x = model_x
-        self.cov_y_x = cov_y_x
-
         self._cov_prior_inv = np.linalg.inv(self.cov_prior)
 
-        if basis_y_x is None:   # TODO: getter/setter
-            def power_func(i):
-                return lambda x: np.full(self.shape['y'], (x ** i).sum())
-
-            self.basis_y_x = tuple(power_func(i) for i in range(len(self.mean_prior)))
-        else:
-            self.basis_y_x = basis_y_x
+        # Model
+        self._set_model_x(model_x)
+        self._set_cov_y_x(cov_y_x)
+        self._set_basis_y_x(basis_y_x)
+        # self.model_x = model_x
+        # self.cov_y_x = cov_y_x
+        # self.basis_y_x = basis_y_x
 
         # Learning
-        self._reset()       # FIXME: already called in setters!!
+        self._reset()
 
     def _reset(self):
-        self._posterior = Normal(self.mean_prior, self.cov_prior)
+        self.posterior = Normal(self.mean_prior, self.cov_prior)
 
         model_kwargs = {'model_x': self.model_x, 'basis_y_x': self.basis_y_x,
                         'cov_y_x_single': self._make_posterior_model_cov(self.prior.cov), 'weights': self.prior.mean}
-        self._posterior_model = NormalRegressorModel(**model_kwargs)
+        self.posterior_model = NormalRegressorModel(**model_kwargs)
 
     # Model parameters
     @property
     def model_x(self):
         return self._model_x
 
-    @model_x.setter
-    def model_x(self, val):
+    def _set_model_x(self, val):
         self._model_x = val
         self._shape['x'] = val.shape
 
-        self._reset()   # TODO: call either reset or update in every setter!
+    @model_x.setter
+    def model_x(self, val):
+        self._set_model_x(val)
+        self._reset()
+
+    @property
+    def basis_y_x(self):
+        return self._basis_y_x
+
+    def _set_basis_y_x(self, val):
+        if val is None:
+            def power_func(i):
+                return lambda x: np.full(self.shape['y'], (x ** i).sum())
+
+            self._basis_y_x = tuple(power_func(i) for i in range(len(self.mean_prior)))
+        else:
+            self._basis_y_x = val
+
+    @basis_y_x.setter
+    def basis_y_x(self, val):
+        self._set_basis_y_x(val)
+        self._reset()
 
     @property
     def cov_y_x(self):
         return self._cov_y_x
 
-    @cov_y_x.setter
-    def cov_y_x(self, val):
+    def _set_cov_y_x(self, val):
         self._cov_y_x = np.array(val)
 
         _temp = self._cov_y_x.shape
@@ -184,6 +202,9 @@ class NormalRegressor(Base):
 
         self._prec_U_y_x = _PSD(self._cov_y_x.reshape(2 * (self.size['y'],)), allow_singular=False).U
 
+    @cov_y_x.setter
+    def cov_y_x(self, val):
+        self._set_cov_y_x(val)
         self._reset()
 
     # Prior parameters
@@ -224,8 +245,6 @@ class NormalRegressor(Base):
             self._cov_data_inv = np.zeros(2 * self.prior.shape)
             self._mean_data_temp = np.zeros(self.prior.shape)
 
-            # self._update_posterior()        # TODO: inefficient
-
         n = len(d)
         if n > 0:   # update data-dependent attributes
             psi = np.array([np.array([func(x_i) for func in self.basis_y_x])
@@ -240,11 +259,11 @@ class NormalRegressor(Base):
 
     def _update_posterior(self, mean_only=False):
         if not mean_only:
-            self._posterior.cov = np.linalg.inv(self._cov_prior_inv + self._cov_data_inv)
-            self._posterior_model.cov_y_x_single = self._make_posterior_model_cov(self._posterior.cov)
+            self.posterior.cov = np.linalg.inv(self._cov_prior_inv + self._cov_data_inv)
+            self.posterior_model.cov_y_x_single = self._make_posterior_model_cov(self.posterior.cov)
 
-        self._posterior.mean = self._posterior.cov @ (self._cov_prior_inv @ self.mean_prior + self._mean_data_temp)
-        self._posterior_model.weights = self._posterior.mean
+        self.posterior.mean = self.posterior.cov @ (self._cov_prior_inv @ self.mean_prior + self._mean_data_temp)
+        self.posterior_model.weights = self.posterior.mean
 
     def _make_posterior_model_cov(self, cov_weight):
         def cov_y_x(x):
