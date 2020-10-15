@@ -1,5 +1,5 @@
 from numbers import Integral
-from collections.abc import Sequence
+from collections.abc import Iterable
 from functools import wraps
 from copy import deepcopy
 import math
@@ -127,7 +127,7 @@ def vectorize_func_dec(data_shape):     # TODO: use?
 def vectorize_first_arg(func):
     @wraps(func)
     def func_wrap(*args, **kwargs):
-        if isinstance(args[0], Sequence):
+        if isinstance(args[0], Iterable):
             return list(func(arg, *args[1:], **kwargs) for arg in args[0])
         else:
             return func(*args, **kwargs)

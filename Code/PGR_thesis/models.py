@@ -206,8 +206,9 @@ class DataConditionalRVyx(DataConditionalRVx, DataConditionalRVy):       # TODO:
 
 
 class NormalRegressor(MixinRVx, MixinRVy, Base):
-    def __init__(self, model_x=Normal(), basis_y_x=(lambda x: 1.,), weights=(0.,),
-                 cov_y_x_single=1., rng=None):
+    # param_names = ('model_x', 'basis_y_x', 'cov_y_x_single', 'weights')
+
+    def __init__(self, model_x=Normal(), basis_y_x=(lambda x: 1.,), cov_y_x_single=1., weights=(0.,), rng=None):
         super().__init__(rng)
 
         self.model_x = model_x
