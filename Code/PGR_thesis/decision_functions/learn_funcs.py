@@ -301,17 +301,6 @@ class ModelPredictor:
             params_full = params
 
         # Generate random data and make predictions
-
-        # shape_out = (len(n_train_delta), len(predictors))
-        # y = np.empty((n_mc, *shape_out, *set_shape, *shape['y']))
-        # for i_mc in range(n_mc):
-        #     for i_n, n_tr in enumerate(n_train_delta):
-        #         warm_start = False if i_n == 0 else True  # resets learner for new iteration
-        #         d = model.rvs(n_tr)
-        #         for i_p, predictor in enumerate(predictors):
-        #             predictor.fit(d, warm_start=warm_start)
-        #             y[i_mc, i_n, i_p] = predictor.predict(x)
-
         y_full = []
         shape_out_full = []
         for predictor, params in zip(predictors, params_full):
@@ -346,7 +335,6 @@ class ModelPredictor:
             _samp += (np.empty(stat_shape),)
             dtype.append((stat, np.float, stat_shape))  # TODO: dtype float? need model dtype attribute?!
 
-        # y_stats = np.tile(np.array(_samp, dtype=dtype), reps=shape_out)
         y_stats_full = [np.tile(np.array(_samp, dtype=dtype), reps=shape_out) for shape_out in shape_out_full]
 
         for y_stats, y in zip(y_stats_full, y_full):
@@ -378,9 +366,6 @@ class ModelPredictor:
 
     @classmethod
     def plot_compare_stats(cls, predictors, x, model, params=None, n_train=0, n_mc=1, do_std=False, ax=None, rng=None):
-
-        # if isinstance(n_train, (Integral, np.integer)):
-        #     n_train = [n_train]
 
         if params is None:
             params_full = [{} for _ in predictors]
@@ -414,7 +399,7 @@ class ModelPredictor:
 
         return out
 
-
+    # TODO: rename stats methods
     def prediction_stats_param(self, x, model, params=None, n_train=(0,), n_mc=1, stats=('mode',), rng=None):
 
         shape, size, ndim = model.shape, model.size, model.ndim
