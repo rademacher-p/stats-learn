@@ -13,8 +13,8 @@ import numpy as np
 from scipy.stats import mode
 import matplotlib.pyplot as plt
 
-import util
 from util.generic import vectorize_func, empirical_pmf, vectorize_first_arg, check_data_shape
+from util.plot import get_axes_xy
 from loss_funcs import loss_se, loss_01
 from models import Base as BaseModel, MixinRVy, DataConditional
 
@@ -120,40 +120,14 @@ class ModelPredictor:
 
     # Plotting utilities
 
-    @staticmethod
-    def _get_axes_xy(ax=None, shape=None):
-        if ax is None:
-            if shape == ():
-                _, ax = plt.subplots()
-                ax.set(xlabel='$x$', ylabel='$\\hat{y}(x)$')
-            elif shape == (2,):
-                _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$\\hat{y}(x)$')
-            else:
-                return None
-
-            ax.grid(True)
-            return ax
-        else:
-            return ax
-
     def plot_xy(self, x, y, y_std=None, ax=None, label=None):
         # TODO: get 'x' default from model_x.plot_pf plot_data.axes?
 
         x, set_shape = check_data_shape(x, self.shape['x'])
 
-        ax = self._get_axes_xy(ax, self.shape['x'])
-
-        # if label is None:
-        #     label = self.name
-
+        ax = get_axes_xy(ax, self.shape['x'])
         if self.ndim['y'] == 0:
             if self.shape['x'] == () and len(set_shape) == 1:
-                # if ax is None:
-                #     _, ax = plt.subplots()
-                #     ax.set(xlabel='$x$', ylabel='$\\hat{y}(x)$')
-                #     ax.grid(True)
-
                 plt_data = ax.plot(x, y, label=label)
                 if y_std is not None:
                     # plt_data_std = ax.errorbar(x, y_mean, yerr=y_std)
@@ -161,10 +135,6 @@ class ModelPredictor:
                     plt_data = (plt_data, plt_data_std)
 
             elif self.shape['x'] == (2,) and len(set_shape) == 2:
-                # if ax is None:
-                #     _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                #     ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$\\hat{y}(x)$')
-
                 plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, cmap=plt.cm.viridis)
                 if y_std is not None:
                     plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y - y_std, cmap=plt.cm.viridis)
@@ -183,184 +153,19 @@ class ModelPredictor:
         return self.plot_xy(x, self.predict(x), ax=ax, label=label)
 
     # Prediction statistics
-
-    # @staticmethod
-    # def predict_stats_compare(predictors, x, model, n_train=(0,), n_mc=1, stats=('mode',), rng=None):
-    #
-    #     shape, size, ndim = model.shape, model.size, model.ndim
-    #     if not all(predictor.shape == shape for predictor in predictors):
-    #         raise ValueError("All models must have same shape.")
-    #
-    #     x, set_shape = check_data_shape(x, shape['x'])
-    #     n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
-    #     model.rng = rng
-    #
-    #     # Generate random data and make predictions
-    #     shape_out = (len(n_train_delta), len(predictors))
-    #     y = np.empty((n_mc, *shape_out, *set_shape, *shape['y']))
-    #     for i_mc in range(n_mc):
-    #         for i_n, n_tr in enumerate(n_train_delta):
-    #             warm_start = False if i_n == 0 else True  # resets learner for new iteration
-    #             d = model.rvs(n_tr)
-    #             for i_p, predictor in enumerate(predictors):
-    #                 predictor.fit(d, warm_start=warm_start)
-    #                 y[i_mc, i_n, i_p] = predictor.predict(x)
-    #
-    #     # Generate statistics
-    #     _samp, dtype = (), []
-    #     for stat in stats:
-    #         if stat in ('mode', 'median', 'mean'):
-    #             stat_shape = set_shape + shape['y']
-    #         elif stat in ('std', 'cov'):
-    #             stat_shape = set_shape + 2 * shape['y']
-    #         else:
-    #             raise ValueError
-    #         _samp += (np.empty(stat_shape),)
-    #         dtype.append((stat, np.float, stat_shape))  # TODO: dtype float? need model dtype attribute?!
-    #
-    #     y_stats = np.tile(np.array(_samp, dtype=dtype), reps=shape_out)
-    #
-    #     if 'mode' in stats:
-    #         y_stats['mode'] = mode(y, axis=0)
-    #
-    #     if 'median' in stats:
-    #         y_stats['median'] = np.median(y, axis=0)
-    #
-    #     if 'mean' in stats:
-    #         y_stats['mean'] = y.mean(axis=0)
-    #
-    #     if 'std' in stats:
-    #         if ndim['y'] == 0:
-    #             y_stats['std'] = y.std(axis=0)
-    #         else:
-    #             raise ValueError("Standard deviation is only supported for singular data shapes.")
-    #
-    #     if 'cov' in stats:
-    #         if size['y'] == 1:
-    #             _temp = y.var(axis=0)
-    #         else:
-    #             _temp = np.moveaxis(y.reshape((n_mc, math.prod(set_shape), size['y'])), 0, -1)
-    #             _temp = np.array([np.cov(t) for t in _temp])
-    #
-    #         y_stats['cov'] = _temp.reshape(set_shape + 2 * shape['y'])
-    #
-    #     return y_stats
-    #
-    # @classmethod
-    # def plot_predict_stats_compare(cls, predictors, x, model, n_train=0, n_mc=1, do_std=False, ax=None, rng=None):
-    #
-    #     if not isinstance(predictors, Iterable):
-    #         predictors = [predictors]
-    #
-    #     if isinstance(n_train, (Integral, np.integer)):
-    #         n_train = [n_train]
-    #     stats = ('mean', 'std') if do_std else ('mean',)    # TODO: generalize for mode, etc.
-    #
-    #     y_stats = cls.predict_stats_compare(predictors, x, model, n_train, n_mc, stats, rng)
-    #
-    #     ax = cls._get_axes_xy(ax, model.shape['x'])
-    #
-    #     if len(n_train) == 1:
-    #         p_iter = predictors
-    #         y_stats = y_stats.squeeze(axis=0)
-    #         labels = [p.name for p in predictors]
-    #         ax.set_title(f'N = {n_train[0]}')
-    #     else:
-    #         if len(predictors) == 1:
-    #             p_iter = len(n_train) * predictors
-    #             y_stats = y_stats.squeeze(axis=1)
-    #             labels = [f"N = {n}" for n in n_train]
-    #             ax.set_title(f"{predictors[0].name}")
-    #         else:
-    #             raise ValueError
-    #
-    #     out = []
-    #     for predictor, y_stat, label in zip(p_iter, y_stats, labels):
-    #         y_mean = y_stat['mean']
-    #         y_std = y_stat['std'] if do_std else None
-    #         plt_data = predictor.plot_xy(x, y_mean, y_std, ax, label)
-    #         out.append(plt_data)
-    #
-    #     ax.legend()
-    #
-    #     return out
-
     def predict_stats(self, x, model, params=None, n_train=0, n_mc=1, stats=('mode',), rng=None):
         if params is None:
             params = {}
         return self.predict_stats_compare([self], x, model, [params], n_train, n_mc, stats, rng)[0]
 
-        # shape, size, ndim = model.shape, model.size, model.ndim
-        # if self.shape != shape:
-        #     raise ValueError("Predictor and model must have the same shape.")
-        #
-        # if params is None:
-        #     params = {}
-        #
-        # if isinstance(n_train, (Integral, np.integer)):
-        #     n_train = [n_train]
-        # n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
-        #
-        # x, set_shape = check_data_shape(x, shape['x'])
-        # model.rng = rng
-        #
-        # # Generate random data and make predictions
-        # params_shape = tuple(len(vals) for _, vals in params.items())
-        # y = np.empty((n_mc, len(n_train_delta)) + params_shape + set_shape + shape['y'])
-        # for i_mc in range(n_mc):
-        #     for i_n, n_tr in enumerate(n_train_delta):
-        #         warm_start = False if i_n == 0 else True  # resets learner for new iteration
-        #         d = model.rvs(n_tr)
-        #         self.fit(d, warm_start=warm_start)
-        #         if len(params) == 0:
-        #             y[i_mc, i_n] = self.predict(x)
-        #         else:
-        #             for i_v, param_vals in enumerate(product(*params.values())):
-        #                 self.set_params(**dict(zip(params.keys(), param_vals)))
-        #                 y[i_mc, i_n][np.unravel_index([i_v], params_shape)] = self.predict(x)
-        #
-        # # Calculate statistics
-        # _samp, dtype = (), []
-        # for stat in stats:
-        #     if stat in ('mode', 'median', 'mean'):
-        #         stat_shape = set_shape + shape['y']
-        #     elif stat in ('std', 'cov'):
-        #         stat_shape = set_shape + 2 * shape['y']
-        #     else:
-        #         raise ValueError
-        #     _samp += (np.empty(stat_shape),)
-        #     dtype.append((stat, np.float, stat_shape))  # TODO: dtype float? need model dtype attribute?!
-        #
-        # y_stats = np.tile(np.array(_samp, dtype=dtype), reps=(len(n_train_delta), *params_shape))
-        #
-        # if 'mode' in stats:
-        #     y_stats['mode'] = mode(y, axis=0)
-        #
-        # if 'median' in stats:
-        #     y_stats['median'] = np.median(y, axis=0)
-        #
-        # if 'mean' in stats:
-        #     y_stats['mean'] = y.mean(axis=0)
-        #
-        # if 'std' in stats:
-        #     if ndim['y'] == 0:
-        #         y_stats['std'] = y.std(axis=0)
-        #     else:
-        #         raise ValueError("Standard deviation is only supported for singular data shapes.")
-        #
-        # if 'cov' in stats:
-        #     if size['y'] == 1:
-        #         _temp = y.var(axis=0)
-        #     else:
-        #         _temp = np.moveaxis(y.reshape((n_mc, math.prod(set_shape), size['y'])), 0, -1)
-        #         _temp = np.array([np.cov(t) for t in _temp])
-        #
-        #     y_stats['cov'] = _temp.reshape(set_shape + 2 * shape['y'])
-        #
-        # return y_stats
+    def plot_predict_stats(self, x, model, params=None, n_train=0, n_mc=1, do_std=False, ax=None, rng=None):
+        if params is None:
+            params = {}
+        return self.plot_predict_stats_compare([self], x, model, [params], n_train, n_mc, do_std, ax, rng)
 
+    # TODO: move non-instance methods outside class?
     @staticmethod
-    def predict_stats_compare(predictors, x, model, params=None, n_train=(0,), n_mc=1, stats=('mode',), rng=None):
+    def predict_stats_compare(predictors, x, model, params=None, n_train=0, n_mc=1, stats=('mode',), rng=None):
 
         if params is None:
             params_full = [{} for _ in predictors]
@@ -379,26 +184,27 @@ class ModelPredictor:
         model.rng = rng
 
         # Generate random data and make predictions
+        params_shape_full = []
         y_full = []
-        shape_out_full = []
-        for predictor, params in zip(predictors, params_full):
-            shape_out = (len(n_train_delta),) + tuple(len(vals) for _, vals in params.items())
-            shape_out_full.append(shape_out)
-            y = np.empty((n_mc, *shape_out, *set_shape, *shape['y']))
+        for params in params_full:
+            params_shape = tuple(len(vals) for _, vals in params.items())
+            y = np.empty((n_mc, len(n_train_delta)) + params_shape + set_shape + shape['y'])
+            params_shape_full.append(params_shape)
             y_full.append(y)
 
         for i_mc in range(n_mc):
             for i_n, n_tr in enumerate(n_train_delta):
                 warm_start = False if i_n == 0 else True  # resets learner for new iteration
                 d = model.rvs(n_tr)
-                for i_p, (predictor, params, shape_out) in enumerate(zip(predictors, params_full, shape_out_full)):
+                for predictor, params, params_shape, y in zip(predictors, params_full, params_shape_full, y_full):
                     predictor.fit(d, warm_start=warm_start)
-                    for i_v, param_vals in enumerate(list(product(*params.values()))):
-                        predictor.set_params(**dict(zip(params.keys(), param_vals)))
-                        if len(params) == 0:
-                            y_full[i_p][i_mc, i_n] = predictor.predict(x)
-                        else:
-                            y_full[i_p][i_mc, i_n][np.unravel_index([i_v], shape_out[1:])] = predictor.predict(x)
+                    if len(params) == 0:
+                        y[i_mc, i_n] = predictor.predict(x)
+                    else:
+                        for i_v, param_vals in enumerate(list(product(*params.values()))):
+                            predictor.set_params(**dict(zip(params.keys(), param_vals)))
+                            # params_shape = y.shape[2:-(len(set_shape) + ndim['y'])]
+                            y[i_mc, i_n][np.unravel_index([i_v], params_shape)] = predictor.predict(x)
 
         # Generate statistics
         _samp, dtype = (), []
@@ -412,8 +218,8 @@ class ModelPredictor:
             _samp += (np.empty(stat_shape),)
             dtype.append((stat, np.float, stat_shape))  # TODO: dtype float? need model dtype attribute?!
 
-        y_stats_full = [np.tile(np.array(_samp, dtype=dtype), reps=shape_out) for shape_out in shape_out_full]
-
+        y_stats_full = [np.tile(np.array(_samp, dtype=dtype), reps=(len(n_train_delta),) + param_shape)
+                        for param_shape in params_shape_full]
         for y, y_stats in zip(y_full, y_stats_full):
             if 'mode' in stats:
                 y_stats['mode'] = mode(y, axis=0)
@@ -441,72 +247,9 @@ class ModelPredictor:
 
         return y_stats_full
 
-
-    def plot_predict_stats(self, x, model, params=None, n_train=0, n_mc=1, do_std=False, ax=None, rng=None):
-        if params is None:
-            params = {}
-        return self.plot_predict_stats_compare([self], x, model, [params], n_train, n_mc, do_std, ax, rng)
-
-        # # Generate statistics
-        # stats = ('mean', 'std') if do_std else ('mean',)  # TODO: generalize for mode, etc.
-        # y_stats = self.predict_stats(x, model, params, n_train, n_mc, stats, rng)
-        #
-        # #
-        # if params is None:
-        #     params = {}
-        #
-        # if isinstance(n_train, (Integral, np.integer)):
-        #     n_train = [n_train]
-        #
-        # ax = self._get_axes_xy(ax, model.shape['x'])
-        #
-        # # Check plot type
-        # title = str(self.name)
-        # if len(params) == 0:
-        #     if len(n_train) == 1:
-        #         labels = [None]
-        #         title += f", N = {n_train[0]}"
-        #     else:
-        #         labels = [f"N = {n}" for n in n_train]
-        # elif len(params) == 1:
-        #     name, vals = list(params.items())[0]
-        #     if len(n_train) == 1:
-        #         y_stats = y_stats.squeeze(axis=0)
-        #         title += f", N = {n_train[0]}"
-        #         if len(vals) == 1:
-        #             labels = [None]
-        #             title += f", {name} = {vals[0]}"
-        #         else:
-        #             labels = [f"{name} = {val}" for val in vals]
-        #     elif len(vals) == 1:
-        #         y_stats = y_stats.squeeze(axis=1)
-        #         labels = [f"N = {n}" for n in n_train]
-        #         title += f", {name} = {vals[0]}"
-        #     else:
-        #         raise ValueError
-        # else:
-        #     raise ValueError
-        #
-        # # Plot
-        # out = []
-        # for y_stat, label in zip(y_stats, labels):
-        #     y_mean = y_stat['mean']
-        #     y_std = y_stat['std'] if do_std else None
-        #     plt_data = self.plot_xy(x, y_mean, y_std, ax, label)
-        #     out.append(plt_data)
-        #
-        # ax.set_title(title)
-        # if labels != [None]:
-        #     ax.legend()
-        #
-        # return out
-
-
     @classmethod
-    def plot_predict_stats_compare(cls, predictors, x, model, params=None, n_train=0, n_mc=1, do_std=False, ax=None, rng=None):
-
-        stats = ('mean', 'std') if do_std else ('mean',)  # TODO: generalize for mode, etc.
-        y_stats_full = cls.predict_stats_compare(predictors, x, model, params, n_train, n_mc, stats, rng)
+    def plot_predict_stats_compare(cls, predictors, x, model, params=None,
+                                   n_train=0, n_mc=1, do_std=False, ax=None, rng=None):
 
         if params is None:
             params_full = [{} for _ in predictors]
@@ -516,27 +259,10 @@ class ModelPredictor:
         if isinstance(n_train, (Integral, np.integer)):
             n_train = [n_train]
 
-        ax = cls._get_axes_xy(ax, model.shape['x'])
+        stats = ('mean', 'std') if do_std else ('mean',)  # TODO: generalize for mode, etc.
+        y_stats_full = cls.predict_stats_compare(predictors, x, model, params_full, n_train, n_mc, stats, rng)
 
-        # out = []
-        # for predictor, params, y_stats in zip(predictors, params_full, y_stats_full):
-        #     if len(params) == 0:
-        #         labels = [predictor.name]
-        #     elif len(params) == 1:
-        #         y_stats = y_stats.squeeze(0)
-        #         name, vals = list(params.items())[0]
-        #         labels = [f"{predictor.name}, {name} = {val}" for val in vals]
-        #     else:
-        #         raise ValueError
-        #
-        #     for y_stat, label in zip(y_stats, labels):
-        #         y_mean = y_stat['mean']
-        #         y_std = y_stat['std'] if do_std else None
-        #         plt_data = predictor.plot_xy(x, y_mean, y_std, ax, label=label)
-        #         out.append(plt_data)
-        #
-        # ax.set_title(f'N = {n_train}')
-        # ax.legend()
+        ax = get_axes_xy(ax, model.shape['x'])
 
         out = []
         if len(predictors) == 1:
@@ -549,19 +275,19 @@ class ModelPredictor:
                 else:
                     labels = [f"N = {n}" for n in n_train]
             elif len(params) == 1:
-                name, vals = list(params.items())[0]
+                param_name, param_vals = list(params.items())[0]
                 if len(n_train) == 1:
                     y_stats = y_stats.squeeze(axis=0)
                     title += f", N = {n_train[0]}"
-                    if len(vals) == 1:
+                    if len(param_vals) == 1:
                         labels = [None]
-                        title += f", {name} = {vals[0]}"
+                        title += f", {param_name} = {param_vals[0]}"
                     else:
-                        labels = [f"{name} = {val}" for val in vals]
-                elif len(vals) == 1:
+                        labels = [f"{param_name} = {val}" for val in param_vals]
+                elif len(param_vals) == 1:
                     y_stats = y_stats.squeeze(axis=1)
                     labels = [f"N = {n}" for n in n_train]
-                    title += f", {name} = {vals[0]}"
+                    title += f", {param_name} = {param_vals[0]}"
                 else:
                     raise ValueError
             else:
@@ -584,8 +310,8 @@ class ModelPredictor:
                         labels = [predictor.name]
                     elif len(params) == 1:
                         y_stats = y_stats.squeeze(0)
-                        name, vals = list(params.items())[0]
-                        labels = [f"{predictor.name}, {name} = {val}" for val in vals]
+                        param_name, param_vals = list(params.items())[0]
+                        labels = [f"{predictor.name}, {param_name} = {val}" for val in param_vals]
                     else:
                         raise ValueError
 
@@ -603,94 +329,27 @@ class ModelPredictor:
 
         return out
 
-
-
     # Loss evaluation
-
-    def eval_dat(self, model, params=None, n_train=(0,), n_test=1, n_mc=1, rng=None):
-
-        shape, size, ndim = model.shape, model.size, model.ndim
-        if self.shape != shape:
-            raise ValueError("Predictor and model must have the same shape.")
-
+    def loss_eval(self, model, params=None, n_train=0, n_test=1, n_mc=1, rng=None):
         if params is None:
             params = {}
+        return self.loss_eval_compare([self], model, [params], n_train, n_test, n_mc, rng)[0]
 
-        if isinstance(n_train, (Integral, np.integer)):
-            n_train = [n_train]
-        n_train_delta = np.diff(np.concatenate(([0], list(n_train))))   # TODO
-
-        model.rng = rng
-
-        # Generate random data and make predictions
-        params_shape = tuple(len(vals) for _, vals in params.items())
-        loss = np.empty((n_mc, len(n_train_delta)) + params_shape)
-        for i_mc in range(n_mc):
-            d_test = model.rvs(n_test)
-            for i_n, n_tr in enumerate(n_train_delta):
-                warm_start = False if i_n == 0 else True  # resets learner for new iteration
-                d_train = model.rvs(n_tr)
-                self.fit(d_train, warm_start=warm_start)
-
-                if len(params) == 0:
-                    loss[i_mc, i_n] = self.evaluate(d_test)
-                else:
-                    for i_v, param_vals in enumerate(list(product(*params.values()))):
-                        self.set_params(**dict(zip(params.keys(), param_vals)))
-                        loss[i_mc, i_n][np.unravel_index([i_v], params_shape)] = self.evaluate(d_test)
-
-        return loss.mean(axis=0)
-
-    def plot_eval_dat(self, model, params=None, n_train=(0,), n_test=1, n_mc=1, ax=None, rng=None):
-
+    def plot_loss_eval(self, model, params=None, n_train=0, n_test=1, n_mc=1, ax=None, rng=None):
         if params is None:
             params = {}
+        return self.plot_loss_eval_compare([self], model, [params], n_train, n_test, n_mc, ax, rng)
 
-        if isinstance(n_train, (Integral, np.integer)):
-            n_train = [n_train]
+    @staticmethod
+    def loss_eval_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, rng=None):
 
-        if ax is None:
-            _, ax = plt.subplots()
-            ax.set(ylabel='Loss')
-            ax.grid(True)
-            ax.set_title(self.name)
-
-        loss = self.eval_dat(model, params, n_train, n_test, n_mc, rng)
-
-        if len(params) == 0:
-            loss = loss[np.newaxis]
-            x_plt = n_train
-            xlabel = 'N'
-            labels = [None]
-        elif len(params) == 1:
-            name, vals = list(params.items())[0]
-            if len(n_train) < len(vals):
-                x_plt = vals
-                xlabel = name
-                labels = [f"N = {n}" for n in n_train]
-            else:
-                loss = np.transpose(loss)
-                x_plt = n_train
-                xlabel = 'N'
-                labels = [f"{name} = {val}" for val in vals]
+        if params is None:
+            params_full = [{} for _ in predictors]
         else:
-            raise ValueError
+            params_full = params
 
-        out = []
-        for loss_plt, label in zip(loss, labels):
-            plt_data = ax.plot(x_plt, loss_plt, label=label)
-            out.append(plt_data)
-
-        ax.set(xlabel=xlabel)
-        if len(params) > 0:
-            ax.legend()
-
-        return out
-
-
-    @staticmethod   # FIXME
-    def compare_eval(predictors, model, n_train=(0,), n_test=1, n_mc=1, rng=None):
-        # TODO: code redundancy?
+        if isinstance(n_train, (Integral, np.integer)):
+            n_train = [n_train]
 
         shape, size, ndim = model.shape, model.size, model.ndim
         if not all(predictor.shape == shape for predictor in predictors):
@@ -699,51 +358,105 @@ class ModelPredictor:
         n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
         model.rng = rng
 
-        # Generate random data and make predictions
-        loss = np.empty((n_mc, len(n_train_delta), len(predictors)))
+        loss_full = []
+        for params in params_full:
+            params_shape = tuple(len(vals) for _, vals in params.items())
+            loss = np.empty((n_mc, len(n_train_delta)) + params_shape)
+            loss_full.append(loss)
+
         for i_mc in range(n_mc):
             d_test = model.rvs(n_test)
             for i_n, n_tr in enumerate(n_train_delta):
                 warm_start = False if i_n == 0 else True  # resets learner for new iteration
                 d_train = model.rvs(n_tr)
-                for i_p, predictor in enumerate(predictors):
+                for predictor, params, loss in zip(predictors, params_full, loss_full):
                     predictor.fit(d_train, warm_start=warm_start)
-                    loss[i_mc, i_n, i_p] = predictor.evaluate(d_test)
 
-        return loss.mean(axis=0)
+                    if len(params) == 0:
+                        loss[i_mc, i_n] = predictor.evaluate(d_test)
+                    else:
+                        for i_v, param_vals in enumerate(list(product(*params.values()))):
+                            predictor.set_params(**dict(zip(params.keys(), param_vals)))
+                            loss[i_mc, i_n][np.unravel_index([i_v], loss.shape[2:])] = predictor.evaluate(d_test)
+
+        loss_full = [loss.mean(axis=0) for loss in loss_full]
+        return loss_full
 
     @classmethod
-    def plot_compare_eval(cls, predictors, model, n_train=0, n_test=1, n_mc=1, ax=None, rng=None):
+    def plot_loss_eval_compare(cls, predictors, model, params=None, n_train=0, n_test=1, n_mc=1, ax=None, rng=None):
 
-        if not isinstance(predictors, Iterable):
-            predictors = [predictors]
+        if params is None:
+            params_full = [{} for _ in predictors]
+        else:
+            params_full = params
 
         if isinstance(n_train, (Integral, np.integer)):
             n_train = [n_train]
+
+        loss_full = cls.loss_eval_compare(predictors, model, params_full, n_train, n_test, n_mc, rng)
 
         if ax is None:
             _, ax = plt.subplots()
             ax.set(ylabel='Loss')
             ax.grid(True)
 
-        loss = cls.compare_eval(predictors, model, n_train, n_test, n_mc, rng)
-
-        if loss.shape[0] > loss.shape[1]:
-            loss = np.transpose(loss)
-            x_plt = n_train
-            labels = [p.name for p in predictors]
-            ax.set(xlabel='N')
-        else:
-            x_plt = range(len(predictors))
-            labels = [f"N = {n}" for n in n_train]
-            ax.set(xlabel='Predictors')     # TODO
-
         out = []
-        for loss_plt, label in zip(loss, labels):
-            plt_data = ax.plot(x_plt, loss_plt, label=label)
-            out.append(plt_data)
+        if len(predictors) == 1:
+            predictor, params, loss = predictors[0], params_full[0], loss_full[0]
+            title = str(predictor.name)
 
-        ax.legend()
+            if len(params) == 0:
+                loss = loss[np.newaxis]
+                xlabel, x_plt = 'N', n_train
+                labels = [None]
+            elif len(params) == 1:
+                param_name, param_vals = list(params.items())[0]
+                if len(n_train) < len(param_vals):
+                    xlabel, x_plt = param_name, param_vals
+                    if len(n_train) == 1:
+                        title += f", N = {n_train[0]}"
+                        labels = [None]
+                    else:
+                        labels = [f"N = {n}" for n in n_train]
+                else:
+                    loss = np.transpose(loss)
+                    xlabel, x_plt = 'N', n_train
+                    if len(param_vals) == 1:
+                        title += f"{param_name} = {param_vals[0]}"
+                        labels = [None]
+                    else:
+                        labels = [f"{param_name} = {val}" for val in param_vals]
+            else:
+                raise ValueError
+
+            for loss_plt, label in zip(loss, labels):
+                plt_data = ax.plot(x_plt, loss_plt, label=label)
+                out.append(plt_data)
+
+            if labels != [None]:
+                ax.legend()
+        else:
+            title = ''
+            xlabel, x_plt = 'N', n_train
+            for predictor, params, loss in zip(predictors, params_full, loss_full):
+                if len(params) == 0:
+                    loss = loss[np.newaxis]
+                    labels = [predictor.name]
+                elif len(params) == 1:
+                    loss = np.transpose(loss)
+                    param_name, param_vals = list(params.items())[0]
+                    labels = [f"{predictor.name}, {param_name} = {val}" for val in param_vals]
+                else:
+                    raise ValueError
+
+                for loss_plt, label in zip(loss, labels):
+                    plt_data = ax.plot(x_plt, loss_plt, label=label)
+                    out.append(plt_data)
+
+                ax.legend()
+
+        ax.set(xlabel=xlabel)
+        ax.set_title(title)
 
         return out
 
