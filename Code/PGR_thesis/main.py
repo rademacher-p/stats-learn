@@ -175,23 +175,24 @@ def main():
     model = NormalRegressorModel(model_x=model_x, basis_y_x=None,  # (lambda x: 1., lambda x: x)
                                  weights=np.ones(2), cov_y_x_single=1., rng=None)
 
-    bayes_models = {r'$C_{\theta} = $' + str(_cov): NormalRegressorBayes(model_x=model_x, basis_y_x=None, cov_y_x=1.,
-                                                                         mean_prior=np.zeros(2),
-                                                                         cov_prior=_cov)
-                    for _cov in [0.1, 10]}
 
-    predictors = [
-        ModelRegressor(model, name=r'$f_{opt}$'),
-        *(BayesRegressor(bayes_model, name=name) for name, bayes_model in bayes_models.items()),
-    ]
+    # bayes_models = {r'$C_{\theta} = $' + str(_cov): NormalRegressorBayes(model_x=model_x, basis_y_x=None, cov_y_x=1.,
+    #                                                                      mean_prior=np.zeros(2),
+    #                                                                      cov_prior=_cov)
+    #                 for _cov in [0.1, 10]}
+    #
+    # predictors = [
+    #     ModelRegressor(model, name=r'$f_{opt}$'),
+    #     *(BayesRegressor(bayes_model, name=name) for name, bayes_model in bayes_models.items()),
+    # ]
 
     # Risk sim
 
-    # losses = ModelPredictor.compare_eval(predictors, model, n_train=(5,), n_test=1, n_mc=100, rng=None)
+    # losses = ModelPredictor.loss_eval_compare(predictors, model, n_train=(5,), n_test=1, n_mc=100, rng=None)
     # print(losses)
 
-    # ModelPredictor.plot_compare_eval(predictors, model, n_train=(5, 10), n_test=1, n_mc=100, ax=None, rng=None)
-    # ModelPredictor.plot_compare_eval(predictors, model, n_train=np.arange(10), n_test=1, n_mc=500, ax=None, rng=None)
+    # ModelPredictor.plot_loss_eval_compare(predictors, model, n_train=(5, 10), n_test=1, n_mc=100, ax=None, rng=None)
+    # ModelPredictor.plot_loss_eval_compare(predictors, model, n_train=np.arange(10), n_test=1, n_mc=500, ax=None, rng=None)
 
     # losses = predictor_compare_mc_bayes(predictors, bayes_models['learn: 0.1'],
     #                                     n_train=10, n_test=1, n_mc=3, rng=None)
@@ -207,29 +208,28 @@ def main():
         {},
         {'cov_prior': [0.1, 10]},
     ]
-    ModelPredictor.plot_predict_stats_compare(predictors, x, model, params, n_train=10, n_mc=100, do_std=True, ax=None, rng=None)
 
-    # ModelPredictor.plot_predict_stats_compare(predictors, x, model, n_train=10, n_mc=100, do_std=True, ax=None, rng=None)
-
-    pr = predictors[1]
+    ModelPredictor.plot_predict_stats_compare(predictors, x, model, params, n_train=2, n_mc=30, do_std=True, ax=None, rng=None)
+    ModelPredictor.plot_loss_eval_compare(predictors, model, params, n_train=np.arange(10), n_test=1, n_mc=30, ax=None, rng=None)
 
 
     # single predictor methods
-
-    pr.plot_predict_stats(x, model, n_train=[0, 1, 2], n_mc=100, do_std=True, ax=None, rng=None)
+    pr = predictors[1]
 
     # params = None
     # params = {'weights': [m * np.ones(2) for m in [.1, .5, 1]]}
     params = {
-        # 'cov_prior': [.1, 1, 10],
-        'cov_prior': np.linspace(.1, 10, 64),
+        'cov_prior': [.1, 1, 10],
+        # 'cov_prior': np.linspace(.1, 10, 32),
         # 'mean_prior': [m * np.ones(2) for m in [.1, .5, 1]],
               }
 
-    # pr.plot_predict_stats(x, model, params=params, n_train=2, n_mc=100, do_std=True)
+    n_train = 2
+    # n_train = [0, 1, 2]
+    # n_train = np.arange(10)
 
-
-    pr.plot_eval_dat(model, params=params, n_train=[0, 1, 2], n_test=10, n_mc=100, ax=None, rng=None)
+    pr.plot_predict_stats(x, model, params=params, n_train=n_train, n_mc=30, do_std=True, ax=None, rng=None)
+    pr.plot_loss_eval(model, params=params, n_train=n_train, n_test=10, n_mc=30, ax=None, rng=None)
 
     pass
 # def main():
