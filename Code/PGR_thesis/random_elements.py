@@ -761,6 +761,10 @@ class Normal(BaseRV):
     @cov.setter
     def cov(self, cov):
         self._cov = np.array(cov)
+
+        if self._cov.shape == () and self.ndim == 1:    # FIXME: hack-ish?
+            self._cov = self._cov * np.eye(self.size)
+
         if self._cov.shape != self._shape * 2:
             raise ValueError(f"Covariance array shape must be {self._shape * 2}.")
         self._cov_flat = self._cov.reshape(2 * (self.size,))
