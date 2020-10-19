@@ -176,9 +176,6 @@ class ModelPredictor:
             n_train = [n_train]
 
         shape, size, ndim = model.shape, model.size, model.ndim
-        if not all(predictor.shape == shape for predictor in predictors):
-            raise ValueError("All models must have same shape.")
-
         x, set_shape = check_data_shape(x, shape['x'])
         n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
         model.rng = rng
@@ -350,10 +347,6 @@ class ModelPredictor:
 
         if isinstance(n_train, (Integral, np.integer)):
             n_train = [n_train]
-
-        shape, size, ndim = model.shape, model.size, model.ndim
-        if not all(predictor.shape == shape for predictor in predictors):
-            raise ValueError("All models must have same shape.")
 
         n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
         model.rng = rng
