@@ -11,27 +11,19 @@ from scipy import stats
 
 from random_elements import Base as BaseRE, BaseRV, Normal
 from RE_obj_callable import FiniteRE, DirichletRV, BetaRV       # TODO: note - CALLABLE!!!!
-from util.generic import check_rng, vectorize_func, check_data_shape
+from util.generic import RandomGeneratorMixin, vectorize_func, check_data_shape
 
 
-class Base:
+class Base(RandomGeneratorMixin):
     """
     Base class for supervised learning data models.
     """
 
     def __init__(self, rng=None):
-        self.rng = rng
+        super().__init__(rng)
         self._shape = {'x': None, 'y': None}
 
         self._mode_x = None
-
-    @property
-    def rng(self):
-        return self._rng
-
-    @rng.setter
-    def rng(self, rng):
-        self._rng = check_rng(rng)
 
     shape = property(lambda self: self._shape)
     size = property(lambda self: {key: math.prod(val) for key, val in self._shape.items()})
@@ -134,7 +126,7 @@ class DataConditional(Base):
 
     def _rvs(self, size, rng):
         d_x = np.array(self.model_x.rvs(size, rng))
-        d_y = np.array([self.model_y_x(x).rvs((), rng)
+        d_y = np.array([self.model_y_x(x).rvs(rng=rng)
                         for x in d_x.reshape((-1,) + self.shape['x'])]).reshape(size + self.shape['y'])
 
         d = np.array(list(zip(d_x.reshape((-1,) + self.shape['x']), d_y.reshape((-1,) + self.shape['y']))),

@@ -14,20 +14,20 @@ from scipy.stats._multivariate import _PSD
 from scipy.special import gammaln, xlogy, xlog1py, betaln
 import matplotlib.pyplot as plt
 
-from util.generic import check_rng, check_data_shape, check_valid_pmf, vectorize_func, vectorize_func_dec
+from util.generic import RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func, vectorize_func_dec
 from util.math import outer_gen, diag_gen, simplex_round
 from util.plot import simplex_grid
 
 
 #%% Base RE classes
 
-class Base:
+class Base(RandomGeneratorMixin):
     """
     Base class for generic random element objects.
     """
 
     def __init__(self, rng=None):
-        self.rng = rng
+        super().__init__(rng)
 
         self._shape = None
         self._mode = None
@@ -37,14 +37,6 @@ class Base:
     ndim = property(lambda self: len(self._shape))
 
     mode = property(lambda self: self._mode)
-
-    @property
-    def rng(self):
-        return self._rng
-
-    @rng.setter
-    def rng(self, rng):
-        self._rng = check_rng(rng)
 
     def pf(self, x):
         return vectorize_func(self._pf_single, self._shape)(x)     # TODO: decorator? better way?
@@ -65,11 +57,7 @@ class Base:
         elif not isinstance(size, tuple):
             raise TypeError("Input 'size' must be int or tuple.")
 
-        if rng is None:
-            rng = self.rng
-        else:
-            rng = check_rng(rng)
-
+        rng = self._get_rng(rng)
         return self._rvs(size, rng)
 
     def _rvs(self, size, rng):
@@ -131,6 +119,12 @@ class DeterministicRE(Base):
 
     @val.setter
     def val(self, val):
+        # self._val = np.array(val)
+        # self._shape = self._val.shape
+        # self._mode = self._val
+        self._set_val(val)
+
+    def _set_val(self, val):
         self._val = np.array(val)
         self._shape = self._val.shape
         self._mode = self._val
@@ -150,11 +144,17 @@ class DeterministicRV(MixinRV, DeterministicRE):
     Deterministic random variable.
     """
 
-    @DeterministicRE.val.setter
-    def val(self, val):
-        DeterministicRE.val.fset(self, val)
-        # super(DeterministicRV, self.__class__).val.fset(self, val)    # TODO: super instead?
+    # @DeterministicRE.val.setter
+    # def val(self, val):
+    #     self._val = np.array(val)
+    #     self._shape = self._val.shape
+    #     self._mode = self._val
+    #
+    #     self._mean = self._val
+    #     self._cov = np.zeros(2 * self._shape)
 
+    def _set_val(self, val):
+        super()._set_val(val)
         self._mean = self._val
         self._cov = np.zeros(2 * self._shape)
 

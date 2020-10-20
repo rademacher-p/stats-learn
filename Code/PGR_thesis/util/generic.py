@@ -7,30 +7,47 @@ import math
 import numpy as np
 
 
-def check_rng(rng=None):
-    """
-    Return a random number generator.
+class RandomGeneratorMixin:
+    def __init__(self, rng=None):
+        self.rng = rng
 
-    Parameters
-    ----------
-    rng : int or RandomState or Generator, optional
-        Random number generator seed or object.
+    @property
+    def rng(self):
+        return self._rng
 
-    Returns
-    -------
-    Generator
+    @rng.setter
+    def rng(self, val):
+        self._rng = self.check_rng(val)
 
-    """
+    def _get_rng(self, rng=None):
+        if rng is None:
+            return self._rng
+        else:
+            return self.check_rng(rng)
 
-    if rng is None:
-        return np.random.default_rng()
-    elif isinstance(rng, (Integral, np.integer)):
-        return np.random.default_rng(rng)
-    elif isinstance(rng, np.random.Generator) or isinstance(rng, np.random.RandomState):
-        # return deepcopy(rng)        # TODO: implement input to reference, not copy?
-        return rng
-    else:
-        raise TypeError("Input must be None, int, or a valid NumPy random number generator.")
+    @staticmethod
+    def check_rng(rng):
+        """
+        Return a random number generator.
+
+        Parameters
+        ----------
+        rng : int or RandomState or Generator, optional
+            Random number generator seed or object.
+
+        Returns
+        -------
+        Generator
+
+        """
+        if rng is None:
+            return np.random.default_rng()
+        elif isinstance(rng, (Integral, np.integer)):
+            return np.random.default_rng(rng)
+        elif isinstance(rng, np.random.Generator) or isinstance(rng, np.random.RandomState):
+            return rng
+        else:
+            raise TypeError("Input must be None, int, or a valid NumPy random number generator.")
 
 
 def check_data_shape(x, data_shape=()):
