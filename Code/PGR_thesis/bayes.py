@@ -14,7 +14,7 @@ from scipy.stats._multivariate import _PSD
 from random_elements import Normal, Dirichlet
 import RE_obj_callable
 from models import DataConditional, NormalRegressor as NormalRegressorModel
-from util.generic import empirical_pmf, check_rng
+from util.generic import RandomGeneratorMixin, empirical_pmf
 from util.func_obj import FiniteDomainFunc
 
 #%% Priors
@@ -22,15 +22,15 @@ from util.func_obj import FiniteDomainFunc
 # TODO: Add deterministic DEP to effect a DP realization and sample!!
 
 
-class Base:
-    param_names = ()
+class Base(RandomGeneratorMixin):
+    # param_names = ()
 
     def __init__(self, prior=None, rng=None):
+        super().__init__(rng)
+
         self._shape = {'x': None, 'y': None}
 
         self.prior = prior
-        self.prior.rng = rng
-
         self.posterior = None
         self.posterior_model = None
 
@@ -229,12 +229,10 @@ class NormalRegressor(Base):
 
     # Methods
     def random_model(self, rng=None):
-        model_kwargs = {'model_x': self.model_x, 'basis_y_x': self.basis_y_x,
-                        'cov_y_x_single': self.cov_y_x, 'rng': self.prior.rng}
+        rng = self._get_rng(rng)
 
-        if rng is not None:
-            rng = check_rng(rng)
-            model_kwargs.update(rng=rng)
+        model_kwargs = {'model_x': self.model_x, 'basis_y_x': self.basis_y_x,
+                        'cov_y_x_single': self.cov_y_x, 'rng': rng}
 
         rand_kwargs = {'weights': self.prior.rvs(rng=rng)}
 
