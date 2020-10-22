@@ -5,19 +5,15 @@ Main.
 import itertools
 
 import numpy as np
-from numpy.random import default_rng
-import matplotlib.pyplot as plt
 
 # from scipy.stats._multivariate import multi_rv_generic
 # from scipy._lib._util import check_random_state
 # from mpl_toolkits.mplot3d import Axes3D
 
-from util.generic import vectorize_first_arg
-from random_elements import Normal, Beta
+from random_elements import Normal
 from models import NormalRegressor as NormalRegressorModel
-from bayes import NormalRegressor as NormalRegressorBayes
-from decision_functions.learn_funcs import (BayesPredictor, BayesClassifier, BayesRegressor,
-                                            ModelPredictor, ModelClassifier, ModelRegressor)
+from bayes_models import NormalRegressor as NormalRegressorBayes
+from predictors import BayesRegressor, ModelRegressor, plot_loss_eval_compare, plot_predict_stats_compare
 
 # plt.style.use('seaborn')
 
@@ -135,49 +131,23 @@ def main():
     model = NormalRegressorModel(model_x=model_x, basis_y_x=None,  # (lambda x: 1., lambda x: x)
                                  weights=np.ones(2), cov_y_x_single=1., rng=None)
 
-
-    # bayes_models = {r'$C_{\theta} = $' + str(_cov): NormalRegressorBayes(model_x=model_x, basis_y_x=None, cov_y_x=1.,
-    #                                                                      mean_prior=np.zeros(2),
-    #                                                                      cov_prior=_cov)
-    #                 for _cov in [0.1, 10]}
-    #
-    # predictors = [
-    #     ModelRegressor(model, name=r'$f_{opt}$'),
-    #     *(BayesRegressor(bayes_model, name=name) for name, bayes_model in bayes_models.items()),
-    # ]
-
-    # Risk sim
-
-    # losses = ModelPredictor.loss_eval_compare(predictors, model, n_train=(5,), n_test=1, n_mc=100, rng=None)
-    # print(losses)
-
-    # ModelPredictor.plot_loss_eval_compare(predictors, model, n_train=(5, 10), n_test=1, n_mc=100, ax=None, rng=None)
-    # ModelPredictor.plot_loss_eval_compare(predictors, model, n_train=np.arange(10), n_test=1, n_mc=500, ax=None, rng=None)
-
-    # losses = predictor_compare_mc_bayes(predictors, bayes_models['learn: 0.1'],
-    #                                     n_train=10, n_test=1, n_mc=3, rng=None)
-    # print(losses)
-
     # Plotting
     predictors = [
         ModelRegressor(model, name=r'$f_{opt}$'),
         BayesRegressor(NormalRegressorBayes(model_x=model_x, basis_y_x=None,
-                                            cov_y_x=1., mean_prior=0*np.ones(2), cov_prior=0.1*np.eye(2)), name='Bayes'),
+                                            cov_y_x=1., mean_prior=0*np.ones(2), cov_prior=0.1*np.eye(2)), name='Norm'),
     ]
+
+    # predictors[0].plot_loss_eval(params={'weights': np.linspace(0, 2, 20)}, n_train=[0, 1, 2], n_test=10, n_mc=100, verbose=True)
+
     params = [
         {},
         {'cov_prior': [0.1, 1, 10]},
     ]
 
-    # print(ModelPredictor.loss_eval_compare(predictors, model, params, n_train=np.arange(3), n_test=10, n_mc=100,
-    #                                        verbose=False, rng=100))
-    # print(predictors[1].loss_eval(model, params[1], n_train=np.arange(3), n_test=10, n_mc=100, verbose=False, rng=100))
-
-
-    # ModelPredictor.plot_predict_stats_compare(predictors, x, model, params, n_train=2, n_mc=30, do_std=True, ax=None, rng=None)
-    ModelPredictor.plot_loss_eval_compare(predictors, model, params, n_train=np.arange(3), n_test=10, n_mc=100,
-                                          verbose=False, ax=None, rng=100)
-
+    # plot_predict_stats_compare(predictors, x, model, params, n_train=2, n_mc=30, do_std=True, ax=None, rng=None)
+    plot_loss_eval_compare(predictors, model, params, n_train=np.arange(3), n_test=10, n_mc=100,
+                           verbose=False, ax=None, rng=100)
 
     # single predictor methods
     pr = predictors[1]
@@ -196,9 +166,11 @@ def main():
     # n_train = np.arange(10)
 
     # pr.plot_predict_stats(x, model, params=params, n_train=n_train, n_mc=30, do_std=True, ax=None, rng=None)
-    pr.plot_loss_eval(model=pr.bayes_model, params=params, n_train=n_train, n_test=10, n_mc=100, verbose=False, ax=None, rng=100)
+    pr.plot_loss_eval(model=None, params=params, n_train=n_train, n_test=10, n_mc=100, verbose=False, ax=None, rng=100)
+
 
     pass
+
 # def main():
 #     alpha_0 = alpha_0_plot = supp_x_s.size * supp_y_s.size
 #

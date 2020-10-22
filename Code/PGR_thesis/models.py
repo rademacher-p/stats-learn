@@ -7,7 +7,6 @@ Supervised Learning base classes.
 import math
 
 import numpy as np
-from scipy import stats
 
 from random_elements import Base as BaseRE, BaseRV, Normal
 from RE_obj_callable import FiniteRE, DirichletRV, BetaRV       # TODO: note - CALLABLE!!!!
@@ -61,6 +60,8 @@ class MixinRVx:
 
 
 class MixinRVy:
+    _shape: dict
+
     def mean_y_x(self, x):
         return vectorize_func(self._mean_y_x_single, self._shape['x'])(x)
 
@@ -200,11 +201,12 @@ class DataConditionalRVyx(DataConditionalRVx, DataConditionalRVy):       # TODO:
 class NormalRegressor(MixinRVx, MixinRVy, Base):
     # param_names = ('model_x', 'basis_y_x', 'cov_y_x_single', 'weights')
 
-    def __init__(self, model_x=Normal(), basis_y_x=(lambda x: 1.,), cov_y_x_single=1., weights=(0.,), rng=None):
+    def __init__(self, model_x=Normal(), basis_y_x=None, cov_y_x_single=1., weights=(0.,), rng=None):
         super().__init__(rng)
 
         self.model_x = model_x
-        self.weights = np.array(weights)
+        # self.weights = weights
+        self._weights = np.array(weights)
 
         self.cov_y_x_single = cov_y_x_single
 
@@ -236,8 +238,16 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):
         self._mean_x = self._model_x.mean
         self._cov_x = self._model_x.cov
 
-    # def cov_y_x(self, x):
-    #     return vectorize_func(self.cov_y_x_single, self._shape['x'])(x)
+    @property
+    def weights(self):
+        return self._weights
+
+    @weights.setter
+    def weights(self, val):
+        # self._weights = np.array(val)
+        self._weights = np.broadcast_to(val, (self.n_weights,))     # FIXME?
+
+    n_weights = property(lambda self: self._weights.size)
 
     @property
     def cov_y_x_single(self):
