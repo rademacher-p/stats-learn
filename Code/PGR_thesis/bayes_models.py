@@ -3,12 +3,8 @@ Bayesian Prior objects.
 """
 
 import math
-import types
-import functools
-from copy import deepcopy
 
 import numpy as np
-# from scipy.stats._multivariate import multi_rv_generic
 from scipy.stats._multivariate import _PSD
 
 from random_elements import Normal, Dirichlet
