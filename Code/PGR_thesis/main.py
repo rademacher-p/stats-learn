@@ -118,47 +118,7 @@ supp_y_s = np.array(list(itertools.product(supp_y.reshape((-1,) + data_shape_y))
 
 #%% Sim
 
-# TODO: want RNG seeding for identical fit/eval data
 # TODO: split learning funcs from eval funcs for fixed predictors?
-# TODO: need MC results for fitting
-
-def predictor_compare(predictors, model, n_train, n_test, rng=None):
-    d = model.rvs(n_train + n_test, rng=rng)  # generate train/test data
-    d_train, d_test = np.split(d, [n_train])
-
-    losses = np.empty(len(predictors))
-    for idx, predictor in enumerate(predictors):
-        predictor.fit(d_train)
-        losses[idx] = predictor.evaluate(d_test)
-    return losses
-
-
-def predictor_compare_mc(predictors, model, n_train=0, n_test=1, n_mc=1, rng=None):
-    model.rng = rng
-    loss_mc = np.empty((n_mc, len(predictors)))
-    for i_mc in range(n_mc):
-        loss_mc[i_mc] = predictor_compare(predictors, model, n_train, n_test, rng=None)
-    return loss_mc.mean(0)
-
-
-def predictor_compare_mc_bayes(predictors, bayes_model, n_train=0, n_test=1, n_mc=1, rng=None):
-    bayes_model.rng = rng
-    loss_mc = np.empty((n_mc, len(predictors)))
-    for i_mc in range(n_mc):
-        model = bayes_model.random_model()
-        loss_mc[i_mc] = predictor_compare(predictors, model, n_train, n_test, rng=None)
-    return loss_mc.mean(0)
-
-
-# def predictor_eval_2(predictors, model, rng_fit=None, rng_eval=None):
-#     losses = []
-#     for predictor in predictors:
-#         predictor.fit_from_model(model, n_train=5, rng=rng_fit)
-#         loss = predictor.evaluate_from_model(model, n_test=10, n_mc=15, rng=rng_eval)
-#         losses.append(loss)
-#
-#     return losses
-
 
 def main():
     model_x = Normal(mean=0., cov=10.)
@@ -206,30 +166,37 @@ def main():
     ]
     params = [
         {},
-        {'cov_prior': [0.1, 10]},
+        {'cov_prior': [0.1, 1, 10]},
     ]
 
-    ModelPredictor.plot_predict_stats_compare(predictors, x, model, params, n_train=2, n_mc=30, do_std=True, ax=None, rng=None)
-    ModelPredictor.plot_loss_eval_compare(predictors, model, params, n_train=np.arange(10), n_test=1, n_mc=30, ax=None, rng=None)
+    # print(ModelPredictor.loss_eval_compare(predictors, model, params, n_train=np.arange(3), n_test=10, n_mc=100,
+    #                                        verbose=False, rng=100))
+    # print(predictors[1].loss_eval(model, params[1], n_train=np.arange(3), n_test=10, n_mc=100, verbose=False, rng=100))
+
+
+    # ModelPredictor.plot_predict_stats_compare(predictors, x, model, params, n_train=2, n_mc=30, do_std=True, ax=None, rng=None)
+    ModelPredictor.plot_loss_eval_compare(predictors, model, params, n_train=np.arange(3), n_test=10, n_mc=100,
+                                          verbose=False, ax=None, rng=100)
 
 
     # single predictor methods
     pr = predictors[1]
+    pr.set_params(cov_prior=5)
 
     # params = None
     # params = {'weights': [m * np.ones(2) for m in [.1, .5, 1]]}
     params = {
-        'cov_prior': [.1, 1, 10],
-        # 'cov_prior': np.linspace(.1, 10, 32),
+        # 'cov_prior': [.1, 1, 10, 11],
+        'cov_prior': np.linspace(.1, 10, 32),
         # 'mean_prior': [m * np.ones(2) for m in [.1, .5, 1]],
               }
 
-    n_train = 2
-    # n_train = [0, 1, 2]
+    # n_train = 2
+    n_train = [0, 1, 2]
     # n_train = np.arange(10)
 
-    pr.plot_predict_stats(x, model, params=params, n_train=n_train, n_mc=30, do_std=True, ax=None, rng=None)
-    pr.plot_loss_eval(model, params=params, n_train=n_train, n_test=10, n_mc=30, ax=None, rng=None)
+    # pr.plot_predict_stats(x, model, params=params, n_train=n_train, n_mc=30, do_std=True, ax=None, rng=None)
+    pr.plot_loss_eval(model=pr.bayes_model, params=params, n_train=n_train, n_test=10, n_mc=100, verbose=False, ax=None, rng=100)
 
     pass
 # def main():
