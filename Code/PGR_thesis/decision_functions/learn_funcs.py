@@ -2,24 +2,29 @@
 Supervised learning functions.
 """
 
-import functools
 import math
 from numbers import Integral
-from collections import Iterable
 from itertools import product
-
+from copy import deepcopy
 
 import numpy as np
 from scipy.stats import mode
 import matplotlib.pyplot as plt
 
-from util.generic import vectorize_func, empirical_pmf, vectorize_first_arg, check_data_shape
+from util.generic import vectorize_func, check_data_shape
 from util.plot import get_axes_xy
 from loss_funcs import loss_se, loss_01
 from models import Base as BaseModel, MixinRVy, DataConditional
+from bayes import Base as BaseBayesModel
 
 
 # TODO: add method functionality to work with SKL, TF conventions?
+
+def _get_model(model):
+    if isinstance(model, BaseBayesModel):
+        return model.random_model()
+    else:
+        return model
 
 
 # %%
@@ -39,16 +44,20 @@ class RegressorMixin:
 
 # %%
 class ModelPredictor:
+
+    # TODO: make superclass, sub model and bayes?
+
     def __init__(self, loss_func, model, name=None):
         self.loss_func = loss_func
         self.model = model
 
-        if name is None:
-            self.name = 'model'
-        elif isinstance(name, str):
-            self.name = name
-        else:
-            raise TypeError
+        self.name = name
+        # if name is None:
+        #     self.name = 'model'
+        # elif isinstance(name, str):
+        #     self.name = name
+        # else:
+        #     raise TypeError
 
     def __repr__(self):
         return self.__class__.__name__ + f"(model={self.model})"
@@ -99,7 +108,7 @@ class ModelPredictor:
         loss = self.loss_func(self.predict(d['x']), d['y'], data_shape=self.shape['y'])
         return loss.mean()
 
-    def evaluate_from_model(self, model, n_test=1, n_mc=1, rng=None):       # TODO: move MC looping elsewhere?
+    def evaluate_from_model(self, model, n_test=1, n_mc=1, rng=None):
         """Average empirical risk achieved from a given data model."""
 
         model.rng = rng
@@ -153,19 +162,21 @@ class ModelPredictor:
         return self.plot_xy(x, self.predict(x), ax=ax, label=label)
 
     # Prediction statistics
-    def predict_stats(self, x, model, params=None, n_train=0, n_mc=1, stats=('mode',), rng=None):
+    def predict_stats(self, x, model, params=None, n_train=0, n_mc=1, stats=('mode',), verbose=False, rng=None):
         if params is None:
             params = {}
-        return self.predict_stats_compare([self], x, model, [params], n_train, n_mc, stats, rng)[0]
+        return self.predict_stats_compare([self], x, model, [params], n_train, n_mc, stats, verbose, rng)[0]
 
-    def plot_predict_stats(self, x, model, params=None, n_train=0, n_mc=1, do_std=False, ax=None, rng=None):
+    def plot_predict_stats(self, x, model, params=None, n_train=0, n_mc=1, do_std=False,
+                           verbose=False, ax=None, rng=None):
         if params is None:
             params = {}
-        return self.plot_predict_stats_compare([self], x, model, [params], n_train, n_mc, do_std, ax, rng)
+        return self.plot_predict_stats_compare([self], x, model, [params], n_train, n_mc, do_std, verbose, ax, rng)
 
     # TODO: move non-instance methods outside class?
     @staticmethod
-    def predict_stats_compare(predictors, x, model, params=None, n_train=0, n_mc=1, stats=('mode',), rng=None):
+    def predict_stats_compare(predictors, x, model, params=None, n_train=0, n_mc=1, stats=('mode',),
+                              verbose=False, rng=None):
 
         if params is None:
             params_full = [{} for _ in predictors]
@@ -178,6 +189,8 @@ class ModelPredictor:
         shape, size, ndim = model.shape, model.size, model.ndim
         x, set_shape = check_data_shape(x, shape['x'])
         n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
+
+        model = deepcopy(model)
         model.rng = rng
 
         # Generate random data and make predictions
@@ -190,9 +203,13 @@ class ModelPredictor:
             y_full.append(y)
 
         for i_mc in range(n_mc):
+            if verbose:
+                print(f"{i_mc+1}/{n_mc}")
+
+            model_mc = _get_model(model)
             for i_n, n_tr in enumerate(n_train_delta):
                 warm_start = False if i_n == 0 else True  # resets learner for new iteration
-                d = model.rvs(n_tr)
+                d = model_mc.rvs(n_tr)
                 for predictor, params, params_shape, y in zip(predictors, params_full, params_shape_full, y_full):
                     predictor.fit(d, warm_start=warm_start)
                     if len(params) == 0:
@@ -245,8 +262,8 @@ class ModelPredictor:
         return y_stats_full
 
     @classmethod
-    def plot_predict_stats_compare(cls, predictors, x, model, params=None,
-                                   n_train=0, n_mc=1, do_std=False, ax=None, rng=None):
+    def plot_predict_stats_compare(cls, predictors, x, model, params=None, n_train=0, n_mc=1, do_std=False,
+                                   verbose=False, ax=None, rng=None):
 
         if params is None:
             params_full = [{} for _ in predictors]
@@ -257,7 +274,7 @@ class ModelPredictor:
             n_train = [n_train]
 
         stats = ('mean', 'std') if do_std else ('mean',)  # TODO: generalize for mode, etc.
-        y_stats_full = cls.predict_stats_compare(predictors, x, model, params_full, n_train, n_mc, stats, rng)
+        y_stats_full = cls.predict_stats_compare(predictors, x, model, params_full, n_train, n_mc, stats, verbose, rng)
 
         ax = get_axes_xy(ax, model.shape['x'])
 
@@ -327,18 +344,18 @@ class ModelPredictor:
         return out
 
     # Loss evaluation
-    def loss_eval(self, model, params=None, n_train=0, n_test=1, n_mc=1, rng=None):
+    def loss_eval(self, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, rng=None):
         if params is None:
             params = {}
-        return self.loss_eval_compare([self], model, [params], n_train, n_test, n_mc, rng)[0]
+        return self.loss_eval_compare([self], model, [params], n_train, n_test, n_mc, verbose, rng)[0]
 
-    def plot_loss_eval(self, model, params=None, n_train=0, n_test=1, n_mc=1, ax=None, rng=None):
+    def plot_loss_eval(self, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None, rng=None):
         if params is None:
             params = {}
-        return self.plot_loss_eval_compare([self], model, [params], n_train, n_test, n_mc, ax, rng)
+        return self.plot_loss_eval_compare([self], model, [params], n_train, n_test, n_mc, verbose, ax, rng)
 
     @staticmethod
-    def loss_eval_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, rng=None):
+    def loss_eval_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, rng=None):
 
         if params is None:
             params_full = [{} for _ in predictors]
@@ -349,6 +366,8 @@ class ModelPredictor:
             n_train = [n_train]
 
         n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
+
+        model = deepcopy(model)
         model.rng = rng
 
         loss_full = []
@@ -358,10 +377,14 @@ class ModelPredictor:
             loss_full.append(loss)
 
         for i_mc in range(n_mc):
-            d_test = model.rvs(n_test)
+            if verbose:
+                print(f"{i_mc+1}/{n_mc}")
+
+            model_mc = _get_model(model)
+            d_test = model_mc.rvs(n_test)
             for i_n, n_tr in enumerate(n_train_delta):
                 warm_start = False if i_n == 0 else True  # resets learner for new iteration
-                d_train = model.rvs(n_tr)
+                d_train = model_mc.rvs(n_tr)
                 for predictor, params, loss in zip(predictors, params_full, loss_full):
                     predictor.fit(d_train, warm_start=warm_start)
 
@@ -376,7 +399,8 @@ class ModelPredictor:
         return loss_full
 
     @classmethod
-    def plot_loss_eval_compare(cls, predictors, model, params=None, n_train=0, n_test=1, n_mc=1, ax=None, rng=None):
+    def plot_loss_eval_compare(cls, predictors, model, params=None, n_train=0, n_test=1, n_mc=1,
+                               verbose=False, ax=None, rng=None):
 
         if params is None:
             params_full = [{} for _ in predictors]
@@ -386,7 +410,7 @@ class ModelPredictor:
         if isinstance(n_train, (Integral, np.integer)):
             n_train = [n_train]
 
-        loss_full = cls.loss_eval_compare(predictors, model, params_full, n_train, n_test, n_mc, rng)
+        loss_full = cls.loss_eval_compare(predictors, model, params_full, n_train, n_test, n_mc, verbose, rng)
 
         if ax is None:
             _, ax = plt.subplots()
@@ -472,10 +496,15 @@ class BayesPredictor(ModelPredictor):
 
         self.bayes_model = bayes_model
 
+        self.prior = self.bayes_model.prior
+        self.posterior = self.bayes_model.posterior
+        self.model = self.bayes_model.posterior_model
+
         self.fit()      # sets model attribute for prediction
 
-    prior = property(lambda self: self.bayes_model.prior)
-    posterior = property(lambda self: self.bayes_model.posterior)
+    # prior = property(lambda self: self.bayes_model.prior)
+    # posterior = property(lambda self: self.bayes_model.posterior)
+    # model = property(lambda self: self.bayes_model.posterior_model)
 
     def set_params(self, **kwargs):
         for key, val in kwargs.items():
@@ -486,7 +515,6 @@ class BayesPredictor(ModelPredictor):
 
     def fit(self, d=None, warm_start=False):
         self.bayes_model.fit(d, warm_start)
-        self.model = self.bayes_model.posterior_model
 
     def fit_from_model(self, model, n_train=0, rng=None, warm_start=False):
         d = model.rvs(n_train, rng=rng)  # generate train/test data

@@ -51,7 +51,7 @@ class RandomGeneratorMixin:
 
 
 def check_data_shape(x, data_shape=()):
-    x = np.asarray(x)
+    x = np.array(x)
 
     if data_shape == ():
         set_shape = x.shape
@@ -66,7 +66,7 @@ def check_data_shape(x, data_shape=()):
 
 
 def check_set_shape(x, set_shape=()):
-    x = np.asarray(x)
+    x = np.array(x)
 
     # if set_shape == ():
     #     shape = x.shape
@@ -80,9 +80,9 @@ def check_set_shape(x, set_shape=()):
     return x, data_shape
 
 
-def check_valid_pmf(p, data_shape=None, full_support=False):
+def check_valid_pmf(p, data_shape=None, full_support=False, tol=1e-9):
     if data_shape is None:
-        p = np.asarray(p)
+        p = np.array(p)
         set_shape = ()
     else:
         p, set_shape = check_data_shape(p, data_shape)
@@ -94,7 +94,7 @@ def check_valid_pmf(p, data_shape=None, full_support=False):
         if np.min(p) < 0:
             raise ValueError("Each entry in 'p' must be non-negative.")
 
-    if (np.abs(p.reshape(set_shape + (-1,)).sum(-1) - 1.0) > 1e-9).any():
+    if (np.abs(p.reshape(set_shape + (-1,)).sum(-1) - 1.0) > tol).any():
         raise ValueError("The input 'p' must lie within the normal simplex, but p.sum() = %s." % p.sum())
 
     if data_shape is None:
@@ -115,8 +115,8 @@ def vectorize_func(func, data_shape):
         # if len(_out) == 1:      # FIXME: new, check.
         #     return _out[0]
         # else:
-        out_shape = _out.shape[1:]
-        return _out.reshape(set_shape + out_shape)
+        data_shape_y = _out.shape[1:]
+        return _out.reshape(set_shape + data_shape_y)
 
     return func_vec
 
@@ -134,8 +134,8 @@ def vectorize_func_dec(data_shape):     # TODO: use?
             # if len(_out) == 1:
             #     return _out[0]
             # else:
-            out_shape = _out.shape[1:]
-            return _out.reshape(set_shape + out_shape)
+            data_shape_y = _out.shape[1:]
+            return _out.reshape(set_shape + data_shape_y)
 
         return func_vec
     return wrapper

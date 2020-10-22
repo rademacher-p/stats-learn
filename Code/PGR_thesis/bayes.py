@@ -149,14 +149,22 @@ class NormalRegressor(Base):
         # self.basis_y_x = basis_y_x
 
         # Learning
-        self._reset()
-
-    def _reset(self):
         self.posterior = Normal(self.mean_prior, self.cov_prior)
 
         model_kwargs = {'model_x': self.model_x, 'basis_y_x': self.basis_y_x,
                         'cov_y_x_single': self._make_posterior_model_cov(self.prior.cov), 'weights': self.prior.mean}
         self.posterior_model = NormalRegressorModel(**model_kwargs)
+
+        # self._reset_posterior()
+
+    def _reset_posterior(self):
+        self.posterior.mean = self.mean_prior
+        self.posterior.cov = self.cov_prior
+
+        model_kwargs = {'model_x': self.model_x, 'basis_y_x': self.basis_y_x,
+                        'cov_y_x_single': self._make_posterior_model_cov(self.prior.cov), 'weights': self.prior.mean}
+        for key, val in model_kwargs.items():
+            setattr(self.posterior_model, key, val)
 
     # Model parameters
     @property
@@ -170,7 +178,7 @@ class NormalRegressor(Base):
     @model_x.setter
     def model_x(self, val):
         self._set_model_x(val)
-        self._reset()
+        self._reset_posterior()
 
     @property
     def basis_y_x(self):
@@ -188,7 +196,7 @@ class NormalRegressor(Base):
     @basis_y_x.setter
     def basis_y_x(self, val):
         self._set_basis_y_x(val)
-        self._reset()
+        self._reset_posterior()
 
     @property
     def cov_y_x(self):
@@ -205,7 +213,7 @@ class NormalRegressor(Base):
     @cov_y_x.setter
     def cov_y_x(self, val):
         self._set_cov_y_x(val)
-        self._reset()
+        self._reset_posterior()
 
     # Prior parameters
     @property
