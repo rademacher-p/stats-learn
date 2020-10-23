@@ -134,33 +134,70 @@ class NormalRegressor(Base):
         if self.prior.ndim > 1:
             raise ValueError
 
-        self._cov_prior_inv = np.linalg.inv(self.cov_prior)
+        self._set_prior_persistent_attr()
 
         # Model
         self._set_model_x(model_x)
         self._set_cov_y_x(cov_y_x)
         self._set_basis_y_x(basis_y_x)
-        # self.model_x = model_x
-        # self.cov_y_x = cov_y_x
-        # self.basis_y_x = basis_y_x
 
         # Learning
         self.posterior = Normal(self.mean_prior, self.cov_prior)
+        self.posterior_model = NormalRegressorModel(**self._prior_model_kwargs)
+
+    # Methods
+    def random_model(self, rng=None):
+        rng = self._get_rng(rng)
 
         model_kwargs = {'model_x': self.model_x, 'basis_y_x': self.basis_y_x,
-                        'cov_y_x_single': self._make_posterior_model_cov(self.prior.cov), 'weights': self.prior.mean}
-        self.posterior_model = NormalRegressorModel(**model_kwargs)
+                        'cov_y_x_single': self.cov_y_x, 'rng': rng}
+        rand_kwargs = {'weights': self.prior.rvs(rng=rng)}
 
-        # self._reset_posterior()
+        return NormalRegressorModel(**model_kwargs, **rand_kwargs)
+
+    def _fit(self, d, warm_start=False):
+        if not warm_start:  # reset learning attributes
+            self._cov_data_inv = np.zeros(2 * self.prior.shape)
+            self._mean_data_temp = np.zeros(self.prior.shape)
+
+        n = len(d)
+        if n > 0:  # update data-dependent attributes
+            psi = np.array([np.array([func(x_i) for func in self.basis_y_x])
+                            for x_i in d['x']]).reshape((n, self.prior.size, self.size['y']))
+            psi_white = np.dot(psi, self._prec_U_y_x)
+            self._cov_data_inv += sum(psi_i @ psi_i.T for psi_i in psi_white)
+
+            y_white = np.dot(d['y'].reshape(n, self.size['y']), self._prec_U_y_x)
+            self._mean_data_temp += sum(psi_i @ y_i for psi_i, y_i in zip(psi_white, y_white))
+
+        self._update_posterior()
 
     def _reset_posterior(self):
         self.posterior.mean = self.mean_prior
         self.posterior.cov = self.cov_prior
 
-        model_kwargs = {'model_x': self.model_x, 'basis_y_x': self.basis_y_x,
-                        'cov_y_x_single': self._make_posterior_model_cov(self.prior.cov), 'weights': self.prior.mean}
-        for key, val in model_kwargs.items():
+        for key, val in self._prior_model_kwargs.items():
             setattr(self.posterior_model, key, val)
+
+    def _update_posterior(self, mean_only=False):
+        if not mean_only:
+            self.posterior.cov = np.linalg.inv(self._cov_prior_inv + self._cov_data_inv)
+            self.posterior_model.cov_y_x_single = self._make_posterior_model_cov(self.posterior.cov)
+
+        self.posterior.mean = self.posterior.cov @ (self._cov_prior_inv @ self.mean_prior + self._mean_data_temp)
+        self.posterior_model.weights = self.posterior.mean
+
+    @property
+    def _prior_model_kwargs(self):
+        return {'model_x': self.model_x, 'basis_y_x': self.basis_y_x,
+                'cov_y_x_single': self._prior_model_cov, 'weights': self.mean_prior}
+
+    def _make_posterior_model_cov(self, cov_weight):
+        def cov_y_x(x):
+            psi_x = np.array([func(x) for func in self.basis_y_x]).reshape(self.prior.size, self.size['y'])
+            return self.cov_y_x + (psi_x.T @ cov_weight @ psi_x).reshape(2 * self.shape['y'])
+
+        return cov_y_x
 
     # Model parameters
     @property
@@ -228,59 +265,12 @@ class NormalRegressor(Base):
     @cov_prior.setter
     def cov_prior(self, val):
         self.prior.cov = val
+        self._set_prior_persistent_attr()
+        self._update_posterior()
+
+    def _set_prior_persistent_attr(self):
         self._cov_prior_inv = np.linalg.inv(self.prior.cov)
-        self._update_posterior()
-
-    # Methods
-    def random_model(self, rng=None):
-        rng = self._get_rng(rng)
-
-        model_kwargs = {'model_x': self.model_x, 'basis_y_x': self.basis_y_x,
-                        'cov_y_x_single': self.cov_y_x, 'rng': rng}
-
-        rand_kwargs = {'weights': self.prior.rvs(rng=rng)}
-
-        return NormalRegressorModel(**model_kwargs, **rand_kwargs)
-
-    def _fit(self, d, warm_start=False):
-        if not warm_start:      # reset learning attributes
-            self._cov_data_inv = np.zeros(2 * self.prior.shape)
-            self._mean_data_temp = np.zeros(self.prior.shape)
-
-        n = len(d)
-        if n > 0:   # update data-dependent attributes
-            psi = np.array([np.array([func(x_i) for func in self.basis_y_x])
-                            for x_i in d['x']]).reshape((n, self.prior.size, self.size['y']))
-            psi_white = np.dot(psi, self._prec_U_y_x)
-            self._cov_data_inv += sum(psi_i @ psi_i.T for psi_i in psi_white)
-
-            y_white = np.dot(d['y'].reshape(n, self.size['y']), self._prec_U_y_x)
-            self._mean_data_temp += sum(psi_i @ y_i for psi_i, y_i in zip(psi_white, y_white))
-
-        self._update_posterior()
-
-    def _update_posterior(self, mean_only=False):
-        if not mean_only:
-            self.posterior.cov = np.linalg.inv(self._cov_prior_inv + self._cov_data_inv)
-            self.posterior_model.cov_y_x_single = self._make_posterior_model_cov(self.posterior.cov)
-
-        self.posterior.mean = self.posterior.cov @ (self._cov_prior_inv @ self.mean_prior + self._mean_data_temp)
-        self.posterior_model.weights = self.posterior.mean
-
-    def _make_posterior_model_cov(self, cov_weight):
-        def cov_y_x(x):
-            psi_x = np.array([func(x) for func in self.basis_y_x]).reshape(self.prior.size, self.size['y'])
-            return self.cov_y_x + (psi_x.T @ cov_weight @ psi_x).reshape(2 * self.shape['y'])
-        return cov_y_x
-
-    # def _update_posterior_model(self, mean, cov):
-    #     def cov_y_x(x):
-    #         psi_x = np.array([func(x) for func in self.basis_y_x]).reshape(self.prior.size, self.size['y'])
-    #         return self.cov_y_x + (psi_x.T @ self._posterior.cov @ psi_x).reshape(2 * self.shape['y'])
-    #
-    #     model_kwargs = {'model_x': self.model_x, 'basis_y_x': self.basis_y_x,
-    #                     'cov_y_x_single': cov_y_x, 'weights': self._posterior.mean}
-    #     self._posterior_model = NormalRegressorModel(**model_kwargs)  # TODO: RNG arg?
+        self._prior_model_cov = self._make_posterior_model_cov(self.prior.cov)
 
 
 

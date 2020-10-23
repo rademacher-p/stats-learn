@@ -5,6 +5,7 @@ Main.
 import itertools
 
 import numpy as np
+from matplotlib import pyplot as plt
 
 # from scipy.stats._multivariate import multi_rv_generic
 # from scipy._lib._util import check_random_state
@@ -135,10 +136,12 @@ def main():
     predictors = [
         ModelRegressor(model, name=r'$f_{opt}$'),
         BayesRegressor(NormalRegressorBayes(model_x=model_x, basis_y_x=None,
-                                            cov_y_x=1., mean_prior=0*np.ones(2), cov_prior=0.1*np.eye(2)), name='Norm'),
+                                            cov_y_x=1., mean_prior=0*np.ones(2), cov_prior=0.5*np.eye(2)), name='Norm'),
     ]
 
     # predictors[0].plot_loss_eval(params={'weights': np.linspace(0, 2, 20)}, n_train=[0, 1, 2], n_test=10, n_mc=100, verbose=True)
+    # predictors[1].plot_loss_eval(model=None, params={'cov_prior': np.linspace(0.1, 1, 90, endpoint=False)},
+    #                              n_train=[10], n_test=10, n_mc=400, verbose=True, ax=None, rng=None)
 
     params = [
         {},
@@ -165,9 +168,8 @@ def main():
     n_train = [0, 1, 2]
     # n_train = np.arange(10)
 
-    # pr.plot_predict_stats(x, model, params=params, n_train=n_train, n_mc=30, do_std=True, ax=None, rng=None)
-    pr.plot_loss_eval(model=None, params=params, n_train=n_train, n_test=10, n_mc=100, verbose=False, ax=None, rng=100)
-
+    # pr.plot_predict_stats(x, model=model, params=params, n_train=n_train, n_mc=30, do_std=True, ax=None, rng=None)
+    pr.plot_loss_eval(model=model, params=params, n_train=n_train, n_test=10, n_mc=100, verbose=False, ax=None, rng=100)
 
     pass
 
