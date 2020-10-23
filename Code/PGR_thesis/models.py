@@ -126,7 +126,7 @@ class DataConditional(Base):
         self._mode_y_x_single = lambda x: self._model_y_x(x).mode
 
     def _rvs(self, size, rng):
-        d_x = np.array(self.model_x.rvs(size, rng))
+        d_x = np.array(self.model_x.rvs(size, rng=rng))
         d_y = np.array([self.model_y_x(x).rvs(rng=rng)
                         for x in d_x.reshape((-1,) + self.shape['x'])]).reshape(size + self.shape['y'])
 
