@@ -19,13 +19,6 @@ from models import Base as BaseModel, MixinRVy
 from bayes_models import Base as BaseBayesModel
 
 
-def _gen_model(model):
-    if isinstance(model, BaseBayesModel):
-        return model.random_model()
-    else:
-        return model
-
-
 def predict_stats_compare(predictors, x, model, params=None, n_train=0, n_mc=1, stats=('mode',),
                           verbose=False, rng=None):
 
@@ -57,10 +50,11 @@ def predict_stats_compare(predictors, x, model, params=None, n_train=0, n_mc=1, 
         if verbose:
             print(f"{i_mc+1}/{n_mc}")
 
-        model_mc = _gen_model(model)
-        for i_n, n_tr in enumerate(n_train_delta):
+        d = model.rvs(n_train_delta.sum())
+        d_iter = np.split(d, np.cumsum(n_train_delta)[:-1])
+
+        for i_n, d in enumerate(d_iter):
             warm_start = False if i_n == 0 else True  # resets learner for new iteration
-            d = model_mc.rvs(n_tr)
             for predictor, params, params_shape, y in zip(predictors, params_full, params_shape_full, y_full):
                 predictor.fit(d, warm_start=warm_start)
                 if len(params) == 0:
@@ -220,11 +214,12 @@ def loss_eval_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=
         if verbose:
             print(f"{i_mc+1}/{n_mc}")
 
-        model_mc = _gen_model(model)
-        d_test = model_mc.rvs(n_test)
-        for i_n, n_tr in enumerate(n_train_delta):
+        d = model.rvs(n_test + n_train_delta.sum())
+        d_test, _d_train = d[:n_test], d[n_test:]
+        d_train_iter = np.split(_d_train, np.cumsum(n_train_delta)[:-1])
+
+        for i_n, d_train in enumerate(d_train_iter):
             warm_start = False if i_n == 0 else True  # resets learner for new iteration
-            d_train = model_mc.rvs(n_tr)
             for predictor, params, loss in zip(predictors, params_full, loss_full):
                 predictor.fit(d_train, warm_start=warm_start)
 

@@ -7,7 +7,7 @@ import math
 import numpy as np
 from scipy.stats._multivariate import _PSD
 
-from random_elements import Normal, Dirichlet
+from random_elements import Normal, Dirichlet, Base as BaseRE
 import RE_obj_callable
 from models import DataConditional, NormalRegressor as NormalRegressorModel
 from util.generic import RandomGeneratorMixin, empirical_pmf
@@ -36,6 +36,11 @@ class Base(RandomGeneratorMixin):
 
     def random_model(self, rng=None):
         raise NotImplementedError
+
+    rvs = BaseRE.rvs
+
+    def _rvs(self, size, rng):
+        raise NotImplementedError("Method must be overwritten.")
 
     def fit(self, d=None, warm_start=False):
         if d is None:
@@ -155,6 +160,10 @@ class NormalRegressor(Base):
 
         return NormalRegressorModel(**model_kwargs, **rand_kwargs)
 
+    def _rvs(self, size, rng):
+        model = self.random_model(rng)
+        return model._rvs(size)
+
     def _fit(self, d, warm_start=False):
         if not warm_start:  # reset learning attributes
             self._cov_data_inv = np.zeros(2 * self.prior.shape)
@@ -271,9 +280,6 @@ class NormalRegressor(Base):
     def _set_prior_persistent_attr(self):
         self._cov_prior_inv = np.linalg.inv(self.prior.cov)
         self._prior_model_cov = self._make_posterior_model_cov(self.prior.cov)
-
-
-
 
 
 # class NormalRegressor(Base):
