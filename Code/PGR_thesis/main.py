@@ -5,16 +5,15 @@ Main.
 import itertools
 
 import numpy as np
-from matplotlib import pyplot as plt
 
 # from scipy.stats._multivariate import multi_rv_generic
 # from scipy._lib._util import check_random_state
 # from mpl_toolkits.mplot3d import Axes3D
 
-from random_elements import Normal
-from models import NormalRegressor as NormalRegressorModel
-from bayes_models import NormalRegressor as NormalRegressorBayes
-from predictors import BayesRegressor, ModelRegressor, plot_loss_eval_compare, plot_predict_stats_compare
+from rand.elements import Normal
+from rand.models import NormalRegressor as NormalRegressorModel
+from bayes.models import NormalRegressor as NormalRegressorBayes
+from predictors import BayesRegressor, ModelRegressor, plot_loss_eval_compare
 
 # plt.style.use('seaborn')
 
@@ -129,14 +128,12 @@ def main():
     # model_x = Beta(a=1, b=1)
     # x = np.linspace(0, 1, 100, endpoint=False)
 
-    model = NormalRegressorModel(model_x=model_x, basis_y_x=None,  # (lambda x: 1., lambda x: x)
-                                 weights=np.ones(2), cov_y_x_single=1., rng=None)
+    model = NormalRegressorModel(weights=np.ones(2), basis_y_x=None, cov_y_x_single=1., model_x=model_x, rng=None)
 
     # Plotting
     predictors = [
         ModelRegressor(model, name=r'$f_{opt}$'),
-        BayesRegressor(NormalRegressorBayes(model_x=model_x, basis_y_x=None,
-                                            cov_y_x=1., mean_prior=0*np.ones(2), cov_prior=0.5*np.eye(2)), name='Norm'),
+        BayesRegressor(NormalRegressorBayes(mean_prior=0*np.ones(2), cov_prior=0.5*np.eye(2), basis_y_x=None, cov_y_x=1., model_x=model_x), name='Norm'),
     ]
 
     # predictors[0].plot_loss_eval(params={'weights': np.linspace(0, 2, 20)}, n_train=[0, 1, 2], n_test=10, n_mc=100, verbose=True)

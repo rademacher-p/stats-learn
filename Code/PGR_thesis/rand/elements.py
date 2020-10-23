@@ -1,5 +1,5 @@
 """
-Random element objects.
+Random elements.
 """
 
 # TODO: docstrings?
@@ -88,8 +88,8 @@ class BaseRV(MixinRV, Base):
 
     def __init__(self, rng=None):
         super().__init__(rng)
-        self._mean = None
-        self._cov = None
+        # self._mean = None
+        # self._cov = None
 
 
 #%% Specific RE's
@@ -102,7 +102,7 @@ class DeterministicRE(Base):
     # TODO: redundant, just use FiniteRE? or change to ContinuousRV for integration? General dirac mix?
 
     def __new__(cls, val, rng=None):
-        val = np.asarray(val)
+        val = np.array(val)
         if np.issubdtype(val.dtype, np.number):
             return super().__new__(DeterministicRV)
         else:
@@ -119,12 +119,6 @@ class DeterministicRE(Base):
 
     @val.setter
     def val(self, val):
-        # self._val = np.array(val)
-        # self._shape = self._val.shape
-        # self._mode = self._val
-        self._set_val(val)
-
-    def _set_val(self, val):
         self._val = np.array(val)
         self._shape = self._val.shape
         self._mode = self._val
@@ -144,17 +138,16 @@ class DeterministicRV(MixinRV, DeterministicRE):
     Deterministic random variable.
     """
 
-    # @DeterministicRE.val.setter
-    # def val(self, val):
-    #     self._val = np.array(val)
-    #     self._shape = self._val.shape
-    #     self._mode = self._val
-    #
-    #     self._mean = self._val
-    #     self._cov = np.zeros(2 * self._shape)
+    # @property
+    # def val(self):
+    #     return self.val
 
-    def _set_val(self, val):
-        super()._set_val(val)
+    @DeterministicRE.val.setter
+    # @val.setter
+    def val(self, val):
+        # super(DeterministicRV, self.__class__).val.fset(self, val)
+        DeterministicRE.val.fset(self, val)
+
         self._mean = self._val
         self._cov = np.zeros(2 * self._shape)
 
@@ -735,9 +728,6 @@ class Normal(BaseRV):
         self.mean = mean
         self.cov = cov
 
-        # self._inv_cov = None
-        # self._psd = None
-
     def __repr__(self):
         return f"NormalRV(mean={self.mean}, cov={self.cov})"
 
@@ -746,6 +736,7 @@ class Normal(BaseRV):
         return self._mean
 
     @mean.setter
+    # @BaseRV.mean.setter
     def mean(self, mean):
         self._mean = np.array(mean)
         if self._mean.shape != self._shape:
@@ -759,6 +750,7 @@ class Normal(BaseRV):
         return self._cov
 
     @cov.setter
+    # @BaseRV.cov.setter
     def cov(self, cov):
         self._cov = np.array(cov)
 
@@ -769,25 +761,12 @@ class Normal(BaseRV):
             raise ValueError(f"Covariance array shape must be {self._shape * 2}.")
         self._cov_flat = self._cov.reshape(2 * (self.size,))
 
-        # self._psd = _PSD(self._cov)
-        # self._log_pf_coef = -0.5 * (self._psd.rank * np.log(2 * np.pi) + self._psd.log_pdet)
-
-        # self._inv_cov = inverse(self._cov)
-        # _log_det_cov = np.log(determinant(self._cov))
-        # self._inv_cov = np.linalg.inv(self._cov)
-        # _log_det_cov = np.log(np.linalg.det(self._cov))
-        # self._log_pf_coef = -0.5 * (self._size * np.log(2 * np.pi) + _log_det_cov)
-
         psd = _PSD(self._cov_flat, allow_singular=False)
         self.prec_U = psd.U
         self._log_pf_coef = -0.5 * (psd.rank * np.log(2 * np.pi) + psd.log_pdet)
 
     def _rvs(self, size, rng):
         return rng.multivariate_normal(self._mean_flat, self._cov_flat, size).reshape(size + self._shape)
-        # if self._shape == ():
-        #     return rng.normal(self._mean, np.sqrt(self._cov), size).reshape(size + self._shape)
-        # else:
-        #     return rng.multivariate_normal(self._mean, self._cov, size).reshape(size + self._shape)
 
     def pf(self, x):
         x, set_shape = check_data_shape(x, self._shape)
@@ -795,15 +774,11 @@ class Normal(BaseRV):
         dev = x.reshape(-1, self.size) - self._mean_flat
         maha = np.sum(np.square(np.dot(dev, self.prec_U)), axis=-1)
 
-        # inner_white = np.array([(outer_gen(dev_i, np.ones(self._shape)) * self._inv_cov
-        #                         * outer_gen(np.ones(self._shape), dev_i)).sum() for dev_i in dev])
-        # inner_white = np.sum(np.square(np.dot(dev, self._psd.U)), axis=-1)
-
         log_pf = self._log_pf_coef + -0.5 * maha.reshape(set_shape)
         return np.exp(log_pf)
 
     @property
-    def x_default(self):
+    def x_plot_default(self):       # TODO
         n_plt = 100
 
         if self.size == 1:
@@ -825,7 +800,7 @@ class Normal(BaseRV):
         n_plt = 100
 
         if x is None:
-            x = self.x_default
+            x = self.x_plot_default
 
         if self.size == 1:
             # if x is None:
@@ -873,3 +848,52 @@ class Normal(BaseRV):
 #
 # y = norm.pf(x)
 # print(delta**2*y.sum())
+
+
+class NormalLinear(Normal):
+    def __init__(self, weights=(0.,), basis=np.ones(1), cov=(1.,), rng=None):
+
+        self._set_weights(weights)
+        self._set_basis(basis)
+
+        self._shape = self._basis.shape[:-1]
+        self._set_mean()
+
+        super().__init__(self.mean, cov, rng)
+
+    def __repr__(self):
+        return f"NormalLinear(weights={self.weights}, basis={self.basis}, cov={self.cov})"
+
+    @property
+    def weights(self):
+        return self._weights
+
+    @weights.setter
+    def weights(self, val):
+        self._set_weights(val)
+        self._set_mean()
+
+    def _set_weights(self, val):
+        self._weights = np.array(val)
+        if self._weights.ndim != 1:
+            raise ValueError
+
+    @property
+    def basis(self):
+        return self._basis
+
+    @basis.setter
+    def basis(self, val):
+        self._set_basis(val)
+        self._set_mean()
+
+    def _set_basis(self, val):
+        self._basis = np.array(val)
+
+    def _set_mean(self):
+        self.mean = self._basis @ self._weights
+
+
+# bs = [[1, 0], [0, 1], [1, 1]]
+# a = NormalLinear(weights=np.ones(2), basis=np.array(bs), cov=np.eye(3))
+# pass

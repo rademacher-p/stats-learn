@@ -1,5 +1,5 @@
 """
-Bayesian Prior objects.
+Bayesian SL models.
 """
 
 import math
@@ -7,9 +7,9 @@ import math
 import numpy as np
 from scipy.stats._multivariate import _PSD
 
-from random_elements import Normal, Dirichlet, Base as BaseRE
+from rand.elements import Normal, Dirichlet, Base as BaseRE
 import RE_obj_callable
-from models import DataConditional, NormalRegressor as NormalRegressorModel
+from rand.models import DataConditional, NormalRegressor as NormalRegressorModel
 from util.generic import RandomGeneratorMixin, empirical_pmf
 from util.func_obj import FiniteDomainFunc
 
@@ -55,10 +55,10 @@ class Base(RandomGeneratorMixin):
 
 
 class NormalRegressor(Base):
-    # param_names = ('model_x', 'basis_y_x', 'cov_y_x', 'mean_prior', 'cov_prior')
+    # param_names = ('mean_prior', 'cov_prior', 'basis_y_x', 'cov_y_x','model_x')
 
-    def __init__(self, model_x=Normal(), basis_y_x=None, cov_y_x=1.,
-                 mean_prior=np.zeros(1), cov_prior=np.eye(1), rng=None):
+    def __init__(self, mean_prior=np.zeros(1), cov_prior=np.eye(1), basis_y_x=None, cov_y_x=1., model_x=Normal(),
+                 rng=None):
 
         # Prior
         prior = Normal(mean_prior, cov_prior)
@@ -81,8 +81,8 @@ class NormalRegressor(Base):
     def random_model(self, rng=None):
         rng = self._get_rng(rng)
 
-        model_kwargs = {'model_x': self.model_x, 'basis_y_x': self.basis_y_x,
-                        'cov_y_x_single': self.cov_y_x, 'rng': rng}
+        model_kwargs = {'basis_y_x': self.basis_y_x, 'cov_y_x_single': self.cov_y_x, 'model_x': self.model_x,
+                        'rng': rng}
         rand_kwargs = {'weights': self.prior.rvs(rng=rng)}
 
         return NormalRegressorModel(**model_kwargs, **rand_kwargs)
@@ -111,6 +111,11 @@ class NormalRegressor(Base):
         for key, val in self._prior_model_kwargs.items():
             setattr(self.posterior_model, key, val)
 
+    @property
+    def _prior_model_kwargs(self):
+        return {'weights': self.mean_prior, 'basis_y_x': self.basis_y_x, 'cov_y_x_single': self._prior_model_cov,
+                'model_x': self.model_x}
+
     def _update_posterior(self, mean_only=False):
         if not mean_only:
             self.posterior.cov = np.linalg.inv(self._cov_prior_inv + self._cov_data_inv)
@@ -118,11 +123,6 @@ class NormalRegressor(Base):
 
         self.posterior.mean = self.posterior.cov @ (self._cov_prior_inv @ self.mean_prior + self._mean_data_temp)
         self.posterior_model.weights = self.posterior.mean
-
-    @property
-    def _prior_model_kwargs(self):
-        return {'model_x': self.model_x, 'basis_y_x': self.basis_y_x,
-                'cov_y_x_single': self._prior_model_cov, 'weights': self.mean_prior}
 
     def _make_posterior_model_cov(self, cov_weight):
         def cov_y_x(x):
@@ -201,8 +201,8 @@ class NormalRegressor(Base):
         self._update_posterior()
 
     def _set_prior_persistent_attr(self):
-        self._cov_prior_inv = np.linalg.inv(self.prior.cov)
-        self._prior_model_cov = self._make_posterior_model_cov(self.prior.cov)
+        self._cov_prior_inv = np.linalg.inv(self.cov_prior)
+        self._prior_model_cov = self._make_posterior_model_cov(self.cov_prior)
 
 
 
