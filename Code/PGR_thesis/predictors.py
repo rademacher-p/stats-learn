@@ -16,7 +16,6 @@ from util.generic import vectorize_func, check_data_shape
 from util.plot import get_axes_xy
 from loss_funcs import loss_se, loss_01
 from models import Base as BaseModel, MixinRVy
-from bayes_models import Base as BaseBayesModel
 
 
 def predict_stats_compare(predictors, x, model, params=None, n_train=0, n_mc=1, stats=('mode',),
@@ -401,29 +400,6 @@ class Base(ABC):
     def plot_predict(self, x, ax=None, label=None):
         """Plot prediction function."""
         return self.plot_xy(x, self.predict(x), ax=ax, label=label)
-
-    # # Prediction statistics
-    # def predict_stats(self, x, model, params=None, n_train=0, n_mc=1, stats=('mode',), verbose=False, rng=None):
-    #     if params is None:
-    #         params = {}
-    #     return predict_stats_compare([self], x, model, [params], n_train, n_mc, stats, verbose, rng)[0]
-    #
-    # def plot_predict_stats(self, x, model, params=None, n_train=0, n_mc=1, do_std=False,
-    #                        verbose=False, ax=None, rng=None):
-    #     if params is None:
-    #         params = {}
-    #     return plot_predict_stats_compare([self], x, model, [params], n_train, n_mc, do_std, verbose, ax, rng)
-    #
-    # # Loss evaluation
-    # def loss_eval(self, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, rng=None):
-    #     if params is None:
-    #         params = {}
-    #     return loss_eval_compare([self], model, [params], n_train, n_test, n_mc, verbose, rng)[0]
-    #
-    # def plot_loss_eval(self, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None, rng=None):
-    #     if params is None:
-    #         params = {}
-    #     return plot_loss_eval_compare([self], model, [params], n_train, n_test, n_mc, verbose, ax, rng)
 
     # Prediction statistics
     def predict_stats(self, x, model=None, params=None, n_train=0, n_mc=1, stats=('mode',), verbose=False, rng=None):
