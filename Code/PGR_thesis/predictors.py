@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from util.generic import vectorize_func, check_data_shape
 from util.plot import get_axes_xy
 from loss_funcs import loss_se, loss_01
-from models import Base as BaseModel, MixinRVy
+from rand.models import Base as BaseModel, MixinRVy
 
 
 def predict_stats_compare(predictors, x, model, params=None, n_train=0, n_mc=1, stats=('mode',),
@@ -502,7 +502,7 @@ class Bayes(Base):
 
     def plot_param_dist(self, x=None, ax_prior=None):  # TODO: improve or remove?
         if x is None:
-            x = self.prior.x_default
+            x = self.prior.x_plot_default
 
         self.prior.plot_pf(x, ax=ax_prior)
         # ax_posterior= plt_prior.axes

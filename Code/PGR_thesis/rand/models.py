@@ -1,5 +1,5 @@
 """
-Supervised Learning base classes.
+SL models.
 """
 
 # TODO: add conditional RE object?
@@ -8,9 +8,9 @@ import math
 
 import numpy as np
 
-from random_elements import Base as BaseRE, BaseRV, Normal
-from RE_obj_callable import FiniteRE, DirichletRV, BetaRV       # TODO: note - CALLABLE!!!!
-from util.generic import RandomGeneratorMixin, vectorize_func, check_data_shape
+from rand.elements import Base as BaseRE, BaseRV, Normal
+from RE_obj_callable import FiniteRE  # TODO: note - CALLABLE!!!!
+from util.generic import RandomGeneratorMixin, vectorize_func
 
 
 class Base(RandomGeneratorMixin):
@@ -201,7 +201,7 @@ class DataConditionalRVyx(DataConditionalRVx, DataConditionalRVy):       # TODO:
 class NormalRegressor(MixinRVx, MixinRVy, Base):
     # param_names = ('model_x', 'basis_y_x', 'cov_y_x_single', 'weights')
 
-    def __init__(self, model_x=Normal(), basis_y_x=None, cov_y_x_single=1., weights=(0.,), rng=None):
+    def __init__(self, weights=(0.,), basis_y_x=None, cov_y_x_single=1., model_x=Normal(), rng=None):
         super().__init__(rng)
 
         self.model_x = model_x
