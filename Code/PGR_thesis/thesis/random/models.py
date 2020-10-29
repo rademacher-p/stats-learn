@@ -8,9 +8,9 @@ import math
 
 import numpy as np
 
-from rand.elements import Base as BaseRE, BaseRV, Normal
-from RE_obj_callable import FiniteRE  # TODO: note - CALLABLE!!!!
-from util.generic import RandomGeneratorMixin, vectorize_func
+from thesis.random.elements import Base as BaseRE, BaseRV, Normal
+from thesis._depreciated.RE_obj_callable import FiniteRE  # TODO: note - CALLABLE!!!!
+from thesis.util.generic import RandomGeneratorMixin, vectorize_func
 
 
 class Base(RandomGeneratorMixin):

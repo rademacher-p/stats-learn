@@ -14,9 +14,9 @@ from scipy.stats._multivariate import _PSD
 from scipy.special import gammaln, xlogy, xlog1py, betaln
 import matplotlib.pyplot as plt
 
-from util.generic import RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func, vectorize_func_dec
-from util.math import outer_gen, diag_gen, simplex_round
-from util.plot import simplex_grid
+from thesis.util.generic import RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func
+from thesis.util.math import outer_gen, diag_gen, simplex_round
+from thesis.util.plot import simplex_grid
 
 
 #%% Base RE classes

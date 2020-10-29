@@ -7,8 +7,8 @@ import math
 import numpy as np
 from scipy.stats._multivariate import _PSD
 
-from rand.elements import Normal, Base as BaseRE, NormalLinear as NormalLinearRE
-from util.generic import RandomGeneratorMixin
+from thesis.random.elements import Normal, Base as BaseRE, NormalLinear as NormalLinearRE
+from thesis.util.generic import RandomGeneratorMixin
 
 #%% Priors
 

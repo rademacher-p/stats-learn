@@ -1,14 +1,14 @@
-import copy
 import operator
 import math
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-from util.generic import check_data_shape, check_set_shape, vectorize_func
+from thesis.util.generic import check_set_shape, vectorize_func
 
 # TODO: getter and setters?
 # TODO: plot methods
+
 
 #%% Support objs
 class BaseSupp(object):
