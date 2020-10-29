@@ -7,7 +7,7 @@ import math
 import numpy as np
 from scipy.stats._multivariate import _PSD
 
-from thesis.random.elements import Normal, Base as BaseRE, NormalLinear as NormalLinearRE
+from thesis.random.elements import Normal, Base as BaseRE, NormalLinear as NormalLinearRE, EmpiricalDist
 from thesis.util.generic import RandomGeneratorMixin
 
 #%% Priors
@@ -23,19 +23,19 @@ class Base(RandomGeneratorMixin):
 
         self.prior = prior
         self.posterior = None
+        self.posterior_model = None
 
     shape = property(lambda self: self._shape)
     size = property(lambda self: math.prod(self._shape))
     ndim = property(lambda self: len(self._shape))
 
-    def random_element(self, rng=None):
+    def random_model(self, rng=None):
         raise NotImplementedError
 
     rvs = BaseRE.rvs
 
     def _rvs(self, size, rng):
-        model = self.random_element(rng)
-        return model._rvs(size)
+        return self.random_model(rng)._rvs(size)
 
     def fit(self, d=None, warm_start=False):
         if d is None:
@@ -48,10 +48,10 @@ class Base(RandomGeneratorMixin):
 
 
 class NormalLinear(Base):
-    def __init__(self, mean_prior=np.zeros(1), cov_prior=np.eye(1), basis=None, cov=1., rng=None):
+    def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis=None, cov=1., rng=None):
 
         # Prior
-        prior = Normal(mean_prior, cov_prior)
+        prior = Normal(prior_mean, prior_cov)
         super().__init__(prior, rng)
         if self.prior.ndim > 1:
             raise ValueError
@@ -64,11 +64,11 @@ class NormalLinear(Base):
         self._set_basis_white()
 
         # Learning
-        self.posterior = Normal(self.mean_prior, self.cov_prior)
+        self.posterior = Normal(self.prior_mean, self.prior_cov)
         self.posterior_model = NormalLinearRE(**self._prior_model_kwargs)
 
     # Methods
-    def random_element(self, rng=None):
+    def random_model(self, rng=None):
         rng = self._get_rng(rng)
 
         model_kwargs = {'basis': self.basis, 'cov': self.cov, 'rng': rng}
@@ -91,15 +91,15 @@ class NormalLinear(Base):
         self._update_posterior()
 
     def _reset_posterior(self):
-        self.posterior.mean = self.mean_prior
-        self.posterior.cov = self.cov_prior
+        self.posterior.mean = self.prior_mean
+        self.posterior.cov = self.prior_cov
 
         for key, val in self._prior_model_kwargs.items():
             setattr(self.posterior_model, key, val)
 
     @property
     def _prior_model_kwargs(self):
-        return {'weights': self.mean_prior, 'basis': self.basis, 'cov': self._prior_model_cov}
+        return {'weights': self.prior_mean, 'basis': self.basis, 'cov': self._prior_model_cov}
 
     def _update_posterior(self, mean_only=False):
         if not mean_only:
@@ -107,7 +107,7 @@ class NormalLinear(Base):
                                                + self._n_total * self._basis_white.T @ self._basis_white)
             self.posterior_model.cov = self._make_posterior_model_cov(self.posterior.cov)
 
-        self.posterior.mean = self.posterior.cov @ (self._cov_prior_inv @ self.mean_prior + self._mean_data_temp)
+        self.posterior.mean = self.posterior.cov @ (self._cov_prior_inv @ self.prior_mean + self._mean_data_temp)
         self.posterior_model.weights = self.posterior.mean
 
     def _make_posterior_model_cov(self, cov_weight):
@@ -154,34 +154,65 @@ class NormalLinear(Base):
 
     # Prior parameters
     @property
-    def mean_prior(self):
+    def prior_mean(self):
         return self.prior.mean
 
-    @mean_prior.setter
-    def mean_prior(self, val):
+    @prior_mean.setter
+    def prior_mean(self, val):
         self.prior.mean = val
         self._update_posterior(mean_only=True)
 
     @property
-    def cov_prior(self):
+    def prior_cov(self):
         return self.prior.cov
 
-    @cov_prior.setter
-    def cov_prior(self, val):
+    @prior_cov.setter
+    def prior_cov(self, val):
         self.prior.cov = val
         self._set_prior_persistent_attr()
         self._update_posterior()
 
     def _set_prior_persistent_attr(self):
-        self._cov_prior_inv = np.linalg.inv(self.cov_prior)
-        self._prior_model_cov = self._make_posterior_model_cov(self.cov_prior)
+        self._cov_prior_inv = np.linalg.inv(self.prior_cov)
+        self._prior_model_cov = self._make_posterior_model_cov(self.prior_cov)
 
 
 # basis = [[1, 0], [0, 1], [1, 1]]
-# a = NormalLinear(mean_prior=np.ones(2), cov_prior=10*np.eye(2), basis=basis, cov=np.eye(3), rng=None)
-# r = a.random_element()
+# a = NormalLinear(prior_mean=np.ones(2), prior_cov=10*np.eye(2), basis=basis, cov=np.eye(3), rng=None)
+# r = a.random_model()
 # d = r.rvs(10)
 # a.fit(d)
 # print(a.prior.mean)
 # print(a.posterior.mean)
 # print(r.weights)
+
+
+class Dirichlet(Base):
+    def __init__(self, alpha_0, prior_mean, rng=None):
+        super().__init__(prior=None, rng=rng)
+        self.alpha_0 = alpha_0
+        self.prior_mean = prior_mean
+
+        self._shape = self.prior_mean.shape
+
+        # Learning
+        # self.posterior = None
+
+        self.emp_dist = None
+        self.posterior_model = None     # TODO: mixture dist
+
+    def random_model(self, rng=None):
+        raise NotImplementedError       # TODO: implement for finite in subclass?
+
+    def _rvs(self, size, rng):
+        # Samples directly from the marginal data distribution
+        _out = []
+        for n in range(size):
+            if rng.random() <= self.alpha_0 / (self.alpha_0 + n):
+                sample = self.prior_mean.rvs(rng=rng)     # sample from mean distribution
+            else:
+                sample = rng.choice(_out)
+            _out.append(sample)
+
+    def _fit(self, d, warm_start=False):
+        self.emp_dist = EmpiricalDist(d)

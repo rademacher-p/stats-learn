@@ -485,7 +485,7 @@ class Bayes(Base):
         self.prior = self.bayes_model.prior
         self.posterior = self.bayes_model.posterior
 
-        self.model = self.bayes_model.posterior_model
+        self.model = self.bayes_model.posterior_model       # updates in-place with set_params() and fit()
 
         self.fit()
 
