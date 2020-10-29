@@ -9,7 +9,7 @@ import math
 import numpy as np
 
 from thesis.random.elements import Base as BaseRE, BaseRV, Normal
-from thesis._depreciated.RE_obj_callable import FiniteRE  # TODO: note - CALLABLE!!!!
+from thesis._deprecated.RE_obj_callable import FiniteRE  # TODO: note - CALLABLE!!!!
 from thesis.util.generic import RandomGeneratorMixin, vectorize_func
 
 
@@ -181,14 +181,14 @@ class DataConditionalRVyx(DataConditionalRVx, DataConditionalRVy):       # TODO:
 
 
 # theta_m = Dirichlet(8, [[.2, .1], [.3, .4]])
-# def theta_c(x): return FiniteRE.gen_func([[0, 1], [2, 3]], x)
+# def theta_c(x): return Finite.gen_func([[0, 1], [2, 3]], x)
 #
 # theta_m = Dirichlet(8, [[.2, .1, .1], [.3, .1, .2]])
-# def theta_c(x): return FiniteRE.gen_func(np.stack(np.meshgrid([0,1,2],[0,1]), axis=-1), x)
+# def theta_c(x): return Finite.gen_func(np.stack(np.meshgrid([0,1,2],[0,1]), axis=-1), x)
 #
 # theta_m = Dirichlet(6, [.5, .5])
-# # def theta_c(x): return FiniteRE.gen_func(['a', 'b'], x)
-# def theta_c(x): return FiniteRE.gen_func([0, 1], x)
+# # def theta_c(x): return Finite.gen_func(['a', 'b'], x)
+# def theta_c(x): return Finite.gen_func([0, 1], x)
 #
 # t = DataConditional(theta_m, theta_c)
 # t.rvs()

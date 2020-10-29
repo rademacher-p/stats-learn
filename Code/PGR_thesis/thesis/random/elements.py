@@ -32,6 +32,8 @@ class Base(RandomGeneratorMixin):
         self._shape = None
         self._mode = None
 
+        # TODO: dtype attribute?
+
     shape = property(lambda self: self._shape)
     size = property(lambda self: math.prod(self._shape))
     ndim = property(lambda self: len(self._shape))
@@ -51,16 +53,18 @@ class Base(RandomGeneratorMixin):
 
     def rvs(self, size=None, rng=None):
         if size is None:
-            size = ()
+            shape = ()
         elif isinstance(size, (Integral, np.integer)):
-            size = (size,)
-        elif not isinstance(size, tuple):
+            shape = (size,)
+        elif isinstance(size, tuple):
+            shape = size
+        else:
             raise TypeError("Input 'size' must be int or tuple.")
 
         rng = self._get_rng(rng)
-        return self._rvs(size, rng)
+        return self._rvs(math.prod(shape), rng).reshape(shape + self._shape)
 
-    def _rvs(self, size, rng):
+    def _rvs(self, n, rng):
         raise NotImplementedError("Method must be overwritten.")
         pass
 
@@ -94,16 +98,15 @@ class BaseRV(MixinRV, Base):
 
 #%% Specific RE's
 
-class DeterministicRE(Base):
+class Deterministic(Base):
     """
     Deterministic random element.
     """
 
-    # TODO: redundant, just use FiniteRE? or change to ContinuousRV for integration? General dirac mix?
+    # TODO: redundant, just use Finite? or change to ContinuousRV for integration? General dirac mix?
 
     def __new__(cls, val, rng=None):
-        val = np.array(val)
-        if np.issubdtype(val.dtype, np.number):
+        if np.issubdtype(np.array(val).dtype, np.number):
             return super().__new__(DeterministicRV)
         else:
             return super().__new__(cls)
@@ -123,8 +126,8 @@ class DeterministicRE(Base):
         self._shape = self._val.shape
         self._mode = self._val
 
-    def _rvs(self, size, rng):
-        return np.broadcast_to(self._val, size + self._shape)
+    def _rvs(self, n, rng):
+        return np.broadcast_to(self._val, (n, *self._shape))
 
     def pf(self, x):
         return np.where(np.all(x.reshape(-1, self.size) == self._val.flatten(), axis=-1), 1., 0.)
@@ -133,7 +136,7 @@ class DeterministicRE(Base):
     #     return 1. if np.all(np.array(x) == self._val) else 0.
 
 
-class DeterministicRV(MixinRV, DeterministicRE):
+class DeterministicRV(MixinRV, Deterministic):
     """
     Deterministic random variable.
     """
@@ -142,11 +145,11 @@ class DeterministicRV(MixinRV, DeterministicRE):
     # def val(self):
     #     return self.val
 
-    @DeterministicRE.val.setter
+    @Deterministic.val.setter
     # @val.setter
     def val(self, val):
         # super(DeterministicRV, self.__class__).val.fset(self, val)
-        DeterministicRE.val.fset(self, val)
+        Deterministic.val.fset(self, val)
 
         self._mean = self._val
         self._cov = np.zeros(2 * self._shape)
@@ -155,21 +158,20 @@ class DeterministicRV(MixinRV, DeterministicRE):
 # rng = np.random.default_rng()
 # a = np.arange(6).reshape(3, 2)
 # # a = ['a','b','c']
-# b = DeterministicRE(a[1], rng)
+# b = Deterministic(a[1], rng)
 # b.mode
 # b.mean
 # b.cov
 # b.pf(b.rvs(8))
 
 
-class FiniteRE(Base):
+class Finite(Base):
     """
     Generic RE drawn from a finite support set using an explicitly defined PMF.
     """
 
     def __new__(cls, supp, p, rng=None):
-        supp = np.array(supp)
-        if np.issubdtype(supp.dtype, np.number):
+        if np.issubdtype(np.array(supp).dtype, np.number):
             return super().__new__(FiniteRV)
         else:
             return super().__new__(cls)
@@ -185,10 +187,10 @@ class FiniteRE(Base):
     def supp(self):
         return self._supp
 
-    @supp.setter
-    def supp(self, supp):
-        self._supp = np.array(supp)
-        self._update_attr()
+    # @supp.setter      # TODO: rework accordingly?
+    # def supp(self, supp):
+    #     self._supp = np.array(supp)
+    #     self._update_attr()
 
     @property
     def p(self):
@@ -206,16 +208,17 @@ class FiniteRE(Base):
         if set_shape != self._p.shape:
             raise ValueError("Leading shape values of 'supp' must equal the shape of 'p'.")
 
-        self._supp_flat = self._supp.reshape((self._p.size, -1))
+        self._supp_flat = self._supp.reshape((self._p.size, self.size))
         self._p_flat = self._p.flatten()
         if len(self._supp_flat) != len(np.unique(self._supp_flat, axis=0)):
             raise ValueError("Input 'supp' must have unique values")
 
         self._mode = self._supp_flat[np.argmax(self._p_flat)].reshape(self._shape)
 
-    def _rvs(self, size, rng):
-        i = rng.choice(self._p.size, size, p=self._p_flat)
-        return self._supp_flat[i].reshape(size + self._shape)
+    def _rvs(self, n, rng):
+        # i = rng.choice(self._p.size, size=n, p=self._p_flat)
+        # return self._supp_flat[i].reshape(size + self._shape)
+        return rng.choice(self._supp_flat, size=n, p=self._p_flat)      # .reshape(n, *self._shape)
 
     def _pf_single(self, x):
         eq_supp = np.all(x.flatten() == self._supp_flat, axis=-1)
@@ -237,7 +240,7 @@ class FiniteRE(Base):
             raise NotImplementedError('Plot method only implemented for 1-dimensional data.')
 
 
-class FiniteRV(MixinRV, FiniteRE):
+class FiniteRV(MixinRV, Finite):
     """
     Generic RV drawn from a finite support set using an explicitly defined PMF.
     """
@@ -284,14 +287,14 @@ class FiniteRV(MixinRV, FiniteRE):
 # s = np.random.random((1, 1, 2))
 # pp = np.random.random((1,))
 # pp = pp / pp.sum()
-# f = FiniteRE(s, pp)
+# f = Finite(s, pp)
 # f.pf(f.rvs((4, 5)))
 #
 # s = np.stack(np.meshgrid([0, 1], [0, 1], [0, 1]), axis=-1)
 # p = np.random.random((2, 2, 2))
 # p = p / p.sum()
 # # s, p = ['a','b','c'], [.3,.2,.5]
-# f2 = FiniteRE(s, p)
+# f2 = Finite(s, p)
 # f2.pf(f2.rvs(4))
 # f2.plot_pf()
 
@@ -357,8 +360,8 @@ class Dirichlet(BaseRV):
 
         self._log_pf_coef = gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
 
-    def _rvs(self, size, rng):
-        return rng.dirichlet(self._alpha_0 * self._mean.flatten(), size).reshape(size + self._shape)
+    def _rvs(self, n, rng):
+        return rng.dirichlet(self._alpha_0 * self._mean.flatten(), size=n)      # .reshape(n, *self._shape)
 
     def pf(self, x):
         x, set_shape = _dirichlet_check_input(x, self._alpha_0, self._mean)
@@ -477,8 +480,8 @@ class Empirical(BaseRV):
 
         self._log_pf_coef = gammaln(self._n + 1)
 
-    def _rvs(self, size, rng):
-        return rng.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._shape) / self._n
+    def _rvs(self, n, rng):
+        return rng.multinomial(self._n, self._mean.flatten(), size=n) / self._n      # .reshape(n, *self._shape)
 
     def pf(self, x):
         x, set_shape = _empirical_check_input(x, self._n, self._mean)
@@ -589,7 +592,7 @@ class DirichletEmpirical(BaseRV):
         self._log_pf_coef = (gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
                              + gammaln(self._n + 1) - gammaln(self._alpha_0 + self._n))
 
-    def _rvs(self, size, rng):
+    def _rvs(self, n, rng):
         # return rng.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._shape) / self._n
         raise NotImplementedError
 
@@ -702,8 +705,8 @@ class Beta(BaseRV):
         self._mean = self._a / (self._a + self._b)
         self._cov = self._a * self._b / (self._a + self._b)**2 / (self._a + self._b + 1)
 
-    def _rvs(self, size, rng):
-        return rng.beta(self._a, self._b, size)
+    def _rvs(self, n, rng):
+        return rng.beta(self._a, self._b, size=n)
 
     def pf(self, x):
         log_pf = xlog1py(self._b - 1.0, -x) + xlogy(self._a - 1.0, x) - betaln(self._a, self._b)
@@ -722,6 +725,20 @@ class Beta(BaseRV):
 
 class Normal(BaseRV):
     def __init__(self, mean=0., cov=1., rng=None):
+        """
+        Normal random variable.
+
+        Parameters
+        ----------
+        mean : float or np.ndarray
+            Mean
+        cov : float or np.ndarray
+            Covariance
+        rng : np.random.Generator or int, optional
+            Random number generator
+
+        """
+
         super().__init__(rng)
         self._shape = np.array(mean).shape
 
@@ -765,8 +782,8 @@ class Normal(BaseRV):
         self.prec_U = psd.U
         self._log_pf_coef = -0.5 * (psd.rank * np.log(2 * np.pi) + psd.log_pdet)
 
-    def _rvs(self, size, rng):
-        return rng.multivariate_normal(self._mean_flat, self._cov_flat, size).reshape(size + self._shape)
+    def _rvs(self, n, rng):
+        return rng.multivariate_normal(self._mean_flat, self._cov_flat, size=n)     # .reshape(size + self._shape)
 
     def pf(self, x):
         x, set_shape = check_data_shape(x, self._shape)
@@ -796,18 +813,10 @@ class Normal(BaseRV):
         return x
 
     def plot_pf(self, x=None, ax=None):
-        # _delta = 0.01
-        n_plt = 100
-
         if x is None:
             x = self.x_plot_default
 
         if self.size == 1:
-            # if x is None:
-            #     lims = self._mean.item() + np.array([-1, 1]) * 3*np.sqrt(self._cov.item())
-            #     # n_plt = int(round((lims[1]-lims[0]) / _delta))
-            #     x = np.linspace(*lims, n_plt, endpoint=False).reshape(n_plt, *self._shape)
-
             if ax is None:
                 _, ax = plt.subplots()
                 ax.set(xlabel='$x_1$', ylabel='$p$')
@@ -816,14 +825,6 @@ class Normal(BaseRV):
             return plt_data
 
         elif self.size == 2:
-            # if x is None:
-            #     lims = [(self._mean[i] - 3 * np.sqrt(self._cov[i, i]), self._mean[i] + 3 * np.sqrt(self._cov[i, i]))
-            #             for i in range(2)]
-            #     # n_plt = int(round((lims[0][1] - lims[0][0]) / _delta)), int(round((lims[1][1] - lims[1][0]) / _delta))
-            #     x0_plt = np.linspace(*lims[0], n_plt, endpoint=False)
-            #     x1_plt = np.linspace(*lims[1], n_plt, endpoint=False)
-            #     x = np.stack(np.meshgrid(x0_plt, x1_plt), axis=-1)
-
             if ax is None:
                 _, ax = plt.subplots(subplot_kw={'projection': '3d'})
                 ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$p$')
@@ -897,3 +898,160 @@ class NormalLinear(Normal):
 # bs = [[1, 0], [0, 1], [1, 1]]
 # a = NormalLinear(weights=np.ones(2), basis=np.array(bs), cov=np.eye(3))
 # pass
+
+
+# class EmpiricalFinite(Finite):
+#     def __init__(self, d, rng=None):
+#         self.n = len(d)
+#         self.values, self.counts = self._count_data(d)
+#
+#         super().__init__(self.values, self.counts / self.n)
+#
+#     @staticmethod
+#     def _count_data(d):
+#         return np.unique(d, return_counts=True, axis=0)
+
+
+class EmpiricalDist(Base):       # TODO: implement using factory of Finite object?
+
+    def __new__(cls, d, rng=None):
+        if np.issubdtype(np.array(d).dtype, np.number):
+            return super().__new__(EmpiricalDistRV)
+        else:
+            return super().__new__(cls)
+
+    def __init__(self, d, rng=None):
+        super().__init__(rng)
+        self.n = len(d)
+        self.values, self.counts = self._count_data(d)
+
+        self._shape = self.values.shape[1:]
+
+        self._values_flat = self.values.reshape(-1, self.size)
+        self.p = self.counts / self.n
+
+        self._update_stats()
+
+    def _update_stats(self):
+        self._mode = self.values[self.counts.argmax()]
+
+        # if self.is_rv:
+        #     mean_flat = (self._values_flat * self.p[:, np.newaxis]).sum(0)
+        #     self._mean = mean_flat.reshape(self._shape)
+        #
+        #     ctr_flat = self._values_flat - mean_flat
+        #     outer_flat = (ctr_flat[:, np.newaxis] * ctr_flat[..., np.newaxis]).reshape(len(ctr_flat), -1)
+        #     self._cov = (self.p[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self._shape)
+
+    @staticmethod
+    def _count_data(d):
+        return np.unique(d, return_counts=True, axis=0)
+
+    def add_data(self, d):
+        self.n += len(d)
+
+        values_new, counts_new = [], []
+        for value, count in zip(*self._count_data(d)):
+            eq = np.all(value.flatten() == self._values_flat, axis=-1)
+            if eq.sum() == 1:
+                self.counts[eq] += count
+            elif eq.sum() == 0:
+                values_new.append(value)
+                counts_new.append(count)
+            else:
+                raise ValueError
+
+        if len(values_new) > 0:
+            values_new, counts_new = np.array(values_new), np.array(counts_new)
+            self.values = np.concatenate((self.values, values_new), axis=0)
+            self.counts = np.concatenate((self.counts, counts_new), axis=0)
+
+            self._values_flat = np.concatenate((self._values_flat, values_new.reshape(-1, self.size)), axis=0)
+            self.p = self.counts / self.n
+
+        self._update_stats()        # TODO: add efficient updates
+
+    def _rvs(self, size, rng):
+        return rng.choice(self.values, size, p=self.p)
+
+    def _pf_single(self, x):
+        eq_supp = np.all(x.flatten() == self._values_flat, axis=-1)
+        if eq_supp.sum() != 1:
+            raise ValueError("Input 'x' must be in the support.")
+
+        return self.p[eq_supp].squeeze()
+
+    # def plot_pf(self, ax=None):
+    #     raise NotImplementedError       # TODO: definitely for finite
+
+
+class EmpiricalDistRV(MixinRV, EmpiricalDist):
+
+    def _update_stats(self):
+        super()._update_stats()
+
+        mean_flat = (self._values_flat * self.p[:, np.newaxis]).sum(0)
+        self._mean = mean_flat.reshape(self._shape)
+
+        ctr_flat = self._values_flat - mean_flat
+        outer_flat = (ctr_flat[:, np.newaxis] * ctr_flat[..., np.newaxis]).reshape(len(ctr_flat), -1)
+        self._cov = (self.p[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self._shape)
+
+    # def plot_pf(self, ax=None):
+    #     raise NotImplementedError
+
+
+# s = [[0, 1], [3, 6]]
+# # s = ['a', 'b']
+# rng_ = np.random.default_rng()
+# d_ = rng_.choice(s, size=10, p=[.5, .5])
+# e = EmpiricalDist(d_)
+# e.add_data(d_)
+# print(e)
+
+
+class Mixture(Base):
+    def __init__(self, dists, weights, rng=None):       # TODO: special implementation for Finite? get modes, etc?
+        super().__init__(rng)
+        self.dists = dists
+
+        self._shape = self.dists[0].shape
+        if not all(dist.shape == self._shape for dist in self.dists[1:]):
+            raise ValueError("All distributions must have the same shape.")
+
+        self.weights = weights
+
+    @property
+    def weights(self):
+        return self._weights
+
+    @weights.setter
+    def weights(self, value):
+        self._weights = np.array(value)
+        if self._weights.sum() != 1:
+            raise ValueError("Weights must sum to one.")
+        if self._weights.shape == (len(self.dists),):
+            self.n_dists = self.weights.size
+        else:
+            raise ValueError
+
+        self._mode = None       # TODO: formula???
+
+        self._mean = sum(weight * dist.mean for dist, weight in zip(self.dists, self._weights))
+        self._cov = None        # TODO
+
+    def pf(self, x):
+        return sum(weight * dist.pf(x) for dist, weight in zip(self.dists, self._weights))
+
+    def _rvs(self, n, rng):
+        c = rng.choice(self.n_dists, size=n, p=self._weights)
+        out = np.empty(n)
+        for i, dist in enumerate(self.dists):
+            idx = np.flatnonzero(c == i)
+            out[idx] = dist.rvs(size=idx.size)
+
+
+dists_ = [Normal(mean, 1.) for mean in [0, 1]]
+w = [.5, .5]
+m = Mixture(dists_, w)
+pass

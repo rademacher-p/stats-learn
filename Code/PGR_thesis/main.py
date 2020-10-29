@@ -105,11 +105,11 @@ supp_y_s = np.array(list(itertools.product(supp_y.reshape((-1,) + data_shape_y))
 # prior = Dirichlet(alpha_0, mean, rng)
 #
 # theta_pmf = prior.rvs()
-# theta = FiniteRE(supp_yx, theta_pmf, rng)
+# theta = Finite(supp_yx, theta_pmf, rng)
 #
 # theta_m_pmf = theta_pmf.reshape((-1,) + supp_shape_x).sum(axis=0)
-# theta_m = FiniteRE(supp_x_s['x'], theta_m_pmf)
-# theta_m_s = FiniteRE(supp_x_s, theta_m_pmf)
+# theta_m = Finite(supp_x_s['x'], theta_m_pmf)
+# theta_m_s = Finite(supp_x_s, theta_m_pmf)
 
 
 #%% Sim
@@ -133,16 +133,16 @@ def main():
     # Plotting
     predictors = [
         ModelRegressor(model, name=r'$f_{opt}$'),
-        BayesRegressor(NormalRegressorBayes(mean_prior=0*np.ones(2), cov_prior=0.5*np.eye(2), basis_y_x=None, cov_y_x=1., model_x=model_x), name='Norm'),
+        BayesRegressor(NormalRegressorBayes(prior_mean=0 * np.ones(2), prior_cov=0.5 * np.eye(2), basis_y_x=None, cov_y_x=1., model_x=model_x), name='Norm'),
     ]
 
     # predictors[0].plot_loss_eval(params={'weights': np.linspace(0, 2, 20)}, n_train=[0, 1, 2], n_test=10, n_mc=100, verbose=True)
-    # predictors[1].plot_loss_eval(model=None, params={'cov_prior': np.linspace(0.1, 1, 90, endpoint=False)},
+    # predictors[1].plot_loss_eval(model=None, params={'prior_cov': np.linspace(0.1, 1, 90, endpoint=False)},
     #                              n_train=[10], n_test=10, n_mc=400, verbose=True, ax=None, rng=None)
 
     params = [
         {},
-        {'cov_prior': [0.1, 1, 10]},
+        {'prior_cov': [0.1, 1, 10]},
     ]
 
     # plot_predict_stats_compare(predictors, x, model, params, n_train=2, n_mc=30, do_std=True, ax=None, rng=None)
@@ -156,9 +156,9 @@ def main():
     # params = None
     # params = {'weights': [m * np.ones(2) for m in [.1, .5, 1]]}
     params = {
-        # 'cov_prior': [.1, 1, 10, 11],
-        'cov_prior': np.linspace(.1, 10, 32),
-        # 'mean_prior': [m * np.ones(2) for m in [.1, .5, 1]],
+        # 'prior_cov': [.1, 1, 10, 11],
+        'prior_cov': np.linspace(.1, 10, 32),
+        # 'prior_mean': [m * np.ones(2) for m in [.1, .5, 1]],
               }
 
     # n_train = 2

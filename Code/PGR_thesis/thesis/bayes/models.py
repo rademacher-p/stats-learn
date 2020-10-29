@@ -8,7 +8,7 @@ import numpy as np
 from scipy.stats._multivariate import _PSD
 
 from thesis.random.elements import Normal, Dirichlet, Base as BaseRE
-from thesis._depreciated import RE_obj_callable
+from thesis._deprecated import RE_obj_callable
 from thesis.random.models import DataConditional, NormalRegressor as NormalRegressorModel
 from thesis.util.generic import RandomGeneratorMixin, empirical_pmf
 from thesis.util.func_obj import FiniteDomainFunc
@@ -55,13 +55,13 @@ class Base(RandomGeneratorMixin):
 
 
 class NormalRegressor(Base):
-    # param_names = ('mean_prior', 'cov_prior', 'basis_y_x', 'cov_y_x','model_x')
+    # param_names = ('prior_mean', 'prior_cov', 'basis_y_x', 'cov_y_x','model_x')
 
-    def __init__(self, mean_prior=np.zeros(1), cov_prior=np.eye(1), basis_y_x=None, cov_y_x=1., model_x=Normal(),
+    def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1., model_x=Normal(),
                  rng=None):
 
         # Prior
-        prior = Normal(mean_prior, cov_prior)
+        prior = Normal(prior_mean, prior_cov)
         super().__init__(prior, rng)
         if self.prior.ndim > 1:
             raise ValueError
@@ -74,7 +74,7 @@ class NormalRegressor(Base):
         self._set_basis_y_x(basis_y_x)
 
         # Learning
-        self.posterior = Normal(self.mean_prior, self.cov_prior)
+        self.posterior = Normal(self.prior_mean, self.prior_cov)
         self.posterior_model = NormalRegressorModel(**self._prior_model_kwargs)
 
     # Methods
@@ -105,15 +105,15 @@ class NormalRegressor(Base):
         self._update_posterior()
 
     def _reset_posterior(self):
-        self.posterior.mean = self.mean_prior
-        self.posterior.cov = self.cov_prior
+        self.posterior.mean = self.prior_mean
+        self.posterior.cov = self.prior_cov
 
         for key, val in self._prior_model_kwargs.items():
             setattr(self.posterior_model, key, val)
 
     @property
     def _prior_model_kwargs(self):
-        return {'weights': self.mean_prior, 'basis_y_x': self.basis_y_x, 'cov_y_x_single': self._prior_model_cov,
+        return {'weights': self.prior_mean, 'basis_y_x': self.basis_y_x, 'cov_y_x_single': self._prior_model_cov,
                 'model_x': self.model_x}
 
     def _update_posterior(self, mean_only=False):
@@ -121,7 +121,7 @@ class NormalRegressor(Base):
             self.posterior.cov = np.linalg.inv(self._cov_prior_inv + self._cov_data_inv)
             self.posterior_model.cov_y_x_single = self._make_posterior_model_cov(self.posterior.cov)
 
-        self.posterior.mean = self.posterior.cov @ (self._cov_prior_inv @ self.mean_prior + self._mean_data_temp)
+        self.posterior.mean = self.posterior.cov @ (self._cov_prior_inv @ self.prior_mean + self._mean_data_temp)
         self.posterior_model.weights = self.posterior.mean
 
     def _make_posterior_model_cov(self, cov_weight):
@@ -154,7 +154,7 @@ class NormalRegressor(Base):
             def power_func(i):
                 return lambda x: np.full(self.shape['y'], (x ** i).sum())
 
-            self._basis_y_x = tuple(power_func(i) for i in range(len(self.mean_prior)))
+            self._basis_y_x = tuple(power_func(i) for i in range(len(self.prior_mean)))
         else:
             self._basis_y_x = val
 
@@ -182,27 +182,27 @@ class NormalRegressor(Base):
 
     # Prior parameters
     @property
-    def mean_prior(self):
+    def prior_mean(self):
         return self.prior.mean
 
-    @mean_prior.setter
-    def mean_prior(self, val):
+    @prior_mean.setter
+    def prior_mean(self, val):
         self.prior.mean = val
         self._update_posterior(mean_only=True)
 
     @property
-    def cov_prior(self):
+    def prior_cov(self):
         return self.prior.cov
 
-    @cov_prior.setter
-    def cov_prior(self, val):
+    @prior_cov.setter
+    def prior_cov(self, val):
         self.prior.cov = val
         self._set_prior_persistent_attr()
         self._update_posterior()
 
     def _set_prior_persistent_attr(self):
-        self._cov_prior_inv = np.linalg.inv(self.cov_prior)
-        self._prior_model_cov = self._make_posterior_model_cov(self.cov_prior)
+        self._cov_prior_inv = np.linalg.inv(self.prior_cov)
+        self._prior_model_cov = self._make_posterior_model_cov(self.prior_cov)
 
 
 
@@ -615,7 +615,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #         args = self.dist.rvs()
 #         return self.cls_frozen(p=args)
 
-# class FiniteREPrior(FiniteRE):
+# class FiniteREPrior(Finite):
 #     def __new__(cls, supp, seed=None):
 #         cls.bayes_model = Dirichlet(2, [.5, .5])
 #         p = cls.rng_prior()
@@ -655,9 +655,9 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #
 #
 # dist = Dirichlet(4, [.5, .5])
-# class model_cls(FiniteRE):
-#     __new__ = functools.partialmethod(FiniteRE.__new__, supp=['a', 'c'])
-#     __init__ = functools.partialmethod(FiniteRE.__init__, supp=['a', 'c'])
+# class model_cls(Finite):
+#     __new__ = functools.partialmethod(Finite.__new__, supp=['a', 'c'])
+#     __init__ = functools.partialmethod(Finite.__init__, supp=['a', 'c'])
 #
 # # a = model_cls(p=[.4,.6])
 #
@@ -682,7 +682,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #
 #
 # dist = Dirichlet(4, [.5, .5])
-# model_cls = FiniteRE
+# model_cls = Finite
 # model_kwargs = {'supp': ['d', 'e']}
 #
 # d = Prior2(dist, model_cls, model_kwargs)
@@ -716,8 +716,8 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #         theta_pmf = self.dist.rvs()
 #         # theta_pmf_m = None
 #
-#         theta = FiniteRE(self.support, theta_pmf, self.rng)
-#         # theta_m = FiniteRE(self.support_x, theta_pmf_m, self.rng)
+#         theta = Finite(self.support, theta_pmf, self.rng)
+#         # theta_m = Finite(self.support_x, theta_pmf_m, self.rng)
 #
 #         return theta
 #
