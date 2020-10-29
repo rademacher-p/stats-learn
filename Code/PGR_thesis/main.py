@@ -10,10 +10,10 @@ import numpy as np
 # from scipy._lib._util import check_random_state
 # from mpl_toolkits.mplot3d import Axes3D
 
-from rand.elements import Normal
-from rand.models import NormalRegressor as NormalRegressorModel
-from bayes.models import NormalRegressor as NormalRegressorBayes
-from predictors import BayesRegressor, ModelRegressor, plot_loss_eval_compare
+from thesis.random.elements import Normal
+from thesis.random.models import NormalRegressor as NormalRegressorModel
+from thesis.bayes.models import NormalRegressor as NormalRegressorBayes
+from thesis.predictors import BayesRegressor, ModelRegressor, plot_loss_eval_compare
 
 # plt.style.use('seaborn')
 

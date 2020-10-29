@@ -12,10 +12,10 @@ import numpy as np
 from scipy.stats import mode
 import matplotlib.pyplot as plt
 
-from util.generic import vectorize_func, check_data_shape
-from util.plot import get_axes_xy
-from loss_funcs import loss_se, loss_01
-from rand.models import Base as BaseModel, MixinRVy
+from thesis.util.generic import vectorize_func, check_data_shape
+from thesis.util.plot import get_axes_xy
+from thesis.loss_funcs import loss_se, loss_01
+from thesis.random.models import Base as BaseModel, MixinRVy
 
 
 def predict_stats_compare(predictors, x, model, params=None, n_train=0, n_mc=1, stats=('mode',),

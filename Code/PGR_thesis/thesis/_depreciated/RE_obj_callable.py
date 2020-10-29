@@ -9,10 +9,10 @@ import numpy as np
 from scipy.stats._multivariate import multi_rv_generic
 from scipy.special import gammaln, xlogy, xlog1py, betaln
 import matplotlib.pyplot as plt
-from util.generic import check_data_shape, check_valid_pmf
-from util.math import outer_gen, diag_gen, simplex_round
-from util.plot import simplex_grid
-from util.func_obj import FiniteDomainFunc
+
+from thesis.util.generic import check_data_shape, check_valid_pmf
+from thesis.util.math import simplex_round
+from thesis.util.func_obj import FiniteDomainFunc
 
 
 #%% Base RE classes

@@ -10,10 +10,10 @@ import matplotlib.pyplot as plt
 
 from main import learn_eval_mc_bayes
 
-from bayes.models import DirichletFiniteYcXModelBayesNew
-from predictors import ModelClassifier
+from thesis.bayes.models import DirichletFiniteYcXModelBayesNew
+from thesis.predictors import ModelClassifier
 
-from util.func_obj import FiniteDomainFunc
+from thesis.util.func_obj import FiniteDomainFunc
 
 
 

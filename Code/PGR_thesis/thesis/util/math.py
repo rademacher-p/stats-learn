@@ -1,10 +1,7 @@
 import functools
 import itertools
-import math
 
 import numpy as np
-
-from util.generic import check_data_shape
 
 
 # def mean(x, shape):

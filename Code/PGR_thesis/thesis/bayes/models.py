@@ -7,11 +7,11 @@ import math
 import numpy as np
 from scipy.stats._multivariate import _PSD
 
-from rand.elements import Normal, Dirichlet, Base as BaseRE
-import RE_obj_callable
-from rand.models import DataConditional, NormalRegressor as NormalRegressorModel
-from util.generic import RandomGeneratorMixin, empirical_pmf
-from util.func_obj import FiniteDomainFunc
+from thesis.random.elements import Normal, Dirichlet, Base as BaseRE
+from thesis._depreciated import RE_obj_callable
+from thesis.random.models import DataConditional, NormalRegressor as NormalRegressorModel
+from thesis.util.generic import RandomGeneratorMixin, empirical_pmf
+from thesis.util.func_obj import FiniteDomainFunc
 
 #%% Priors
 
