@@ -10,8 +10,10 @@ from scipy.stats._multivariate import _PSD
 from thesis.random.elements import Normal, Base as BaseRE, NormalLinear as NormalLinearRE, EmpiricalDist
 from thesis.util.generic import RandomGeneratorMixin
 
-#%% Priors
+np.set_printoptions(precision=2)
 
+
+#%% Priors
 
 class Base(RandomGeneratorMixin):
     # param_names = ()
@@ -34,8 +36,8 @@ class Base(RandomGeneratorMixin):
 
     rvs = BaseRE.rvs
 
-    def _rvs(self, size, rng):
-        return self.random_model(rng)._rvs(size)
+    def _rvs(self, n, rng):
+        return self.random_model(rng)._rvs(n, rng)
 
     def fit(self, d=None, warm_start=False):
         if d is None:
@@ -204,15 +206,16 @@ class Dirichlet(Base):
     def random_model(self, rng=None):
         raise NotImplementedError       # TODO: implement for finite in subclass?
 
-    def _rvs(self, size, rng):
+    def _rvs(self, n, rng):
         # Samples directly from the marginal data distribution
-        _out = []
-        for n in range(size):
-            if rng.random() <= self.alpha_0 / (self.alpha_0 + n):
-                sample = self.prior_mean.rvs(rng=rng)     # sample from mean distribution
+        _out = np.empty((n, *self.shape))
+        for i in range(n):
+            if rng.random() <= self.alpha_0 / (self.alpha_0 + i):
+                _out[i] = self.prior_mean.rvs(rng=rng)     # sample from mean distribution
             else:
-                sample = rng.choice(_out)
-            _out.append(sample)
+                _out[i] = rng.choice(_out[:i])
+
+        return _out
 
     def _fit(self, d, warm_start=False):
-        self.emp_dist = EmpiricalDist(d)
+        self.emp_dist = EmpiricalDist(d)        # TODO: in-place?

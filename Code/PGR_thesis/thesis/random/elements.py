@@ -16,7 +16,8 @@ import matplotlib.pyplot as plt
 
 from thesis.util.generic import RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func
 from thesis.util.math import outer_gen, diag_gen, simplex_round
-from thesis.util.plot import simplex_grid
+from thesis.util.plot import simplex_grid, box_grid
+from thesis.util import spaces
 
 
 #%% Base RE classes
@@ -228,7 +229,7 @@ class Finite(Base):
         return self._p_flat[eq_supp].squeeze()
 
     def plot_pf(self, ax=None):
-        if self._p.ndim == 1:
+        if self._p.ndim == 1 and self.shape == (1,):
             if ax is None:
                 _, ax = plt.subplots()
                 ax.set(xlabel='$x$', ylabel=r'$\mathrm{P}_\mathrm{x}(x)$')
@@ -259,7 +260,7 @@ class FiniteRV(MixinRV, Finite):
         if self._p.ndim == 1:
             super().plot_pf(ax)
 
-        elif self._p.ndim == 2:
+        elif self._p.ndim == 2 and self.shape == (2,):
             if ax is None:
                 _, ax = plt.subplots(subplot_kw={'projection': '3d'})
                 ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel=r'$\mathrm{P}_\mathrm{x}(x)$')
@@ -268,7 +269,7 @@ class FiniteRV(MixinRV, Finite):
                                 self._supp[..., 1].flatten(), 0, 1, 1, self._p_flat, shade=True)
             return plt_data
 
-        elif self._p.ndim == 3:
+        elif self._p.ndim == 3 and self.shape == (3,):
             if ax is None:
                 _, ax = plt.subplots(subplot_kw={'projection': '3d'})
                 ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
@@ -327,6 +328,8 @@ class Dirichlet(BaseRV):
         self._mean = check_valid_pmf(mean, full_support=True)
         self._update_attr()
 
+        self.space = spaces.Simplex(self._shape)
+
     # Input properties
     @property
     def alpha_0(self):
@@ -370,49 +373,14 @@ class Dirichlet(BaseRV):
         return np.exp(log_pf).reshape(set_shape)
 
     def plot_pf(self, x=None, ax=None):
-        n_plt = 40
-
-        if self.size in (2, 3):
-            if x is None:
-                x = simplex_grid(n_plt, self._shape, hull_mask=(self.mean < 1 / self.alpha_0))
-
-            pf_plt = self.pf(x)
-            x.resize(x.shape[0], self.size)
-
-            # pf_plt.sum() / (n_plt ** (self._size - 1))
-
-            if self.size == 2:
-                if ax is None:
-                    _, ax = plt.subplots()
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$')
-
-                plt_data = ax.scatter(x[:, 0], x[:, 1], s=15, c=pf_plt)
-
-                c_bar = plt.colorbar(plt_data)
-                c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
-
-                return plt_data
-
-            elif self.size == 3:
-                if ax is None:
-                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                    ax.view_init(35, 45)
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
-
-                plt_data = ax.scatter(x[:, 0], x[:, 1], x[:, 2], s=15, c=pf_plt)
-
-                c_bar = plt.colorbar(plt_data)
-                c_bar.set_label(r'$\mathrm{p}_\mathrm{x}(x)$')
-
-                return plt_data
-
-        else:
-            raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
+        if x is None:
+            x = simplex_grid(60, self._shape, hull_mask=(self.mean < 1 / self.alpha_0))
+        return self.space.plot(self.pf, x, ax)
 
 
 # rng = np.random.default_rng()
 # a0 = 10
-# m = np.random.random((1, 3))
+# m = np.random.random(3)
 # m = m / m.sum()
 # d = Dirichlet(a0, m, rng)
 # d.plot_pf()
@@ -451,6 +419,8 @@ class Empirical(BaseRV):
         self._mean = check_valid_pmf(mean)
         self._update_attr()
 
+        self.space = spaces.SimplexDiscrete(self._n, self._shape)
+
     # Input properties
     @property
     def n(self):
@@ -473,12 +443,12 @@ class Empirical(BaseRV):
     # Attribute Updates
     def _update_attr(self):
         self._shape = self._mean.shape
+        self._log_pf_coef = gammaln(self._n + 1)
 
-        self._mode = ((self._n * self._mean) // 1) + simplex_round((self._n * self._mean) % 1)  # FIXME: broken
+        # self._mode = ((self._n * self._mean) // 1) + simplex_round((self._n * self._mean) % 1)  # FIXME: broken
+        self._mode = None
 
         self._cov = (diag_gen(self._mean) - outer_gen(self._mean, self._mean)) / self._n
-
-        self._log_pf_coef = gammaln(self._n + 1)
 
     def _rvs(self, n, rng):
         return rng.multinomial(self._n, self._mean.flatten(), size=n) / self._n      # .reshape(n, *self._shape)
@@ -490,45 +460,13 @@ class Empirical(BaseRV):
                                       - gammaln(self._n * x + 1)).reshape(-1, self.size).sum(axis=-1)
         return np.exp(log_pf).reshape(set_shape)
 
-    def plot_pf(self, ax=None):
-
-        if self.size in (2, 3):
-            x_plt = simplex_grid(self.n, self._shape)
-            pf_plt = self.pf(x_plt)
-            x_plt.resize(x_plt.shape[0], self.size)
-
-            if self.size == 2:
-                if ax is None:
-                    _, ax = plt.subplots()
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$')
-
-                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pf_plt)
-
-                c_bar = plt.colorbar(plt_data)
-                c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
-
-                return plt_data
-
-            elif self.size == 3:
-                if ax is None:
-                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                    ax.view_init(35, 45)
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
-
-                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pf_plt)
-
-                c_bar = plt.colorbar(plt_data)
-                c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
-
-                return plt_data
-
-        else:
-            raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
+    def plot_pf(self, x=None, ax=None):
+        return self.space.plot(self.pf, x, ax)
 
 # rng = np.random.default_rng()
 # n = 10
 # # m = np.random.random((1, 3))
-# m = np.random.default_rng().integers(10, size=(1, 3))
+# m = np.random.default_rng().integers(10, size=(3,))
 # m = m / m.sum()
 # d = Empirical(n, m, rng)
 # d.plot_pf()
@@ -551,6 +489,8 @@ class DirichletEmpirical(BaseRV):
         self._alpha_0 = _dirichlet_check_alpha_0(alpha_0)
         self._mean = check_valid_pmf(mean)
         self._update_attr()
+
+        self.space = spaces.SimplexDiscrete(self._n, self._shape)
 
     # Input properties
     @property
@@ -603,45 +543,13 @@ class DirichletEmpirical(BaseRV):
             .reshape(-1, self.size).sum(axis=-1)
         return np.exp(log_pf).reshape(set_shape)
 
-    def plot_pf(self, ax=None):        # TODO: reused code. define simplex plot_xy outside!
-
-        if self.size in (2, 3):
-            x_plt = simplex_grid(self.n, self._shape)
-            pf_plt = self.pf(x_plt)
-            x_plt.resize(x_plt.shape[0], self.size)
-
-            if self.size == 2:
-                if ax is None:
-                    _, ax = plt.subplots()
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$')
-
-                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], s=15, c=pf_plt)
-
-                c_bar = plt.colorbar(plt_data)
-                c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
-
-                return plt_data
-
-            elif self.size == 3:
-                if ax is None:
-                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                    ax.view_init(35, 45)
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
-
-                plt_data = ax.scatter(x_plt[:, 0], x_plt[:, 1], x_plt[:, 2], s=15, c=pf_plt)
-
-                c_bar = plt.colorbar(plt_data)
-                c_bar.set_label(r'$\mathrm{P}_\mathrm{x}(x)$')
-
-                return plt_data
-
-        else:
-            raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
+    def plot_pf(self, x=None, ax=None):
+        return self.space.plot(self.pf, x, ax)
 
 # rng_ = np.random.default_rng()
 # n = 10
 # a0 = 600
-# m = np.ones((1, 3))
+# m = np.ones((3,))
 # m = m / m.sum()
 # d = DirichletEmpirical(n, a0, m, rng_)
 # d.plot_pf()
@@ -663,6 +571,8 @@ class Beta(BaseRV):
 
         self._shape = ()
         self._update_attr()
+
+        self.space = spaces.Box((0, 1))
 
     # Input properties
     @property
@@ -713,14 +623,7 @@ class Beta(BaseRV):
         return np.exp(log_pf)
 
     def plot_pf(self, x=None, ax=None):
-        if x is None:
-            x = np.linspace(0, 1, 101, endpoint=True)
-        if ax is None:
-            _, ax = plt.subplots()
-            ax.set(xlabel='$x$', ylabel=r'$\mathrm{P}_\mathrm{x}(x)$')
-
-        plt_data = ax.plot(x, self.pf(x))
-        return plt_data
+        return self.space.plot(self.pf, x, ax)
 
 
 class Normal(BaseRV):
@@ -744,6 +647,8 @@ class Normal(BaseRV):
 
         self.mean = mean
         self.cov = cov
+
+        self.space = spaces.Euclidean(self._shape)      # FIXME
 
     def __repr__(self):
         return f"NormalRV(mean={self.mean}, cov={self.cov})"
@@ -796,46 +701,27 @@ class Normal(BaseRV):
 
     @property
     def x_plot_default(self):       # TODO
-        n_plt = 100
-
-        if self.size == 1:
+        if self.shape == ():
             lims = self._mean.item() + np.array([-1, 1]) * 3 * np.sqrt(self._cov.item())
-            x = np.linspace(*lims, n_plt, endpoint=False).reshape(n_plt, *self._shape)
-        elif self.size == 2:
+        elif self.shape == (2,):
             lims = [(self._mean[i] - 3 * np.sqrt(self._cov[i, i]), self._mean[i] + 3 * np.sqrt(self._cov[i, i]))
                     for i in range(2)]
-            x0_plt = np.linspace(*lims[0], n_plt, endpoint=False)
-            x1_plt = np.linspace(*lims[1], n_plt, endpoint=False)
-            x = np.stack(np.meshgrid(x0_plt, x1_plt), axis=-1)
         else:
             raise NotImplementedError('Plot method only supported for 1- and 2-dimensional data.')
 
-        return x
+        return box_grid(lims, 100, endpoint=False)
 
     def plot_pf(self, x=None, ax=None):
-        if x is None:
-            x = self.x_plot_default
+        if x is None and self.shape in ((), (2,)):
+            if self.shape == ():
+                lims = self._mean.item() + np.array([-1, 1]) * 3 * np.sqrt(self._cov.item())
+            else:   # self.shape == (2,):
+                lims = [(self._mean[i] - 3 * np.sqrt(self._cov[i, i]), self._mean[i] + 3 * np.sqrt(self._cov[i, i]))
+                        for i in range(2)]
 
-        if self.size == 1:
-            if ax is None:
-                _, ax = plt.subplots()
-                ax.set(xlabel='$x_1$', ylabel='$p$')
+            x = box_grid(lims, 100, endpoint=False)
 
-            plt_data = ax.plot(x, self.pf(x))
-            return plt_data
-
-        elif self.size == 2:
-            if ax is None:
-                _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$p$')
-
-            # ax.plot_wireframe(x[..., 0], x[..., 1], self.pf(x))
-            plt_data = ax.plot_surface(x[..., 0], x[..., 1], self.pf(x), cmap=plt.cm.viridis)
-
-            return plt_data
-        else:
-            raise NotImplementedError('Plot method only supported for 1- and 2-dimensional data.')
-
+        return self.space.plot(self.pf, x, ax)
 
 # mean_, cov_ = 1., 1.
 # # mean_, cov_ = np.ones(2), np.eye(2)
@@ -853,11 +739,9 @@ class Normal(BaseRV):
 
 class NormalLinear(Normal):
     def __init__(self, weights=(0.,), basis=np.ones(1), cov=(1.,), rng=None):
-
         self._set_weights(weights)
         self._set_basis(basis)
 
-        self._shape = self._basis.shape[:-1]
         self._set_mean()
 
         super().__init__(self.mean, cov, rng)
@@ -890,6 +774,7 @@ class NormalLinear(Normal):
 
     def _set_basis(self, val):
         self._basis = np.array(val)
+        self._shape = self._basis.shape[:-1]
 
     def _set_mean(self):
         self.mean = self._basis @ self._weights
@@ -935,14 +820,6 @@ class EmpiricalDist(Base):       # TODO: implement using factory of Finite objec
     def _update_stats(self):
         self._mode = self.values[self.counts.argmax()]
 
-        # if self.is_rv:
-        #     mean_flat = (self._values_flat * self.p[:, np.newaxis]).sum(0)
-        #     self._mean = mean_flat.reshape(self._shape)
-        #
-        #     ctr_flat = self._values_flat - mean_flat
-        #     outer_flat = (ctr_flat[:, np.newaxis] * ctr_flat[..., np.newaxis]).reshape(len(ctr_flat), -1)
-        #     self._cov = (self.p[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self._shape)
-
     @staticmethod
     def _count_data(d):
         return np.unique(d, return_counts=True, axis=0)
@@ -986,7 +863,6 @@ class EmpiricalDist(Base):       # TODO: implement using factory of Finite objec
 
 
 class EmpiricalDistRV(MixinRV, EmpiricalDist):
-
     def _update_stats(self):
         super()._update_stats()
 
@@ -1001,23 +877,32 @@ class EmpiricalDistRV(MixinRV, EmpiricalDist):
     #     raise NotImplementedError
 
 
+s = np.random.default_rng().random((2,1,3))
 # s = [[0, 1], [3, 6]]
-# # s = ['a', 'b']
-# rng_ = np.random.default_rng()
-# d_ = rng_.choice(s, size=10, p=[.5, .5])
-# e = EmpiricalDist(d_)
-# e.add_data(d_)
-# print(e)
+# s = ['a', 'b']
+rng_ = np.random.default_rng()
+d_ = rng_.choice(s, size=10, p=[.5, .5])
+e = EmpiricalDist(d_)
+e.add_data(d_)
+print(e)
 
 
 class Mixture(Base):
+    def __new__(cls, dists, weights, rng=None):
+        if all(isinstance(dist, BaseRV) for dist in dists):
+            return super().__new__(MixtureRV)
+        else:
+            return super().__new__(cls)
+
     def __init__(self, dists, weights, rng=None):       # TODO: special implementation for Finite? get modes, etc?
         super().__init__(rng)
-        self.dists = dists
+        self.dists = dists      # FIXME: updates on set??? `_set_dist` method or something?
 
         self._shape = self.dists[0].shape
         if not all(dist.shape == self._shape for dist in self.dists[1:]):
             raise ValueError("All distributions must have the same shape.")
+
+        self.dtype = self.dists[0].mode.dtype   # FIXME
 
         self.weights = weights
 
@@ -1030,28 +915,42 @@ class Mixture(Base):
         self._weights = np.array(value)
         if self._weights.sum() != 1:
             raise ValueError("Weights must sum to one.")
+
         if self._weights.shape == (len(self.dists),):
             self.n_dists = self.weights.size
         else:
             raise ValueError
 
-        self._mode = None       # TODO: formula???
+    def _update_stats(self):
+        self._mode = None  # TODO: formula???
 
-        self._mean = sum(weight * dist.mean for dist, weight in zip(self.dists, self._weights))
-        self._cov = None        # TODO
-
-    def pf(self, x):
+    def pf(self, x):        # TODO: check plotting
         return sum(weight * dist.pf(x) for dist, weight in zip(self.dists, self._weights))
+
+    # def plot_pf(self, x, ax=None):        # TODO
+    #     pass
 
     def _rvs(self, n, rng):
         c = rng.choice(self.n_dists, size=n, p=self._weights)
-        out = np.empty(n)
+        out = np.empty((n, *self.shape), dtype=self.dtype)
         for i, dist in enumerate(self.dists):
             idx = np.flatnonzero(c == i)
             out[idx] = dist.rvs(size=idx.size)
 
+        return out
 
-dists_ = [Normal(mean, 1.) for mean in [0, 1]]
+
+class MixtureRV(MixinRV, Mixture):
+    def _update_stats(self):
+        super()._update_stats()
+
+        self._mean = sum(weight * dist.mean for dist, weight in zip(self.dists, self._weights))
+        self._cov = None  # TODO
+
+
+# dists_ = [Normal(mean, .01) for mean in [0, 10]]
+dists_ = [Finite(['a', 'b'], p=[p_, 1-p_]) for p_ in [0, 1]]
 w = [.5, .5]
 m = Mixture(dists_, w)
+m.rvs(10)
 pass
