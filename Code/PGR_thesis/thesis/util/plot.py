@@ -2,7 +2,7 @@ import math
 
 import numpy as np
 from matplotlib import pyplot as plt
-# from scipy.special import binom
+from scipy.special import binom
 
 
 def get_axes_xy(ax=None, shape=None):
@@ -22,7 +22,7 @@ def get_axes_xy(ax=None, shape=None):
         return ax
 
 
-def simplex_grid(n=1, shape=(1,), hull_mask=None):
+def simplex_grid(n, shape, hull_mask=None):
     """
     Generate a uniform grid over a simplex.
     """
@@ -35,8 +35,10 @@ def simplex_grid(n=1, shape=(1,), hull_mask=None):
     elif not all([isinstance(x, int) for x in shape]):
         raise TypeError("Elements of 'shape' must be integers.")
 
+    d = math.prod(shape)
+
     if hull_mask is None:
-        hull_mask = np.broadcast_to(False, math.prod(shape))
+        hull_mask = np.broadcast_to(False, (d,))
     # elif hull_mask == 'all':
     #     hull_mask = np.broadcast_to(True, math.prod(shape))
     else:
@@ -49,8 +51,6 @@ def simplex_grid(n=1, shape=(1,), hull_mask=None):
 
     if n < sum(hull_mask.flatten()):
         raise ValueError("Input 'n' must meet or exceed the number of True values in 'hull_mask'.")
-
-    d = math.prod(shape)
 
     if d == 1:
         return np.array(1).reshape(shape)
@@ -74,3 +74,26 @@ def simplex_grid(n=1, shape=(1,), hull_mask=None):
     g = np.hstack((g, n - g.sum(axis=1)[:, np.newaxis]))
 
     return g.reshape((-1,) + shape) / n
+
+
+# g = simplex_grid(10, shape=(3,))
+# print(g.shape)
+# print(binom(12, 2))
+
+
+def box_grid(lims, n=100, endpoint=False):
+    lims = np.array(lims)
+
+    if endpoint:
+        n += 1
+
+    if lims.shape == (2,):
+        return np.linspace(*lims, n, endpoint=endpoint)
+    elif lims.ndim == 2 and lims.shape[-1] == 2:
+        x_dim = [np.linspace(*lims_i, n, endpoint=endpoint) for lims_i in lims]
+        return np.stack(np.meshgrid(*x_dim), axis=-1)
+    else:
+        raise ValueError("Shape must be (2,) or (*, 2)")
+
+    # if not (lims[..., 0] <= lims[..., 1]).all():
+    #     raise ValueError("Upper values must meet or exceed lower values.")
