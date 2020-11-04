@@ -51,7 +51,6 @@
 \DeclareMathOperator{\Yrm}{\mathrm{Y}}
 \DeclareMathOperator{\Drm}{\mathrm{D}}
 \DeclareMathOperator{\nrm}{\mathrm{n}}
-\DeclareMathOperator{\nbarrm}{\bar{\mathrm{n}}}
 \DeclareMathOperator{\zrm}{\mathrm{z}}
 
 \DeclareMathOperator{\Prm}{\mathrm{P}}
@@ -175,23 +174,14 @@
 
 
 
-
-\todohigh{introduce tilde alpha to match tilde theta?}
-
-\todohigh{use x,y subs instead of prime/tilde?}
-
-\todohigh{change from nbar to emprical RV??? PROPERTIES??}
-
 \todohigh{Generalize to semi-supervised joint decisions??? training/test!}
 
-\todohi{multinomial random process?}
-
-\todohi{Investigate N lim for nbar given theta, risks. Model support, bounded prior?}
+\todohi{Investigate N lim for psi given theta, risks. Model support, bounded prior?}
 
 \todohi{priors = sparse conditionals; w/ sufficient statistics}
 
 
-\todolow{NFLT investigation? try matlab examples}
+\todolow{NFLT investigation? try sim examples}
 
 \todolow{generalize y,x,h from scalars to functions!!!}
 
@@ -271,14 +261,9 @@ Consider a random element $\xrm \in \Xcal$. If $\Xcal$ is countable, either fini
 
 \todolo{explicit PMF/PDF formula with P of events?}
 
-For notational simplicity, probability distributions are occasionally represented as $\Prm(\xrm)$; in such instances, the formal notation can be recovered by replacing the distribution with $\Prm_{\xrm}(x)$ and all instances of the roman symbol $\xrm$ with the italic symbol $x$. 
-
-Consider $\xrm$ conditioned on another random element $\zrm \in \Zcal$. The conditional distribution is represented as $\Prm_{\xrm | \zrm} : \Zcal \mapsto \Pcal(\Xcal)$, such that $\Prm_{\xrm | \zrm}(z)$ is a PMF over $\Xcal$ and $\Prm_{\xrm | \zrm}(x|z)$ is a specific value of that PMF. These distributions may be compactly represented as $\Prm(\xrm|\zrm)$. 
-
-Often, the dependency on the conditional variable $\zrm$ will not be expressed in terms of a specific value $z$, but will be left in terms of the random element itself; in this case, the more compact notation $\Prm_{\xrm | \zrm}$ is used to imply $\Prm_{\xrm | \zrm}(\zrm)$, a function of $\zrm$.
+Consider $\xrm$ conditioned on another random element $\zrm \in \Zcal$. The conditional distribution is represented as $\Prm_{\xrm | \zrm} : \Zcal \mapsto \Pcal(\Xcal)$, such that $\Prm_{\xrm | \zrm}(z)$ is a PMF over $\Xcal$ and $\Prm_{\xrm | \zrm}(x|z)$ is a specific value of that PMF. Often, the dependency on the conditional variable $\zrm$ will not be expressed in terms of a specific value $z$, but will be left in terms of the random element itself; in this case, the more compact notation $\Prm_{\xrm | \zrm}$ is used to imply $\Prm_{\xrm | \zrm}(\zrm)$, a function of $\zrm$.
 
 \todohi{Ever need the full functional?}
-\todolo{Remove subscript suppression convention?} 
 
 Many distributions will be repeatedly used and thus special functions will be defined for the PDF's and PMF's of interest. For example, consider a random process $\xrm \in \Xcal$ characterized by a Multinomial distribution with parameters $N \in \Zbbgeq$ and $\theta \in \Uptheta$; the PDF will be notated as $\Multi : \Zbbgeq \times \Uptheta \mapsto \Pcal(\Xcal)$, where the range is the set of valid PDF's. More compactly, the notation $\xrm \sim \Multi(N, \theta)$ implies that $\Prm_{\xrm} = \Multi(\cdot ; N, \theta)$. Other distribution functions repeatedly used include $\Dir$, $\DM$, $\DP$, and $\DMP$, representing the Dirichlet distribution, the Dirichlet-multinomial distribution, the Dirichlet process, and the Dirichlet-Multinomial process.
 
@@ -544,7 +529,7 @@ over the domain $\prod_{x \in \Xcal} \left\{ \frac{n}{N \psim(x)}: n \in {\Zbbge
 
 \section{Learning Objective}
 
-\todomid{use marginal/conditional model? D or nbar?}
+\todomid{use marginal/conditional model? D or psi?}
 
 \todomid{Continuous? Comment on PMF notation}
 
@@ -758,7 +743,7 @@ It is important to note that this inequality holds for any number of training sa
 
 \section{Applications to Common Loss Functions}
 
-\todohi{marginal/conditional??? D or nbar? Continuous?}
+\todohi{marginal/conditional??? D or psi? Continuous?}
 
 
 In this section, loss functions typical for classification and regression applications, specifically the 0-1 loss function and the squared-error loss function, are adopted. The conditional risk \eqref{eq:risk_cond} is assessed, clairvoyant decision functions \eqref{eq:f_clv_x} are found, and the clairvoyant risk \eqref{eq:risk_clv} is expressed.
@@ -1157,7 +1142,7 @@ Observe that as the number of training samples increases, the statistic PMF tend
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{P_nbar_N.pdf}
-\caption{$\Prm(\uppsi)$ for different training set sizes $N$}
+\caption{$\Prm_{\uppsi}$ for different training set sizes $N$}
 \label{fig:P_nbar_N}
 \end{figure}
 
@@ -1179,7 +1164,7 @@ Figure \ref{fig:P_nbar_a0} displays example distributions of $\uppsi$ for $N=10$
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{P_nbar_a0.pdf}
-\caption{$\Prm(\uppsi)$ for different prior concentrations $\alpha_0$}
+\caption{$\Prm_{\uppsi}$ for different prior concentrations $\alpha_0$}
 \label{fig:P_nbar_a0}
 \end{figure}
 
@@ -1201,7 +1186,7 @@ The distribution of $\uppsi$ is uniform over the set $\Uppsi$. The PMF for $\Drm
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{P_nbar_uni.pdf}
-\caption{$\Prm(\uppsi)$ for uniform prior}
+\caption{$\Prm_{\uppsi}$ for uniform prior}
 \label{fig:P_nbar_uni}
 \end{figure}
 
@@ -2028,7 +2013,7 @@ PGR: comment on simulation!
 %\begin{figure}
 %\centering
 %\includegraphics[width=0.7\linewidth]{Risk_01_Dir_IO_Px_N_10_a0_1.pdf}
-%\caption{Minimum 0-1 Risk vs $\Prm(x)$ (sim)}
+%\caption{Minimum 0-1 Risk vs $\Prm_{\xrm}$ (sim)}
 %\label{fig:Risk_01_Dir_IO_Px_N_10_a0_1}
 %\end{figure}
 
@@ -2280,7 +2265,7 @@ Also, it is important to consider how a given classifier performs for varying mo
 %
 %
 %
-%\subsubsection{Training Data PMF, $\Prm(\Drm)$}
+%\subsubsection{Training Data PMF, $\Prm_{\Drm}$}
 %
 %\begin{equation}
 %\Prm(\Drm | \uptheta) = \prod_{y \in \Ycal} \uptheta(y)^{\Psi(y;\Drm)} \;.
