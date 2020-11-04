@@ -162,8 +162,6 @@
 
 \todomid{Use $\Pcal$ only? Define discrete version of $\Pcal$?}
 
-\todolo{check notation throughout for expectation/variance operators, proper arguments}
-
 \todolo{use clairvoyant/irreducible terms and symbols $\Rcal$}
 
 \todolo{suppress arguments where sensible? eg Pd = theta}
@@ -265,7 +263,7 @@ Consider $\xrm$ conditioned on another random element $\zrm \in \Zcal$. The cond
 
 \todohi{Ever need the full functional?}
 
-Many distributions will be repeatedly used and thus special functions will be defined for the PDF's and PMF's of interest. For example, consider a random process $\xrm \in \Xcal$ characterized by a Multinomial distribution with parameters $N \in \Zbbgeq$ and $\theta \in \Uptheta$; the PDF will be notated as $\Multi : \Zbbgeq \times \Uptheta \mapsto \Pcal(\Xcal)$, where the range is the set of valid PDF's. More compactly, the notation $\xrm \sim \Multi(N, \theta)$ implies that $\Prm_{\xrm} = \Multi(\cdot ; N, \theta)$. Other distribution functions repeatedly used include $\Dir$, $\DM$, $\DP$, and $\DMP$, representing the Dirichlet distribution, the Dirichlet-multinomial distribution, the Dirichlet process, and the Dirichlet-Multinomial process.
+Many distributions will be repeatedly used and thus special functions will be defined for the PDF's and PMF's of interest. For example, consider a random process $\xrm \in \Xcal$ characterized by a Multinomial distribution with parameters $N \in \Zbbgeq$ and $\theta \in \Uptheta$; the PDF will be notated as $\Multi : \Zbbgeq \times \Uptheta \mapsto \Pcal(\Xcal)$, where the range is the set of valid PDF's. More compactly, the notation $\xrm \sim \Multi(N, \theta)$ implies that $\Prm_{\xrm} = \Multi(N, \theta)$. Other distribution functions repeatedly used include $\Dir$, $\DM$, $\DP$, and $\DMP$, representing the Dirichlet distribution, the Dirichlet-multinomial distribution, the Dirichlet process, and the Dirichlet-Multinomial process.
 
 \todolo{Add PDF citations. Introduce Empirical process?}
 
@@ -307,8 +305,6 @@ If the expectations are evaluated with respect to a conditional distribution $\P
 Again, it is common for the conditional random element $\zrm$ to be left as a random quantity instead of being explicitly defined. In such cases, the italic $z$ is dropped from the arguments and the formulas $\Erm_{\xrm|\zrm}\big[ g(\xrm) \big](y)$, $\Crm_{\xrm|\zrm}\big[g(\xrm)\big](y,y')$, $\mu_{\xrm|\zrm}(y)$, and $\Sigma_{\xrm|\zrm}(y,y')$ imply dependence on $\zrm$.
 
 \todohi{ABOVE NOTATION CREATES AMBIGUITY!!!!!!! Check for uses...}
-
-As for probability distributions, the subscript notation of these operators may be suppressed. In such cases, the expectations are to be performed with respect to the joint distribution of all random elements (roman font) found in the argument. For example, $\Erm\big[f(\yrm,\xrm) | \zrm \big]$ compactly represents $\Erm_{\yrm,\xrm | \zrm}\big[f(\yrm,\xrm)\big]$.
 
 
 
