@@ -877,7 +877,7 @@ class EmpiricalDistRV(MixinRV, EmpiricalDist):
     #     raise NotImplementedError
 
 
-s = np.random.default_rng().random((2,1,3))
+s = np.random.default_rng().random((2, 1, 3))
 # s = [[0, 1], [3, 6]]
 # s = ['a', 'b']
 rng_ = np.random.default_rng()

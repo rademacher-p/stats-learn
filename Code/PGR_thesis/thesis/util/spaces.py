@@ -11,6 +11,7 @@ class Space:
     size = property(lambda self: math.prod(self._shape))
     ndim = property(lambda self: len(self._shape))
 
+
 class Discrete(Space):
     pass
 
@@ -37,7 +38,7 @@ class Euclidean(Continuous):
         else:
             self.x_plt = None
 
-    def plot(self, f, x=None, ax=None):     # TODO: DRY
+    def plot(self, f, x=None, ax=None):
         if x is None:
             x = self.x_plt
 
