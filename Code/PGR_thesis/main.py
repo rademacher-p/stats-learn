@@ -51,12 +51,12 @@ from thesis.predictors import BayesRegressor, ModelRegressor, plot_loss_eval_com
 #
 # _, ax_theta_m = plt.subplots(num='theta_m', clear=True, subplot_kw={'projection': '3d'})
 #
-x1_plot = np.linspace(-5, 5, 101, endpoint=True)
-x2_plot = np.linspace(-5, 5, 51, endpoint=True)
-X_plot = np.stack(np.meshgrid(x1_plot, x2_plot), axis=-1)
-
-ax_theta_m.plot_wireframe(X_plot[..., 0], X_plot[..., 1], theta_m.pdf(X_plot))
-plt.gca().set(title='Marginal Model', xlabel='$x$', ylabel=r'$p_{\theta_m}(x)$')
+# x1_plot = np.linspace(-5, 5, 101, endpoint=True)
+# x2_plot = np.linspace(-5, 5, 51, endpoint=True)
+# X_plot = np.stack(np.meshgrid(x1_plot, x2_plot), axis=-1)
+#
+# ax_theta_m.plot_wireframe(X_plot[..., 0], X_plot[..., 1], theta_m.pdf(X_plot))
+# plt.gca().set(title='Marginal Model', xlabel='$x$', ylabel=r'$p_{\theta_m}(x)$')
 #
 # X = theta_m.rvs()
 #
