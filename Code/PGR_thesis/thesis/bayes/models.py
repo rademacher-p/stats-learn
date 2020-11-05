@@ -11,7 +11,7 @@ from thesis.random.elements import Normal, Dirichlet, Base as BaseRE
 from thesis._deprecated import RE_obj_callable
 from thesis.random.models import DataConditional, NormalRegressor as NormalRegressorModel
 from thesis.util.generic import RandomGeneratorMixin, empirical_pmf
-from thesis.util.func_obj import FiniteDomainFunc
+from thesis._deprecated.func_obj import FiniteDomainFunc
 
 #%% Priors
 
