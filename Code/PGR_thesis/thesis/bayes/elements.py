@@ -7,7 +7,7 @@ import math
 import numpy as np
 from scipy.stats._multivariate import _PSD
 
-from thesis.random.elements import Normal, Base as BaseRE, NormalLinear as NormalLinearRE, EmpiricalDist
+from thesis.random.elements import Normal, Base as BaseRE, NormalLinear as NormalLinearRE, GenericEmpirical
 from thesis.util.generic import RandomGeneratorMixin
 from thesis.util import spaces
 
@@ -221,4 +221,4 @@ class Dirichlet(Base):
         return _out
 
     def _fit(self, d, warm_start=False):
-        self.emp_dist = EmpiricalDist(d)        # TODO: in-place?
+        self.emp_dist = GenericEmpirical(d)        # TODO: in-place?
