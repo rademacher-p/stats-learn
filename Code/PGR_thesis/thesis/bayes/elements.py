@@ -7,7 +7,7 @@ import math
 import numpy as np
 from scipy.stats._multivariate import _PSD
 
-from thesis.random.elements import Normal, Base as BaseRE, NormalLinear as NormalLinearRE, GenericEmpirical
+from thesis.random import elements as rand_elements
 from thesis.util.generic import RandomGeneratorMixin
 from thesis.util import spaces
 
@@ -37,7 +37,7 @@ class Base(RandomGeneratorMixin):
     def random_model(self, rng=None):
         raise NotImplementedError
 
-    rvs = BaseRE.rvs
+    rvs = rand_elements.Base.rvs
 
     def _rvs(self, n, rng):
         return self.random_model(rng)._rvs(n, rng)
@@ -56,7 +56,7 @@ class NormalLinear(Base):
     def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis=None, cov=1., rng=None):
 
         # Prior
-        prior = Normal(prior_mean, prior_cov)
+        prior = rand_elements.Normal(prior_mean, prior_cov)
         super().__init__(prior, rng)
         if self.prior.ndim > 1:
             raise ValueError
@@ -69,8 +69,8 @@ class NormalLinear(Base):
         self._set_basis_white()
 
         # Learning
-        self.posterior = Normal(self.prior_mean, self.prior_cov)
-        self.posterior_model = NormalLinearRE(**self._prior_model_kwargs)
+        self.posterior = rand_elements.Normal(self.prior_mean, self.prior_cov)
+        self.posterior_model = rand_elements.NormalLinear(**self._prior_model_kwargs)
 
     # Methods
     def random_model(self, rng=None):
@@ -79,16 +79,16 @@ class NormalLinear(Base):
         model_kwargs = {'basis': self.basis, 'cov': self.cov, 'rng': rng}
         rand_kwargs = {'weights': self.prior.rvs(rng=rng)}
 
-        return NormalLinearRE(**model_kwargs, **rand_kwargs)
+        return rand_elements.NormalLinear(**model_kwargs, **rand_kwargs)
 
     def _fit(self, d, warm_start=False):
         if not warm_start:  # reset learning attributes
-            self._n_total = 0
+            self.n = 0
             self._mean_data_temp = np.zeros(self.prior.shape)
 
         n = len(d)
         if n > 0:  # update data-dependent attributes
-            self._n_total += n
+            self.n += n
 
             y_white = np.dot(d.reshape(n, self.size), self._prec_U)
             self._mean_data_temp += sum(self._basis_white.T @ y_i for y_i in y_white)
@@ -109,7 +109,7 @@ class NormalLinear(Base):
     def _update_posterior(self, mean_only=False):
         if not mean_only:
             self.posterior.cov = np.linalg.inv(self._cov_prior_inv
-                                               + self._n_total * self._basis_white.T @ self._basis_white)
+                                               + self.n * self._basis_white.T @ self._basis_white)
             self.posterior_model.cov = self._make_posterior_model_cov(self.posterior.cov)
 
         self.posterior.mean = self.posterior.cov @ (self._cov_prior_inv @ self.prior_mean + self._mean_data_temp)
@@ -196,23 +196,29 @@ class Dirichlet(Base):
     def __init__(self, alpha_0, prior_mean, rng=None):
         super().__init__(prior=None, rng=rng)
         self.alpha_0 = alpha_0
-        self.prior_mean = prior_mean
+        self.prior_mean = prior_mean        # TODO: add setter fit update!!
 
-        # self._space = spaces.Euclidean(self.prior_mean.shape)
         self._space = self.prior_mean.space
 
         # Learning
-        # self.posterior = None
+        self.posterior = None
+        self.posterior_model = rand_elements.Mixture([self.prior_mean], [self.alpha_0])
 
-        self.emp_dist = None
-        self.posterior_model = None     # TODO: mixture dist
+    is_fit = property(lambda self: self.posterior_model.n_dists > 1)
+
+    @property
+    def n(self):
+        if self.is_fit:
+            return self.posterior_model.dists[1].n
+        else:
+            return 0
 
     def random_model(self, rng=None):
         raise NotImplementedError       # TODO: implement for finite in subclass?
 
     def _rvs(self, n, rng):
-        # Samples directly from the marginal data distribution
-        _out = np.empty((n, *self.shape))
+        # Samples directly from the marginal Dirichlet-Empirical data distribution
+        _out = np.empty((n, *self.shape), dtype=self.space.dtype)
         for i in range(n):
             if rng.random() <= self.alpha_0 / (self.alpha_0 + i):
                 _out[i] = self.prior_mean.rvs(rng=rng)     # sample from mean distribution
@@ -222,4 +228,41 @@ class Dirichlet(Base):
         return _out
 
     def _fit(self, d, warm_start=False):
-        self.emp_dist = GenericEmpirical(d)        # TODO: in-place?
+
+        if not self.is_fit:
+            warm_start = False
+
+        n = len(d)
+        if n == 0:
+            if not warm_start and self.is_fit:
+                self.posterior_model.del_dist(1)    # delete empirical distribution
+        else:
+            if warm_start:
+                emp_dist = self.posterior_model.dists[1]
+                emp_dist.add_data(d)
+                self.posterior_model.set_dist(1, emp_dist, emp_dist.n)
+            else:
+                emp_dist = rand_elements.GenericEmpirical(d, self.space)
+                if self.is_fit:
+                    self.posterior_model.set_dist(1, emp_dist, emp_dist.n)
+                else:
+                    self.posterior_model.add_dist(emp_dist, emp_dist.n)
+
+
+if __name__ == '__main__':
+    alpha = rand_elements.Beta(5, 25)
+    theta = rand_elements.Beta(25, 5)
+
+    # alpha = rand_elements.Finite(['a', 'b'], [.2, .8])
+    # theta = rand_elements.Finite(['a', 'b'], [.8, .2])
+
+    a = Dirichlet(alpha_0=10, prior_mean=alpha)
+    a.rvs(5)
+    print(a.posterior_model.mode)
+    # print(a.posterior_model.mean)
+    a.posterior_model.plot_pf()
+    a.fit(theta.rvs(10))
+    a.rvs(10)
+    print(a.posterior_model.mode)
+    # print(a.posterior_model.mean)
+    a.posterior_model.plot_pf()

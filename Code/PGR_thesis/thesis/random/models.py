@@ -243,7 +243,7 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):
             self.basis_y_x = basis_y_x
 
     def __repr__(self):
-        return f"NormalRVModel(model_x={self.model_x}, basis_y_x={self.basis_y_x}, " \
+        return f"NormalModel(model_x={self.model_x}, basis_y_x={self.basis_y_x}, " \
                f"weights={self.weights}, cov_y_x={self._cov_repr})"
 
     @property

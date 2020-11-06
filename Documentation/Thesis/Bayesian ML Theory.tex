@@ -1242,6 +1242,8 @@ a Dirichlet distribution with concentration $\alpha_0 + N$ and parameter distrib
 & = & \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpha + \left(\frac{N}{\alpha_0 + N}\right) \Psi(\Drm) \nonumber \;.
 \end{IEEEeqnarray}
 
+\todolo{Comment on N=0 case, psi not a valid PF?}
+
 This posterior distribution is of specific interest in the machine learning literature. While Bayesian techniques are used here, often point estimates of the model $\uptheta$ are formed; perhaps the most common approach is to form the Maximum a posteriori estimate,
 \begin{IEEEeqnarray}{rCl}
 \theta_\mathrm{MAP}(D) & = & \argmax_{\theta \in \Uptheta} \Prm_{\uptheta | \Drm}(\theta | D) - \frac{\alpha_0 \alpha + N \Psi(D) - 1}{\alpha_0 + N - |\Ycal||\Xcal|} \\

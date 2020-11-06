@@ -92,7 +92,8 @@ class FiniteGeneric(Finite):
             set_ndim = self.set_ndim
         else:
             x = np.array(x)
-            set_ndim = x.shape[:x.ndim - self.ndim]
+            # set_shape = x.shape[:x.ndim - self.ndim]
+            set_ndim = x.ndim - self.ndim
 
         if set_ndim == 1 and self.shape == ():
             if ax is None:
@@ -150,7 +151,7 @@ class Euclidean(Continuous):
             return False
 
     def _set_x_plot(self):
-        if self.shape in ((), (2,)):
+        if self.shape in {(), (2,)}:
             lims = np.broadcast_to([0, 1], shape=(*self.shape, 2))
             self.x_plt = box_grid(lims, 100, endpoint=False)
         else:
@@ -209,7 +210,7 @@ class Box(Euclidean):
             return False
 
     def _set_x_plot(self):
-        if self.shape in ((), (2,)):
+        if self.shape in {(), (2,)}:
             self.x_plt = box_grid(self.lims, 100, endpoint=False)
         else:
             self.x_plt = None
@@ -242,7 +243,7 @@ class Simplex(Continuous):
             return False
 
     def _set_x_plot(self):
-        if self.shape in ((2,), (3,)):
+        if self.shape in {(2,), (3,)}:
             self.x_plt = simplex_grid(40, self._shape)
         else:
             self.x_plt = None
@@ -302,7 +303,7 @@ class SimplexDiscrete(Simplex):
             return False
 
     def _set_x_plot(self):
-        if self.shape in ((2,), (3,)):
+        if self.shape in {(2,), (3,)}:
             self.x_plt = simplex_grid(self.n, self._shape)
         else:
             self.x_plt = None
