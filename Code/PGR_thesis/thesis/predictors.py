@@ -320,8 +320,8 @@ class Base(ABC):
 
         self.model = None
 
-    # def __repr__(self):
-    #     return self.__class__.__name__ + f"(model={self.model})"
+    def __str__(self):
+        return self.__class__.__name__ + f"(model={self.model})"
 
     shape = property(lambda self: self.model.shape)
     size = property(lambda self: self.model.size)
@@ -502,7 +502,6 @@ class Bayes(Base):
 
     def plot_param_dist(self, x=None, ax_prior=None):  # TODO: improve or remove?
         if x is None:
-            # x = self.prior.x_plot_default
             raise ValueError        # TODO
 
         self.prior.plot_pf(x, ax=ax_prior)

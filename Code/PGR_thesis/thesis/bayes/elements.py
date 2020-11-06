@@ -7,8 +7,9 @@ import math
 import numpy as np
 from scipy.stats._multivariate import _PSD
 
-from thesis.random.elements import Normal, Base as BaseRE, NormalLinear as NormalLinearRE, EmpiricalDist
+from thesis.random.elements import Normal, Base as BaseRE, NormalLinear as NormalLinearRE, GenericEmpirical
 from thesis.util.generic import RandomGeneratorMixin
+from thesis.util import spaces
 
 np.set_printoptions(precision=2)
 
@@ -21,15 +22,17 @@ class Base(RandomGeneratorMixin):
     def __init__(self, prior=None, rng=None):
         super().__init__(rng)
 
-        self._shape = None
+        self._space = None
 
         self.prior = prior
         self.posterior = None
         self.posterior_model = None
 
-    shape = property(lambda self: self._shape)
-    size = property(lambda self: math.prod(self._shape))
-    ndim = property(lambda self: len(self._shape))
+    space = property(lambda self: self._space)
+
+    shape = property(lambda self: self._space.shape)
+    size = property(lambda self: self._space.size)
+    ndim = property(lambda self: self._space.ndim)
 
     def random_model(self, rng=None):
         raise NotImplementedError
@@ -141,7 +144,7 @@ class NormalLinear(Base):
         self._cov = np.array(val)
 
         _temp = self._cov.shape
-        self._shape = _temp[:int(len(_temp) / 2)]
+        self._space = spaces.Euclidean(_temp[:int(len(_temp) / 2)])
 
         self._prec_U = _PSD(self._cov.reshape(2 * (self.size,)), allow_singular=False).U
 
@@ -195,7 +198,7 @@ class Dirichlet(Base):
         self.alpha_0 = alpha_0
         self.prior_mean = prior_mean
 
-        self._shape = self.prior_mean.shape
+        self._space = spaces.Euclidean(self.prior_mean.shape)
 
         # Learning
         # self.posterior = None
@@ -218,4 +221,4 @@ class Dirichlet(Base):
         return _out
 
     def _fit(self, d, warm_start=False):
-        self.emp_dist = EmpiricalDist(d)        # TODO: in-place?
+        self.emp_dist = GenericEmpirical(d)        # TODO: in-place?

@@ -97,3 +97,7 @@ def box_grid(lims, n=100, endpoint=False):
 
     # if not (lims[..., 0] <= lims[..., 1]).all():
     #     raise ValueError("Upper values must meet or exceed lower values.")
+
+
+def mesh_grid(*args):
+    return np.stack(np.meshgrid(*args[::-1])[::-1], axis=-1)
