@@ -94,7 +94,8 @@ def check_valid_pmf(p, data_shape=None, full_support=False, tol=1e-9):
         if np.min(p) < 0:
             raise ValueError("Each entry in 'p' must be non-negative.")
 
-    if (np.abs(p.reshape(set_shape + (-1,)).sum(-1) - 1.0) > tol).any():
+    # if (np.abs(p.reshape(*set_shape, -1).sum(-1) - 1.0) > tol).any():
+    if not np.allclose(p.reshape(*set_shape, -1).sum(-1), 1., rtol=tol):
         raise ValueError("The input 'p' must lie within the normal simplex, but p.sum() = %s." % p.sum())
 
     if data_shape is None:

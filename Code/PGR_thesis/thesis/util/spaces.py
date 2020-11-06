@@ -6,7 +6,8 @@ from matplotlib import pyplot as plt
 from thesis.util.plot import simplex_grid, box_grid
 
 # TODO: use get_axes_xy?
-# TODO: implement rest of __contains__
+
+# TODO: numerical approximation of mode, etc.?
 
 # def infer_space(sample):      # TODO
 #     sample = np.array(sample)
@@ -66,7 +67,7 @@ class FiniteGeneric(Finite):
 
         self._set_x_plot()
 
-    def __str__(self):
+    def __repr__(self):
         return f"FiniteGeneric({self.support})"
 
     def __eq__(self, other):
@@ -76,11 +77,11 @@ class FiniteGeneric(Finite):
 
     def __contains__(self, item):
         item = np.array(item)
-        if item.shape != self.shape or item.dtype != self.dtype:
-            return False
-        else:
+        if item.shape == self.shape and item.dtype == self.dtype:
             eq_supp = np.all(item.flatten() == self._supp_flat, axis=-1)
             return eq_supp.sum() > 0
+        else:
+            return False
 
     def _set_x_plot(self):
         self.x_plt = self.support
@@ -133,7 +134,7 @@ class Euclidean(Continuous):
 
         self._set_x_plot()
 
-    def __str__(self):
+    def __repr__(self):
         return f"Euclidean{self.shape}"
 
     def __eq__(self, other):
@@ -143,10 +144,10 @@ class Euclidean(Continuous):
 
     def __contains__(self, item):
         item = np.array(item)
-        if item.shape != self.shape or item.dtype != self.dtype:
-            return False
-        else:
+        if item.shape == self.shape and item.dtype == self.dtype:
             return True
+        else:
+            return False
 
     def _set_x_plot(self):
         if self.shape in ((), (2,)):
@@ -192,7 +193,7 @@ class Box(Euclidean):
 
         super().__init__(shape=self.lims.shape[:-1])
 
-    def __str__(self):
+    def __repr__(self):
         return f"Box({self.lims})"
 
     def __eq__(self, other):
@@ -202,10 +203,10 @@ class Box(Euclidean):
 
     def __contains__(self, item):
         item = np.array(item)
-        if item.shape != self.shape or item.dtype != self.dtype:
-            return False
+        if item.shape == self.shape and item.dtype == self.dtype:
+            return (item >= self.lims[..., 0]).all() and (item <= self.lims[..., 1]).all()
         else:
-            raise NotImplementedError       # TODO
+            return False
 
     def _set_x_plot(self):
         if self.shape in ((), (2,)):
@@ -221,13 +222,24 @@ class Simplex(Continuous):
 
         self._set_x_plot()
 
-    def __str__(self):
+    def __repr__(self):
         return f"Simplex{self.shape}"
 
     def __eq__(self, other):
         if isinstance(other, Simplex):
             return self.shape == other.shape
         return NotImplemented
+
+    def __contains__(self, item):
+        item = np.array(item)
+        if item.shape == self.shape and item.dtype == self.dtype:
+            conditions = ((item >= np.zeros(self.shape)).all(),
+                          (item <= np.ones(self.shape)).all(),
+                          np.allclose(item.sum(), 1., rtol=1e-9),
+                          )
+            return all(conditions)
+        else:
+            return False
 
     def _set_x_plot(self):
         if self.shape in ((2,), (3,)):
@@ -269,13 +281,25 @@ class SimplexDiscrete(Simplex):
         self.n = n
         super().__init__(shape)
 
-    def __str__(self):
+    def __repr__(self):
         return f"SimplexDiscrete({self.n}, {self.shape})"
 
     def __eq__(self, other):
         if isinstance(other, SimplexDiscrete):
             return self.shape == other.shape and self.n == other.n
         return NotImplemented
+
+    def __contains__(self, item):
+        item = np.array(item)
+        if item.shape == self.shape and item.dtype == self.dtype:
+            conditions = ((item >= np.zeros(self.shape)).all(),
+                          (item <= np.ones(self.shape)).all(),
+                          np.allclose(item.sum(), 1., rtol=1e-9),
+                          (np.minimum((self.n * item) % 1, (-self.n * item) % 1) < 1e-9).all(),
+                          )
+            return all(conditions)
+        else:
+            return False
 
     def _set_x_plot(self):
         if self.shape in ((2,), (3,)):
