@@ -320,7 +320,7 @@ class Base(ABC):
 
         self.model = None
 
-    def __str__(self):
+    def __repr__(self):
         return self.__class__.__name__ + f"(model={self.model})"
 
     shape = property(lambda self: self.model.shape)

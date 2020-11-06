@@ -198,7 +198,8 @@ class Dirichlet(Base):
         self.alpha_0 = alpha_0
         self.prior_mean = prior_mean
 
-        self._space = spaces.Euclidean(self.prior_mean.shape)
+        # self._space = spaces.Euclidean(self.prior_mean.shape)
+        self._space = self.prior_mean.space
 
         # Learning
         # self.posterior = None
