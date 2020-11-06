@@ -68,7 +68,7 @@ class Base(RandomGeneratorMixin):
         rng = self._get_rng(rng)
         # return self._rvs(math.prod(shape), rng).reshape(shape + self.shape)
         rvs = self._rvs(math.prod(shape), rng)
-        return rvs.reshape(shape + rvs.shape[1:])     # FIXME
+        return rvs.reshape(shape + rvs.shape[1:])    # TODO: use np.asscalar if possible?
 
     def _rvs(self, n, rng):
         raise NotImplementedError("Method must be overwritten.")
@@ -523,6 +523,9 @@ class Beta(BaseRV):
 
         self._update_attr()
 
+    def __repr__(self):
+        return f"Beta({self.a}, {self.b})"
+
     # Input properties
     @property
     def a(self):
@@ -595,7 +598,7 @@ class Normal(BaseRV):
         self.cov = cov
 
     def __repr__(self):
-        return f"NormalRV(mean={self.mean}, cov={self.cov})"
+        return f"Normal(mean={self.mean}, cov={self.cov})"
 
     @property
     def mean(self):
@@ -644,7 +647,7 @@ class Normal(BaseRV):
         return np.exp(log_pf)
 
     def plot_pf(self, x=None, ax=None):
-        if x is None and self.shape in ((), (2,)):
+        if x is None and self.shape in {(), (2,)}:
             if self.shape == ():
                 lims = self._mean.item() + np.array([-1, 1]) * 3 * np.sqrt(self._cov.item())
             else:   # self.shape == (2,):
@@ -753,9 +756,12 @@ class GenericEmpirical(Base):       # TODO: implement using factory of Finite ob
         self.values, self.counts = self._count_data(d)
         self._values_flat = self.values.reshape(-1, self.size)
 
-        self._update_stats()
+        self._update_attr()
 
-    def _update_stats(self):
+    def __repr__(self):
+        return f"GenericEmpirical(space={self.space}, n={self.n})"
+
+    def _update_attr(self):
         self.p = self.counts / self.n
         self._mode = self.values[self.p.argmax()]
 
@@ -784,12 +790,12 @@ class GenericEmpirical(Base):       # TODO: implement using factory of Finite ob
 
             self._values_flat = np.concatenate((self._values_flat, values_new.reshape(-1, self.size)), axis=0)
 
-        self._update_stats()        # TODO: add efficient updates
+        self._update_attr()        # TODO: add efficient updates
 
     def _rvs(self, size, rng):
         return rng.choice(self.values, size, p=self.p)
 
-    def pf(self, x):        # FIXME: impulsive output for continuous spaces??? add `values` to support?
+    def pf(self, x):        # TODO: implement infinite valued output for continuous space!?
         x, set_shape = check_data_shape(x, self.shape)
         x = x.reshape((math.prod(set_shape), *self.shape))
 
@@ -811,10 +817,17 @@ class GenericEmpirical(Base):       # TODO: implement using factory of Finite ob
     #
     #     return self.p[eq_supp].squeeze()
 
+    def plot_pf(self, x=None, ax=None):
+        if x is None and isinstance(self.space, spaces.Continuous) and self.shape in {()}:
+            x = self.space.x_plt
+            x = np.sort(np.concatenate((x, self.values)))
+
+        return super().plot_pf(x, ax)
+
 
 class GenericEmpiricalRV(MixinRV, GenericEmpirical):
-    def _update_stats(self):
-        super()._update_stats()
+    def _update_attr(self):
+        super()._update_attr()
 
         mean_flat = (self._values_flat * self.p[:, np.newaxis]).sum(0)
         self._mean = mean_flat.reshape(self.shape)
@@ -824,9 +837,9 @@ class GenericEmpiricalRV(MixinRV, GenericEmpirical):
         self._cov = (self.p[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self.shape)
 
 
-# # r = Beta(5, 5)
+# r = Beta(5, 5)
 # # r = Finite(plot.mesh_grid([0, 1], [3, 4, 5]), Dirichlet(10, np.ones((2, 3))/6).rvs())
-# r = Finite(['a', 'b'], [.6, .4])
+# # r = Finite(['a', 'b'], [.7, .3])
 # e = GenericEmpirical(r.rvs(10), space=r.space)
 # e.add_data(r.rvs(5))
 # print(e)
@@ -842,7 +855,7 @@ class Mixture(Base):
 
     def __init__(self, dists, weights, rng=None):       # TODO: special implementation for Finite? get modes, etc?
         super().__init__(rng)
-        self.dists = dists      # FIXME: updates on set??? `_set_dist` method or something?
+        self.dists = list(dists)
 
         self._space = self.dists[0].space
         if not all(dist.space == self.space for dist in self.dists[1:]):
@@ -850,29 +863,56 @@ class Mixture(Base):
 
         self.weights = weights
 
+    def __repr__(self):
+        _str = "; ".join([f"{prob}: {dist}" for dist, prob in zip(self.dists, self._p)])
+        return f"Mixture({_str})"
+
+    n_dists = property(lambda self: len(self.dists))
+
     @property
     def weights(self):
         return self._weights
 
     @weights.setter
     def weights(self, value):
-        self._weights = np.array(value)
-        if self._weights.sum() != 1:
-            raise ValueError("Weights must sum to one.")
+        self._weights = list(value)
+        if len(self._weights) != self.n_dists:
+            raise ValueError(f"Weights must have length {self.n_dists}.")
+        # elif self._weights.sum() != 1:
+        #     raise ValueError("Weights must sum to one.")
 
-        if self._weights.shape == (len(self.dists),):
-            self.n_dists = self.weights.size
-        else:
-            raise ValueError
+        self._p = np.array(self._weights) / sum(self.weights)
 
-    def _update_stats(self):
-        self._mode = None  # TODO: formula???
+        self._update_attr()
 
-    def pf(self, x):
-        return sum(weight * dist.pf(x) for dist, weight in zip(self.dists, self._weights))
+    def set_dist_attr(self, idx, **dist_kwargs):      # TODO: improved implementation w/ direct self.dists access?
+        dist = self.dists[idx]
+        for key, val in dist_kwargs.items():
+            setattr(dist, key, val)
+        self._update_attr()
+
+    def add_dist(self, dist, weight):
+        self.dists.append(dist)
+        # self.weights.append(weight)
+        self.weights += [weight]
+
+    def set_dist(self, idx, dist, weight):
+        self.dists[idx] = dist
+        self.weights[idx] = weight      # setter not invoked
+        self._update_attr()
+
+    def del_dist(self, idx):
+        del self.dists[idx]
+        _w = self.weights
+        del _w[idx]
+        self.weights = _w
+
+    def _update_attr(self):
+        self._mode = None  # TODO: formula??? numeric approx?
 
     def _rvs(self, n, rng):
-        c = rng.choice(self.n_dists, size=n, p=self._weights)
+        # c = rng.choice(self.n_dists, size=n, p=self._weights)
+        c = rng.choice(self.n_dists, size=n, p=self._p)
         out = np.empty((n, *self.shape), dtype=self.space.dtype)
         for i, dist in enumerate(self.dists):
             idx = np.flatnonzero(c == i)
@@ -880,19 +920,32 @@ class Mixture(Base):
 
         return out
 
+    def pf(self, x):
+        # return sum(weight * dist.pf(x) for dist, weight in zip(self.dists, self._weights))
+        return sum(prob * dist.pf(x) for dist, prob in zip(self.dists, self._p))
+
+    def plot_pf(self, x=None, ax=None):     # TODO
+        if x is None and isinstance(self.space, spaces.Continuous) and self.shape in {()}:
+            x = self.space.x_plt
+            for dist in self.dists:
+                if isinstance(dist, GenericEmpirical):
+                    x = np.sort(np.concatenate((x, dist.values)))
+
+        return super().plot_pf(x, ax)
+
 
 class MixtureRV(MixinRV, Mixture):
-    def _update_stats(self):
-        super()._update_stats()
+    def _update_attr(self):
+        super()._update_attr()
 
-        self._mean = sum(weight * dist.mean for dist, weight in zip(self.dists, self._weights))
+        # self._mean = sum(weight * dist.mean for dist, weight in zip(self.dists, self._weights))
+        self._mean = sum(prob * dist.mean for dist, prob in zip(self.dists, self._p))
         self._cov = None  # TODO
 
 
 # dists_ = [Normal(mean, 1) for mean in [0, 10]]
 # # dists_ = [Finite(['a', 'b'], p=[p_, 1-p_]) for p_ in [.5, 1]]
-# w = [.5, .5]
-# m = Mixture(dists_, w)
+# m = Mixture(dists_, [5, 5])
 # m.rvs(10)
 # m.plot_pf(x=np.linspace(-10, 20, 1001))
 # pass

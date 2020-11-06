@@ -67,9 +67,9 @@ def predict_stats_compare(predictors, x, model, params=None, n_train=0, n_mc=1, 
     # Generate statistics
     _samp, dtype = (), []
     for stat in stats:
-        if stat in ('mode', 'median', 'mean'):
+        if stat in {'mode', 'median', 'mean'}:
             stat_shape = set_shape + shape['y']
-        elif stat in ('std', 'cov'):
+        elif stat in {'std', 'cov'}:
             stat_shape = set_shape + 2 * shape['y']
         else:
             raise ValueError
