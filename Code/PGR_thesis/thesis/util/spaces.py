@@ -6,15 +6,23 @@ from matplotlib import pyplot as plt
 from thesis.util.plot import simplex_grid, box_grid
 
 # TODO: use get_axes_xy?
+# TODO: implement rest of __contains__
+
+# def infer_space(sample):      # TODO
+#     sample = np.array(sample)
+#     if np.issubdtype(sample.dtype, np.number):
+#         return Euclidean(sample.shape)
+#     else:
+#         pass
 
 
 class Space:
-    def __init__(self, shape):
+    def __init__(self, shape, dtype):
         self._shape = tuple(shape)
         self._size = math.prod(self._shape)
         self._ndim = len(self._shape)
 
-        self._dtype = np.number
+        self._dtype = dtype
 
     shape = property(lambda self: self._shape)
     size = property(lambda self: self._size)
@@ -34,21 +42,24 @@ class Finite(Discrete):
 
 
 class Continuous(Space):
-    pass
+    def __init__(self, shape):
+        super().__init__(shape, np.float64)
 
 
 #
 class FiniteGeneric(Finite):
-    def __init__(self, support, shape):
-        super().__init__(shape)
-
+    def __init__(self, support, shape=()):
         self.support = np.array(support)
-        self._dtype = self.support.dtype
+        super().__init__(shape, self.support.dtype)
 
         _supp_shape = self.support.shape
         _idx_split = self.support.ndim - self.ndim
         if _supp_shape[_idx_split:] != self.shape:
             raise ValueError(f"Support trailing shape must be {self.shape}.")
+
+        self._supp_flat = self.support.reshape(-1, self.size)
+        if len(self._supp_flat) != len(np.unique(self._supp_flat, axis=0)):
+            raise ValueError("Input 'support' must have unique values")
 
         self.set_shape = _supp_shape[:_idx_split]
         self.set_ndim = len(self.set_shape)
@@ -62,6 +73,14 @@ class FiniteGeneric(Finite):
         if isinstance(other, FiniteGeneric):
             return self.shape == other.shape and (self.support == other.support).all
         return NotImplemented
+
+    def __contains__(self, item):
+        item = np.array(item)
+        if item.shape != self.shape or item.dtype != self.dtype:
+            return False
+        else:
+            eq_supp = np.all(item.flatten() == self._supp_flat, axis=-1)
+            return eq_supp.sum() > 0
 
     def _set_x_plot(self):
         self.x_plt = self.support
@@ -122,6 +141,13 @@ class Euclidean(Continuous):
             return self.shape == other.shape
         return NotImplemented
 
+    def __contains__(self, item):
+        item = np.array(item)
+        if item.shape != self.shape or item.dtype != self.dtype:
+            return False
+        else:
+            return True
+
     def _set_x_plot(self):
         if self.shape in ((), (2,)):
             lims = np.broadcast_to([0, 1], shape=(*self.shape, 2))
@@ -173,6 +199,13 @@ class Box(Euclidean):
         if isinstance(other, Box):
             return self.lims == other.lims
         return NotImplemented
+
+    def __contains__(self, item):
+        item = np.array(item)
+        if item.shape != self.shape or item.dtype != self.dtype:
+            return False
+        else:
+            raise NotImplementedError       # TODO
 
     def _set_x_plot(self):
         if self.shape in ((), (2,)):

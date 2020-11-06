@@ -66,9 +66,9 @@ class Base(RandomGeneratorMixin):
             raise TypeError("Input 'size' must be int or tuple.")
 
         rng = self._get_rng(rng)
-        # return self._rvs(math.prod(shape), rng).reshape(shape + self.shape)
-        rvs = self._rvs(math.prod(shape), rng)
-        return rvs.reshape(shape + rvs.shape[1:])
+        return self._rvs(math.prod(shape), rng).reshape(shape + self.shape)
+        # rvs = self._rvs(math.prod(shape), rng)
+        # return rvs.reshape(shape + rvs.shape[1:])     # FIXME
 
     def _rvs(self, n, rng):
         raise NotImplementedError("Method must be overwritten.")
@@ -218,9 +218,23 @@ class Finite(Base):
     def _rvs(self, n, rng):
         return rng.choice(self._supp_flat, size=n, p=self._p_flat)
 
+    # def pf(self, x, check_set=True):
+    #     x, set_shape = check_data_shape(x, self.shape)
+    #     x = x.reshape(-1, self.size)
+    #
+    #     out = np.empty(len(x))
+    #     for i, x_i in enumerate(x):
+    #         eq_supp = np.all(x_i == self._supp_flat, axis=-1)
+    #         if check_set and eq_supp.sum() != 1:
+    #             raise ValueError("Input 'x' must be in the support.")
+    #
+    #         out[i] = self._p_flat[eq_supp].squeeze()
+    #
+    #     return out.reshape(set_shape)
+
     def _pf_single(self, x):
         eq_supp = np.all(x.flatten() == self._supp_flat, axis=-1)
-        if eq_supp.sum() != 1:
+        if eq_supp.sum() == 0:
             raise ValueError("Input 'x' must be in the support.")
 
         return self._p_flat[eq_supp].squeeze()
@@ -242,10 +256,11 @@ class FiniteRV(MixinRV, Finite):
         self._cov = (self._p_flat[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self.shape)
 
 
-# s = np.random.random((1, 1, 2))
-# pp = np.random.random((1,))
+# s = np.random.random((3, 1, 2))
+# pp = np.random.random((3,))
 # pp = pp / pp.sum()
 # f = Finite(s, pp)
+# f.rvs((2, 3))
 # f.pf(f.rvs((4, 5)))
 #
 # s = plot.mesh_grid([0, 1], [0, 1, 2])
@@ -719,23 +734,24 @@ class NormalLinear(Normal):
 #         return np.unique(d, return_counts=True, axis=0)
 
 
-class EmpiricalDist(Base):       # TODO: implement using factory of Finite object?
+class GenericEmpirical(Base):       # TODO: implement using factory of Finite object?
 
-    def __new__(cls, d, rng=None):
+    def __new__(cls, d, space=None, rng=None):
         if np.issubdtype(np.array(d).dtype, np.number):
-            return super().__new__(EmpiricalDistRV)
+            return super().__new__(GenericEmpiricalRV)
         else:
             return super().__new__(cls)
 
     def __init__(self, d, space=None, rng=None):
         super().__init__(rng)
-        self.n = len(d)
-        self.values, self.counts = self._count_data(d)
 
         if space is None:
-            self._space = spaces.Euclidean(self.values.shape[1:])       # TODO: subclass for FiniteGeneric space?
+            self._space = spaces.Euclidean(d[0].shape)       # TODO: subclass for FiniteGeneric space?
         else:
             self._space = space
+
+        self.n = len(d)
+        self.values, self.counts = self._count_data(d)
 
         self._values_flat = self.values.reshape(-1, self.size)
         self.p = self.counts / self.n
@@ -776,18 +792,30 @@ class EmpiricalDist(Base):       # TODO: implement using factory of Finite objec
     def _rvs(self, size, rng):
         return rng.choice(self.values, size, p=self.p)
 
-    def _pf_single(self, x):
-        eq_supp = np.all(x.flatten() == self._values_flat, axis=-1)
-        if eq_supp.sum() != 1:
-            raise ValueError("Input 'x' must be in the support.")
+    def pf(self, x):
+        x, set_shape = check_data_shape(x, self.shape)
+        x = x.reshape((math.prod(set_shape), *self.shape))
 
-        return self.p[eq_supp].squeeze()
+        out = np.zeros(len(x))
+        for i, x_i in enumerate(x):
+            if x_i in self.space:
+                eq_supp = np.all(x_i.flatten() == self._values_flat, axis=-1)
+                if eq_supp.sum() > 0:
+                    out[i] = self.p[eq_supp].squeeze()
+            else:
+                raise ValueError("Must be in support.")
 
-    # def plot_pf(self, ax=None):
-    #     raise NotImplementedError       # TODO: definitely for finite
+        return out.reshape(set_shape)
+
+    # def _pf_single(self, x):
+    #     eq_supp = np.all(x.flatten() == self._values_flat, axis=-1)
+    #     if eq_supp.sum() != 1:
+    #         raise ValueError("Input 'x' must be in the support.")
+    #
+    #     return self.p[eq_supp].squeeze()
 
 
-class EmpiricalDistRV(MixinRV, EmpiricalDist):
+class GenericEmpiricalRV(MixinRV, GenericEmpirical):
     def _update_stats(self):
         super()._update_stats()
 
@@ -798,18 +826,17 @@ class EmpiricalDistRV(MixinRV, EmpiricalDist):
         outer_flat = (ctr_flat[:, np.newaxis] * ctr_flat[..., np.newaxis]).reshape(len(ctr_flat), -1)
         self._cov = (self.p[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self.shape)
 
-    # def plot_pf(self, ax=None):
-    #     raise NotImplementedError
 
-
-# s = np.random.default_rng().random((2, 1, 3))
+# # s = np.random.default_rng().random((2, 1, 3))
 # # s = [[0, 1], [3, 6]]
+# s = [0, .5]
 # # s = ['a', 'b']
 # rng_ = np.random.default_rng()
 # d_ = rng_.choice(s, size=10, p=[.5, .5])
-# e = EmpiricalDist(d_)
+# e = GenericEmpirical(d_, space=spaces.FiniteGeneric([0,.1,.5,.6]))
 # e.add_data(d_)
 # print(e)
+# e.plot_pf()
 
 
 class Mixture(Base):
@@ -850,9 +877,6 @@ class Mixture(Base):
     def pf(self, x):        # TODO: check plotting
         return sum(weight * dist.pf(x) for dist, weight in zip(self.dists, self._weights))
 
-    # def plot_pf(self, x, ax=None):        # TODO
-    #     pass
-
     def _rvs(self, n, rng):
         c = rng.choice(self.n_dists, size=n, p=self._weights)
         out = np.empty((n, *self.shape), dtype=self.space.dtype)
@@ -871,9 +895,10 @@ class MixtureRV(MixinRV, Mixture):
         self._cov = None  # TODO
 
 
-# # dists_ = [Normal(mean, .01) for mean in [0, 10]]
-# dists_ = [Finite(['a', 'b'], p=[p_, 1-p_]) for p_ in [0, 1]]
+# dists_ = [Normal(mean, 1) for mean in [0, 10]]
+# # dists_ = [Finite(['a', 'b'], p=[p_, 1-p_]) for p_ in [.5, 1]]
 # w = [.5, .5]
 # m = Mixture(dists_, w)
 # m.rvs(10)
+# m.plot_pf(x=np.linspace(-10, 20, 1001))
 # pass
