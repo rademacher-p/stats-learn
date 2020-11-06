@@ -41,7 +41,7 @@ class Base(RandomGeneratorMixin):
 
     mode = property(lambda self: self._mode)
 
-    def pf(self, x):
+    def pf(self, x):    # TODO: perform input checks using `space.__contains__`?
         return vectorize_func(self._pf_single, self.shape)(x)     # TODO: decorator? better way?
 
     def _pf_single(self, x):
@@ -66,9 +66,9 @@ class Base(RandomGeneratorMixin):
             raise TypeError("Input 'size' must be int or tuple.")
 
         rng = self._get_rng(rng)
-        return self._rvs(math.prod(shape), rng).reshape(shape + self.shape)
-        # rvs = self._rvs(math.prod(shape), rng)
-        # return rvs.reshape(shape + rvs.shape[1:])     # FIXME
+        # return self._rvs(math.prod(shape), rng).reshape(shape + self.shape)
+        rvs = self._rvs(math.prod(shape), rng)
+        return rvs.reshape(shape + rvs.shape[1:])     # FIXME
 
     def _rvs(self, n, rng):
         raise NotImplementedError("Method must be overwritten.")
@@ -216,7 +216,7 @@ class Finite(Base):
         self._mode = self._supp_flat[np.argmax(self._p_flat)].reshape(self.shape)
 
     def _rvs(self, n, rng):
-        return rng.choice(self._supp_flat, size=n, p=self._p_flat)
+        return rng.choice(self._supp_flat.reshape(-1, *self.shape), size=n, p=self._p_flat)
 
     # def pf(self, x, check_set=True):
     #     x, set_shape = check_data_shape(x, self.shape)
@@ -327,7 +327,7 @@ class Dirichlet(BaseRV):
         self._log_pf_coef = gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
 
     def _rvs(self, n, rng):
-        return rng.dirichlet(self._alpha_0 * self._mean.flatten(), size=n)
+        return rng.dirichlet(self._alpha_0 * self._mean.flatten(), size=n).reshape(n, *self.shape)
 
     def pf(self, x):
         x, set_shape = _dirichlet_check_input(x, self._alpha_0, self._mean)
@@ -358,7 +358,6 @@ class Dirichlet(BaseRV):
 def _empirical_check_input(x, n, mean):
     x, set_shape = check_valid_pmf(x, data_shape=mean.shape)
 
-    # if ((n * x) % 1 > 0).any():
     if (np.minimum((n * x) % 1, (-n * x) % 1) > 1e-9).any():
         raise ValueError("Each entry in 'x' must be a multiple of 1/n.")
 
@@ -407,7 +406,7 @@ class Empirical(BaseRV):
         self._cov = (diag_gen(self._mean) - outer_gen(self._mean, self._mean)) / self._n
 
     def _rvs(self, n, rng):
-        return rng.multinomial(self._n, self._mean.flatten(), size=n) / self._n
+        return rng.multinomial(self._n, self._mean.flatten(), size=n).reshape(n, *self.shape) / self._n
 
     def pf(self, x):
         x, set_shape = _empirical_check_input(x, self._n, self._mean)
@@ -595,7 +594,7 @@ class Normal(BaseRV):
         self.mean = mean
         self.cov = cov
 
-    def __str__(self):
+    def __repr__(self):
         return f"NormalRV(mean={self.mean}, cov={self.cov})"
 
     @property
@@ -633,7 +632,7 @@ class Normal(BaseRV):
         self._log_pf_coef = -0.5 * (psd.rank * np.log(2 * np.pi) + psd.log_pdet)
 
     def _rvs(self, n, rng):
-        return rng.multivariate_normal(self._mean_flat, self._cov_flat, size=n)
+        return rng.multivariate_normal(self._mean_flat, self._cov_flat, size=n).reshape(n, *self.shape)
 
     def pf(self, x):
         x, set_shape = check_data_shape(x, self.shape)
@@ -681,7 +680,7 @@ class NormalLinear(Normal):
 
         self.weights = weights
 
-    def __str__(self):
+    def __repr__(self):
         return f"NormalLinear(weights={self.weights}, basis={self.basis}, cov={self.cov})"
 
     @property
@@ -752,14 +751,13 @@ class GenericEmpirical(Base):       # TODO: implement using factory of Finite ob
 
         self.n = len(d)
         self.values, self.counts = self._count_data(d)
-
         self._values_flat = self.values.reshape(-1, self.size)
-        self.p = self.counts / self.n
 
         self._update_stats()
 
     def _update_stats(self):
-        self._mode = self.values[self.counts.argmax()]
+        self.p = self.counts / self.n
+        self._mode = self.values[self.p.argmax()]
 
     @staticmethod
     def _count_data(d):
@@ -785,14 +783,13 @@ class GenericEmpirical(Base):       # TODO: implement using factory of Finite ob
             self.counts = np.concatenate((self.counts, counts_new), axis=0)
 
             self._values_flat = np.concatenate((self._values_flat, values_new.reshape(-1, self.size)), axis=0)
-            self.p = self.counts / self.n
 
         self._update_stats()        # TODO: add efficient updates
 
     def _rvs(self, size, rng):
         return rng.choice(self.values, size, p=self.p)
 
-    def pf(self, x):
+    def pf(self, x):        # FIXME: impulsive output for continuous spaces??? add `values` to support?
         x, set_shape = check_data_shape(x, self.shape)
         x = x.reshape((math.prod(set_shape), *self.shape))
 
@@ -827,14 +824,11 @@ class GenericEmpiricalRV(MixinRV, GenericEmpirical):
         self._cov = (self.p[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self.shape)
 
 
-# # s = np.random.default_rng().random((2, 1, 3))
-# # s = [[0, 1], [3, 6]]
-# s = [0, .5]
-# # s = ['a', 'b']
-# rng_ = np.random.default_rng()
-# d_ = rng_.choice(s, size=10, p=[.5, .5])
-# e = GenericEmpirical(d_, space=spaces.FiniteGeneric([0,.1,.5,.6]))
-# e.add_data(d_)
+# # r = Beta(5, 5)
+# # r = Finite(plot.mesh_grid([0, 1], [3, 4, 5]), Dirichlet(10, np.ones((2, 3))/6).rvs())
+# r = Finite(['a', 'b'], [.6, .4])
+# e = GenericEmpirical(r.rvs(10), space=r.space)
+# e.add_data(r.rvs(5))
 # print(e)
 # e.plot_pf()
 
@@ -874,7 +868,7 @@ class Mixture(Base):
     def _update_stats(self):
         self._mode = None  # TODO: formula???
 
-    def pf(self, x):        # TODO: check plotting
+    def pf(self, x):
         return sum(weight * dist.pf(x) for dist, weight in zip(self.dists, self._weights))
 
     def _rvs(self, n, rng):
