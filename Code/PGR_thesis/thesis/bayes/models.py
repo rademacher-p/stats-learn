@@ -11,6 +11,7 @@ from thesis.random.elements import Normal, Dirichlet, Base as BaseRE
 from thesis._deprecated import RE_obj_callable
 from thesis.random.models import DataConditional, NormalRegressor as NormalRegressorModel
 from thesis.util.generic import RandomGeneratorMixin, empirical_pmf
+from thesis.util import spaces
 from thesis._deprecated.func_obj import FiniteDomainFunc
 
 #%% Priors
@@ -24,15 +25,22 @@ class Base(RandomGeneratorMixin):
     def __init__(self, prior=None, rng=None):
         super().__init__(rng)
 
-        self._shape = {'x': None, 'y': None}
+        # self._shape = {'x': None, 'y': None}
+        self._space = {}
 
         self.prior = prior
         self.posterior = None
         self.posterior_model = None
 
-    shape = property(lambda self: self._shape)
-    size = property(lambda self: {key: math.prod(val) for key, val in self._shape.items()})
-    ndim = property(lambda self: {key: len(val) for key, val in self._shape.items()})
+    space = property(lambda self: self._space)
+
+    shape = property(lambda self: {key: space.shape for key, space in self._space.items()})
+    size = property(lambda self: {key: space.size for key, space in self._space.items()})
+    ndim = property(lambda self: {key: space.ndim for key, space in self._space.items()})
+
+    # shape = property(lambda self: self._shape)
+    # size = property(lambda self: {key: math.prod(val) for key, val in self._shape.items()})
+    # ndim = property(lambda self: {key: len(val) for key, val in self._shape.items()})
 
     def random_model(self, rng=None):
         raise NotImplementedError
@@ -138,7 +146,8 @@ class NormalRegressor(Base):
 
     def _set_model_x(self, val):
         self._model_x = val
-        self._shape['x'] = val.shape
+        # self._shape['x'] = val.shape
+        self._space['x'] = val.space
 
     @model_x.setter
     def model_x(self, val):
@@ -171,7 +180,8 @@ class NormalRegressor(Base):
         self._cov_y_x = np.array(val)
 
         _temp = self._cov_y_x.shape
-        self._shape['y'] = _temp[:int(len(_temp) / 2)]
+        # self._shape['y'] = _temp[:int(len(_temp) / 2)]
+        self._space['y'] = spaces.Euclidean(_temp[:int(len(_temp) / 2)])
 
         self._prec_U_y_x = _PSD(self._cov_y_x.reshape(2 * (self.size['y'],)), allow_singular=False).U
 

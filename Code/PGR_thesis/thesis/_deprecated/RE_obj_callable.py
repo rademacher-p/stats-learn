@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 from thesis.util.generic import check_data_shape, check_valid_pmf
 from thesis.util.math import simplex_round
-from thesis.util.func_obj import FiniteDomainFunc
+from thesis._deprecated.func_obj import FiniteDomainFunc
 
 
 #%% Base RE classes

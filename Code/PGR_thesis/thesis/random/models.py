@@ -11,6 +11,7 @@ import numpy as np
 from thesis.random.elements import Base as BaseRE, BaseRV, Normal
 from thesis._deprecated.RE_obj_callable import FiniteRE  # TODO: note - CALLABLE!!!!
 from thesis.util.generic import RandomGeneratorMixin, vectorize_func
+from thesis.util import spaces
 
 
 class Base(RandomGeneratorMixin):
@@ -20,26 +21,45 @@ class Base(RandomGeneratorMixin):
 
     def __init__(self, rng=None):
         super().__init__(rng)
-        self._shape = {'x': None, 'y': None}
+        # self._shape = {'x': None, 'y': None}
+        self._space = {}
 
         self._mode_x = None
 
-    shape = property(lambda self: self._shape)
-    size = property(lambda self: {key: math.prod(val) for key, val in self._shape.items()})
-    ndim = property(lambda self: {key: len(val) for key, val in self._shape.items()})
+    space = property(lambda self: self._space)
+
+    shape = property(lambda self: {key: space.shape for key, space in self._space.items()})
+    size = property(lambda self: {key: space.size for key, space in self._space.items()})
+    ndim = property(lambda self: {key: space.ndim for key, space in self._space.items()})
+
+    # shape = property(lambda self: self._shape)
+    # size = property(lambda self: {key: math.prod(val) for key, val in self._shape.items()})
+    # ndim = property(lambda self: {key: len(val) for key, val in self._shape.items()})
 
     @property
     def mode_x(self):
         return self._mode_x
 
     def mode_y_x(self, x):
-        return vectorize_func(self._mode_y_x_single, self._shape['x'])(x)
+        return vectorize_func(self._mode_y_x_single, self.shape['x'])(x)
 
     def _mode_y_x_single(self, x):
         raise NotImplementedError
         pass
 
     rvs = BaseRE.rvs
+    # def rvs(self, size=None, rng=None):
+    #     if size is None:
+    #         shape = ()
+    #     elif isinstance(size, (Integral, np.integer)):
+    #         shape = (size,)
+    #     elif isinstance(size, tuple):
+    #         shape = size
+    #     else:
+    #         raise TypeError("Input 'size' must be int or tuple.")
+    #
+    #     rng = self._get_rng(rng)
+    #     return self._rvs(math.prod(shape), rng).reshape(shape + self.shape)
 
     def _rvs(self, size, rng):
         raise NotImplementedError("Method must be overwritten.")
@@ -60,17 +80,17 @@ class MixinRVx:
 
 
 class MixinRVy:
-    _shape: dict
+    shape: dict
 
     def mean_y_x(self, x):
-        return vectorize_func(self._mean_y_x_single, self._shape['x'])(x)
+        return vectorize_func(self._mean_y_x_single, self.shape['x'])(x)
 
     def _mean_y_x_single(self, x):
         raise NotImplementedError
         pass
 
     def cov_y_x(self, x):
-        return vectorize_func(self._cov_y_x_single, self._shape['x'])(x)
+        return vectorize_func(self._cov_y_x_single, self.shape['x'])(x)
 
     def _cov_y_x_single(self, x):
         raise NotImplementedError
@@ -117,21 +137,23 @@ class DataConditional(Base):
         self._update_y_x()
 
     def _update_x(self):
-        self._shape['x'] = self._model_x.shape
+        # self._shape['x'] = self._model_x.shape
+        self._space['x'] = self._model_x.space
         self._mode_x = self._model_x.mode
 
     def _update_y_x(self):
-        self._shape['y'] = self._model_y_x(self._model_x.rvs()).shape
-        # self._mode_y_x = vectorize_func(lambda x: self._model_y_x(x).mode, self._shape['x'])
+        # self._shape['y'] = self._model_y_x(self._model_x.rvs()).shape
+        self._space['y'] = self._model_y_x(self._model_x.rvs()).space
+        # self._mode_y_x = vectorize_func(lambda x: self._model_y_x(x).mode, self.shape['x'])
         self._mode_y_x_single = lambda x: self._model_y_x(x).mode
 
-    def _rvs(self, size, rng):
-        d_x = np.array(self.model_x.rvs(size, rng=rng))
+    def _rvs(self, n, rng):
+        d_x = np.array(self.model_x.rvs(n, rng=rng))
         d_y = np.array([self.model_y_x(x).rvs(rng=rng)
-                        for x in d_x.reshape((-1,) + self.shape['x'])]).reshape(size + self.shape['y'])
+                        for x in d_x.reshape((-1,) + self.shape['x'])]).reshape(n, *self.shape['y'])
 
         d = np.array(list(zip(d_x.reshape((-1,) + self.shape['x']), d_y.reshape((-1,) + self.shape['y']))),
-                     dtype=[('x', d_x.dtype, self._shape['x']), ('y', d_y.dtype, self._shape['y'])]).reshape(size)
+                     dtype=[('x', d_x.dtype, self.shape['x']), ('y', d_y.dtype, self.shape['y'])]).reshape(n)
 
         return d
 
@@ -170,8 +192,8 @@ class DataConditionalRVx(MixinRVx, DataConditional):
 class DataConditionalRVy(MixinRVy, DataConditional):
     def _update_y_x(self):
         super()._update_y_x()
-        # self._mean_y_x = vectorize_func(lambda x: self._model_y_x(x).mean, self._shape['x'])
-        # self._cov_y_x = vectorize_func(lambda x: self._model_y_x(x).cov, self._shape['x'])
+        # self._mean_y_x = vectorize_func(lambda x: self._model_y_x(x).mean, self.shape['x'])
+        # self._cov_y_x = vectorize_func(lambda x: self._model_y_x(x).cov, self.shape['x'])
         self._mean_y_x_single = lambda x: self._model_y_x(x).mean
         self._cov_y_x_single = lambda x: self._model_y_x(x).cov
 
@@ -220,7 +242,7 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):
         else:
             self.basis_y_x = basis_y_x
 
-    def __repr__(self):
+    def __str__(self):
         return f"NormalRVModel(model_x={self.model_x}, basis_y_x={self.basis_y_x}, " \
                f"weights={self.weights}, cov_y_x={self._cov_repr})"
 
@@ -232,7 +254,7 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):
     def model_x(self, model_x):
         self._model_x = model_x
 
-        self._shape['x'] = self._model_x.shape
+        self._space['x'] = self._model_x.space
         self._mode_x = self._model_x.mode
 
         self._mean_x = self._model_x.mean
@@ -264,7 +286,7 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):
             self._cov_y_x_single = lambda x: self._cov_repr
             _temp = self._cov_repr.shape
 
-        self._shape['y'] = _temp[:int(len(_temp) / 2)]
+        self._space['y'] = spaces.Euclidean(_temp[:int(len(_temp) / 2)])
 
     def model_y_x(self, x):
         mean = self._mean_y_x_single(x)
@@ -277,6 +299,6 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):
     _rvs = DataConditional._rvs
 
 
-# g = NormalRegressor(basis_y_x=(lambda x: x,), weights=(1,), cov_y_x=.01)
+# g = NormalRegressor(basis_y_x=(lambda x: x,), weights=(1,), cov_y_x_single=.01)
 # r = g.rvs(100)
 # # plt.plot(r['x'], r['y'], '.')
