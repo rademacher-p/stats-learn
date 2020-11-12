@@ -99,5 +99,5 @@ def box_grid(lims, n=100, endpoint=False):
     #     raise ValueError("Upper values must meet or exceed lower values.")
 
 
-def mesh_grid(*args):
-    return np.stack(np.meshgrid(*args[::-1])[::-1], axis=-1)
+# def mesh_grid(*args):       # TODO: mgrid??
+#     return np.stack(np.meshgrid(*args[::-1])[::-1], axis=-1)
