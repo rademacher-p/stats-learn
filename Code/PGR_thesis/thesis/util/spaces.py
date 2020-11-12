@@ -93,6 +93,7 @@ class FiniteGeneric(Finite):
             raise ValueError("Input 'support' must have unique values")
 
         self.set_shape = _supp_shape[:_idx_split]
+        self.set_size = math.prod(self.set_shape)
         self.set_ndim = len(self.set_shape)
 
         # self.set_x_plot()
@@ -113,11 +114,26 @@ class FiniteGeneric(Finite):
         else:
             return False
 
-    def argmax(self, f):
-        x, y, set_shape = self._eval_func(f, self.support)
+    # def argmax(self, f):      # TODO
+    #     x, y, set_shape = self._eval_func(f, self.support)
+    #
+    #     x_flat, y_flat = x.reshape(-1, *self.shape), y.flatten()
+    #     return x_flat[np.argmax(y_flat)]
 
-        x_flat, y_flat = x.reshape(-1, *self.shape), y.flatten()
-        return x_flat[np.argmax(y_flat)]
+    def _minimize(self, f):
+        def g(i):
+            x_ = self._supp_flat[int(i)].reshape(self.shape)
+            return f(x_)
+
+        return optimize.brute(g, (np.mgrid[:self.set_size],))
+
+    def argmin(self, f):
+        i = self._minimize(f)
+        return self._supp_flat[int(i)].reshape(self.shape)
+        # return self._minimize(f).x.reshape(self.shape)
+
+    def argmax(self, f):
+        return self.argmin(lambda x: -1*f(x))
 
     def set_x_plot(self, x=None):
         if x is None:
@@ -174,7 +190,7 @@ class Continuous(Space):
     def _minimize(self, f):
         kwargs = self.optimize_kwargs.copy()
         x0 = kwargs.pop('x0')
-        return optimize.basinhopping(f, x0, minimizer_kwargs=kwargs)        # TODO: use `brute` method if needed
+        return optimize.basinhopping(f, x0, minimizer_kwargs=kwargs)        # TODO: add `brute` method option?
         # if self.ndim == 0:
         #     return optimize.minimize_scalar(f, bounds=self.optimize_kwargs['bounds'])
         # elif self.ndim == 1:
