@@ -37,8 +37,6 @@ class Space:
     shape = property(lambda self: self._shape)
     size = property(lambda self: self._size)
     ndim = property(lambda self: self._ndim)
-    # size = property(lambda self: math.prod(self._shape))
-    # ndim = property(lambda self: len(self._shape))
 
     dtype = property(lambda self: self._dtype)
 
@@ -81,6 +79,7 @@ class Finite(Discrete):
     pass
 
 
+#%%
 class FiniteGeneric(Finite):
     def __init__(self, support, shape=()):
         self.support = np.array(support)
@@ -172,7 +171,7 @@ class FiniteGeneric(Finite):
             raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
 
 
-#
+#%%
 class Continuous(Space):
     def __init__(self, shape):
         super().__init__(shape, np.float64)
@@ -221,9 +220,32 @@ class Box(Continuous):
             return False
 
     @property
-    def optimize_kwargs(self):
-        x0 = self.lims_plot.sum(-1).reshape(self.size) / 2
-        return {'x0': x0, 'bounds': self.lims.reshape(-1, 2), 'constraints': ()}
+    def optimize_kwargs(self):      # bounds reshaped for scipy optimizer
+        return {'x0': self.lims_plot.mean(-1), 'bounds': self.lims.reshape(-1, 2), 'constraints': ()}
+
+    def integrate(self, f):
+        if self.shape == ():
+            return integrate.quad(f, *self.lims)[0]
+        if self.shape == (2,):
+            return integrate.dblquad(lambda x, y: f([x, y]),
+                                     *self.lims[1], self.lims[0][0], self.lims[0][1])[0]
+        else:
+            raise NotImplementedError
+
+    def moment(self, f, order=1, center=False):
+        if order == 1 and not center:
+            if self.shape == ():
+                return self.integrate(lambda x: x * f(x))
+            elif self.shape == (2,):
+                out = []
+                for i in range(self.size):
+                    out.append(self.integrate(lambda x: x[i] * f(x)))
+
+                return np.array(out)
+            else:
+                raise NotImplementedError
+        else:
+            raise NotImplementedError
 
     @property
     def lims_plot(self):
@@ -285,11 +307,11 @@ class Euclidean(Box):
         else:
             return False
 
-    @property
-    def optimize_kwargs(self):
-        kwargs = super().optimize_kwargs
-        kwargs['bounds'] = None
-        return kwargs
+    # @property
+    # def optimize_kwargs(self):
+    #     kwargs = super().optimize_kwargs
+    #     kwargs['bounds'] = None
+    #     return kwargs
 
     @property
     def lims_plot(self):
