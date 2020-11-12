@@ -53,14 +53,20 @@ class RandomGeneratorMixin:
 def check_data_shape(x, data_shape=()):
     x = np.array(x)
 
-    if data_shape == ():
-        set_shape = x.shape
-    # elif x.shape == shape:
-    #     set_shape = ()
-    elif x.shape[-len(data_shape):] == data_shape:
-        set_shape = x.shape[:-len(data_shape)]
+    idx = x.ndim - len(data_shape)
+    if x.shape[idx:] == data_shape:
+        set_shape = x.shape[:idx]
     else:
         raise TypeError("Trailing dimensions of 'x.shape' must be equal to 'data_shape_x'.")
+
+    # if data_shape == ():      # TODO
+    #     set_shape = x.shape
+    # # elif x.shape == shape:
+    # #     set_shape = ()
+    # elif x.shape[-len(data_shape):] == data_shape:
+    #     set_shape = x.shape[:-len(data_shape)]
+    # else:
+    #     raise TypeError("Trailing dimensions of 'x.shape' must be equal to 'data_shape_x'.")
 
     return x, set_shape
 
