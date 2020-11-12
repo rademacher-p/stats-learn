@@ -232,8 +232,7 @@ class Dirichlet(Base):
         if not self.is_fit:
             warm_start = False
 
-        n = len(d)
-        if n == 0:
+        if len(d) == 0:
             if not warm_start and self.is_fit:
                 self.posterior_model.del_dist(1)    # delete empirical distribution
         else:
@@ -250,11 +249,11 @@ class Dirichlet(Base):
 
 
 if __name__ == '__main__':
-    alpha = rand_elements.Beta(5, 25)
-    theta = rand_elements.Beta(25, 5)
+    # alpha = rand_elements.Beta(5, 25)
+    # theta = rand_elements.Beta(25, 5)
 
-    # alpha = rand_elements.Finite(['a', 'b'], [.2, .8])
-    # theta = rand_elements.Finite(['a', 'b'], [.8, .2])
+    alpha = rand_elements.Finite(['a', 'b'], [.2, .8])
+    theta = rand_elements.Finite(['a', 'b'], [.8, .2])
 
     a = Dirichlet(alpha_0=10, prior_mean=alpha)
     a.rvs(5)

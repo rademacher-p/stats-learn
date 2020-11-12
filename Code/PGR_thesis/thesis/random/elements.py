@@ -31,7 +31,7 @@ class Base(RandomGeneratorMixin):
 
         self._space = None      # TODO: arg?
 
-        self._mode = None
+        self._mode = None       # TODO: make getter do numerical approx if None!?
 
     space = property(lambda self: self._space)
 
@@ -169,7 +169,7 @@ class DeterministicRV(MixinRV, Deterministic):
 # b.pf(b.rvs(8))
 
 
-class Finite(Base):
+class Finite(Base):     # TODO: DRY - use stat approx from the Finite space's methods?
     """
     Generic RE drawn from a finite support set using an explicitly defined PMF.
     """
@@ -326,6 +326,8 @@ class Dirichlet(BaseRV):
 
         self._log_pf_coef = gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
 
+        self._set_x_plot()
+
     def _rvs(self, n, rng):
         return rng.dirichlet(self._alpha_0 * self._mean.flatten(), size=n).reshape(n, *self.shape)
 
@@ -335,17 +337,16 @@ class Dirichlet(BaseRV):
         log_pf = self._log_pf_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x).reshape(-1, self.size), -1)
         return np.exp(log_pf).reshape(set_shape)
 
-    def plot_pf(self, x=None, ax=None):
-        if x is None:
-            x = plot.simplex_grid(60, self.shape, hull_mask=(self.mean < 1 / self.alpha_0))
-        return super().plot_pf(x, ax)
+    def _set_x_plot(self):
+        x = plot.simplex_grid(60, self.shape, hull_mask=(self.mean < 1 / self.alpha_0))
+        self._space.set_x_plot(x)
 
 
-# rng = np.random.default_rng()
+# rng_ = np.random.default_rng()
 # a0 = 10
 # m = np.random.random(3)
 # m = m / m.sum()
-# d = Dirichlet(a0, m, rng)
+# d = Dirichlet(a0, m, rng_)
 # d.plot_pf()
 # d.mean
 # d.mode
@@ -614,6 +615,11 @@ class Normal(BaseRV):
 
         self._mode = self._mean
 
+        try:
+            self._set_x_plot()
+        except AttributeError:      # TODO: workaround for init - wack?
+            pass
+
     @property
     def cov(self):
         return self._cov
@@ -634,6 +640,8 @@ class Normal(BaseRV):
         self.prec_U = psd.U
         self._log_pf_coef = -0.5 * (psd.rank * np.log(2 * np.pi) + psd.log_pdet)
 
+        self._set_x_plot()
+
     def _rvs(self, n, rng):
         return rng.multivariate_normal(self._mean_flat, self._cov_flat, size=n).reshape(n, *self.shape)
 
@@ -646,20 +654,23 @@ class Normal(BaseRV):
         log_pf = self._log_pf_coef + -0.5 * maha.reshape(set_shape)
         return np.exp(log_pf)
 
-    def plot_pf(self, x=None, ax=None):
-        if x is None and self.shape in {(), (2,)}:
+    def _set_x_plot(self):
+        if self.shape in {(), (2,)}:
             if self.shape == ():
                 lims = self._mean.item() + np.array([-1, 1]) * 3 * np.sqrt(self._cov.item())
             else:   # self.shape == (2,):
                 lims = [(self._mean[i] - 3 * np.sqrt(self._cov[i, i]), self._mean[i] + 3 * np.sqrt(self._cov[i, i]))
                         for i in range(2)]
 
-            x = plot.box_grid(lims, 100, endpoint=False)
+            self._space.lims_plot = lims
+            # x = plot.box_grid(lims, 100, endpoint=False)
+        # else:
+        #     x = None
 
-        return super().plot_pf(x, ax)
+        # self._space.set_x_plot(x)
 
-# mean_, cov_ = 1., 1.
-# # mean_, cov_ = np.ones(2), np.eye(2)
+# # mean_, cov_ = 1., 1.
+# mean_, cov_ = np.ones(2), np.eye(2)
 # norm = Normal(mean_, cov_)
 # norm.rvs(5)
 # plt_data = norm.plot_pf()
@@ -765,6 +776,8 @@ class GenericEmpirical(Base):       # TODO: implement using factory of Finite ob
         self.p = self.counts / self.n
         self._mode = self.values[self.p.argmax()]
 
+        self._set_x_plot()
+
     @staticmethod
     def _count_data(d):
         return np.unique(d, return_counts=True, axis=0)
@@ -817,15 +830,17 @@ class GenericEmpirical(Base):       # TODO: implement using factory of Finite ob
     #
     #     return self.p[eq_supp].squeeze()
 
-    def plot_pf(self, x=None, ax=None):
-        if x is None and isinstance(self.space, spaces.Continuous) and self.shape in {()}:
-            x = self.space.x_plt
-            x = np.sort(np.concatenate((x, self.values)))
-
-        return super().plot_pf(x, ax)
+    def _set_x_plot(self):
+        if isinstance(self.space, spaces.Continuous) and self.shape in {()}:
+            # TODO: hackish? adds empirical values to the plot support (so impulses are not missed)
+            x = np.sort(np.unique(np.concatenate((self.space.x_plt, self.values))))
+            self._space.set_x_plot(x)
 
 
 class GenericEmpiricalRV(MixinRV, GenericEmpirical):
+    def __repr__(self):
+        return f"GenericEmpiricalRV(space={self.space}, n={self.n})"
+
     def _update_attr(self):
         super()._update_attr()
 
@@ -891,15 +906,15 @@ class Mixture(Base):
             setattr(dist, key, val)
         self._update_attr()
 
-    def add_dist(self, dist, weight):
+    def add_dist(self, dist, weight):       # TODO: type check?
         self.dists.append(dist)
         # self.weights.append(weight)
         self.weights += [weight]
 
     def set_dist(self, idx, dist, weight):
         self.dists[idx] = dist
-        self.weights[idx] = weight      # setter not invoked
-        self._update_attr()
+        self.weights[idx] = weight
+        self._update_attr()     # weights setter not invoked
 
     def del_dist(self, idx):
         del self.dists[idx]
@@ -908,7 +923,9 @@ class Mixture(Base):
         self.weights = _w
 
     def _update_attr(self):
-        self._mode = None  # TODO: formula??? numeric approx?
+        self._set_x_plot()
+
+        self._mode = self.space.argmax(self.pf)
 
     def _rvs(self, n, rng):
         # c = rng.choice(self.n_dists, size=n, p=self._weights)
@@ -924,28 +941,37 @@ class Mixture(Base):
         # return sum(weight * dist.pf(x) for dist, weight in zip(self.dists, self._weights))
         return sum(prob * dist.pf(x) for dist, prob in zip(self.dists, self._p))
 
-    def plot_pf(self, x=None, ax=None):     # TODO
-        if x is None and isinstance(self.space, spaces.Continuous) and self.shape in {()}:
+    def _set_x_plot(self):
+        if isinstance(self.space, spaces.Euclidean):
+            temp = np.stack(list(dist.space.lims_plot for dist in self.dists))
+            self._space.lims_plot = [temp[:, 0].min(), temp[:, 1].max()]
+
+        if isinstance(self.space, spaces.Continuous) and self.shape in {()}:
             x = self.space.x_plt
             for dist in self.dists:
                 if isinstance(dist, GenericEmpirical):
-                    x = np.sort(np.concatenate((x, dist.values)))
+                    x = np.concatenate((x, dist.values))
 
-        return super().plot_pf(x, ax)
+            x = np.sort(np.unique(x))
+            self._space.set_x_plot(x)
 
 
 class MixtureRV(MixinRV, Mixture):
+    def __repr__(self):
+        _str = "; ".join([f"{prob}: {dist}" for dist, prob in zip(self.dists, self._p)])
+        return f"MixtureRV({_str})"
+
     def _update_attr(self):
         super()._update_attr()
 
         # self._mean = sum(weight * dist.mean for dist, weight in zip(self.dists, self._weights))
         self._mean = sum(prob * dist.mean for dist, prob in zip(self.dists, self._p))
-        self._cov = None  # TODO
+        self._cov = None  # TODO: numeric approx from `space`?
 
 
-# dists_ = [Normal(mean, 1) for mean in [0, 10]]
-# # dists_ = [Finite(['a', 'b'], p=[p_, 1-p_]) for p_ in [.5, 1]]
-# m = Mixture(dists_, [5, 5])
+# # dists_ = [Normal(mean, 1) for mean in [0, 10]]
+# dists_ = [Finite(['a', 'b'], p=[p_, 1-p_]) for p_ in [0, 1]]
+# m = Mixture(dists_, [5, 8])
 # m.rvs(10)
-# m.plot_pf(x=np.linspace(-10, 20, 1001))
+# m.plot_pf()
 # pass
