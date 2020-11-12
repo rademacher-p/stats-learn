@@ -583,7 +583,7 @@ class Normal(BaseRV):
 
         Parameters
         ----------
-        mean : float or np.ndarray
+        mean : float or Iterable of float
             Mean
         cov : float or np.ndarray
             Covariance
@@ -808,7 +808,7 @@ class GenericEmpirical(Base):       # TODO: implement using factory of Finite ob
     def _rvs(self, size, rng):
         return rng.choice(self.values, size, p=self.p)
 
-    def pf(self, x):        # TODO: implement infinite valued output for continuous space!?
+    def pf(self, x):        # TODO: implement infinite valued output for continuous space!? use CDF?!
         x, set_shape = check_data_shape(x, self.shape)
         x = x.reshape((math.prod(set_shape), *self.shape))
 
@@ -969,8 +969,10 @@ class MixtureRV(MixinRV, Mixture):
         self._cov = None  # TODO: numeric approx from `space`?
 
 
-# # dists_ = [Normal(mean, 1) for mean in [0, 10]]
-# dists_ = [Finite(['a', 'b'], p=[p_, 1-p_]) for p_ in [0, 1]]
+# dists_ = [Beta(*args) for args in [[10, 5], [2, 12]]]
+# # dists_ = [Normal(mean, 1) for mean in [0, 4]]
+# # dists_ = [Normal(mean, 10) for mean in [[0, 0], [10, 10]]]
+# # dists_ = [Finite(['a', 'b'], p=[p_, 1-p_]) for p_ in [0, 1]]
 # m = Mixture(dists_, [5, 8])
 # m.rvs(10)
 # m.plot_pf()
