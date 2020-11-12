@@ -969,11 +969,11 @@ class MixtureRV(MixinRV, Mixture):
         self._cov = None  # TODO: numeric approx from `space`?
 
 
-dists_ = [Beta(*args) for args in [[10, 5], [2, 12]]]
-# dists_ = [Normal(mean, 1) for mean in [0, 4]]
-# dists_ = [Normal(mean, 10) for mean in [[0, 0], [10, 10]]]
-# dists_ = [Finite(['a', 'b'], p=[p_, 1-p_]) for p_ in [0, 1]]
-m = Mixture(dists_, [5, 8])
-m.rvs(10)
-m.plot_pf()
-pass
+# dists_ = [Beta(*args) for args in [[10, 5], [2, 12]]]
+# # dists_ = [Normal(mean, 1) for mean in [0, 4]]
+# # dists_ = [Normal(mean, 10) for mean in [[0, 0], [10, 10]]]
+# # dists_ = [Finite(['a', 'b'], p=[p_, 1-p_]) for p_ in [0, 1]]
+# m = Mixture(dists_, [5, 8])
+# m.rvs(10)
+# m.plot_pf()
+# pass

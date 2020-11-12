@@ -57,11 +57,14 @@ class Space:
 
         return x, y, set_shape
 
-    # def argmax(self, f, x=None):        # FIXME: implement with scipy.optimize!!
-    #     x, y, set_shape = self._eval_func(f, x)
-    #
-    #     x_flat, y_flat = x.reshape(-1, *self.shape), y.flatten()
-    #     return x_flat[np.argmax(y_flat)]
+    def _minimize(self, f):
+        pass    # TODO
+
+    def argmin(self, f):
+        return self._minimize(f)
+
+    def argmax(self, f):
+        return self.argmin(lambda x: -1*f(x))
 
     # def integrate(self, f, x=None):   # TODO: use scipy.integrate
     #     pass        # TODO: also, need delta, not n_lim for approx? Confirm PDF sum to one.
@@ -96,8 +99,6 @@ class FiniteGeneric(Finite):
         self.set_size = math.prod(self.set_shape)
         self.set_ndim = len(self.set_shape)
 
-        # self.set_x_plot()
-
     def __repr__(self):
         return f"FiniteGeneric({self.support})"
 
@@ -125,15 +126,8 @@ class FiniteGeneric(Finite):
             x_ = self._supp_flat[int(i)].reshape(self.shape)
             return f(x_)
 
-        return optimize.brute(g, (np.mgrid[:self.set_size],))
-
-    def argmin(self, f):
-        i = self._minimize(f)
-        return self._supp_flat[int(i)].reshape(self.shape)
-        # return self._minimize(f).x.reshape(self.shape)
-
-    def argmax(self, f):
-        return self.argmin(lambda x: -1*f(x))
+        i_opt = int(optimize.brute(g, (np.mgrid[:self.set_size],)))     # ignore type inspection
+        return self._supp_flat[i_opt].reshape(self.shape)
 
     def set_x_plot(self, x=None):
         if x is None:
@@ -187,22 +181,17 @@ class Continuous(Space):
     def optimize_kwargs(self):
         return {'x0': np.zeros(self.shape), 'bounds': None, 'constraints': ()}
 
-    def _minimize(self, f):
+    def _minimize(self, f):     # TODO: add `brute` method option?
         kwargs = self.optimize_kwargs.copy()
         x0 = kwargs.pop('x0')
-        return optimize.basinhopping(f, x0, minimizer_kwargs=kwargs)        # TODO: add `brute` method option?
+        return optimize.basinhopping(f, x0, minimizer_kwargs=kwargs).x.reshape(self.shape)
+
         # if self.ndim == 0:
         #     return optimize.minimize_scalar(f, bounds=self.optimize_kwargs['bounds'])
         # elif self.ndim == 1:
         #     return optimize.minimize(f, **self.optimize_kwargs)
         # else:
         #     raise ValueError
-
-    def argmin(self, f):
-        return self._minimize(f).x.reshape(self.shape)
-
-    def argmax(self, f):
-        return self.argmin(lambda x: -1*f(x))
 
 
 class Box(Continuous):
@@ -236,11 +225,6 @@ class Box(Continuous):
         x0 = self.lims_plot.sum(-1).reshape(self.size) / 2
         return {'x0': x0, 'bounds': self.lims.reshape(-1, 2), 'constraints': ()}
 
-    # @property
-    # def optimize_kwargs(self):
-    #     x0 = self.lims_plot.sum(-1) / 2
-    #     return {'x0': x0, 'bounds': self.lims, 'constraints': ()}
-
     @property
     def lims_plot(self):
         return self.lims
@@ -248,8 +232,6 @@ class Box(Continuous):
     def set_x_plot(self, x=None):   # TODO: simplify?
         if x is None:
             if self.shape in {(), (2,)}:
-                # lims = np.broadcast_to([0, 1], shape=(*self.shape, 2))      # defaults to unit hypercube
-                # self.x_plt = box_grid(lims, 100, endpoint=False)
                 self.x_plt = box_grid(self.lims_plot, 100, endpoint=False)
             else:
                 self.x_plt = None
@@ -308,7 +290,6 @@ class Euclidean(Box):
         kwargs = super().optimize_kwargs
         kwargs['bounds'] = None
         return kwargs
-        # return {'bounds': None, 'constraints': ()}
 
     @property
     def lims_plot(self):
@@ -318,112 +299,6 @@ class Euclidean(Box):
     def lims_plot(self, val):
         self._lims_plot = np.broadcast_to(val, shape=(*self.shape, 2))
         self.set_x_plot()
-
-# class Euclidean(Continuous):
-#     def __init__(self, shape: tuple):
-#         super().__init__(shape)
-#
-#         # self.set_x_plot()
-#         self.lims_plot = [0, 1]     # defaults to unit hypercube
-#
-#     def __repr__(self):
-#         return f"Euclidean{self.shape}"
-#
-#     def __eq__(self, other):
-#         if isinstance(other, Euclidean):
-#             return self.shape == other.shape
-#         return NotImplemented
-#
-#     def __contains__(self, item):
-#         item = np.array(item)
-#         if item.shape == self.shape and item.dtype == self.dtype:
-#             return True
-#         else:
-#             return False
-#
-#     def _minimize(self, f):
-#         x0 = self.lims_plot.sum(-1) / 2
-#         return optimize.minimize(f, x0)
-#
-#     def argmin(self, f):
-#         return self._minimize(f).x
-#
-#     def argmax(self, f):
-#         return self.argmin(lambda x: -1*f(x))
-#
-#     def set_x_plot(self, x=None):   # TODO: simplify?
-#         if x is None:
-#             if self.shape in {(), (2,)}:
-#                 # lims = np.broadcast_to([0, 1], shape=(*self.shape, 2))      # defaults to unit hypercube
-#                 # self.x_plt = box_grid(lims, 100, endpoint=False)
-#                 self.x_plt = box_grid(self.lims_plot, 100, endpoint=False)
-#             else:
-#                 self.x_plt = None
-#         else:
-#             self.x_plt = np.array(x)
-#
-#     @property
-#     def lims_plot(self):
-#         return self._lims_plot
-#
-#     @lims_plot.setter
-#     def lims_plot(self, val):
-#         self._lims_plot = np.broadcast_to(val, shape=(*self.shape, 2))
-#         self.set_x_plot()
-#
-#     def plot(self, f, x=None, ax=None):
-#         x, y, set_shape = self._eval_func(f, x)
-#
-#         set_ndim = len(set_shape)
-#         if set_ndim == 1 and self.shape == ():
-#             if ax is None:
-#                 _, ax = plt.subplots()
-#                 ax.set(xlabel='$x_1$', ylabel='$f(x)$')        # TODO: ax_kwargs
-#
-#             plt_data = ax.plot(x, y)
-#             return plt_data
-#
-#         elif set_ndim == 2 and self.shape == (2,):
-#             if ax is None:
-#                 _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-#                 ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$f(x)$')
-#
-#             # ax.plot_wireframe(x[..., 0], x[..., 1], self.pf(x))
-#             plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, cmap=plt.cm.viridis)
-#
-#             return plt_data
-#
-#         else:
-#             raise NotImplementedError('Plot method only supported for 1- and 2-dimensional data.')
-#
-#
-# class Box(Euclidean):
-#     def __init__(self, lims):
-#         self.lims = np.array(lims)
-#
-#         if self.lims.shape[-1] != 2:
-#             raise ValueError("Trailing shape must be (2,)")
-#         elif not (self.lims[..., 0] <= self.lims[..., 1]).all():
-#             raise ValueError("Upper values must meet or exceed lower values.")
-#
-#         super().__init__(shape=self.lims.shape[:-1])
-#
-#         self.lims_plot = self.lims
-#
-#     def __repr__(self):
-#         return f"Box({self.lims})"
-#
-#     def __eq__(self, other):
-#         if isinstance(other, Box):
-#             return self.lims == other.lims
-#         return NotImplemented
-#
-#     def __contains__(self, item):
-#         item = np.array(item)
-#         if item.shape == self.shape and item.dtype == self.dtype:
-#             return (item >= self.lims[..., 0]).all() and (item <= self.lims[..., 1]).all()
-#         else:
-#             return False
 
 
 #
