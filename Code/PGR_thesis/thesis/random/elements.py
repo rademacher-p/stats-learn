@@ -196,7 +196,7 @@ class Finite(Base):     # TODO: DRY - use stat approx from the Finite space's me
     # Input properties
     @property
     def supp(self):
-        return self.space.support
+        return self.space.values
 
     @property
     def p(self):
@@ -572,6 +572,7 @@ class Beta(BaseRV):
         return rng.beta(self._a, self._b, size=n)
 
     def pf(self, x):
+        x = np.array(x)
         log_pf = xlog1py(self._b - 1.0, -x) + xlogy(self._a - 1.0, x) - betaln(self._a, self._b)
         return np.exp(log_pf)
 
@@ -863,7 +864,7 @@ class GenericEmpiricalRV(MixinRV, GenericEmpirical):
 
 class Mixture(Base):
     def __new__(cls, dists, weights, rng=None):
-        if all(isinstance(dist, BaseRV) for dist in dists):
+        if all(isinstance(dist, MixinRV) for dist in dists):
             return super().__new__(MixtureRV)
         else:
             return super().__new__(cls)
@@ -971,8 +972,10 @@ class MixtureRV(MixinRV, Mixture):
 
 # # dists_ = [Beta(*args) for args in [[10, 5], [2, 12]]]
 # # dists_ = [Normal(mean, 1) for mean in [0, 4]]
-# dists_ = [Normal(mean, 10) for mean in [[0, 0], [10, 10]]]
-# # dists_ = [Finite(['a', 'b'], p=[p_, 1-p_]) for p_ in [0, 1]]
+# # dists_ = [Normal(mean, 1) for mean in [[0, 0], [2, 3]]]
+# dists_ = [Finite(['a', 'b'], p=[p_, 1-p_]) for p_ in [0, 1]]
+# # dists_ = [Finite([[0, 0], [0, 1]], p=[p_, 1-p_]) for p_ in [0, 1]]
+#
 # m = Mixture(dists_, [5, 8])
 # m.rvs(10)
 # print(m.space.integrate(m.pf))

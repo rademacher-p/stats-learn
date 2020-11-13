@@ -119,9 +119,6 @@ def vectorize_func(func, data_shape):
             _out.append(func(x_i))
         _out = np.array(_out)
 
-        # if len(_out) == 1:      # FIXME: new, check.
-        #     return _out[0]
-        # else:
         data_shape_y = _out.shape[1:]
         return _out.reshape(set_shape + data_shape_y)
 
