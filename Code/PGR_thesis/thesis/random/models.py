@@ -8,7 +8,7 @@ import math
 
 import numpy as np
 
-from thesis.random.elements import Base as BaseRE, BaseRV, Normal
+from thesis.random.elements import Base as BaseRE, MixinRV, Normal
 from thesis._deprecated.RE_obj_callable import FiniteRE  # TODO: note - CALLABLE!!!!
 from thesis.util.generic import RandomGeneratorMixin, vectorize_func
 from thesis.util import spaces
@@ -99,8 +99,8 @@ class MixinRVy:
 
 class DataConditional(Base):
     def __new__(cls, model_x, model_y_x, rng=None):
-        is_numeric_y_x = isinstance(model_y_x(model_x.rvs()), BaseRV)
-        if isinstance(model_x, BaseRV):
+        is_numeric_y_x = isinstance(model_y_x(model_x.rvs()), MixinRV)
+        if isinstance(model_x, MixinRV):
             if is_numeric_y_x:
                 return super().__new__(DataConditionalRVyx)
             else:

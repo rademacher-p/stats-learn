@@ -64,11 +64,17 @@ class Space:
     def argmax(self, f):
         return self.argmin(lambda x: -1*f(x))
 
-    # def integrate(self, f, x=None):   # TODO: use scipy.integrate
-    #     pass        # TODO: also, need delta, not n_lim for approx? Confirm PDF sum to one.
-    #
-    # def moment(self, f, x=None, order=1, central=False):
-    #     pass    # TODO:
+    def integrate(self, f):
+        pass    # TODO
+
+    def moment(self, f, order=1, center=False):
+        if not np.issubdtype(self.dtype, np.number):    # TODO: dispatch to subclass with __new__? use mixin?
+            raise TypeError("Moments only supported for numeric spaces.")
+
+        if order == 1 and not center:
+            return self.integrate(lambda x: np.array(x) * f(x))
+        else:
+            raise NotImplementedError        # TODO
 
 
 class Discrete(Space):
@@ -81,17 +87,17 @@ class Finite(Discrete):
 
 #%%
 class FiniteGeneric(Finite):
-    def __init__(self, support, shape=()):
-        self.support = np.array(support)
-        super().__init__(shape, self.support.dtype)
+    def __init__(self, values, shape=()):
+        self.values = np.array(values)
+        super().__init__(shape, self.values.dtype)
 
-        _supp_shape = self.support.shape
-        _idx_split = self.support.ndim - self.ndim
+        _supp_shape = self.values.shape
+        _idx_split = self.values.ndim - self.ndim
         if _supp_shape[_idx_split:] != self.shape:
             raise ValueError(f"Support trailing shape must be {self.shape}.")
 
-        self._supp_flat = self.support.reshape(-1, self.size)
-        if len(self._supp_flat) != len(np.unique(self._supp_flat, axis=0)):
+        self._vals_flat = self.values.reshape(-1, self.size)
+        if len(self._vals_flat) != len(np.unique(self._vals_flat, axis=0)):
             raise ValueError("Input 'support' must have unique values")
 
         self.set_shape = _supp_shape[:_idx_split]
@@ -99,38 +105,43 @@ class FiniteGeneric(Finite):
         self.set_ndim = len(self.set_shape)
 
     def __repr__(self):
-        return f"FiniteGeneric({self.support})"
+        return f"FiniteGeneric({self.values})"
 
     def __eq__(self, other):
         if isinstance(other, FiniteGeneric):
-            return self.shape == other.shape and (self.support == other.support).all
+            return self.shape == other.shape and (self.values == other.values).all
         return NotImplemented
 
     def __contains__(self, item):
         item = np.array(item)
         if item.shape == self.shape and item.dtype == self.dtype:
-            eq_supp = np.all(item.flatten() == self._supp_flat, axis=-1)
+            eq_supp = np.all(item.flatten() == self._vals_flat, axis=-1)
             return eq_supp.sum() > 0
         else:
             return False
 
-    # def argmax(self, f):      # TODO
-    #     x, y, set_shape = self._eval_func(f, self.support)
+    # def argmax(self, f):      # TODO: delete?
+    #     x, y, set_shape = self._eval_func(f, self.values)
     #
     #     x_flat, y_flat = x.reshape(-1, *self.shape), y.flatten()
     #     return x_flat[np.argmax(y_flat)]
 
     def _minimize(self, f):
         def g(i):
-            x_ = self._supp_flat[int(i)].reshape(self.shape)
+            x_ = self._vals_flat[int(i)].reshape(self.shape)
             return f(x_)
 
         i_opt = int(optimize.brute(g, (np.mgrid[:self.set_size],)))     # ignore type inspection
-        return self._supp_flat[i_opt].reshape(self.shape)
+        return self._vals_flat[i_opt].reshape(self.shape)
+
+    def integrate(self, f):
+        # y_flat = f(self.values.reshape(-1, *self.shape))     # shouldn't require vectorized funcs?
+        y_flat = np.stack([f(val) for val in self.values.reshape(-1, *self.shape)])
+        return y_flat.sum(0)
 
     def set_x_plot(self, x=None):
         if x is None:
-            self.x_plt = self.support
+            self.x_plt = self.values
         else:
             self.x_plt = np.array(x)
 
@@ -183,6 +194,7 @@ class Continuous(Space):
     def _minimize(self, f):     # TODO: add `brute` method option?
         kwargs = self.optimize_kwargs.copy()
         x0 = kwargs.pop('x0')
+
         return optimize.basinhopping(f, x0, minimizer_kwargs=kwargs).x.reshape(self.shape)
 
         # if self.ndim == 0:
@@ -192,8 +204,27 @@ class Continuous(Space):
         # else:
         #     raise ValueError
 
+    def integrate(self, f):
+        y_shape = f(self.optimize_kwargs['x0']).shape
+        ranges = self.optimize_kwargs['bounds']
+        if y_shape == ():
+            return integrate.nquad(lambda *args: f(list(args)), ranges)[0]
+        else:
+            out = np.empty(self.size)
+            for i in range(self.size):
+                out[i] = integrate.nquad(lambda *args: f(list(args))[i], ranges)[0]
 
-class Box(Continuous):
+            return out
+
+        # if self.shape == ():
+        #     return integrate.quad(f, *self.lims)[0]
+        # if self.shape == (2,):
+        #     return integrate.dblquad(lambda x, y: f([x, y]), *self.lims[1], *self.lims[0])[0]
+        # else:
+        #     raise NotImplementedError        # TODO
+
+
+class Box(Continuous):      # TODO: make Box inherit from Euclidean?
     def __init__(self, lims):
         self.lims = np.array(lims)
 
@@ -222,30 +253,6 @@ class Box(Continuous):
     @property
     def optimize_kwargs(self):      # bounds reshaped for scipy optimizer
         return {'x0': self.lims_plot.mean(-1), 'bounds': self.lims.reshape(-1, 2), 'constraints': ()}
-
-    def integrate(self, f):
-        if self.shape == ():
-            return integrate.quad(f, *self.lims)[0]
-        if self.shape == (2,):
-            return integrate.dblquad(lambda x, y: f([x, y]),
-                                     *self.lims[1], self.lims[0][0], self.lims[0][1])[0]
-        else:
-            raise NotImplementedError
-
-    def moment(self, f, order=1, center=False):
-        if order == 1 and not center:
-            if self.shape == ():
-                return self.integrate(lambda x: x * f(x))
-            elif self.shape == (2,):
-                out = []
-                for i in range(self.size):
-                    out.append(self.integrate(lambda x: x[i] * f(x)))
-
-                return np.array(out)
-            else:
-                raise NotImplementedError
-        else:
-            raise NotImplementedError
 
     @property
     def lims_plot(self):
@@ -323,12 +330,16 @@ class Euclidean(Box):
         self.set_x_plot()
 
 
-#
+#%%
+
+# TODO: add integration and mode finding
+
 class Simplex(Continuous):
     def __init__(self, shape):
         super().__init__(shape)
 
-        self.set_x_plot()
+        # self.set_x_plot()
+        self.n_plot = 40
 
     def __repr__(self):
         return f"Simplex{self.shape}"
@@ -349,10 +360,19 @@ class Simplex(Continuous):
         else:
             return False
 
+    @property
+    def n_plot(self):
+        return self._n_plot
+
+    @n_plot.setter
+    def n_plot(self, val):
+        self._n_plot = val
+        self.set_x_plot()
+
     def set_x_plot(self, x=None):
         if x is None:
             if self.shape in {(2,), (3,)}:
-                self.x_plt = simplex_grid(40, self._shape)
+                self.x_plt = simplex_grid(self.n_plot, self._shape)
             else:
                 self.x_plt = None
         else:
@@ -414,11 +434,6 @@ class SimplexDiscrete(Simplex):
         else:
             return False
 
-    def set_x_plot(self, x=None):
-        if x is None:
-            if self.shape in {(2,), (3,)}:
-                self.x_plt = simplex_grid(self.n, self._shape)
-            else:
-                self.x_plt = None
-        else:
-            self.x_plt = np.array(x)
+    @property
+    def n_plot(self):
+        return self.n
