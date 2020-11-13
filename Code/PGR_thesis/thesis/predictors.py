@@ -13,9 +13,10 @@ from scipy.stats import mode
 import matplotlib.pyplot as plt
 
 from thesis.util.generic import vectorize_func, check_data_shape
-from thesis.util.plot import get_axes_xy
+from thesis.util.plotting import get_axes_xy
 from thesis.loss_funcs import loss_se, loss_01
-from thesis.random.models import Base as BaseModel, MixinRVy
+
+from thesis.random import models as rand_models
 
 
 def predict_stats_compare(predictors, x, model, params=None, n_train=0, n_mc=1, stats=('mode',),
@@ -434,14 +435,14 @@ class Base(ABC):
 
 
 class ClassifierMixin:
-    model: BaseModel
+    model: rand_models.Base
 
     def predict(self, x):
         return self.model.mode_y_x(x)  # TODO: argmax?
 
 
 class RegressorMixin:
-    model: MixinRVy
+    model: rand_models.MixinRVy
 
     def predict(self, x):
         return self.model.mean_y_x(x)  # TODO: m1?
