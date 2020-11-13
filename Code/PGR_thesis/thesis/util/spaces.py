@@ -4,7 +4,7 @@ import numpy as np
 from scipy import optimize, integrate
 from matplotlib import pyplot as plt
 
-from thesis.util.plot import simplex_grid, box_grid
+from thesis.util.plotting import simplex_grid, box_grid
 from thesis.util.generic import check_data_shape
 
 # plt.style.use('seaborn')
@@ -14,13 +14,6 @@ from thesis.util.generic import check_data_shape
 
 # TODO: numerical approximation of mode, etc.?
 # TODO: issubset method?
-
-# def infer_space(sample):      # TODO
-#     sample = np.array(sample)
-#     if np.issubdtype(sample.dtype, np.number):
-#         return Euclidean(sample.shape)
-#     else:
-#         pass
 
 
 class Space:

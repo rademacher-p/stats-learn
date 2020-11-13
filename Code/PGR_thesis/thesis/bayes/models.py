@@ -7,9 +7,10 @@ import math
 import numpy as np
 from scipy.stats._multivariate import _PSD
 
-from thesis.random.elements import Normal, Dirichlet, Base as BaseRE
+from thesis.random import elements as rand_elements
+from thesis.random import models as rand_models
+
 from thesis._deprecated import RE_obj_callable
-from thesis.random.models import DataConditional, NormalRegressor as NormalRegressorModel
 from thesis.util.generic import RandomGeneratorMixin, empirical_pmf
 from thesis.util import spaces
 from thesis._deprecated.func_obj import FiniteDomainFunc
@@ -45,7 +46,7 @@ class Base(RandomGeneratorMixin):
     def random_model(self, rng=None):
         raise NotImplementedError
 
-    rvs = BaseRE.rvs
+    rvs = rand_elements.Base.rvs
 
     def _rvs(self, size, rng):
         model = self.random_model(rng)
@@ -65,11 +66,12 @@ class Base(RandomGeneratorMixin):
 class NormalRegressor(Base):
     # param_names = ('prior_mean', 'prior_cov', 'basis_y_x', 'cov_y_x','model_x')
 
-    def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1., model_x=Normal(),
+    def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
+                 model_x=rand_elements.Normal(),
                  rng=None):
 
         # Prior
-        prior = Normal(prior_mean, prior_cov)
+        prior = rand_elements.Normal(prior_mean, prior_cov)
         super().__init__(prior, rng)
         if self.prior.ndim > 1:
             raise ValueError
@@ -82,8 +84,8 @@ class NormalRegressor(Base):
         self._set_basis_y_x(basis_y_x)
 
         # Learning
-        self.posterior = Normal(self.prior_mean, self.prior_cov)
-        self.posterior_model = NormalRegressorModel(**self._prior_model_kwargs)
+        self.posterior = rand_elements.Normal(self.prior_mean, self.prior_cov)
+        self.posterior_model = rand_models.NormalRegressor(**self._prior_model_kwargs)
 
     # Methods
     def random_model(self, rng=None):
@@ -93,7 +95,7 @@ class NormalRegressor(Base):
                         'rng': rng}
         rand_kwargs = {'weights': self.prior.rvs(rng=rng)}
 
-        return NormalRegressorModel(**model_kwargs, **rand_kwargs)
+        return rand_models.NormalRegressor(**model_kwargs, **rand_kwargs)
 
     def _fit(self, d, warm_start=False):
         if not warm_start:  # reset learning attributes
@@ -219,7 +221,7 @@ class NormalRegressor(Base):
 
 class DirichletFiniteYcXModelBayesNew(Base):
     def __init__(self, alpha_0, mean_x, mean_y_x, rng_model=None, rng_prior=None):
-        model_gen = DataConditional.finite_model
+        model_gen = rand_models.DataConditional.finite_model
         model_kwargs = {'rng': rng_model}
         prior = {'p_x': RE_obj_callable.DirichletRV(alpha_0, mean_x, rng_prior),
                  'p_y_x': lambda x: RE_obj_callable.DirichletRV(alpha_0 * mean_x(x), mean_y_x(x), rng_prior)}
@@ -296,7 +298,7 @@ class DirichletFiniteYcXModelBayesNew(Base):
 #%% Without func objects
 class FiniteYcXModelBayes(Base):
     def __init__(self, supp_x, supp_y, prior, rng_model=None):
-        model_gen = DataConditional.finite_model_orig
+        model_gen = rand_models.DataConditional.finite_model_orig
         # model_kwargs = {'rng': rng_model}
         model_kwargs = {'supp_x': supp_x['x'], 'supp_y': supp_y['y'], 'rng': rng_model}
         super().__init__(model_gen, model_kwargs, prior)
@@ -318,7 +320,7 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
     # TODO: initialization from marginal/conditional? full mean init as classmethod?
 
     def __init__(self, supp_x, supp_y, alpha_0, mean, rng_model=None, rng_prior=None):
-        prior = Dirichlet(alpha_0, mean, rng_prior)
+        prior = rand_elements.Dirichlet(alpha_0, mean, rng_prior)
         super().__init__(supp_x, supp_y, prior, rng_model)
 
         self.alpha_0 = self.prior.alpha_0

@@ -205,19 +205,26 @@ class Dirichlet(Base):
         self.posterior = None
         self.posterior_model = rand_elements.Mixture([self.prior_mean], [self.alpha_0])
 
-    # TODO: update `prior_mean` using `posterior_model.set_dist_attr` !!
+    # def __getattribute__(self, name):
+    #     try:
+    #         return getattr(self.prior_mean, name)
+    #     except AttributeError:
+    #         return super().__getattribute__(name)
 
-    def __getattribute__(self, name):
-        try:
-            return getattr(self.prior_mean, name)
-        except AttributeError:
-            return super().__getattribute__(name)
+    # def __setattr__(self, name, value):
+    #     try:
+    #         self.posterior_model.set_dist_attr(0, **{name: value})      # prior attributes take precedence
+    #     except AttributeError:
+    #         super().__setattr__(name, value)
 
-    def __setattr__(self, name, value):
-        try:
-            return setattr(self.prior_mean, name, value)
-        except AttributeError:
-            return super().__setattr__(name, value)
+    def __setattr__(self, name, value):     # TODO: better way?
+        if name == 'alpha_0':
+            super().__setattr__(name, value)
+        else:
+            try:
+                self.posterior_model.set_dist_attr(0, **{name: value})
+            except AttributeError:
+                super().__setattr__(name, value)
 
     is_fit = property(lambda self: self.posterior_model.n_dists > 1)
 
@@ -264,22 +271,22 @@ class Dirichlet(Base):
 
 
 if __name__ == '__main__':
-    alpha = rand_elements.Beta(5, 25)
-    theta = rand_elements.Beta(25, 5)
+    # alpha = rand_elements.Beta(5, 25)
+    # theta = rand_elements.Beta(25, 5)
 
-    # alpha = rand_elements.Finite(['a', 'b'], [.2, .8])
-    # theta = rand_elements.Finite(['a', 'b'], [.8, .2])
+    alpha = rand_elements.Finite(['a', 'b'], [.2, .8])
+    theta = rand_elements.Finite(['a', 'b'], [.8, .2])
 
     a = Dirichlet(alpha_0=10, prior_mean=alpha)
 
     # a.rvs(5)
     print(f"Mode = {a.posterior_model.mode}")
-    print(f"Mean = {a.posterior_model.mean}")
+    # print(f"Mean = {a.posterior_model.mean}")
     a.posterior_model.plot_pf()
 
     a.fit(theta.rvs(100))
     # a.rvs(10)
     print(f"Mode = {a.posterior_model.mode}")
-    print(f"Mean = {a.posterior_model.mean}")
+    # print(f"Mean = {a.posterior_model.mean}")
     a.posterior_model.plot_pf()
     pass
