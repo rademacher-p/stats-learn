@@ -664,11 +664,6 @@ class Normal(BaseRV):
                         for i in range(2)]
 
             self._space.lims_plot = lims
-            # x = plot.box_grid(lims, 100, endpoint=False)
-        # else:
-        #     x = None
-
-        # self._space.set_x_plot(x)
 
 # # mean_, cov_ = 1., 1.
 # mean_, cov_ = np.ones(2), np.eye(2)
@@ -684,7 +679,7 @@ class Normal(BaseRV):
 # print(delta**2*y.sum())
 
 
-class NormalLinear(Normal):
+class NormalLinear(Normal):     # TODO: rework, only allow weights and cov to be set?
     def __init__(self, weights=(0.,), basis=np.ones(1), cov=(1.,), rng=None):
         # self._set_weights(weights)
         # self._set_basis(basis)
@@ -809,27 +804,34 @@ class GenericEmpirical(Base):       # TODO: implement using factory of Finite ob
     def _rvs(self, size, rng):
         return rng.choice(self.values, size, p=self.p)
 
-    def pf(self, x):        # TODO: implement infinite valued output for continuous space!? use CDF?!
-        x, set_shape = check_data_shape(x, self.shape)
-        x = x.reshape((math.prod(set_shape), *self.shape))
-
-        out = np.zeros(len(x))
-        for i, x_i in enumerate(x):
-            if x_i in self.space:
-                eq_supp = np.all(x_i.flatten() == self._values_flat, axis=-1)
-                if eq_supp.sum() > 0:
-                    out[i] = self.p[eq_supp].squeeze()
-            else:
-                raise ValueError("Must be in support.")
-
-        return out.reshape(set_shape)
-
-    # def _pf_single(self, x):
-    #     eq_supp = np.all(x.flatten() == self._values_flat, axis=-1)
-    #     if eq_supp.sum() != 1:
-    #         raise ValueError("Input 'x' must be in the support.")
+    # def pf(self, x):
+    #     x, set_shape = check_data_shape(x, self.shape)
+    #     x = x.reshape((math.prod(set_shape), *self.shape))
     #
-    #     return self.p[eq_supp].squeeze()
+    #     out = np.zeros(len(x))
+    #     for i, x_i in enumerate(x):
+    #         eq_supp = np.all(x_i.flatten() == self._values_flat, axis=-1)
+    #         if eq_supp.sum() > 0:
+    #             out[i] = self.p[eq_supp].squeeze()
+    #         # if x_i in self.space:
+    #         #     eq_supp = np.all(x_i.flatten() == self._values_flat, axis=-1)
+    #         #     if eq_supp.sum() > 0:
+    #         #         out[i] = self.p[eq_supp].squeeze()
+    #         # else:
+    #         #     raise ValueError("Must be in support.")
+    #
+    #     return out.reshape(set_shape)
+
+    # TODO: implement infinite valued output for continuous space!? use CDF?!
+    def _pf_single(self, x):
+        # if x not in self.space:
+        #     raise ValueError("Input 'x' must be in the support.")
+
+        eq_supp = np.all(x.flatten() == self._values_flat, axis=-1)
+        if eq_supp.sum() == 1:
+            return self.p[eq_supp].squeeze()
+        else:
+            return 0.
 
     def _set_x_plot(self):
         if isinstance(self.space, spaces.Continuous) and self.shape in {()}:
@@ -897,8 +899,6 @@ class Mixture(Base):
         # elif self._weights.sum() != 1:
         #     raise ValueError("Weights must sum to one.")
 
-        self._p = np.array(self._weights) / sum(self.weights)
-
         self._update_attr()
 
     def set_dist_attr(self, idx, **dist_kwargs):      # TODO: improved implementation w/ direct self.dists access?
@@ -909,8 +909,8 @@ class Mixture(Base):
 
     def add_dist(self, dist, weight):       # TODO: type check?
         self.dists.append(dist)
-        # self.weights.append(weight)
-        self.weights += [weight]
+        self.weights.append(weight)
+        self._update_attr()
 
     def set_dist(self, idx, dist, weight):
         self.dists[idx] = dist
@@ -919,13 +919,13 @@ class Mixture(Base):
 
     def del_dist(self, idx):
         del self.dists[idx]
-        _w = self.weights
-        del _w[idx]
-        self.weights = _w
+        del self.weights[idx]
+        self._update_attr()
 
     def _update_attr(self):
         self._set_x_plot()
 
+        self._p = np.array(self._weights) / sum(self.weights)
         self._mode = self.space.argmax(self.pf)
 
     def _rvs(self, n, rng):
@@ -970,15 +970,15 @@ class MixtureRV(MixinRV, Mixture):
         self._cov = None  # TODO: numeric approx from `space`?
 
 
-# # dists_ = [Beta(*args) for args in [[10, 5], [2, 12]]]
-# # dists_ = [Normal(mean, 1) for mean in [0, 4]]
-# # dists_ = [Normal(mean, 1) for mean in [[0, 0], [2, 3]]]
+# dists_ = [Beta(*args) for args in [[10, 5], [2, 12]]]
+dists_ = [Normal(mean, 1) for mean in [0, 4]]
+# dists_ = [Normal(mean, 1) for mean in [[0, 0], [2, 3]]]
 # dists_ = [Finite(['a', 'b'], p=[p_, 1-p_]) for p_ in [0, 1]]
-# # dists_ = [Finite([[0, 0], [0, 1]], p=[p_, 1-p_]) for p_ in [0, 1]]
-#
-# m = Mixture(dists_, [5, 8])
-# m.rvs(10)
-# print(m.space.integrate(m.pf))
-# print(m.space.moment(m.pf))
-# m.plot_pf()
-# pass
+# dists_ = [Finite([[0, 0], [0, 1]], p=[p_, 1-p_]) for p_ in [0, 1]]
+
+m = Mixture(dists_, [5, 8])
+m.rvs(10)
+m.plot_pf()
+print(m.space.integrate(m.pf))
+print(m.space.moment(m.pf))
+pass

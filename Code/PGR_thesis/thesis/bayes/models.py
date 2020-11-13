@@ -146,7 +146,6 @@ class NormalRegressor(Base):
 
     def _set_model_x(self, val):
         self._model_x = val
-        # self._shape['x'] = val.shape
         self._space['x'] = val.space
 
     @model_x.setter
@@ -180,7 +179,6 @@ class NormalRegressor(Base):
         self._cov_y_x = np.array(val)
 
         _temp = self._cov_y_x.shape
-        # self._shape['y'] = _temp[:int(len(_temp) / 2)]
         self._space['y'] = spaces.Euclidean(_temp[:int(len(_temp) / 2)])
 
         self._prec_U_y_x = _PSD(self._cov_y_x.reshape(2 * (self.size['y'],)), allow_singular=False).U
