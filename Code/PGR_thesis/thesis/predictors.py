@@ -321,7 +321,7 @@ class Base(ABC):
         self.model = None
 
     def __repr__(self):
-        return self.__class__.__name__ + f"(model={self.model})"
+        return self.__class__.__name__ + f"(model={self.model})"        # FIXME: too generic. need bayes_model info
 
     shape = property(lambda self: self.model.shape)
     size = property(lambda self: self.model.size)

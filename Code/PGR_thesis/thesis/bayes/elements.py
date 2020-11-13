@@ -5,6 +5,7 @@ Bayesian random elements.
 import math
 
 import numpy as np
+from matplotlib import pyplot as plt
 from scipy.stats._multivariate import _PSD
 
 from thesis.random import elements as rand_elements
@@ -125,7 +126,7 @@ class NormalLinear(Base):
 
     def _set_basis(self, val):
         if val is None:
-            self._basis = np.ones((self.size, self.prior.size))
+            # self._basis = np.ones((self.size, self.prior.size))
             self._basis = np.vstack((np.eye(self.prior.size), np.zeros((self.size - self.prior.size, self.prior.size))))
         else:
             self._basis = np.array(val)
@@ -204,6 +205,20 @@ class Dirichlet(Base):
         self.posterior = None
         self.posterior_model = rand_elements.Mixture([self.prior_mean], [self.alpha_0])
 
+    # TODO: update `prior_mean` using `posterior_model.set_dist_attr` !!
+
+    def __getattribute__(self, name):
+        try:
+            return getattr(self.prior_mean, name)
+        except AttributeError:
+            return super().__getattribute__(name)
+
+    def __setattr__(self, name, value):
+        try:
+            return setattr(self.prior_mean, name, value)
+        except AttributeError:
+            return super().__setattr__(name, value)
+
     is_fit = property(lambda self: self.posterior_model.n_dists > 1)
 
     @property
@@ -218,6 +233,7 @@ class Dirichlet(Base):
 
     def _rvs(self, n, rng):
         # Samples directly from the marginal Dirichlet-Empirical data distribution
+
         _out = np.empty((n, *self.shape), dtype=self.space.dtype)
         for i in range(n):
             if rng.random() <= self.alpha_0 / (self.alpha_0 + i):
@@ -228,7 +244,6 @@ class Dirichlet(Base):
         return _out
 
     def _fit(self, d, warm_start=False):
-
         if not self.is_fit:
             warm_start = False
 
@@ -249,19 +264,22 @@ class Dirichlet(Base):
 
 
 if __name__ == '__main__':
-    # alpha = rand_elements.Beta(5, 25)
-    # theta = rand_elements.Beta(25, 5)
+    alpha = rand_elements.Beta(5, 25)
+    theta = rand_elements.Beta(25, 5)
 
-    alpha = rand_elements.Finite(['a', 'b'], [.2, .8])
-    theta = rand_elements.Finite(['a', 'b'], [.8, .2])
+    # alpha = rand_elements.Finite(['a', 'b'], [.2, .8])
+    # theta = rand_elements.Finite(['a', 'b'], [.8, .2])
 
     a = Dirichlet(alpha_0=10, prior_mean=alpha)
-    a.rvs(5)
-    print(a.posterior_model.mode)
-    # print(a.posterior_model.mean)
+
+    # a.rvs(5)
+    print(f"Mode = {a.posterior_model.mode}")
+    print(f"Mean = {a.posterior_model.mean}")
     a.posterior_model.plot_pf()
-    a.fit(theta.rvs(10))
-    a.rvs(10)
-    print(a.posterior_model.mode)
-    # print(a.posterior_model.mean)
+
+    a.fit(theta.rvs(100))
+    # a.rvs(10)
+    print(f"Mode = {a.posterior_model.mode}")
+    print(f"Mean = {a.posterior_model.mean}")
     a.posterior_model.plot_pf()
+    pass

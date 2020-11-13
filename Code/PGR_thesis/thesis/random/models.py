@@ -227,9 +227,7 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):
         super().__init__(rng)
 
         self.model_x = model_x
-        # self.weights = weights
-        self._weights = np.array(weights)
-
+        self.weights = weights
         self.cov_y_x_single = cov_y_x_single
 
         self._mode_y_x_single = self._mean_y_x_single
@@ -277,12 +275,11 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):
 
     @cov_y_x_single.setter
     def cov_y_x_single(self, val):
+        self._cov_repr = val
         if callable(val):
-            self._cov_repr = val
             self._cov_y_x_single = self._cov_repr
             _temp = self._cov_y_x_single(self.model_x.rvs()).shape
         else:
-            self._cov_repr = np.array(val)
             self._cov_y_x_single = lambda x: self._cov_repr
             _temp = self._cov_repr.shape
 
