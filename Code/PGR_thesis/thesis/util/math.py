@@ -4,14 +4,26 @@ import itertools
 import numpy as np
 
 
-def outer_gen(*args):
-    args = tuple(map(np.asarray, args))
-    if len(args) == 1:
-        return args[0]
+# def diag_multi(x):
+#     x = np.array(x)
+#     i = np.unravel_index(range(x.size), x.shape)
+#     out = np.zeros(2 * x.shape)
+#     out[2 * i] = x.flatten()
+#     return out
 
-    ix = np.ix_(*map(np.ravel, args))
-    _temp = functools.reduce(lambda x, y: x * y, ix)
-    return _temp.reshape(tuple(itertools.chain(*map(np.shape, args))))
+# def diag_multi(x):
+#     x = np.array(x)
+#     return np.diagflat(x).reshape(2 * x.shape)
+
+
+# def outer_gen(*args):
+#     args = tuple(map(np.asarray, args))
+#     if len(args) == 1:
+#         return args[0]
+#
+#     ix = np.ix_(*map(np.ravel, args))
+#     _temp = functools.reduce(lambda x, y: x * y, ix)
+#     return _temp.reshape(tuple(itertools.chain(*map(np.shape, args))))
 
 
 # def outer_gen(*args):
@@ -28,14 +40,6 @@ def outer_gen(*args):
 #     for arg in args[1:]:
 #         out = _outer_gen_2(out, arg)
 #     return out
-
-
-def diag_gen(x):
-    x = np.asarray(x)
-    out = np.zeros(2 * x.shape)
-    i = np.unravel_index(range(x.size), x.shape)
-    out[2 * i] = x.flatten()
-    return out
 
 
 # def inverse(x):

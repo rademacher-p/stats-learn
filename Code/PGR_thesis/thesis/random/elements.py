@@ -15,7 +15,6 @@ from scipy.special import gammaln, xlogy, xlog1py, betaln
 import matplotlib.pyplot as plt
 
 from thesis.util.generic import RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func
-from thesis.util.math import outer_gen, diag_gen, simplex_round
 from thesis.util import plotting, spaces
 
 
@@ -327,7 +326,8 @@ class Dirichlet(BaseRV):
             # warnings.warn("Mode method currently supported for mean > 1/alpha_0 only")
             self._mode = None       # TODO: complete with general formula
 
-        self._cov = (diag_gen(self._mean) - outer_gen(self._mean, self._mean)) / (self._alpha_0 + 1)
+        self._cov = (np.diagflat(self._mean).reshape(2 * self.shape)
+                     - np.tensordot(self._mean, self._mean, 0)) / (self._alpha_0 + 1)
 
         self._log_pf_coef = gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
 
@@ -409,7 +409,8 @@ class Empirical(BaseRV):
         # self._mode = ((self._n * self._mean) // 1) + simplex_round((self._n * self._mean) % 1)  # FIXME: broken
         self._mode = None
 
-        self._cov = (diag_gen(self._mean) - outer_gen(self._mean, self._mean)) / self._n
+        self._cov = (np.diagflat(self._mean).reshape(2 * self.shape)
+                     - np.tensordot(self._mean, self._mean, 0)) / self._n
 
     def _rvs(self, n, rng):
         return rng.multinomial(self._n, self._mean.flatten(), size=n).reshape(n, *self.shape) / self._n
@@ -485,8 +486,8 @@ class DirichletEmpirical(BaseRV):
     def _update_attr(self):
         # TODO: mode?
 
-        self._cov = ((1/self._n + 1/self._alpha_0) / (1 + 1/self._alpha_0)
-                     * (diag_gen(self._mean) - outer_gen(self._mean, self._mean)))
+        self._cov = ((self._n + self._alpha_0) / self._n / (1 + self._alpha_0)
+                     * (np.diagflat(self._mean).reshape(2 * self.shape) - np.tensordot(self._mean, self._mean, 0)))
 
         self._log_pf_coef = (gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
                              + gammaln(self._n + 1) - gammaln(self._alpha_0 + self._n))
@@ -861,7 +862,7 @@ class GenericEmpirical(Base):
 
         self.n = len(d)
         self.values = self._count_data(d)
-        self._values_flat = self._struct_flatten(self.values)
+        # self._values_flat = self._struct_flatten(self.values)
 
         self._update_attr()
 
@@ -869,59 +870,60 @@ class GenericEmpirical(Base):
         return f"GenericEmpirical(space={self.space}, n={self.n})"
 
     def _update_attr(self):
-        self.p = self.values['n'] / self.n
+        self._p = self.values['n'] / self.n
         self._mode = self.values['val'][self.values['n'].argmax()]
 
         self._set_x_plot()
 
-    def _struct_flatten(self, value):
-        x, y = value['val'].reshape(-1, self.size), value['n']
-        return np.array(list(zip(x, y)), dtype=[('val', self.dtype, (self.size,)),
-                                                ('n', np.int)])
+    # def _struct_flatten(self, value):
+    #     x, y = value['val'].reshape(-1, self.size), value['n']
+    #     return np.array(list(zip(x, y)), dtype=[('val', self.dtype, (self.size,)),
+    #                                             ('n', np.int)])
 
     def _count_data(self, d):
         values, counts = np.unique(d, return_counts=True, axis=0)
-        return np.array(list(zip(values, counts)),
-                        dtype=[('val', self.dtype, self.shape), ('n', np.int,)])
+        return np.array(list(zip(values, counts)), dtype=[('val', self.dtype, self.shape), ('n', np.int,)])
+
+    def _get_idx(self, value):
+        # eq = np.all(value.flatten() == self._values_flat['val'], axis=-1)
+        eq = np.all(value == self.values['val'], axis=tuple(range(1, 1 + self.ndim)))
+        idx = np.flatnonzero(eq)
+        if idx.size == 1:
+            return idx.item()
+        elif idx.size == 0:
+            return None
+        else:
+            raise ValueError
 
     def add_data(self, d):
         self.n += len(d)
 
-        values_new, counts_new = [], []
-        for value, count in self._count_data(d):
-            eq = np.all(value.flatten() == self._values_flat['val'], axis=-1)
-            if eq.sum() == 1:
-                self.values[eq]['n'] += count
-            elif eq.sum() == 0:
-                values_new.append(value)
-                counts_new.append(count)
+        values_new = self._count_data(d)
+        idx_new = []
+        for i, (value, count) in enumerate(values_new):
+            idx_eq = self._get_idx(value)
+            if idx_eq is not None:
+                self.values[idx_eq]['n'] += count
             else:
-                raise ValueError
+                idx_new.append(i)
 
-        if len(values_new) > 0:
-            # values_new, counts_new = np.array(values_new), np.array(counts_new)
-
-            values_new = np.array(list(zip(values_new, counts_new)),
-                                  dtype=[('val', self.dtype, self.shape), ('n', np.int,)])
-
-            self.values = np.concatenate((self.values, values_new))
-            # self.counts = np.concatenate((self.counts, counts_new))
-
-            self._values_flat = np.concatenate((self._values_flat, self._struct_flatten(values_new)))
+        if len(idx_new) > 0:
+            self.values = np.concatenate((self.values, values_new[idx_new]))
+            # self._values_flat = np.concatenate((self._values_flat, self._struct_flatten(values_new)))
 
         self._update_attr()        # TODO: add efficient updates
 
     def _rvs(self, size, rng):
-        return rng.choice(self.values['val'], size, p=self.p)
+        return rng.choice(self.values['val'], size, p=self._p)
 
     # TODO: implement infinite valued output for continuous space!? use CDF?!
     def _pf_single(self, x):
         # if x not in self.space:
         #     raise ValueError("Input 'x' must be in the support.")
 
-        eq_supp = np.all(x.flatten() == self._values_flat['val'], axis=-1)
-        if eq_supp.sum() == 1:
-            return self.p[eq_supp].squeeze()
+        idx = self._get_idx(x)
+        if idx is not None:
+            return self._p[idx]
         else:
             return 0.
 
@@ -939,17 +941,25 @@ class GenericEmpiricalRV(MixinRV, GenericEmpirical):
     def _update_attr(self):
         super()._update_attr()
 
-        mean_flat = (self._values_flat['val'] * self.p[:, np.newaxis]).sum(0)
-        self._mean = mean_flat.reshape(self.shape)
+        # mean_flat = self.p @ self._values_flat['val']
+        # self._mean = mean_flat.reshape(self.shape)
+        #
+        # ctr_flat = self._values_flat['val'] - mean_flat
+        # outer_flat = (ctr_flat[:, np.newaxis] * ctr_flat[..., np.newaxis]).reshape(len(ctr_flat), -1)
+        # self._cov = (self.p @ outer_flat).reshape(2 * self.shape)
 
-        ctr_flat = self._values_flat['val'] - mean_flat
-        outer_flat = (ctr_flat[:, np.newaxis] * ctr_flat[..., np.newaxis]).reshape(len(ctr_flat), -1)
-        self._cov = (self.p[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self.shape)
+        self._mean = np.tensordot(self._p, self.values['val'], axes=[0, 0])
+
+        ctr = self.values['val'] - self._mean
+        outer = np.empty((len(ctr),) + 2 * self.shape)
+        for i, ctr_i in enumerate(ctr):
+            outer[i] = np.tensordot(ctr_i, ctr_i, 0)        # TODO: try np.einsum?
+        self._cov = np.tensordot(self._p, outer, axes=[0, 0])
 
 
 # # r = Beta(5, 5)
-# # r = Finite(plotting.mesh_grid([0, 1], [3, 4, 5]), np.ones((2, 3)) / 6)
-# r = Finite(['a', 'b'], [.6, .4])
+# r = Finite(plotting.mesh_grid([0, 1], [3, 4, 5]), np.ones((2, 3)) / 6)
+# # r = Finite(['a', 'b'], [.6, .4])
 # e = GenericEmpirical(r.rvs(10), space=r.space)
 # e.add_data(r.rvs(5))
 # print(e)
