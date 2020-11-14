@@ -315,7 +315,7 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):        # TODO: rename NormalLin
 
 class GenericEmpirical(Base):
 
-    # TODO: import structured array with additional counts field from `random.elements` !!!
+    # FIXME FIXME: import structured array with additional counts field from `random.elements` !!!
 
     def __new__(cls, d, space=None, rng=None):
         dtype = np.array(d).dtype
