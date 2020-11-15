@@ -188,10 +188,6 @@ class Finite(Base):     # TODO: DRY - use stat approx from the Finite space's me
         self._p = check_valid_pmf(p)
         self._space = spaces.FiniteGeneric(_supp, shape=_supp.shape[self._p.ndim:])
 
-        self._supp_flat = self.supp.reshape((self._p.size, self.size))
-        if len(self._supp_flat) != len(np.unique(self._supp_flat, axis=0)):
-            raise ValueError("Input 'supp' must have unique values")
-
         self._update_attr()
 
     def __repr__(self):
@@ -201,6 +197,10 @@ class Finite(Base):     # TODO: DRY - use stat approx from the Finite space's me
     @property
     def supp(self):
         return self.space.values
+
+    @property
+    def _supp_flat(self):
+        return self.space._vals_flat.reshape(-1, *self.shape)   # FIXME: just modify in `spaces.FiniteGeneric`
 
     @property
     def p(self):
@@ -217,27 +217,14 @@ class Finite(Base):     # TODO: DRY - use stat approx from the Finite space's me
             raise ValueError(f"Shape of 'p' must be {self.space.set_shape}.")
         self._p_flat = self._p.flatten()
 
-        self._mode = self._supp_flat[np.argmax(self._p_flat)].reshape(self.shape)
+        self._mode = self._supp_flat[np.argmax(self._p_flat)]
 
     def _rvs(self, n, rng):
-        return rng.choice(self._supp_flat.reshape(-1, *self.shape), size=n, p=self._p_flat)
-
-    # def pf(self, x, check_set=True):
-    #     x, set_shape = check_data_shape(x, self.shape)
-    #     x = x.reshape(-1, self.size)
-    #
-    #     out = np.empty(len(x))
-    #     for i, x_i in enumerate(x):
-    #         eq_supp = np.all(x_i == self._supp_flat, axis=-1)
-    #         if check_set and eq_supp.sum() != 1:
-    #             raise ValueError("Input 'x' must be in the support.")
-    #
-    #         out[i] = self._p_flat[eq_supp].squeeze()
-    #
-    #     return out.reshape(set_shape)
+        return rng.choice(self._supp_flat, size=n, p=self._p_flat)
 
     def _pf_single(self, x):
-        eq_supp = np.all(x.flatten() == self._supp_flat, axis=-1)
+        # eq_supp = np.all(x.flatten() == self._supp_flat, axis=-1)
+        eq_supp = np.all(x == self._supp_flat, axis=tuple(range(1, 1 + self.ndim)))
         if eq_supp.sum() == 0:
             raise ValueError("Input 'x' must be in the support.")
 
@@ -252,12 +239,21 @@ class FiniteRV(MixinRV, Finite):
     def _update_attr(self):
         super()._update_attr()
 
-        mean_flat = (self._p_flat[:, np.newaxis] * self._supp_flat).sum(axis=0)
-        self._mean = mean_flat.reshape(self.shape)
+        # mean_flat = self._p_flat @ self._supp_flat
+        # self._mean = mean_flat.reshape(self.shape)
+        #
+        # ctr_flat = self._supp_flat - mean_flat
+        # outer_flat = (ctr_flat[:, np.newaxis] * ctr_flat[..., np.newaxis]).reshape(self._p.size, -1)
+        # self._cov = (self._p_flat @ outer_flat).reshape(2 * self.shape)
 
-        ctr_flat = self._supp_flat - mean_flat
-        outer_flat = (ctr_flat[:, np.newaxis] * ctr_flat[..., np.newaxis]).reshape(self._p.size, -1)
-        self._cov = (self._p_flat[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self.shape)
+        self._mean = np.tensordot(self._p_flat, self._supp_flat, axes=[0, 0])
+
+        ctr = self._supp_flat - self._mean
+        # outer = np.empty((len(ctr), *(2 * self.shape)))
+        # for i, ctr_i in enumerate(ctr):
+        #     outer[i] = np.tensordot(ctr_i, ctr_i, 0)
+        # self._cov = np.tensordot(self._p, outer, axes=[0, 0])
+        self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p_flat, ctr))
 
 
 # s = np.random.random((3, 1, 2))
@@ -267,13 +263,14 @@ class FiniteRV(MixinRV, Finite):
 # f.rvs((2, 3))
 # f.pf(f.rvs((4, 5)))
 #
-# s = plot.mesh_grid([0, 1], [0, 1, 2])
-# p = np.random.random((2, 3))
-# p = p / p.sum()
+# s = plotting.mesh_grid([0, 1], [0, 1, 2])
+# p_ = np.random.random((2, 3))
+# p_ = p_ / p_.sum()
 # # s, p = ['a','b','c'], [.3,.2,.5]
-# f2 = Finite(s, p)
+# f2 = Finite(s, p_)
 # f2.pf(f2.rvs(4))
 # f2.plot_pf()
+# qq = None
 
 
 def _dirichlet_check_input(x, alpha_0, mean):
@@ -861,8 +858,7 @@ class GenericEmpirical(Base):
             self._space = space
 
         self.n = len(d)
-        self.values = self._count_data(d)
-        # self._values_flat = self._struct_flatten(self.values)
+        self.data = self._count_data(d)
 
         self._update_attr()
 
@@ -870,8 +866,8 @@ class GenericEmpirical(Base):
         return f"GenericEmpirical(space={self.space}, n={self.n})"
 
     def _update_attr(self):
-        self._p = self.values['n'] / self.n
-        self._mode = self.values['val'][self.values['n'].argmax()]
+        self._p = self.data['n'] / self.n
+        self._mode = self.data['val'][self.data['n'].argmax()]
 
         self._set_x_plot()
 
@@ -885,8 +881,7 @@ class GenericEmpirical(Base):
         return np.array(list(zip(values, counts)), dtype=[('val', self.dtype, self.shape), ('n', np.int,)])
 
     def _get_idx(self, value):
-        # eq = np.all(value.flatten() == self._values_flat['val'], axis=-1)
-        eq = np.all(value == self.values['val'], axis=tuple(range(1, 1 + self.ndim)))
+        eq = np.all(value == self.data['val'], axis=tuple(range(1, 1 + self.ndim)))
         idx = np.flatnonzero(eq)
         if idx.size == 1:
             return idx.item()
@@ -903,18 +898,17 @@ class GenericEmpirical(Base):
         for i, (value, count) in enumerate(values_new):
             idx_eq = self._get_idx(value)
             if idx_eq is not None:
-                self.values[idx_eq]['n'] += count
+                self.data[idx_eq]['n'] += count
             else:
                 idx_new.append(i)
 
         if len(idx_new) > 0:
-            self.values = np.concatenate((self.values, values_new[idx_new]))
-            # self._values_flat = np.concatenate((self._values_flat, self._struct_flatten(values_new)))
+            self.data = np.concatenate((self.data, values_new[idx_new]))
 
         self._update_attr()        # TODO: add efficient updates
 
     def _rvs(self, size, rng):
-        return rng.choice(self.values['val'], size, p=self._p)
+        return rng.choice(self.data['val'], size, p=self._p)
 
     # TODO: implement infinite valued output for continuous space!? use CDF?!
     def _pf_single(self, x):
@@ -930,7 +924,7 @@ class GenericEmpirical(Base):
     def _set_x_plot(self):
         if isinstance(self.space, spaces.Continuous) and self.shape in {()}:
             # TODO: hackish? adds empirical values to the plot support (so impulses are not missed)
-            x = np.sort(np.unique(np.concatenate((self.space.x_plt, self.values['val']))))
+            x = np.sort(np.unique(np.concatenate((self.space.x_plt, self.data['val']))))
             self._space.set_x_plot(x)
 
 
@@ -941,21 +935,14 @@ class GenericEmpiricalRV(MixinRV, GenericEmpirical):
     def _update_attr(self):
         super()._update_attr()
 
-        # mean_flat = self.p @ self._values_flat['val']
-        # self._mean = mean_flat.reshape(self.shape)
-        #
-        # ctr_flat = self._values_flat['val'] - mean_flat
-        # outer_flat = (ctr_flat[:, np.newaxis] * ctr_flat[..., np.newaxis]).reshape(len(ctr_flat), -1)
-        # self._cov = (self.p @ outer_flat).reshape(2 * self.shape)
+        self._mean = np.tensordot(self._p, self.data['val'], axes=[0, 0])
 
-        self._mean = np.tensordot(self._p, self.values['val'], axes=[0, 0])
-
-        ctr = self.values['val'] - self._mean
-        outer = np.empty((len(ctr),) + 2 * self.shape)
-        for i, ctr_i in enumerate(ctr):
-            outer[i] = np.tensordot(ctr_i, ctr_i, 0)        # TODO: try np.einsum?
-        self._cov = np.tensordot(self._p, outer, axes=[0, 0])
-
+        ctr = self.data['val'] - self._mean
+        # outer = np.empty((len(ctr), *(2 * self.shape)))
+        # for i, ctr_i in enumerate(ctr):
+        #     outer[i] = np.tensordot(ctr_i, ctr_i, 0)        # TODO: try np.einsum?
+        # self._cov = np.tensordot(self._p, outer, axes=[0, 0])
+        self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p, ctr))
 
 # # r = Beta(5, 5)
 # r = Finite(plotting.mesh_grid([0, 1], [3, 4, 5]), np.ones((2, 3)) / 6)
@@ -1054,7 +1041,7 @@ class Mixture(Base):
             x = self.space.x_plt
             for dist in self.dists:
                 if isinstance(dist, GenericEmpirical):
-                    x = np.concatenate((x, dist.values))
+                    x = np.concatenate((x, dist.data))
 
             x = np.sort(np.unique(x))
             self._space.set_x_plot(x)
