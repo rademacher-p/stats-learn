@@ -80,7 +80,7 @@ class Finite(Discrete):
 
 #%%
 class FiniteGeneric(Finite):
-    def __init__(self, values, shape=()):
+    def __init__(self, values, shape=()):       # TODO: flatten and ignore set shape?
         self.values = np.array(values)
         super().__init__(shape, self.values.dtype)
 
@@ -89,26 +89,30 @@ class FiniteGeneric(Finite):
         if _supp_shape[_idx_split:] != self.shape:
             raise ValueError(f"Support trailing shape must be {self.shape}.")
 
-        self._vals_flat = self.values.reshape(-1, self.size)
-        if len(self._vals_flat) != len(np.unique(self._vals_flat, axis=0)):
-            raise ValueError("Input 'support' must have unique values")
-
         self.set_shape = _supp_shape[:_idx_split]
         self.set_size = math.prod(self.set_shape)
         self.set_ndim = len(self.set_shape)
+
+        # self._vals_flat = self.values.reshape(-1, self.size)
+        # if len(self._vals_flat) != len(np.unique(self._vals_flat, axis=0)):
+        #     raise ValueError("Input 'support' must have unique values")
+        self._vals_flat = self.values.reshape(-1, *self.shape)
+        if len(self._vals_flat) != len(np.unique(self._vals_flat, axis=0)):
+            raise ValueError("Input 'support' must have unique values")
 
     def __repr__(self):
         return f"FiniteGeneric({self.values})"
 
     def __eq__(self, other):
         if isinstance(other, FiniteGeneric):
-            return self.shape == other.shape and (self.values == other.values).all
+            return self.shape == other.shape and (self.values == other.values).all()
         return NotImplemented
 
     def __contains__(self, item):
         item = np.array(item)
         if item.shape == self.shape and item.dtype == self.dtype:
-            eq_supp = np.all(item.flatten() == self._vals_flat, axis=-1)
+            # eq_supp = np.all(item.flatten() == self._vals_flat, axis=-1)
+            eq_supp = np.all(item == self._vals_flat, axis=tuple(range(1, 1 + self.ndim)))
             return eq_supp.sum() > 0
         else:
             return False
@@ -121,11 +125,11 @@ class FiniteGeneric(Finite):
 
     def _minimize(self, f):
         def g(i):
-            x_ = self._vals_flat[int(i)].reshape(self.shape)
+            x_ = self._vals_flat[int(i)]
             return f(x_)
 
         i_opt = int(optimize.brute(g, (np.mgrid[:self.set_size],)))     # ignore type inspection
-        return self._vals_flat[i_opt].reshape(self.shape)
+        return self._vals_flat[i_opt]
 
     def integrate(self, f):
         # y_flat = f(self.values.reshape(-1, *self.shape))     # shouldn't require vectorized funcs?
