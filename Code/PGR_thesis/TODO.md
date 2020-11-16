@@ -4,10 +4,11 @@
 - Computational burden?
 - Empirical dist func objects?
 
-## Continuous dists
-- Validate with Beta example. Done?
-- Deterministic prior with DEP to effect DP realization and sample
+- Categorical vs numeric grid distinction
+  - as `spaces.Finite` subclasses
+  - as `random.elements.Finite` subclasses
+- `random.models` class-conditional model
+  - user specifies categorical space, conditional distributions, and class probabilities
 
-Rework YcX stuff for functions?
 
 
