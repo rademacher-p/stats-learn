@@ -2,18 +2,19 @@
 SL models.
 """
 
-# TODO: add conditional RE object?
-
 import math
 from typing import Optional
 
 import numpy as np
+from matplotlib import pyplot as plt
 
 from thesis.random import elements as rand_elements
 # from thesis._deprecated.RE_obj_callable import FiniteRE  # TODO: note - CALLABLE!!!!
 
-from thesis.util.generic import RandomGeneratorMixin, vectorize_func
+from thesis.util.generic import RandomGeneratorMixin, vectorize_func, vectorize_func_dec
 from thesis.util import spaces
+
+# TODO: add marginal/conditional pf methods
 
 
 class Base(RandomGeneratorMixin):
@@ -24,6 +25,9 @@ class Base(RandomGeneratorMixin):
     def __init__(self, rng=None):
         super().__init__(rng)
         self._space = {'x': None, 'y': None}
+
+        # self.model_x = None
+        # self.model_y_x = None
 
         self._mode_x = None
 
@@ -52,9 +56,13 @@ class Base(RandomGeneratorMixin):
 
     rvs = rand_elements.Base.rvs
 
-    def _rvs(self, size, rng):
-        raise NotImplementedError("Method must be overwritten.")
-        pass
+    def _rvs(self, n, rng):
+        d_x = np.array(self.model_x.rvs(n, rng=rng))
+        d_y = np.stack([self.model_y_x(x).rvs(rng=rng) for x in d_x])
+
+        d = np.array(list(zip(d_x, d_y)), dtype=[('x', d_x.dtype, self.shape['x']), ('y', d_y.dtype, self.shape['y'])])
+
+        return d
 
 
 class MixinRVx:
@@ -140,14 +148,6 @@ class DataConditional(Base):
     def _mode_y_x_single(self, x):
         return self._model_y_x(x).mode
 
-    def _rvs(self, n, rng):
-        d_x = np.array(self.model_x.rvs(n, rng=rng))
-        d_y = np.stack([self.model_y_x(x).rvs(rng=rng) for x in d_x])
-
-        d = np.array(list(zip(d_x, d_y)), dtype=[('x', d_x.dtype, self.shape['x']), ('y', d_y.dtype, self.shape['y'])])
-
-        return d
-
     @classmethod
     def finite_model(cls, supp_x, p_x, supp_y, p_y_x, rng=None):
         model_x = rand_elements.Finite(supp_x, p_x)
@@ -196,6 +196,9 @@ class DataConditionalRVy(MixinRVy, DataConditional):
         # self._mean_y_x_single = lambda x: self._model_y_x(x).mean
         # self._cov_y_x_single = lambda x: self._model_y_x(x).cov
 
+    def mean_y_x(self, x):
+        return vectorize_func(self._mean_y_x_single, self.shape['x'])(x)
+
     def _mean_y_x_single(self, x):
         return self._model_y_x(x).mean
 
@@ -203,7 +206,7 @@ class DataConditionalRVy(MixinRVy, DataConditional):
         return self._model_y_x(x).cov
 
 
-class DataConditionalRVxy(MixinRVy, DataConditionalRVx):
+class DataConditionalRVxy(DataConditionalRVy, DataConditionalRVx):
     pass
 
 
@@ -299,24 +302,13 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):        # TODO: rename NormalLin
         cov = self._cov_y_x_single(x)
         return rand_elements.Normal(mean, cov)
 
-    # _rvs = DataConditional._rvs
-    def _rvs(self, n, rng):
-        d_x = np.array(self.model_x.rvs(n, rng=rng))
-        d_y = np.stack([self.model_y_x(x).rvs(rng=rng) for x in d_x])
 
-        d = np.array(list(zip(d_x, d_y)), dtype=[('x', d_x.dtype, self.shape['x']), ('y', d_y.dtype, self.shape['y'])])
-
-        return d
-
-# g = NormalRegressor(basis_y_x=(lambda x: x,), weights=(1,), cov_y_x_single=.01)
+# g = NormalRegressor(basis_y_x=(lambda x: x,), weights=(1,), cov_y_x_single=.01, model_x=rand_elements.Normal(4))
 # r = g.rvs(100)
 # # plt.plot(r['x'], r['y'], '.')
 
 
 class GenericEmpirical(Base):
-
-    # FIXME FIXME: import structured array with additional counts field from `random.elements` !!!
-
     def __new__(cls, d, space=None, rng=None):
         dtype = np.array(d).dtype
         if all(np.issubdtype(dtype[c].base, np.number) for c in 'xy'):
@@ -327,93 +319,92 @@ class GenericEmpirical(Base):
     def __init__(self, d, space=None, rng=None):
         super().__init__(rng)
 
+        d = np.array(d)
         if space is None:
-            self._space = spaces.Euclidean(d[0].shape)
+            dtype = np.array(d).dtype
+            for c in 'xy':
+                if np.issubdtype(dtype[c].base, np.number):
+                    self._space[c] = spaces.Euclidean(dtype[c].shape)
+                else:
+                    raise NotImplementedError
         else:
             self._space = space
 
         self.n = len(d)
-        self.values, self.counts = self._count_data(d)
-        self._values_flat = self._struct_flatten(self.values)
+        self.data = self._count_data(d)
 
         self._update_attr()
-
-    def _struct_flatten(self, val):
-        x, y = val['x'].reshape(-1, self.size['x']), val['y'].reshape(-1, self.size['y'])
-        return np.array(list(zip(x, y)), dtype=[('x', self.dtype['x'], (self.size['x'],)),
-                                                ('y', self.dtype['y'], (self.size['y'],))])
 
     def __repr__(self):
         return f"GenericEmpirical(space={self.space}, n={self.n})"
 
-    def _update_attr(self):
-        self.p = self.counts / self.n
-        # self._mode = self.values[self.counts.argmax()]
+    def _count_data(self, d):
+        values, counts = np.unique(d, return_counts=True, axis=0)
+        return np.array(list(zip(values['x'], values['y'], counts)), dtype=[('x', self.dtype['x'], self.shape['x']),
+                                                                            ('y', self.dtype['y'], self.shape['y']),
+                                                                            ('n', np.int,)])
+    # def _get_idx_x(self, x):
+    #     idx = np.flatnonzero(np.all(x == self.data_x['x'], axis=tuple(range(1, 1 + self.ndim['x']))))
+    #     if idx.size == 1:
+    #         return idx.item()
+    #     elif idx.size == 0:
+    #         return None
+    #     else:
+    #         raise ValueError
 
-        # self.values_x, _idx = np.unique(self.values['x'], return_inverse=True, axis=0)
-        # self.counts_x = np.array([self.counts[_idx == i].sum() for i in range(len(self.values_x))])
-
-        self.values_x, _idx = np.unique(self.values['x'], return_inverse=True, axis=0)
-        self.counts_x = np.empty(len(self.values_x), dtype=np.int)
-        self.values_y_x, self.counts_y_x = [], []
-        for i in range(len(self.values_x)):
-            values_, counts_ = self.values['y'][_idx == i], self.counts[_idx == i]
-            self.counts_x[i] = counts_.sum()
-
-            self.values_y_x.append(values_)
-            self.counts_y_x.append(counts_)
-
-        self._mode_x = self.values_x[self.counts_x.argmax()]
-
-        # TODO: efficient with setattr?
-        # self.values_y, _idx = np.unique(self.values['y'], return_inverse=True, axis=0)
-        # self.counts_y = np.array([self.counts[_idx == i].sum() for i in range(len(self.values_y))])
-        # self._mode_y = self.values_y[self.counts_y.argmax()]
-
-    def info_y_x(self, x):
-        eq = np.all(x.flatten() == self.values_x.reshape(-1, self.size['x']), axis=-1)
-        if eq.sum() == 1:
-            idx = np.flatnonzero(eq).item()
-            return self.values_y_x[idx], self.counts_y_x[idx]
+    def _get_data_y_x(self, x):
+        idx = np.flatnonzero(np.all(x == self.data_x['x'], axis=tuple(range(1, 1 + self.ndim['x']))))
+        if idx.size == 1:
+            return self.data_y_x[idx.item()]
+        elif idx.size == 0:
+            return None
         else:
-            return None, None
-
-    def _mode_y_x_single(self, x):
-        values, counts = self.info_y_x(x)
-        if values is not None:
-            return values[counts.argmax()]
-        else:
-            return np.nan     # TODO: value?
-
-    @staticmethod
-    def _count_data(d):
-        return np.unique(d, return_counts=True, axis=0)
+            raise ValueError
 
     def add_data(self, d):
         self.n += len(d)
 
-        values_new, counts_new = [], []
-        for value, count in zip(*self._count_data(d)):
-            eq = self._struct_flatten(value) == self._values_flat
-            if eq.sum() == 1:
-                self.counts[eq] += count
-            elif eq.sum() == 0:
-                values_new.append(value)
-                counts_new.append(count)
+        data_new = self._count_data(d)
+        idx_new = []
+        for i, value in enumerate(data_new):
+            idx = np.flatnonzero(value[['x', 'y']] == self.data[['x', 'y']])
+            if idx.size == 1:
+                self.data['n'][idx.item()] += value['n']
             else:
-                raise ValueError
+                idx_new.append(i)
 
-        if len(values_new) > 0:
-            values_new, counts_new = np.array(values_new), np.array(counts_new)
-            self.values = np.concatenate((self.values, values_new))
-            self.counts = np.concatenate((self.counts, counts_new))
+        if len(idx_new) > 0:
+            self.data = np.concatenate((self.data, data_new[idx_new]))
 
-            self._values_flat = np.concatenate((self._values_flat, self._struct_flatten(values_new)))
+        self._update_attr()
 
-        self._update_attr()        # TODO: add efficient updates
+    def _update_attr(self):
+        self._p = self.data['n'] / self.n
+
+        values_x, self._idx_inv = np.unique(self.data['x'], return_inverse=True, axis=0)
+        self.data_y_x = []
+        counts_x = np.empty(len(values_x), dtype=np.int)
+        for i in range(len(values_x)):
+            data_match = self.data[['y', 'n']][self._idx_inv == i]
+            counts_x[i] = data_match['n'].sum()
+
+            self.data_y_x.append(data_match)
+
+        self.data_x = np.array(list(zip(values_x, counts_x)),
+                               dtype=[('x', self.dtype['x'], self.shape['x']), ('n', np.int,)])
+
+        self._p_x = self.data_x['n'] / self.n
+        self._mode_x = self.data_x['x'][self.data_x['n'].argmax()]
+
+    def _mode_y_x_single(self, x):
+        data_ = self._get_data_y_x(x)
+        if data_ is not None:
+            return data_['y'][data_['n'].argmax()]
+        else:
+            return np.nan     # TODO: value?
 
     def _rvs(self, size, rng):
-        return rng.choice(self.values, size, p=self.p)
+        return rng.choice(self.data[['x', 'y']], size, p=self._p)
 
 
 class GenericEmpiricalRVxy(MixinRVx, MixinRVy, GenericEmpirical):
@@ -423,24 +414,174 @@ class GenericEmpiricalRVxy(MixinRVx, MixinRVy, GenericEmpirical):
     def _update_attr(self):
         super()._update_attr()
 
-        mean_flat = (self._values_flat * self.p[:, np.newaxis]).sum(0)
-        self._mean = mean_flat.reshape(self.shape)
+        self._mean_x = np.tensordot(self._p_x, self.data_x['x'], axes=[0, 0])
 
-        ctr_flat = self._values_flat - mean_flat
-        outer_flat = (ctr_flat[:, np.newaxis] * ctr_flat[..., np.newaxis]).reshape(len(ctr_flat), -1)
-        self._cov = (self.p[:, np.newaxis] * outer_flat).sum(axis=0).reshape(2 * self.shape)
+        self._cov_x = sum(p_i * np.tensordot(ctr_i, ctr_i, 0)
+                          for p_i, ctr_i in zip(self._p_x, self.data_x['x'] - self._mean_x))
+
+    def _mean_y_x_single(self, x):
+        data_ = self._get_data_y_x(x)
+        if data_ is not None:
+            p_y_x = data_['n'] / data_['n'].sum()
+            return np.tensordot(p_y_x, data_['y'], axes=[0, 0])
+        else:
+            return np.nan
 
 
 # x_ = [10, 11]
+# p_x = [.5, .5]
+# # y_ = ['a', 'b']
+# y_ = [0, 1]
 # def p_y_x_(x):
 #     return [.8, .2] if x == 0 else [.2, .8]
-# r = DataConditional.finite_model(x_, [.5, .5], ['a', 'b'], p_y_x_)
+# r = DataConditional.finite_model(x_, p_x, y_, p_y_x_)
+#
+# # r = NormalRegressor(weights=[1, 1], cov_y_x_single=np.eye(2))
+# # r = NormalRegressor(weights=[1, 1], cov_y_x_single=1., model_x=rand_elements.Normal([0, 0]))
+#
+# d_ = r.rvs(10)
+# e = GenericEmpirical(d_, space=r.space)
+# e.add_data(r.rvs(5))
+# print(e)
+# pass
 
-r = NormalRegressor(weights=[1, 1], cov_y_x_single=np.eye(2))
-# r = NormalRegressor(weights=[1, 1], cov_y_x_single=1., model_x=rand_elements.Normal([0, 0]))
 
-d_ = r.rvs(10)
-e = GenericEmpirical(d_, space=r.space)
-e.add_data(r.rvs(5))
-print(e)
-pass
+class Mixture(Base):
+    def __new__(cls, dists, weights, rng=None):
+        if all(isinstance(dist, MixinRVx) and isinstance(dist, MixinRVy) for dist in dists):
+            return super().__new__(MixtureRVxy)
+        else:
+            return super().__new__(cls)
+
+    def __init__(self, dists, weights, rng=None):       # TODO: special implementation for Finite? get modes, etc?
+        super().__init__(rng)
+        self.dists = list(dists)
+
+        self._space = self.dists[0].space
+        if not all(dist.space == self.space for dist in self.dists[1:]):
+            raise ValueError("All distributions must have the same space.")
+
+        self.weights = weights
+
+    def __repr__(self):
+        _str = "; ".join([f"{prob}: {dist}" for dist, prob in zip(self.dists, self._p)])
+        return f"Mixture({_str})"
+
+    n_dists = property(lambda self: len(self.dists))
+
+    @property
+    def weights(self):
+        return self._weights
+
+    @weights.setter
+    def weights(self, value):
+        self._weights = list(value)
+        if len(self._weights) != self.n_dists:
+            raise ValueError(f"Weights must have length {self.n_dists}.")
+
+        self._update_attr()
+
+    def set_dist_attr(self, idx, **dist_kwargs):      # TODO: improved implementation w/ direct self.dists access?
+        dist = self.dists[idx]
+        for key, val in dist_kwargs.items():
+            setattr(dist, key, val)
+        self._update_attr()
+
+    def add_dist(self, dist, weight):       # TODO: type check?
+        self.dists.append(dist)
+        self.weights.append(weight)
+        self._update_attr()
+
+    def set_dist(self, idx, dist, weight):
+        self.dists[idx] = dist
+        self.weights[idx] = weight
+        self._update_attr()     # weights setter not invoked
+
+    def del_dist(self, idx):
+        del self.dists[idx]
+        del self.weights[idx]
+        self._update_attr()
+
+    def _update_attr(self):
+        self._p = np.array(self._weights) / sum(self.weights)
+        # self._mode_x = self.space['x'].argmax(self.pf_x)
+
+        self.model_x = rand_elements.Mixture([dist.model_x for dist in self.dists], self.weights)
+        self._mode_x = self.model_x.mode
+
+    def mode_y_x(self, x):
+        # return self.space['y'].argmax(self.pf_y_x(x))
+        return self.model_y_x(x).mode
+
+    def _rvs(self, n, rng):
+        c = rng.choice(self.n_dists, size=n, p=self._p)
+        out = np.array(list(zip(np.zeros((n, *self.shape['x'])), np.zeros((n, *self.shape['y'])))),
+                       dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
+        for i, dist in enumerate(self.dists):
+            idx = np.flatnonzero(c == i)
+            out[idx] = dist.rvs(size=idx.size)
+
+        return out
+
+    # @property
+    # def model_x(self):
+    #     return rand_elements.Mixture([dist.model_x for dist in self.dists], self.weights)
+
+    def model_y_x(self, x):
+        return rand_elements.Mixture([dist.model_y_x(x) for dist in self.dists], self.weights)
+
+    def pf_x(self, x):
+        # return sum(prob * dist.model_x.pf(x) for dist, prob in zip(self.dists, self._p))
+        return self.model_x.pf(x)
+
+    def pf_y_x(self, x):
+        # def temp(y):
+        #     return sum(prob * dist.model_y_x(x).pf(y) for dist, prob in zip(self.dists, self._p))
+        # return temp
+        return self.model_y_x(x).pf
+
+
+class MixtureRVxy(MixinRVx, MixinRVy, Mixture):
+    def __repr__(self):
+        _str = "; ".join([f"{prob}: {dist}" for dist, prob in zip(self.dists, self._p)])
+        return f"MixtureRVxy({_str})"
+
+    def _update_attr(self):
+        super()._update_attr()
+
+        self._mean_x = sum(prob * dist.mean_x for dist, prob in zip(self.dists, self._p))
+
+    # def _mean_y_x_single(self, x):
+    #     return sum(prob * dist._mean_y_x_single(x) for dist, prob in zip(self.dists, self._p))
+
+    def mean_y_x(self, x):
+        return sum(prob * dist.mean_y_x(x) for dist, prob in zip(self.dists, self._p))
+
+
+# dists_ = [NormalRegressor(basis_y_x=(lambda x: x,), weights=(w,), cov_y_x_single=10) for w in [0, 4]]
+#
+# # x_ = [10, 11]
+# # p_x = [.5, .5]
+# # # y_ = ['a', 'b']
+# # y_ = [0, 1]
+# # dists_ = []
+# # q = [.8, .5]
+# # def getdat(t):
+# #     def p_y_x_(x):
+# #         return [t, 1 - t] if x == x_[0] else [1 - t, t]
+# #     return p_y_x_
+# # for v in q:
+# #     r = DataConditional.finite_model(x_, p_x, y_, getdat(v))
+# #     dists_.append(r)
+#
+# m = Mixture(dists_, [5, 8])
+# m.rvs(10)
+# m.mode_x
+# # m.mean_x
+#
+# x_p = 10
+# m.model_y_x(x_p).plot_pf()
+# plt.title(f"Mode={m.mode_y_x(x_p):.3f}, Mean={m.mean_y_x(x_p):.3f}")
+# # m.mode_y_x(1)
+# # m.mean_y_x(1)
+# pass

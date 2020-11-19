@@ -93,9 +93,6 @@ class FiniteGeneric(Finite):
         self.set_size = math.prod(self.set_shape)
         self.set_ndim = len(self.set_shape)
 
-        # self._vals_flat = self.values.reshape(-1, self.size)
-        # if len(self._vals_flat) != len(np.unique(self._vals_flat, axis=0)):
-        #     raise ValueError("Input 'support' must have unique values")
         self._vals_flat = self.values.reshape(-1, *self.shape)
         if len(self._vals_flat) != len(np.unique(self._vals_flat, axis=0)):
             raise ValueError("Input 'support' must have unique values")
@@ -128,12 +125,12 @@ class FiniteGeneric(Finite):
             x_ = self._vals_flat[int(i)]
             return f(x_)
 
-        i_opt = int(optimize.brute(g, (np.mgrid[:self.set_size],)))     # ignore type inspection
+        i_opt = int(optimize.brute(g, (np.mgrid[:len(self._vals_flat)],)))     # ignore type inspection
         return self._vals_flat[i_opt]
 
     def integrate(self, f):
         # y_flat = f(self.values.reshape(-1, *self.shape))     # shouldn't require vectorized funcs?
-        y_flat = np.stack([f(val) for val in self.values.reshape(-1, *self.shape)])
+        y_flat = np.stack([f(val) for val in self._vals_flat])
         return y_flat.sum(0)
 
     def set_x_plot(self, x=None):
@@ -192,7 +189,8 @@ class Continuous(Space):
         kwargs = self.optimize_kwargs.copy()
         x0 = kwargs.pop('x0')
 
-        return optimize.basinhopping(f, x0, minimizer_kwargs=kwargs).x.reshape(self.shape)
+        # FIXME: add stepsize dependence on lims
+        return optimize.basinhopping(f, x0, niter=100, T=1., stepsize=4., minimizer_kwargs=kwargs).x.reshape(self.shape)
 
         # if self.ndim == 0:
         #     return optimize.minimize_scalar(f, bounds=self.optimize_kwargs['bounds'])
@@ -293,7 +291,7 @@ class Box(Continuous):      # TODO: make Box inherit from Euclidean?
 class Euclidean(Box):
     def __init__(self, shape):
         lims = np.broadcast_to([-np.inf, np.inf], (*shape, 2))
-        self._lims_plot = [-1, 1]  # defaults
+        self._lims_plot = np.array([-1, 1])  # defaults
         super().__init__(lims)
 
     def __repr__(self):
@@ -324,7 +322,13 @@ class Euclidean(Box):
     @lims_plot.setter
     def lims_plot(self, val):
         self._lims_plot = np.broadcast_to(val, shape=(*self.shape, 2))
-        self.set_x_plot()
+        super().set_x_plot()
+        # self.set_x_plot()
+
+    def set_x_plot(self, x=None):   # TODO: simplify?
+        super().set_x_plot(x)
+        temp = self.x_plt.reshape(-1, *self.shape)
+        self._lims_plot = np.array([temp.min(0), temp.max(0)])
 
 
 #%%

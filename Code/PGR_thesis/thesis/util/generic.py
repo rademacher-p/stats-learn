@@ -111,6 +111,7 @@ def check_valid_pmf(p, data_shape=None, full_support=False, tol=1e-9):
 
 
 def vectorize_func(func, data_shape):
+    @wraps(func)
     def func_vec(x):
         x, set_shape = check_data_shape(x, data_shape)
 
@@ -127,6 +128,7 @@ def vectorize_func(func, data_shape):
 
 def vectorize_func_dec(data_shape):     # TODO: use?
     def wrapper(func):
+        @wraps(func)
         def func_vec(x):
             x, set_shape = check_data_shape(x, data_shape)
 
@@ -145,15 +147,15 @@ def vectorize_func_dec(data_shape):     # TODO: use?
     return wrapper
 
 
-def vectorize_first_arg(func):
-    @wraps(func)
-    def func_wrap(*args, **kwargs):
-        if isinstance(args[0], Iterable):
-            return list(func(arg, *args[1:], **kwargs) for arg in args[0])
-        else:
-            return func(*args, **kwargs)
-
-    return func_wrap
+# def vectorize_first_arg(func):
+#     @wraps(func)
+#     def func_wrap(*args, **kwargs):
+#         if isinstance(args[0], Iterable):
+#             return list(func(arg, *args[1:], **kwargs) for arg in args[0])
+#         else:
+#             return func(*args, **kwargs)
+#
+#     return func_wrap
 
 
 def empirical_pmf(d, supp, data_shape):

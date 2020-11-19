@@ -9,6 +9,3 @@
   - as `random.elements.Finite` subclasses
 - `random.models` class-conditional model
   - user specifies categorical space, conditional distributions, and class probabilities
-
-
-
