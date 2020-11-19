@@ -197,7 +197,7 @@ class Dirichlet(Base):
     def __init__(self, alpha_0, prior_mean, rng=None):
         super().__init__(prior=None, rng=rng)
         self.alpha_0 = alpha_0
-        self.prior_mean = prior_mean        # TODO: add setter fit update!!
+        self.prior_mean = prior_mean
 
         self._space = self.prior_mean.space
 

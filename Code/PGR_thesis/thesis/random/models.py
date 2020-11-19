@@ -43,6 +43,12 @@ class Base(RandomGeneratorMixin):
     # size = property(lambda self: {key: math.prod(val) for key, val in self._shape.items()})
     # ndim = property(lambda self: {key: len(val) for key, val in self._shape.items()})
 
+    # TODO: default stats to reference `model_x` and `model_y_x` attributes
+
+    # @property
+    # def model_x(self):
+    #     return self._model_x
+
     @property
     def mode_x(self):
         return self._mode_x
@@ -98,14 +104,14 @@ class MixinRVy:
 
 class DataConditional(Base):
     def __new__(cls, model_x, model_y_x, rng=None):
-        is_numeric_y_x = isinstance(model_y_x(model_x.rvs()), rand_elements.MixinRV)
+        is_numeric_y = isinstance(model_y_x(model_x.rvs()), rand_elements.MixinRV)
         if isinstance(model_x, rand_elements.MixinRV):
-            if is_numeric_y_x:
+            if is_numeric_y:
                 return super().__new__(DataConditionalRVxy)
             else:
                 return super().__new__(DataConditionalRVx)
         else:
-            if is_numeric_y_x:
+            if is_numeric_y:
                 return super().__new__(DataConditionalRVy)
             else:
                 return super().__new__(cls)
@@ -228,15 +234,68 @@ class DataConditionalRVxy(DataConditionalRVy, DataConditionalRVx):
 # t.cov_y_x(t.model_x.rvs(4))
 
 
-class NormalRegressor(MixinRVx, MixinRVy, Base):        # TODO: rename NormalLinear?
-    # param_names = ('model_x', 'basis_y_x', 'cov_y_x_single', 'weights')
+class ClassConditional(MixinRVx, Base):
+    def __init__(self, y, dists, p_y=None, rng=None):
+        super().__init__(rng)
 
-    def __init__(self, weights=(0.,), basis_y_x=None, cov_y_x_single=1., model_x=rand_elements.Normal(), rng=None):
+        self.model_y = rand_elements.Finite(np.array(y, dtype='U').flatten(), p_y)
+        self._space['y'] = self.model_y.space
+
+        self._dists = list(dists)
+
+        self._space['x'] = self.dists[0].space
+        if not all(dist.space == self._space['x'] for dist in self.dists[1:]):
+            raise ValueError("All distributions must have the same space.")
+
+        self._update_attr()
+
+    # @property
+    # def y(self):
+    #     return self.model_y.supp
+
+    @property
+    def dists(self):
+        return self._dists
+
+    @property
+    def p_y(self):
+        return self.model_y.p
+
+    @p_y.setter
+    def p_y(self, val):
+        self.model_y.p = val
+        self._update_attr()
+
+    def set_dist_attr(self, idx, **dist_kwargs):
+        for key, val in dist_kwargs.items():
+            setattr(self._dists[idx], key, val)
+        self._update_attr()
+
+    def _update_attr(self):
+        self.model_x = rand_elements.MixtureRV(self.dists, self.p_y)
+        self._mode_x = self.model_x.mode
+        self._mean_x = self.model_x.mean
+        self._cov_x = self.model_x.cov
+
+    def _mode_y_x_single(self, x):
+        return self.model_y_x(x).mode
+
+    def model_y_x(self, x):
+        temp = np.array([dist.pf(x) for dist in self.dists])
+        p_y_x = temp / temp.sum()
+        return rand_elements.Finite(self.model_y.supp, p_y_x)
+
+
+# m = ClassConditional(['a', 'b'], [rand_elements.Normal(mean) for mean in [0, 4]])
+
+
+class NormalRegressor(MixinRVx, MixinRVy, Base):        # TODO: rename NormalLinear?
+    def __init__(self, weights=(0.,), basis_y_x=None, cov_y_x=1., model_x=rand_elements.Normal(), rng=None):
         super().__init__(rng)
 
         self.model_x = model_x
         self.weights = weights
-        self.cov_y_x_single = cov_y_x_single         # TODO: override inherited, change attr name?
+        self.cov_y_x_ = cov_y_x
 
         self._mode_y_x_single = self._mean_y_x_single
 
@@ -278,14 +337,15 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):        # TODO: rename NormalLin
     # n_weights = property(lambda self: self._weights.size)
 
     @property
-    def cov_y_x_single(self):
-        return self._cov_y_x_single
+    def cov_y_x_(self):
+        return self._cov_repr
+        # return vectorize_func(self._cov_y_x_single, self.shape['x'])
 
-    @cov_y_x_single.setter
-    def cov_y_x_single(self, val):
+    @cov_y_x_.setter
+    def cov_y_x_(self, val):
         if callable(val):
             self._cov_repr = val
-            self._cov_y_x_single = self._cov_repr
+            self._cov_y_x_single = val
             _temp = self._cov_y_x_single(self.model_x.rvs()).shape
         else:
             self._cov_repr = np.array(val)
@@ -311,10 +371,21 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):        # TODO: rename NormalLin
 class GenericEmpirical(Base):
     def __new__(cls, d, space=None, rng=None):
         dtype = np.array(d).dtype
-        if all(np.issubdtype(dtype[c].base, np.number) for c in 'xy'):
-            return super().__new__(GenericEmpiricalRVxy)
+        if np.issubdtype(dtype['x'].base, np.number):
+            if np.issubdtype(dtype['y'].base, np.number):
+                return super().__new__(GenericEmpiricalRVxy)
+            else:
+                return super().__new__(GenericEmpiricalRVx)
         else:
-            return super().__new__(cls)
+            if np.issubdtype(dtype['y'].base, np.number):
+                return super().__new__(GenericEmpiricalRVy)
+            else:
+                return super().__new__(cls)
+
+        # if all(np.issubdtype(dtype[c].base, np.number) for c in 'xy'):
+        #     return super().__new__(GenericEmpiricalRVxy)
+        # else:
+        #     return super().__new__(cls)
 
     def __init__(self, d, space=None, rng=None):
         super().__init__(rng)
@@ -407,9 +478,9 @@ class GenericEmpirical(Base):
         return rng.choice(self.data[['x', 'y']], size, p=self._p)
 
 
-class GenericEmpiricalRVxy(MixinRVx, MixinRVy, GenericEmpirical):
+class GenericEmpiricalRVx(MixinRVx, GenericEmpirical):
     def __repr__(self):
-        return f"GenericEmpiricalRVxy(space={self.space}, n={self.n})"
+        return f"GenericEmpiricalRVx(space={self.space}, n={self.n})"
 
     def _update_attr(self):
         super()._update_attr()
@@ -419,6 +490,11 @@ class GenericEmpiricalRVxy(MixinRVx, MixinRVy, GenericEmpirical):
         self._cov_x = sum(p_i * np.tensordot(ctr_i, ctr_i, 0)
                           for p_i, ctr_i in zip(self._p_x, self.data_x['x'] - self._mean_x))
 
+
+class GenericEmpiricalRVy(MixinRVy, GenericEmpirical):
+    def __repr__(self):
+        return f"GenericEmpiricalRVy(space={self.space}, n={self.n})"
+
     def _mean_y_x_single(self, x):
         data_ = self._get_data_y_x(x)
         if data_ is not None:
@@ -426,6 +502,11 @@ class GenericEmpiricalRVxy(MixinRVx, MixinRVy, GenericEmpirical):
             return np.tensordot(p_y_x, data_['y'], axes=[0, 0])
         else:
             return np.nan
+
+
+class GenericEmpiricalRVxy(GenericEmpiricalRVx, GenericEmpiricalRVy):
+    def __repr__(self):
+        return f"GenericEmpiricalRVxy(space={self.space}, n={self.n})"
 
 
 # x_ = [10, 11]
@@ -448,14 +529,20 @@ class GenericEmpiricalRVxy(MixinRVx, MixinRVy, GenericEmpirical):
 
 class Mixture(Base):
     def __new__(cls, dists, weights, rng=None):
-        if all(isinstance(dist, MixinRVx) and isinstance(dist, MixinRVy) for dist in dists):
-            return super().__new__(MixtureRVxy)
+        if all(isinstance(dist, MixinRVx) for dist in dists):
+            if all(isinstance(dist, MixinRVy) for dist in dists):
+                return super().__new__(MixtureRVxy)
+            else:
+                return super().__new__(MixtureRVx)
         else:
-            return super().__new__(cls)
+            if all(isinstance(dist, MixinRVy) for dist in dists):
+                return super().__new__(MixtureRVy)
+            else:
+                return super().__new__(cls)
 
     def __init__(self, dists, weights, rng=None):       # TODO: special implementation for Finite? get modes, etc?
         super().__init__(rng)
-        self.dists = list(dists)
+        self._dists = list(dists)
 
         self._space = self.dists[0].space
         if not all(dist.space == self.space for dist in self.dists[1:]):
@@ -467,6 +554,7 @@ class Mixture(Base):
         _str = "; ".join([f"{prob}: {dist}" for dist, prob in zip(self.dists, self._p)])
         return f"Mixture({_str})"
 
+    dists = property(lambda self: self._dists)
     n_dists = property(lambda self: len(self.dists))
 
     @property
@@ -482,35 +570,32 @@ class Mixture(Base):
         self._update_attr()
 
     def set_dist_attr(self, idx, **dist_kwargs):      # TODO: improved implementation w/ direct self.dists access?
-        dist = self.dists[idx]
         for key, val in dist_kwargs.items():
-            setattr(dist, key, val)
+            setattr(self._dists[idx], key, val)
         self._update_attr()
 
     def add_dist(self, dist, weight):       # TODO: type check?
-        self.dists.append(dist)
+        self._dists.append(dist)
         self.weights.append(weight)
         self._update_attr()
 
     def set_dist(self, idx, dist, weight):
-        self.dists[idx] = dist
+        self._dists[idx] = dist
         self.weights[idx] = weight
         self._update_attr()     # weights setter not invoked
 
     def del_dist(self, idx):
-        del self.dists[idx]
+        del self._dists[idx]
         del self.weights[idx]
         self._update_attr()
 
     def _update_attr(self):
         self._p = np.array(self._weights) / sum(self.weights)
-        # self._mode_x = self.space['x'].argmax(self.pf_x)
 
         self.model_x = rand_elements.Mixture([dist.model_x for dist in self.dists], self.weights)
         self._mode_x = self.model_x.mode
 
     def mode_y_x(self, x):
-        # return self.space['y'].argmax(self.pf_y_x(x))
         return self.model_y_x(x).mode
 
     def _rvs(self, n, rng):
@@ -523,39 +608,47 @@ class Mixture(Base):
 
         return out
 
-    # @property
-    # def model_x(self):
-    #     return rand_elements.Mixture([dist.model_x for dist in self.dists], self.weights)
-
     def model_y_x(self, x):
         return rand_elements.Mixture([dist.model_y_x(x) for dist in self.dists], self.weights)
 
-    def pf_x(self, x):
-        # return sum(prob * dist.model_x.pf(x) for dist, prob in zip(self.dists, self._p))
-        return self.model_x.pf(x)
+    # def pf_x(self, x):
+    #     # return sum(prob * dist.model_x.pf(x) for dist, prob in zip(self.dists, self._p))
+    #     return self.model_x.pf(x)
+    #
+    # def pf_y_x(self, x):
+    #     # def temp(y):
+    #     #     return sum(prob * dist.model_y_x(x).pf(y) for dist, prob in zip(self.dists, self._p))
+    #     # return temp
+    #     return self.model_y_x(x).pf
 
-    def pf_y_x(self, x):
-        # def temp(y):
-        #     return sum(prob * dist.model_y_x(x).pf(y) for dist, prob in zip(self.dists, self._p))
-        # return temp
-        return self.model_y_x(x).pf
 
-
-class MixtureRVxy(MixinRVx, MixinRVy, Mixture):
+class MixtureRVx(MixinRVx, Mixture):
     def __repr__(self):
         _str = "; ".join([f"{prob}: {dist}" for dist, prob in zip(self.dists, self._p)])
-        return f"MixtureRVxy({_str})"
+        return f"MixtureRVx({_str})"
 
     def _update_attr(self):
         super()._update_attr()
 
         self._mean_x = sum(prob * dist.mean_x for dist, prob in zip(self.dists, self._p))
 
+
+class MixtureRVy(MixinRVy, Mixture):
+    def __repr__(self):
+        _str = "; ".join([f"{prob}: {dist}" for dist, prob in zip(self.dists, self._p)])
+        return f"MixtureRVy({_str})"
+
     # def _mean_y_x_single(self, x):
     #     return sum(prob * dist._mean_y_x_single(x) for dist, prob in zip(self.dists, self._p))
 
     def mean_y_x(self, x):
         return sum(prob * dist.mean_y_x(x) for dist, prob in zip(self.dists, self._p))
+
+
+class MixtureRVxy(MixtureRVx, MixtureRVy):
+    def __repr__(self):
+        _str = "; ".join([f"{prob}: {dist}" for dist, prob in zip(self.dists, self._p)])
+        return f"MixtureRVxy({_str})"
 
 
 # dists_ = [NormalRegressor(basis_y_x=(lambda x: x,), weights=(w,), cov_y_x_single=10) for w in [0, 4]]

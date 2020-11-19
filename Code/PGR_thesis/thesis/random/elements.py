@@ -175,20 +175,27 @@ class Finite(Base):     # TODO: DRY - use stat approx from the Finite space's me
     Generic RE drawn from a finite support set using an explicitly defined PMF.
     """
 
-    def __new__(cls, supp, p, rng=None):
+    def __new__(cls, supp, p=None, rng=None):
         if np.issubdtype(np.array(supp).dtype, np.number):
             return super().__new__(FiniteRV)
         else:
             return super().__new__(cls)
 
-    def __init__(self, supp, p, rng=None):
+    def __init__(self, supp, p=None, rng=None):
         super().__init__(rng)
 
         _supp = np.array(supp)
-        self._p = check_valid_pmf(p)
-        self._space = spaces.FiniteGeneric(_supp, shape=_supp.shape[self._p.ndim:])
 
-        self._update_attr()
+        if p is None:
+            size_p = _supp.shape[0]
+            p = np.ones(size_p) / size_p
+        else:
+            p = np.array(p)
+
+        self._space = spaces.FiniteGeneric(_supp, shape=_supp.shape[p.ndim:])
+
+        self.p = p
+        # self._update_attr()
 
     def __repr__(self):
         return f"FiniteRE(support={self.supp}, p={self.p})"
@@ -223,7 +230,6 @@ class Finite(Base):     # TODO: DRY - use stat approx from the Finite space's me
         return rng.choice(self._supp_flat, size=n, p=self._p_flat)
 
     def _pf_single(self, x):
-        # eq_supp = np.all(x.flatten() == self._supp_flat, axis=-1)
         eq_supp = np.all(x == self._supp_flat, axis=tuple(range(1, 1 + self.ndim)))
         if eq_supp.sum() == 0:
             raise ValueError("Input 'x' must be in the support.")

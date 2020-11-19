@@ -128,7 +128,7 @@ def main():
     # model_x = Beta(a=1, b=1)
     # x = np.linspace(0, 1, 100, endpoint=False)
 
-    model = NormalRegressorModel(weights=np.ones(2), basis_y_x=None, cov_y_x_single=1., model_x=model_x, rng=None)
+    model = NormalRegressorModel(weights=np.ones(2), basis_y_x=None, cov_y_x=1., model_x=model_x, rng=None)
 
     # Plotting
     predictors = [
