@@ -91,7 +91,7 @@ class NormalRegressor(Base):
     def random_model(self, rng=None):
         rng = self._get_rng(rng)
 
-        model_kwargs = {'basis_y_x': self.basis_y_x, 'cov_y_x_single': self.cov_y_x, 'model_x': self.model_x,
+        model_kwargs = {'basis_y_x': self.basis_y_x, 'cov_y_x': self.cov_y_x, 'model_x': self.model_x,
                         'rng': rng}
         rand_kwargs = {'weights': self.prior.rvs(rng=rng)}
 
@@ -123,13 +123,13 @@ class NormalRegressor(Base):
 
     @property
     def _prior_model_kwargs(self):
-        return {'weights': self.prior_mean, 'basis_y_x': self.basis_y_x, 'cov_y_x_single': self._prior_model_cov,
+        return {'weights': self.prior_mean, 'basis_y_x': self.basis_y_x, 'cov_y_x': self._prior_model_cov,
                 'model_x': self.model_x}
 
     def _update_posterior(self, mean_only=False):
         if not mean_only:
             self.posterior.cov = np.linalg.inv(self._cov_prior_inv + self._cov_data_inv)
-            self.posterior_model.cov_y_x_single = self._make_posterior_model_cov(self.posterior.cov)
+            self.posterior_model.cov_y_x_ = self._make_posterior_model_cov(self.posterior.cov)
 
         self.posterior.mean = self.posterior.cov @ (self._cov_prior_inv @ self.prior_mean + self._mean_data_temp)
         self.posterior_model.weights = self.posterior.mean
