@@ -235,13 +235,15 @@ class DataConditionalRVxy(DataConditionalRVy, DataConditionalRVx):
 
 
 class ClassConditional(MixinRVx, Base):
-    def __init__(self, y, dists, p_y=None, rng=None):
+    def __init__(self, dists, model_y, rng=None):
         super().__init__(rng)
 
-        self.model_y = rand_elements.Finite(np.array(y, dtype='U').flatten(), p_y)
-        self._space['y'] = self.model_y.space
-
         self._dists = list(dists)
+        self.model_y = model_y
+
+        self._space['y'] = self.model_y.space
+        if self.space['y'].ndim != 0 or not np.issubdtype(self.space['y'].dtype, 'U'):
+            raise ValueError
 
         self._space['x'] = self.dists[0].space
         if not all(dist.space == self._space['x'] for dist in self.dists[1:]):
@@ -249,9 +251,10 @@ class ClassConditional(MixinRVx, Base):
 
         self._update_attr()
 
-    # @property
-    # def y(self):
-    #     return self.model_y.supp
+    @classmethod
+    def from_finite(cls, dists, y, p_y=None, rng=None):
+        model_y = rand_elements.Finite(np.array(y, dtype='U').flatten(), p_y)
+        return cls(dists, model_y, rng)
 
     @property
     def dists(self):
@@ -286,7 +289,7 @@ class ClassConditional(MixinRVx, Base):
         return rand_elements.Finite(self.model_y.supp, p_y_x)
 
 
-# m = ClassConditional(['a', 'b'], [rand_elements.Normal(mean) for mean in [0, 4]])
+# m = ClassConditional.from_finite([rand_elements.Normal(mean) for mean in [0, 4]], ['a', 'b'])
 
 
 class NormalRegressor(MixinRVx, MixinRVy, Base):        # TODO: rename NormalLinear?
