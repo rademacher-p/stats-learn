@@ -9,17 +9,17 @@ from matplotlib import pyplot as plt
 from scipy.stats._multivariate import _PSD
 
 from thesis.random import elements as rand_elements
-from thesis.util.generic import RandomGeneratorMixin
+from thesis.util.base import RandomGeneratorMixin
 from thesis.util import spaces
 
 np.set_printoptions(precision=2)
+
+# TODO: rename `model` attributes to `element`?
 
 
 #%% Priors
 
 class Base(RandomGeneratorMixin):
-    # param_names = ()
-
     def __init__(self, prior=None, rng=None):
         super().__init__(rng)
 
@@ -228,12 +228,12 @@ class Dirichlet(Base):
 
     is_fit = property(lambda self: self.posterior_model.n_dists > 1)
 
-    @property
-    def n(self):
-        if self.is_fit:
-            return self.posterior_model.dists[1].n
-        else:
-            return 0
+    # @property
+    # def n(self):
+    #     if self.is_fit:
+    #         return self.posterior_model.dists[1].n
+    #     else:
+    #         return 0
 
     def random_model(self, rng=None):
         raise NotImplementedError       # TODO: implement for finite in subclass?
@@ -261,13 +261,10 @@ class Dirichlet(Base):
             if warm_start:
                 emp_dist = self.posterior_model.dists[1]
                 emp_dist.add_data(d)
-                self.posterior_model.set_dist(1, emp_dist, emp_dist.n)
             else:
-                emp_dist = rand_elements.GenericEmpirical(d, self.space)
-                if self.is_fit:
-                    self.posterior_model.set_dist(1, emp_dist, emp_dist.n)
-                else:
-                    self.posterior_model.add_dist(emp_dist, emp_dist.n)
+                emp_dist = rand_elements.DataEmpirical(d, self.space)
+
+            self.posterior_model.set_dist(1, emp_dist, emp_dist.n)
 
 
 if __name__ == '__main__':

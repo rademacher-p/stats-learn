@@ -12,7 +12,7 @@ import numpy as np
 from scipy.stats import mode
 import matplotlib.pyplot as plt
 
-from thesis.util.generic import vectorize_func, check_data_shape
+from thesis.util.base import vectorize_func, check_data_shape
 from thesis.util.plotting import get_axes_xy
 from thesis.loss_funcs import loss_se, loss_01
 
@@ -321,9 +321,6 @@ class Base(ABC):
 
         self.model = None
 
-    def __repr__(self):
-        return self.__class__.__name__ + f"(model={self.model})"        # FIXME: too generic. need bayes_model info
-
     shape = property(lambda self: self.model.shape)
     size = property(lambda self: self.model.size)
     ndim = property(lambda self: self.model.ndim)
@@ -454,6 +451,9 @@ class Model(Base):
         super().__init__(loss_func, name)
         self.model = model
 
+    def __repr__(self):
+        return self.__class__.__name__ + f"(model={self.model})"
+
     @property
     def _model_obj(self):
         return self.model
@@ -489,6 +489,9 @@ class Bayes(Base):
         self.model = self.bayes_model.posterior_model       # updates in-place with set_params() and fit()
 
         self.fit()
+
+    def __repr__(self):
+        return self.__class__.__name__ + f"(bayes_model={self.bayes_model})"
 
     @property
     def _model_obj(self):
@@ -584,7 +587,8 @@ class BayesRegressor(RegressorMixin, Bayes):
 #
 #         self._mean_y_x = _mean_y_x
 #
-#         self._model_gen = functools.partial(DataConditional.finite_model, supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
+#         self._model_gen = functools.partial(DataConditional.finite_model,
+#                                             supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
 #         self._posterior_mean = None
 #         self.fit()
 #

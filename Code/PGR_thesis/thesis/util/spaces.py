@@ -5,14 +5,12 @@ from scipy import optimize, integrate
 from matplotlib import pyplot as plt
 
 from thesis.util.plotting import simplex_grid, box_grid
-from thesis.util.generic import check_data_shape
+from thesis.util.base import check_data_shape
 
 # plt.style.use('seaborn')
 
 
 # TODO: use get_axes_xy?
-
-# TODO: numerical approximation of mode, etc.?
 # TODO: issubset method?
 
 

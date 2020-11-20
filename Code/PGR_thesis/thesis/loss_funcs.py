@@ -2,7 +2,7 @@
 Loss functions.
 """
 
-from thesis.util.generic import check_data_shape
+from thesis.util.base import check_data_shape
 
 
 def _check_inputs(y_est, y, data_shape):
