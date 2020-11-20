@@ -14,7 +14,7 @@ from scipy.stats._multivariate import _PSD
 from scipy.special import gammaln, xlogy, xlog1py, betaln
 import matplotlib.pyplot as plt
 
-from thesis.util.generic import RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func
+from thesis.util.base import RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func
 from thesis.util import plotting, spaces
 
 
@@ -22,7 +22,7 @@ from thesis.util import plotting, spaces
 
 class Base(RandomGeneratorMixin):
     """
-    Base class for generic random element objects.
+    Base class for random element objects.
     """
 
     def __init__(self, rng=None):
@@ -94,7 +94,7 @@ class MixinRV:
 
 class BaseRV(MixinRV, Base):
     """
-    Base class for generic random variable (numeric) objects.
+    Base class for random variable (numeric) objects.
     """
 
     def __init__(self, rng=None):
@@ -170,6 +170,7 @@ class DeterministicRV(MixinRV, Deterministic):
 # b.pf(b.rvs(8))
 
 
+# TODO: rename generic?
 class Finite(Base):     # TODO: DRY - use stat approx from the Finite space's methods?
     """
     Generic RE drawn from a finite support set using an explicitly defined PMF.
@@ -754,39 +755,133 @@ class NormalLinear(Normal):     # TODO: rework, only allow weights and cov to be
 #         return np.unique(d, return_counts=True, axis=0)
 
 
-class GenericEmpirical(Base):
+# class DataEmpirical(Base):
+#
+#     # TODO: subclass for FiniteGeneric space?
+#     # TODO: subclass for continuous spaces, easy stats?
+#
+#     def __new__(cls, d, space=None, rng=None):
+#         if np.issubdtype(np.array(d).dtype, np.number):
+#             return super().__new__(DataEmpiricalRV)
+#         else:
+#             return super().__new__(cls)
+#
+#     def __init__(self, d, space=None, rng=None):
+#         super().__init__(rng)
+#
+#         d = np.array(d)
+#         if space is None:
+#             if np.issubdtype(d.dtype, np.number):
+#                 self._space = spaces.Euclidean(d.shape[1:])
+#             else:
+#                 raise NotImplementedError
+#         else:
+#             self._space = space
+#
+#         self.n = len(d)
+#         self.data = self._count_data(d)
+#
+#         self._update_attr()
+#
+#     def __repr__(self):
+#         return f"DataEmpirical(space={self.space}, n={self.n})"
+#
+#     def _count_data(self, d):
+#         values, counts = np.unique(d, return_counts=True, axis=0)
+#         return np.array(list(zip(values, counts)), dtype=[('x', self.dtype, self.shape), ('n', np.int,)])
+#
+#     def _get_idx(self, value):
+#         idx = np.flatnonzero(np.all(value == self.data['x'], axis=tuple(range(1, 1 + self.ndim))))
+#         if idx.size == 1:
+#             return idx.item()
+#         elif idx.size == 0:
+#             return None
+#         else:
+#             raise ValueError
+#
+#     def add_data(self, d):
+#         self.n += len(d)
+#
+#         data_new = self._count_data(d)
+#         idx_new = []
+#         for i, (value, count) in enumerate(data_new):
+#             idx = self._get_idx(value)
+#             if idx is not None:
+#                 self.data['n'][idx] += count
+#             else:
+#                 idx_new.append(i)
+#
+#         if len(idx_new) > 0:
+#             self.data = np.concatenate((self.data, data_new[idx_new]))
+#
+#         self._update_attr()
+#
+#     def _update_attr(self):
+#         self._p = self.data['n'] / self.n
+#         self._mode = self.data['x'][self.data['n'].argmax()]
+#
+#         self._set_x_plot()
+#
+#     def _rvs(self, size, rng):
+#         return rng.choice(self.data['x'], size, p=self._p)
+#
+#     def _pf_single(self, x):
+#         # if x not in self.space:
+#         #     raise ValueError("Input 'x' must be in the support.")
+#
+#         idx = self._get_idx(x)
+#         if idx is not None:
+#             return self._p[idx]     # TODO: implement infinite valued output for continuous space!? use CDF?!
+#         else:
+#             return 0.
+#
+#     def _set_x_plot(self):
+#         if isinstance(self.space, spaces.Continuous) and self.shape in {()}:
+#             # TODO: hackish? adds empirical values to the plot support (so impulses are not missed)
+#             x = np.sort(np.unique(np.concatenate((self.space.x_plt, self.data['x']))))
+#             self._space.set_x_plot(x)
+
+
+class DataEmpirical(Base):
 
     # TODO: subclass for FiniteGeneric space?
     # TODO: subclass for continuous spaces, easy stats?
 
-    def __new__(cls, d, space=None, rng=None):
-        if np.issubdtype(np.array(d).dtype, np.number):
-            return super().__new__(GenericEmpiricalRV)
+    def __new__(cls, values, counts, space=None, rng=None):
+        if np.issubdtype(np.array(values).dtype, np.number):
+            return super().__new__(DataEmpiricalRV)
         else:
             return super().__new__(cls)
 
-    def __init__(self, d, space=None, rng=None):
+    def __init__(self, values, counts, space=None, rng=None):
         super().__init__(rng)
 
-        d = np.array(d)
+        values, counts = np.array(values), np.array(counts)
         if space is None:
-            if np.issubdtype(d.dtype, np.number):
-                self._space = spaces.Euclidean(d.shape[1:])
+            if np.issubdtype(values.dtype, np.number):
+                self._space = spaces.Euclidean(values.shape[1:])
             else:
                 raise NotImplementedError
         else:
             self._space = space
 
-        self.n = len(d)
-        self.data = self._count_data(d)
+        self.n = counts.sum()
+        self.data = self._structure_data(values, counts)
 
         self._update_attr()
 
     def __repr__(self):
-        return f"GenericEmpirical(space={self.space}, n={self.n})"
+        return f"DataEmpirical(space={self.space}, n={self.n})"
 
-    def _count_data(self, d):
-        values, counts = np.unique(d, return_counts=True, axis=0)
+    @classmethod
+    def from_data(cls, d, space=None, rng=None):
+        return cls(*cls._count_data(d), space, rng)
+
+    @staticmethod
+    def _count_data(d):
+        return np.unique(d, return_counts=True, axis=0)
+
+    def _structure_data(self, values, counts):
         return np.array(list(zip(values, counts)), dtype=[('x', self.dtype, self.shape), ('n', np.int,)])
 
     def _get_idx(self, value):
@@ -798,12 +893,12 @@ class GenericEmpirical(Base):
         else:
             raise ValueError
 
-    def add_data(self, d):
-        self.n += len(d)
+    def add_values(self, values, counts):
+        values, counts = np.array(values), np.array(counts)
+        self.n += counts.sum()
 
-        data_new = self._count_data(d)
         idx_new = []
-        for i, (value, count) in enumerate(data_new):
+        for i, (value, count) in enumerate(zip(values, counts)):
             idx = self._get_idx(value)
             if idx is not None:
                 self.data['n'][idx] += count
@@ -811,9 +906,12 @@ class GenericEmpirical(Base):
                 idx_new.append(i)
 
         if len(idx_new) > 0:
-            self.data = np.concatenate((self.data, data_new[idx_new]))
+            self.data = np.concatenate((self.data, self._structure_data(values[idx_new], counts[idx_new])))
 
         self._update_attr()
+
+    def add_data(self, d):
+        self.add_values(*self._count_data(d))
 
     def _update_attr(self):
         self._p = self.data['n'] / self.n
@@ -841,9 +939,9 @@ class GenericEmpirical(Base):
             self._space.set_x_plot(x)
 
 
-class GenericEmpiricalRV(MixinRV, GenericEmpirical):
+class DataEmpiricalRV(MixinRV, DataEmpirical):
     def __repr__(self):
-        return f"GenericEmpiricalRV(space={self.space}, n={self.n})"
+        return f"DataEmpiricalRV(space={self.space}, n={self.n})"
 
     def _update_attr(self):
         super()._update_attr()
@@ -859,10 +957,14 @@ class GenericEmpiricalRV(MixinRV, GenericEmpirical):
 
 
 # # r = Beta(5, 5)
-# r = Finite(plotting.mesh_grid([0, 1], [3, 4, 5]), np.ones((2, 3)) / 6)
+# # r = Finite(plotting.mesh_grid([0, 1], [3, 4, 5]), np.ones((2, 3)) / 6)
 # # r = Finite(['a', 'b'], [.6, .4])
-# e = GenericEmpirical(r.rvs(10), space=r.space)
-# e.add_data(r.rvs(5))
+# # e = DataEmpirical.from_data(r.rvs(10), space=r.space)
+# # e.add_data(r.rvs(5))
+#
+# e = DataEmpirical(['a', 'b'], [5, 6], space=spaces.FiniteGeneric(['a', 'b']))
+# e.add_values(['b', 'c'], [4, 1])
+#
 # print(e)
 # e.plot_pf()
 # qq = None
@@ -877,7 +979,7 @@ class Mixture(Base):
 
     def __init__(self, dists, weights, rng=None):       # TODO: special implementation for Finite? get modes, etc?
         super().__init__(rng)
-        self.dists = list(dists)
+        self._dists = list(dists)
 
         self._space = self.dists[0].space
         if not all(dist.space == self.space for dist in self.dists[1:]):
@@ -889,7 +991,8 @@ class Mixture(Base):
         _str = "; ".join([f"{prob}: {dist}" for dist, prob in zip(self.dists, self._p)])
         return f"Mixture({_str})"
 
-    n_dists = property(lambda self: len(self.dists))
+    dists = property(lambda self: self._dists)
+    n_dists = property(lambda self: len(self._dists))
 
     @property
     def weights(self):
@@ -904,23 +1007,26 @@ class Mixture(Base):
         self._update_attr()
 
     def set_dist_attr(self, idx, **dist_kwargs):      # TODO: improved implementation w/ direct self.dists access?
-        dist = self.dists[idx]
+        dist = self._dists[idx]
         for key, val in dist_kwargs.items():
             setattr(dist, key, val)
         self._update_attr()
 
     def add_dist(self, dist, weight):       # TODO: type check?
-        self.dists.append(dist)
+        self._dists.append(dist)
         self.weights.append(weight)
         self._update_attr()
 
     def set_dist(self, idx, dist, weight):
-        self.dists[idx] = dist
-        self.weights[idx] = weight
-        self._update_attr()     # weights setter not invoked
+        try:
+            self._dists[idx] = dist
+            self.weights[idx] = weight
+            self._update_attr()     # weights setter not invoked
+        except IndexError:
+            self.add_dist(dist, weight)
 
     def del_dist(self, idx):
-        del self.dists[idx]
+        del self._dists[idx]
         del self.weights[idx]
         self._update_attr()
 
@@ -931,10 +1037,10 @@ class Mixture(Base):
         self._mode = self.space.argmax(self.pf)
 
     def _rvs(self, n, rng):
-        c = rng.choice(self.n_dists, size=n, p=self._p)
+        idx_rng = rng.choice(self.n_dists, size=n, p=self._p)
         out = np.empty((n, *self.shape), dtype=self.space.dtype)
         for i, dist in enumerate(self.dists):
-            idx = np.flatnonzero(c == i)
+            idx = np.flatnonzero(i == idx_rng)
             out[idx] = dist.rvs(size=idx.size)
 
         return out
@@ -950,8 +1056,8 @@ class Mixture(Base):
         if isinstance(self.space, spaces.Continuous) and self.shape in {()}:
             x = self.space.x_plt
             for dist in self.dists:
-                if isinstance(dist, GenericEmpirical):
-                    x = np.concatenate((x, dist.data))
+                if isinstance(dist, DataEmpirical):
+                    x = np.concatenate((x, dist.data['x']))
 
             x = np.sort(np.unique(x))
             self._space.set_x_plot(x)
@@ -959,22 +1065,22 @@ class Mixture(Base):
 
 class MixtureRV(MixinRV, Mixture):
     def __repr__(self):
-        _str = "; ".join([f"{prob}: {dist}" for dist, prob in zip(self.dists, self._p)])
+        _str = "; ".join([f"{w}: {dist}" for dist, w in zip(self.dists, self.weights)])
         return f"MixtureRV({_str})"
 
     def _update_attr(self):
         super()._update_attr()
 
         self._mean = sum(prob * dist.mean for dist, prob in zip(self.dists, self._p))
-
         self._cov = None  # TODO: numeric approx from `space`?
 
 
 # # dists_ = [Beta(*args) for args in [[10, 5], [2, 12]]]
-# dists_ = [Normal(mean, 1) for mean in [0, 4]]
+# # dists_ = [Normal(mean, 1) for mean in [0, 4]]
 # # dists_ = [Normal(mean, 1) for mean in [[0, 0], [2, 3]]]
 # # dists_ = [Finite(['a', 'b'], p=[p_, 1-p_]) for p_ in [0, 1]]
 # # dists_ = [Finite([[0, 0], [0, 1]], p=[p_, 1-p_]) for p_ in [0, 1]]
+# dists_ = [Normal(), DataEmpirical(Normal().rvs(10))]
 #
 # m = Mixture(dists_, [5, 8])
 # m.rvs(10)
