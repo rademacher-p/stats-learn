@@ -119,11 +119,11 @@ class FiniteGeneric(Finite):
     #     return x_flat[np.argmax(y_flat)]
 
     def _minimize(self, f):
-        def g(i):
-            x_ = self._vals_flat[int(i)]
-            return f(x_)
+        # def g(i):
+        #     return f(self._vals_flat[int(i)])
 
-        i_opt = int(optimize.brute(g, (np.mgrid[:len(self._vals_flat)],)))     # ignore type inspection
+        i_opt = int(optimize.brute(lambda i: f(self._vals_flat[int(i)]), (np.mgrid[:self.set_size],)))
+        # i_opt = int(optimize.brute(g, (np.mgrid[:self.set_size],)))     # ignore type inspection
         return self._vals_flat[i_opt]
 
     def integrate(self, f):
