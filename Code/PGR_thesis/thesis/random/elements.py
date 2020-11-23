@@ -227,7 +227,11 @@ class Finite(Base):     # TODO: DRY - use stat approx from the Finite space's me
         return rng.choice(self._supp_flat, size=n, p=self._p_flat)
 
     def _pf_single(self, x):
-        eq_supp = np.all(x == self._supp_flat, axis=tuple(range(1, 1 + self.ndim)))
+        # eq_supp = np.all(x == self._supp_flat, axis=tuple(range(1, 1 + self.ndim)))
+        eq_supp = np.empty(self.space.set_size, dtype=np.bool)
+        for i, val in enumerate(self._supp_flat):
+            eq_supp[i] = np.allclose(x, val)
+
         if eq_supp.sum() == 0:
             raise ValueError("Input 'x' must be in the support.")
 
@@ -746,10 +750,25 @@ class DataEmpirical(Base):
     # TODO: subclass for continuous spaces, easy stats?
 
     def __new__(cls, values, counts, space=None, rng=None):
-        if space is not None and np.issubdtype(space.dtype, 'U') or np.issubdtype(np.array(values).dtype, 'U'):
-            return super().__new__(cls)
+        if space is not None:
+            dtype = space.dtype
         else:
+            dtype = np.array(values).dtype
+
+        if np.issubdtype(dtype, np.number):
             return super().__new__(DataEmpiricalRV)
+        else:
+            return super().__new__(cls)
+
+        # if space is not None and np.issubdtype(space.dtype, np.number) or np.issubdtype(dtype, np.number):
+        #     return super().__new__(DataEmpiricalRV)
+        # else:
+        #     return super().__new__(cls)
+
+        # if space is not None and np.issubdtype(space.dtype, 'U') or np.issubdtype(np.array(values).dtype, 'U'):
+        #     return super().__new__(cls)
+        # else:
+        #     return super().__new__(DataEmpiricalRV)
 
         # if np.issubdtype(np.array(values).dtype, np.number):
         #     return super().__new__(DataEmpiricalRV)
@@ -772,6 +791,10 @@ class DataEmpirical(Base):
         # self.data = self._structure_data(values, counts)
         #
         # self._update_attr()
+
+        self._mode = np.full(self.shape, np.nan)
+        self._mean = np.full(self.shape, np.nan)
+        self._cov = np.full(2 * self.shape, np.nan)
 
         self.n = 0
         self.data = self._structure_data([], [])
@@ -802,7 +825,7 @@ class DataEmpirical(Base):
 
     def add_values(self, values, counts):
         values, counts = np.array(values), np.array(counts)
-        n_new = counts.sum()
+        n_new = counts.sum(dtype=np.int)
         if n_new == 0:
             return
 
@@ -867,15 +890,14 @@ class DataEmpiricalRV(MixinRV, DataEmpirical):
         self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p, ctr))
 
 
-# r = Beta(5, 5)
-# # r = Finite(plotting.mesh_grid([0, 1], [3, 4, 5]), np.ones((2, 3)) / 6)
-# # r = Finite(['a', 'b'], [.6, .4])
-# e = DataEmpirical.from_data(r.rvs(0), space=r.space)
-# e.add_data(r.rvs(10))
-#
+# # r = Beta(5, 5)
+# # # r = Finite(plotting.mesh_grid([0, 1], [3, 4, 5]), np.ones((2, 3)) / 6)
+# # # r = Finite(['a', 'b'], [.6, .4])
+# # e = DataEmpirical.from_data(r.rvs(10), space=r.space)
+# # e.add_data(r.rvs(10))
 #
 # # e = DataEmpirical(['a', 'b'], [5, 6], space=spaces.FiniteGeneric(['a', 'b']))
-# # e = DataEmpirical([], [], space=spaces.FiniteGeneric(['a', 'b']))
+# e = DataEmpirical([], [], space=spaces.FiniteGeneric(['a', 'b']))
 # # e.add_values(['b', 'c'], [4, 1])
 #
 # print(e)
