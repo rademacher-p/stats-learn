@@ -247,9 +247,10 @@ class ClassConditional(MixinRVx, Base):
         elif self.space['y'].set_size != len(self.dists):
             raise ValueError("Incorrect number of conditional distributions.")
 
-        self._space['x'] = self.dists[0].space
-        if not all(dist.space == self._space['x'] for dist in self.dists[1:]):
-            raise ValueError("All distributions must have the same space.")
+        self._space['x'] = spaces.check_spaces(self.dists)
+        # self._space['x'] = self.dists[0].space
+        # if not all(dist.space == self._space['x'] for dist in self.dists[1:]):
+        #     raise ValueError("All distributions must have the same space.")
 
         self._update_attr()
 
@@ -570,9 +571,10 @@ class Mixture(Base):
         super().__init__(rng)
         self._dists = list(dists)
 
-        self._space = self.dists[0].space
-        if not all(dist.space == self.space for dist in self.dists[1:]):
-            raise ValueError("All distributions must have the same space.")
+        self._space = spaces.check_spaces(self.dists)
+        # self._space = self.dists[0].space
+        # if not all(dist.space == self.space for dist in self.dists[1:]):
+        #     raise ValueError("All distributions must have the same space.")
 
         self.weights = weights
 
@@ -677,13 +679,13 @@ class MixtureRVxy(MixtureRVx, MixtureRVy):
 
 
 # # dists_ = [NormalRegressor(basis_y_x=(lambda x: x,), weights=(w,), cov_y_x_single=10) for w in [0, 4]]
-# # dists_ = [ClassConditional.from_finite([rand_elements.Normal(mean) for mean in [i, i+2]], ['a', 'b']) for i in (0, 4)]
+# dists_ = [ClassConditional.from_finite([rand_elements.Normal(mean) for mean in [i, i+2]], ['a', 'b']) for i in (0, 4)]
 # # dists_ = [ClassConditional.from_finite([rand_elements.Finite([1, 2], [p, 1-p]) for p in p_], ['a', 'b'])
 # #           for p_ in [(.2, .5), (.7, .4)]]
 #
-# dists_ = [ClassConditional.from_finite([rand_elements.Normal(mean) for mean in (0, 2)], ['a', 'b'])]
-# # dists_ = [ClassConditional.from_finite([rand_elements.Finite([1, 2], [p, 1-p]) for p in (.3, .6)], ['a', 'b'])]
-# dists_.append(DataEmpirical.from_data(dists_[0].rvs(10), dists_[0].space))
+# # dists_ = [ClassConditional.from_finite([rand_elements.Normal(mean) for mean in (0, 2)], ['a', 'b'])]
+# # # dists_ = [ClassConditional.from_finite([rand_elements.Finite([1, 2], [p, 1-p]) for p in (.3, .6)], ['a', 'b'])]
+# # dists_.append(DataEmpirical.from_data(dists_[0].rvs(10), dists_[0].space))
 #
 # m = Mixture(dists_, [5, 8])
 # m.rvs(10)
@@ -698,4 +700,5 @@ class MixtureRVxy(MixtureRVx, MixtureRVy):
 # # plt.title(f"Mode={m.mode_y_x(x_p)}, Mean={m.mean_y_x(x_p)}")
 # # m.mode_y_x(np.linspace(-2, 8, 100))
 # # m.mean_y_x(1)
-# pass
+#
+# qq = None

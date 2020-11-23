@@ -879,9 +879,10 @@ class Mixture(Base):
         super().__init__(rng)
         self._dists = list(dists)
 
-        self._space = self.dists[0].space
-        if not all(dist.space == self.space for dist in self.dists[1:]):
-            raise ValueError("All distributions must have the same space.")
+        self._space = spaces.check_spaces(self.dists)
+        # self._space = self.dists[0].space
+        # if not all(dist.space == self.space for dist in self.dists[1:]):
+        #     raise ValueError("All distributions must have the same space.")
 
         self.weights = weights
 
@@ -939,7 +940,8 @@ class Mixture(Base):
         out = np.empty((n, *self.shape), dtype=self.space.dtype)
         for i, dist in enumerate(self.dists):
             idx = np.flatnonzero(i == idx_rng)
-            out[idx] = dist.rvs(size=idx.size)
+            if idx.size > 0:
+                out[idx] = dist.rvs(size=idx.size)
 
         return out
 

@@ -13,6 +13,13 @@ from thesis.util.base import check_data_shape
 # TODO: generalize plotting for non-numeric values (e.g. mode_y_x)
 # TODO: issubset method?
 
+def check_spaces(iter_):
+    space = iter_[0].space
+    if all(obj.space == space for obj in iter_[1:]):
+        return space
+    else:
+        raise ValueError("All objects must have the same space attribute.")
+
 
 class Space:
     def __init__(self, shape, dtype):
