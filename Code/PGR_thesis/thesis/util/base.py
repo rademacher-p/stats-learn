@@ -121,7 +121,11 @@ def vectorize_func(func, data_shape):
         _out = np.array(_out)
 
         data_shape_y = _out.shape[1:]
-        return _out.reshape(set_shape + data_shape_y)
+        _out = _out.reshape(set_shape + data_shape_y)
+        if _out.shape == ():
+            return _out.item()
+        else:
+            return _out
 
     return func_vec
 

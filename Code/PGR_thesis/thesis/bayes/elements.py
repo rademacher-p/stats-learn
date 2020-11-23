@@ -205,7 +205,7 @@ class Dirichlet(Base):
         self.posterior = None
 
         _emp_dist = rand_elements.DataEmpirical([], [], space=self.space)
-        self.posterior_model = rand_elements.Mixture([self.prior_mean, _emp_dist], [self.alpha_0, 0])
+        self.posterior_model = rand_elements.Mixture([self.prior_mean, _emp_dist], [self.alpha_0, _emp_dist.n])
 
     # def __getattribute__(self, name):
     #     try:
@@ -220,7 +220,7 @@ class Dirichlet(Base):
     #         super().__setattr__(name, value)
 
     def __setattr__(self, name, value):     # TODO: better way?
-        if name == 'alpha_0':
+        if name in ('alpha_0', 'prior_mean', 'emp_dist', 'posterior_model',):
             super().__setattr__(name, value)
         else:
             try:
