@@ -52,7 +52,7 @@ def plot_xy(x, y, y_std=None, space_x=None, ax=None, label=None):       # TODO: 
 def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False,
                           rng=None):
 
-    space = _check_spaces(predictors)
+    space = check_spaces(predictors)
     if x is None:
         x = space['x'].x_plt
 
@@ -144,7 +144,7 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
 def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, do_std=False, verbose=False,
                                ax=None, rng=None):
 
-    space = _check_spaces(predictors)
+    space = check_spaces(predictors)
     if x is None:
         x = space['x'].x_plt
     if ax is None:

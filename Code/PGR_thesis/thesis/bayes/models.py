@@ -3,6 +3,7 @@ Bayesian SL models.
 """
 
 import numpy as np
+from matplotlib import pyplot as plt
 from scipy.stats._multivariate import _PSD
 
 from thesis.random import elements as rand_elements
@@ -203,8 +204,7 @@ class NormalRegressor(Base):
         self._prior_model_cov = self._make_posterior_model_cov(self.prior_cov)
 
 
-
-class Dirichlet(Base):      # FIXME FIXME: copied WIP!
+class Dirichlet(Base):
     def __init__(self, alpha_0, prior_mean, rng=None):
         super().__init__(prior=None, rng=rng)
         self.alpha_0 = alpha_0
@@ -213,11 +213,11 @@ class Dirichlet(Base):      # FIXME FIXME: copied WIP!
         self._space = self.prior_mean.space
 
         # Learning
-        self.posterior = None
-        self.posterior_model = rand_models.Mixture([self.prior_mean], [self.alpha_0])
+        _emp_dist = rand_models.DataEmpirical([], [], space=self.space)
+        self.posterior_model = rand_models.Mixture([self.prior_mean, _emp_dist], [self.alpha_0, _emp_dist.n])
 
-    def __setattr__(self, name, value):
-        if name == 'alpha_0':
+    def __setattr__(self, name, value):     # TODO: better way?
+        if name in ('alpha_0', 'prior_mean', 'emp_dist', 'posterior_model',):
             super().__setattr__(name, value)
         else:
             try:
@@ -225,17 +225,16 @@ class Dirichlet(Base):      # FIXME FIXME: copied WIP!
             except AttributeError:
                 super().__setattr__(name, value)
 
-    is_fit = property(lambda self: self.posterior_model.n_dists > 1)
+    @property
+    def emp_dist(self):
+        return self.posterior_model.dists[1]
 
-    # @property
-    # def n(self):
-    #     if self.is_fit:
-    #         return self.posterior_model.dists[1].n
-    #     else:
-    #         return 0
+    @emp_dist.setter
+    def emp_dist(self, val):
+        self.posterior_model.set_dist(1, val, val.n)
 
     def random_model(self, rng=None):
-        raise NotImplementedError
+        raise NotImplementedError       # TODO: implement for finite in subclass?
 
     def _rvs(self, n, rng):
         # Samples directly from the marginal Dirichlet-Empirical data distribution
@@ -251,57 +250,56 @@ class Dirichlet(Base):      # FIXME FIXME: copied WIP!
         return _out
 
     def _fit(self, d, warm_start=False):
-        if not self.is_fit:
-            warm_start = False
-
-        if len(d) == 0:
-            if not warm_start and self.is_fit:
-                self.posterior_model.del_dist(1)    # delete empirical distribution
+        if warm_start:
+            emp_dist = self.emp_dist
         else:
-            if warm_start:
-                emp_dist = self.posterior_model.dists[1]
-                emp_dist.add_data(d)
-            else:
-                emp_dist = rand_models.DataEmpirical.from_data(d, self.space)
-
-            self.posterior_model.set_dist(1, emp_dist, emp_dist.n)
+            emp_dist = rand_models.DataEmpirical([], [], space=self.space)
+        emp_dist.add_data(d)
+        self.emp_dist = emp_dist
 
 
 if __name__ == '__main__':
-    # alpha = rand_models.NormalRegressor(basis_y_x=(lambda x: x,), weights=(2,), cov_y_x_single=10)
-    # theta = rand_models.NormalRegressor(basis_y_x=(lambda x: x,), weights=(1,), cov_y_x_single=10)
+    theta = rand_models.NormalRegressor(weights=(1,), basis_y_x=(lambda x: x,), cov_y_x=.1,
+                                        model_x=rand_elements.Finite(np.linspace(0, 1, 10, endpoint=False)),
+                                        )
+    alpha = rand_models.NormalRegressor(weights=(2,), basis_y_x=(lambda x: 1,), cov_y_x=.1,
+                                        model_x=rand_elements.Finite(np.linspace(0, 1, 10, endpoint=False)),
+                                        )
 
-    # alpha = rand_models.ClassConditional.from_finite([rand_elements.Normal(mean) for mean in (0, 2)], ['a', 'b'])
     # theta = rand_models.ClassConditional.from_finite([rand_elements.Normal(mean) for mean in (1, 3)], ['a', 'b'])
+    # alpha = rand_models.ClassConditional.from_finite([rand_elements.Normal(mean) for mean in (0, 2)], ['a', 'b'])
 
-    alpha = rand_models.ClassConditional.from_finite([rand_elements.Finite([1, 2], [p, 1-p]) for p in (.3, .6)],
-                                                     ['a', 'b'])
-    theta = rand_models.ClassConditional.from_finite([rand_elements.Finite([1, 2], [p, 1 - p]) for p in (.1, .8)],
-                                                     ['a', 'b'])
+    # theta = rand_models.ClassConditional.from_finite([rand_elements.Finite([1, 2], [p, 1 - p]) for p in (.1, .8)],
+    #                                                  ['a', 'b'], p_y=None)
+    # # alpha = rand_models.ClassConditional.from_finite([rand_elements.Finite([1, 2], [p, 1-p]) for p in (.3, .6)],
+    # #                                                  ['a', 'b'], p_y=None)
+    # alpha = rand_models.ClassConditional.from_finite([rand_elements.Finite([1, 2], [.5, .5]) for _ in range(2)],
+    #                                                  ['a', 'b'], p_y=None)
 
-    a = Dirichlet(alpha_0=10, prior_mean=alpha)
-
-    a.rvs(5)
-
-    # print(f"Mode = {a.posterior_model.mode}")
-    # # print(f"Mean = {a.posterior_model.mean}")
-    # a.posterior_model.plot_pf()
     #
-    # a.fit(theta.rvs(100))
-    # # a.rvs(10)
-    # print(f"Mode = {a.posterior_model.mode}")
-    # # print(f"Mean = {a.posterior_model.mean}")
-    # a.posterior_model.plot_pf()
-    # pass
-    #
-    # m.model_x.plot_pf()
-    # plt.title(f"Mode={m.mode_x:.3f}")
-    # # plt.title(f"Mode={m.mode_x:.3f}, Mean={m.mean_x:.3f}")
-    #
-    # x_p = m.model_x.rvs()
-    # m.model_y_x(x_p).plot_pf()
-    # plt.title(f"Mode={m.mode_y_x(x_p)}")
-    # # plt.title(f"Mode={m.mode_y_x(x_p)}, Mean={m.mean_y_x(x_p)}")
-    # # m.mode_y_x(np.linspace(-2, 8, 100))
-    # # m.mean_y_x(1)
-    # pass
+    x_plt = theta.space['x'].x_plt
+    # ax_mode = theta.space['x'].make_axes()
+    ax_mode = None
+
+    # theta.plot_mode_y_x(ax=ax_mode)
+    theta.plot_mean_y_x(ax=ax_mode)
+
+    # print(f"Mode = {theta.mode}")
+    # print(f"Mean = {theta.mean}")
+
+    b = Dirichlet(alpha_0=1, prior_mean=alpha)
+    # b.posterior_model.plot_mode_y_x(ax=ax_mode)
+    b.posterior_model.plot_mean_y_x(ax=ax_mode)
+    b.rvs(5)
+
+    # print(f"Mode = {b.posterior_model.mode}")
+    # print(f"Mean = {b.posterior_model.mean}")
+
+    b.fit(theta.rvs(100))
+    # b.posterior_model.plot_mode_y_x(ax=ax_mode)
+    b.posterior_model.plot_mean_y_x(ax=ax_mode)
+    b.rvs(10)
+
+    # print(f"Mode = {b.posterior_model.mode}")
+    # print(f"Mean = {b.posterior_model.mean}")
+
