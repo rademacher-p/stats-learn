@@ -213,8 +213,6 @@ class Dirichlet(Base):
         self._space = self.prior_mean.space
 
         # Learning
-        # self.posterior = None
-
         _emp_dist = rand_models.DataEmpirical([], [], space=self.space)
         self.posterior_model = rand_models.Mixture([self.prior_mean, _emp_dist], [self.alpha_0, _emp_dist.n])
 

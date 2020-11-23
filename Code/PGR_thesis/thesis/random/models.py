@@ -405,18 +405,6 @@ class DataEmpirical(Base):
             else:
                 return super().__new__(cls)
 
-        # dtype = np.array(values).dtype
-        # if np.issubdtype(dtype['x'].base, np.number):
-        #     if np.issubdtype(dtype['y'].base, np.number):
-        #         return super().__new__(DataEmpiricalRVxy)
-        #     else:
-        #         return super().__new__(DataEmpiricalRVx)
-        # else:
-        #     if np.issubdtype(dtype['y'].base, np.number):
-        #         return super().__new__(DataEmpiricalRVy)
-        #     else:
-        #         return super().__new__(cls)
-
     def __init__(self, values, counts, space=None, rng=None):
         super().__init__(rng)
 
@@ -431,16 +419,11 @@ class DataEmpirical(Base):
         else:
             self._space = space
 
-        # self.n = counts.sum()
-        # self.data = self._structure_data(values, counts)
-        #
-        # self._update_attr()
-
         self.n = 0
-        # self.data = self._structure_data([], [])
-        self.data = np.array([], dtype=[('x', self.dtype['x'], self.shape['x']),
-                                        ('y', self.dtype['y'], self.shape['y']),
-                                        ('n', np.int,)])
+        # self.data = np.array([], dtype=[('x', self.dtype['x'], self.shape['x']),
+        #                                 ('y', self.dtype['y'], self.shape['y']),
+        #                                 ('n', np.int,)])
+        self.data = self._structure_data({'x': [], 'y': []}, [])
         self.add_values(values, counts)
 
     def __repr__(self):
@@ -461,8 +444,6 @@ class DataEmpirical(Base):
                                ('n', np.int,)])
 
     def add_values(self, values, counts):
-        # values, counts = np.array(values), np.array(counts)
-        # self.n += counts.sum()
         values, counts = np.array(values), np.array(counts)
         n_new = counts.sum(dtype=np.int)
         # if n_new == 0:
@@ -496,14 +477,7 @@ class DataEmpirical(Base):
             data_match = self.data[_idx_inv == i]
             counts_x[i] = data_match['n'].sum()
 
-            # self.data_y_x.append(data_match)
             self.data_y_x.append(rand_elements.DataEmpirical(data_match['y'], data_match['n'], self.space['y']))
-
-        # self.data_x = np.array(list(zip(values_x, counts_x)),
-        #                        dtype=[('x', self.dtype['x'], self.shape['x']), ('n', np.int,)])
-        #
-        # self._p_x = self.data_x['n'] / self.n
-        # self._mode_x = self.data_x['x'][self.data_x['n'].argmax()]
 
         self._model_x = rand_elements.DataEmpirical(values_x, counts_x, space=self.space['x'])
         self._mode_x = self._model_x.mode
@@ -533,10 +507,6 @@ class DataEmpiricalRVx(MixinRVx, DataEmpirical):
         self._mean_x = self._model_x.mean
         self._cov_x = self._model_x.cov
 
-        # self._mean_x = np.tensordot(self._p_x, self.data_x['x'], axes=[0, 0])
-        # self._cov_x = sum(p_i * np.tensordot(ctr_i, ctr_i, 0)
-        #                   for p_i, ctr_i in zip(self._p_x, self.data_x['x'] - self._mean_x))
-
 
 class DataEmpiricalRVy(MixinRVy, DataEmpirical):
     def __repr__(self):
@@ -544,14 +514,6 @@ class DataEmpiricalRVy(MixinRVy, DataEmpirical):
 
     def _mean_y_x_single(self, x):
         return self.model_y_x(x).mean
-
-    # def _mean_y_x_single(self, x):
-    #     data_ = self._get_data_y_x(x)
-    #     if data_ is not None:
-    #         p_y_x = data_['n'] / data_['n'].sum()
-    #         return np.tensordot(p_y_x, data_['y'], axes=[0, 0])
-    #     else:
-    #         return np.nan
 
 
 class DataEmpiricalRVxy(DataEmpiricalRVx, DataEmpiricalRVy):
@@ -588,9 +550,6 @@ class Mixture(Base):
         self._dists = list(dists)
 
         self._space = spaces.check_spaces(self.dists)
-        # self._space = self.dists[0].space
-        # if not all(dist.space == self.space for dist in self.dists[1:]):
-        #     raise ValueError("All distributions must have the same space.")
 
         self.weights = weights
 
@@ -655,12 +614,7 @@ class Mixture(Base):
 
     def _weights_y_x(self, x):
         # return self.weights * np.array([dist.model_x.pf(x) for dist in self.dists])
-
         return np.array([w * dist.model_x.pf(x) for w, dist in zip(self.weights, self.dists)])
-
-        # temp = np.array([dist.model_x.pf(x) for dist in self.dists])
-        # return np.broadcast_to(self.weights, (len(self.weights), *temp.shape[1:])) * temp
-        # return self.weights * np.moveaxis(np.array([dist.model_x.pf(x) for dist in self.dists]), 0, -1)
 
     def _rvs(self, n, rng):
         idx_rng = rng.choice(self.n_dists, size=n, p=self._p)
@@ -695,7 +649,6 @@ class MixtureRVy(MixinRVy, Mixture):
         p_y_x = temp / temp.sum(0)
 
         # return sum(prob * dist.mean_y_x(x) for prob, dist in zip(p_y_x, self.dists) if prob > 0)
-        # return sum(prob * dist.mean_y_x(x) for prob, dist in zip(p_y_x, self.dists))
         temp = np.array([prob * dist.mean_y_x(x) for prob, dist in zip(p_y_x, self.dists)])
         return np.nansum(temp, axis=0)
 

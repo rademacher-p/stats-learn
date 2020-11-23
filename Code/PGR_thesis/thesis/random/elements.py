@@ -760,21 +760,6 @@ class DataEmpirical(Base):
         else:
             return super().__new__(cls)
 
-        # if space is not None and np.issubdtype(space.dtype, np.number) or np.issubdtype(dtype, np.number):
-        #     return super().__new__(DataEmpiricalRV)
-        # else:
-        #     return super().__new__(cls)
-
-        # if space is not None and np.issubdtype(space.dtype, 'U') or np.issubdtype(np.array(values).dtype, 'U'):
-        #     return super().__new__(cls)
-        # else:
-        #     return super().__new__(DataEmpiricalRV)
-
-        # if np.issubdtype(np.array(values).dtype, np.number):
-        #     return super().__new__(DataEmpiricalRV)
-        # else:
-        #     return super().__new__(cls)
-
     def __init__(self, values, counts, space=None, rng=None):
         super().__init__(rng)
 
@@ -786,11 +771,6 @@ class DataEmpirical(Base):
                 raise NotImplementedError
         else:
             self._space = space
-
-        # self.n = counts.sum()
-        # self.data = self._structure_data(values, counts)
-        #
-        # self._update_attr()
 
         self._mode = np.full(self.shape, np.nan)
         self._mean = np.full(self.shape, np.nan)
@@ -883,11 +863,7 @@ class DataEmpiricalRV(MixinRV, DataEmpirical):
         self._mean = np.tensordot(self._p, self.data['x'], axes=[0, 0])
 
         ctr = self.data['x'] - self._mean
-        # outer = np.empty((len(ctr), *(2 * self.shape)))
-        # for i, ctr_i in enumerate(ctr):
-        #     outer[i] = np.tensordot(ctr_i, ctr_i, 0)        # TODO: try np.einsum?
-        # self._cov = np.tensordot(self._p, outer, axes=[0, 0])
-        self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p, ctr))
+        self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p, ctr))    # TODO: try np.einsum?
 
 
 # # r = Beta(5, 5)
@@ -917,9 +893,6 @@ class Mixture(Base):
         self._dists = list(dists)
 
         self._space = spaces.check_spaces(self.dists)
-        # self._space = self.dists[0].space
-        # if not all(dist.space == self.space for dist in self.dists[1:]):
-        #     raise ValueError("All distributions must have the same space.")
 
         self.weights = weights
 
