@@ -746,10 +746,15 @@ class DataEmpirical(Base):
     # TODO: subclass for continuous spaces, easy stats?
 
     def __new__(cls, values, counts, space=None, rng=None):
-        if np.issubdtype(np.array(values).dtype, np.number):
-            return super().__new__(DataEmpiricalRV)
-        else:
+        if space is not None and np.issubdtype(space.dtype, 'U') or np.issubdtype(np.array(values).dtype, 'U'):
             return super().__new__(cls)
+        else:
+            return super().__new__(DataEmpiricalRV)
+
+        # if np.issubdtype(np.array(values).dtype, np.number):
+        #     return super().__new__(DataEmpiricalRV)
+        # else:
+        #     return super().__new__(cls)
 
     def __init__(self, values, counts, space=None, rng=None):
         super().__init__(rng)
@@ -763,10 +768,14 @@ class DataEmpirical(Base):
         else:
             self._space = space
 
-        self.n = counts.sum()
-        self.data = self._structure_data(values, counts)
+        # self.n = counts.sum()
+        # self.data = self._structure_data(values, counts)
+        #
+        # self._update_attr()
 
-        self._update_attr()
+        self.n = 0
+        self.data = self._structure_data([], [])
+        self.add_values(values, counts)
 
     def __repr__(self):
         return f"DataEmpirical(space={self.space}, n={self.n})"
@@ -793,7 +802,11 @@ class DataEmpirical(Base):
 
     def add_values(self, values, counts):
         values, counts = np.array(values), np.array(counts)
-        self.n += counts.sum()
+        n_new = counts.sum()
+        if n_new == 0:
+            return
+
+        self.n += n_new
 
         idx_new = []
         for i, (value, count) in enumerate(zip(values, counts)):
@@ -854,14 +867,16 @@ class DataEmpiricalRV(MixinRV, DataEmpirical):
         self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p, ctr))
 
 
-# # r = Beta(5, 5)
+# r = Beta(5, 5)
 # # r = Finite(plotting.mesh_grid([0, 1], [3, 4, 5]), np.ones((2, 3)) / 6)
 # # r = Finite(['a', 'b'], [.6, .4])
-# # e = DataEmpirical.from_data(r.rvs(10), space=r.space)
-# # e.add_data(r.rvs(5))
+# e = DataEmpirical.from_data(r.rvs(0), space=r.space)
+# e.add_data(r.rvs(10))
 #
-# e = DataEmpirical(['a', 'b'], [5, 6], space=spaces.FiniteGeneric(['a', 'b']))
-# e.add_values(['b', 'c'], [4, 1])
+#
+# # e = DataEmpirical(['a', 'b'], [5, 6], space=spaces.FiniteGeneric(['a', 'b']))
+# # e = DataEmpirical([], [], space=spaces.FiniteGeneric(['a', 'b']))
+# # e.add_values(['b', 'c'], [4, 1])
 #
 # print(e)
 # e.plot_pf()
@@ -887,7 +902,7 @@ class Mixture(Base):
         self.weights = weights
 
     def __repr__(self):
-        _str = "; ".join([f"{prob}: {dist}" for dist, prob in zip(self.dists, self._p)])
+        _str = "; ".join([f"{prob}: {dist}" for prob, dist in zip(self._p, self.dists)])
         return f"Mixture({_str})"
 
     dists = property(lambda self: self._dists)
@@ -946,16 +961,18 @@ class Mixture(Base):
         return out
 
     def pf(self, x):
-        return sum(prob * dist.pf(x) for dist, prob in zip(self.dists, self._p))
+        return sum(prob * dist.pf(x) for prob, dist in zip(self._p, self.dists) if prob > 0)
 
     def _set_x_plot(self):
+        dists_nonzero = [dist for (w, dist) in zip(self.weights, self.dists) if w > 0]
+
         if isinstance(self.space, spaces.Euclidean):
-            temp = np.stack(list(dist.space.lims_plot for dist in self.dists))
+            temp = np.stack(list(dist.space.lims_plot for dist in dists_nonzero))
             self._space.lims_plot = [temp[:, 0].min(), temp[:, 1].max()]
 
         if isinstance(self.space, spaces.Continuous) and self.shape in {()}:
             x = self.space.x_plt
-            for dist in self.dists:
+            for dist in dists_nonzero:
                 if isinstance(dist, DataEmpirical):
                     x = np.concatenate((x, dist.data['x']))
 
@@ -965,13 +982,13 @@ class Mixture(Base):
 
 class MixtureRV(MixinRV, Mixture):
     def __repr__(self):
-        _str = "; ".join([f"{w}: {dist}" for dist, w in zip(self.dists, self.weights)])
+        _str = "; ".join([f"{w}: {dist}" for w, dist in zip(self.weights, self.dists)])
         return f"MixtureRV({_str})"
 
     def _update_attr(self):
         super()._update_attr()
 
-        self._mean = sum(prob * dist.mean for dist, prob in zip(self.dists, self._p))
+        self._mean = sum(prob * dist.mean for prob, dist in zip(self._p, self.dists) if prob > 0)
         self._cov = None  # TODO: numeric approx from `space`?
 
 
@@ -980,11 +997,13 @@ class MixtureRV(MixinRV, Mixture):
 # # dists_ = [Normal(mean, 1) for mean in [[0, 0], [2, 3]]]
 # # dists_ = [Finite(['a', 'b'], p=[p_, 1-p_]) for p_ in [0, 1]]
 # # dists_ = [Finite([[0, 0], [0, 1]], p=[p_, 1-p_]) for p_ in [0, 1]]
-# dists_ = [Normal(), DataEmpirical(Normal().rvs(10))]
 #
-# m = Mixture(dists_, [5, 8])
+# dists_ = [Normal(2)]
+# dists_.append(DataEmpirical.from_data(dists_[0].rvs(0)))
+#
+# m = Mixture(dists_, [5, 0])
 # m.rvs(10)
 # m.plot_pf()
 # print(m.space.integrate(m.pf))
 # print(m.space.moment(m.pf))
-# pass
+# qq = None

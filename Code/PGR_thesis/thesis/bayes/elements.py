@@ -193,8 +193,6 @@ class NormalLinear(Base):
 # print(r.weights)
 
 
-# TODO: reimplement with empty empirical init?
-
 class Dirichlet(Base):
     def __init__(self, alpha_0, prior_mean, rng=None):
         super().__init__(prior=None, rng=rng)
@@ -205,7 +203,9 @@ class Dirichlet(Base):
 
         # Learning
         self.posterior = None
-        self.posterior_model = rand_elements.Mixture([self.prior_mean], [self.alpha_0])
+
+        _emp_dist = rand_elements.DataEmpirical([], [], space=self.space)
+        self.posterior_model = rand_elements.Mixture([self.prior_mean, _emp_dist], [self.alpha_0, 0])
 
     # def __getattribute__(self, name):
     #     try:
@@ -228,14 +228,13 @@ class Dirichlet(Base):
             except AttributeError:
                 super().__setattr__(name, value)
 
-    is_fit = property(lambda self: self.posterior_model.n_dists > 1)
+    @property
+    def emp_dist(self):
+        return self.posterior_model.dists[1]
 
-    # @property
-    # def n(self):
-    #     if self.is_fit:
-    #         return self.posterior_model.dists[1].n
-    #     else:
-    #         return 0
+    @emp_dist.setter
+    def emp_dist(self, val):
+        self.posterior_model.set_dist(1, val, val.n)
 
     def random_model(self, rng=None):
         raise NotImplementedError       # TODO: implement for finite in subclass?
@@ -253,20 +252,17 @@ class Dirichlet(Base):
         return _out
 
     def _fit(self, d, warm_start=False):
-        if not self.is_fit:
-            warm_start = False
-
-        if len(d) == 0:
-            if not warm_start and self.is_fit:
-                self.posterior_model.del_dist(1)    # delete empirical distribution
+        if warm_start:
+            emp_dist = self.emp_dist
         else:
-            if warm_start:
-                emp_dist = self.posterior_model.dists[1]
-                emp_dist.add_data(d)
-            else:
-                emp_dist = rand_elements.DataEmpirical.from_data(d, self.space)
+            emp_dist = rand_elements.DataEmpirical([], [], space=self.space)
+        emp_dist.add_data(d)
+        self.emp_dist = emp_dist
 
-            self.posterior_model.set_dist(1, emp_dist, emp_dist.n)
+        # if not warm_start:
+        #     self.emp_dist = rand_elements.DataEmpirical([], [], space=self.space)
+        # self.emp_dist.add_data(d)
+        # self.posterior_model._update_attr()
 
 
 if __name__ == '__main__':
