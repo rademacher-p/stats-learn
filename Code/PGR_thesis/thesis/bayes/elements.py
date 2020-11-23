@@ -259,11 +259,6 @@ class Dirichlet(Base):
         emp_dist.add_data(d)
         self.emp_dist = emp_dist
 
-        # if not warm_start:
-        #     self.emp_dist = rand_elements.DataEmpirical([], [], space=self.space)
-        # self.emp_dist.add_data(d)
-        # self.posterior_model._update_attr()
-
 
 if __name__ == '__main__':
     # alpha = rand_elements.Beta(5, 25)
