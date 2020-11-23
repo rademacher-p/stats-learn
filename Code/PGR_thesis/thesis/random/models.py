@@ -579,7 +579,7 @@ class Mixture(Base):
         self.weights = weights
 
     def __repr__(self):
-        _str = "; ".join([f"{w}: {dist}" for dist, w in zip(self.dists, self.weights)])
+        _str = "; ".join([f"{w}: {dist}" for w, dist in zip(self.weights, self.dists)])
         return f"Mixture({_str})"
 
     dists = property(lambda self: self._dists)
@@ -652,29 +652,29 @@ class Mixture(Base):
 
 class MixtureRVx(MixinRVx, Mixture):
     def __repr__(self):
-        _str = "; ".join([f"{w}: {dist}" for dist, w in zip(self.dists, self.weights)])
+        _str = "; ".join([f"{w}: {dist}" for w, dist in zip(self.weights, self.dists)])
         return f"MixtureRVx({_str})"
 
     def _update_attr(self):
         super()._update_attr()
 
-        self._mean_x = sum(prob * dist.mean_x for dist, prob in zip(self.dists, self._p))
+        self._mean_x = sum(prob * dist.mean_x for prob, dist in zip(self._p, self.dists) if prob > 0)
 
 
 class MixtureRVy(MixinRVy, Mixture):
     def __repr__(self):
-        _str = "; ".join([f"{w}: {dist}" for dist, w in zip(self.dists, self.weights)])
+        _str = "; ".join([f"{w}: {dist}" for w, dist in zip(self.weights, self.dists)])
         return f"MixtureRVy({_str})"
 
     def mean_y_x(self, x):
         temp = self._weights_y_x(x)
         p_y_x = temp / temp.sum()
-        return sum(prob * dist.mean_y_x(x) for dist, prob in zip(self.dists, p_y_x))
+        return sum(prob * dist.mean_y_x(x) for prob, dist in zip(p_y_x, self.dists) if prob > 0)
 
 
 class MixtureRVxy(MixtureRVx, MixtureRVy):
     def __repr__(self):
-        _str = "; ".join([f"{w}: {dist}" for dist, w in zip(self.dists, self.weights)])
+        _str = "; ".join([f"{w}: {dist}" for w, dist in zip(self.weights, self.dists)])
         return f"MixtureRVxy({_str})"
 
 
