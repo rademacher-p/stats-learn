@@ -16,14 +16,7 @@ from thesis.util.base import vectorize_func, check_data_shape
 from thesis.loss_funcs import loss_se, loss_01
 
 from thesis.random import models as rand_models
-
-
-def _check_spaces(predictors):
-    space = predictors[0].space
-    if all(pred.space == space for pred in predictors[1:]):
-        return space
-    else:
-        raise ValueError("All predictors must have the same space.")
+from thesis.util.spaces import check_spaces
 
 
 def plot_xy(x, y, y_std=None, space_x=None, ax=None, label=None):       # TODO: make `space` method?
