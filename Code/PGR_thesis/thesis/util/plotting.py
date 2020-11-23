@@ -1,25 +1,25 @@
 import math
 
 import numpy as np
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 from scipy.special import binom
 
 
-def get_axes_xy(ax=None, shape=None):
-    if ax is None:
-        if shape == ():
-            _, ax = plt.subplots()
-            ax.set(xlabel='$x$', ylabel='$y$')
-        elif shape == (2,):
-            _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-            ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$y$')
-        else:
-            return None
-
-        ax.grid(True)
-        return ax
-    else:
-        return ax
+# def get_axes_xy(ax=None, shape=None):   # TODO: delete?
+#     if ax is None:
+#         if shape == ():
+#             _, ax = plt.subplots()
+#             ax.set(xlabel='$x$', ylabel='$y$')
+#         elif shape == (2,):
+#             _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+#             ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$y$')
+#         else:
+#             return None
+#
+#         ax.grid(True)
+#         return ax
+#     else:
+#         return ax
 
 
 def simplex_grid(n, shape, hull_mask=None):
@@ -91,7 +91,8 @@ def box_grid(lims, n=100, endpoint=False):
         return np.linspace(*lims, n, endpoint=endpoint)
     elif lims.ndim == 2 and lims.shape[-1] == 2:
         x_dim = [np.linspace(*lims_i, n, endpoint=endpoint) for lims_i in lims]
-        return np.stack(np.meshgrid(*x_dim), axis=-1)
+        # return np.stack(np.meshgrid(*x_dim), axis=-1)
+        return mesh_grid(*x_dim)
     else:
         raise ValueError("Shape must be (2,) or (*, 2)")
 
@@ -99,5 +100,6 @@ def box_grid(lims, n=100, endpoint=False):
     #     raise ValueError("Upper values must meet or exceed lower values.")
 
 
-def mesh_grid(*args):       # TODO: mgrid??
-    return np.stack(np.meshgrid(*args[::-1])[::-1], axis=-1)
+def mesh_grid(*args):
+    # return np.stack(np.meshgrid(*args[::-1])[::-1], axis=-1)
+    return np.stack(np.meshgrid(*args, indexing='ij'), axis=-1)

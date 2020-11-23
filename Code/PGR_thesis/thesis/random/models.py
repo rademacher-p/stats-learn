@@ -2,14 +2,12 @@
 SL models.
 """
 
-import math
 from typing import Optional
 
 import numpy as np
 from matplotlib import pyplot as plt
 
 from thesis.random import elements as rand_elements
-# from thesis._deprecated.RE_obj_callable import FiniteRE  # TODO: note - CALLABLE!!!!
 
 from thesis.util.base import RandomGeneratorMixin, vectorize_func, vectorize_func_dec
 from thesis.util import spaces
@@ -60,6 +58,9 @@ class Base(RandomGeneratorMixin):
     def _mode_y_x_single(self, x):
         raise Exception
 
+    def plot_mode_y_x(self, x=None, ax=None):
+        return self.space['x'].plot(self.mode_y_x, x, ax)
+
     rvs = rand_elements.Base.rvs
 
     def _rvs(self, n, rng):
@@ -83,6 +84,7 @@ class MixinRVx:
 
 
 class MixinRVy:
+    space: spaces.Space
     shape: dict
 
     def mean_y_x(self, x):
@@ -90,6 +92,9 @@ class MixinRVy:
 
     def _mean_y_x_single(self, x):
         raise Exception
+
+    def plot_mean_y_x(self, x=None, ax=None):
+        return self.space['x'].plot(self.mean_y_x, x, ax)
 
     def cov_y_x(self, x):
         return vectorize_func(self._cov_y_x_single, self.shape['x'])(x)
@@ -372,9 +377,10 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):        # TODO: rename NormalLin
         return rand_elements.Normal(mean, cov)
 
 
-# g = NormalRegressor(basis_y_x=(lambda x: x,), weights=(1,), cov_y_x_single=.01, model_x=rand_elements.Normal(4))
+# g = NormalRegressor(basis_y_x=(lambda x: x**2,), weights=(1,), cov_y_x=.01, model_x=rand_elements.Normal(4))
 # r = g.rvs(100)
 # # plt.plot(r['x'], r['y'], '.')
+# qq = None
 
 
 class DataEmpirical(Base):
@@ -622,27 +628,18 @@ class Mixture(Base):
         return self.model_y_x(x).mode
 
     def model_y_x(self, x):
+
+        # TODO: only generate model_y_x if weight is non-zero!? avoids empirical error.
+
         return rand_elements.Mixture([dist.model_y_x(x) for dist in self.dists], self._weights_y_x(x))
 
     def _weights_y_x(self, x):
         return self.weights * np.array([dist.model_x.pf(x) for dist in self.dists])
 
-    # def pf_x(self, x):
-    #     # return sum(prob * dist.model_x.pf(x) for dist, prob in zip(self.dists, self._p))
-    #     return self.model_x.pf(x)
-    #
-    # def pf_y_x(self, x):
-    #     # def temp(y):
-    #     #     return sum(prob * dist.model_y_x(x).pf(y) for dist, prob in zip(self.dists, self._p))
-    #     # return temp
-    #     return self.model_y_x(x).pf
-
     def _rvs(self, n, rng):
         idx_rng = rng.choice(self.n_dists, size=n, p=self._p)
         out = np.array([tuple(np.empty(self.shape[c], self.dtype[c]) for c in 'xy') for _ in range(n)],
                        dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
-        # out = np.array(list(zip(np.zeros((n, *self.shape['x'])), np.zeros((n, *self.shape['y'])))),
-        #                dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
         for i, dist in enumerate(self.dists):
             idx = np.flatnonzero(i == idx_rng)
             if idx.size > 0:

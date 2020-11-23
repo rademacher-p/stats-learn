@@ -5,6 +5,7 @@ Main.
 import itertools
 
 import numpy as np
+from matplotlib import pyplot as plt
 
 # from scipy.stats._multivariate import multi_rv_generic
 # from scipy._lib._util import check_random_state
@@ -13,7 +14,7 @@ import numpy as np
 from thesis.random.elements import Normal
 from thesis.random.models import NormalRegressor as NormalRegressorModel
 from thesis.bayes.models import NormalRegressor as NormalRegressorBayes
-from thesis.predictors import BayesRegressor, ModelRegressor, plot_loss_eval_compare
+from thesis.predictors import BayesRegressor, ModelRegressor, plot_loss_eval_compare, plot_predict_stats_compare
 
 # plt.style.use('seaborn')
 
@@ -118,7 +119,7 @@ supp_y_s = np.array(list(itertools.product(supp_y.reshape((-1,) + data_shape_y))
 
 def main():
     model_x = Normal(mean=0., cov=10.)
-    x = np.linspace(-3, 3, 100, endpoint=False)
+    # x = np.linspace(-3, 3, 100, endpoint=False)
 
     # model_x = Normal(mean=np.zeros(2), cov=np.eye(2))
     # x1_plot = np.linspace(-3, 3, 101, endpoint=True)
@@ -145,28 +146,28 @@ def main():
         {'prior_cov': [0.1, 1, 10]},
     ]
 
-    # plot_predict_stats_compare(predictors, x, model, params, n_train=2, n_mc=30, do_std=True, ax=None, rng=None)
-    plot_loss_eval_compare(predictors, model, params, n_train=np.arange(3), n_test=10, n_mc=100,
-                           verbose=False, ax=None, rng=100)
+    plot_predict_stats_compare(predictors, model, params, x=None, n_train=2, n_mc=30, do_std=True, ax=None, rng=None)
+    # plot_loss_eval_compare(predictors, model, params, n_train=np.arange(3), n_test=10, n_mc=100,
+    #                        verbose=False, ax=None, rng=100)
 
     # single predictor methods
     pr = predictors[1]
     pr.set_params(cov_prior=5)
 
-    # params = None
+    params = None
     # params = {'weights': [m * np.ones(2) for m in [.1, .5, 1]]}
-    params = {
-        # 'prior_cov': [.1, 1, 10, 11],
-        'prior_cov': np.linspace(.1, 10, 32),
-        # 'prior_mean': [m * np.ones(2) for m in [.1, .5, 1]],
-              }
+    # params = {
+    #     # 'prior_cov': [.1, 1, 10, 11],
+    #     'prior_cov': np.linspace(.1, 10, 32),
+    #     # 'prior_mean': [m * np.ones(2) for m in [.1, .5, 1]],
+    #           }
 
     # n_train = 2
     n_train = [0, 1, 2]
     # n_train = np.arange(10)
 
-    # pr.plot_predict_stats(x, model=model, params=params, n_train=n_train, n_mc=30, do_std=True, ax=None, rng=None)
-    pr.plot_loss_eval(model=model, params=params, n_train=n_train, n_test=10, n_mc=100, verbose=False, ax=None, rng=100)
+    pr.plot_predict_stats(model=model, params=params, x=None, n_train=n_train, n_mc=30, do_std=True, ax=None, rng=None)
+    # pr.plot_loss_eval(model=model, params=params, n_train=n_train, n_test=10, n_mc=100, verbose=False, ax=None, rng=100)
 
     pass
 
