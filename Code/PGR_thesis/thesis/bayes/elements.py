@@ -193,6 +193,8 @@ class NormalLinear(Base):
 # print(r.weights)
 
 
+# TODO: reimplement with empty empirical init?
+
 class Dirichlet(Base):
     def __init__(self, alpha_0, prior_mean, rng=None):
         super().__init__(prior=None, rng=rng)
@@ -262,7 +264,7 @@ class Dirichlet(Base):
                 emp_dist = self.posterior_model.dists[1]
                 emp_dist.add_data(d)
             else:
-                emp_dist = rand_elements.DataEmpirical(d, self.space)
+                emp_dist = rand_elements.DataEmpirical.from_data(d, self.space)
 
             self.posterior_model.set_dist(1, emp_dist, emp_dist.n)
 
@@ -274,16 +276,23 @@ if __name__ == '__main__':
     alpha = rand_elements.Finite(['a', 'b'], [.2, .8])
     theta = rand_elements.Finite(['a', 'b'], [.8, .2])
 
+    print(f"Mode = {theta.mode}")
+    # print(f"Mean = {theta.mean}")
+    theta.plot_pf()
+    plt.title("True")
+
     a = Dirichlet(alpha_0=10, prior_mean=alpha)
 
     # a.rvs(5)
     print(f"Mode = {a.posterior_model.mode}")
     # print(f"Mean = {a.posterior_model.mean}")
     a.posterior_model.plot_pf()
+    plt.title("Prior")
 
     a.fit(theta.rvs(100))
     # a.rvs(10)
     print(f"Mode = {a.posterior_model.mode}")
     # print(f"Mean = {a.posterior_model.mean}")
     a.posterior_model.plot_pf()
+    plt.title("Posterior")
     pass

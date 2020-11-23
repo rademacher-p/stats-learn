@@ -10,7 +10,7 @@ from thesis.util.base import check_data_shape
 # plt.style.use('seaborn')
 
 
-# TODO: use get_axes_xy?
+# TODO: generalize plotting for non-numeric values (e.g. mode_y_x)
 # TODO: issubset method?
 
 
@@ -33,6 +33,25 @@ class Space:
 
     def set_x_plot(self, x=None):
         pass
+
+    def make_axes(self):        # TODO: axes kwargs
+        if self.shape == ():
+            _, ax = plt.subplots()
+            ax.set(xlabel='$x$', ylabel='$f(x)$')
+            return ax
+        elif self.shape == (2,):
+            _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+            ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$f(x)$')
+            return ax
+        # elif self.shape == (3,):
+        #     _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+        #     ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
+        #     return ax
+        else:
+            raise NotImplementedError('Plotting only supported for 1- and 2- dimensional data.')
+
+    def plot(self, f, x=None, ax=None, label=None):
+        raise Exception
 
     def _eval_func(self, f, x=None):
         if x is None:
@@ -137,33 +156,21 @@ class FiniteGeneric(Finite):
         else:
             self.x_plt = np.array(x)
 
-    def plot(self, f, x=None, ax=None):
-        x, y, set_shape = self._eval_func(f, x)     # TODO: exception if set_shape != self.set_shape?
+    def plot(self, f, x=None, ax=None, label=None):
+        if ax is None:
+            ax = self.make_axes()
+
+        x, y, set_shape = self._eval_func(f, x)
 
         set_ndim = len(set_shape)
         if set_ndim == 1 and self.shape == ():
-            if ax is None:
-                _, ax = plt.subplots()
-                ax.set(xlabel='$x$', ylabel='$f(x)$')
-
-            plt_data = ax.stem(x, y, use_line_collection=True)
-
-            return plt_data
+            return ax.stem(x, y, use_line_collection=True, label=label)
 
         elif set_ndim == 2 and self.shape == (2,):
-            if ax is None:
-                _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$f(x)$')
-
-            plt_data = ax.bar3d(x[..., 0].flatten(), x[..., 1].flatten(), 0, 1, 1, y.flatten(), shade=True)
-            return plt_data
+            return ax.bar3d(x[..., 0].flatten(), x[..., 1].flatten(), 0, 1, 1, y.flatten(), shade=True)
 
         elif set_ndim == 3 and self.shape == (3,):
-            if ax is None:
-                _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
-
-            plt_data = ax.scatter(x[..., 0], x[..., 1], x[..., 2], s=15, c=y)
+            plt_data = ax.scatter(x[..., 0], x[..., 1], x[..., 2], s=15, c=y, label=label)
 
             c_bar = plt.colorbar(plt_data)
             c_bar.set_label('$f(x)$')
@@ -260,27 +267,22 @@ class Box(Continuous):      # TODO: make Box inherit from Euclidean?
         else:
             self.x_plt = np.array(x)
 
-    def plot(self, f, x=None, ax=None):
+    def plot(self, f, x=None, ax=None, label=None):
+        if ax is None:
+            ax = self.make_axes()
+
         x, y, set_shape = self._eval_func(f, x)
 
         set_ndim = len(set_shape)
         if set_ndim == 1 and self.shape == ():
-            if ax is None:
-                _, ax = plt.subplots()
-                ax.set(xlabel='$x_1$', ylabel='$f(x)$')        # TODO: ax_kwargs
-
-            plt_data = ax.plot(x, y)
-            return plt_data
+            return ax.plot(x, y, label=label)
 
         elif set_ndim == 2 and self.shape == (2,):
-            if ax is None:
-                _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$f(x)$')
+            _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+            ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$f(x)$')
 
-            # ax.plot_wireframe(x[..., 0], x[..., 1], self.pf(x))
-            plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, cmap=plt.cm.viridis)
-
-            return plt_data
+            # return ax.plot_wireframe(x[..., 0], x[..., 1], y)
+            return ax.plot_surface(x[..., 0], x[..., 1], y, cmap=plt.cm.viridis)
 
         else:
             raise NotImplementedError('Plot method only supported for 1- and 2-dimensional data.')
@@ -377,7 +379,23 @@ class Simplex(Continuous):
         else:
             self.x_plt = np.array(x)
 
-    def plot(self, f, x=None, ax=None):
+    def make_axes(self):
+        if self.shape == (2,):
+            _, ax = plt.subplots()
+            ax.set(xlabel='$x_1$', ylabel='$x_2$')
+            return ax
+        elif self.shape == (3,):
+            _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+            ax.view_init(35, 45)
+            ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
+            return ax
+        else:
+            raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
+
+    def plot(self, f, x=None, ax=None, label=None):
+        if ax is None:
+            ax = self.make_axes()
+
         x, y, set_shape = self._eval_func(f, x)
 
         # pf_plt.sum() / (n_plt ** (self._size - 1))
@@ -386,19 +404,9 @@ class Simplex(Continuous):
             raise ValueError()
 
         if self.shape == (2,):
-            if ax is None:
-                _, ax = plt.subplots()
-                ax.set(xlabel='$x_1$', ylabel='$x_2$')
-
-            plt_data = ax.scatter(x[:, 0], x[:, 1], s=15, c=y)
-
+            plt_data = ax.scatter(x[:, 0], x[:, 1], s=15, c=y, label=label)
         elif self.shape == (3,):
-            if ax is None:
-                _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                ax.view_init(35, 45)
-                ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
-
-            plt_data = ax.scatter(x[:, 0], x[:, 1], x[:, 2], s=15, c=y)
+            plt_data = ax.scatter(x[:, 0], x[:, 1], x[:, 2], s=15, c=y, label=label)
         else:
             raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 

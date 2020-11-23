@@ -49,10 +49,6 @@ class Base(RandomGeneratorMixin):
         raise NotImplementedError("Method must be overwritten.")
         pass
 
-    # def plot_pf(self, ax=None):
-    #     raise NotImplementedError
-    #     pass
-
     def plot_pf(self, x=None, ax=None):
         return self.space.plot(self.pf, x, ax)
 
