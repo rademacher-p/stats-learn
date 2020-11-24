@@ -11,7 +11,7 @@ from scipy.stats._multivariate import _PSD
 from thesis.random import elements as rand_elements
 from thesis.random import models as rand_models
 
-from thesis.util.base import RandomGeneratorMixin
+from thesis.util.base import RandomGeneratorMixin, vectorize_func
 from thesis.util import spaces
 
 #%% Priors
@@ -67,12 +67,25 @@ class NormalRegressor(Base):
         if self.prior.ndim > 1:
             raise ValueError
 
-        self._set_prior_persistent_attr()
-
         # Model
-        self._set_model_x(model_x)
+
+        self._space['x'] = model_x.space
+        self._model_x = model_x
+
+        _temp = np.array(cov_y_x).shape
+        self._space['y'] = spaces.Euclidean(_temp[:int(len(_temp) / 2)])
+
         self._set_cov_y_x(cov_y_x)
-        self._set_basis_y_x(basis_y_x)
+
+        if basis_y_x is None:
+            def power_func(i):
+                return vectorize_func(lambda x: np.full(self.shape['y'], (x ** i).sum()), shape=self.shape['x'])
+
+            self._basis_y_x = tuple(power_func(i) for i in range(len(self.prior_mean)))
+        else:
+            self._basis_y_x = basis_y_x
+
+        self._set_prior_persistent_attr()
 
         # Learning
         self.posterior = rand_elements.Normal(self.prior_mean, self.prior_cov)
@@ -137,32 +150,14 @@ class NormalRegressor(Base):
     def model_x(self):
         return self._model_x
 
-    def _set_model_x(self, val):
-        self._model_x = val
-        self._space['x'] = val.space
-
     @model_x.setter
     def model_x(self, val):
-        self._set_model_x(val)
+        self._model_x = val
         self._reset_posterior()
 
     @property
     def basis_y_x(self):
         return self._basis_y_x
-
-    def _set_basis_y_x(self, val):
-        if val is None:
-            def power_func(i):
-                return lambda x: np.full(self.shape['y'], (x ** i).sum())
-
-            self._basis_y_x = tuple(power_func(i) for i in range(len(self.prior_mean)))
-        else:
-            self._basis_y_x = val
-
-    @basis_y_x.setter
-    def basis_y_x(self, val):
-        self._set_basis_y_x(val)
-        self._reset_posterior()
 
     @property
     def cov_y_x(self):
@@ -170,10 +165,6 @@ class NormalRegressor(Base):
 
     def _set_cov_y_x(self, val):
         self._cov_y_x = np.array(val)
-
-        _temp = self._cov_y_x.shape
-        self._space['y'] = spaces.Euclidean(_temp[:int(len(_temp) / 2)])
-
         self._prec_U_y_x = _PSD(self._cov_y_x.reshape(2 * (self.size['y'],)), allow_singular=False).U
 
     @cov_y_x.setter
@@ -206,17 +197,10 @@ class NormalRegressor(Base):
         self._prior_model_cov = self._make_posterior_model_cov(self.prior_cov)
 
 
-# def rsetattr(obj, attr, val):
-#     pre, _, post = attr.rpartition('.')
-#     # return setattr(rgetattr(obj, pre) if pre else obj, post, val)
-#     return super().__setattr__(post, val)
-#
-#
-# def rgetattr(obj, attr, *args):
-#     def _getattr(obj_, attr_):
-#         return getattr(obj_, attr_, *args)
-#
-#     return functools.reduce(_getattr, [obj] + attr.split('.'))
+if __name__ == '__main__':
+    a = NormalRegressor(prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
+                        model_x=rand_elements.Normal(), rng=None)
+    qq = None
 
 
 class Dirichlet(Base):

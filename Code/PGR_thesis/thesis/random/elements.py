@@ -283,7 +283,7 @@ class FiniteRV(MixinRV, Finite):
 
 
 def _dirichlet_check_input(x, alpha_0, mean):
-    x, set_shape = check_valid_pmf(x, data_shape=mean.shape)
+    x, set_shape = check_valid_pmf(x, shape=mean.shape)
 
     if np.logical_and(x == 0, mean < 1 / alpha_0).any():
         raise ValueError("Each element in 'x' must be greater than "
@@ -368,7 +368,7 @@ class Dirichlet(BaseRV):
 
 
 def _empirical_check_input(x, n, mean):
-    x, set_shape = check_valid_pmf(x, data_shape=mean.shape)
+    x, set_shape = check_valid_pmf(x, shape=mean.shape)
 
     if (np.minimum((n * x) % 1, (-n * x) % 1) > 1e-9).any():
         raise ValueError("Each entry in 'x' must be a multiple of 1/n.")
@@ -609,6 +609,9 @@ class Normal(BaseRV):
         self._space = spaces.Euclidean(np.array(mean).shape)
 
         self.mean = mean
+        # self._mean = np.array(mean)
+        # self._mean_flat = self._mean.flatten()
+
         self.cov = cov
 
     def __repr__(self):
@@ -691,8 +694,6 @@ class Normal(BaseRV):
 
 class NormalLinear(Normal):     # TODO: rework, only allow weights and cov to be set?
     def __init__(self, weights=(0.,), basis=np.ones(1), cov=(1.,), rng=None):
-        # self._set_weights(weights)
-        # self._set_basis(basis)
         self._basis = np.array(basis)
 
         _mean_temp = np.empty(self._basis.shape[:-1])
@@ -709,34 +710,14 @@ class NormalLinear(Normal):     # TODO: rework, only allow weights and cov to be
 
     @weights.setter
     def weights(self, val):
-        # self._set_weights(val)
-        # self._set_mean()
         self._weights = np.array(val)
         if self._weights.ndim != 1:
-            raise ValueError
+            raise ValueError("Weights must be 1-dimensional.")
         self.mean = self._basis @ self._weights
-
-    # def _set_weights(self, val):
-    #     self._weights = np.array(val)
-    #     if self._weights.ndim != 1:
-    #         raise ValueError
 
     @property
     def basis(self):
         return self._basis
-
-    # @basis.setter
-    # def basis(self, val):
-    #     self._set_basis(val)
-    #     self._set_mean()
-
-    # def _set_basis(self, val):
-    #     self._basis = np.array(val)
-    #     self._shape = self._basis.shape[:-1]
-
-    # def _set_mean(self):
-    #     self.mean = self._basis @ self._weights
-
 
 # bs = [[1, 0], [0, 1], [1, 1]]
 # a = NormalLinear(weights=np.ones(2), basis=np.array(bs), cov=np.eye(3))

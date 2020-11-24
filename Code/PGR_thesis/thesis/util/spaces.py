@@ -311,10 +311,11 @@ class Box(Continuous):      # TODO: make Box inherit from Euclidean?
 
     def set_x_plot(self, x=None):   # TODO: simplify?
         if x is None:
-            if self.shape in {(), (2,)}:
-                self.x_plt = box_grid(self.lims_plot, 100, endpoint=False)
-            else:
-                self.x_plt = None
+            self.x_plt = box_grid(self.lims_plot, 100, endpoint=False)
+            # if self.shape in {(), (2,)}:
+            #     self.x_plt = box_grid(self.lims_plot, 100, endpoint=False)
+            # else:
+            #     self.x_plt = None
         else:
             self.x_plt = np.array(x)
 
@@ -342,7 +343,8 @@ class Box(Continuous):      # TODO: make Box inherit from Euclidean?
 class Euclidean(Box):
     def __init__(self, shape):
         lims = np.broadcast_to([-np.inf, np.inf], (*shape, 2))
-        self._lims_plot = np.array([-1, 1])  # defaults
+        # self._lims_plot = np.array([-1, 1])  # defaults
+        self._lims_plot = np.broadcast_to([-1, 1], shape=(*shape, 2))
         super().__init__(lims)
 
     def __repr__(self):
