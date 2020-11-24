@@ -1,4 +1,5 @@
 import math
+from functools import partial
 
 import numpy as np
 from scipy import optimize, integrate
@@ -6,6 +7,7 @@ from matplotlib import pyplot as plt
 
 from thesis.util.plotting import simplex_grid, box_grid
 from thesis.util.base import check_data_shape
+from thesis.util import plotting
 
 # plt.style.use('seaborn')
 
@@ -103,6 +105,55 @@ class Finite(Discrete):
 
 
 #%%
+
+# class Grid(Finite):
+#     def __init__(self, *vecs):
+#         # self.vecs = list(map(lambda v: np.sort(np.array(v, dtype=np.float).flatten()), vecs))
+#         self.vecs = tuple(np.sort(np.array(vec, dtype=np.float).flatten()) for vec in vecs)
+#         super().__init__((len(self.vecs),), np.float)
+#
+#     def __repr__(self):
+#         return f"Grid({self.vecs})"
+#
+#     def __eq__(self, other):
+#         if isinstance(other, Grid):
+#             return self.vecs == other.vecs
+#         return NotImplemented
+#
+#     def __contains__(self, item):
+#         return all(x_i in vec for x_i, vec in zip(item, self.vecs))
+#
+#     def set_x_plot(self, x=None):
+#         if x is None:
+#             self.x_plt = plotting.mesh_grid(*self.vecs)
+#         else:
+#             self.x_plt = np.array(x)
+#
+#     def plot(self, f, x=None, ax=None, label=None):
+#         if ax is None:
+#             ax = self.make_axes()
+#
+#         x, y, set_shape = self._eval_func(f, x)
+#
+#         set_ndim = len(set_shape)
+#         if set_ndim == 1 and self.shape == ():
+#             return ax.stem(x, y, use_line_collection=True, label=label)
+#
+#         elif set_ndim == 2 and self.shape == (2,):
+#             return ax.bar3d(x[..., 0].flatten(), x[..., 1].flatten(), 0, 1, 1, y.flatten(), shade=True)
+#
+#         elif set_ndim == 3 and self.shape == (3,):
+#             plt_data = ax.scatter(x[..., 0], x[..., 1], x[..., 2], s=15, c=y, label=label)
+#
+#             c_bar = plt.colorbar(plt_data)
+#             c_bar.set_label('$f(x)$')
+#
+#             return plt_data
+#
+#         else:
+#             raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
+
+
 class FiniteGeneric(Finite):
     def __init__(self, values, shape=()):       # TODO: flatten and ignore set shape?
         self.values = np.array(values)
@@ -138,20 +189,11 @@ class FiniteGeneric(Finite):
         else:
             return False
 
-    # def argmax(self, f):      # TODO: delete?
-    #     x, y, set_shape = self._eval_func(f, self.values)
-    #
-    #     x_flat, y_flat = x.reshape(-1, *self.shape), y.flatten()
-    #     return x_flat[np.argmax(y_flat)]
-
     def _minimize(self, f):
-        # def g(i):
-        #     return f(self._vals_flat[int(i)])
-
         # ranges = (np.mgrid[:self.set_size],)
         ranges = (slice(self.set_size), )
         i_opt = int(optimize.brute(lambda i: f(self._vals_flat[int(i)]), ranges))
-        # i_opt = int(optimize.brute(g, (np.mgrid[:self.set_size],)))     # ignore type inspection
+
         return self._vals_flat[i_opt]
 
     def integrate(self, f):

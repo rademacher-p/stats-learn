@@ -92,3 +92,26 @@ supp_y_s = np.array(list(itertools.product(supp_y.reshape((-1,) + data_shape_y))
 # theta_m = Finite(supp_x_s['x'], theta_m_pmf)
 # theta_m_s = Finite(supp_x_s, theta_m_pmf)
 
+# def main():
+#     alpha_0 = alpha_0_plot = supp_x_s.size * supp_y_s.size
+#
+#     # mean = np.ones(supp_x_s.shape + supp_y_s.shape) / (supp_x_s.size * supp_y_s.size)
+#
+#     mean_x = FiniteDomainFunc(supp_x, np.ones(supp_x_s.shape) / supp_x_s.size)
+#
+#     mean_y_x = FiniteDomainFunc(supp_x, np.full(supp_x_s.shape,
+#                                                 FiniteDomainFunc(supp_y, np.ones(supp_y_s.shape) / supp_y_s.size)))
+#
+#     # bayes_model = DirichletFiniteYcXModelBayes(supp_x_s, supp_y_s, alpha_0, mean,
+#     #                                            rng_model=default_rng(6),
+#     #                                            rng_prior=default_rng(5))
+#     bayes_model = DirichletFiniteYcXModelBayesNew(alpha_0, mean_x, mean_y_x,
+#                                                   rng_model=default_rng(6),
+#                                                   rng_prior=default_rng(5))
+#
+#     learner = ModelClassifier(bayes_model)
+#
+#     loss = learn_eval_mc_bayes(bayes_model, learner, n_train=10, n_test=1, n_mc=5, verbose=False)
+#
+#     bayes_model = BetaModelBayes()
+#     learner = BetaEstimatorTemp(n_x=10)

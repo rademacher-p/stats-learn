@@ -227,10 +227,10 @@ class Finite(Base):     # TODO: DRY - use stat approx from the Finite space's me
         return rng.choice(self._supp_flat, size=n, p=self._p_flat)
 
     def _pf_single(self, x):
-        # eq_supp = np.all(x == self._supp_flat, axis=tuple(range(1, 1 + self.ndim)))
-        eq_supp = np.empty(self.space.set_size, dtype=np.bool)
-        for i, val in enumerate(self._supp_flat):
-            eq_supp[i] = np.allclose(x, val)
+        eq_supp = np.all(x == self._supp_flat, axis=tuple(range(1, 1 + self.ndim)))
+        # eq_supp = np.empty(self.space.set_size, dtype=np.bool)
+        # for i, val in enumerate(self._supp_flat):
+        #     eq_supp[i] = np.allclose(x, val)
 
         if eq_supp.sum() == 0:
             raise ValueError("Input 'x' must be in the support.")
@@ -628,10 +628,8 @@ class Normal(BaseRV):
 
         self._mode = self._mean
 
-        try:
-            self._set_x_plot()
-        except AttributeError:      # TODO: workaround for init - wack?
-            pass
+        if hasattr(self, '_cov'):
+            self._set_x_plot()      # avoids call before cov is set
 
     @property
     def cov(self):
@@ -763,7 +761,7 @@ class DataEmpirical(Base):
     def __init__(self, values, counts, space=None, rng=None):
         super().__init__(rng)
 
-        values, counts = np.array(values), np.array(counts)
+        values, counts = map(np.array, (values, counts))
         if space is None:
             if np.issubdtype(values.dtype, np.number):
                 self._space = spaces.Euclidean(values.shape[1:])
@@ -804,7 +802,7 @@ class DataEmpirical(Base):
             raise ValueError
 
     def add_values(self, values, counts):
-        values, counts = np.array(values), np.array(counts)
+        values, counts = map(np.array, (values, counts))
         n_new = counts.sum(dtype=np.int)
         if n_new == 0:
             return
@@ -921,23 +919,26 @@ class Mixture(Base):
             setattr(dist, key, val)
         self._update_attr()
 
-    def add_dist(self, dist, weight):       # TODO: type check?
-        self._dists.append(dist)
-        self.weights.append(weight)
-        self._update_attr()
+    # def add_dist(self, dist, weight):
+    #     self._dists.append(dist)
+    #     self.weights.append(weight)
+    #     self._update_attr()
 
-    def set_dist(self, idx, dist, weight):
-        try:
-            self._dists[idx] = dist
-            self.weights[idx] = weight
-            self._update_attr()     # weights setter not invoked
-        except IndexError:
-            self.add_dist(dist, weight)
+    def set_dist(self, idx, dist, weight):  # TODO: type check?
+        self._dists[idx] = dist
+        self.weights[idx] = weight
+        self._update_attr()  # weights setter not invoked
+        # try:
+        #     self._dists[idx] = dist
+        #     self.weights[idx] = weight
+        #     self._update_attr()     # weights setter not invoked
+        # except IndexError:
+        #     self.add_dist(dist, weight)
 
-    def del_dist(self, idx):
-        del self._dists[idx]
-        del self.weights[idx]
-        self._update_attr()
+    # def del_dist(self, idx):
+    #     del self._dists[idx]
+    #     del self.weights[idx]
+    #     self._update_attr()
 
     def _update_attr(self):
         self._set_x_plot()
