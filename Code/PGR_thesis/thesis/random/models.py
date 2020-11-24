@@ -355,23 +355,29 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):        # TODO: rename NormalLin
     def __init__(self, weights=(0.,), basis_y_x=None, cov_y_x=1., model_x=rand_elements.Normal(), rng=None):
         super().__init__(rng)
 
+        self._space['x'] = model_x.space
         self.model_x = model_x
+
         self.weights = weights
         self.cov_y_x_ = cov_y_x
 
         self._mode_y_x_single = self._mean_y_x_single
 
-        if basis_y_x is None:       # TODO: vectorize basis funcs for speed?
+        if basis_y_x is None:
             def power_func(i):
-                return lambda x: np.full(self.shape['y'], (x ** i).sum())
+                return vectorize_func(lambda x: np.full(self.shape['y'], (x ** i).sum()), shape=self.shape['x'])
 
-            self.basis_y_x = tuple(power_func(i) for i in range(len(self.weights)))
+            self._basis_y_x = tuple(power_func(i) for i in range(len(self.weights)))
         else:
-            self.basis_y_x = basis_y_x
+            self._basis_y_x = basis_y_x
 
     def __repr__(self):
         return f"NormalModel(model_x={self.model_x}, basis_y_x={self.basis_y_x}, " \
                f"weights={self.weights}, cov_y_x={self._cov_repr})"
+
+    @property
+    def basis_y_x(self):
+        return self._basis_y_x
 
     @property
     def model_x(self):
@@ -381,19 +387,18 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):        # TODO: rename NormalLin
     def model_x(self, model_x):
         self._model_x = model_x
 
-        self._space['x'] = self._model_x.space
         self._mode_x = self._model_x.mode
 
         self._mean_x = self._model_x.mean
         self._cov_x = self._model_x.cov
 
-    @property
-    def weights(self):
-        return self._weights
-
-    @weights.setter
-    def weights(self, val):
-        self._weights = np.array(val)
+    # @property
+    # def weights(self):
+    #     return self._weights
+    #
+    # @weights.setter
+    # def weights(self, val):
+    #     self._weights = np.array(val)
 
     @property
     def cov_y_x_(self):
@@ -412,18 +417,23 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):        # TODO: rename NormalLin
 
         self._space['y'] = spaces.Euclidean(_temp[:int(len(_temp) / 2)])
 
-    def _mean_y_x_single(self, x):
-        return sum(weight * func(x) for weight, func in zip(self.weights, self.basis_y_x))
+    # def _mean_y_x_single(self, x):
+    #     return sum(weight * func(x) for weight, func in zip(self.weights, self._basis_y_x))
+
+    def mean_y_x(self, x):
+        return sum(weight * func(x) for weight, func in zip(self.weights, self._basis_y_x))
 
     def model_y_x(self, x):
-        mean = self._mean_y_x_single(x)
+        # mean = self._mean_y_x_single(x)
+        mean = self.mean_y_x(x)
         cov = self._cov_y_x_single(x)
         return rand_elements.Normal(mean, cov)
 
 
-# g = NormalRegressor(basis_y_x=(lambda x: x**2,), weights=(1,), cov_y_x=.01, model_x=rand_elements.Normal(4))
+# g = NormalRegressor(basis_y_x=(lambda x: 1, lambda x: x**2,), weights=(1, 2), cov_y_x=.01, model_x=rand_elements.Normal(4))
 # r = g.rvs(100)
 # # plt.plot(r['x'], r['y'], '.')
+# g.mean_y_x(np.linspace(0, 2, 20, endpoint=True))
 # qq = None
 
 
