@@ -62,12 +62,18 @@ class NormalLinear(Base):
         if self.prior.ndim > 1:
             raise ValueError
 
-        # Model
-        self._set_cov(cov)
-        self._set_basis(basis)
+        _temp = np.array(cov).shape
+        self._space = spaces.Euclidean(_temp[:int(len(_temp) / 2)])
 
+        # Model
+        if basis is None:
+            self._basis = np.vstack((np.eye(self.prior.size),
+                                     np.zeros((self.size - self.prior.size, self.prior.size))))
+        else:
+            self._basis = np.array(basis)
+
+        self._set_cov(cov)
         self._set_prior_persistent_attr()
-        self._set_basis_white()
 
         # Learning
         self.posterior = rand_elements.Normal(self.prior_mean, self.prior_cov)
@@ -124,39 +130,19 @@ class NormalLinear(Base):
     def basis(self):
         return self._basis
 
-    def _set_basis(self, val):
-        if val is None:
-            # self._basis = np.ones((self.size, self.prior.size))
-            self._basis = np.vstack((np.eye(self.prior.size), np.zeros((self.size - self.prior.size, self.prior.size))))
-        else:
-            self._basis = np.array(val)
-
-    @basis.setter
-    def basis(self, val):
-        self._set_basis(val)
-        self._set_basis_white()
-        self._reset_posterior()
-
     @property
     def cov(self):
         return self._cov
 
     def _set_cov(self, val):
         self._cov = np.array(val)
-
-        _temp = self._cov.shape
-        self._space = spaces.Euclidean(_temp[:int(len(_temp) / 2)])
-
         self._prec_U = _PSD(self._cov.reshape(2 * (self.size,)), allow_singular=False).U
+        self._basis_white = np.dot(self.basis.T, self._prec_U).T
 
     @cov.setter
     def cov(self, val):
         self._set_cov(val)
-        self._set_basis_white()
         self._reset_posterior()
-
-    def _set_basis_white(self):
-        self._basis_white = np.dot(self.basis.T, self._prec_U).T
 
     # Prior parameters
     @property
@@ -191,6 +177,7 @@ class NormalLinear(Base):
 # print(a.prior.mean)
 # print(a.posterior.mean)
 # print(r.weights)
+# qq = None
 
 
 class Dirichlet(Base):

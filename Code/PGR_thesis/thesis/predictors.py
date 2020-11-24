@@ -394,14 +394,14 @@ class Base(ABC):
         raise NotImplementedError
 
     def predict(self, x):
-        return vectorize_func(self._predict_single, data_shape=self.shape['x'])(x)
+        return vectorize_func(self._predict_single, shape=self.shape['x'])(x)
 
     def _predict_single(self, x):
         # raise NotImplementedError("Method must be overwritten.")  # TODO: numeric approx with loss and predictive!?
         pass
 
     def evaluate(self, d):
-        loss = self.loss_func(self.predict(d['x']), d['y'], data_shape=self.shape['y'])
+        loss = self.loss_func(self.predict(d['x']), d['y'], shape=self.shape['y'])
         return loss.mean()
 
     def evaluate_from_model(self, model, n_test=1, n_mc=1, rng=None):
