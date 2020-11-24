@@ -5,9 +5,8 @@ Supervised learning functions.
 import math
 from numbers import Integral
 from itertools import product
-from copy import deepcopy
+import copy
 from abc import ABC, abstractmethod
-
 import numpy as np
 from scipy.stats import mode
 import matplotlib.pyplot as plt
@@ -68,7 +67,7 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
     x, set_shape = check_data_shape(x, shape['x'])
     n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
 
-    model = deepcopy(model)
+    model = copy.deepcopy(model)
     model.rng = rng
 
     # Generate random data and make predictions
@@ -82,7 +81,7 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
 
     for i_mc in range(n_mc):
         if verbose:
-            print(f"{i_mc+1}/{n_mc}")
+            print(f"Stats iteration: {i_mc+1}/{n_mc}")
 
         d = model.rvs(n_train_delta.sum())
         d_iter = np.split(d, np.cumsum(n_train_delta)[:-1])
@@ -242,7 +241,7 @@ def loss_eval_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=
 
     n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
 
-    model = deepcopy(model)
+    # model = copy.deepcopy(model)   # FIXME: __new__ issue?
     model.rng = rng
 
     loss_full = []
@@ -253,7 +252,7 @@ def loss_eval_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=
 
     for i_mc in range(n_mc):
         if verbose:
-            print(f"{i_mc+1}/{n_mc}")
+            print(f"Loss iteration: {i_mc+1}/{n_mc}")
 
         d = model.rvs(n_test + n_train_delta.sum())
         d_test, _d_train = d[:n_test], d[n_test:]
@@ -379,12 +378,12 @@ class Base(ABC):
     def _model_obj(self):
         raise NotImplementedError
 
-    def set_params(self, **kwargs):     # TODO: improve?
+    def set_params(self, **kwargs):     # TODO: improve? wrapper to ignore non-changing param set?
         for key, val in kwargs.items():
             setattr(self._model_obj, key, val)
 
-    def get_params(self, *args):
-        return {arg: getattr(self._model_obj, arg) for arg in args}
+    # def get_params(self, *args):
+    #     return {arg: getattr(self._model_obj, arg) for arg in args}
 
     @abstractmethod
     def fit(self, d=None, warm_start=False):

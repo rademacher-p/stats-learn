@@ -121,10 +121,11 @@ class MixinRVy:
 #     def __init__(self, model_x, model_y_x, rng=None):
 #         super().__init__(rng)
 #         self._model_x = model_x
+#         self._space['x'] = self._model_x.space
 #         self._update_x()
 #
-#         self._model_y_x = model_y_x
-#         self._update_y_x()
+#         self._model_y_x_ = model_y_x
+#         self._space['y'] = self.model_y_x(self._model_x.rvs()).space
 #
 #     @property
 #     def model_x(self):
@@ -135,57 +136,33 @@ class MixinRVy:
 #         self._model_x = model_x
 #         self._update_x()
 #
-#     def model_y_x(self, x):
-#         return self._model_y_x
-#
-#     @model_y_x.setter
-#     def model_y_x(self, model_y_x):
-#         self._model_y_x = model_y_x
-#         self._update_y_x()
-#
 #     def _update_x(self):
-#         self._space['x'] = self._model_x.space
 #         self._mode_x = self._model_x.mode
 #
-#     def _update_y_x(self):
-#         self._space['y'] = self._model_y_x(self._model_x.rvs()).space
-#         # self._mode_y_x = vectorize_func(lambda x: self._model_y_x(x).mode, self.shape['x'])
-#         # self._mode_y_x_single = lambda x: self._model_y_x(x).mode
+#     def model_y_x(self, x):
+#         return self.model_y_x_(x)
+#
+#     @property
+#     def model_y_x_(self):
+#         return self._model_y_x_
+#
+#     @model_y_x_.setter
+#     def model_y_x_(self, model_y_x):
+#         self._model_y_x_ = model_y_x
 #
 #     def _mode_y_x_single(self, x):
-#         return self._model_y_x(x).mode
+#         return self.model_y_x(x).mode
 #
 #     @classmethod
-#     def finite_model(cls, supp_x, p_x, supp_y, p_y_x, rng=None):
+#     def from_finite(cls, dists, supp_x, p_x=None, rng=None):
 #         model_x = rand_elements.Finite(supp_x, p_x)
 #
-#         def model_y_x(x): return rand_elements.Finite(supp_y, p_y_x(x))
+#         def model_y_x(x):
+#             eq_supp = np.all(x == model_x.space._vals_flat, axis=tuple(range(1, 1 + model_x.space.ndim)))
+#             idx = np.flatnonzero(eq_supp).item()
+#             return dists[idx]
 #
 #         return cls(model_x, model_y_x, rng)
-#
-#     # @classmethod
-#     # def finite_model_orig(cls, supp_x, p_x, supp_y, p_y_x, rng=None):
-#     #     model_x = FiniteRE.gen_func(supp_x, p_x)
-#     #
-#     #     def model_y_x(x): return FiniteRE.gen_func(supp_y, p_y_x(x))
-#     #
-#     #     return cls(model_x, model_y_x, rng)
-#     #
-#     # @classmethod
-#     # def finite_model(cls, p_x, p_y_x, rng=None):
-#     #     model_x = FiniteRE(p_x)
-#     #
-#     #     def model_y_x(x): return FiniteRE(p_y_x(x))
-#     #
-#     #     return cls(model_x, model_y_x, rng)
-#
-#     # @classmethod
-#     # def beta_model(cls, a, b, c, rng=None):
-#     #     model_x = BetaRV(a, b)
-#     #
-#     #     def model_y_x(x): return BetaRV(c*x, c*(1-x))
-#     #
-#     #     return cls(model_x, model_y_x, rng)
 #
 #
 # class DataConditionalRVx(MixinRVx, DataConditional):
@@ -196,21 +173,11 @@ class MixinRVy:
 #
 #
 # class DataConditionalRVy(MixinRVy, DataConditional):
-#     def _update_y_x(self):
-#         super()._update_y_x()
-#         # self._mean_y_x = vectorize_func(lambda x: self._model_y_x(x).mean, self.shape['x'])
-#         # self._cov_y_x = vectorize_func(lambda x: self._model_y_x(x).cov, self.shape['x'])
-#         # self._mean_y_x_single = lambda x: self._model_y_x(x).mean
-#         # self._cov_y_x_single = lambda x: self._model_y_x(x).cov
-#
-#     def mean_y_x(self, x):
-#         return vectorize_func(self._mean_y_x_single, self.shape['x'])(x)
-#
 #     def _mean_y_x_single(self, x):
-#         return self._model_y_x(x).mean
+#         return self.model_y_x(x).mean
 #
 #     def _cov_y_x_single(self, x):
-#         return self._model_y_x(x).cov
+#         return self.model_y_x(x).cov
 #
 #
 # class DataConditionalRVxy(DataConditionalRVy, DataConditionalRVx):
@@ -234,13 +201,91 @@ class MixinRVy:
 # t.mean_y_x(t.model_x.rvs(4))
 # t.cov_y_x(t.model_x.rvs(4))
 
+class DataConditional(Base):
+    def __new__(cls, dists, model_x, rng=None):
+        is_numeric_y = all(isinstance(dist, rand_elements.MixinRV) for dist in dists)
+        if isinstance(model_x, rand_elements.MixinRV):
+            if is_numeric_y:
+                return super().__new__(DataConditionalRVxy)
+            else:
+                return super().__new__(DataConditionalRVx)
+        else:
+            if is_numeric_y:
+                return super().__new__(DataConditionalRVy)
+            else:
+                return super().__new__(cls)
+
+    def __init__(self, dists, model_x, rng=None):
+        super().__init__(rng)
+
+        self._dists = list(dists)
+        self._model_x = model_x
+
+        self._space['x'] = self.model_x.space
+        if self.space['x'].set_size != len(self.dists):
+            raise ValueError("Incorrect number of conditional distributions.")
+
+        self._space['y'] = spaces.check_spaces(self.dists)
+
+        self._update_attr()
+
+    dists = property(lambda self: self._dists)
+    model_x = property(lambda self: self._model_x)
+
+    @property
+    def p_x(self):
+        return self.model_x.p
+
+    @p_x.setter
+    def p_x(self, val):
+        self.model_x.p = val
+        self._update_attr()
+
+    def _update_attr(self):
+        self._mode_x = self.model_x.mode
+
+    def model_y_x(self, x):
+        idx = self.space['x'].values.tolist().index(x)
+        return self.dists[idx]
+
+    def _mode_y_x_single(self, x):
+        return self.model_y_x(x).mode
+
+    @classmethod
+    def from_finite(cls, dists, supp_x, p_x=None, rng=None):
+        model_x = rand_elements.Finite(supp_x, p_x)
+        return cls(dists, model_x, rng)
+        # def model_y_x(x):
+        #     eq_supp = np.all(x == model_x.space._vals_flat, axis=tuple(range(1, 1 + model_x.space.ndim)))
+        #     idx = np.flatnonzero(eq_supp).item()
+        #     return dists[idx]
+
+
+class DataConditionalRVx(MixinRVx, DataConditional):
+    def _update_attr(self):
+        super()._update_attr()
+        self._mean_x = self._model_x.mean
+        self._cov_x = self._model_x.cov
+
+
+class DataConditionalRVy(MixinRVy, DataConditional):
+    def _mean_y_x_single(self, x):
+        return self.model_y_x(x).mean
+
+    def _cov_y_x_single(self, x):
+        return self.model_y_x(x).cov
+
+
+class DataConditionalRVxy(DataConditionalRVy, DataConditionalRVx):
+    pass
+
 
 class ClassConditional(MixinRVx, Base):
     def __init__(self, dists, model_y, rng=None):
         super().__init__(rng)
 
         self._dists = list(dists)
-        self.model_y = model_y
+        self._model_y = model_y
 
         self._space['y'] = self.model_y.space
         if self.space['y'].ndim != 0 or not np.issubdtype(self.space['y'].dtype, 'U'):
@@ -249,20 +294,21 @@ class ClassConditional(MixinRVx, Base):
             raise ValueError("Incorrect number of conditional distributions.")
 
         self._space['x'] = spaces.check_spaces(self.dists)
-        # self._space['x'] = self.dists[0].space
-        # if not all(dist.space == self._space['x'] for dist in self.dists[1:]):
-        #     raise ValueError("All distributions must have the same space.")
 
         self._update_attr()
 
     @classmethod
-    def from_finite(cls, dists, y, p_y=None, rng=None):
-        model_y = rand_elements.Finite(np.array(y, dtype='U').flatten(), p_y)
+    def from_finite(cls, dists, supp_y, p_y=None, rng=None):
+        model_y = rand_elements.Finite(np.array(supp_y, dtype='U').flatten(), p_y)
         return cls(dists, model_y, rng)
 
-    @property
-    def dists(self):
-        return self._dists
+    dists = property(lambda self: self._dists)
+    model_y = property(lambda self: self._model_y)
+
+    def set_dist_attr(self, idx, **dist_kwargs):
+        for key, val in dist_kwargs.items():
+            setattr(self._dists[idx], key, val)
+        self._update_attr()
 
     @property
     def p_y(self):
@@ -271,11 +317,6 @@ class ClassConditional(MixinRVx, Base):
     @p_y.setter
     def p_y(self, val):
         self.model_y.p = val
-        self._update_attr()
-
-    def set_dist_attr(self, idx, **dist_kwargs):
-        for key, val in dist_kwargs.items():
-            setattr(self._dists[idx], key, val)
         self._update_attr()
 
     def _update_attr(self):
@@ -408,7 +449,7 @@ class DataEmpirical(Base):
     def __init__(self, values, counts, space=None, rng=None):
         super().__init__(rng)
 
-        values, counts = np.array(values), np.array(counts)
+        values, counts = map(np.array, (values, counts))
         if space is None:
             dtype = np.array(values).dtype
             for c in 'xy':
@@ -444,7 +485,7 @@ class DataEmpirical(Base):
                                ('n', np.int,)])
 
     def add_values(self, values, counts):
-        values, counts = np.array(values), np.array(counts)
+        values, counts = map(np.array, (values, counts))
         n_new = counts.sum(dtype=np.int)
         # if n_new == 0:
         #     return
@@ -577,23 +618,26 @@ class Mixture(Base):
             setattr(self._dists[idx], key, val)
         self._update_attr()
 
-    def add_dist(self, dist, weight):       # TODO: type check?
-        self._dists.append(dist)
-        self.weights.append(weight)
-        self._update_attr()
+    # def add_dist(self, dist, weight):
+    #     self._dists.append(dist)
+    #     self.weights.append(weight)
+    #     self._update_attr()
 
-    def set_dist(self, idx, dist, weight):
-        try:
-            self._dists[idx] = dist
-            self.weights[idx] = weight
-            self._update_attr()     # weights setter not invoked
-        except IndexError:
-            self.add_dist(dist, weight)
+    def set_dist(self, idx, dist, weight):  # TODO: type check?
+        self._dists[idx] = dist
+        self.weights[idx] = weight
+        self._update_attr()  # weights setter not invoked
+        # try:
+        #     self._dists[idx] = dist
+        #     self.weights[idx] = weight
+        #     self._update_attr()     # weights setter not invoked
+        # except IndexError:
+        #     self.add_dist(dist, weight)
 
-    def del_dist(self, idx):
-        del self._dists[idx]
-        del self.weights[idx]
-        self._update_attr()
+    # def del_dist(self, idx):
+    #     del self._dists[idx]
+    #     del self.weights[idx]
+    #     self._update_attr()
 
     def _update_attr(self):
         self._p = np.array(self._weights) / sum(self.weights)

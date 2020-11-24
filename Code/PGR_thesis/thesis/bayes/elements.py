@@ -194,18 +194,19 @@ class NormalLinear(Base):
 
 
 class Dirichlet(Base):
-    def __init__(self, alpha_0, prior_mean, rng=None):
+    def __init__(self, prior_mean, alpha_0, rng=None):
         super().__init__(prior=None, rng=rng)
-        self.alpha_0 = alpha_0
-        self.prior_mean = prior_mean
-
-        self._space = self.prior_mean.space
-
-        # Learning
-        self.posterior = None
+        self._space = prior_mean.space
 
         _emp_dist = rand_elements.DataEmpirical([], [], space=self.space)
-        self.posterior_model = rand_elements.Mixture([self.prior_mean, _emp_dist], [self.alpha_0, _emp_dist.n])
+        self.posterior_model = rand_elements.Mixture([prior_mean, _emp_dist], [alpha_0, _emp_dist.n])
+
+    def __setattr__(self, name, value):
+        if name.startswith('prior_mean.'):
+            # setattr(self.prior_mean, name.removeprefix('prior_mean.'), value)
+            self.posterior_model.set_dist_attr(0, **{name.removeprefix('prior_mean.'): value})
+        else:
+            super().__setattr__(name, value)
 
     # def __getattribute__(self, name):
     #     try:
@@ -219,14 +220,30 @@ class Dirichlet(Base):
     #     except AttributeError:
     #         super().__setattr__(name, value)
 
-    def __setattr__(self, name, value):     # TODO: better way?
-        if name in ('alpha_0', 'prior_mean', 'emp_dist', 'posterior_model',):
-            super().__setattr__(name, value)
-        else:
-            try:
-                self.posterior_model.set_dist_attr(0, **{name: value})
-            except AttributeError:
-                super().__setattr__(name, value)
+    # def __setattr__(self, name, value):     # TODO: better way?
+    #     if name in ('alpha_0', 'prior_mean', 'emp_dist', 'posterior_model',):
+    #         super().__setattr__(name, value)
+    #     else:
+    #         try:
+    #             self.posterior_model.set_dist_attr(0, **{name: value})
+    #         except AttributeError:
+    #             super().__setattr__(name, value)
+
+    @property
+    def prior_mean(self):
+        return self.posterior_model.dists[0]
+
+    @prior_mean.setter
+    def prior_mean(self, val):
+        self.posterior_model.set_dist(0, val, self.alpha_0)
+
+    @property
+    def alpha_0(self):
+        return self.posterior_model.weights[0]
+
+    @alpha_0.setter
+    def alpha_0(self, val):
+        self.posterior_model.weights = [val, self.n]
 
     @property
     def emp_dist(self):
@@ -235,6 +252,8 @@ class Dirichlet(Base):
     @emp_dist.setter
     def emp_dist(self, val):
         self.posterior_model.set_dist(1, val, val.n)
+
+    n = property(lambda self: self.emp_dist.n)
 
     def random_model(self, rng=None):
         raise NotImplementedError       # TODO: implement for finite in subclass?
@@ -272,7 +291,7 @@ if __name__ == '__main__':
     theta.plot_pf()
     plt.title("True")
 
-    a = Dirichlet(alpha_0=10, prior_mean=alpha)
+    a = Dirichlet(prior_mean=alpha, alpha_0=10)
 
     # a.rvs(5)
     print(f"Mode = {a.posterior_model.mode}")

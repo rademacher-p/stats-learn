@@ -2,6 +2,8 @@
 Bayesian SL models.
 """
 
+import functools
+
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy.stats._multivariate import _PSD
@@ -204,26 +206,52 @@ class NormalRegressor(Base):
         self._prior_model_cov = self._make_posterior_model_cov(self.prior_cov)
 
 
+# def rsetattr(obj, attr, val):
+#     pre, _, post = attr.rpartition('.')
+#     # return setattr(rgetattr(obj, pre) if pre else obj, post, val)
+#     return super().__setattr__(post, val)
+#
+#
+# def rgetattr(obj, attr, *args):
+#     def _getattr(obj_, attr_):
+#         return getattr(obj_, attr_, *args)
+#
+#     return functools.reduce(_getattr, [obj] + attr.split('.'))
+
+
 class Dirichlet(Base):
-    def __init__(self, alpha_0, prior_mean, rng=None):
+    def __init__(self, prior_mean, alpha_0, rng=None):
         super().__init__(prior=None, rng=rng)
-        self.alpha_0 = alpha_0
-        self.prior_mean = prior_mean
+        self._space = prior_mean.space
 
-        self._space = self.prior_mean.space
-
-        # Learning
         _emp_dist = rand_models.DataEmpirical([], [], space=self.space)
-        self.posterior_model = rand_models.Mixture([self.prior_mean, _emp_dist], [self.alpha_0, _emp_dist.n])
+        self.posterior_model = rand_models.Mixture([prior_mean, _emp_dist], [alpha_0, _emp_dist.n])
 
-    def __setattr__(self, name, value):     # TODO: better way?
-        if name in ('alpha_0', 'prior_mean', 'emp_dist', 'posterior_model',):
-            super().__setattr__(name, value)
+    def __repr__(self):
+        return f"Dirichlet(alpha_0={self.alpha_0}, n={self.n}, prior_mean={self.prior_mean})"
+
+    def __setattr__(self, name, value):
+        if name.startswith('prior_mean.'):
+            # setattr(self.prior_mean, name.removeprefix('prior_mean.'), value)
+            self.posterior_model.set_dist_attr(0, **{name.removeprefix('prior_mean.'): value})
         else:
-            try:
-                self.posterior_model.set_dist_attr(0, **{name: value})
-            except AttributeError:
-                super().__setattr__(name, value)
+            super().__setattr__(name, value)
+
+    @property
+    def prior_mean(self):
+        return self.posterior_model.dists[0]
+
+    @prior_mean.setter
+    def prior_mean(self, val):
+        self.posterior_model.set_dist(0, val, self.alpha_0)
+
+    @property
+    def alpha_0(self):
+        return self.posterior_model.weights[0]
+
+    @alpha_0.setter
+    def alpha_0(self, val):
+        self.posterior_model.weights = [val, self.n]
 
     @property
     def emp_dist(self):
@@ -232,6 +260,8 @@ class Dirichlet(Base):
     @emp_dist.setter
     def emp_dist(self, val):
         self.posterior_model.set_dist(1, val, val.n)
+
+    n = property(lambda self: self.emp_dist.n)
 
     def random_model(self, rng=None):
         raise NotImplementedError       # TODO: implement for finite in subclass?
@@ -287,7 +317,7 @@ if __name__ == '__main__':
     # print(f"Mode = {theta.mode}")
     # print(f"Mean = {theta.mean}")
 
-    b = Dirichlet(alpha_0=1, prior_mean=alpha)
+    b = Dirichlet(prior_mean=alpha, alpha_0=1)
     # b.posterior_model.plot_mode_y_x(ax=ax_mode)
     b.posterior_model.plot_mean_y_x(ax=ax_mode)
     b.rvs(5)
@@ -303,3 +333,4 @@ if __name__ == '__main__':
     # print(f"Mode = {b.posterior_model.mode}")
     # print(f"Mean = {b.posterior_model.mean}")
 
+    b.alpha_0 = 2
