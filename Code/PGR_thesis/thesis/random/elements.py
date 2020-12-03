@@ -192,7 +192,9 @@ class Finite(Base):     # TODO: DRY - use stat approx from the Finite space's me
         self._space = spaces.FiniteGeneric(_supp, shape=_supp.shape[p.ndim:])
 
         self.p = p
-        # self._update_attr()
+
+    def __deepcopy__(self, memodict={}):
+        return type(self)(self.supp, self.p, self.rng)
 
     def __repr__(self):
         return f"FiniteRE(support={self.supp}, p={self.p})"
@@ -785,8 +787,8 @@ class DataEmpirical(Base):
     def add_values(self, values, counts):
         values, counts = map(np.array, (values, counts))
         n_new = counts.sum(dtype=np.int)
-        if n_new == 0:
-            return
+        # if n_new == 0:
+        #     return
 
         self.n += n_new
 
@@ -808,7 +810,11 @@ class DataEmpirical(Base):
 
     def _update_attr(self):
         self._p = self.data['n'] / self.n
-        self._mode = self.data['x'][self.data['n'].argmax()]
+
+        if self.n > 0:
+            self._mode = self.data['x'][self.data['n'].argmax()]
+        else:
+            self._mode = np.nan
 
         self._set_x_plot()
 
@@ -842,19 +848,19 @@ class DataEmpiricalRV(MixinRV, DataEmpirical):
         self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p, ctr))
         # TODO: try np.einsum?
 
-# # r = Beta(5, 5)
-# # # r = Finite(plotting.mesh_grid([0, 1], [3, 4, 5]), np.ones((2, 3)) / 6)
-# # # r = Finite(['a', 'b'], [.6, .4])
-# # e = DataEmpirical.from_data(r.rvs(10), space=r.space)
-# # e.add_data(r.rvs(10))
-#
-# # e = DataEmpirical(['a', 'b'], [5, 6], space=spaces.FiniteGeneric(['a', 'b']))
-# e = DataEmpirical([], [], space=spaces.FiniteGeneric(['a', 'b']))
-# # e.add_values(['b', 'c'], [4, 1])
-#
-# print(e)
-# e.plot_pf()
-# qq = None
+# r = Beta(5, 5)
+# # r = Finite(plotting.mesh_grid([0, 1], [3, 4, 5]), np.ones((2, 3)) / 6)
+# # r = Finite(['a', 'b'], [.6, .4])
+# e = DataEmpirical.from_data(r.rvs(10), space=r.space)
+# e.add_data(r.rvs(10))
+
+# e = DataEmpirical(['a', 'b'], [5, 6], space=spaces.FiniteGeneric(['a', 'b']))
+e = DataEmpirical([], [], space=spaces.FiniteGeneric(['a', 'b']))
+# e.add_values(['b', 'c'], [4, 1])
+
+print(e)
+e.plot_pf()
+qq = None
 
 
 class Mixture(Base):
