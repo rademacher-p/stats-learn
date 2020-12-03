@@ -3,6 +3,7 @@ SL models.
 """
 
 from typing import Optional
+from copy import deepcopy
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -229,6 +230,10 @@ class DataConditional(Base):
 
         self._update_attr()
 
+    def __deepcopy__(self, memodict={}):
+        # return type(self)(self.dists, self.model_x)
+        return type(self)(deepcopy(self.dists), deepcopy(self.model_x))
+
     dists = property(lambda self: self._dists)
     model_x = property(lambda self: self._model_x)
 
@@ -288,10 +293,12 @@ class ClassConditional(MixinRVx, Base):
         self._model_y = model_y
 
         self._space['y'] = self.model_y.space
-        if self.space['y'].ndim != 0 or not np.issubdtype(self.space['y'].dtype, 'U'):
-            raise ValueError("Space must be categorical")
-        elif self.space['y'].set_size != len(self.dists):
+        if not (isinstance(self.space['y'], spaces.Finite) and self.space['y'].ndim == 0):
+            raise ValueError
+        elif self.space['y'].set_shape != (len(self.dists),):
             raise ValueError("Incorrect number of conditional distributions.")
+        elif not np.issubdtype(self.space['y'].dtype, 'U'):
+            raise ValueError("Space must be categorical")
 
         self._space['x'] = spaces.check_spaces(self.dists)
 
@@ -351,7 +358,7 @@ class ClassConditional(MixinRVx, Base):
 # qq = None
 
 
-class NormalRegressor(MixinRVx, MixinRVy, Base):        # TODO: rename NormalLinear?
+class NormalLinear(MixinRVx, MixinRVy, Base):
     def __init__(self, weights=(0.,), basis_y_x=None, cov_y_x=1., model_x=rand_elements.Normal(), rng=None):
         super().__init__(rng)
 
@@ -430,7 +437,7 @@ class NormalRegressor(MixinRVx, MixinRVy, Base):        # TODO: rename NormalLin
         return rand_elements.Normal(mean, cov)
 
 
-# g = NormalRegressor(basis_y_x=(lambda x: 1, lambda x: x**2,), weights=(1, 2), cov_y_x=.01, model_x=rand_elements.Normal(4))
+# g = NormalLinear(basis_y_x=(lambda x: 1, lambda x: x**2,), weights=(1, 2), cov_y_x=.01, model_x=rand_elements.Normal(4))
 # r = g.rvs(100)
 # # plt.plot(r['x'], r['y'], '.')
 # g.mean_y_x(np.linspace(0, 2, 20, endpoint=True))
@@ -494,8 +501,8 @@ class DataEmpirical(Base):
     def add_values(self, values, counts):
         values, counts = map(np.array, (values, counts))
         n_new = counts.sum(dtype=np.int)
-        if n_new == 0:
-            return
+        # if n_new == 0:
+        #     return
 
         self.n += n_new
 
@@ -571,8 +578,8 @@ class DataEmpiricalRVxy(DataEmpiricalRVx, DataEmpiricalRVy):
 
 # r = ClassConditional.from_finite([rand_elements.Normal(mean) for mean in [0, 4]], ['a', 'b'])
 # # r = ClassConditional.from_finite([rand_elements.Finite([1, 2], [p, 1-p]) for p in (.2, .5)], ['a', 'b'])
-# # r = NormalRegressor(weights=[1, 1], cov_y_x=np.eye(2))
-# # r = NormalRegressor(weights=[1, 1], cov_y_x=1., model_x=rand_elements.Normal([0, 0]))
+# # r = NormalLinear(weights=[1, 1], cov_y_x=np.eye(2))
+# # r = NormalLinear(weights=[1, 1], cov_y_x=1., model_x=rand_elements.Normal([0, 0]))
 # e = DataEmpirical.from_data(r.rvs(0), space=r.space)
 # # e.add_data(r.rvs(5))
 #
@@ -681,7 +688,8 @@ class Mixture(Base):
     def _weights_y_x(self, x):
         # return self.weights * np.array([dist.model_x.pf(x) for dist in self.dists])
         # return np.array([w * dist.model_x.pf(x) for w, dist in zip(self.weights, self.dists)])
-        return np.array([w * dist.model_x.pf(x) if w > 0. else 0. for w, dist in zip(self.weights, self.dists)])
+        return np.array([w * dist.model_x.pf(x) if w > 0. else np.zeros(x.shape)
+                         for w, dist in zip(self.weights, self.dists)])
 
     def _rvs(self, n, rng):
         idx_rng = rng.choice(self.n_dists, size=n, p=self._p)
@@ -716,12 +724,12 @@ class MixtureRVy(MixinRVy, Mixture):
         temp = self._weights_y_x(x)
         p_y_x = temp / temp.sum(0)
 
-        idx_nonzero = np.flatnonzero(p_y_x)
-        return sum(p_y_x[i] * self.dists[i].mean_y_x(x) for i in idx_nonzero)
+        # idx_nonzero = np.flatnonzero(p_y_x)
+        # return sum(p_y_x[i] * self.dists[i].mean_y_x(x) for i in idx_nonzero)
 
-        # # return sum(prob * dist.mean_y_x(x) for prob, dist in zip(p_y_x, self.dists) if prob > 0)
-        # temp = np.array([prob * dist.mean_y_x(x) for prob, dist in zip(p_y_x, self.dists)])
-        # return np.nansum(temp, axis=0)
+        # return sum(prob * dist.mean_y_x(x) for prob, dist in zip(p_y_x, self.dists) if prob > 0)
+        temp = np.array([prob * dist.mean_y_x(x) for prob, dist in zip(p_y_x, self.dists)])
+        return np.nansum(temp, axis=0)
 
 
 class MixtureRVxy(MixtureRVx, MixtureRVy):
@@ -730,12 +738,12 @@ class MixtureRVxy(MixtureRVx, MixtureRVy):
         return f"MixtureRVxy({_str})"
 
 
-# dists_ = [NormalRegressor(basis_y_x=(lambda x: x,), weights=(w,), cov_y_x=10) for w in [0, 4]]
+# dists_ = [NormalLinear(basis_y_x=(lambda x: x,), weights=(w,), cov_y_x=10) for w in [0, 4]]
 # # dists_ = [ClassConditional.from_finite([rand_elements.Normal(mean) for mean in [i, i+2]], ['a', 'b']) for i in (0, 4)]
 # # dists_ = [ClassConditional.from_finite([rand_elements.Finite([1, 2], [p, 1-p]) for p in p_], ['a', 'b'])
 # #           for p_ in [(.2, .5), (.7, .4)]]
 #
-# # # dists_ = [NormalRegressor(basis_y_x=(lambda x: x,), weights=(2,), cov_y_x=10)]
+# # # dists_ = [NormalLinear(basis_y_x=(lambda x: x,), weights=(2,), cov_y_x=10)]
 # # dists_ = [ClassConditional.from_finite([rand_elements.Normal(mean) for mean in (0, 2)], ['a', 'b'])]
 # # # dists_ = [ClassConditional.from_finite([rand_elements.Finite([1, 2], [p, 1-p]) for p in (.3, .6)], ['a', 'b'])]
 # # dists_.append(DataEmpirical.from_data(dists_[0].rvs(10), dists_[0].space))

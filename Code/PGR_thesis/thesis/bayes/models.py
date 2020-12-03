@@ -56,7 +56,7 @@ class Base(RandomGeneratorMixin):
         raise NotImplementedError
 
 
-class NormalRegressor(Base):
+class NormalLinear(Base):
     def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
                  model_x=rand_elements.Normal(),
                  rng=None):
@@ -89,7 +89,7 @@ class NormalRegressor(Base):
 
         # Learning
         self.posterior = rand_elements.Normal(self.prior_mean, self.prior_cov)
-        self.posterior_model = rand_models.NormalRegressor(**self._prior_model_kwargs)
+        self.posterior_model = rand_models.NormalLinear(**self._prior_model_kwargs)
 
     # Methods
     def random_model(self, rng=None):
@@ -99,7 +99,7 @@ class NormalRegressor(Base):
                         'rng': rng}
         rand_kwargs = {'weights': self.prior.rvs(rng=rng)}
 
-        return rand_models.NormalRegressor(**model_kwargs, **rand_kwargs)
+        return rand_models.NormalLinear(**model_kwargs, **rand_kwargs)
 
     def _fit(self, d, warm_start=False):
         if not warm_start:  # reset learning attributes
@@ -198,8 +198,8 @@ class NormalRegressor(Base):
 
 
 if __name__ == '__main__':
-    a = NormalRegressor(prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
-                        model_x=rand_elements.Normal(), rng=None)
+    a = NormalLinear(prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
+                     model_x=rand_elements.Normal(), rng=None)
     qq = None
 
 
@@ -217,7 +217,8 @@ class Dirichlet(Base):
     def __setattr__(self, name, value):
         if name.startswith('prior_mean.'):
             # setattr(self.prior_mean, name.removeprefix('prior_mean.'), value)
-            self.posterior_model.set_dist_attr(0, **{name.removeprefix('prior_mean.'): value})
+            # self.posterior_model.set_dist_attr(0, **{name.removeprefix('prior_mean.'): value})
+            self.posterior_model.set_dist_attr(0, **{name.replace('prior_mean.',''): value})
         else:
             super().__setattr__(name, value)
 
@@ -273,12 +274,12 @@ class Dirichlet(Base):
 
 
 if __name__ == '__main__':
-    theta = rand_models.NormalRegressor(weights=(1,), basis_y_x=(lambda x: x,), cov_y_x=.1,
-                                        model_x=rand_elements.Finite(np.linspace(0, 1, 10, endpoint=False)),
-                                        )
-    alpha = rand_models.NormalRegressor(weights=(2,), basis_y_x=(lambda x: 1,), cov_y_x=.1,
-                                        model_x=rand_elements.Finite(np.linspace(0, 1, 10, endpoint=False)),
-                                        )
+    theta = rand_models.NormalLinear(weights=(1,), basis_y_x=(lambda x: x,), cov_y_x=.1,
+                                     model_x=rand_elements.Finite(np.linspace(0, 1, 10, endpoint=False)),
+                                     )
+    alpha = rand_models.NormalLinear(weights=(2,), basis_y_x=(lambda x: 1,), cov_y_x=.1,
+                                     model_x=rand_elements.Finite(np.linspace(0, 1, 10, endpoint=False)),
+                                     )
 
     # theta = rand_models.ClassConditional.from_finite([rand_elements.Normal(mean) for mean in (1, 3)], ['a', 'b'])
     # alpha = rand_models.ClassConditional.from_finite([rand_elements.Normal(mean) for mean in (0, 2)], ['a', 'b'])

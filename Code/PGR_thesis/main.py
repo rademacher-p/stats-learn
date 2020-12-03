@@ -15,23 +15,25 @@ from thesis.predictors import (ModelRegressor, BayesRegressor, ModelClassifier, 
 
 #%% Sim
 
-# model = rand_models.NormalRegressor(weights=np.ones(2), basis_y_x=None, cov_y_x=1., model_x=Normal(0, 10), rng=None)
+# model = rand_models.NormalLinear(weights=np.ones(2), basis_y_x=None, cov_y_x=1.,
+#                                  model_x=rand_elements.Normal(0, 10), rng=None)
 # model = rand_models.ClassConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
 #                                                  [0, .5], p_y=None)
-model = rand_models.DataConditional.from_finite([rand_elements.Finite(['a', 'b'], [p, 1 - p]) for p in (.6, .6)],
+model = rand_models.DataConditional.from_finite([rand_elements.Finite([-1, -2], [p, 1 - p]) for p in (.6, .6)],
                                                 [0, .5], p_x=None)
 
-# prior_mean = model
-prior_mean = rand_models.DataConditional.from_finite([rand_elements.Finite(['a', 'b'], [p, 1 - p]) for p in (.8, .8)],
-                                                     [0, .5], p_x=None)
+prior_mean = model
+# prior_mean = rand_models.DataConditional.from_finite([rand_elements.Finite(['a', 'b'], [p, 1 - p]) for p in (.8, .8)],
+#                                                      [0, .5], p_x=None)
 
 # Plotting
 predictors = [
     # ModelRegressor(model, name=r'$f_{opt}$'),
-    # BayesRegressor(bayes_models.NormalRegressor(prior_mean=0 * np.ones(2), prior_cov=0.5 * np.eye(2),
-    #                                             basis_y_x=None, cov_y_x=1., model_x=Normal(0, 10)), name='Norm'),
-    # BayesRegressor(bayes_models.Dirichlet(prior_mean, 4), name='Dir'),
-    BayesClassifier(bayes_models.Dirichlet(prior_mean, 4), name='Dir'),
+    # BayesRegressor(bayes_models.NormalLinear(prior_mean=0 * np.ones(2), prior_cov=0.5 * np.eye(2),
+    #                                          basis_y_x=None, cov_y_x=1.,
+    #                                          model_x=rand_elements.Normal(0, 10)), name='Norm'),
+    BayesRegressor(bayes_models.Dirichlet(prior_mean, 4), name='Dir'),
+    # BayesClassifier(bayes_models.Dirichlet(prior_mean, 4), name='Dir'),
 ]
 
 # predictors[0].plot_loss_eval(params={'weights': np.linspace(0, 2, 20)}, n_train=[0, 1, 2], n_test=10, n_mc=100, verbose=True)
@@ -40,8 +42,9 @@ predictors = [
 
 params = [
     # {},
+    # {'cov_y_x_': [2, 3]}
     # {'prior_cov': [0.1, 1, 10]},
-    {'alpha_0': [.4, 4]},
+    {'prior_mean.p_x': [[.7,.3], [.4,.6]]},
     # {'alpha_0': np.arange(.01, 10, .5)}
 ]
 
