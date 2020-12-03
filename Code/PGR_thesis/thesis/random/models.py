@@ -471,9 +471,6 @@ class DataEmpirical(Base):
             self._space = space
 
         self.n = 0
-        # self.data = np.array([], dtype=[('x', self.dtype['x'], self.shape['x']),
-        #                                 ('y', self.dtype['y'], self.shape['y']),
-        #                                 ('n', np.int,)])
         self.data = self._structure_data({'x': [], 'y': []}, [])
         self.add_values(values, counts)
 
@@ -488,7 +485,7 @@ class DataEmpirical(Base):
     def _count_data(d):
         return np.unique(d, return_counts=True, axis=0)
 
-    def _structure_data(self, values, counts):      # TODO: one-use method...
+    def _structure_data(self, values, counts):
         return np.array(list(zip(values['x'], values['y'], counts)),
                         dtype=[('x', self.dtype['x'], self.shape['x']),
                                ('y', self.dtype['y'], self.shape['y']),
@@ -497,8 +494,8 @@ class DataEmpirical(Base):
     def add_values(self, values, counts):
         values, counts = map(np.array, (values, counts))
         n_new = counts.sum(dtype=np.int)
-        # if n_new == 0:
-        #     return
+        if n_new == 0:
+            return
 
         self.n += n_new
 
@@ -523,12 +520,12 @@ class DataEmpirical(Base):
 
         values_x, _idx_inv = np.unique(self.data['x'], return_inverse=True, axis=0)
         counts_x = np.empty(len(values_x), dtype=np.int)
-        self.data_y_x = []
+        self._models_y_x = []
         for i in range(len(values_x)):
             data_match = self.data[_idx_inv == i]
             counts_x[i] = data_match['n'].sum()
 
-            self.data_y_x.append(rand_elements.DataEmpirical(data_match['y'], data_match['n'], self.space['y']))
+            self._models_y_x.append(rand_elements.DataEmpirical(data_match['y'], data_match['n'], self.space['y']))
 
         self._model_x = rand_elements.DataEmpirical(values_x, counts_x, space=self.space['x'])
         self._mode_x = self._model_x.mode
@@ -536,7 +533,7 @@ class DataEmpirical(Base):
     def model_y_x(self, x):
         idx = np.flatnonzero(np.all(x == self.model_x.data['x'], axis=tuple(range(1, 1 + self.ndim['x']))))
         if idx.size == 1:
-            return self.data_y_x[idx.item()]
+            return self._models_y_x[idx.item()]
         else:
             # raise ValueError("No matching data for empirical distribution.")
             return rand_elements.DataEmpirical([], [], space=self.space['y'])
@@ -617,7 +614,7 @@ class Mixture(Base):
 
     @weights.setter
     def weights(self, value):
-        self._weights = list(value)
+        self._weights = np.array(value)
         if len(self._weights) != self.n_dists:
             raise ValueError(f"Weights must have length {self.n_dists}.")
 
@@ -649,26 +646,42 @@ class Mixture(Base):
     #     del self.weights[idx]
     #     self._update_attr()
 
-    def _update_attr(self):
-        self._p = np.array(self._weights) / sum(self.weights)
+    @property
+    def _idx_nonzero(self):
+        return np.flatnonzero(self._weights)
 
-        args = zip(*[(dist.model_x, w) for dist, w in zip(self.dists, self.weights) if w > 0])
-        self._model_x = rand_elements.Mixture(*args)
-        # self._model_x = rand_elements.Mixture([dist.model_x for dist in self.dists], self.weights)  # TODO: efficiency
+    def _update_attr(self):
+        self._p = self._weights / self.weights.sum()
+
+        if self._idx_nonzero.size == 1:
+            self._model_x = self._dists[self._idx_nonzero.item()].model_x
+        else:
+            # self._mode = self.space.argmax(self.pf)
+            # args = zip(*[(dist.model_x, w) for dist, w in zip(self.dists, self.weights) if w > 0])
+            args = zip(*[(self.dists[i].model_x, self.weights[i]) for i in self._idx_nonzero])
+            self._model_x = rand_elements.Mixture(*args)
+
         self._mode_x = self.model_x.mode
 
     def _mode_y_x_single(self, x):
         return self.model_y_x(x).mode
 
     def model_y_x(self, x):
-        # only generate model_y_x if weight is non-zero
-        args = zip(*[(dist.model_y_x(x), w) for dist, w in zip(self.dists, self._weights_y_x(x)) if w > 0])
-        return rand_elements.Mixture(*args)
-        # return rand_elements.Mixture([dist.model_y_x(x) for dist in self.dists], self._weights_y_x(x))
+        _weights = self._weights_y_x(x)
+        idx_nonzero = np.flatnonzero(_weights)
+        if idx_nonzero.size == 1:
+            return self._dists[idx_nonzero.item()].model_y_x(x)
+        else:
+            args = zip(*[(self.dists[i].model_y_x(x), _weights[i]) for i in idx_nonzero])
+            return rand_elements.Mixture(*args)
+
+        # args = zip(*[(dist.model_y_x(x), w) for dist, w in zip(self.dists, self._weights_y_x(x)) if w > 0])
+        # return rand_elements.Mixture(*args)
 
     def _weights_y_x(self, x):
         # return self.weights * np.array([dist.model_x.pf(x) for dist in self.dists])
-        return np.array([w * dist.model_x.pf(x) for w, dist in zip(self.weights, self.dists)])
+        # return np.array([w * dist.model_x.pf(x) for w, dist in zip(self.weights, self.dists)])
+        return np.array([w * dist.model_x.pf(x) if w > 0. else 0. for w, dist in zip(self.weights, self.dists)])
 
     def _rvs(self, n, rng):
         idx_rng = rng.choice(self.n_dists, size=n, p=self._p)
@@ -690,7 +703,8 @@ class MixtureRVx(MixinRVx, Mixture):
     def _update_attr(self):
         super()._update_attr()
 
-        self._mean_x = sum(prob * dist.mean_x for prob, dist in zip(self._p, self.dists) if prob > 0)
+        # self._mean_x = sum(prob * dist.mean_x for prob, dist in zip(self._p, self.dists) if prob > 0)
+        self._mean_x = sum(self._p[i] * self.dists[i].mean_x for i in self._idx_nonzero)
 
 
 class MixtureRVy(MixinRVy, Mixture):
@@ -702,9 +716,12 @@ class MixtureRVy(MixinRVy, Mixture):
         temp = self._weights_y_x(x)
         p_y_x = temp / temp.sum(0)
 
-        # return sum(prob * dist.mean_y_x(x) for prob, dist in zip(p_y_x, self.dists) if prob > 0)
-        temp = np.array([prob * dist.mean_y_x(x) for prob, dist in zip(p_y_x, self.dists)])
-        return np.nansum(temp, axis=0)
+        idx_nonzero = np.flatnonzero(p_y_x)
+        return sum(p_y_x[i] * self.dists[i].mean_y_x(x) for i in idx_nonzero)
+
+        # # return sum(prob * dist.mean_y_x(x) for prob, dist in zip(p_y_x, self.dists) if prob > 0)
+        # temp = np.array([prob * dist.mean_y_x(x) for prob, dist in zip(p_y_x, self.dists)])
+        # return np.nansum(temp, axis=0)
 
 
 class MixtureRVxy(MixtureRVx, MixtureRVy):

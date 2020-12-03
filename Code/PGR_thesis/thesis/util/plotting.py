@@ -90,9 +90,10 @@ def box_grid(lims, n=100, endpoint=False):
     if lims.shape == (2,):
         return np.linspace(*lims, n, endpoint=endpoint)
     elif lims.ndim == 2 and lims.shape[-1] == 2:
-        x_dim = [np.linspace(*lims_i, n, endpoint=endpoint) for lims_i in lims]
+        # x_dim = [np.linspace(*lims_i, n, endpoint=endpoint) for lims_i in lims]
         # return np.stack(np.meshgrid(*x_dim), axis=-1)
-        return mesh_grid(*x_dim)
+        # return mesh_grid(*x_dim)
+        return mesh_grid(np.linspace(*lims_i, n, endpoint=endpoint) for lims_i in lims)
     else:
         raise ValueError("Shape must be (2,) or (*, 2)")
 

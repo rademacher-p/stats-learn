@@ -816,9 +816,6 @@ class DataEmpirical(Base):
         return rng.choice(self.data['x'], size, p=self._p)
 
     def _pf_single(self, x):
-        # if x not in self.space:
-        #     raise ValueError("Input 'x' must be in the support.")
-
         idx = self._get_idx(x)
         if idx is not None:
             return self._p[idx]     # TODO: implement infinite valued output for continuous space!? use CDF?!
@@ -827,7 +824,7 @@ class DataEmpirical(Base):
 
     def _set_x_plot(self):
         if isinstance(self.space, spaces.Continuous) and self.shape in {()}:
-            # TODO: hackish? adds empirical values to the plot support (so impulses are not missed)
+            # add empirical values to the plot support (so impulses are not missed)
             x = np.sort(np.unique(np.concatenate((self.space.x_plt, self.data['x']))))
             self._space.set_x_plot(x)
 
@@ -842,8 +839,8 @@ class DataEmpiricalRV(MixinRV, DataEmpirical):
         self._mean = np.tensordot(self._p, self.data['x'], axes=[0, 0])
 
         ctr = self.data['x'] - self._mean
-        self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p, ctr))    # TODO: try np.einsum?
-
+        self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p, ctr))
+        # TODO: try np.einsum?
 
 # # r = Beta(5, 5)
 # # # r = Finite(plotting.mesh_grid([0, 1], [3, 4, 5]), np.ones((2, 3)) / 6)
@@ -888,7 +885,7 @@ class Mixture(Base):
 
     @weights.setter
     def weights(self, value):
-        self._weights = list(value)
+        self._weights = np.array(value)
         if len(self._weights) != self.n_dists:
             raise ValueError(f"Weights must have length {self.n_dists}.")
 
@@ -921,11 +918,19 @@ class Mixture(Base):
     #     del self.weights[idx]
     #     self._update_attr()
 
-    def _update_attr(self):
+    @property
+    def _idx_nonzero(self):
+        return np.flatnonzero(self._weights)
+
+    def _update_attr(self):     # TODO: logic for single valid dist case?
         self._set_x_plot()
 
-        self._p = np.array(self._weights) / sum(self.weights)
-        self._mode = self.space.argmax(self.pf)
+        self._p = self._weights / self._weights.sum()
+
+        if self._idx_nonzero.size == 1:
+            self._mode = self._dists[self._idx_nonzero.item()].mode
+        else:
+            self._mode = self.space.argmax(self.pf)
 
     def _rvs(self, n, rng):
         idx_rng = rng.choice(self.n_dists, size=n, p=self._p)
@@ -938,10 +943,12 @@ class Mixture(Base):
         return out
 
     def pf(self, x):
-        return sum(prob * dist.pf(x) for prob, dist in zip(self._p, self.dists) if prob > 0)
+        # return sum(prob * dist.pf(x) for prob, dist in zip(self._p, self.dists) if prob > 0)
+        return sum(self._p[i] * self.dists[i].pf(x) for i in self._idx_nonzero)
 
     def _set_x_plot(self):
-        dists_nonzero = [dist for (w, dist) in zip(self.weights, self.dists) if w > 0]
+        # dists_nonzero = [dist for (w, dist) in zip(self.weights, self.dists) if w > 0]
+        dists_nonzero = [self.dists[i] for i in self._idx_nonzero]
 
         if isinstance(self.space, spaces.Euclidean):
             temp = np.stack(list(dist.space.lims_plot for dist in dists_nonzero))
@@ -965,7 +972,8 @@ class MixtureRV(MixinRV, Mixture):
     def _update_attr(self):
         super()._update_attr()
 
-        self._mean = sum(prob * dist.mean for prob, dist in zip(self._p, self.dists) if prob > 0)
+        # self._mean = sum(prob * dist.mean for prob, dist in zip(self._p, self.dists) if prob > 0)
+        self._mean = sum(self._p[i] * self.dists[i].mean for i in self._idx_nonzero)
         self._cov = None  # TODO: numeric approx from `space`?
 
 
