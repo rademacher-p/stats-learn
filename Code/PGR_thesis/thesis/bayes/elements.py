@@ -188,33 +188,16 @@ class Dirichlet(Base):
         _emp_dist = rand_elements.DataEmpirical([], [], space=self.space)
         self.posterior_model = rand_elements.Mixture([prior_mean, _emp_dist], [alpha_0, _emp_dist.n])
 
+    def __repr__(self):
+        return f"Dirichlet(alpha_0={self.alpha_0}, n={self.n}, prior_mean={self.prior_mean})"
+
     def __setattr__(self, name, value):
         if name.startswith('prior_mean.'):
             # setattr(self.prior_mean, name.removeprefix('prior_mean.'), value)
-            self.posterior_model.set_dist_attr(0, **{name.removeprefix('prior_mean.'): value})
+            # self.posterior_model.set_dist_attr(0, **{name.removeprefix('prior_mean.'): value})
+            self.posterior_model.set_dist_attr(0, **{name.replace('prior_mean.', ''): value})
         else:
             super().__setattr__(name, value)
-
-    # def __getattribute__(self, name):
-    #     try:
-    #         return getattr(self.prior_mean, name)
-    #     except AttributeError:
-    #         return super().__getattribute__(name)
-
-    # def __setattr__(self, name, value):
-    #     try:
-    #         self.posterior_model.set_dist_attr(0, **{name: value})      # prior attributes take precedence
-    #     except AttributeError:
-    #         super().__setattr__(name, value)
-
-    # def __setattr__(self, name, value):     # TODO: better way?
-    #     if name in ('alpha_0', 'prior_mean', 'emp_dist', 'posterior_model',):
-    #         super().__setattr__(name, value)
-    #     else:
-    #         try:
-    #             self.posterior_model.set_dist_attr(0, **{name: value})
-    #         except AttributeError:
-    #             super().__setattr__(name, value)
 
     @property
     def prior_mean(self):
