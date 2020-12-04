@@ -241,7 +241,7 @@ def loss_eval_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=
 
     n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
 
-    model = copy.deepcopy(model)   # FIXME: __new__ issue?
+    model = copy.deepcopy(model)
     model.rng = rng
 
     loss_full = []
