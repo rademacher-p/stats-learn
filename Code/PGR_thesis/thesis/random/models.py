@@ -479,7 +479,8 @@ class DataEmpirical(Base):
 
         self.n = 0
         self.data = self._structure_data({'x': [], 'y': []}, [])
-        self._model_x = rand_elements.DataEmpirical([], [], space=self.space['x'])
+        # self._model_x = rand_elements.DataEmpirical([], [], space=self.space['x'])
+        self._init_attr()
         self.add_values(values, counts)
 
     def __repr__(self):
@@ -489,8 +490,9 @@ class DataEmpirical(Base):
     def from_data(cls, d, space=None, rng=None):
         return cls(*cls._count_data(d), space, rng)
 
-    # def _init_attr(self):
-    #     self._model_x = rand_elements.DataEmpirical([], [], space=self.space['x'])
+    def _init_attr(self):
+        self._model_x = rand_elements.DataEmpirical([], [], space=self.space['x'])
+        self._models_y_x = []
 
     @staticmethod
     def _count_data(d):
@@ -501,6 +503,9 @@ class DataEmpirical(Base):
                         dtype=[('x', self.dtype['x'], self.shape['x']),
                                ('y', self.dtype['y'], self.shape['y']),
                                ('n', np.int,)])
+
+    def add_data(self, d):
+        self.add_values(*self._count_data(d))
 
     def add_values(self, values, counts):
         values, counts = map(np.array, (values, counts))
@@ -521,24 +526,37 @@ class DataEmpirical(Base):
         if len(idx_new) > 0:
             self.data = np.concatenate((self.data, self._structure_data(values[idx_new], counts[idx_new])))
 
+        #
+        _, idx = np.unique(values['x'], axis=0, return_index=True)
+        values_x_unique = values['x'][np.sort(idx)]
+        # values_x_unique = np.unique(values['x'], axis=0)
+        for x_add in values_x_unique:
+            idx_match = np.flatnonzero(np.all(x_add == values['x'], axis=tuple(range(1, 1 + self.ndim['x']))))
+            values_y, counts_y = values['y'][idx_match], counts[idx_match]
+
+            idx = self._model_x._get_idx(x_add)
+            if idx is None:
+                self._models_y_x.append(rand_elements.DataEmpirical(values_y, counts_y, self.space['y']))
+            else:
+                self._models_y_x[idx].add_values(values_y, counts_y)
+
+            self._model_x.add_values([x_add], [counts[idx_match].sum()])
+
         self._update_attr()
 
-    def add_data(self, d):
-        self.add_values(*self._count_data(d))
-
-    def _update_attr(self):      # TODO: improve efficiency? in `add_values`!?
+    def _update_attr(self):
         self._p = self.data['n'] / self.n
 
-        values_x, _idx_inv = np.unique(self.data['x'], return_inverse=True, axis=0)
-        counts_x = np.empty(len(values_x), dtype=np.int)
-        self._models_y_x = []
-        for i in range(len(values_x)):
-            data_match = self.data[_idx_inv == i]
-            counts_x[i] = data_match['n'].sum()
-
-            self._models_y_x.append(rand_elements.DataEmpirical(data_match['y'], data_match['n'], self.space['y']))
-
-        self._model_x = rand_elements.DataEmpirical(values_x, counts_x, space=self.space['x'])
+        # values_x, _idx_inv = np.unique(self.data['x'], return_inverse=True, axis=0)
+        # counts_x = np.empty(len(values_x), dtype=np.int)
+        # self._models_y_x = []
+        # for i in range(len(values_x)):
+        #     data_match = self.data[_idx_inv == i]
+        #     counts_x[i] = data_match['n'].sum()
+        #
+        #     self._models_y_x.append(rand_elements.DataEmpirical(data_match['y'], data_match['n'], self.space['y']))
+        #
+        # self._model_x = rand_elements.DataEmpirical(values_x, counts_x, space=self.space['x'])
         # self._mode_x = self._model_x.mode
 
     @property
@@ -622,11 +640,11 @@ class DataEmpiricalRVxy(DataEmpiricalRVx, DataEmpiricalRVy):
         return f"DataEmpiricalRVxy(space={self.space}, n={self.n})"
 
 
-# r = ClassConditional.from_finite([rand_elements.Normal(mean) for mean in [0, 4]], ['a', 'b'])
-# # r = ClassConditional.from_finite([rand_elements.Finite([1, 2], [p, 1-p]) for p in (.2, .5)], ['a', 'b'])
+# # r = ClassConditional.from_finite([rand_elements.Normal(mean) for mean in [[0, 0], [4, 4]]], ['a', 'b'])
+# r = ClassConditional.from_finite([rand_elements.Finite([1, 2], [p, 1-p]) for p in (.2, .5)], ['a', 'b'])
 # # r = NormalLinear(weights=[1, 1], cov_y_x=np.eye(2))
 # # r = NormalLinear(weights=[1, 1], cov_y_x=1., model_x=rand_elements.Normal([0, 0]))
-# e = DataEmpirical.from_data(r.rvs(0), space=r.space)
+# e = DataEmpirical.from_data(r.rvs(5), space=r.space)
 # # e.add_data(r.rvs(5))
 #
 # print(e)

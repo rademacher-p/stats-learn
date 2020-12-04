@@ -203,7 +203,7 @@ if __name__ == '__main__':
     qq = None
 
 
-class Dirichlet(Base):
+class Dirichlet(Base):      # TODO: DRY from random.elements?
     def __init__(self, prior_mean, alpha_0, rng=None):
         super().__init__(prior=None, rng=rng)
         self._space = prior_mean.space
@@ -218,7 +218,7 @@ class Dirichlet(Base):
         if name.startswith('prior_mean.'):
             # setattr(self.prior_mean, name.removeprefix('prior_mean.'), value)
             # self.posterior_model.set_dist_attr(0, **{name.removeprefix('prior_mean.'): value})
-            self.posterior_model.set_dist_attr(0, **{name.replace('prior_mean.',''): value})
+            self.posterior_model.set_dist_attr(0, **{name.replace('prior_mean.', ''): value})
         else:
             super().__setattr__(name, value)
 

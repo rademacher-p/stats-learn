@@ -728,7 +728,6 @@ class NormalLinear(Normal):     # TODO: rework, only allow weights and cov to be
 class DataEmpirical(Base):
 
     # TODO: subclass for FiniteGeneric space?
-    # TODO: subclass for continuous spaces, easy stats?
 
     def __new__(cls, values, counts, space=None, rng=None):
         if space is not None:
@@ -785,6 +784,9 @@ class DataEmpirical(Base):
         else:
             raise ValueError
 
+    def add_data(self, d):
+        self.add_values(*self._count_data(d))
+
     def add_values(self, values, counts):
         values, counts = map(np.array, (values, counts))
         n_new = counts.sum(dtype=np.int)
@@ -805,9 +807,6 @@ class DataEmpirical(Base):
             self.data = np.concatenate((self.data, self._structure_data(values[idx_new], counts[idx_new])))
 
         self._update_attr()
-
-    def add_data(self, d):
-        self.add_values(*self._count_data(d))
 
     def _update_attr(self):
         self._p = self.data['n'] / self.n
@@ -902,7 +901,7 @@ class Mixture(Base):
 
         self._update_attr()
 
-    def set_dist_attr(self, idx, **dist_kwargs):      # TODO: improved implementation w/ direct self.dists access?
+    def set_dist_attr(self, idx, **dist_kwargs):
         dist = self._dists[idx]
         for key, val in dist_kwargs.items():
             setattr(dist, key, val)
@@ -985,7 +984,7 @@ class MixtureRV(MixinRV, Mixture):
 
         # self._mean = sum(prob * dist.mean for prob, dist in zip(self._p, self.dists) if prob > 0)
         self._mean = sum(self._p[i] * self.dists[i].mean for i in self._idx_nonzero)
-
+        self._cov = None    # TODO
 
 # # dists_ = [Beta(*args) for args in [[10, 5], [2, 12]]]
 # # dists_ = [Normal(mean, 1) for mean in [0, 4]]
