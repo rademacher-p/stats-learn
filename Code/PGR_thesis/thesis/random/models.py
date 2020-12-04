@@ -479,6 +479,7 @@ class DataEmpirical(Base):
 
         self.n = 0
         self.data = self._structure_data({'x': [], 'y': []}, [])
+        self._model_x = rand_elements.DataEmpirical([], [], space=self.space['x'])
         self.add_values(values, counts)
 
     def __repr__(self):
@@ -487,6 +488,9 @@ class DataEmpirical(Base):
     @classmethod
     def from_data(cls, d, space=None, rng=None):
         return cls(*cls._count_data(d), space, rng)
+
+    # def _init_attr(self):
+    #     self._model_x = rand_elements.DataEmpirical([], [], space=self.space['x'])
 
     @staticmethod
     def _count_data(d):
@@ -501,8 +505,8 @@ class DataEmpirical(Base):
     def add_values(self, values, counts):
         values, counts = map(np.array, (values, counts))
         n_new = counts.sum(dtype=np.int)
-        # if n_new == 0:
-        #     return
+        if n_new == 0:
+            return
 
         self.n += n_new
 
@@ -535,18 +539,45 @@ class DataEmpirical(Base):
             self._models_y_x.append(rand_elements.DataEmpirical(data_match['y'], data_match['n'], self.space['y']))
 
         self._model_x = rand_elements.DataEmpirical(values_x, counts_x, space=self.space['x'])
-        self._mode_x = self._model_x.mode
+        # self._mode_x = self._model_x.mode
 
-    def model_y_x(self, x):
+    @property
+    def mode_x(self):
+        return self._model_x.mode
+
+    def _get_idx_x(self, x):
         idx = np.flatnonzero(np.all(x == self.model_x.data['x'], axis=tuple(range(1, 1 + self.ndim['x']))))
         if idx.size == 1:
-            return self._models_y_x[idx.item()]
+            return idx.item()
+        elif idx.size == 0:
+            return None
+        else:
+            raise ValueError
+
+    def model_y_x(self, x):
+        # idx = np.flatnonzero(np.all(x == self.model_x.data['x'], axis=tuple(range(1, 1 + self.ndim['x']))))
+        # if idx.size == 1:
+        #     return self._models_y_x[idx.item()]
+        # else:
+        #     # raise ValueError("No matching data for empirical distribution.")
+        #     return rand_elements.DataEmpirical([], [], space=self.space['y'])
+
+        idx = self._get_idx_x(x)
+        if idx is not None:
+            return self._models_y_x[idx]
         else:
             # raise ValueError("No matching data for empirical distribution.")
             return rand_elements.DataEmpirical([], [], space=self.space['y'])
 
+    # def _mode_y_x_single(self, x):
+    #     return self.model_y_x(x).mode
+
     def _mode_y_x_single(self, x):
-        return self.model_y_x(x).mode
+        idx = self._get_idx_x(x)
+        if idx is not None:
+            return self._models_y_x[idx].mode
+        else:
+            return np.nan
 
     def _rvs(self, size, rng):
         return rng.choice(self.data[['x', 'y']], size, p=self._p)
@@ -556,19 +587,34 @@ class DataEmpiricalRVx(MixinRVx, DataEmpirical):
     def __repr__(self):
         return f"DataEmpiricalRVx(space={self.space}, n={self.n})"
 
-    def _update_attr(self):
-        super()._update_attr()
+    # def _update_attr(self):
+    #     super()._update_attr()
+    #
+    #     self._mean_x = self._model_x.mean
+    #     self._cov_x = self._model_x.cov
 
-        self._mean_x = self._model_x.mean
-        self._cov_x = self._model_x.cov
+    @property
+    def mean_x(self):
+        return self._model_x.mean
+
+    @property
+    def cov_x(self):
+        return self._model_x.cov
 
 
 class DataEmpiricalRVy(MixinRVy, DataEmpirical):
     def __repr__(self):
         return f"DataEmpiricalRVy(space={self.space}, n={self.n})"
 
+    # def _mean_y_x_single(self, x):
+    #     return self.model_y_x(x).mean
+
     def _mean_y_x_single(self, x):
-        return self.model_y_x(x).mean
+        idx = self._get_idx_x(x)
+        if idx is not None:
+            return self._models_y_x[idx].mean
+        else:
+            return np.nan
 
 
 class DataEmpiricalRVxy(DataEmpiricalRVx, DataEmpiricalRVy):
@@ -611,6 +657,9 @@ class Mixture(Base):
     def __repr__(self):
         _str = "; ".join([f"{w}: {dist}" for w, dist in zip(self.weights, self.dists)])
         return f"Mixture({_str})"
+
+    def __deepcopy__(self, memodict={}):
+        return type(self)(self.dists, self.weights, self.rng)
 
     dists = property(lambda self: self._dists)
     n_dists = property(lambda self: len(self._dists))
@@ -687,9 +736,9 @@ class Mixture(Base):
 
     def _weights_y_x(self, x):
         # return self.weights * np.array([dist.model_x.pf(x) for dist in self.dists])
-        # return np.array([w * dist.model_x.pf(x) for w, dist in zip(self.weights, self.dists)])
-        return np.array([w * dist.model_x.pf(x) if w > 0. else np.zeros(x.shape)
-                         for w, dist in zip(self.weights, self.dists)])
+        return np.array([w * dist.model_x.pf(x) for w, dist in zip(self.weights, self.dists)])
+        # return np.array([w * dist.model_x.pf(x) if w > 0. else np.zeros(x.shape)
+        #                  for w, dist in zip(self.weights, self.dists)])
 
     def _rvs(self, n, rng):
         idx_rng = rng.choice(self.n_dists, size=n, p=self._p)
@@ -712,7 +761,8 @@ class MixtureRVx(MixinRVx, Mixture):
         super()._update_attr()
 
         # self._mean_x = sum(prob * dist.mean_x for prob, dist in zip(self._p, self.dists) if prob > 0)
-        self._mean_x = sum(self._p[i] * self.dists[i].mean_x for i in self._idx_nonzero)
+        # self._mean_x = sum(self._p[i] * self.dists[i].mean_x for i in self._idx_nonzero)
+        self._mean_x = np.nansum([prob * dist.mean_x for prob, dist in zip(self._p, self.dists)])
 
 
 class MixtureRVy(MixinRVy, Mixture):

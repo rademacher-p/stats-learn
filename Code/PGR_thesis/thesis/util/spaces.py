@@ -314,7 +314,7 @@ class FiniteGeneric(Finite):
             return False
 
     def _minimize(self, f):
-        i_opt = np.argmax(f(self._vals_flat))
+        i_opt = np.argmin(f(self._vals_flat))
         return self._vals_flat[i_opt]
 
         # # ranges = (np.mgrid[:self.set_size],)

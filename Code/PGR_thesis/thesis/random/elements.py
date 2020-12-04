@@ -753,9 +753,7 @@ class DataEmpirical(Base):
         else:
             self._space = space
 
-        self._mode = np.full(self.shape, np.nan)
-        self._mean = np.full(self.shape, np.nan)
-        self._cov = np.full(2 * self.shape, np.nan)
+        self._init_attr()
 
         self.n = 0
         self.data = self._structure_data([], [])
@@ -767,6 +765,9 @@ class DataEmpirical(Base):
     @classmethod
     def from_data(cls, d, space=None, rng=None):
         return cls(*cls._count_data(d), space, rng)
+
+    def _init_attr(self):
+        self._mode = np.full(self.shape, np.nan)
 
     @staticmethod
     def _count_data(d):
@@ -787,8 +788,8 @@ class DataEmpirical(Base):
     def add_values(self, values, counts):
         values, counts = map(np.array, (values, counts))
         n_new = counts.sum(dtype=np.int)
-        # if n_new == 0:
-        #     return
+        if n_new == 0:
+            return
 
         self.n += n_new
 
@@ -811,10 +812,7 @@ class DataEmpirical(Base):
     def _update_attr(self):
         self._p = self.data['n'] / self.n
 
-        if self.n > 0:
-            self._mode = self.data['x'][self.data['n'].argmax()]
-        else:
-            self._mode = np.nan
+        self._mode = self.data['x'][self.data['n'].argmax()]
 
         self._set_x_plot()
 
@@ -836,8 +834,15 @@ class DataEmpirical(Base):
 
 
 class DataEmpiricalRV(MixinRV, DataEmpirical):
+
     def __repr__(self):
         return f"DataEmpiricalRV(space={self.space}, n={self.n})"
+
+    def _init_attr(self):
+        super()._init_attr()
+
+        self._mean = np.full(self.shape, np.nan)
+        self._cov = np.full(2 * self.shape, np.nan)
 
     def _update_attr(self):
         super()._update_attr()
@@ -848,19 +853,19 @@ class DataEmpiricalRV(MixinRV, DataEmpirical):
         self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p, ctr))
         # TODO: try np.einsum?
 
-# r = Beta(5, 5)
-# # r = Finite(plotting.mesh_grid([0, 1], [3, 4, 5]), np.ones((2, 3)) / 6)
-# # r = Finite(['a', 'b'], [.6, .4])
-# e = DataEmpirical.from_data(r.rvs(10), space=r.space)
-# e.add_data(r.rvs(10))
-
-# e = DataEmpirical(['a', 'b'], [5, 6], space=spaces.FiniteGeneric(['a', 'b']))
-e = DataEmpirical([], [], space=spaces.FiniteGeneric(['a', 'b']))
-# e.add_values(['b', 'c'], [4, 1])
-
-print(e)
-e.plot_pf()
-qq = None
+# # r = Beta(5, 5)
+# # # r = Finite(plotting.mesh_grid([0, 1], [3, 4, 5]), np.ones((2, 3)) / 6)
+# # # r = Finite(['a', 'b'], [.6, .4])
+# # e = DataEmpirical.from_data(r.rvs(10), space=r.space)
+# # e.add_data(r.rvs(10))
+#
+# # e = DataEmpirical(['a', 'b'], [5, 6], space=spaces.FiniteGeneric(['a', 'b']))
+# e = DataEmpirical([], [], space=spaces.FiniteGeneric([0, 1]))
+# # e.add_values(['b', 'c'], [4, 1])
+#
+# print(e)
+# e.plot_pf()
+# qq = None
 
 
 class Mixture(Base):
@@ -928,7 +933,7 @@ class Mixture(Base):
     def _idx_nonzero(self):
         return np.flatnonzero(self._weights)
 
-    def _update_attr(self):     # TODO: logic for single valid dist case?
+    def _update_attr(self):
         self._set_x_plot()
 
         self._p = self._weights / self._weights.sum()
@@ -980,7 +985,6 @@ class MixtureRV(MixinRV, Mixture):
 
         # self._mean = sum(prob * dist.mean for prob, dist in zip(self._p, self.dists) if prob > 0)
         self._mean = sum(self._p[i] * self.dists[i].mean for i in self._idx_nonzero)
-        self._cov = None  # TODO: numeric approx from `space`?
 
 
 # # dists_ = [Beta(*args) for args in [[10, 5], [2, 12]]]
