@@ -43,21 +43,21 @@ class Space:
     def set_x_plot(self, x=None):
         pass
 
-    def make_axes(self):        # TODO: axes kwargs
+    def make_axes(self, grid=False):        # TODO: axes kwargs
         if self.shape == ():
             _, ax = plt.subplots()
             ax.set(xlabel='$x$', ylabel='$f(x)$')
-            return ax
         elif self.shape == (2,):
             _, ax = plt.subplots(subplot_kw={'projection': '3d'})
             ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$f(x)$')
-            return ax
         elif self.shape == (3,):
             _, ax = plt.subplots(subplot_kw={'projection': '3d'})
             ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
-            return ax
         else:
             raise NotImplementedError('Plotting only supported for 1- and 2- dimensional data.')
+
+        ax.grid(grid)
+        return ax
 
     def plot(self, f, x=None, ax=None, label=None):
         raise Exception
@@ -336,7 +336,7 @@ class FiniteGeneric(Finite):
 
     def plot(self, f, x=None, ax=None, label=None):
         if ax is None:
-            ax = self.make_axes()
+            ax = self.make_axes(grid=True)
 
         x, y, set_shape = self._eval_func(f, x)
 
@@ -361,6 +361,33 @@ class FiniteGeneric(Finite):
 
         else:
             raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
+
+    def plot_xy(self, x, y, y_std=None, ax=None, label=None):
+        if ax is None:
+            ax = self.make_axes(grid=True)
+
+        x, set_shape = check_data_shape(x, self.shape)
+        if y.shape != set_shape:
+            raise NotImplementedError
+
+        if len(set_shape) == 1 and self.shape == ():
+            plt_data = ax.plot(x, y, label=label)
+            if y_std is not None:
+                # plt_data_std = ax.errorbar(x, y_mean, yerr=y_std)
+                plt_data_std = ax.fill_between(x, y - y_std, y + y_std, alpha=0.5)
+                plt_data = (plt_data, plt_data_std)
+
+        elif len(set_shape) == 2 and self.shape == (2,):
+            plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, cmap=plt.cm.viridis)
+            if y_std is not None:
+                plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y - y_std, cmap=plt.cm.viridis)
+                plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y + y_std, cmap=plt.cm.viridis)
+                plt_data = (plt_data, (plt_data_lo, plt_data_hi))
+
+        else:
+            raise NotImplementedError
+
+        return plt_data
 
 
 #%%
@@ -452,7 +479,7 @@ class Box(Continuous):      # TODO: make Box inherit from Euclidean?
 
     def plot(self, f, x=None, ax=None, label=None):
         if ax is None:
-            ax = self.make_axes()
+            ax = self.make_axes(grid=True)
 
         x, y, set_shape = self._eval_func(f, x)
 

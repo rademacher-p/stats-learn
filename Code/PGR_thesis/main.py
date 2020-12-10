@@ -19,7 +19,7 @@ from thesis.predictors import (ModelRegressor, BayesRegressor, ModelClassifier, 
 # supp_x = np.array([0, .5])
 supp_x = np.linspace(0, 1, 16, endpoint=True)
 
-w_prior = [1, -1]
+w_prior = [.5, 0]
 
 # model = rand_models.NormalLinear(weights=np.ones(2), basis_y_x=None, cov_y_x=1.,
 #                                  model_x=rand_elements.Normal(0, 10), rng=None)
@@ -27,7 +27,9 @@ w_prior = [1, -1]
 #                                                  ['a', 'b'], p_y=None)
 # model = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
 #                                                 supp_x, p_x=None)
-mean_y_x = 0.5 + 0.5 * np.sin(2*np.pi * supp_x)
+mean_y_x = supp_x ** 3
+# mean_y_x = 0.5 + 0.5 * np.sin(2*np.pi * supp_x)
+# mean_y_x = 1 / (1 + 4 * supp_x ** 4)
 model = rand_models.DataConditional.from_finite([rand_elements.BinomialNormalized(10, p) for p in mean_y_x],
                                                 supp_x, p_x=None)
 
@@ -42,13 +44,10 @@ prior_mean = rand_models.DataConditional.from_finite([rand_elements.BinomialNorm
 # Plotting
 predictors = [
     ModelRegressor(model, name=r'$f_{opt}$'),
-    BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=0.5 * np.eye(2),
-                                             basis_y_x=None, cov_y_x=1.,
-                                             model_x=rand_elements.Uniform(0, 1)), name='Norm'),
-    BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=0.5 * np.eye(2),
+    BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=10 * np.eye(2),
                                              basis_y_x=None, cov_y_x=.1,
-                                             model_x=rand_elements.Uniform(0, 1)), name='Norm_lo'),
-    # BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=4), name='Dir'),
+                                             model_x=rand_elements.FiniteRV(supp_x)), name='Norm'),
+    BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=.1), name='Dir'),
     # BayesRegressor(model),
     # BayesClassifier(bayes_models.Dirichlet(prior_mean, alpha_0=40), name='Dir'),
 ]
@@ -59,26 +58,27 @@ predictors = [
 
 params = [
     {},
-    # {},
-    # {'cov_y_x': [.1, 1]}
-    {'prior_cov': [10, 0.1]},
-    {'prior_cov': [10, 0.1]},
+    {},
+    # {'prior_cov': [10, 0.1]},
     # {'prior_mean.p_x': [[.7,.3], [.4,.6]]},
-    # {},
+    {},
     # {'alpha_0': [.1, 10]},
-    # {'alpha_0': np.arange(.01, 10, .5)}
+    # {'alpha_0': np.arange(.01, 100, 5)}
 ]
 
-n_train = np.arange(0, 50, 5)
-# n_train = [0, 2, 8]
-# n_train = 10
+# n_train = np.arange(0, 100, 5)
+# n_train = [0, 10, 100]
+n_train = 40
 
-# plot_predict_stats_compare(predictors, model, params, x=None, n_train=2, n_mc=30, do_std=True, ax=None, rng=None)
-plot_loss_eval_compare(predictors, model, params, n_train=n_train, n_test=10, n_mc=500,
-                       verbose=True, ax=None, rng=None)
+# plot_loss_eval_compare(predictors, model, params, n_train=n_train, n_test=10, n_mc=300,
+#                        verbose=True, ax=None, rng=None)
+plot_predict_stats_compare(predictors, model, params, x=None, n_train=n_train, n_mc=500, do_std=True,
+                           verbose=True, ax=None, rng=None)
+
+plt.show()
 
 # single predictor methods
-pr = predictors[1]
+pr = predictors[0]
 pr.set_params(cov_prior=5)
 
 # params = None
@@ -94,5 +94,5 @@ params = {'alpha_0': np.linspace(0, 10, 20, endpoint=False)}
 n_train = [0, 2, 4, 8]
 # n_train = np.arange(10)
 
-# pr.plot_predict_stats(model=model, params=params, x=None, n_train=n_train, n_mc=30, do_std=True, ax=None, rng=None)
+pr.plot_predict_stats(model=model, params=params, x=None, n_train=n_train, n_mc=30, do_std=True, ax=None, rng=None)
 # pr.plot_loss_eval(model=model, params=params, n_train=n_train, n_test=10, n_mc=100, verbose=False, ax=None, rng=100)

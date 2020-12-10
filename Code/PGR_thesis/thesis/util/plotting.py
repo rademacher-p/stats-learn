@@ -2,24 +2,7 @@ import math
 
 import numpy as np
 # from matplotlib import pyplot as plt
-from scipy.special import binom
-
-
-# def get_axes_xy(ax=None, shape=None):   # TODO: delete?
-#     if ax is None:
-#         if shape == ():
-#             _, ax = plt.subplots()
-#             ax.set(xlabel='$x$', ylabel='$y$')
-#         elif shape == (2,):
-#             _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-#             ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$y$')
-#         else:
-#             return None
-#
-#         ax.grid(True)
-#         return ax
-#     else:
-#         return ax
+# from scipy.special import binom
 
 
 def simplex_grid(n, shape, hull_mask=None):
