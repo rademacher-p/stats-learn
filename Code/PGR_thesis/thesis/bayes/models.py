@@ -90,6 +90,8 @@ class NormalLinear(Base):
         # Learning
         self.posterior = rand_elements.Normal(self.prior_mean, self.prior_cov)
         self.posterior_model = rand_models.NormalLinear(**self._prior_model_kwargs)
+        # self.posterior_model = rand_models.NormalLinear(model_x=model_x, basis_y_x=basis_y_x,
+        #                                                 **self._prior_model_kwargs)
 
     # Methods
     def random_model(self, rng=None):
@@ -122,13 +124,16 @@ class NormalLinear(Base):
         self.posterior.mean = self.prior_mean
         self.posterior.cov = self.prior_cov
 
-        for key, val in self._prior_model_kwargs.items():
+        kwargs = self._prior_model_kwargs.copy()
+        del kwargs['basis_y_x']
+        for key, val in kwargs.items():
             setattr(self.posterior_model, key, val)
 
     @property
     def _prior_model_kwargs(self):
         return {'weights': self.prior_mean, 'basis_y_x': self.basis_y_x, 'cov_y_x': self._prior_model_cov,
                 'model_x': self.model_x}
+        # return {'weights': self.prior_mean, 'cov_y_x': self._prior_model_cov}
 
     def _update_posterior(self, mean_only=False):
         if not mean_only:
@@ -149,15 +154,18 @@ class NormalLinear(Base):
     @property
     def model_x(self):
         return self._model_x
+        # return self.posterior_model.model_x
 
     @model_x.setter
     def model_x(self, val):
         self._model_x = val
+        # self.posterior_model.model_x = val
         self._reset_posterior()
 
     @property
     def basis_y_x(self):
         return self._basis_y_x
+        # return self.posterior_model.basis_y_x
 
     @property
     def cov_y_x(self):
