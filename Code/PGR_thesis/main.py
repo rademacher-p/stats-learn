@@ -17,7 +17,9 @@ from thesis.predictors import (ModelRegressor, BayesRegressor, ModelClassifier, 
 #%% Sim
 
 # supp_x = np.array([0, .5])
-supp_x = np.linspace(0, 1, 11, endpoint=True)
+supp_x = np.linspace(0, 1, 16, endpoint=True)
+
+norm_mean = [1, -1]
 
 # model = rand_models.NormalLinear(weights=np.ones(2), basis_y_x=None, cov_y_x=1.,
 #                                  model_x=rand_elements.Normal(0, 10), rng=None)
@@ -30,7 +32,8 @@ model = rand_models.DataConditional.from_finite([rand_elements.BinomialNormalize
 
 # prior_mean = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.9, .9)],
 #                                                      supp_x, p_x=None)
-prior_mean = rand_models.DataConditional.from_finite([rand_elements.BinomialNormalized(10, p) for p in supp_x ** 1],
+dir_p_y_x = sum(w * supp_x ** i for i, w in enumerate(norm_mean))
+prior_mean = rand_models.DataConditional.from_finite([rand_elements.BinomialNormalized(10, p) for p in dir_p_y_x],
                                                      supp_x, p_x=None)
 # model = bayes_models.Dirichlet(prior_mean, alpha_0=4)
 
@@ -38,10 +41,10 @@ prior_mean = rand_models.DataConditional.from_finite([rand_elements.BinomialNorm
 # Plotting
 predictors = [
     ModelRegressor(model, name=r'$f_{opt}$'),
-    BayesRegressor(bayes_models.NormalLinear(prior_mean=[0, 1], prior_cov=0.5 * np.eye(2),
+    BayesRegressor(bayes_models.NormalLinear(prior_mean=norm_mean, prior_cov=0.5 * np.eye(2),
                                              basis_y_x=None, cov_y_x=1.,
-                                             model_x=rand_elements.Normal(0, 10)), name='Norm'),
-    # BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=4), name='Dir'),
+                                             model_x=rand_elements.Uniform(0, 1)), name='Norm'),
+    BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=4), name='Dir'),
     # BayesRegressor(model),
     # BayesClassifier(bayes_models.Dirichlet(prior_mean, alpha_0=40), name='Dir'),
 ]
@@ -54,10 +57,10 @@ params = [
     {},
     # {},
     # {'cov_y_x': [.1, 1]}
-    {'prior_cov': [0.1, 1]},
+    {'prior_cov': [10, 0.1]},
     # {'prior_mean.p_x': [[.7,.3], [.4,.6]]},
     # {},
-    # {'alpha_0': [2, 16]},
+    {'alpha_0': [.1, 10]},
     # {'alpha_0': np.arange(.01, 10, .5)}
 ]
 
