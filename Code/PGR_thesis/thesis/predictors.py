@@ -18,42 +18,13 @@ from thesis.random import models as rand_models
 from thesis.util.spaces import check_spaces
 
 
-def plot_xy(x, y, y_std=None, space_x=None, ax=None, label=None):       # TODO: make `space` method?
-
-    # ax = get_axes_xy(ax, self.shape['x'])
-    if ax is None:
-        ax = space_x.make_axes()
-
-    x, set_shape = check_data_shape(x, space_x.shape)
-    if y.shape != set_shape:
-        raise NotImplementedError
-
-    if space_x.shape == () and len(set_shape) == 1:
-        plt_data = ax.plot(x, y, label=label)
-        if y_std is not None:
-            # plt_data_std = ax.errorbar(x, y_mean, yerr=y_std)
-            plt_data_std = ax.fill_between(x, y - y_std, y + y_std, alpha=0.5)
-            plt_data = (plt_data, plt_data_std)
-
-    elif space_x.shape == (2,) and len(set_shape) == 2:
-        plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, cmap=plt.cm.viridis)
-        if y_std is not None:
-            plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y - y_std, cmap=plt.cm.viridis)
-            plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y + y_std, cmap=plt.cm.viridis)
-            plt_data = (plt_data, (plt_data_lo, plt_data_hi))
-
-    else:
-        raise NotImplementedError
-
-    return plt_data
-
-
 def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False,
                           rng=None):
 
-    space = check_spaces(predictors)
+    # space = check_spaces(predictors)
+    space_x = check_spaces([pr.model.model_x for pr in predictors])
     if x is None:
-        x = space['x'].x_plt
+        x = space_x.x_plt
 
     if params is None:
         params_full = [{} for _ in predictors]
@@ -143,12 +114,13 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
 def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, do_std=False, verbose=False,
                                ax=None, rng=None):
 
-    space = check_spaces(predictors)
+    # space = check_spaces(predictors)
+    space_x = check_spaces([pr.model.model_x for pr in predictors])
+
     if x is None:
-        x = space['x'].x_plt
+        x = space_x.x_plt
     if ax is None:
-        ax = space['x'].make_axes()
-    # ax = get_axes_xy(ax, model.shape['x'])
+        ax = space_x.make_axes(grid=True)
 
     if params is None:
         params_full = [{} for _ in predictors]
@@ -194,7 +166,8 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
             y_mean = y_stat['mean']
             y_std = y_stat['std'] if do_std else None
             # plt_data = predictor.plot_xy(x, y_mean, y_std, ax, label=label)
-            plt_data = plot_xy(x, y_mean, y_std, space['x'], ax, label=label)
+            # plt_data = plot_xy(x, y_mean, y_std, space_x, ax, label=label)
+            plt_data = space_x.plot_xy(x, y_mean, y_std, ax, label=label)
             out.append(plt_data)
 
         if labels != [None]:
@@ -217,10 +190,11 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
                     y_mean = y_stat['mean']
                     y_std = y_stat['std'] if do_std else None
                     # plt_data = predictor.plot_xy(x, y_mean, y_std, ax, label=label)
-                    plt_data = plot_xy(x, y_mean, y_std, space['x'], ax, label=label)
+                    # plt_data = plot_xy(x, y_mean, y_std, space_x, ax, label=label)
+                    plt_data = space_x.plot_xy(x, y_mean, y_std, ax, label=label)
                     out.append(plt_data)
         else:
-            raise ValueError
+            raise ValueError("Plotting not supported for multiple predictors and multiple values of n_train.")
 
         ax.legend()
 
@@ -415,36 +389,6 @@ class Base(ABC):
         return loss.mean()
 
     # Plotting utilities
-
-    # def plot_xy(self, x, y, y_std=None, ax=None, label=None):       # TODO: make `space` method?
-    #
-    #     # ax = get_axes_xy(ax, self.shape['x'])
-    #     if ax is None:
-    #         ax = self.space['x'].make_axes()
-    #
-    #     x, set_shape = check_data_shape(x, self.shape['x'])
-    #     if y.shape != set_shape:
-    #         raise NotImplementedError
-    #
-    #     if self.shape['x'] == () and len(set_shape) == 1:
-    #         plt_data = ax.plot(x, y, label=label)
-    #         if y_std is not None:
-    #             # plt_data_std = ax.errorbar(x, y_mean, yerr=y_std)
-    #             plt_data_std = ax.fill_between(x, y - y_std, y + y_std, alpha=0.5)
-    #             plt_data = (plt_data, plt_data_std)
-    #
-    #     elif self.shape['x'] == (2,) and len(set_shape) == 2:
-    #         plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, cmap=plt.cm.viridis)
-    #         if y_std is not None:
-    #             plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y - y_std, cmap=plt.cm.viridis)
-    #             plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y + y_std, cmap=plt.cm.viridis)
-    #             plt_data = (plt_data, (plt_data_lo, plt_data_hi))
-    #
-    #     else:
-    #         raise NotImplementedError
-    #
-    #     return plt_data
-
     def plot_predict(self, x=None, ax=None, label=None):
         """Plot prediction function."""
         # return self.plot_xy(x, self.predict(x), ax=ax, label=label)

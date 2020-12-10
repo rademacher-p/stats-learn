@@ -14,3 +14,15 @@
 - Compare to classic algorithms (Normal regressor)
   - help reader relate
   - demonstrate Dirichlet consistency vs Normal loss
+
+
+# Results log
+
+### 1 - norm vs dir loss vs N
+16 point grid
+.5 + 0*x prior mean
+x**4 true mean
+
+### 2 - alpha_0 loss min
+.5 + .2*x true mean
+up to 100 a_0
