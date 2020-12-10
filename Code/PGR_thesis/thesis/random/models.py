@@ -250,7 +250,8 @@ class DataConditional(Base):
         self._mode_x = self.model_x.mode
 
     def model_y_x(self, x):
-        idx = self.space['x'].values.tolist().index(x)
+        # idx = self.space['x'].values.tolist().index(x)
+        idx = np.flatnonzero(np.isclose(x, self.space['x'].values)).item()
         return self.dists[idx]
 
     def _mode_y_x_single(self, x):

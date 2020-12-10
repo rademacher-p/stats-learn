@@ -659,6 +659,32 @@ class Binomial(BaseRV):
         return np.exp(log_pf)
 
 
+class BinomialNormalized(Binomial):
+    """
+    Binomial random variable, normalized to unit interval.
+    """
+
+    def __init__(self, n, p, rng=None):
+        super().__init__(n, p, rng)
+        self._space = spaces.FiniteGeneric(np.arange(n + 1) / n)
+
+    def __repr__(self):
+        return f"BinomialNormalized({self.n}, {self.p})"
+
+    def _update_attr(self):
+        super()._update_attr()
+        self._mode /= self._n
+        self._mean /= self._n
+        self._cov /= (self._n ** 2)
+
+    def _rvs(self, n, rng):
+        return super()._rvs(n, rng) / self._n
+
+    def pf(self, x):
+        x = np.array(x) * self._n
+        return super().pf(x)
+
+
 class Normal(BaseRV):
     def __init__(self, mean=0., cov=1., rng=None):
         """
