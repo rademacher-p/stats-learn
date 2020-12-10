@@ -13,3 +13,4 @@
   - Needed to make continuous Dirichlet viable
 - Compare to classic algorithms (Normal regressor)
   - help reader relate
+  - demonstrate Dirichlet consistency vs Normal loss
