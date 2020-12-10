@@ -534,7 +534,8 @@ class Beta(BaseRV):
 
         if a <= 0 or b <= 0:
             raise ValueError("Parameters must be strictly positive.")
-        self._a, self._b = a, b
+        self._a = a
+        self._b = b
 
         self._update_attr()
 
@@ -588,6 +589,73 @@ class Beta(BaseRV):
     def pf(self, x):
         x = np.array(x)
         log_pf = xlog1py(self._b - 1.0, -x) + xlogy(self._a - 1.0, x) - betaln(self._a, self._b)
+        return np.exp(log_pf)
+
+
+class Binomial(BaseRV):
+    """
+    Binomial random variable.
+    """
+
+    def __init__(self, n, p, rng=None):
+        super().__init__(rng)
+        self._space = spaces.FiniteGeneric(np.arange(n + 1))
+
+        if n < 0:
+            raise ValueError
+        elif p < 0 or p > 1:
+            raise ValueError
+        self._n = n
+        self._p = p
+
+        self._update_attr()
+
+    def __repr__(self):
+        return f"Binomial({self.n}, {self.p})"
+
+    # Input properties
+    @property
+    def n(self):
+        return self._n
+
+    @n.setter
+    def n(self, n):
+        if n < 0:
+            raise ValueError
+        self._n = n
+        self._update_attr()
+
+    @property
+    def p(self):
+        return self._p
+
+    @p.setter
+    def p(self, p):
+        if p < 0 or p > 1:
+            raise ValueError
+        self._p = p
+        self._update_attr()
+
+    # Attribute Updates
+    def _update_attr(self):
+        _val = (self._n + 1) * self._p
+        if _val == 0 or _val % 1 != 0:
+            self._mode = math.floor(_val)
+        elif _val - 1 in range(self._n):
+            self._mode = _val
+        elif _val - 1 == self._n:
+            self._mode = self._n
+
+        self._mean = self._n * self._p
+        self._cov = self._n * self._p * (1 - self._p)
+
+    def _rvs(self, n, rng):
+        return rng.binomial(self._n, self._p, size=n)
+
+    def pf(self, x):
+        x = np.floor(x)
+        combiln = (gammaln(self._n + 1) - (gammaln(x + 1) + gammaln(self._n - x + 1)))
+        log_pf = combiln + xlogy(x, self._p) + xlog1py(self._n - x, -self._p)
         return np.exp(log_pf)
 
 
