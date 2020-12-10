@@ -25,7 +25,7 @@ supp_x = np.linspace(0, 1, 11, endpoint=True)
 #                                                  ['a', 'b'], p_y=None)
 # model = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
 #                                                 supp_x, p_x=None)
-model = rand_models.DataConditional.from_finite([rand_elements.BinomialNormalized(10, p) for p in supp_x ** 1],
+model = rand_models.DataConditional.from_finite([rand_elements.BinomialNormalized(10, p) for p in supp_x ** 2],
                                                 supp_x, p_x=None)
 
 # prior_mean = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.9, .9)],
@@ -38,10 +38,10 @@ prior_mean = rand_models.DataConditional.from_finite([rand_elements.BinomialNorm
 # Plotting
 predictors = [
     ModelRegressor(model, name=r'$f_{opt}$'),
-    # BayesRegressor(bayes_models.NormalLinear(prior_mean=0 * np.ones(2), prior_cov=0.5 * np.eye(2),
-    #                                          basis_y_x=None, cov_y_x=1.,
-    #                                          model_x=rand_elements.Normal(0, 10)), name='Norm'),
-    BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=4), name='Dir'),
+    BayesRegressor(bayes_models.NormalLinear(prior_mean=[0, 1], prior_cov=0.5 * np.eye(2),
+                                             basis_y_x=None, cov_y_x=1.,
+                                             model_x=rand_elements.Normal(0, 10)), name='Norm'),
+    # BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=4), name='Dir'),
     # BayesRegressor(model),
     # BayesClassifier(bayes_models.Dirichlet(prior_mean, alpha_0=40), name='Dir'),
 ]
@@ -52,20 +52,21 @@ predictors = [
 
 params = [
     {},
-    # {'cov_y_x_': [2, 3]}
-    # {'prior_cov': [0.1, 1, 10]},
+    # {},
+    # {'cov_y_x': [.1, 1]}
+    {'prior_cov': [0.1, 1]},
     # {'prior_mean.p_x': [[.7,.3], [.4,.6]]},
     # {},
-    {'alpha_0': [2, 16]},
+    # {'alpha_0': [2, 16]},
     # {'alpha_0': np.arange(.01, 10, .5)}
 ]
 
-n_train = np.arange(0, 10)
+n_train = np.arange(0, 50, 5)
 # n_train = [0, 2, 8]
 # n_train = 10
 
 # plot_predict_stats_compare(predictors, model, params, x=None, n_train=2, n_mc=30, do_std=True, ax=None, rng=None)
-plot_loss_eval_compare(predictors, model, params, n_train=n_train, n_test=20, n_mc=2000,
+plot_loss_eval_compare(predictors, model, params, n_train=n_train, n_test=10, n_mc=1000,
                        verbose=True, ax=None, rng=None)
 
 # single predictor methods
