@@ -685,6 +685,68 @@ class BinomialNormalized(Binomial):
         return super().pf(x)
 
 
+class Uniform(BaseRV):
+    """
+    Binomial random variable.
+    """
+
+    def __init__(self, a, b, rng=None):
+        super().__init__(rng)
+        self._space = spaces.Box((a, b))
+
+        if b < a:
+            raise ValueError
+        self._a = a
+        self._b = b
+
+        self._update_attr()
+
+    def __repr__(self):
+        return f"Uniform({self.a}, {self.b})"
+
+    lims = property(lambda self: (self.a, self.b))
+
+    # Input properties
+    @property
+    def a(self):
+        return self._a
+
+    @a.setter
+    def a(self, a):
+        if a > self._b:
+            raise ValueError
+        self._a = a
+        self._update_attr()
+
+    @property
+    def b(self):
+        return self._b
+
+    @b.setter
+    def b(self, b):
+        if b < self._a:
+            raise ValueError
+        self._b = b
+        self._update_attr()
+
+    # Attribute Updates
+    def _update_attr(self):
+        self._mode = sum(self.lims) / 2
+
+        self._mean = sum(self.lims) / 2
+        self._cov = (self._b - self._a) ** 2 / 12
+
+    def _rvs(self, n, rng):
+        return rng.uniform(self._a, self._b, size=n)
+
+    def pf(self, x):
+        x = np.array(x)
+        if not ((x >= self._a).all() and (x <= self._b).all()):
+            raise ValueError(f"Values must be in interval {self.lims}")
+
+        return np.full(x.shape, 1 / (self._b - self._a))
+
+
 class Normal(BaseRV):
     def __init__(self, mean=0., cov=1., rng=None):
         """
