@@ -1,3 +1,6 @@
+# Outline
+
+## Base structure
 - Use both discrete and continuous
   - for math impact and realism
 - Bayesian and conditional risk results
@@ -7,7 +10,7 @@
   - SHOW IN STATS PLOTS!
   - model estimation perspective, too?
 
-# Primary objectives
+## Outstanding goals
 - Non-trivial data support for discrete results
   - realism for reader
 - Find a sensible application for "countable" continuous data support
@@ -17,7 +20,9 @@
   - demonstrate Dirichlet consistency vs Normal loss
 
 
-# Results log
+# Conditional risk results
+
+**REMAKE plots with proper number of values y**
 
 <!-- ## Loss vs N, vs Norm
 - 16 point [0, 1] grid
@@ -73,7 +78,11 @@
 ## Loss vs alpha_0
 - true mean: f(x) = .3 + .4* x**2
 
+### unbiased
+![](loss_alpha_unbiased.png)
+
 ### biased mean, f(x) = .5
-
-
 ![](loss_alpha_biased.png)
+
+
+# Bayesian risk results

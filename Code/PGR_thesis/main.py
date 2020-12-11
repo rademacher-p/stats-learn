@@ -26,7 +26,7 @@ def weights_to_mean(weights):
 
 
 def mean_to_rv(mean):
-    return rand_elements.BinomialNormalized(10, mean)
+    return rand_elements.BinomialNormalized(supp_x.size, mean)
     # return rand_elements.Beta.from_mean(50, mean)
 
 
@@ -44,7 +44,7 @@ mean_y_x = weights_to_mean([.5, 0, 0])
 # mean_y_x = 0.5 + 0.5 * np.sin(2*np.pi * supp_x)
 # mean_y_x = 1 / (1 + 4 * supp_x ** 4)
 model = rand_models.DataConditional(list(map(mean_to_rv, mean_y_x)), model_x)
-model = bayes_models.Dirichlet(model, alpha_0=5)
+model = bayes_models.Dirichlet(model, alpha_0=7)
 
 # w_prior = np.array([.5, 0, .5])
 w_prior = np.array([.5, 0, 0])
@@ -84,7 +84,7 @@ params = [
 # n_train = [0, 10, 20]
 n_train = 10
 
-plot_loss_eval_compare(predictors, model, params, n_train=n_train, n_test=10, n_mc=1000,
+plot_loss_eval_compare(predictors, model, params, n_train=n_train, n_test=1, n_mc=1000,
                        verbose=True, ax=None, rng=None)
 # plot_predict_stats_compare(predictors, model, params, x=None, n_train=n_train, n_mc=300, do_std=True,
 #                            verbose=True, ax=None, rng=None)
