@@ -288,7 +288,7 @@ def plot_loss_eval_compare(predictors, model, params=None, n_train=0, n_test=1, 
                 loss = np.transpose(loss)
                 xlabel, x_plt = 'N', n_train
                 if len(param_vals) == 1:
-                    title += f"{param_name} = {param_vals[0]}"
+                    title += f", {param_name} = {param_vals[0]}"
                     labels = [None]
                 else:
                     labels = [f"{param_name} = {val}" for val in param_vals]

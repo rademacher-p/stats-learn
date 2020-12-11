@@ -39,26 +39,26 @@ def mean_to_rv(mean):
 # prior_mean = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.9, .9)],
 #                                                      supp_x, p_x=None)
 
-# mean_y_x = weights_to_mean(w_prior)
-mean_y_x = weights_to_mean([0, 0, 1])
+# mean_y_x = weights_to_mean([0, 0, 1])
+mean_y_x = weights_to_mean([.5, 0, 0])
 # mean_y_x = 0.5 + 0.5 * np.sin(2*np.pi * supp_x)
 # mean_y_x = 1 / (1 + 4 * supp_x ** 4)
 model = rand_models.DataConditional(list(map(mean_to_rv, mean_y_x)), model_x)
+model = bayes_models.Dirichlet(model, alpha_0=5)
 
-# w_prior = np.array([0, 0, 1])
-w_prior = np.array([.5, 0])
+# w_prior = np.array([.5, 0, .5])
+w_prior = np.array([.5, 0, 0])
 
 mean_y_x_dir = weights_to_mean(w_prior)
 prior_mean = rand_models.DataConditional(list(map(mean_to_rv, mean_y_x_dir)), model_x)
-# model = bayes_models.Dirichlet(prior_mean, alpha_0=4)
 
 
 # Plotting
 predictors = [
-    ModelRegressor(model, name=r'$f_{opt}$'),
-    BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=10 * np.eye(w_prior.size),
-                                             basis_y_x=None, cov_y_x=.1,
-                                             model_x=model_x), name='Norm'),
+    # ModelRegressor(model, name=r'$f_{opt}$'),
+    # BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=10 * np.eye(w_prior.size),
+    #                                          basis_y_x=None, cov_y_x=.1,
+    #                                          model_x=model_x), name='Norm'),
     BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=.1), name='Dir'),
     # BayesRegressor(model),
     # BayesClassifier(bayes_models.Dirichlet(prior_mean, alpha_0=40), name='Dir'),
@@ -69,25 +69,25 @@ predictors = [
 #                              n_train=[10], n_test=10, n_mc=400, verbose=True, ax=None, rng=None)
 
 params = [
-    {},
+    # {},
     # {},
     # {'prior_cov': [10, 0.05]},
-    {'prior_cov': [10]},
+    # {'prior_cov': [10]},
     # {'prior_mean.p_x': [[.7,.3], [.4,.6]]},
     # {},
     # {'alpha_0': [.1, 50]},
-    {'alpha_0': [.1]},
-    # {'alpha_0': np.arange(.01, 100, 5)}
+    # {'alpha_0': [50]},
+    {'alpha_0': .01 + np.arange(0, 10, .2)}
 ]
 
 # n_train = np.arange(0, 200, 5)
-# n_train = [0, 100, 200]
-n_train = 100
+# n_train = [0, 10, 20]
+n_train = 10
 
-# plot_loss_eval_compare(predictors, model, params, n_train=n_train, n_test=10, n_mc=100,
-#                        verbose=True, ax=None, rng=None)
-plot_predict_stats_compare(predictors, model, params, x=None, n_train=n_train, n_mc=1000, do_std=True,
-                           verbose=True, ax=None, rng=None)
+plot_loss_eval_compare(predictors, model, params, n_train=n_train, n_test=10, n_mc=1000,
+                       verbose=True, ax=None, rng=None)
+# plot_predict_stats_compare(predictors, model, params, x=None, n_train=n_train, n_mc=300, do_std=True,
+#                            verbose=True, ax=None, rng=None)
 
 plt.show()
 

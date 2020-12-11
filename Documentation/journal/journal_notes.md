@@ -41,28 +41,39 @@
 - Normal: cov_y_x=.1
 
 ### unbiased mean
+![](predict_unbiased_dir.png)
+
 - Norm order = 2
 ![](loss_n_unbiased.png)
+![](predict_unbiased.png)
 
 ### biased mean, f(x) = .5
+![](predict_biased_dir.png)
+
 - Norm order = 1
 ![](loss_n_biased.png)
+![](predict_biased.png)
 - Norm order = 2
 ![](loss_n_biased_norm2.png)
 
 
-## Loss vs N, vs Norm, hard non-linear
+## Loss vs N, vs Norm, hard non-poly
 - p_x: uniform on 16 point [0, 1] grid
 - true mean: f(x) = 1 / (2 + sin(2*pi* x))
 - Normal: cov_y_x=.1
 
 ### biased mean, f(x) = .5
+![](predict_biased_hi_dir.png)
+
 - Norm order = 2
 ![](loss_n_biased_hi.png)
+![](predict_biased_hi.png)
 
 
 ## Loss vs alpha_0
-- true mean: f(x) = .5 + .2*x
-- prior mean: f(x) = .5
+- true mean: f(x) = .3 + .4* x**2
+
+### biased mean, f(x) = .5
+
 
 ![](loss_alpha_biased.png)
