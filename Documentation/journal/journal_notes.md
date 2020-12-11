@@ -18,10 +18,13 @@
 
 # Results log
 
-### 1 - norm vs dir loss vs N
-16 point grid
-.5 + 0*x prior mean
-x**4 true mean
+### dir vs norm, biased mean
+- 16 point [0, 1] grid
+- prior mean: f(x) = .5
+- true mean: f(x) = x**3
+- Normal: 1st order mean, cov_y_x=.1
+
+![](result_1.png)
 
 ### 2 - alpha_0 loss min
 .5 + .2*x true mean

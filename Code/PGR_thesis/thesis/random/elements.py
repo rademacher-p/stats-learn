@@ -542,6 +542,10 @@ class Beta(BaseRV):
     def __repr__(self):
         return f"Beta({self.a}, {self.b})"
 
+    @classmethod
+    def from_mean(cls, alpha_0, mean, rng=None):
+        return cls(alpha_0 * mean, alpha_0 * (1 - mean), rng)
+
     # Input properties
     @property
     def a(self):
@@ -664,8 +668,8 @@ class BinomialNormalized(Binomial):
     Binomial random variable, normalized to unit interval.
     """
 
-    def __init__(self, n, p, rng=None):
-        super().__init__(n, p, rng)
+    def __init__(self, n, mean, rng=None):
+        super().__init__(n, mean, rng)
         self._space = spaces.FiniteGeneric(np.arange(n + 1) / n)
 
     def __repr__(self):
