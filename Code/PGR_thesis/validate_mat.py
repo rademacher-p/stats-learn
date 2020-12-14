@@ -22,9 +22,9 @@ model_x = rand_elements.FiniteRV(supp_x, p=None)
 # model = rand_models.ClassConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
 #                                                  ['a', 'b'], p_y=None)
 model = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
-model = bayes_models.Dirichlet(model, alpha_0=3)
+# model = bayes_models.Dirichlet(model, alpha_0=3)
 
-prior_mean = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
+prior_mean = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.9, .9)], model_x)
 
 
 # Plotting
@@ -43,15 +43,15 @@ params = [
     # {},
     # {'alpha_0': [2, 16]},
     # {'alpha_0': [50]},
-    {'alpha_0': .01 + np.arange(0, 10, .2)}
+    {'alpha_0': .01 + np.arange(0, 10, .5)}
     # {'prior_mean.p_x': [[.7,.3], [.4,.6]]},
 ]
 
 # n_train = np.arange(0, 50, 5)
-# n_train = [0, 10, 20]
-n_train = 10
+n_train = [0, 2, 4, 8]
+# n_train = 10
 
-plot_loss_eval_compare(predictors, model, params, n_train=n_train, n_test=1, n_mc=2000,
+plot_loss_eval_compare(predictors, model, params, n_train=n_train, n_test=10, n_mc=5000,
                        verbose=True, ax=None, rng=None)
 # plot_predict_stats_compare(predictors, model, params, x=None, n_train=n_train, n_mc=300, do_std=True,
 #                            verbose=True, ax=None, rng=None)
