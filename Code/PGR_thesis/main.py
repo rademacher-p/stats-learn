@@ -43,7 +43,7 @@ model = rand_models.DataConditional(list(map(mean_to_rv, mean_y_x)), model_x)
 # model = rand_models.ClassConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
 #                                                  ['a', 'b'], p_y=None)
 
-# model = bayes_models.Dirichlet(model, alpha_0=7)
+model = bayes_models.Dirichlet(model, alpha_0=15)
 
 
 w_prior = [.5, 0, 0]
@@ -61,14 +61,14 @@ n_train = [0, 10, 20]
 # n_train = np.arange(0, 200, 5)
 
 # dir_params = None
-dir_params = {'alpha_0': .01 + np.arange(0, 80, 5)}
+dir_params = {'alpha_0': .001 + np.arange(0, 30, 5)}
 
 
 #
 # loss = dir_predictor.loss_eval(model, params=None, n_train=n_train, n_test=1, n_mc=20000, verbose=True, rng=None)
 # print(loss)
 
-dir_predictor.plot_loss_eval(model, params=dir_params, n_train=n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
+dir_predictor.plot_loss_eval(model, params=dir_params, n_train=n_train, n_test=1, n_mc=4000, verbose=True, rng=None)
 
 # bayes_risk = 0.
 # for x in model.space['x'].values:
