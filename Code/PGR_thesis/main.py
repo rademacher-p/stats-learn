@@ -17,7 +17,7 @@ from thesis.predictors import (ModelRegressor, BayesRegressor, ModelClassifier, 
 # %% Sim
 
 # supp_x = np.array([0, .5])
-supp_x = np.linspace(0, 1, 16, endpoint=True)
+supp_x = np.linspace(0, 1, 11, endpoint=True)
 
 model_x = rand_elements.FiniteRV(supp_x, p=None)
 
@@ -31,8 +31,8 @@ def mean_to_rv(mean):
     # return rand_elements.Beta.from_mean(50, mean)
 
 
-# mean_y_x = poly(supp_x, [0, 0, 1])
-mean_y_x = poly(supp_x, [.5, 0, 0])
+# mean_y_x = poly(supp_x, [.5, 0, 0])
+mean_y_x = poly(supp_x, [.3, 0, .4])
 # mean_y_x = 0.5 + 0.5 * np.sin(2*np.pi * supp_x)
 # mean_y_x = 1 / (1 + np.exp(10 * supp_x))
 # mean_y_x = 1 / (2 + np.sin(2*np.pi * supp_x))
@@ -43,7 +43,7 @@ model = rand_models.DataConditional(list(map(mean_to_rv, mean_y_x)), model_x)
 # model = rand_models.ClassConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
 #                                                  ['a', 'b'], p_y=None)
 
-model = bayes_models.Dirichlet(model, alpha_0=7)
+# model = bayes_models.Dirichlet(model, alpha_0=7)
 
 
 w_prior = [.5, 0, 0]
@@ -57,11 +57,11 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=1), na
 # Plotting
 
 # n_train = 2
-n_train = [0, 2, 8]
+n_train = [0, 10, 20]
 # n_train = np.arange(0, 200, 5)
 
 # dir_params = None
-dir_params = {'alpha_0': .01 + np.arange(0, 10, .2)}
+dir_params = {'alpha_0': .01 + np.arange(0, 80, 5)}
 
 
 #
