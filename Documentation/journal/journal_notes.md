@@ -24,6 +24,10 @@
 
 **REMAKE plots with proper number of values y**
 
+- X_set = Y_set = uniform grid on [0, 1]
+- p_x(x) = constant
+- p_y_x(x) = BinomialNormalized(n_grid, true_mean(x))
+
 <!-- ## Loss vs N, vs Norm
 - 16 point [0, 1] grid
 - Normal: 1st order mean, cov_y_x=.1
@@ -41,7 +45,6 @@
 ![](loss_n_unbiased_v2.png) -->
 
 ## Loss vs N, vs Norm, poly
-- p_x: uniform on 16 point [0, 1] grid
 - true mean: f(x) = x**2
 - Normal: cov_y_x=.1
 
@@ -63,7 +66,6 @@
 
 
 ## Loss vs N, vs Norm, hard non-poly
-- p_x: uniform on 16 point [0, 1] grid
 - true mean: f(x) = 1 / (2 + sin(2*pi* x))
 - Normal: cov_y_x=.1
 
@@ -86,3 +88,9 @@
 
 
 # Bayesian risk results
+
+## Loss vs alpha_0
+- true mean: f(x) = .5
+- true alpha_0 = 10
+
+![](loss_bayes_alpha_unbiased.png)

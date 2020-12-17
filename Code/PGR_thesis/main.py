@@ -57,11 +57,12 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=1), na
 # Plotting
 
 # n_train = 10
-n_train = [0, 5, 10]
-# n_train = np.arange(0, 200, 5)
+# n_train = [0, 5, 10]
+n_train = np.arange(0, 50, 5)
 
 # dir_params = None
-dir_params = {'alpha_0': .001 + np.arange(0, 50, 2)}
+dir_params = {'alpha_0': [1, 10, 100]}
+# dir_params = {'alpha_0': .001 + np.arange(0, 50, 2)}
 
 
 #
