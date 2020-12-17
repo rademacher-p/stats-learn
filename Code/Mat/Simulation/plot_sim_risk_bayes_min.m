@@ -7,27 +7,27 @@ clear;
 %%% Inputs
 
 en_emp = 1;
-N_mc = 1000;                  % Number of monte carlo iterations
+N_mc = 4000;                  % Number of monte carlo iterations
 
 
-% Y = num2cell((1:2)'/2);             % output set
-% X = num2cell((1:1)'/1);             % input set
+Y = num2cell((1:2)'/2);             % output set
+X = num2cell((1:2)'/2);             % input set
 
 % Y = {'a';'b';'c';'d'};
-Y = num2cell((1:2)');
-X = num2cell((1:2)');
+% Y = num2cell((1:2)');
+% X = num2cell((1:2)');
 
 fcn_prior = @dirrnd;
 
 
 
-% fcn_loss = @loss_SE;
-% fcn_learn = @learn_dir_SE;
-% fcn_risk_a = @risk_min_dir_SE;
+fcn_loss = @loss_SE;
+fcn_learn = @learn_dir_SE;
+fcn_risk_a = @risk_min_dir_SE;
 
-fcn_loss = @loss_01;
-fcn_learn = @learn_dir_01;
-fcn_risk_a = @risk_min_dir_01;
+% fcn_loss = @loss_01;
+% fcn_learn = @learn_dir_01;
+% fcn_risk_a = @risk_min_dir_01;
 
 
 
@@ -35,13 +35,13 @@ fcn_risk_a = @risk_min_dir_01;
 % N = 1;
 % N = [0, 1, 10, 100]';
 % N = [0, 1, 2, 4]';
-% N = [0, 2, 4, 8]';
-N = (0:1:5)';
+N = [0, 2, 4]';
+% N = (0:1:5)';
 
 % alpha_0 = .001*numel(Y)*numel(X);
 % alpha_0 = 10;
-alpha_0 = numel(Y)*numel(X)*[.1, 1, 10]';
-% alpha_0 = (.1:.1:20)';
+% alpha_0 = numel(Y)*numel(X)*[.1, 1, 10]';
+alpha_0 = (.1:.1:20)';
 
 P_x = ones(numel(X),1)/numel(X);
 % P_x = [.99; .01];
