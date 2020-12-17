@@ -88,9 +88,11 @@
 
 
 # Bayesian risk results
-
-## Loss vs alpha_0
 - true mean: f(x) = .5
 - true alpha_0 = 10
 
+## Loss vs N
+![](loss_bayes_n_unbiased.png)
+
+## Loss vs alpha_0
 ![](loss_bayes_alpha_unbiased.png)
