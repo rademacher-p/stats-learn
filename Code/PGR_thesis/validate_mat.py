@@ -31,19 +31,19 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=3), na
 
 # Plotting
 
-# n_train = 2
-n_train = [2, 4]
+n_train = 2
+# n_train = [2, 4]
 # n_train = np.arange(0, 11, 1)
 
 # dir_params = None
-dir_params = {'alpha_0': .001 + np.arange(0, 10, .2)}
+dir_params = {'alpha_0': .001 + np.arange(2, 4, .2)}
 
 
 #
 # loss = dir_predictor.loss_eval(model, params=dir_params, n_train=n_train, n_test=1, n_mc=20000, verbose=True, rng=None)
 # print(loss)
 
-dir_predictor.plot_loss_eval(model, params=dir_params, n_train=n_train, n_test=1, n_mc=3000, verbose=True, rng=None)
+dir_predictor.plot_loss_eval(model, params=dir_params, n_train=n_train, n_test=1, n_mc=10000, verbose=True, rng=None)
 
 bayes_risk = 0.
 for x in model.space['x'].values:
