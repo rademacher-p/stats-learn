@@ -22,17 +22,17 @@ model_x = rand_elements.FiniteRV([0, .5], p=None)
 
 model = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
 
-# model = bayes_models.Dirichlet(model, alpha_0=1)
+model = bayes_models.Dirichlet(model, alpha_0=3)
 
 
-prior_mean = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.9, .9)], model_x)
-dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=1), name='Dir')
+prior_mean = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
+dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=3), name='Dir')
 
 
 # Plotting
 
 # n_train = 2
-n_train = [0, 2, 8]
+n_train = [0, 2, 4]
 # n_train = np.arange(0, 11, 1)
 
 # dir_params = None
@@ -43,15 +43,15 @@ dir_params = {'alpha_0': .01 + np.arange(0, 10, .2)}
 # loss = dir_predictor.loss_eval(model, params=dir_params, n_train=n_train, n_test=1, n_mc=20000, verbose=True, rng=None)
 # print(loss)
 
-dir_predictor.plot_loss_eval(model, params=dir_params, n_train=n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
+dir_predictor.plot_loss_eval(model, params=dir_params, n_train=n_train, n_test=1, n_mc=3000, verbose=True, rng=None)
 
-# bayes_risk = 0.
-# for x in model.space['x'].values:
-#     alpha_m = model.prior_mean.model_x.pf(x)
-#     weight = (alpha_m + 1 / (model.alpha_0 + n_train)) / (alpha_m + 1 / model.alpha_0)
-#     bayes_risk += alpha_m * model.prior_mean.model_y_x(x).cov * weight
-#
-# print(bayes_risk)
+bayes_risk = 0.
+for x in model.space['x'].values:
+    alpha_m = model.prior_mean.model_x.pf(x)
+    weight = (alpha_m + 1 / (model.alpha_0 + n_train)) / (alpha_m + 1 / model.alpha_0)
+    bayes_risk += alpha_m * model.prior_mean.model_y_x(x).cov * weight
+
+print(bayes_risk)
 
 
 #
