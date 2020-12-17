@@ -43,7 +43,7 @@ model = rand_models.DataConditional(list(map(mean_to_rv, mean_y_x)), model_x)
 # model = rand_models.ClassConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
 #                                                  ['a', 'b'], p_y=None)
 
-model = bayes_models.Dirichlet(model, alpha_0=5)
+model = bayes_models.Dirichlet(model, alpha_0=10)
 
 
 w_prior = [.5, 0, 0]
@@ -56,12 +56,12 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=1), na
 
 # Plotting
 
-n_train = 2
-# n_train = [0, 10, 20]
+# n_train = 10
+n_train = [0, 5, 10]
 # n_train = np.arange(0, 200, 5)
 
 # dir_params = None
-dir_params = {'alpha_0': .001 + np.arange(0, 10, .2)}
+dir_params = {'alpha_0': .001 + np.arange(0, 50, 2)}
 
 
 #
