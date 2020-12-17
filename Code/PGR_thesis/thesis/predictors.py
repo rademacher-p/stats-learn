@@ -29,7 +29,8 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
     if params is None:
         params_full = [{} for _ in predictors]
     else:
-        params_full = params
+        # params_full = params
+        params_full = [item if item is not None else {} for item in params]
 
     if isinstance(n_train, (Integral, np.integer)):
         n_train = [n_train]
@@ -125,7 +126,8 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
     if params is None:
         params_full = [{} for _ in predictors]
     else:
-        params_full = params
+        # params_full = params
+        params_full = [item if item is not None else {} for item in params]
 
     if isinstance(n_train, (Integral, np.integer)):
         n_train = [n_train]
@@ -208,7 +210,8 @@ def loss_eval_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=
     if params is None:
         params_full = [{} for _ in predictors]
     else:
-        params_full = params
+        # params_full = params
+        params_full = [item if item is not None else {} for item in params]
 
     if isinstance(n_train, (Integral, np.integer)):
         n_train = [n_train]
@@ -254,7 +257,8 @@ def plot_loss_eval_compare(predictors, model, params=None, n_train=0, n_test=1, 
     if params is None:
         params_full = [{} for _ in predictors]
     else:
-        params_full = params
+        # params_full = params
+        params_full = [item if item is not None else {} for item in params]
 
     if isinstance(n_train, (Integral, np.integer)):
         n_train = [n_train]
