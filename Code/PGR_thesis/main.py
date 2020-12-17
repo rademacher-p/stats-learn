@@ -34,10 +34,6 @@ def mean_to_rv(mean):
 #                                  model_x=rand_elements.Normal(0, 10), rng=None)
 # model = rand_models.ClassConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
 #                                                  ['a', 'b'], p_y=None)
-# model = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
-#                                                 supp_x, p_x=None)
-# prior_mean = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.9, .9)],
-#                                                      supp_x, p_x=None)
 
 # mean_y_x = weights_to_mean([0, 0, 1])
 mean_y_x = weights_to_mean([.5, 0, 0])
@@ -82,9 +78,9 @@ params = [
 
 # n_train = np.arange(0, 200, 5)
 # n_train = [0, 10, 20]
-n_train = 10
+n_train = 1
 
-plot_loss_eval_compare(predictors, model, params, n_train=n_train, n_test=1, n_mc=1000,
+plot_loss_eval_compare(predictors, model, params, n_train=n_train, n_test=1, n_mc=2000,
                        verbose=True, ax=None, rng=None)
 # plot_predict_stats_compare(predictors, model, params, x=None, n_train=n_train, n_mc=300, do_std=True,
 #                            verbose=True, ax=None, rng=None)
