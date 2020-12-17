@@ -38,7 +38,8 @@ def mean_to_rv(mean):
 # mean_y_x = weights_to_mean([0, 0, 1])
 mean_y_x = weights_to_mean([.5, 0, 0])
 # mean_y_x = 0.5 + 0.5 * np.sin(2*np.pi * supp_x)
-# mean_y_x = 1 / (1 + 4 * supp_x ** 4)
+# mean_y_x = 1 / (1 + np.exp(10 * supp_x))
+# mean_y_x = 1 / (2 + np.sin(2*np.pi * supp_x))
 model = rand_models.DataConditional(list(map(mean_to_rv, mean_y_x)), model_x)
 model = bayes_models.Dirichlet(model, alpha_0=7)
 
