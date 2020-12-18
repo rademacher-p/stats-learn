@@ -16,12 +16,6 @@ from thesis.predictors import (ModelRegressor, BayesRegressor, ModelClassifier, 
 
 # %% Sim
 
-# supp_x = np.array([0, .5])
-supp_x = np.linspace(0, 1, 11, endpoint=True)
-
-model_x = rand_elements.FiniteRV(supp_x, p=None)
-
-
 def poly(x, weights):
     return sum(w * x ** i for i, w in enumerate(weights))
 
@@ -30,6 +24,13 @@ def mean_to_rv(mean):
     return rand_elements.BinomialNormalized(supp_x.size, mean)
     # return rand_elements.Beta.from_mean(50, mean)
 
+
+# True model
+
+# supp_x = np.array([0, .5])
+supp_x = np.linspace(0, 1, 11, endpoint=True)
+
+model_x = rand_elements.FiniteRV(supp_x, p=None)
 
 mean_y_x = poly(supp_x, [.5, 0, 0])
 # mean_y_x = poly(supp_x, [.3, 0, .4])
@@ -45,6 +46,15 @@ model = rand_models.DataConditional(list(map(mean_to_rv, mean_y_x)), model_x)
 
 model = bayes_models.Dirichlet(model, alpha_0=10)
 
+if isinstance(model, rand_models.Base):
+    opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}$')
+elif isinstance(model, bayes_models.Base):
+    opt_predictor = BayesRegressor(model, name=r'$f^*$')
+else:
+    raise TypeError
+
+
+# Dirichlet learner
 
 w_prior = [.5, 0, 0]
 # w_prior = [.5, 0, .5]
@@ -66,19 +76,16 @@ dir_params = {'alpha_0': [1, 10, 100]}
 
 
 #
-# loss = dir_predictor.loss_eval(model, params=None, n_train=n_train, n_test=1, n_mc=20000, verbose=True, rng=None)
-# print(loss)
-
+# print(dir_predictor.loss_eval(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
 dir_predictor.plot_loss_eval(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
 
 
-if isinstance(model, bayes_models.Dirichlet):
-    print(model.bayes_se_min(n_train))
-
+if isinstance(opt_predictor, BayesRegressor):
+    print(opt_predictor.bayes_risk_min(n_train))
 
 #
 predictors = [
-    ModelRegressor(model, name=r'$f_{opt}$'),
+    opt_predictor,
     # BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=10 * np.eye(len(w_prior)),
     #                                          basis_y_x=None, cov_y_x=.1,
     #                                          model_x=model_x), name='Norm'),

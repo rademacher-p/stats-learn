@@ -280,18 +280,6 @@ class Dirichlet(Base):      # TODO: DRY from random.elements?
         emp_dist.add_data(d)
         self.emp_dist = emp_dist
 
-    def bayes_se_min(self, n):
-        if isinstance(self.space['x'], spaces.FiniteGeneric):
-            bayes_risk = 0.
-            for x in self.space['x'].values:
-                alpha_m = self.prior_mean.model_x.pf(x)
-                weight = (alpha_m + 1 / (self.alpha_0 + n)) / (alpha_m + 1 / self.alpha_0)
-                bayes_risk += alpha_m * self.prior_mean.model_y_x(x).cov * weight
-
-            return bayes_risk
-        else:
-            raise NotImplementedError
-
 
 if __name__ == '__main__':
     theta = rand_models.NormalLinear(weights=(1,), basis_y_x=(lambda x: x,), cov_y_x=.1,
