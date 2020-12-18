@@ -11,10 +11,12 @@ import numpy as np
 from scipy.stats import mode
 import matplotlib.pyplot as plt
 
+from thesis.util import spaces
 from thesis.util.base import vectorize_func, check_data_shape
 from thesis.loss_funcs import loss_se, loss_01
 
 from thesis.random import models as rand_models
+from thesis.bayes import models as bayes_models
 from thesis.util.spaces import check_spaces
 
 
@@ -523,6 +525,22 @@ class BayesClassifier(ClassifierMixin, Bayes):
 class BayesRegressor(RegressorMixin, Bayes):
     def __init__(self, bayes_model, name=None):
         super().__init__(bayes_model, loss_se, name)
+
+    def bayes_risk_min(self, n):
+        if isinstance(self.bayes_model, bayes_models.Dirichlet) and isinstance(self.space['x'], spaces.FiniteGeneric):
+            mean = self.bayes_model.prior_mean
+            alpha_0 = self.bayes_model.alpha_0
+
+            bayes_risk = 0.
+            for x in self.space['x'].values:
+                alpha_m = mean.model_x.pf(x)
+                weight = (alpha_m + 1 / (alpha_0 + n)) / (alpha_m + 1 / alpha_0)
+                bayes_risk += alpha_m * mean.model_y_x(x).cov * weight
+
+            return bayes_risk
+        else:
+            raise NotImplementedError
+
 
 
 # %%
