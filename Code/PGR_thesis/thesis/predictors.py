@@ -335,7 +335,38 @@ def plot_loss_eval_compare(predictors, model, params=None, n_train=0, n_test=1, 
     return out
 
 
-# %%
+# FIXME FIXME
+def loss_eval_comp_compare(predictors, model, params=None, n_train=0, verbose=False):
+
+    if params is None:
+        params_full = [{} for _ in predictors]
+    else:
+        params_full = [item if item is not None else {} for item in params]
+
+    if isinstance(n_train, (Integral, np.integer)):
+        n_train = [n_train]
+
+    model = copy.deepcopy(model)
+
+    loss_full = []
+    for params in params_full:
+        params_shape = tuple(len(vals) for _, vals in params.items())
+        loss = np.empty((len(n_train),) + params_shape)
+        loss_full.append(loss)
+
+    for i_n, n_i in enumerate(n_train):
+        for predictor, params, loss in zip(predictors, params_full, loss_full):
+            if len(params) == 0:
+                loss[i_n] = predictor.evaluate(d_test)
+            else:
+                for i_v, param_vals in enumerate(list(product(*params.values()))):
+                    predictor.set_params(**dict(zip(params.keys(), param_vals)))
+                    loss[i_mc, i_n][np.unravel_index([i_v], loss.shape[2:])] = predictor.evaluate(d_test)
+
+    return loss_full
+
+
+#%%
 class Base(ABC):
     def __init__(self, loss_func, name=None):
         self.loss_func = loss_func
@@ -544,14 +575,49 @@ class BayesRegressor(RegressorMixin, Bayes):
             mean = self.bayes_model.prior_mean
             alpha_0 = self.bayes_model.alpha_0
 
-            bayes_risk = 0.
-            for x in self.space['x'].values:
-                alpha_m = mean.model_x.pf(x)
-                bayes_risk += alpha_m * mean.cov_y_x(x) * (alpha_m + 1 / (alpha_0 + n)) / (alpha_m + 1 / alpha_0)
+            x = self.space['x'].values
+            alpha_m = mean.model_x.pf(x)
+            weights = (alpha_m + 1 / (alpha_0 + n)) / (alpha_m + 1 / alpha_0)
+            bayes_risk = (alpha_m * weights * mean.cov_y_x(x)).sum()
+
+            # bayes_risk = 0.
+            # for x in self.space['x'].values:
+            #     alpha_m = mean.model_x.pf(x)
+            #     bayes_risk += alpha_m * mean.cov_y_x(x) * (alpha_m + 1 / (alpha_0 + n)) / (alpha_m + 1 / alpha_0)
 
             return bayes_risk
         else:
             raise NotImplementedError
+
+    def evaluate_comp(self, model=None, n=0):       # FIXME FIXME
+        if model is None:
+            model = self._model_obj
+
+        if (isinstance(self.bayes_model, bayes_models.Dirichlet)
+                and isinstance(self.space['x'], spaces.FiniteGeneric)
+                and isinstance(model.space['x'], spaces.FiniteGeneric)):
+
+            if isinstance(model, rand_models.Base):
+                pass
+
+            elif isinstance(model, bayes_models.Base):
+                if model == self.bayes_model:
+                    mean = self.bayes_model.prior_mean
+                    alpha_0 = self.bayes_model.alpha_0
+
+                    bayes_risk = 0.
+                    for x in self.space['x'].values:
+                        alpha_m = mean.model_x.pf(x)
+                        weight = (alpha_m + 1 / (alpha_0 + n)) / (alpha_m + 1 / alpha_0)
+                        bayes_risk += alpha_m * mean.cov_y_x(x) * weight
+
+                    return bayes_risk
+
+                else:
+                    raise NotImplementedError
+        else:
+            raise NotImplementedError
+
 
 # %%
 
