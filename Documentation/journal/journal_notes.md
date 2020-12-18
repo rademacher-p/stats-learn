@@ -88,11 +88,14 @@
 
 
 # Bayesian risk results
+- set = {0, .1, ... , 1}
 - true mean: f(x) = .5
 - true alpha_0 = 10
 
 ## Loss vs N
+- unbiased
 ![](loss_bayes_n_unbiased.png)
 
 ## Loss vs alpha_0
+- unbiased
 ![](loss_bayes_alpha_unbiased.png)
