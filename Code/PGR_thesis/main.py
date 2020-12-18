@@ -46,6 +46,7 @@ model = rand_models.DataConditional(list(map(mean_to_rv, mean_y_x)), model_x)
 # model = rand_models.ClassConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
 #                                                  ['a', 'b'], p_y=None)
 
+
 model = bayes_models.Dirichlet(model, alpha_0=10)
 
 
