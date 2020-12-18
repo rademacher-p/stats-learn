@@ -82,13 +82,22 @@ from thesis.predictors import (ModelRegressor, BayesRegressor, ModelClassifier, 
 
 # %% Sim
 
+# True model
 model_x = rand_elements.FiniteRV([0, .5], p=None)
 
 model = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
 
 model = bayes_models.Dirichlet(model, alpha_0=3)
 
+if isinstance(model, rand_models.Base):
+    opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}$')
+elif isinstance(model, bayes_models.Base):
+    opt_predictor = BayesRegressor(model, name=r'$f^*$')
+else:
+    raise TypeError
 
+
+# Dirichlet learner
 prior_mean = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=3), name='Dir')
 
@@ -105,16 +114,15 @@ dir_params = {'alpha_0': .001 + np.arange(2, 4, .2)}
 
 #
 # print(dir_predictor.loss_eval(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
+dir_predictor.plot_loss_eval(model, dir_params, n_train, n_test=1, n_mc=1000, verbose=True, rng=None)
 
-dir_predictor.plot_loss_eval(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
-
-if isinstance(model, bayes_models.Dirichlet):
-    print(model.bayes_se_min(n_train))
+if isinstance(opt_predictor, BayesRegressor):
+    print(opt_predictor.bayes_risk_min(n_train))
 
 
 #
 predictors = [
-    ModelRegressor(model, name=r'$f_{opt}$'),
+    opt_predictor,
     dir_predictor,
 ]
 
@@ -124,6 +132,3 @@ params = [None, dir_params]
 #                        verbose=True, ax=None, rng=None)
 # plot_predict_stats_compare(predictors, model, params, x=None, n_train=n_train, n_mc=300, do_std=True,
 #                            verbose=True, ax=None, rng=None)
-
-
-qq = 1

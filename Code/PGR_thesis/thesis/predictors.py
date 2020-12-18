@@ -7,6 +7,8 @@ from numbers import Integral
 from itertools import product
 import copy
 from abc import ABC, abstractmethod
+from typing import Union
+
 import numpy as np
 from scipy.stats import mode
 import matplotlib.pyplot as plt
@@ -441,7 +443,7 @@ class ClassifierMixin:
 
 
 class RegressorMixin:
-    model: rand_models.MixinRVy
+    model: Union[rand_models.Base, rand_models.MixinRVy]
 
     def predict(self, x):
         return self.model.mean_y_x(x)
@@ -475,6 +477,15 @@ class ModelClassifier(ClassifierMixin, Model):
 class ModelRegressor(RegressorMixin, Model):
     def __init__(self, model, name=None):
         super().__init__(model, loss_se, name)
+
+    def risk_min(self):
+        """Assess optimal risk when predicting on own model."""
+
+        if isinstance(self.space['x'], spaces.FiniteGeneric):
+            x = self.space['x'].values
+            return (self.model.model_x.pf(x) * self.model.cov_y_x(x)).sum()
+        else:
+            raise NotImplementedError
 
 
 #%% Bayes model
@@ -526,7 +537,21 @@ class BayesRegressor(RegressorMixin, Bayes):
     def __init__(self, bayes_model, name=None):
         super().__init__(bayes_model, loss_se, name)
 
+    def bayes_risk_min(self, n):
+        """Assess optimal Bayes risk when predicting on own Bayesian model."""
 
+        if isinstance(self.bayes_model, bayes_models.Dirichlet) and isinstance(self.space['x'], spaces.FiniteGeneric):
+            mean = self.bayes_model.prior_mean
+            alpha_0 = self.bayes_model.alpha_0
+
+            bayes_risk = 0.
+            for x in self.space['x'].values:
+                alpha_m = mean.model_x.pf(x)
+                bayes_risk += alpha_m * mean.cov_y_x(x) * (alpha_m + 1 / (alpha_0 + n)) / (alpha_m + 1 / alpha_0)
+
+            return bayes_risk
+        else:
+            raise NotImplementedError
 
 # %%
 
