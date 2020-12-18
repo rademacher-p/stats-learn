@@ -59,19 +59,21 @@ def dir_figs(n_train, alpha_0, p_y=(.5, .5), n_mc=1000, do_bayes=False, alpha_0_
         plot_loss_eval_compare(predictors, model, params, n_train=n_train, n_test=1, n_mc=n_mc,
                                verbose=True, ax=None, rng=None)
 
+    plt.show()
     plt.savefig(f'images/{datetime.datetime.now().strftime("%y-%m-%d_%H-%M-%S")}')
+    plt.close()
 
 
 def main():
     args = [
-        (np.arange(0, 50, 1), [2, 16], (.5, .5)),
+        # (np.arange(0, 50, 1), [2, 16], (.5, .5)),
         (np.arange(0, 50, 1), [2, 16], (.9, .9)),
         ([0, 2, 8], .001 + np.arange(0, 10, .1), (.5, .5)),
         ([0, 2, 8], .001 + np.arange(0, 20, .1), (.9, .9)),
     ]
 
     for args_i in args:
-        dir_figs(*args_i, n_mc=20000)
+        dir_figs(*args_i, n_mc=50000)
 
 
 if __name__ == '__main__':

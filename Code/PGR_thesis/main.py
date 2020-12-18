@@ -58,7 +58,7 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=1), na
 
 # n_train = 10
 # n_train = [0, 5, 10]
-n_train = np.arange(0, 50, 5)
+n_train = np.arange(0, 100, 5)
 
 # dir_params = None
 dir_params = {'alpha_0': [1, 10, 100]}
@@ -69,7 +69,7 @@ dir_params = {'alpha_0': [1, 10, 100]}
 # loss = dir_predictor.loss_eval(model, params=None, n_train=n_train, n_test=1, n_mc=20000, verbose=True, rng=None)
 # print(loss)
 
-dir_predictor.plot_loss_eval(model, params=dir_params, n_train=n_train, n_test=1, n_mc=2000, verbose=True, rng=None)
+dir_predictor.plot_loss_eval(model, params=dir_params, n_train=n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
 
 # bayes_risk = 0.
 # for x in model.space['x'].values:
@@ -98,7 +98,7 @@ params = [
 ]
 
 
-# plot_loss_eval_compare(predictors, model, params, n_train=n_train, n_test=1, n_mc=2000,
+# plot_loss_eval_compare(predictors, model, params, n_train=n_train, n_test=1, n_mc=100,
 #                        verbose=True, ax=None, rng=None)
 # plot_predict_stats_compare(predictors, model, params, x=None, n_train=n_train, n_mc=300, do_std=True,
 #                            verbose=True, ax=None, rng=None)
