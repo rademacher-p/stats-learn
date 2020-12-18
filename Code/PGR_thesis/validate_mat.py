@@ -104,12 +104,12 @@ dir_params = {'alpha_0': .001 + np.arange(2, 4, .2)}
 
 
 #
-# loss = dir_predictor.loss_eval(model, params=dir_params, n_train=n_train, n_test=1, n_mc=20000, verbose=True, rng=None)
-# print(loss)
+# print(dir_predictor.loss_eval(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
 
-dir_predictor.plot_loss_eval(model, params=dir_params, n_train=n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
+dir_predictor.plot_loss_eval(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
 
-print(dir_predictor.bayes_risk_min(n_train))
+if isinstance(model, bayes_models.Dirichlet):
+    print(model.bayes_se_min(n_train))
 
 
 #

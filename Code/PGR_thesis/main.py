@@ -69,15 +69,11 @@ dir_params = {'alpha_0': [1, 10, 100]}
 # loss = dir_predictor.loss_eval(model, params=None, n_train=n_train, n_test=1, n_mc=20000, verbose=True, rng=None)
 # print(loss)
 
-dir_predictor.plot_loss_eval(model, params=dir_params, n_train=n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
+dir_predictor.plot_loss_eval(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
 
-# bayes_risk = 0.
-# for x in model.space['x'].values:
-#     alpha_m = model.prior_mean.model_x.pf(x)
-#     weight = (alpha_m + 1 / (model.alpha_0 + n_train)) / (alpha_m + 1 / model.alpha_0)
-#     bayes_risk += alpha_m * model.prior_mean.model_y_x(x).cov * weight
-#
-# print(bayes_risk)
+
+if isinstance(model, bayes_models.Dirichlet):
+    print(model.bayes_se_min(n_train))
 
 
 #
