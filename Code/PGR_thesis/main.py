@@ -34,8 +34,8 @@ model_x = rand_elements.FiniteRV(supp_x, p=None)
 
 # model = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
 
-mean_y_x = poly(supp_x, [.5, 0, 0])
-# mean_y_x = poly(supp_x, [.3, 0, .4])
+# mean_y_x = poly(supp_x, [.5, 0, 0])
+mean_y_x = poly(supp_x, [.3, 0, .4])
 # mean_y_x = 0.5 + 0.5 * np.sin(2*np.pi * supp_x)
 # mean_y_x = 1 / (1 + np.exp(10 * supp_x))
 # mean_y_x = 1 / (2 + np.sin(2*np.pi * supp_x))
@@ -47,7 +47,7 @@ model = rand_models.DataConditional(list(map(mean_to_rv, mean_y_x)), model_x)
 #                                                  ['a', 'b'], p_y=None)
 
 
-model = bayes_models.Dirichlet(model, alpha_0=10)
+# model = bayes_models.Dirichlet(model, alpha_0=10)
 
 
 # Optimal learner
@@ -110,14 +110,15 @@ plot_loss_eval_compare(predictors, model, params, n_train=n_train, n_test=1, n_m
 #                            verbose=True, ax=None, rng=None)
 
 
-print('')
-if isinstance(model, rand_models.Base):
-    risk_an = opt_predictor.risk_min()
-    print(f"Min risk = {risk_an}")
-elif isinstance(model, bayes_models.Base):
-    risk_an = opt_predictor.bayes_risk_min(n_train)
-    print(f"Min Bayes risk = {risk_an}")
-else:
-    raise TypeError
+print(f"\nAnalytical Risk = {opt_predictor.evaluate_comp(n=n_train)}")
+
+# if isinstance(model, rand_models.Base):
+#     risk_an = opt_predictor.risk_min()
+#     print(f"Min risk = {risk_an}")
+# elif isinstance(model, bayes_models.Base):
+#     risk_an = opt_predictor.bayes_risk_min(n_train)
+#     print(f"Min Bayes risk = {risk_an}")
+# else:
+#     raise TypeError
 
 print('Done')
