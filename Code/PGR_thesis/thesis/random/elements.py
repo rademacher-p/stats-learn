@@ -193,7 +193,14 @@ class Finite(Base):     # TODO: DRY - use stat approx from the Finite space's me
 
         self.p = p
 
-    def __deepcopy__(self, memodict={}):
+    def __eq__(self, other):
+        if isinstance(other, Finite):
+            return (self.supp == other.supp).all() and (self.p == other.p).all()
+        return NotImplemented
+
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
         return type(self)(self.supp, self.p, self.rng)
 
     def __repr__(self):

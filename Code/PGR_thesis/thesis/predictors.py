@@ -638,11 +638,13 @@ class BayesRegressor(RegressorMixin, Bayes):
                 raise NotImplementedError
 
         elif isinstance(model, bayes_models.Base):
-            if model == self.bayes_model:
-                # Minimum Bayesian squared-error
 
-                if (isinstance(self.space['x'], spaces.FiniteGeneric)
-                        and isinstance(self.bayes_model, bayes_models.Dirichlet)):
+            if (isinstance(self.space['x'], spaces.FiniteGeneric)
+                    and isinstance(self.bayes_model, bayes_models.Dirichlet)):
+
+                if (isinstance(model, bayes_models.Dirichlet) and model.alpha_0 == self.bayes_model.alpha_0
+                        and model.prior_mean == self.bayes_model.prior_mean):
+                    # Minimum Bayesian squared-error
 
                     n_train = n_train[..., np.newaxis]
 
