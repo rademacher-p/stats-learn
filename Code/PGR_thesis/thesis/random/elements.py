@@ -670,6 +670,8 @@ class EmpiricalScalar(Binomial):
 
     def __init__(self, n, mean, rng=None):
         super().__init__(n, mean, rng)
+        if self.n == 0:
+            raise ValueError
         self._space = spaces.FiniteGeneric(np.arange(n + 1) / n)
 
     def __repr__(self):
