@@ -206,7 +206,7 @@ class Finite(Base):     # TODO: DRY - use stat approx from the Finite space's me
 
     @property
     def _supp_flat(self):
-        return self.space._vals_flat
+        return self.space.values_flat
 
     @property
     def p(self):
@@ -663,9 +663,9 @@ class Binomial(BaseRV):
         return np.exp(log_pf)
 
 
-class BinomialNormalized(Binomial):
+class EmpiricalScalar(Binomial):
     """
-    Binomial random variable, normalized to unit interval.
+    Scalar empirical random variable. Equivalent to normalized Binomial RV.
     """
 
     def __init__(self, n, mean, rng=None):
@@ -673,7 +673,7 @@ class BinomialNormalized(Binomial):
         self._space = spaces.FiniteGeneric(np.arange(n + 1) / n)
 
     def __repr__(self):
-        return f"BinomialNormalized({self.n}, {self.p})"
+        return f"EmpiricalScalar({self.n}, {self.p})"
 
     def _update_attr(self):
         super()._update_attr()

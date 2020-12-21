@@ -289,6 +289,8 @@ class FiniteGeneric(Finite):
         if len(self._vals_flat) != len(np.unique(self._vals_flat, axis=0)):
             raise ValueError("Input 'values' must have unique values")
 
+    values_flat = property(lambda self: self._vals_flat)
+
     @classmethod
     def from_grid(cls, *vecs):
         if len(vecs) == 1:

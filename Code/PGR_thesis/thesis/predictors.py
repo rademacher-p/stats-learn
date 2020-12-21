@@ -17,7 +17,7 @@ from thesis.util import spaces
 from thesis.util.base import vectorize_func, check_data_shape
 from thesis.loss_funcs import loss_se, loss_01
 
-from thesis.random import models as rand_models
+from thesis.random import elements as rand_elements, models as rand_models
 from thesis.bayes import models as bayes_models
 from thesis.util.spaces import check_spaces
 
@@ -33,7 +33,6 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
     if params is None:
         params_full = [{} for _ in predictors]
     else:
-        # params_full = params
         params_full = [item if item is not None else {} for item in params]
 
     if isinstance(n_train, (Integral, np.integer)):
@@ -72,7 +71,8 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
                     for i_v, param_vals in enumerate(list(product(*params.values()))):
                         predictor.set_params(**dict(zip(params.keys(), param_vals)))
                         # params_shape = y.shape[2:-(len(set_shape) + ndim['y'])]
-                        y[i_mc, i_n][np.unravel_index([i_v], params_shape)] = predictor.predict(x)
+                        # y[i_mc, i_n][np.unravel_index([i_v], params_shape)] = predictor.predict(x)
+                        y[i_mc, i_n][np.unravel_index(i_v, params_shape)] = predictor.predict(x)
 
     # Generate statistics
     _samp, dtype = (), []
@@ -130,7 +130,6 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
     if params is None:
         params_full = [{} for _ in predictors]
     else:
-        # params_full = params
         params_full = [item if item is not None else {} for item in params]
 
     if isinstance(n_train, (Integral, np.integer)):
@@ -209,12 +208,11 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
     return out
 
 
-def loss_eval_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, rng=None):
+def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, rng=None):
 
     if params is None:
         params_full = [{} for _ in predictors]
     else:
-        # params_full = params
         params_full = [item if item is not None else {} for item in params]
 
     if isinstance(n_train, (Integral, np.integer)):
@@ -249,25 +247,54 @@ def loss_eval_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=
                 else:
                     for i_v, param_vals in enumerate(list(product(*params.values()))):
                         predictor.set_params(**dict(zip(params.keys(), param_vals)))
-                        loss[i_mc, i_n][np.unravel_index([i_v], loss.shape[2:])] = predictor.evaluate(d_test)
+                        # loss[i_mc, i_n][np.unravel_index([i_v], loss.shape[2:])] = predictor.evaluate(d_test)
+                        loss[i_mc, i_n][np.unravel_index(i_v, loss.shape[2:])] = predictor.evaluate(d_test)
 
     loss_full = [loss.mean(axis=0) for loss in loss_full]
     return loss_full
 
 
-def plot_loss_eval_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None,
-                           rng=None):
+def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, verbose=False):
 
     if params is None:
         params_full = [{} for _ in predictors]
     else:
-        # params_full = params
         params_full = [item if item is not None else {} for item in params]
 
     if isinstance(n_train, (Integral, np.integer)):
         n_train = [n_train]
 
-    loss_full = loss_eval_compare(predictors, model, params_full, n_train, n_test, n_mc, verbose, rng)
+    model = copy.deepcopy(model)
+
+    loss_full = []
+    for predictor, params in zip(predictors, params_full):
+        if len(params) == 0:
+            loss_full.append(predictor.evaluate_comp(model, n_train, n_test))
+        else:
+            params_shape = tuple(len(vals) for _, vals in params.items())
+            loss = np.empty((len(n_train),) + params_shape)
+            for i_v, param_vals in enumerate(list(product(*params.values()))):
+                predictor.set_params(**dict(zip(params.keys(), param_vals)))
+
+                idx_p = np.unravel_index(i_v, loss.shape[2:])
+                idx = (np.arange(len(n_train)),) + tuple([k for _ in range(len(n_train))] for k in idx_p)
+                loss[idx] = predictor.evaluate_comp(model, n_train, n_test)
+                # loss[:, np.unravel_index(i_v, loss.shape[2:])] = predictor.evaluate_comp(model, n_train)
+
+            loss_full.append(loss)
+
+    return loss_full
+
+
+def _plot_risk_eval_compare(losses, predictors, params=None, n_train=0, ax=None):
+
+    if params is None:
+        params_full = [{} for _ in predictors]
+    else:
+        params_full = [item if item is not None else {} for item in params]
+
+    if isinstance(n_train, (Integral, np.integer)):
+        n_train = [n_train]
 
     if ax is None:
         _, ax = plt.subplots()
@@ -276,7 +303,7 @@ def plot_loss_eval_compare(predictors, model, params=None, n_train=0, n_test=1, 
 
     out = []
     if len(predictors) == 1:
-        predictor, params, loss = predictors[0], params_full[0], loss_full[0]
+        predictor, params, loss = predictors[0], params_full[0], losses[0]
         title = str(predictor.name)
 
         if len(params) == 0:
@@ -312,7 +339,7 @@ def plot_loss_eval_compare(predictors, model, params=None, n_train=0, n_test=1, 
     else:
         title = ''
         xlabel, x_plt = 'N', n_train
-        for predictor, params, loss in zip(predictors, params_full, loss_full):
+        for predictor, params, loss in zip(predictors, params_full, losses):
             if len(params) == 0:
                 loss = loss[np.newaxis]
                 labels = [predictor.name]
@@ -335,48 +362,15 @@ def plot_loss_eval_compare(predictors, model, params=None, n_train=0, n_test=1, 
     return out
 
 
-# FIXME FIXME
-# def loss_eval_comp_compare(predictors, model, params=None, n_train=0, verbose=False):
-#
-#     if params is None:
-#         params_full = [{} for _ in predictors]
-#     else:
-#         params_full = [item if item is not None else {} for item in params]
-#
-#     if isinstance(n_train, (Integral, np.integer)):
-#         n_train = [n_train]
-#
-#     model = copy.deepcopy(model)
-#
-#     loss_full = []
-#     for params in params_full:
-#         params_shape = tuple(len(vals) for _, vals in params.items())
-#         loss = np.empty((len(n_train),) + params_shape)
-#         loss_full.append(loss)
-#
-#     for predictor, params, loss in zip(predictors, params_full, loss_full):
-#         if len(params) == 0:
-#             loss_full.append(predictor.evaluate_comp(model, n_train))
-#         else:
-#             for i_v, param_vals in enumerate(list(product(*params.values()))):
-#                 predictor.set_params(**dict(zip(params.keys(), param_vals)))
-#                 loss[:][:, np.unravel_index([i_v], loss.shape[2:])] = predictor.evaluate_comp(model, n_train)
-#
-#
-#     loss_full = []
-#     for predictor, params in zip(predictors, params_full):
-#         if len(params) == 0:
-#             loss_full.append(predictor.evaluate_comp(model, n_train))
-#         else:
-#             params_shape = tuple(len(vals) for _, vals in params.items())
-#             loss = np.empty((len(n_train),) + params_shape)
-#             for i_v, param_vals in enumerate(list(product(*params.values()))):
-#                 predictor.set_params(**dict(zip(params.keys(), param_vals)))
-#                 loss[:, np.unravel_index([i_v], loss.shape[2:])] = predictor.evaluate_comp(model, n_train)
-#
-#             loss_full.append()
-#
-#     return loss_full
+def plot_risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None,
+                               rng=None):
+    losses = risk_eval_sim_compare(predictors, model, params, n_train, n_test, n_mc, verbose, rng)
+    return _plot_risk_eval_compare(losses, predictors, params, n_train, ax)
+
+
+def plot_risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, verbose=False, ax=None):
+    losses = risk_eval_comp_compare(predictors, model, params, n_train, n_test, verbose)
+    return _plot_risk_eval_compare(losses, predictors, params, n_train, ax)
 
 
 #%%
@@ -463,20 +457,27 @@ class Base(ABC):
             params = {}
         return plot_predict_stats_compare([self], model, [params], x, n_train, n_mc, do_std, verbose, ax, rng)
 
-    # Loss evaluation
-    def loss_eval(self, model=None, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, rng=None):
+    # Risk evaluation
+    def risk_eval_sim(self, model=None, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, rng=None):
         if model is None:
             model = self._model_obj
-        if params is None:
-            params = {}
-        return loss_eval_compare([self], model, [params], n_train, n_test, n_mc, verbose, rng)[0]
+        return risk_eval_sim_compare([self], model, [params], n_train, n_test, n_mc, verbose, rng)[0]
 
-    def plot_loss_eval(self, model=None, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None, rng=None):
+    def plot_risk_eval_sim(self, model=None, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None,
+                           rng=None):
         if model is None:
             model = self._model_obj
-        if params is None:
-            params = {}
-        return plot_loss_eval_compare([self], model, [params], n_train, n_test, n_mc, verbose, ax, rng)
+        return plot_risk_eval_sim_compare([self], model, [params], n_train, n_test, n_mc, verbose, ax, rng)
+
+    def risk_eval_comp(self, model=None, params=None, n_train=0, n_test=1, verbose=False):
+        if model is None:
+            model = self._model_obj
+        return risk_eval_comp_compare([self], model, [params], n_train, n_test, verbose)[0]
+
+    def plot_risk_eval_comp(self, model=None, params=None, n_train=0, n_test=1, verbose=False, ax=None):
+        if model is None:
+            model = self._model_obj
+        return plot_risk_eval_comp_compare([self], model, [params], n_train, n_test, verbose, ax)
 
 
 class ClassifierMixin:
@@ -522,18 +523,23 @@ class ModelRegressor(RegressorMixin, Model):
     def __init__(self, model, name=None):
         super().__init__(model, loss_se, name)
 
-    def evaluate_comp(self, model=None, n=0):
+    def evaluate_comp(self, model=None, n_train=0, n_test=1):
         if model is None:
             model = self._model_obj
 
-        if isinstance(model, rand_models.Base):
-            if model == self.model:
-                # Clairvoyant squared-error
-                if isinstance(self.space['x'], spaces.FiniteGeneric):
-                    x = self.space['x'].values
-                    return (self.model.model_x.pf(x) * self.model.cov_y_x(x)).sum()
-                else:
-                    raise NotImplementedError
+        n_train = np.array(n_train)
+
+        if isinstance(model, (rand_models.Base, rand_models.MixinRVy)):
+            if isinstance(self.space['x'], spaces.FiniteGeneric):
+                x = self.space['x'].values_flat
+
+                p_x = model.model_x.pf(x)
+
+                cov_y_x = model.cov_y_x(x)
+                bias_sq = (self.predict(x) - model.mean_y_x(x)) ** 2
+
+                risk = np.dot(cov_y_x + bias_sq, p_x)
+                return np.full(n_train.shape, risk)
             else:
                 raise NotImplementedError
 
@@ -590,29 +596,61 @@ class BayesRegressor(RegressorMixin, Bayes):
     def __init__(self, bayes_model, name=None):
         super().__init__(bayes_model, loss_se, name)
 
-    def evaluate_comp(self, model=None, n=0):
+    def evaluate_comp(self, model=None, n_train=0, n_test=1):
         if model is None:
             model = self._model_obj
 
-        if isinstance(model, rand_models.Base):
-            raise NotImplementedError
+        n_train = np.array(n_train)
+
+        if isinstance(model, (rand_models.Base, rand_models.MixinRVy)):
+            if (isinstance(self.space['x'], spaces.FiniteGeneric)
+                    and isinstance(self.bayes_model, bayes_models.Dirichlet)):
+
+                x = self.space['x'].values_flat
+
+                p_x = model.model_x.pf(x)
+                alpha_x = self.bayes_model.alpha_0 * self.bayes_model.prior_mean.model_x.pf(x)
+
+                cov_y_x = model.cov_y_x(x)
+                bias_sq = (self.bayes_model.prior_mean.mean_y_x(x) - model.mean_y_x(x)) ** 2
+
+                w_cov = np.zeros((n_train.size, p_x.size))
+                w_bias = np.zeros((n_train.size, p_x.size))
+                for i_n, n_i in enumerate(n_train.flatten()):
+                    rv = rand_elements.EmpiricalScalar(n_i, .5)
+                    supp = rv.space.values
+                    for i_x, (p_i, a_i) in enumerate(zip(p_x, alpha_x)):
+                        rv.p = p_i
+                        p_rv = rv.pf(supp)
+
+                        den = (a_i + n_i * supp) ** 2
+
+                        w_cov[i_n, i_x] = (p_rv / den * n_i * supp).sum()
+                        w_cov[i_n, i_x] = (p_rv / den * a_i ** 2).sum()
+
+                risk = np.dot(cov_y_x * w_cov + bias_sq * w_bias, p_x)
+
+                return risk.reshape(n_train.shape)
+            else:
+                raise NotImplementedError
 
         elif isinstance(model, bayes_models.Base):
             if model == self.bayes_model:
                 # Minimum Bayesian squared-error
 
-                if (isinstance(self.bayes_model, bayes_models.Dirichlet)
-                        and isinstance(self.space['x'], spaces.FiniteGeneric)):
-                    n = np.array(n)[..., np.newaxis]
+                if (isinstance(self.space['x'], spaces.FiniteGeneric)
+                        and isinstance(self.bayes_model, bayes_models.Dirichlet)):
 
-                    mean = self.bayes_model.prior_mean
+                    n_train = n_train[..., np.newaxis]
+
+                    x = self.space['x'].values_flat
+
                     alpha_0 = self.bayes_model.alpha_0
+                    alpha_m = self.bayes_model.prior_mean.model_x.pf(x)
+                    weights = (alpha_m + 1 / (alpha_0 + n_train)) / (alpha_m + 1 / alpha_0)
 
-                    x = self.space['x'].values
-                    alpha_m = mean.model_x.pf(x).flatten()
-                    weights = (alpha_m + 1 / (alpha_0 + n)) / (alpha_m + 1 / alpha_0)
-
-                    return (alpha_m * weights * mean.cov_y_x(x)).sum(axis=-1)
+                    # return (alpha_m * weights * self.bayes_model.prior_mean.cov_y_x(x)).sum(axis=-1)
+                    return np.dot(weights * self.bayes_model.prior_mean.cov_y_x(x), alpha_m)
                 else:
                     raise NotImplementedError
             else:
@@ -620,7 +658,7 @@ class BayesRegressor(RegressorMixin, Bayes):
 
 
 
-# %%
+#%%
 
 # class DirichletFiniteClassifier(BaseLearner):
 #     def __init__(self, alpha_0, mean_y_x):
