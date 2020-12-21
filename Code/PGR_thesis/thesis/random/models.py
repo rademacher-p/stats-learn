@@ -230,7 +230,15 @@ class DataConditional(Base):
 
         self._update_attr()
 
-    def __deepcopy__(self, memodict={}):
+    def __eq__(self, other):
+        if isinstance(other, DataConditional):
+            return (self.model_x == other.model_x
+                    and self.dists == other.dists)
+        return NotImplemented
+
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
         # return type(self)(self.dists, self.model_x)
         return type(self)(deepcopy(self.dists), deepcopy(self.model_x))
 
@@ -677,7 +685,9 @@ class Mixture(Base):
         _str = "; ".join([f"{w}: {dist}" for w, dist in zip(self.weights, self.dists)])
         return f"Mixture({_str})"
 
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
         return type(self)(self.dists, self.weights, self.rng)
 
     dists = property(lambda self: self._dists)
