@@ -28,20 +28,20 @@ def mean_to_rv(mean):
 
 # True model
 
-supp_x = np.array([0, .5])
-# supp_x = np.linspace(0, 1, 11, endpoint=True)
+# supp_x = np.array([0, .5])
+supp_x = np.linspace(0, 1, 11, endpoint=True)
 
 model_x = rand_elements.FiniteRV(supp_x, p=None)
 
 
-model = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
+# model = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
 
 # mean_y_x = poly(supp_x, [.5, 0, 0])
 mean_y_x = poly(supp_x, [.3, 0, .4])
 # mean_y_x = 0.5 + 0.5 * np.sin(2*np.pi * supp_x)
 # mean_y_x = 1 / (1 + np.exp(10 * supp_x))
 # mean_y_x = 1 / (2 + np.sin(2*np.pi * supp_x))
-# model = rand_models.DataConditional(list(map(mean_to_rv, mean_y_x)), model_x)
+model = rand_models.DataConditional(list(map(mean_to_rv, mean_y_x)), model_x)
 
 # model = rand_models.NormalLinear(weights=np.ones(2), basis_y_x=None, cov_y_x=1.,
 #                                  model_x=rand_elements.Normal(0, 10), rng=None)
@@ -63,18 +63,18 @@ else:
 
 # Dirichlet learner
 
-prior_mean = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
+# prior_mean = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
 
 w_prior = [.5, 0, 0]
 # w_prior = [.5, 0, .5]
 mean_y_x_dir = poly(supp_x, w_prior)
-# prior_mean = rand_models.DataConditional(list(map(mean_to_rv, mean_y_x_dir)), model_x)
+prior_mean = rand_models.DataConditional(list(map(mean_to_rv, mean_y_x_dir)), model_x)
 
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=1), name='Dir')
 
 # dir_params = None
 # dir_params = {'alpha_0': [2, 4, 8, 16]}
-dir_params = {'alpha_0': .001 + np.arange(0, 10, .1)}
+dir_params = {'alpha_0': .001 + np.arange(0, 80, 5)}
 
 
 # Normal learner
@@ -90,7 +90,7 @@ norm_params = None
 # Plotting
 
 # n_train = 10
-n_train = [0, 2, 4, 8]
+n_train = [0, 10, 20]
 # n_train = np.arange(0, 50, 1)
 
 # print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
@@ -106,9 +106,9 @@ temp = [
 predictors, params = list(zip(*temp))
 
 
-# plot_risk_eval_sim_compare(predictors, model, params, n_train=n_train, n_test=1, n_mc=2000,
-#                            verbose=True, ax=None, rng=None)
-plot_risk_eval_comp_compare(predictors, model, params, n_train, n_test=1, verbose=False, ax=None)
+plot_risk_eval_sim_compare(predictors, model, params, n_train=n_train, n_test=1, n_mc=200,
+                           verbose=True, ax=None, rng=None)
+# plot_risk_eval_comp_compare(predictors, model, params, n_train, n_test=1, verbose=False, ax=None)
 
 # plot_predict_stats_compare(predictors, model, params, x=None, n_train=n_train, n_mc=300, do_std=True,
 #                            verbose=True, ax=None, rng=None)
