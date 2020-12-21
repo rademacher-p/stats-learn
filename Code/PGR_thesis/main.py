@@ -73,8 +73,8 @@ mean_y_x_dir = poly(supp_x, w_prior)
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=1), name='Dir')
 
 # dir_params = None
-# dir_params = {'alpha_0': [2, 16]}
-dir_params = {'alpha_0': .001 + np.arange(0, 50, 2)}
+# dir_params = {'alpha_0': [2, 4, 8, 16]}
+dir_params = {'alpha_0': .001 + np.arange(0, 10, .1)}
 
 
 # Normal learner
@@ -90,15 +90,15 @@ norm_params = None
 # Plotting
 
 # n_train = 10
-n_train = [0, 5, 10]
-# n_train = np.arange(0, 50, 5)
+n_train = [0, 2, 4, 8]
+# n_train = np.arange(0, 50, 1)
 
 # print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
 # dir_predictor.plot_risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
 
 
 temp = [
-    (opt_predictor, None),
+    # (opt_predictor, None),
     # (norm_predictor, norm_params),
     (dir_predictor, dir_params),
 ]
@@ -106,15 +106,15 @@ temp = [
 predictors, params = list(zip(*temp))
 
 
-plot_risk_eval_sim_compare(predictors, model, params, n_train=n_train, n_test=1, n_mc=2000,
-                           verbose=True, ax=None, rng=None)
-# plot_risk_eval_comp_compare(predictors, model, params, n_train, n_test=1, verbose=False, ax=None)
+# plot_risk_eval_sim_compare(predictors, model, params, n_train=n_train, n_test=1, n_mc=2000,
+#                            verbose=True, ax=None, rng=None)
+plot_risk_eval_comp_compare(predictors, model, params, n_train, n_test=1, verbose=False, ax=None)
 
 # plot_predict_stats_compare(predictors, model, params, x=None, n_train=n_train, n_mc=300, do_std=True,
 #                            verbose=True, ax=None, rng=None)
 
 
-print(f"\nAnalytical Risk = {opt_predictor.evaluate_comp(n_train=n_train)}")
+# print(f"\nAnalytical Risk = {opt_predictor.evaluate_comp(n_train=n_train)}")
 
 # if isinstance(model, rand_models.Base):
 #     risk_an = opt_predictor.risk_min()

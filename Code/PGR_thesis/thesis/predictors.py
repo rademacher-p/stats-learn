@@ -276,7 +276,7 @@ def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, 
             for i_v, param_vals in enumerate(list(product(*params.values()))):
                 predictor.set_params(**dict(zip(params.keys(), param_vals)))
 
-                idx_p = np.unravel_index(i_v, loss.shape[2:])
+                idx_p = np.unravel_index(i_v, loss.shape[1:])
                 idx = (np.arange(len(n_train)),) + tuple([k for _ in range(len(n_train))] for k in idx_p)
                 loss[idx] = predictor.evaluate_comp(model, n_train, n_test)
                 # loss[:, np.unravel_index(i_v, loss.shape[2:])] = predictor.evaluate_comp(model, n_train)
@@ -617,18 +617,21 @@ class BayesRegressor(RegressorMixin, Bayes):
                 w_cov = np.zeros((n_train.size, p_x.size))
                 w_bias = np.zeros((n_train.size, p_x.size))
                 for i_n, n_i in enumerate(n_train.flatten()):
-                    rv = rand_elements.EmpiricalScalar(n_i, .5)
+                    # rv = rand_elements.EmpiricalScalar(n_i, .5)
+                    rv = rand_elements.Binomial(n_i, .5)
                     supp = rv.space.values
                     for i_x, (p_i, a_i) in enumerate(zip(p_x, alpha_x)):
                         rv.p = p_i
                         p_rv = rv.pf(supp)
 
-                        den = (a_i + n_i * supp) ** 2
+                        # den = (a_i + n_i * supp) ** 2
+                        den = (a_i + supp) ** 2
 
-                        w_cov[i_n, i_x] = (p_rv / den * n_i * supp).sum()
-                        w_cov[i_n, i_x] = (p_rv / den * a_i ** 2).sum()
+                        # w_cov[i_n, i_x] = (p_rv / den * n_i * supp).sum()
+                        w_cov[i_n, i_x] = (p_rv / den * supp).sum()
+                        w_bias[i_n, i_x] = (p_rv / den * a_i ** 2).sum()
 
-                risk = np.dot(cov_y_x * w_cov + bias_sq * w_bias, p_x)
+                risk = np.dot(cov_y_x * (1 + w_cov) + bias_sq * w_bias, p_x)
 
                 return risk.reshape(n_train.shape)
             else:
