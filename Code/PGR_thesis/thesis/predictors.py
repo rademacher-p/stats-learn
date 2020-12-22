@@ -25,7 +25,6 @@ from thesis.util.spaces import check_spaces
 def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False,
                           rng=None):
 
-    # space = check_spaces(predictors)
     space_x = check_spaces([pr.model.model_x for pr in predictors])
     if x is None:
         x = space_x.x_plt
@@ -62,7 +61,7 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
         d_iter = np.split(d, np.cumsum(n_train_delta)[:-1])
 
         for i_n, d in enumerate(d_iter):
-            warm_start = False if i_n == 0 else True  # resets learner for new iteration
+            warm_start = i_n > 0  # resets learner for new iteration
             for predictor, params, params_shape, y in zip(predictors, params_full, params_shape_full, y_full):
                 predictor.fit(d, warm_start=warm_start)
                 if len(params) == 0:
@@ -88,6 +87,7 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
 
     y_stats_full = [np.tile(np.array(_samp, dtype=dtype), reps=(len(n_train_delta),) + param_shape)
                     for param_shape in params_shape_full]
+
     for y, y_stats in zip(y_full, y_stats_full):
         if 'mode' in stats:
             y_stats['mode'] = mode(y, axis=0)
@@ -119,7 +119,9 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
 def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, do_std=False, verbose=False,
                                ax=None, rng=None):
 
-    # space = check_spaces(predictors)
+    stats = ('mean', 'std') if do_std else ('mean',)  # TODO: generalize for mode, etc.
+    y_stats_full = predict_stats_compare(predictors, model, params, x, n_train, n_mc, stats, verbose, rng)
+
     space_x = check_spaces([pr.model.model_x for pr in predictors])
 
     if x is None:
@@ -134,9 +136,6 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
 
     if isinstance(n_train, (Integral, np.integer)):
         n_train = [n_train]
-
-    stats = ('mean', 'std') if do_std else ('mean',)  # TODO: generalize for mode, etc.
-    y_stats_full = predict_stats_compare(predictors, model, params_full, x, n_train, n_mc, stats, verbose, rng)
 
     out = []
     if len(predictors) == 1:
@@ -238,7 +237,7 @@ def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n
         d_train_iter = np.split(_d_train, np.cumsum(n_train_delta)[:-1])
 
         for i_n, d_train in enumerate(d_train_iter):
-            warm_start = False if i_n == 0 else True  # resets learner for new iteration
+            warm_start = i_n > 0  # resets learner for new iteration
             for predictor, params, loss in zip(predictors, params_full, loss_full):
                 predictor.fit(d_train, warm_start=warm_start)
 
@@ -437,7 +436,6 @@ class Base(ABC):
     # Plotting utilities
     def plot_predict(self, x=None, ax=None, label=None):
         """Plot prediction function."""
-        # return self.plot_xy(x, self.predict(x), ax=ax, label=label)
         return self.space['x'].plot(self.predict, x, ax=ax, label=label)
 
     # Prediction statistics
@@ -445,16 +443,12 @@ class Base(ABC):
                       rng=None):
         if model is None:
             model = self._model_obj
-        if params is None:
-            params = {}
         return predict_stats_compare([self], model, [params], x, n_train, n_mc, stats, verbose, rng)[0]
 
     def plot_predict_stats(self, model=None, params=None, x=None, n_train=0, n_mc=1, do_std=False, verbose=False,
                            ax=None, rng=None):
         if model is None:
             model = self._model_obj
-        if params is None:
-            params = {}
         return plot_predict_stats_compare([self], model, [params], x, n_train, n_mc, do_std, verbose, ax, rng)
 
     # Risk evaluation
@@ -530,8 +524,8 @@ class ModelRegressor(RegressorMixin, Model):
         n_train = np.array(n_train)
 
         if isinstance(model, (rand_models.Base, rand_models.MixinRVy)):
-            if isinstance(self.space['x'], spaces.FiniteGeneric):
-                x = self.space['x'].values_flat
+            if isinstance(model.space['x'], spaces.FiniteGeneric):
+                x = model.space['x'].values_flat
 
                 p_x = model.model_x.pf(x)
 
@@ -603,10 +597,10 @@ class BayesRegressor(RegressorMixin, Bayes):
         n_train = np.array(n_train)
 
         if isinstance(model, (rand_models.Base, rand_models.MixinRVy)):
-            if (isinstance(self.space['x'], spaces.FiniteGeneric)
+            if (isinstance(model.space['x'], spaces.FiniteGeneric)
                     and isinstance(self.bayes_model, bayes_models.Dirichlet)):
 
-                x = self.space['x'].values_flat
+                x = model.space['x'].values_flat
 
                 p_x = model.model_x.pf(x)
                 alpha_x = self.bayes_model.alpha_0 * self.bayes_model.prior_mean.model_x.pf(x)
@@ -639,20 +633,18 @@ class BayesRegressor(RegressorMixin, Bayes):
 
         elif isinstance(model, bayes_models.Base):
 
-            if (isinstance(self.space['x'], spaces.FiniteGeneric)
+            if (isinstance(model.space['x'], spaces.FiniteGeneric)
                     and isinstance(self.bayes_model, bayes_models.Dirichlet)):
 
                 if (isinstance(model, bayes_models.Dirichlet) and model.alpha_0 == self.bayes_model.alpha_0
                         and model.prior_mean == self.bayes_model.prior_mean):
                     # Minimum Bayesian squared-error
 
-                    n_train = n_train[..., np.newaxis]
-
-                    x = self.space['x'].values_flat
+                    x = model.space['x'].values_flat
 
                     alpha_0 = self.bayes_model.alpha_0
                     alpha_m = self.bayes_model.prior_mean.model_x.pf(x)
-                    weights = (alpha_m + 1 / (alpha_0 + n_train)) / (alpha_m + 1 / alpha_0)
+                    weights = (alpha_m + 1 / (alpha_0 + n_train[..., np.newaxis])) / (alpha_m + 1 / alpha_0)
 
                     # return (alpha_m * weights * self.bayes_model.prior_mean.cov_y_x(x)).sum(axis=-1)
                     return np.dot(weights * self.bayes_model.prior_mean.cov_y_x(x), alpha_m)

@@ -6,7 +6,7 @@ Random elements.
 # TODO: do ABC or PyCharm bug?
 
 import math
-from typing import Optional
+from typing import Optional, Union
 from numbers import Integral
 
 import numpy as np
@@ -73,8 +73,8 @@ class Base(RandomGeneratorMixin):
 
 
 class MixinRV:
-    _mean: Optional[np.ndarray]
-    _cov: Optional[np.ndarray]
+    _mean: Optional[Union[float, np.ndarray]]
+    _cov: Optional[Union[float, np.ndarray]]
 
     # mean = property(lambda self: self._mean)
     # cov = property(lambda self: self._cov)
@@ -535,7 +535,7 @@ class Beta(BaseRV):
     Beta random variable.
     """
 
-    def __init__(self, a, b, rng=None):
+    def __init__(self, a=1, b=1, rng=None):
         super().__init__(rng)
         self._space = spaces.Box((0, 1))
 
@@ -550,7 +550,7 @@ class Beta(BaseRV):
         return f"Beta({self.a}, {self.b})"
 
     @classmethod
-    def from_mean(cls, alpha_0, mean, rng=None):
+    def from_mean(cls, mean, alpha_0, rng=None):
         return cls(alpha_0 * mean, alpha_0 * (1 - mean), rng)
 
     # Input properties
@@ -578,6 +578,8 @@ class Beta(BaseRV):
 
     # Attribute Updates
     def _update_attr(self):
+        # self._alpha_0 = self._a + self._b
+
         if self._a > 1:
             if self._b > 1:
                 self._mode = (self._a - 1) / (self._a + self._b - 2)
@@ -592,7 +594,7 @@ class Beta(BaseRV):
                 self._mode = 0      # any in {0,1}
 
         self._mean = self._a / (self._a + self._b)
-        self._cov = self._a * self._b / (self._a + self._b)**2 / (self._a + self._b + 1)
+        self._cov = self._a * self._b / (self._a + self._b) ** 2 / (self._a + self._b + 1)
 
     def _rvs(self, n, rng):
         return rng.beta(self._a, self._b, size=n)
@@ -683,6 +685,11 @@ class EmpiricalScalar(Binomial):
 
     def __repr__(self):
         return f"EmpiricalScalar({self.n}, {self.p})"
+
+    def __eq__(self, other):
+        if isinstance(other, EmpiricalScalar):
+            return self.n == other.n and self.mean == other.mean
+        return NotImplemented
 
     def _update_attr(self):
         super()._update_attr()

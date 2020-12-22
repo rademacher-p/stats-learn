@@ -1,5 +1,6 @@
 import math
 from functools import partial
+from abc import ABC, abstractmethod
 
 import numpy as np
 from scipy import optimize, integrate
@@ -23,7 +24,7 @@ def check_spaces(iter_):
         raise ValueError("All objects must have the same space attribute.")
 
 
-class Space:
+class Base(ABC):
     def __init__(self, shape, dtype):
         self._shape = tuple(shape)
         self._size = math.prod(self._shape)
@@ -96,7 +97,7 @@ class Space:
             raise NotImplementedError        # TODO
 
 
-class Discrete(Space):
+class Discrete(Base):
     pass
 
 
@@ -393,7 +394,7 @@ class FiniteGeneric(Finite):
 
 
 #%%
-class Continuous(Space):
+class Continuous(Base):
     def __init__(self, shape):
         super().__init__(shape, np.float64)
 

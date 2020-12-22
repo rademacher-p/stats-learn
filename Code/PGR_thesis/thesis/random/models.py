@@ -2,7 +2,7 @@
 SL models.
 """
 
-from typing import Optional
+from typing import Optional, Dict
 from copy import deepcopy
 
 import numpy as np
@@ -20,6 +20,7 @@ class Base(RandomGeneratorMixin):
     """
     Base class for supervised learning data models.
     """
+    _space: Dict[str, Optional[spaces.Base]]
 
     def __init__(self, rng=None):
         super().__init__(rng)
@@ -105,7 +106,7 @@ class MixinRVy:
         raise Exception
 
 
-# class DataConditional(Base):
+# class DataConditionalGeneric(Base):
 #     def __new__(cls, model_x, model_y_x, rng=None):
 #         is_numeric_y = isinstance(model_y_x(model_x.rvs()), rand_elements.MixinRV)
 #         if isinstance(model_x, rand_elements.MixinRV):
@@ -223,8 +224,10 @@ class DataConditional(Base):
         self._model_x = model_x
 
         self._space['x'] = self.model_x.space
-        if self.space['x'].set_size != len(self.dists):
-            raise ValueError("Incorrect number of conditional distributions.")
+        if not isinstance(self.space['x'], spaces.FiniteGeneric):
+            raise ValueError(f"Data space must be finite.")
+        elif self.space['x'].set_size != len(self.dists):
+            raise ValueError(f"Data space must have {len(self.dists)} elements.")
 
         self._space['y'] = spaces.check_spaces(self.dists)
 
@@ -269,10 +272,6 @@ class DataConditional(Base):
     def from_finite(cls, dists, supp_x, p_x=None, rng=None):
         model_x = rand_elements.Finite(supp_x, p_x)
         return cls(dists, model_x, rng)
-        # def model_y_x(x):
-        #     eq_supp = np.all(x == model_x.space._vals_flat, axis=tuple(range(1, 1 + model_x.space.ndim)))
-        #     idx = np.flatnonzero(eq_supp).item()
-        #     return dists[idx]
 
 
 class DataConditionalRVx(MixinRVx, DataConditional):
@@ -367,6 +366,61 @@ class ClassConditional(MixinRVx, Base):
 # qq = None
 
 
+class BetaLinear(MixinRVx, MixinRVy, Base):     # TODO: DRY with NormalLinear
+    def __init__(self, weights=(0.,), basis_y_x=None, alpha_y_x=2., model_x=rand_elements.Beta(), rng=None):
+        super().__init__(rng)
+
+        self._space['x'] = model_x.space
+        self._space['y'] = spaces.Box((0, 1))
+
+        self.model_x = model_x
+
+        self.weights = weights
+        self.alpha_y_x = alpha_y_x
+
+        if basis_y_x is None:
+            def power_func(i):
+                return vectorize_func(lambda x: np.full(self.shape['y'], (x ** i).sum()), shape=self.shape['x'])
+
+            self._basis_y_x = tuple(power_func(i) for i in range(len(self.weights)))
+        else:
+            self._basis_y_x = basis_y_x
+
+    def __repr__(self):
+        return f"NormalModel(model_x={self.model_x}, basis_y_x={self.basis_y_x}, " \
+               f"weights={self.weights}, cov_y_x={self._cov_repr})"
+
+    @property
+    def basis_y_x(self):
+        return self._basis_y_x
+
+    @property
+    def model_x(self):
+        return self._model_x
+
+    @model_x.setter
+    def model_x(self, model_x):
+        self._model_x = model_x
+
+        self._mode_x = self._model_x.mode
+
+        self._mean_x = self._model_x.mean
+        self._cov_x = self._model_x.cov
+
+    def mean_y_x(self, x):
+        return sum(weight * func(x) for weight, func in zip(self.weights, self._basis_y_x))
+
+    def cov_y_x(self, x):
+        mean = self.mean_y_x(x)
+        return mean * (1 - mean) / (self.alpha_y_x + 1)
+
+    def model_y_x(self, x):
+        return rand_elements.Beta.from_mean(self.mean_y_x(x), self.alpha_y_x)
+
+    def _mode_y_x_single(self, x):
+        return self.model_y_x(x).mode
+
+
 class NormalLinear(MixinRVx, MixinRVy, Base):
     def __init__(self, weights=(0.,), basis_y_x=None, cov_y_x=1., model_x=rand_elements.Normal(), rng=None):
         super().__init__(rng)
@@ -377,7 +431,7 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
         self.weights = weights
         self.cov_y_x_ = cov_y_x
 
-        self._mode_y_x_single = self._mean_y_x_single
+        # self._mode_y_x_single = self._mean_y_x_single
 
         if basis_y_x is None:
             def power_func(i):
@@ -438,6 +492,9 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
 
     def mean_y_x(self, x):
         return sum(weight * func(x) for weight, func in zip(self.weights, self._basis_y_x))
+
+    def mode_y_x(self, x):
+        return self.mean_y_x(x)
 
     def model_y_x(self, x):
         # mean = self._mean_y_x_single(x)
