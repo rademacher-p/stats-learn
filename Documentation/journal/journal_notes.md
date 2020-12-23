@@ -46,7 +46,7 @@
 
 ## Loss vs N, vs Norm, poly
 - true mean: f(x) = x**2
-- Normal: cov_y_x=.1
+- Normal: cov_y_x=.1, prior_cov=10 ?
 
 ### unbiased mean
 ![](predict_unbiased_dir.png)
