@@ -240,8 +240,8 @@ class DataConditional(Base):
         return NotImplemented
 
     def __deepcopy__(self, memodict=None):
-        if memodict is None:
-            memodict = {}
+        # if memodict is None:
+        #     memodict = {}
         # return type(self)(self.dists, self.model_x)
         return type(self)(deepcopy(self.dists), deepcopy(self.model_x))
 
@@ -387,8 +387,8 @@ class BetaLinear(MixinRVx, MixinRVy, Base):     # TODO: DRY with NormalLinear
             self._basis_y_x = basis_y_x
 
     def __repr__(self):
-        return f"NormalModel(model_x={self.model_x}, basis_y_x={self.basis_y_x}, " \
-               f"weights={self.weights}, cov_y_x={self._cov_repr})"
+        return f"BetaLinear(model_x={self.model_x}, basis_y_x={self.basis_y_x}, " \
+               f"weights={self.weights}, alpha_y_x={self.alpha_y_x})"
 
     @property
     def basis_y_x(self):
@@ -503,7 +503,8 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
         return rand_elements.Normal(mean, cov)
 
 
-# g = NormalLinear(basis_y_x=(lambda x: 1, lambda x: x**2,), weights=(1, 2), cov_y_x=.01, model_x=rand_elements.Normal(4))
+# g = NormalLinear(basis_y_x=(lambda x: 1, lambda x: x**2,), weights=(1, 2), cov_y_x=.01,
+#                  model_x=rand_elements.Normal(4))
 # r = g.rvs(100)
 # # plt.plot(r['x'], r['y'], '.')
 # g.mean_y_x(np.linspace(0, 2, 20, endpoint=True))
@@ -743,8 +744,8 @@ class Mixture(Base):
         return f"Mixture({_str})"
 
     def __deepcopy__(self, memodict=None):
-        if memodict is None:
-            memodict = {}
+        # if memodict is None:
+        #     memodict = {}
         return type(self)(self.dists, self.weights, self.rng)
 
     dists = property(lambda self: self._dists)
@@ -821,6 +822,9 @@ class Mixture(Base):
         # return rand_elements.Mixture(*args)
 
     def _weights_y_x(self, x):
+
+        # FIXME FIXME: require special treatment of impulsive PDF's!!
+
         # return self.weights * np.array([dist.model_x.pf(x) for dist in self.dists])
         return np.array([w * dist.model_x.pf(x) for w, dist in zip(self.weights, self.dists)])
         # return np.array([w * dist.model_x.pf(x) if w > 0. else np.zeros(x.shape)
