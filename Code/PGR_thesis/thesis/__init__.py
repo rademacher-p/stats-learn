@@ -1,2 +1,2 @@
-# TODO: define __all__
-# TODO: docstrings?
+__all__ = ['bayes', 'random', 'util', 'loss_funcs', 'predictors']
+from thesis import *

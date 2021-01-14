@@ -14,7 +14,7 @@ from scipy.stats._multivariate import _PSD
 from scipy.special import gammaln, xlogy, xlog1py, betaln
 import matplotlib.pyplot as plt
 
-from thesis.util.base import RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func
+from thesis.util.base import DELTA, RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func
 from thesis.util import plotting, spaces
 
 
@@ -821,7 +821,7 @@ class Normal(BaseRV):
     def cov(self, cov):
         self._cov = np.array(cov)
 
-        if self._cov.shape == () and self.ndim == 1:    # FIXME: hack-ish?
+        if self._cov.shape == () and self.ndim == 1:    # TODO: hack-ish?
             self._cov = self._cov * np.eye(self.size)
 
         if self._cov.shape != self.shape * 2:
@@ -997,7 +997,10 @@ class DataEmpirical(Base):
     def _pf_single(self, x):
         idx = self._get_idx(x)
         if idx is not None:
-            return self._p[idx]     # TODO: implement infinite valued output for continuous space!? use CDF?!
+            # return self._p[idx]     # TODO: implement infinite valued output for continuous space!? use CDF?!
+            delta = DELTA if isinstance(self.space, spaces.Continuous) else 1.
+            return self._p[idx] * delta
+
         else:
             return 0.
 
