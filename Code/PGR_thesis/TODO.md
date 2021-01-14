@@ -1,4 +1,5 @@
 # TODO's
 
-- ANALYTICAL RISK FUNCS
+- DOCUMENTATION
+- analytical risk?
 - Computational burden?

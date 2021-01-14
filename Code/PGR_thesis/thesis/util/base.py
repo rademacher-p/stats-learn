@@ -7,6 +7,9 @@ import math
 import numpy as np
 
 
+DELTA = 1e250       # large value approximating the value of the Dirac delta function at zero
+
+
 class RandomGeneratorMixin:
     def __init__(self, rng=None):
         self.rng = rng
