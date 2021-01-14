@@ -119,13 +119,16 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
 def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, do_std=False, verbose=False,
                                ax=None, rng=None):
 
+    space_x = check_spaces([pr.model.model_x for pr in predictors])
+    if x is None:
+        x = space_x.x_plt
+
     stats = ('mean', 'std') if do_std else ('mean',)  # TODO: generalize for mode, etc.
     y_stats_full = predict_stats_compare(predictors, model, params, x, n_train, n_mc, stats, verbose, rng)
 
-    space_x = check_spaces([pr.model.model_x for pr in predictors])
-
-    if x is None:
-        x = space_x.x_plt
+    # space_x = check_spaces([pr.model.model_x for pr in predictors])
+    # if x is None:
+    #     x = space_x.x_plt
     if ax is None:
         ax = space_x.make_axes(grid=True)
 
@@ -637,7 +640,7 @@ class BayesRegressor(RegressorMixin, Bayes):
                     and isinstance(self.bayes_model, bayes_models.Dirichlet)):
 
                 if (isinstance(model, bayes_models.Dirichlet) and model.alpha_0 == self.bayes_model.alpha_0
-                        and model.prior_mean == self.bayes_model.prior_mean):
+                        and model.prior_mean == self.bayes_model.prior_mean and n_test == 1):
                     # Minimum Bayesian squared-error
 
                     x = model.space['x'].values_flat

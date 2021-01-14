@@ -822,9 +822,6 @@ class Mixture(Base):
         # return rand_elements.Mixture(*args)
 
     def _weights_y_x(self, x):
-
-        # FIXME FIXME: require special treatment of impulsive PDF's!!
-
         # return self.weights * np.array([dist.model_x.pf(x) for dist in self.dists])
         return np.array([w * dist.model_x.pf(x) for w, dist in zip(self.weights, self.dists)])
         # return np.array([w * dist.model_x.pf(x) if w > 0. else np.zeros(x.shape)
