@@ -997,7 +997,10 @@ class DataEmpirical(Base):
     def _pf_single(self, x):
         idx = self._get_idx(x)
         if idx is not None:
-            # return self._p[idx]     # TODO: implement infinite valued output for continuous space!? use CDF?!
+            # return self._p[idx]
+
+            # FIXME: delta use needs to account for space dimensionality!?
+
             delta = DELTA if isinstance(self.space, spaces.Continuous) else 1.
             return self._p[idx] * delta
 
@@ -1012,7 +1015,6 @@ class DataEmpirical(Base):
 
 
 class DataEmpiricalRV(MixinRV, DataEmpirical):
-
     def __repr__(self):
         return f"DataEmpiricalRV(space={self.space}, n={self.n})"
 

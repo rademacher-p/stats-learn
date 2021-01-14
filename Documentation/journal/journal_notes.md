@@ -20,13 +20,16 @@
   - demonstrate Dirichlet consistency vs Normal loss
 
 
-# Conditional risk results
-
-**REMAKE plots with proper number of values y**
+# Discrete set results
 
 - X_set = Y_set = uniform grid on [0, 1]
 - p_x(x) = constant
-- p_y_x(x) = BinomialNormalized(n_grid, true_mean(x))
+- p_y_x(x) = EmpiricalScalar(n_grid, true_mean(x))
+
+
+## Conditional risk
+
+**REMAKE plots with proper number of values y**
 
 <!-- ## Loss vs N, vs Norm
 - 16 point [0, 1] grid
@@ -44,18 +47,18 @@
 
 ![](loss_n_unbiased_v2.png) -->
 
-## Loss vs N, vs Norm, poly
-- true mean: f(x) = x**2
+### Loss vs N, vs Norm, poly
+- true_mean(x) = x**2
 - Normal: cov_y_x=.1, prior_cov=10 ?
 
-### unbiased mean
+#### unbiased mean
 ![](predict_unbiased_dir.png)
 
 - Norm order = 2
 ![](loss_n_unbiased.png)
 ![](predict_unbiased.png)
 
-### biased mean, f(x) = .5
+#### biased mean, f(x) = .5
 ![](predict_biased_dir.png)
 
 - Norm order = 1
@@ -65,11 +68,11 @@
 ![](loss_n_biased_norm2.png)
 
 
-## Loss vs N, vs Norm, hard non-poly
-- true mean: f(x) = 1 / (2 + sin(2*pi* x))
+### Loss vs N, vs Norm, hard non-poly
+- true_mean(x) = 1 / (2 + sin(2*pi* x))
 - Normal: cov_y_x=.1
 
-### biased mean, f(x) = .5
+#### biased mean, f(x) = .5
 ![](predict_biased_hi_dir.png)
 
 - Norm order = 2
@@ -77,25 +80,60 @@
 ![](predict_biased_hi.png)
 
 
-## Loss vs alpha_0
-- true mean: f(x) = .3 + .4* x**2
+### Loss vs alpha_0
+- true_mean(x) = .3 + .4* x**2
 
-### unbiased
+#### unbiased
 ![](loss_alpha_unbiased.png)
 
-### biased mean, f(x) = .5
+#### biased mean, f(x) = .5
 ![](loss_alpha_biased.png)
 
 
-# Bayesian risk results
-- set = {0, .1, ... , 1}
-- true mean: f(x) = .5
+## Bayesian risk
+- true_mean(x) = .5
 - true alpha_0 = 10
+- NOTE: set = {0, .1, ... , 1}
 
-## Loss vs N
+
+### Loss vs N
 - unbiased
 ![](loss_bayes_n_unbiased.png)
 
-## Loss vs alpha_0
-- unbiased
+### Loss vs alpha_0
+- unbiased (note correct minima)
 ![](loss_bayes_alpha_unbiased.png)
+
+
+
+# Continuous set results
+
+- X_set = Y_set = uniform on [0, 1]
+- p_x(x) = 1 (constant)
+- p_y_x(x) = Beta(alpha_y_x * true_mean(x), alpha_y_x * (1 - true_mean(x)))
+  - alpha_y_x = 100
+
+## Conditional risk
+### Loss vs N, vs Norm, poly
+- true_mean(x) = x**2
+- Normal: cov_y_x=.1, prior_cov=10 ?
+
+#### biased mean, f(x) = .5
+![](cont_predict_biased_dir.png)
+
+- Norm order = 1
+![](cont_loss_n_biased.png)
+
+
+## Bayesian risk
+- true_mean(x) = .5
+- true alpha_0 = 10
+
+
+### Loss vs N
+- unbiased
+![](cont_loss_bayes_n_unbiased.png)
+
+### Loss vs alpha_0
+- unbiased (note correct minima)
+![](cont_loss_bayes_alpha_unbiased.png)

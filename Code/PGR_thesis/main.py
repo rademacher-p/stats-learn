@@ -47,7 +47,6 @@ model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=100, m
 # model = rand_models.NormalLinear(weights=np.ones(2), basis_y_x=None, cov_y_x=.1, model_x=rand_elements.Normal(0, 10))
 
 
-#
 # do_bayes = True
 do_bayes = False
 if do_bayes:
@@ -63,6 +62,9 @@ else:
 w_prior = [.5, 0]
 # w_prior = [.5, 0, .5]
 
+
+# Dirichlet learner
+
 # prior_mean = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
 #                                                      supp_x=[0, .5], p_x=None)
 
@@ -77,7 +79,7 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), n
 # dir_params = None
 # dir_params = {'alpha_0': [1, 10, 100]}
 dir_params = {'alpha_0': [.1, 50]}
-# dir_params = {'alpha_0': .001 + np.arange(0, 80, 5)}
+# dir_params = {'alpha_0': .001 + np.arange(0, 50, 10)}
 
 
 # Normal learner
@@ -94,7 +96,7 @@ norm_params = {'prior_cov': [10, 0.05]}
 
 # n_train = 10
 # n_train = [0, 10, 20]
-n_train = np.arange(0, 200, 10)
+n_train = np.arange(0, 50, 10)
 
 # print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
 # dir_predictor.plot_risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
@@ -109,7 +111,7 @@ temp = [
 predictors, params = list(zip(*temp))
 
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=5,
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=50,
                            verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, n_test=1, verbose=False, ax=None)
 
