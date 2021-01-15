@@ -263,7 +263,7 @@ Consider $\xrm$ conditioned on another random element $\zrm \in \Zcal$. The cond
 
 \todohi{Ever need the full functional?}
 
-Many distributions will be repeatedly used and thus special functions will be defined for the PDF's and PMF's of interest. For example, consider a random process $\xrm \in \Xcal$ characterized by a Multinomial distribution with parameters $N \in \Zbbgeq$ and $\theta \in \Uptheta$; the PDF will be notated as $\Multi : \Zbbgeq \times \Uptheta \mapsto \Pcal(\Xcal)$, where the range is the set of valid PDF's. More compactly, the notation $\xrm \sim \Multi(N, \theta)$ implies that $\Prm_{\xrm} = \Multi(N, \theta)$. Other distribution functions repeatedly used include $\Dir$, $\DM$, $\DP$, and $\DMP$, representing the Dirichlet distribution, the Dirichlet-multinomial distribution, the Dirichlet process, and the Dirichlet-Multinomial process.
+Many distributions will be repeatedly used and thus special functions will be defined for the PDF's and PMF's of interest. For example, consider a random process $\xrm \in \Xcal$ characterized by a Multinomial distribution with parameters $N \in \Zbbgeq$ and $\theta \in \Uptheta$; the PDF will be notated as $\Multi : \Zbbgeq \times \Uptheta \mapsto \Pcal(\Xcal)$, where the range is the set of valid PDF's. More compactly, the notation $\xrm \sim \Multi(N, \theta)$ implies that $\Prm_{\xrm} = \Multi(N, \theta)$. Other distribution functions repeatedly used include $\Dir$, $\DE$, $\DP$, and $\DEP$, representing the Dirichlet distribution, the Dirichlet-Empirical distribution, the Dirichlet process, and the Dirichlet-Empirical process.
 
 \todolo{Add PDF citations. Introduce Empirical process?}
 
@@ -364,19 +364,18 @@ will be used repeatedly.
 
 \todolow{italic theta font before Bayes?}
 
-Consider an observable random element $\xrm \in \Xcal$ and and unobservable random element $\yrm \in \Ycal$ which are jointly distributed according to an unknown probability distribution $\uptheta \in \Uptheta \equiv \Pcal(\Ycal \times \Xcal)$, such that $\Prm_{\yrm,\xrm | \uptheta} = \uptheta$. Note that the uppercase PMF notation used throughout this section implies that the random elements are discrete; PDF's are used when $\xrm$ and/or $\yrm$ are continuous random variables/processes.
+Consider an observable random element $\xrm \in \Xcal$ and an unobservable random element $\yrm \in \Ycal$ which are jointly distributed according to an unknown probability distribution $\uptheta \in \Uptheta \equiv \Pcal(\Ycal \times \Xcal)$, such that $\Prm_{\yrm,\xrm | \uptheta} = \uptheta$. Note that the uppercase PMF notation used throughout this section implies that the random elements are discrete; PDF's are used when $\xrm$ and/or $\yrm$ are continuous random variables/processes.
 
-Also observed is a random sequence of $N$ samples from $\uptheta$, denoted $\Drm \in \Dcal = \{\Ycal \times \Xcal\}^N$; an alternative representation that can be used is $\Drm \Leftrightarrow \big( (\Yrm_1,\Xrm_1),\ldots,(\Yrm_N,\Xrm_N) \big)$, where $\Yrm \in \Ycal^N$ and $\Xrm \in \Xcal^N$. The $N$ data pairs are conditionally independent from one another and are identically distributed as $\Prm_{\Drm_n | \uptheta} = \uptheta$. The samples are also conditionally independent from $(\yrm,\xrm)$. Thus $\Prm_{\yrm,\xrm,\Drm | \uptheta} = \Prm_{\yrm,\xrm | \uptheta} \otimes \left( \bigotimes_{n=1}^N \Prm_{\Drm_n | \uptheta} \right) = \uptheta \otimes \left( \bigotimes_{n=1}^N \uptheta \right)$ and
+Also observed is a random sequence of $N$ samples from $\uptheta$, denoted $\Drm \in \Dcal = \{\Ycal \times \Xcal\}^N$; an alternative representation that can be used is $\Drm \Leftrightarrow \big( (\Yrm_1,\Xrm_1),\ldots,(\Yrm_N,\Xrm_N) \big)$, where $\Yrm \in \Ycal^N$ and $\Xrm \in \Xcal^N$. The $N$ data pairs are conditionally independent from one another and are identically distributed as $\Prm_{\Drm_n | \uptheta} = \uptheta$. The samples are also conditionally independent from $(\yrm,\xrm)$. Thus $\Prm_{\yrm,\xrm,\Drm | \uptheta} = \Prm_{\yrm,\xrm | \uptheta} \otimes \left( \bigotimes_{n=1}^N \Prm_{\Drm_n | \uptheta} \right) = \uptheta \otimes \left( \bigotimes_{n=1}^N \uptheta \right)$, or explicitly,
 \begin{equation}
 \Prm_{\yrm,\xrm,\Drm | \uptheta}(y,x,D | \theta) = \Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) \prod_{n=1}^N \Prm_{\Drm_n | \uptheta}\big(Y_n,X_n | \theta\big) \;.
 \end{equation}
 
 
 
-
 \subsection{Marginal and Conditional Model Distributions}
 
-As only $\yrm$ is unobservable, it will be useful to alternatively represent the model distribution via the bijection $\uptheta \Leftrightarrow (\upthetam,\upthetac)$. First, introduce the marginal distribution $\upthetam \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) \in \Pcal(\Xcal)$; note that the summation is replaced by an integral when $\yrm$ is a continuous random variable. Next, introduce the conditional distributions $\upthetac \in \Pcal(\Ycal)^{\Xcal}$ defined as $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x)$.
+As only $\yrm$ is unobservable, it will be useful to alternatively represent the model distribution via the bijection $\uptheta \Leftrightarrow (\upthetam,\upthetac)$. First, introduce the marginal distribution $\upthetam \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) \in \Pcal(\Xcal)$; note that the summation is replaced by an integral when $\yrm$ is a continuous random variable. Next, introduce the conditional distributions $\upthetac \in \Pcal(\Ycal)^{\Xcal}$ defined as $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x)$. Observe that $\Prm_{\xrm | \uptheta} \equiv \Prm_{\xrm | \upthetam} = \upthetam$ and $\Prm_{\yrm | \xrm, \uptheta} \equiv \Prm_{\yrm | \xrm, \upthetac(\xrm)} = \upthetac(\xrm)$.
 
 
 
@@ -484,7 +483,7 @@ defined as
 The conditional distribution of the values $\Yrm$ given the corresponding $\Xrm$ and the model $\uptheta$ can be found using Bayes theorem as
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\Yrm | \Xrm,\uptheta}\big( Y | X,\theta \big) & = & \prod_{n=1}^N \frac{\Prm_{\Yrm_n,\Xrm_n | \uptheta}\big( Y_n,X_n | \theta \big)}{\Prm_{\Xrm_n | \uptheta}\big( X_n | \theta \big)} \equiv \prod_{n=1}^N \thetac(Y_n;X_n) \\
-& \equiv & \prod_{x \in \Xcal} \left[ \prod_{y \in \Ycal} \thetac(y;x)^{N \Psi(y,x;Y,X)} \right] \nonumber \\
+& \equiv & \prod_{x \in \Xcal} \prod_{y \in \Ycal} \thetac(y;x)^{N \Psi(y,x;Y,X)} \nonumber \\
 & = & \prod_{x \in \Xcal} \left( \prod_{y \in \Ycal} \thetac(y;x)^{\Psic(y;x;Y,X)} \right)^{N \Psim(x;X)} \nonumber \;,
 \end{IEEEeqnarray}
 where the function $\Psic : \{\Ycal \times \Xcal\}^N \mapsto \Uppsic \subset \Pcal(\Ycal)^{\Xcal}$ with range
@@ -549,7 +548,7 @@ It is instructive to formulate the optimal decision function assuming the model 
 \begin{equation}
 f_{\Theta}(\uptheta) = \argmin_{f \in \Fcal} \Rcal_{\Theta}(f ; \uptheta) \;.
 \end{equation}
-For a given set of observations $\xrm$ and $\Drm$, the function $f_{\Theta}(\uptheta) \in \Fcal$ selects the decision $h = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big]$. Note the conditional independence of $\yrm$ from $\Drm$ in \eqref{eq:risk_cond} - the knowledge of $\uptheta$ renders the training data $\Drm$ useless. As such, the range of the clairvoyant function is recast as $f_{\Theta} : \Theta \mapsto \Hcal^{\Xcal}$ and the decisions are
+For a given set of observations $\xrm$ and $\Drm$, the function $f_{\Theta}(\uptheta) \in \Fcal$ selects the decision $h = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big]$. Note the conditional independence of $\yrm$ from $\Drm$ in \eqref{eq:risk_cond} - the knowledge of $\uptheta$ renders the training data $\Drm$ valueless. As such, the range of the clairvoyant function is recast as $f_{\Theta} : \Theta \mapsto \Hcal^{\Xcal}$ and the decisions are
 \begin{equation} \label{eq:f_clv_x}
 f_{\Theta}(\xrm;\uptheta) = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \;.
 \end{equation}
@@ -561,7 +560,7 @@ The corresponding clairvoyant risk for a given model $\uptheta$ is
 \end{IEEEeqnarray}
 Additionally, define the excess conditional risk $\Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta) \equiv \Rcal_{\Theta}(f ; \uptheta) - \Rcal_{\Theta}^*(\uptheta)$; minimization of the learning objective \eqref{eq:risk_cond} is equivalent to minimization of this function.
 
-Using the marginal/conditional model representation, the $(\yrm,\xrm)$ distributions can be represented as $\Prm_{\xrm | \uptheta} \equiv \Prm_{\xrm | \upthetam} = \upthetam$ and $\Prm_{\yrm | \xrm,\uptheta} \equiv \Prm_{\yrm | \xrm,\upthetac} = \upthetac(\xrm)$. Note that the clairvoyant decision will depend only on the conditional model $\thetac$.
+Note that using the marginal/conditional model representations introduced previously, the clairvoyant decision will depend only on the conditional model $\thetac$.
 
 
 
@@ -615,7 +614,7 @@ and the minimum Bayes risk is
 
 
 
-Observe that the Bayesian distributions can be represented as $\Prm_{\xrm | \Drm} = \Erm_{\uptheta | \Drm}\big[ \Prm_{\xrm | \uptheta} \big] \equiv \mu_{\upthetam | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm} = \Erm_{\uptheta | \xrm,\Drm}\big[ \Prm_{\yrm | \xrm,\uptheta} \big] \equiv \mu_{\upthetac(\xrm) | \xrm,\Drm}$, the expected values of the corresponding clairvoyant distributions with respect to the model posteriors $\prm_{\upthetam | \Drm}$ and $\prm_{\upthetac(\xrm) | \xrm,\Drm}$, respectively. Also, $\Prm_{\yrm,\xrm | \Drm} = \Erm_{\uptheta | \Drm}\big[ \Prm_{\yrm,\xrm | \uptheta} \big] \equiv \mu_{\uptheta | \Drm}$. Thus, the Bayesian approach to prediction uses the model posterior given the observable random elements to integrate out the model dependency of the risk $\Rcal_{\Theta}(f ; \uptheta)$.
+Observe that the marginal and conditional Bayesian distributions can be represented as $\Prm_{\xrm | \Drm} = \Erm_{\uptheta | \Drm}\big[ \Prm_{\xrm | \uptheta} \big] \equiv \mu_{\upthetam | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm} = \Erm_{\uptheta | \xrm,\Drm}\big[ \Prm_{\yrm | \xrm,\uptheta} \big] \equiv \mu_{\upthetac(\xrm) | \xrm,\Drm}$, the expected values of the corresponding clairvoyant distributions with respect to the model posteriors $\prm_{\upthetam | \Drm}$ and $\prm_{\upthetac(\xrm) | \xrm,\Drm}$, respectively. Also, $\Prm_{\yrm,\xrm | \Drm} = \Erm_{\uptheta | \Drm}\big[ \Prm_{\yrm,\xrm | \uptheta} \big] \equiv \mu_{\uptheta | \Drm}$. Thus, the Bayesian approach to prediction uses the model posterior given the observable random elements to integrate out the model dependency of the risk $\Rcal_{\Theta}(f ; \uptheta)$.
 
 \todomid{Consider notation $\mu_{\upthetac | \xrm,\Drm}(\xrm; \xrm,\Drm)$ !?!?}
 
@@ -651,7 +650,7 @@ where $\Prm_{\Yrm | \Xrm} = \Erm_{\upthetam | \Xrm} \Big[ \Erm_{\upthetac | \upt
 
 
 
-Additionally, since $\Psi(\Drm)$ is a sufficient statistic for the model $\uptheta$, the Bayesian distributions of interest $\Prm_{\Drm}$, $\Prm_{\xrm | \Drm}$, and $\Prm_{\yrm | \xrm,\Drm}$ will also depend on $\Drm$ via $\Psi(\Drm)$; as such, the training data can be transformed into the empirical process $\uppsi$ for Bayesian prediction without incurring any additional risk. 
+Additionally, since $\Psi(\Drm)$ is a sufficient statistic for the model $\uptheta$, the Bayesian distributions of interest $\Prm_{\Drm}$, $\Prm_{\xrm | \Drm}$, and $\Prm_{\yrm | \xrm,\Drm}$ will also depend on $\Drm$ only through $\Psi(\Drm)$; as such, the training data can be transformed into the empirical process $\uppsi$ for Bayesian prediction without incurring any additional risk. 
 
 For this approach, the distributions $\Prm_{\uppsi}$, $\Prm_{\xrm | \uppsi}$, and $\Prm_{\yrm | \xrm,\uppsi}$ are required. Note that $\Mcal\big( N \Psi(D) \big) \Prm_{\Drm | \uptheta}(D | \theta) = \Prm_{\uppsi | \uptheta}\big( \Psi(D) | \theta \big)$. Also, observe that the relevant posterior distributions satisfy $\prm_{\upthetam | \Drm}(D) = \prm_{\upthetam | \uppsi}\big( \Psi(D) \big)$ and $\prm_{\upthetac(x) | \xrm,\Drm}(x,D) = \prm_{\upthetac(x) | \xrm,\uppsi}\big( x,\Psi(D) \big)$; consequently, $\Prm_{\xrm | \Drm}(D) = \Prm_{\xrm | \uppsi}\big( \Psi(D) \big)$, and $\Prm_{\yrm | \xrm,\Drm}(x,D) = \Prm_{\yrm | \xrm,\uppsi}\big( x,\Psi(D) \big)$.
 
@@ -1233,8 +1232,7 @@ As shown in Equation \eqref{eq:f_opt_xD}, the decision selected by the optimally
 
 First observe that since $\Prm_{\Drm | \uptheta}$ is of exponential form, the Dirichlet prior $\prm_{\uptheta}$ is its conjugate prior \cite{theodoridis-ML}; thus, the model posterior PDF given the training data is
 \begin{IEEEeqnarray}{rCl}
-\prm_{\uptheta | \Drm}(\theta | D) & = & \beta \left( \alpha_0 \alpha + N \Psi(D) \right)^{-1} \prod_{y \in \Ycal} \prod_{x \in \Xcal} 
-\theta(y,x)^{\alpha_0 \alpha(y,x) + N \Psi(y,x;D) - 1} \;, 
+\prm_{\uptheta | \Drm}(\theta | D) & = & \beta \left( \alpha_0 \alpha + N \Psi(D) \right)^{-1} \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\alpha_0 \alpha(y,x) + N \Psi(y,x;D) - 1} \;, 
 \end{IEEEeqnarray}
 a Dirichlet distribution with concentration $\alpha_0 + N$ and parameter distribution 
 \begin{IEEEeqnarray}{rCl}
@@ -2615,13 +2613,13 @@ The first and second order conditional distributions are of specific interest. T
 \begin{IEEEeqnarray}{rCl}
 \prm_{\Yrm_n | \Xrm}(X) & = & \prm_{\Yrm_n | \Xrm_n}(X_n) = \prm_{\yrm | \xrm}(X_n) = \mu_{\upthetac(X_n)} = \alphac(X_n) \;,
 \end{IEEEeqnarray}
-To determine the second order conditional distributions, first note that for $\Xrm_n \neq \Xrm_{n'}$, $\prm_{\Yrm_n,\Yrm_{n'} | \Xrm_n,\Xrm_{n'}} = \mu_{\upthetac(\Xrm_n)} \otimes \mu_{\upthetac(\Xrm_{n'})} = \alphac(\Xrm_n) \otimes \alphac(\Xrm_{n'})$. Contrasting, if $\Xrm_n = \Xrm_{n'}$, then
+To determine the second order conditional distributions, first note that for $\Xrm_n \neq \Xrm_{n'}$, $\prm_{\Yrm_n,\Yrm_{n'} | \Xrm_n,\Xrm_{n'}} = \mu_{\upthetac(\Xrm_n)} \otimes \mu_{\upthetac(\Xrm_{n'})} = \alphac(\Xrm_n) \otimes \alphac(\Xrm_{n'})$. Conversely, if $\Xrm_n = \Xrm_{n'}$, then
 \begin{IEEEeqnarray}{L}
 \prm_{\Yrm_n,\Yrm_{n'} | \Xrm_n,\Xrm_{n'}} = \Erm_{\upthetac(\Xrm_n)} \big[\upthetac(\Xrm_n) \otimes \upthetac(\Xrm_n)\big]  \\
 \quad = \frac{\diag\big(\alphac(\Xrm_n)\big) + \delta(0)^{-1} \alpha_0 \alpham(\Xrm_n) \alphac(\Xrm_n) \otimes \alpha(\Xrm_n)}{\delta(0)^{-1} \alpha_0 \alpham(\Xrm_n) + 1} \nonumber \\
 \quad = \frac{\delta(0)}{\alpha_0 \alpham(\Xrm_n) + \delta(0)} \diag\big(\alphac(\Xrm_n)\big) + \frac{\alpha_0 \alpham(\Xrm_n)}{\alpha_0 \alpham(\Xrm_n) + \delta(0)} \alphac(\Xrm_n) \otimes  \alpha(\Xrm_n) \nonumber \;.
 \end{IEEEeqnarray}
-Combining, the formula for the second order distribution is
+Combining, the second order distribution formula is
 \begin{IEEEeqnarray}{L}
 \prm_{\Yrm_n,\Yrm_{n'} | \Xrm_n,\Xrm_{n'}} \\
 \quad = \frac{\delta(\Xrm_n-\Xrm_{n'})}{\alpha_0 \alpham(\Xrm_n) + \delta(\Xrm_n-\Xrm_{n'})} \diag\big(\alphac(\Xrm_n)\big) + \frac{\alpha_0 \alpham(\Xrm_n)}{\alpha_0 \alpham(\Xrm_n) + \delta(\Xrm_n-\Xrm_{n'})} \alphac(\Xrm_n) \otimes \alpha(\Xrm_{n'}) \nonumber
@@ -3392,7 +3390,7 @@ This section introduces a new continuous-domain random process, referred to as t
 
 The continuous-domain Empirical process is characterized by the same aggregation property as its discrete-domain variant. Define a countable partition of $\Ycal$, $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$, and the corresponding function partitions $\uppsi_z \in \Rbbgeq^{\Scal_z}$, such that $\uppsi = \left( \ldots,\uppsi_z,\ldots \right)$, and $\theta_z \in \Rbbgeq^{\Scal_z}$, such that $\theta = \left( \ldots,\theta_z,\ldots \right)$. Thus, for an Empirical process $\uppsi \in \Uppsi$, the aggregation $\uppsim \in \Uppsim \subset \Pcal(\Xcal)$ satisfying $\uppsim(z) \equiv \int_{\Scal_z} \uppsi_z(y) {\drm}y$ is an Empirical process with $N$ samples and mean function $\thetam$ satisfying $\thetam(z) \equiv \int_{\Scal_z} \theta_z(y) {\drm}y$.
 
-Additionally, when also conditioned on the aggregation $\uppsim$, the normalized random processes $\uppsic(z) \equiv \uppsi_z / \uppsim(z)$ are independent continuous-domain Empirical processes, $\uppsic(z) | \uppsim(z), \upthetac(z) \sim \EP\big(N \uppsim(z), \upthetac(z)\big)$, where $\thetac(z) \equiv \theta_z / \thetam(z) \in \Pcal(\Scal_z)$.
+Additionally, when further conditioned on the aggregation $\uppsim$, the normalized random processes $\uppsic(z) \equiv \uppsi_z / \uppsim(z)$ are independent continuous-domain Empirical processes, $\uppsic(z) | \uppsim(z), \upthetac(z) \sim \EP\big(N \uppsim(z), \upthetac(z)\big)$, where $\thetac(z) \equiv \theta_z / \thetam(z) \in \Pcal(\Scal_z)$.
 
 
 
@@ -3738,7 +3736,7 @@ Additionally, when conditioned on the aggregation $\uppsim$, the normalized func
 \section{Training Data representations and distributions}
 
 
-\subsection{Proof: $\uppsi \equiv N^{-1} \sum_{n=1}^N \delta(\cdot - \Drm_n)$ given $\theta$ is an EP}
+\subsection{Proof: $\uppsi \equiv N^{-1} \sum_{n=1}^N \delta(\cdot - \Drm_n)$ given $\theta$ is an Empirical Process}
 
 It is demonstrated that conditioned on $\uptheta$, the random process $\uppsi \equiv \Psi(\Drm) = N^{-1} \sum_{n=1}^N \delta(\cdot - \Drm_n)$ is an EP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta(D_n)$.
 

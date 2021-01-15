@@ -119,6 +119,7 @@
 - Normal: cov_y_x=.1, prior_cov=10 ?
 
 #### biased mean, f(x) = .5
+NOTE: plotting missed at training data points
 ![](cont_predict_biased_dir.png)
 
 - Norm order = 1
