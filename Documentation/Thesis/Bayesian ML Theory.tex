@@ -712,11 +712,23 @@ where $\Prm_{\uppsic | \uppsim} = \Erm_{\upthetam | \uppsim} \Big[ \Erm_{\upthet
 
 \todohigh{Prior support?}
 
-The trends in Bayesian risk as $N \to \infty$ are of specific interest. For priors with full support, observe that as the number of training samples increases, the statistic PMF tends toward $\Prm_{\uppsi}(\psi) \approx N^{1-|\Ycal||\Xcal|}\prm_{\uptheta}(\psi)$; this can be proven using Gautschi's inequality \cite{wendel}. Thus,
+The trends in Bayesian risk as $N \to \infty$ are of specific interest. Recall that $\Prm_{\uppsi | \uptheta}(\psi | \theta) \to \delta[\psi, \theta]$. For priors with full support, observe that as the number of training samples increases, the statistic PMF tends toward $\Prm_{\uppsi}(\psi) \approx N^{1-|\Ycal||\Xcal|}\prm_{\uptheta}(\psi)$; this can be proven using Gautschi's inequality \cite{wendel}. Thus,
 \begin{IEEEeqnarray}{rCl}
 \prm_{\uptheta | \uppsi}(\theta | \psi) & = & \frac{\Prm_{\uppsi | \uptheta}(\psi | \theta)}{\Prm_{\uppsi}(\psi)} \prm_{\uptheta}(\theta) \nonumber \\
-& \to & 
+& \to & \delta(\theta - \psi)
 \end{IEEEeqnarray}
+and 
+\begin{IEEEeqnarray}{rCl}
+f^*(\xrm; \uppsi) & = & \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uppsi}\big[ \Lcal(h,\yrm) \big] \nonumber \\
+& \equiv & \argmin_{h \in \Hcal} \sum_{y \in \Ycal} \uppsic(y; x) \Lcal(h,y) \nonumber \\
+& \equiv & \argmin_{h \in \Hcal} \sum_{n=1}^N \Lcal\big( h,Y_n \big) \delta[\xrm, X_n]
+\end{IEEEeqnarray}
+achieving
+\begin{IEEEeqnarray}{rCl} 
+\Rcal_{\Theta}(f ; \uptheta) & = & \Erm_{\xrm | \uptheta} \bigg[ \Erm_{\yrm | \xrm,\uptheta} \Big[ \Lcal\big( f(\xrm;\uptheta),\yrm \big) \Big] \bigg] \nonumber \\
+& = & \Rcal_{\Theta}^*(\uptheta) 
+\end{IEEEeqnarray}
+demonstrating consistency of the full support Bayesian learner.
 
 \todohigh{FIXXXXXX lim}
 
@@ -1244,7 +1256,7 @@ a Dirichlet distribution with concentration $\alpha_0 + N$ and parameter distrib
 
 This posterior distribution is of specific interest in the machine learning literature. While Bayesian techniques are used here, often point estimates of the model $\uptheta$ are formed; perhaps the most common approach is to form the Maximum a posteriori estimate,
 \begin{IEEEeqnarray}{rCl}
-\theta_\mathrm{MAP}(D) & = & \argmax_{\theta \in \Uptheta} \Prm_{\uptheta | \Drm}(\theta | D) - \frac{\alpha_0 \alpha + N \Psi(D) - 1}{\alpha_0 + N - |\Ycal||\Xcal|} \\
+\theta_\mathrm{MAP}(D) & = & \argmax_{\theta \in \Uptheta} \Prm_{\uptheta | \Drm}(\theta | D) = \frac{\alpha_0 \alpha + N \Psi(D) - 1}{\alpha_0 + N - |\Ycal||\Xcal|} \\
 & = & \frac{\alpha_0}{\alpha_0 - |\Ycal||\Xcal| + N} (\alpha - \alpha_0^{-1}) + \frac{N}{\alpha_0 - |\Ycal||\Xcal| + N} \Psi(\Drm) \nonumber \;.
 \end{IEEEeqnarray}
 This maximizing value is only valid if $\mu_{\uptheta | \Drm} > (\alpha_0 + N)^{-1}$. For the uniform model prior, the maximizing value of the posterior is the empirical model $\Psi(D)$.
