@@ -1379,48 +1379,48 @@ The Bayes predictive PMF can thus be expressed as
 PGR: use poster table??
 
 
-It is instructive to treat the distribution $\Prm_{\yrm | \xrm,\uppsi}$ as an estimate of the unknown conditional PMF $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$ and investigate the effects of informative prior knowledge. For a given $\xrm$ and marginal empirical probability $\uppsim(\xrm)$, the expected value of the estimate conditioned on the true model $\upthetac(\xrm)$ is
+It is instructive to treat the distribution $\Prm_{\yrm | \xrm,\uppsi}$ as an estimate of the unknown conditional PMF $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$ and investigate the effects of informative prior knowledge. For a given $\xrm$, the expected value of the estimate conditioned on the true model is
 \begin{IEEEeqnarray}{L}
-\Erm_{\uppsic | \uppsim,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] 
-\equiv \Erm_{\uppsic(\xrm) | \uppsim(\xrm),\upthetac(\xrm)}\big[ \Prm_{\yrm | \xrm,\uppsim(\xrm),\uppsic(\xrm)} \big] \\ 
-\quad = \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right) \alphac(\xrm) + \left(\frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right) \upthetac(\xrm) \nonumber \;,
+\Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] 
+\equiv \Erm_{\uppsim(\xrm),\uppsic(\xrm) | \upthetam(\xrm),\upthetac(\xrm)}\big[ \Prm_{\yrm | \xrm,\uppsim(\xrm),\uppsic(\xrm)} \big] \\ 
+\quad = \Erm_{\uppsim(\xrm) | \upthetam(\xrm)} \left[\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right] \alphac(\xrm) + \Erm_{\uppsim(\xrm) | \upthetam(\xrm)} \left[\frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right] \upthetac(\xrm) \nonumber
 \end{IEEEeqnarray}
-where the properties of an Empirical distribution conditioned on its aggregation have been used. The result is a convex combination of the conditional data-independent distribution $\alphac(\xrm)$ and the true conditional distribution $\upthetac(\xrm)$. The convex coefficients are dependent on the ``marginal'' values $\alpham(\xrm)$ and $\uppsim(\xrm)$; note that as the number of matching training samples $N \uppsim(x)$ increases relative to prior concentration $\alpha_0 \alpham(x)$, the estimate tends towards the true conditional PMF. 
+where the properties of an Empirical distribution conditioned on its aggregation have been used. The result is a convex combination of the conditional data-independent distribution $\alphac(\xrm)$ and the true conditional distribution $\upthetac(\xrm)$. The convex coefficients are dependent on the ``marginal'' values $\alpham(\xrm)$ and $\upthetam(\xrm)$. Note that as the number of training samples $N$ and the true marginal value $\upthetam(\xrm)$) increase, the estimate tends towards the true conditional PMF; conversely, as the prior concentration $\alpha_0$ and marginal value $\alpha_m(\xrm)$ increase, the estimate tends toward the prior estimate $\alphac(\xrm)$.
 
 
 
-To aid characterization of the estimator, define the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$. For a given $\xrm$ and corresponding empirical model value $\uppsim(\xrm)$, the bias of the conditional PMF estimate is
+To aid characterization of the estimator, define the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$. For a given $\xrm$, the bias of the conditional PMF estimate is
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias}
-\mathrm{Bias}(\xrm;\uppsim,\upthetac) & = & \Erm_{\uppsic | \uppsim,\upthetac}\big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \big] \\
-& = & \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)} \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
-& = & \left( 1 + \frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm)} \right)^{-1} \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber 
+\mathrm{Bias}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim, \uppsic | \upthetam,\upthetac}\big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \big] \\
+& = & \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)} \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber
 \end{IEEEeqnarray}
-and its covariance function is 
+and, noting that
+\begin{IEEEeqnarray}{L}
+\Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
+\quad = \frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\big(\uppsic(\xrm) - \upthetac(\xrm)\big) \nonumber \\
+\qquad + \left( \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)} - \Erm_{\uppsim | \upthetam}\left[ \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)} \right] \right) \big(\alphac(\xrm) - \upthetac(\xrm)\big) \nonumber \;,
+\end{IEEEeqnarray}
+its covariance function is 
 \begin{IEEEeqnarray}{L} \label{eq:predictive_cov}
-\mathrm{Cov}(\xrm;\uppsim,\upthetac) = \Crm_{\uppsic | \uppsim,\upthetac} \big[\Prm_{\yrm | \xrm,\uppsim,\uppsic}(\xrm,\uppsim,\uppsic) \big] \\
-\quad = \left( \frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)} \right)^2 \Sigma_{\uppsic(\xrm) | \uppsim(\xrm),\upthetac(\xrm)} \nonumber \\
-\quad = \left( 1 + \frac{\alpha_0 \alpham(\xrm)}{N \uppsim(\xrm)} \right)^{-2} \Sigma_{\uppsic(\xrm) | \uppsim(\xrm),\upthetac(\xrm)} \nonumber \\
-\quad = \frac{N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \big) \nonumber \;,
+\mathrm{Cov}(\xrm;\upthetam,\upthetac) = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
+\quad = \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \right] \big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \big) \nonumber \\
+\qquad + \Crm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)} \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber
 \end{IEEEeqnarray}
-where the properties of multinomial random processes have been used. Note that the bias is proportionate to the difference between the true conditional model and the data-independent estimate. The scaling factor tends from one to zero as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)}$ tends from zero to infinity; as such, more informative priors (large $\alpha_0$) will lead to PMF estimates that are prone to bias. Conversely, the variance of the PMF estimate tends to zero as $\alpha_0 \to \infty$. 
-
+where the properties of multinomial random processes have been used. Note that the bias is proportionate to the difference between the true conditional model and the data-independent estimate. The scaling factor tends to zero as the expected value of the estimate tends to the true model and to one when it tends to the prior estimate. Thus, higher data volume $N$ produces lower bias, while higher prior concentration $\alpha_0$ leads to higher bias. The variance tends to zero as $\alpha_0 \to \infty$ and as $N \to \infty$.
 
 Combining the estimator bias and variance, the conditional second moments of $\Delta(\xrm;\uppsim,\uppsic,\upthetac)$ are
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_del_sq}
-\mathcal{E}(\xrm;\uppsim,\upthetac) & = & \Erm_{\uppsic | \uppsim,\upthetac} \Big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \otimes \Delta(\xrm;\uppsim,\uppsic,\upthetac) \Big] \\
-& = & \mathrm{Bias}(\xrm;\uppsim,\upthetac) \otimes \mathrm{Bias}(\xrm;\uppsim,\upthetac) + \mathrm{Cov}(\xrm;\uppsim,\upthetac) \nonumber \;.
+\mathcal{E}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim,\uppsic | \upthetam,\upthetac} \Big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \otimes \Delta(\xrm;\uppsim,\uppsic,\upthetac) \Big] \\
+& = & \mathrm{Bias}(\xrm;\upthetam,\upthetac) \otimes \mathrm{Bias}(\xrm;\upthetam,\upthetac) + \mathrm{Cov}(\xrm;\upthetam,\upthetac) \nonumber \;.
 \end{IEEEeqnarray}
-As $N \uppsim(x) \to \infty$, this function tends to zero and thus the underlying model $\upthetac(x)$ is determined precisely. A more practical case is estimation with a finite volume of training data. Specification of the Dirichlet model prior can be interpreted as providing a distribution estimate $\alphac(x)$ and a confidence level $\alpha_0 \alpham(x)$. Higher confidence reduces error due to the variance of the estimator, but increases the error due to bias between the true model and its estimate; low confidence renders the estimate unbiased, but maximizes the estimator variance. 
+As $N \to \infty$, this function tends to zero for values $x$ satisfying $\upthetam(x) > 0$. A more practical case is estimation with a finite volume of training data. Specification of the Dirichlet model prior can be interpreted as providing a distribution estimate $\alphac(x)$ and a confidence level $\alpha_0 \alpham(x)$. Higher confidence reduces error due to the variance of the estimator, but increases the error due to bias between the true model and its estimate; low confidence renders the estimate unbiased, but maximizes the estimator variance. 
 
 
-
-Also of interest, the conditional expectation of $\mathcal{E}(\xrm;\uppsim,\uptheta)$ is
+Also of interest, the conditional expectation over $\xrm$ is
 \begin{IEEEeqnarray}{L} \label{eq:predictive_E_del_sq}
-\Erm_{\xrm,\uppsim | \upthetam}\Big[ \mathcal{E}(\xrm;\uppsim,\upthetac) \Big] \\
+\Erm_{\xrm | \upthetam}\Big[ \mathcal{E}(\xrm;\upthetam,\upthetac) \Big] \\
 \quad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right)^2 \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big)  \right] \nonumber \\
-\qquad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \right] \Big( \diag\big(\upthetac(y;\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \right] \nonumber \\
-\quad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(1 + \frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm)}\right)^{-2} \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \right] \nonumber \\
-\qquad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(1 + \frac{\alpha_0 \alpham(\xrm)}{N \uppsim(\xrm)}\right)^{-2}  \Sigma_{\uppsic(\xrm) | \uppsim(\xrm),\upthetac(\xrm)} \right] \right] \nonumber \;.
+\qquad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \right] \Big( \diag\big(\upthetac(y;\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \right] \nonumber
 \end{IEEEeqnarray}
 Note that by the aggregation property of Empirical distributions, the empirical process $\uppsim(x)$ conditioned on the model $\upthetam(x)$ is distributed as
 \begin{IEEEeqnarray}{rCl}
@@ -1428,6 +1428,8 @@ Note that by the aggregation property of Empirical distributions, the empirical 
 & = & \Bi\big(N \psim(x); N, \thetam(x)\big) \;,
 \end{IEEEeqnarray}
 where $\Bi$ is the binomial PMF.
+
+\todohigh{REDO FIGURES for new formulae?!}
 
 To exemplify how the model estimate $\Prm_{\yrm | \xrm,\uppsi}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 10$ and $|\Xcal| = 1$ for simplicity. The data-independent PMF $\alphac(x)$ and true model $\upthetac(x)$ are shown in Figure \ref{fig:P_yx_error_N_0} - note the significant mismatch. 
 
@@ -1459,50 +1461,6 @@ PGR: full support discussion?
 \caption{Model $\uptheta$ estimates, $\alpha_0 = 10$}
 \label{fig:P_yx_error_a0_10}
 \end{figure}
-
-
-
-\subsection{PGR: better approach!?!}
-
-\todohi{overwrite previous results with this approach?}
-
-\begin{IEEEeqnarray}{L}
-\Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] 
-\equiv \Erm_{\uppsim(\xrm),\uppsic(\xrm) | \upthetam(\xrm),\upthetac(\xrm)}\big[ \Prm_{\yrm | \xrm,\uppsim(\xrm),\uppsic(\xrm)} \big] \\ 
-\quad = \Erm_{\uppsim(\xrm) | \upthetam(\xrm)} \left[\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right] \alphac(\xrm) + \Erm_{\uppsim(\xrm) | \upthetam(\xrm)} \left[\frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right] \upthetac(\xrm) \nonumber
-\end{IEEEeqnarray}
-
-\begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias}
-\mathrm{Bias}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim, \uppsic | \upthetam,\upthetac}\big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \big] \\
-& = & \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)} \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber
-\end{IEEEeqnarray}
-
-\begin{IEEEeqnarray}{L} \label{eq:predictive_cov}
-\mathrm{Cov}(\xrm;\upthetam,\upthetac) = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
-\quad = ... \nonumber \\
-\quad = \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \right] \big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \big) \\
-\qquad + \Crm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)} \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber
-\end{IEEEeqnarray}
-
-
-Combining the estimator bias and variance, the conditional second moments of $\Delta(\xrm;\uppsim,\uppsic,\upthetac)$ are
-\begin{IEEEeqnarray}{rCl} \label{eq:predictive_del_sq}
-\mathcal{E}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim,\uppsic | \upthetam,\upthetac} \Big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \otimes \Delta(\xrm;\uppsim,\uppsic,\upthetac) \Big] \\
-& = & \mathrm{Bias}(\xrm;\upthetam,\upthetac) \otimes \mathrm{Bias}(\xrm;\upthetam,\upthetac) + \mathrm{Cov}(\xrm;\upthetam,\upthetac) \nonumber \;.
-\end{IEEEeqnarray}
-
-Taking the expectation over $\xrm$,
-\begin{IEEEeqnarray}{L} \label{eq:predictive_E_del_sq}
-\Erm_{\xrm | \upthetam}\Big[ \mathcal{E}(\xrm;\upthetam,\upthetac) \Big] \\
-\quad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right)^2 \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big)  \right] \nonumber \\
-\qquad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \right] \Big( \diag\big(\upthetac(y;\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \right] \nonumber
-\end{IEEEeqnarray}
-
-
-
-
-
-
 
 
 
@@ -2672,42 +2630,34 @@ Observe that by the aggregation principle, $\uppsim \sim \DEP(N,\alpha_0,\alpham
 
 \section{Model Estimation Perspective} \label{sec:predictive_est_cont}
 
-\todohi{import new definitions from Discrete section!}
-
 
 \begin{IEEEeqnarray}{L}
-\Erm_{\uppsic | \uppsim,\upthetac}\big[ \prm_{\yrm | \xrm,\uppsim,\uppsic} \big] 
-\equiv \Erm_{\uppsic(\xrm) | \uppsim(\xrm),\upthetac(\xrm)}\big[ \prm_{\yrm | \xrm,\uppsim(\xrm),\uppsic(\xrm)} \big] \\ 
-\quad = \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right) \alphac(\xrm) + \left(\frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right) \upthetac(\xrm) \nonumber \;,
+\Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] 
+\equiv \Erm_{\uppsim(\xrm),\uppsic(\xrm) | \upthetam(\xrm),\upthetac(\xrm)}\big[ \Prm_{\yrm | \xrm,\uppsim(\xrm),\uppsic(\xrm)} \big] \\ 
+\quad = \Erm_{\uppsim(\xrm) | \upthetam(\xrm)} \left[\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right] \alphac(\xrm) + \Erm_{\uppsim(\xrm) | \upthetam(\xrm)} \left[\frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right] \upthetac(\xrm) \nonumber
 \end{IEEEeqnarray}
 
-
-
-To aid characterization of the estimator, define the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \prm_{\yrm | \xrm,\uppsim,\uppsic} - \prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$. 
-
+To aid characterization of the estimator, define the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \prm_{\yrm | \xrm,\uppsim,\uppsic} - \prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$. For a given $\xrm$, the bias of the conditional PDF estimate is
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias_cont}
-\mathrm{Bias}(\xrm;\uppsim,\upthetac) & = & \Erm_{\uppsic | \uppsim,\upthetac}\big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \big] \\
-& = & \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)} \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
-& = & \left( 1 + \frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm)} \right)^{-1} \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber 
+	\mathrm{Bias}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim, \uppsic | \upthetam,\upthetac}\big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \big] \\
+	& = & \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)} \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber
 \end{IEEEeqnarray}
-
+and its covariance function is 
 \begin{IEEEeqnarray}{L} \label{eq:predictive_cov_cont}
-\mathrm{Cov}(\xrm;\uppsim,\upthetac) = \Crm_{\uppsic | \uppsim,\upthetac} \big[\prm_{\yrm | \xrm,\uppsim,\uppsic}(\xrm,\uppsim,\uppsic) \big] \\
-\quad = \left( \frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)} \right)^2 \Sigma_{\uppsic(\xrm) | \uppsim(\xrm),\upthetac(\xrm)} \nonumber \\
-\quad = \left( 1 + \frac{\alpha_0 \alpham(\xrm)}{N \uppsim(\xrm)} \right)^{-2} \Sigma_{\uppsic(\xrm) | \uppsim(\xrm),\upthetac(\xrm)} \nonumber \\
-\quad = \frac{\delta(0) N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \nonumber \;,
+\mathrm{Cov}(\xrm;\upthetam,\upthetac) = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
+\quad = \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\delta(0) N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \right] \big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \big) \nonumber \\
+\qquad + \Crm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)} \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber
 \end{IEEEeqnarray}
 
 
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_del_sq_cont}
-\mathcal{E}(\xrm;\uppsim,\upthetac) & = & \Erm_{\uppsic | \uppsim,\upthetac} \Big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \otimes \Delta(\xrm;\uppsim,\uppsic,\upthetac) \Big] \\
-& = & \mathrm{Bias}(\xrm;\uppsim,\upthetac) \otimes \mathrm{Bias}(\xrm;\uppsim,\upthetac) + \mathrm{Cov}(\xrm;\uppsim,\upthetac) \nonumber \;.
+\mathcal{E}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim,\uppsic | \upthetam,\upthetac} \Big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \otimes \Delta(\xrm;\uppsim,\uppsic,\upthetac) \Big] \\
+& = & \mathrm{Bias}(\xrm;\upthetam,\upthetac) \otimes \mathrm{Bias}(\xrm;\upthetam,\upthetac) + \mathrm{Cov}(\xrm;\upthetam,\upthetac) \nonumber \;.
 \end{IEEEeqnarray}
 
-
-Also of interest, the conditional expectation of $\mathcal{E}(\xrm,\uppsim,\uptheta)$ is
+Also of interest, the conditional expectation over $\xrm$ is
 \begin{IEEEeqnarray}{L} \label{eq:predictive_E_del_sq_cont}
-\Erm_{\xrm,\uppsim | \upthetam}\Big[ \mathcal{E}(\xrm;\uppsim,\upthetac) \Big] \\
+\Erm_{\xrm | \upthetam}\Big[ \mathcal{E}(\xrm;\upthetam,\upthetac) \Big] \\
 \quad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right)^2 \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big)  \right] \nonumber \\
 \qquad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\delta(0) N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \right] \nonumber \\
 \quad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(1 + \frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm)}\right)^{-2} \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \right] \nonumber \\
