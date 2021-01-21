@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def discretizer(vals):
+def discretizer(vals):      # TODO: use sklearn.preprocessing.KBinsDiscretizer?
     def func(x):
         x = np.array(x)
         delta = np.abs(x - vals[:, np.newaxis])

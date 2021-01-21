@@ -987,9 +987,17 @@ class DataEmpirical(Base):
     def _update_attr(self):
         self._p = self.data['n'] / self.n
 
-        self._mode = self.data['x'][self.data['n'].argmax()]
+        self._mode = None
+        # self._mode = self.data['x'][self.data['n'].argmax()]
 
         self._set_x_plot()
+
+    @property
+    def mode(self):
+        if self._mode is None:
+            self._mode = self.data['x'][self.data['n'].argmax()]
+
+        return self._mode
 
     def _rvs(self, size, rng):
         return rng.choice(self.data['x'], size, p=self._p)
@@ -1027,11 +1035,25 @@ class DataEmpiricalRV(MixinRV, DataEmpirical):
     def _update_attr(self):
         super()._update_attr()
 
-        self._mean = np.tensordot(self._p, self.data['x'], axes=[0, 0])
+        self._mean = None
+        self._cov = None
 
-        ctr = self.data['x'] - self._mean
-        self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p, ctr))
-        # TODO: try np.einsum?
+    @property
+    def mean(self):
+        if self._mean is None:
+            self._mean = np.tensordot(self._p, self.data['x'], axes=[0, 0])
+
+        return self._mean
+
+    @property
+    def cov(self):
+        if self._cov is None:
+            ctr = self.data['x'] - self.mean
+            self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p, ctr))
+            # TODO: try np.einsum?
+
+        return self._cov
+
 
 # # r = Beta(5, 5)
 # # # r = Finite(plotting.mesh_grid([0, 1], [3, 4, 5]), np.ones((2, 3)) / 6)
@@ -1170,9 +1192,16 @@ class MixtureRV(MixinRV, Mixture):
     def _update_attr(self):
         super()._update_attr()
 
-        # self._mean = sum(prob * dist.mean for prob, dist in zip(self._p, self.dists) if prob > 0)
-        self._mean = sum(self._p[i] * self.dists[i].mean for i in self._idx_nonzero)
-        self._cov = None    # TODO
+        self._mean = None
+        self._cov = None
+
+    @property
+    def mean(self):
+        if self._mean is None:
+            # self._mean = sum(prob * dist.mean for prob, dist in zip(self._p, self.dists) if prob > 0)
+            self._mean = sum(self._p[i] * self.dists[i].mean for i in self._idx_nonzero)
+
+        return self._mean
 
 # # dists_ = [Beta(*args) for args in [[10, 5], [2, 12]]]
 # # dists_ = [Normal(mean, 1) for mean in [0, 4]]

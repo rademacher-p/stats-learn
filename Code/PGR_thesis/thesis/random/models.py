@@ -785,19 +785,32 @@ class Mixture(Base):
     def _update_attr(self):
         self._p = self._weights / self.weights.sum()
 
-        if self._idx_nonzero.size == 1:
-            self._model_x = self._dists[self._idx_nonzero.item()].model_x
-        else:
-            # self._mode = self.space.argmax(self.pf)
-            # args = zip(*[(dist.model_x, w) for dist, w in zip(self.dists, self.weights) if w > 0])
-            args = zip(*[(self.dists[i].model_x, self.weights[i]) for i in self._idx_nonzero])
-            self._model_x = rand_elements.Mixture(*args)
+        self._model_x = None
+        # if self._idx_nonzero.size == 1:
+        #     self._model_x = self._dists[self._idx_nonzero.item()].model_x
+        # else:
+        #     # self._mode = self.space.argmax(self.pf)
+        #     # args = zip(*[(dist.model_x, w) for dist, w in zip(self.dists, self.weights) if w > 0])
+        #     args = zip(*[(self.dists[i].model_x, self.weights[i]) for i in self._idx_nonzero])
+        #     self._model_x = rand_elements.Mixture(*args)
 
-        # self._mode_x = self.model_x.mode
+    @property
+    def model_x(self):
+        if self._model_x is None:
+            if self._idx_nonzero.size == 1:
+                self._model_x = self._dists[self._idx_nonzero.item()].model_x
+            else:
+                # self._mode = self.space.argmax(self.pf)
+                # args = zip(*[(dist.model_x, w) for dist, w in zip(self.dists, self.weights) if w > 0])
+                args = zip(*[(self.dists[i].model_x, self.weights[i]) for i in self._idx_nonzero])
+                self._model_x = rand_elements.Mixture(*args)
+
+        return self._model_x
 
     @property
     def mode_x(self):
-        return self._model_x.mode
+        # return self._model_x.mode
+        return self.model_x.mode
 
     def _mode_y_x_single(self, x):
         return self.model_y_x(x).mode
@@ -851,8 +864,14 @@ class MixtureRVy(MixinRVy, Mixture):
         return f"MixtureRVy({_str})"
 
     def mean_y_x(self, x):
-        temp = self._weights_y_x(x)
-        p_y_x = temp / temp.sum(0)
+        w = self._weights_y_x(x)
+        w_sum = w.sum(axis=0)
+
+        p_y_x = np.full(w.shape, np.nan)
+        idx = np.flatnonzero(w_sum)
+        p_y_x[:, idx] = w[:, idx] / w_sum[idx]
+
+        # p_y_x = temp / temp.sum(0)
 
         # idx_nonzero = np.flatnonzero(p_y_x)
         # return sum(p_y_x[i] * self.dists[i].mean_y_x(x) for i in idx_nonzero)
