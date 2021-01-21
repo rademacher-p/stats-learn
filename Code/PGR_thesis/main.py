@@ -34,7 +34,8 @@ def func_mean_to_models(n, func):
 
 
 # w_model = [.5, 0, 0]
-w_model = [0, 0, 1]
+# w_model = [0, 0, 1]
+w_model = [.3, 0., .4]
 
 # n_x = 11
 # model = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_model),
@@ -43,6 +44,8 @@ w_model = [0, 0, 1]
 #                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
 model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=100, model_x=rand_elements.Beta())
+# model = rand_models.BetaLinear(weights=[1], basis_y_x=[lambda x: 1 / (2 + np.sin(2*np.pi * x))], alpha_y_x=100,
+#                                model_x=rand_elements.Beta())
 
 
 # model = rand_models.NormalLinear(weights=np.ones(2), basis_y_x=None, cov_y_x=.1, model_x=rand_elements.Normal(0, 10))
@@ -61,7 +64,7 @@ else:
 # Bayesian learners
 
 w_prior = [.5, 0]
-# w_prior = [.5, 0, .5]
+# w_prior = [.5, 0, 0]
 
 
 # Dirichlet learner
@@ -72,21 +75,23 @@ w_prior = [.5, 0]
 # prior_mean = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_prior),
 #                                                      supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
-prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=100, model_x=rand_elements.Beta())
-# prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=100,
-#                                     model_x=rand_elements.Finite(np.linspace(0, 1, 11, endpoint=True)))
 
+# prior_mean_x = rand_elements.Beta()
+# proc_funcs = []
 
-proc_funcs = []
-if isinstance(model.space['x'], spaces.Continuous) and isinstance(prior_mean.space['x'], spaces.Discrete):
-    proc_funcs.append(discretizer(prior_mean.space['x'].values))
+prior_mean_x = rand_elements.Mixture([rand_elements.DataEmpirical(np.linspace(0, 1, 11, endpoint=True),
+                                                                  counts=np.ones(11), space=model.space['x']),
+                                      rand_elements.Beta()],
+                                     weights=[1000, 1])
+proc_funcs = [discretizer(prior_mean_x.dists[0].data['x'])]
 
+prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=100, model_x=prior_mean_x)
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs, name='Dir')
 
 # dir_params = None
 # dir_params = {'alpha_0': [1, 10, 100]}
 dir_params = {'alpha_0': [.1, 50]}
-# dir_params = {'alpha_0': .001 + np.arange(0, 50, 10)}
+# dir_params = {'alpha_0': .001 + np.arange(0, 50, 2)}
 
 
 # Normal learner
@@ -103,7 +108,7 @@ norm_params = {'prior_cov': [10, 0.05]}
 
 # n_train = 10
 # n_train = [0, 10, 100]
-n_train = np.arange(0, 100, 20)
+n_train = np.arange(0, 200, 10)
 
 # print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
 # dir_predictor.plot_risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
@@ -122,8 +127,8 @@ plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_te
                            verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, n_test=1, verbose=False, ax=None)
 
-# plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=30, do_std=True,
-#                            verbose=True, ax=None, rng=None)
+# plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=100,
+#                            do_std=True, verbose=True, ax=None, rng=None)
 
 
 # print(f"\nAnalytical Risk = {opt_predictor.evaluate_comp(n_train=n_train)}")

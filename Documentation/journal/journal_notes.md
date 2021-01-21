@@ -8,8 +8,10 @@
 - Discuss bias/variance SE trade-off
   - nice plots, link to math
   - model estimation perspective, too?
-- Real data APPLICATION!
+- **Real data APPLICATION**
   - Discretization of continuous data??
+
+**Add stat plots for different alpha_0?!**
 
 
 ## Outstanding goals
