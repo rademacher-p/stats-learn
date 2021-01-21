@@ -19,9 +19,6 @@ from thesis.predictors import (ModelRegressor, BayesRegressor, ModelClassifier, 
 
 #%% Sim
 
-n_x = 11
-
-
 def poly_mean_to_models(n, weights):
     return func_mean_to_models(n, lambda x_: sum(w * x_ ** i for i, w in enumerate(weights)))
 
@@ -39,6 +36,7 @@ def func_mean_to_models(n, func):
 # w_model = [.5, 0, 0]
 w_model = [0, 0, 1]
 
+# n_x = 11
 # model = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_model),
 #                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 # model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, lambda x: 1 / (2 + np.sin(2*np.pi * x))),
@@ -74,12 +72,10 @@ w_prior = [.5, 0]
 # prior_mean = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_prior),
 #                                                      supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
-prior_mean_x = rand_elements.Beta()
-# prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_x, endpoint=True), p=None)
-prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=100, model_x=prior_mean_x)
+prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=100, model_x=rand_elements.Beta())
 
 # proc_funcs = []
-proc_funcs = [discretizer(np.linspace(0, 1, n_x, endpoint=True))]
+proc_funcs = [discretizer(np.linspace(0, 1, 31, endpoint=True))]
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs, name='Dir')
 
 # dir_params = None
@@ -101,8 +97,8 @@ norm_params = {'prior_cov': [10, 0.05]}
 # Plotting
 
 # n_train = 10
-# n_train = [0, 10, 20]
-n_train = np.arange(0, 50, 10)
+# n_train = [0, 10, 100]
+n_train = np.arange(0, 100, 20)
 
 # print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
 # dir_predictor.plot_risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
@@ -121,7 +117,7 @@ plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_te
                            verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, n_test=1, verbose=False, ax=None)
 
-# plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=300, do_std=True,
+# plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=30, do_std=True,
 #                            verbose=True, ax=None, rng=None)
 
 
