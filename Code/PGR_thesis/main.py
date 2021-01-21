@@ -7,12 +7,12 @@ from matplotlib import pyplot as plt
 
 from thesis.random import elements as rand_elements, models as rand_models
 from thesis.bayes import models as bayes_models
-from thesis.preprocessing import discretizer
 from thesis.predictors import (ModelRegressor, BayesRegressor, ModelClassifier, BayesClassifier,
                                plot_risk_eval_sim_compare, plot_predict_stats_compare,
                                plot_risk_eval_comp_compare,
                                risk_eval_sim_compare, predict_stats_compare)
-
+from thesis.preprocessing import discretizer
+from thesis.util import spaces
 
 # plt.style.use('seaborn')
 
@@ -73,9 +73,14 @@ w_prior = [.5, 0]
 #                                                      supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
 prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=100, model_x=rand_elements.Beta())
+# prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=100,
+#                                     model_x=rand_elements.Finite(np.linspace(0, 1, 11, endpoint=True)))
 
-# proc_funcs = []
-proc_funcs = [discretizer(np.linspace(0, 1, 31, endpoint=True))]
+
+proc_funcs = []
+if isinstance(model.space['x'], spaces.Continuous) and isinstance(prior_mean.space['x'], spaces.Discrete):
+    proc_funcs.append(discretizer(prior_mean.space['x'].values))
+
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs, name='Dir')
 
 # dir_params = None
