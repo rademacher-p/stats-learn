@@ -270,6 +270,9 @@ def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, 
 
     loss_full = []
     for predictor, params in zip(predictors, params_full):
+        if verbose:
+            print(f"Predictor: {predictor.name}")
+
         if len(params) == 0:
             loss_full.append(predictor.evaluate_comp(model, n_train, n_test))
         else:
@@ -377,8 +380,9 @@ def plot_risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_tes
 
 #%%
 class Base(ABC):
-    def __init__(self, loss_func, name=None):
+    def __init__(self, loss_func, proc_funcs=(), name=None):
         self.loss_func = loss_func
+        self.proc_funcs = list(proc_funcs)
         self.name = name
 
         self.model = None
@@ -407,15 +411,36 @@ class Base(ABC):
     # def get_params(self, *args):
     #     return {arg: getattr(self._model_obj, arg) for arg in args}
 
-    @abstractmethod
+    def _proc_predictors(self, x):
+        for func in self.proc_funcs:
+            x = func(x)
+        return x
+
+    def _proc_data(self, d):
+        x = self._proc_predictors(d['x'])
+        dtype = [('x', d.dtype['x'].base, x.shape[1:]), ('y', d.dtype['y'].base, d.dtype['y'].shape)]
+        return np.array(list(zip(x, d['y'])), dtype=dtype)
+
     def fit(self, d=None, warm_start=False):
-        raise NotImplementedError
+        if d is None:
+            d = np.array([], dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
+
+        d = self._proc_data(d)
+        return self._fit(d, warm_start)
 
     @abstractmethod
-    def fit_from_model(self, model, n_train=0, rng=None, warm_start=False):
+    def _fit(self, d=None, warm_start=False):
         raise NotImplementedError
+
+    def fit_from_model(self, model, n_train=0, rng=None, warm_start=False):
+        d = model.rvs(n_train, rng=rng)  # generate train/test data
+        self.fit(d, warm_start)  # train learner
 
     def predict(self, x):
+        x = self._proc_predictors(x)
+        return self._predict(x)
+
+    def _predict(self, x):
         return vectorize_func(self._predict_single, shape=self.shape['x'])(x)
 
     def _predict_single(self, x):
@@ -480,21 +505,21 @@ class Base(ABC):
 class ClassifierMixin:
     model: rand_models.Base
 
-    def predict(self, x):
+    def _predict(self, x):
         return self.model.mode_y_x(x)
 
 
 class RegressorMixin:
     model: Union[rand_models.Base, rand_models.MixinRVy]
 
-    def predict(self, x):
+    def _predict(self, x):
         return self.model.mean_y_x(x)
 
 
 #%% Fixed model
 class Model(Base):
-    def __init__(self, model, loss_func, name=None):
-        super().__init__(loss_func, name)
+    def __init__(self, model, loss_func, proc_funcs=(), name=None):
+        super().__init__(loss_func, proc_funcs, name)
         self.model = model
 
     def __repr__(self):
@@ -504,21 +529,21 @@ class Model(Base):
     def _model_obj(self):
         return self.model
 
-    def fit(self, d=None, warm_start=False):
+    def _fit(self, d=None, warm_start=False):
         pass
 
     def fit_from_model(self, model, n_train=0, rng=None, warm_start=False):
-        pass
+        pass    # skip unnecessary data generation
 
 
 class ModelClassifier(ClassifierMixin, Model):
-    def __init__(self, model, name=None):
-        super().__init__(model, loss_01, name)
+    def __init__(self, model, proc_funcs=(), name=None):
+        super().__init__(model, loss_01, proc_funcs, name)
 
 
 class ModelRegressor(RegressorMixin, Model):
-    def __init__(self, model, name=None):
-        super().__init__(model, loss_se, name)
+    def __init__(self, model, proc_funcs=(), name=None):
+        super().__init__(model, loss_se, proc_funcs, name)
 
     def evaluate_comp(self, model=None, n_train=0, n_test=1):
         if model is None:
@@ -547,8 +572,8 @@ class ModelRegressor(RegressorMixin, Model):
 #%% Bayes model
 
 class Bayes(Base):
-    def __init__(self, bayes_model, loss_func, name=None):
-        super().__init__(loss_func, name=name)
+    def __init__(self, bayes_model, loss_func, proc_funcs=(), name=None):
+        super().__init__(loss_func, proc_funcs, name=name)
 
         self.bayes_model = bayes_model
 
@@ -566,12 +591,8 @@ class Bayes(Base):
     def _model_obj(self):
         return self.bayes_model
 
-    def fit(self, d=None, warm_start=False):
+    def _fit(self, d=None, warm_start=False):
         self.bayes_model.fit(d, warm_start)
-
-    def fit_from_model(self, model, n_train=0, rng=None, warm_start=False):
-        d = model.rvs(n_train, rng=rng)  # generate train/test data
-        self.fit(d, warm_start)  # train learner
 
     def plot_param_dist(self, x=None, ax_prior=None):  # TODO: improve or remove?
         if x is None:
@@ -585,13 +606,13 @@ class Bayes(Base):
 
 
 class BayesClassifier(ClassifierMixin, Bayes):
-    def __init__(self, bayes_model, name=None):
-        super().__init__(bayes_model, loss_01, name)
+    def __init__(self, bayes_model, proc_funcs=(), name=None):
+        super().__init__(bayes_model, loss_01, proc_funcs, name)
 
 
 class BayesRegressor(RegressorMixin, Bayes):
-    def __init__(self, bayes_model, name=None):
-        super().__init__(bayes_model, loss_se, name)
+    def __init__(self, bayes_model, proc_funcs=(), name=None):
+        super().__init__(bayes_model, loss_se, proc_funcs, name)
 
     def evaluate_comp(self, model=None, n_train=0, n_test=1):
         if model is None:

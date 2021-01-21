@@ -7,8 +7,10 @@
   - for math impact
 - Discuss bias/variance SE trade-off
   - nice plots, link to math
-  - SHOW IN STATS PLOTS!
   - model estimation perspective, too?
+- Real data APPLICATION!
+  - Discretization of continuous data??
+
 
 ## Outstanding goals
 - Non-trivial data support for discrete results
