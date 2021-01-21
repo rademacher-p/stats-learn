@@ -7,15 +7,20 @@ from matplotlib import pyplot as plt
 
 from thesis.random import elements as rand_elements, models as rand_models
 from thesis.bayes import models as bayes_models
+from thesis.preprocessing import discretizer
 from thesis.predictors import (ModelRegressor, BayesRegressor, ModelClassifier, BayesClassifier,
                                plot_risk_eval_sim_compare, plot_predict_stats_compare,
                                plot_risk_eval_comp_compare,
                                risk_eval_sim_compare, predict_stats_compare)
 
+
 # plt.style.use('seaborn')
 
 
 #%% Sim
+
+n_x = 11
+
 
 def poly_mean_to_models(n, weights):
     return func_mean_to_models(n, lambda x_: sum(w * x_ ** i for i, w in enumerate(weights)))
@@ -34,12 +39,10 @@ def func_mean_to_models(n, func):
 # w_model = [.5, 0, 0]
 w_model = [0, 0, 1]
 
-# n_x = 11
 # model = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_model),
 #                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 # model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, lambda x: 1 / (2 + np.sin(2*np.pi * x))),
 #                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
-
 
 model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=100, model_x=rand_elements.Beta())
 
@@ -71,10 +74,13 @@ w_prior = [.5, 0]
 # prior_mean = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_prior),
 #                                                      supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
-prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=100, model_x=rand_elements.Beta())
+prior_mean_x = rand_elements.Beta()
+# prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_x, endpoint=True), p=None)
+prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=100, model_x=prior_mean_x)
 
-
-dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), name='Dir')
+# proc_funcs = []
+proc_funcs = [discretizer(np.linspace(0, 1, n_x, endpoint=True))]
+dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs, name='Dir')
 
 # dir_params = None
 # dir_params = {'alpha_0': [1, 10, 100]}

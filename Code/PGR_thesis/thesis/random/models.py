@@ -503,8 +503,10 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
         return rand_elements.Normal(mean, cov)
 
 
-# g = NormalLinear(basis_y_x=(lambda x: 1, lambda x: x**2,), weights=(1, 2), cov_y_x=.01,
-#                  model_x=rand_elements.Normal(4))
+# # g = NormalLinear(basis_y_x=(lambda x: 1, lambda x: x**2,), weights=(1, 2), cov_y_x=.01,
+# #                  model_x=rand_elements.Normal(4))
+# g = NormalLinear(basis_y_x=(lambda x: 1, lambda x: x.sum(),), weights=(1, 2), cov_y_x=.01,
+#                  model_x=rand_elements.Normal([0, 0]))
 # r = g.rvs(100)
 # # plt.plot(r['x'], r['y'], '.')
 # g.mean_y_x(np.linspace(0, 2, 20, endpoint=True))
