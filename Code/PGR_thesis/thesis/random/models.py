@@ -595,7 +595,6 @@ class DataEmpirical(Base):
         if len(idx_new) > 0:
             self.data = np.concatenate((self.data, self._structure_data(values[idx_new], counts[idx_new])))
 
-        #
         _, idx = np.unique(values['x'], axis=0, return_index=True)
         values_x_unique = values['x'][np.sort(idx)]
         # values_x_unique = np.unique(values['x'], axis=0)
@@ -615,18 +614,6 @@ class DataEmpirical(Base):
 
     def _update_attr(self):
         self._p = self.data['n'] / self.n
-
-        # values_x, _idx_inv = np.unique(self.data['x'], return_inverse=True, axis=0)
-        # counts_x = np.empty(len(values_x), dtype=np.int)
-        # self._models_y_x = []
-        # for i in range(len(values_x)):
-        #     data_match = self.data[_idx_inv == i]
-        #     counts_x[i] = data_match['n'].sum()
-        #
-        #     self._models_y_x.append(rand_elements.DataEmpirical(data_match['y'], data_match['n'], self.space['y']))
-        #
-        # self._model_x = rand_elements.DataEmpirical(values_x, counts_x, space=self.space['x'])
-        # self._mode_x = self._model_x.mode
 
     @property
     def mode_x(self):
@@ -806,7 +793,11 @@ class Mixture(Base):
             args = zip(*[(self.dists[i].model_x, self.weights[i]) for i in self._idx_nonzero])
             self._model_x = rand_elements.Mixture(*args)
 
-        self._mode_x = self.model_x.mode
+        # self._mode_x = self.model_x.mode
+
+    @property
+    def mode_x(self):
+        return self._model_x.mode
 
     def _mode_y_x_single(self, x):
         return self.model_y_x(x).mode

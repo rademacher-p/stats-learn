@@ -1088,11 +1088,6 @@ class Mixture(Base):
             setattr(dist, key, val)
         self._update_attr()
 
-    # def add_dist(self, dist, weight):
-    #     self._dists.append(dist)
-    #     self.weights.append(weight)
-    #     self._update_attr()
-
     def set_dist(self, idx, dist, weight):  # TODO: type check?
         self._dists[idx] = dist
         self.weights[idx] = weight
@@ -1103,6 +1098,11 @@ class Mixture(Base):
         #     self._update_attr()     # weights setter not invoked
         # except IndexError:
         #     self.add_dist(dist, weight)
+
+    # def add_dist(self, dist, weight):
+    #     self._dists.append(dist)
+    #     self.weights.append(weight)
+    #     self._update_attr()
 
     # def del_dist(self, idx):
     #     del self._dists[idx]
@@ -1118,10 +1118,17 @@ class Mixture(Base):
 
         self._p = self._weights / self._weights.sum()
 
-        if self._idx_nonzero.size == 1:
-            self._mode = self._dists[self._idx_nonzero.item()].mode
-        else:
-            self._mode = self.space.argmax(self.pf)
+        self._mode = None
+
+    @property
+    def mode(self):     # TODO: implement similar functionality throughout for costly dependent attributes!!!
+        if self._mode is None:
+            if self._idx_nonzero.size == 1:
+                self._mode = self._dists[self._idx_nonzero.item()].mode
+            else:
+                self._mode = self.space.argmax(self.pf)
+
+        return self._mode
 
     def _rvs(self, n, rng):
         idx_rng = rng.choice(self.n_dists, size=n, p=self._p)
