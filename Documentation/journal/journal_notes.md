@@ -11,8 +11,6 @@
 - **Real data APPLICATION**
   - Discretization of continuous data??
 
-**Add stat plots for different alpha_0?!**
-
 
 ## Outstanding goals
 - Non-trivial data support for discrete results
@@ -64,6 +62,7 @@
 
 #### biased mean, f(x) = .5
 ![](predict_biased_dir.png)
+![](predict_biased_dir_a0.png)
 
 - Norm order = 1
 ![](loss_n_biased.png)
@@ -78,6 +77,8 @@
 
 #### biased mean, f(x) = .5
 ![](predict_biased_hi_dir.png)
+![](predict_biased_hi_dir_a0.png)
+
 
 - Norm order = 2
 ![](loss_n_biased_hi.png)
@@ -140,5 +141,5 @@ NOTE: plotting missed at training data points
 ![](cont_loss_bayes_n_unbiased.png)
 
 ### Loss vs alpha_0
-- unbiased (note correct minima)
+- unbiased
 ![](cont_loss_bayes_alpha_unbiased.png)
