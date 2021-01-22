@@ -32,8 +32,8 @@ n_x = 11
 
 # True model
 
-# model = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
-#                                                 supp_x=[0, .5], p_x=None)
+model = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
+                                                supp_x=[0, .5], p_x=None)
 
 
 w_model = [0, 0, 1]
@@ -46,7 +46,7 @@ w_model = [0, 0, 1]
 # model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, lambda x: 1 / (2 + np.sin(2*np.pi * x))),
 #                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
-model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=100, model_x=rand_elements.Beta())
+# model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=100, model_x=rand_elements.Beta())
 # model = rand_models.BetaLinear(weights=[1], basis_y_x=[lambda x: 1 / (2 + np.sin(2*np.pi * x))], alpha_y_x=100,
 #                                model_x=rand_elements.Beta())
 
@@ -73,8 +73,8 @@ w_prior = [.5, 0]
 # Dirichlet learner
 proc_funcs = []
 
-# prior_mean = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
-#                                                      supp_x=[0, .5], p_x=None)
+prior_mean = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.9, .1)],
+                                                     supp_x=[0, .5], p_x=None)
 
 # prior_mean = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_prior),
 #                                                      supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
@@ -82,18 +82,19 @@ proc_funcs = []
 
 # prior_mean_x = rand_elements.Beta()
 
-prior_mean_x = rand_elements.Mixture([rand_elements.DataEmpirical(np.linspace(0, 1, n_x, endpoint=True),
-                                                                  counts=np.ones(n_x), space=model.space['x']),
-                                      rand_elements.Beta()],
-                                     weights=[1000, 1])
-prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=100, model_x=prior_mean_x)
-proc_funcs.append(discretizer(prior_mean_x.dists[0].data['x']))
+# prior_mean_x = rand_elements.Mixture([rand_elements.DataEmpirical(np.linspace(0, 1, n_x, endpoint=True),
+#                                                                   counts=np.ones(n_x), space=model.space['x']),
+#                                       rand_elements.Beta()],
+#                                      weights=[1000, 1])
+# prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=100, model_x=prior_mean_x)
+# proc_funcs.append(discretizer(prior_mean_x.dists[0].data['x']))
+
 
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs, name='Dir')
 
 # dir_params = None
-# dir_params = {'alpha_0': [1, 10, 100]}
-dir_params = {'alpha_0': [.1, 50]}
+dir_params = {'alpha_0': [2, 16]}
+# dir_params = {'alpha_0': [.1, 50]}
 # dir_params = {'alpha_0': .001 + np.arange(0, 50, 2)}
 
 
@@ -111,7 +112,7 @@ norm_params = {'prior_cov': [10, 0.05]}
 
 # n_train = 10
 # n_train = [0, 10, 100]
-n_train = np.arange(0, 200, 10)
+n_train = np.arange(0, 50, 5)
 
 # print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
 # dir_predictor.plot_risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
@@ -119,14 +120,14 @@ n_train = np.arange(0, 200, 10)
 
 temp = [
     (opt_predictor, None),
-    (norm_predictor, norm_params),
+    # (norm_predictor, norm_params),
     (dir_predictor, dir_params),
 ]
 
 predictors, params = list(zip(*temp))
 
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=100,
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=1000,
                            verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, n_test=1, verbose=False, ax=None)
 
