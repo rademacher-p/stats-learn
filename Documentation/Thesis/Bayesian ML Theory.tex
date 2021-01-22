@@ -252,6 +252,45 @@ Numerous probability distribution functions will be defined over different domai
 
 
 
+\subsection*{Special Operators and Functions}
+
+Various operators commonly used in linear algebra will be generalized for functions. Specifically, the outer product operator $\otimes$ is used on two real-valued functions $f \in \Rbb^{\Xcal}$ and $g \in \Rbb^{\Ycal}$, such that $\big(f \otimes g\big) \in \Rbb^{\Xcal \times \Ycal}$ with $\big(f \otimes g\big) (x,y) = f(x) g(y)$. A general outer product of functions is denoted $\bigotimes_i f_i = f_1 \otimes f_2 \ldots$ for $i = 1,\ldots$, where $\Big(\bigotimes_i f_i\Big)(x_1,x_2,\ldots) = f_1(x_1)f_x(x_2)\ldots$, is used as well. Also, the diagonal operator operates on a single real-valued function, such that $\diag(f) \in \Rbb^{\Xcal \times \Xcal}$. For countable sets $\Xrm$, the operator values are $\diag(f)(x,x') = f(x) \delta[x,x']$; for Euclidean sets, the operator values are $\diag(f)(x,x') = f(x) \delta(x-x')$.
+
+\todolow{tensor product?}
+
+
+A variety of special functions will be used throughout. Both the Dirac and Kronecker delta functions will frequently required. The Dirac delta function over a Euclidean domain $\Xcal$ is represented as $\delta(\cdot)$; it has support only at the point $x=0$ and satisfies
+\begin{equation}
+	\int_{\Xcal} \delta(x) {\drm}x = 1 \;.
+\end{equation}
+Consequently, it also satisfies
+\begin{equation}
+	\int_{\Xcal} g(x) \delta(x) {\drm}x = g(0) \;.
+\end{equation}
+Consider a countable set $\Xcal$; the Kronecker delta function has domain $\Xcal \times \Xcal$ and is defined as
+\begin{equation}
+	\delta[x,x'] = \begin{cases} 1 & \mathrm{if} \ x = x', \\ 0 & \mathrm{if} \ x \neq x'.  \end{cases}
+\end{equation}
+
+\todolo{reference Dirac/Kronecker}
+
+The multinomial coefficient and multivariate beta function, which typically operate on sequences, are defined more generally for function inputs. The multinomial operator $\Mcal$ is used for functions $g : \Xcal \mapsto \Zbbgeq$ that map to non-negative integers from an arbitrary countable domain $\Xcal$. The output of the operator is
+\begin{equation}
+	\Mcal(g) = \frac{\big( \sum_{x \in \Xcal} g(x) \big)!}{\prod_{x \in \Xcal} g(x)!} \;.
+\end{equation}
+Similarly, the beta function $\beta$ operates on functions $g : \Xcal \mapsto \Rbb^+$ that map to positive real numbers from an arbitrary countable domain $\Xcal$, such that
+\begin{equation}
+	\beta(g) = \frac{\prod_{x \in \Xcal} \Gamma\big( g(x) \big)}{\Gamma \left( \sum_{x \in \Xcal} g(x) \right)} \;.
+\end{equation}
+Note that the countable domains of the input functions may have an infinite number of elements. 
+
+The indicator function $\chi$, defined as
+\begin{equation}
+	\chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S \;, \end{cases}
+\end{equation}
+will be used repeatedly.
+
+
 
 
 \subsection*{Random elements, variables, and processes}
@@ -298,57 +337,19 @@ If the range of $g$ is a Hilbert space, such that $g(\xrm)$ is itself a function
 \end{equation}
 Similarly, the covariance function notation is modified and the output is a function over $\Ycal \times \Ycal$, 
 \begin{IEEEeqnarray}{L}
-\Crm_{\xrm}\big[g(\xrm)\big](y,y') \\
-\quad = \Erm_{\xrm} \bigg[ \Big( g(y;\xrm) - \Erm_{\xrm}\big[g(y;\xrm)\big] \Big) \Big( g(y';\xrm) - \Erm_{\xrm}\big[g(y';\xrm)\big] \Big) \bigg] \nonumber \;.
+\Crm_{\xrm}\big[g(\xrm)\big](y,y') = \Erm_{\xrm} \bigg[ \Big( g(y;\xrm) - \Erm_{\xrm}\big[g(y;\xrm)\big] \Big) \Big( g(y';\xrm) - \Erm_{\xrm}\big[g(y';\xrm)\big] \Big) \bigg] \;.
 \end{IEEEeqnarray}
-As before, the notation is simplified when the function $g$ is the identity operator. If $\xrm$ is a random process over a domain $\Ycal$, then the mean and covariance functions are $\mu_{\xrm}(y)$ and $\Sigma_{\xrm}(y,y')$. 
+\begin{IEEEeqnarray}{L}
+\Crm_{\xrm}\big[g(\xrm)\big] = \Erm_{\xrm} \bigg[ \Big( g(\xrm) - \Erm_{\xrm}\big[g(\xrm)\big] \Big) \otimes \Big( g(\xrm) - \Erm_{\xrm}\big[g(\xrm)\big] \Big) \bigg] \;.
+\end{IEEEeqnarray}
+As before, the notation is simplified when the function $g$ is the identity operator. If $\xrm$ is a random process over a domain $\Ycal$, then the mean and covariance functions are defined over domains $\Ycal$ and $\Ycal \times \Ycal$ with values notated such as $\mu_{\xrm}(y)$ and $\Sigma_{\xrm}(y,y')$.
 
-If the expectations are evaluated with respect to a conditional distribution $\Prm_{\xrm | \zrm}$, the additional argument for the observed random element is added and the notation for the above operators extends to $\Erm_{\xrm|\zrm}\big[ g(\xrm) \big](y|z)$ and $\Crm_{\xrm|\zrm}\big[g(\xrm)\big](y,y'|z)$ for non-scalar outputs. When $g$ is the identity operator, the notation $\mu_{\xrm|\zrm}(y|z)$ and $\Sigma_{\xrm|\zrm}(y,y'|z)$ is used.
-
-Again, it is common for the conditional random element $\zrm$ to be left as a random quantity instead of being explicitly defined. In such cases, the italic $z$ is dropped from the arguments and the formulas $\Erm_{\xrm|\zrm}\big[ g(\xrm) \big](y)$, $\Crm_{\xrm|\zrm}\big[g(\xrm)\big](y,y')$, $\mu_{\xrm|\zrm}(y)$, and $\Sigma_{\xrm|\zrm}(y,y')$ imply dependence on $\zrm$.
-
-\todohi{ABOVE NOTATION CREATES AMBIGUITY!!!!!!! Check for uses...}
-
+If the expectations are evaluated with respect to a conditional distribution $\Prm_{\xrm | \zrm}$, the additional argument for the observed random element is added and the notation for the above operators is extended to $\Erm_{\xrm|\zrm}\big[ g(\xrm) \big](y|z)$ and $\Crm_{\xrm|\zrm}\big[g(\xrm)\big](y,y'|z)$ for non-scalar outputs. When $g$ is the identity operator, the notation $\mu_{\xrm|\zrm}(y|z)$ and $\Sigma_{\xrm|\zrm}(y,y'|z)$ is used. As for probability distributions, it is common for the conditional random element $\zrm$ to be left as a random quantity instead of being explicitly defined; in these cases, the dependency on $\zrm$ is implied.
 
 
-\subsection*{Special Operators and Functions}
+\todohi{BELOW NOTATION CREATES AMBIGUITY!!!!!!! Check for residual uses...}
 
-Certain specialized functions are detailed next. 
-
-Both the Dirac and Kronecker delta functions will be used throughout. The Dirac delta function over a Euclidean domain $\Xcal$ is represented as $\delta(\cdot)$; it has support only at the point $x=0$ and satisfies
-\begin{equation}
-\int_{\Xcal} \delta(x) {\drm}x = 1 \;.
-\end{equation}
-Consequently, it also satisfies
-\begin{equation}
-\int_{\Xcal} g(x) \delta(x) {\drm}x = g(0) \;.
-\end{equation}
-Consider a countable set $\Xcal$; the Kronecker delta function has domain $\Xcal \times \Xcal$ and is defined as
-\begin{equation}
-\delta[x,x'] = \begin{cases} 1 & \mathrm{if} \ x = x', \\ 0 & \mathrm{if} \ x \neq x'.  \end{cases}
-\end{equation}
-
-PGR: reference Dirac/Kronecker?
-
-Various operators commonly used in linear algebra will be generalized for functions. Specifically, the outer product operator $\otimes$ is used on two real-valued functions $f \in \Rbb^{\Xcal}$ and $g \in \Rbb^{\Ycal}$, such that $\big(f \otimes g\big) \in \Rbb^{\Xcal \times \Ycal}$ with $\big(f \otimes g\big) (x,y) = f(x) g(y)$. A general outer product of functions is denoted $\bigotimes_i f_i = f_1 \otimes f_2 \ldots$ for $i = 1,\ldots$, where $\Big(\bigotimes_i f_i\Big)(x_1,x_2,\ldots) = f_1(x_1)f_x(x_2)\ldots$, is used as well. Also, the diagonal operator operates on a single real-valued function, such that $\diag(f) \in \Rbb^{\Xcal \times \Xcal}$. For countable sets $\Xrm$, the operator values are $\diag(f)(x,x') = f(x) \delta[x,x']$; for Euclidean sets, the operator values are $\diag(f)(x,x') = f(x) \delta(x-x')$.
-
-\todolow{tensor product?}
-
-The multinomial coefficient and multivariate beta function, which typically operate on sequences, are defined more generally for function inputs. The multinomial operator $\Mcal$ is used for functions $g : \Xcal \mapsto \Zbbgeq$ that map to non-negative integers from an arbitrary countable domain $\Xcal$. The output of the operator is
-\begin{equation}
-\Mcal(g) = \frac{\big( \sum_{x \in \Xcal} g(x) \big)!}{\prod_{x \in \Xcal} g(x)!} \;.
-\end{equation}
-Similarly, the beta function $\beta$ operates on functions $g : \Xcal \mapsto \Rbb^+$ that map to positive real numbers from an arbitrary countable domain $\Xcal$, such that
-\begin{equation}
-\beta(g) = \frac{\prod_{x \in \Xcal} \Gamma\big( g(x) \big)}{\Gamma \left( \sum_{x \in \Xcal} g(x) \right)} \;.
-\end{equation}
-Note that the countable domains of the input functions may have an infinite number of elements. 
-
-The indicator function $\chi$, defined as
-\begin{equation}
-\chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S \;, \end{cases}
-\end{equation}
-will be used repeatedly.
+In such cases, the italic $z$ is dropped from the arguments and the formulas $\Erm_{\xrm|\zrm}\big[ g(\xrm) \big](y)$, $\Crm_{\xrm|\zrm}\big[g(\xrm)\big](y,y')$, $\mu_{\xrm|\zrm}(y)$, and $\Sigma_{\xrm|\zrm}(y,y')$ imply dependence on $\zrm$.
 
 
 
@@ -615,9 +616,7 @@ and the minimum Bayes risk is
 \todohi{Continuous? sums, PMFs...}
 
 
-Observe that the marginal and conditional Bayesian distributions can be represented as $\Prm_{\xrm | \Drm} = \Erm_{\uptheta | \Drm}\big[ \Prm_{\xrm | \uptheta} \big] \equiv \mu_{\upthetam | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm} = \Erm_{\uptheta | \xrm,\Drm}\big[ \Prm_{\yrm | \xrm,\uptheta} \big] \equiv \mu_{\upthetac(\xrm) | \xrm,\Drm}$, the expected values of the corresponding clairvoyant distributions with respect to the model posteriors $\prm_{\upthetam | \Drm}$ and $\prm_{\upthetac(\xrm) | \xrm,\Drm}$, respectively. Also, $\Prm_{\yrm,\xrm | \Drm} = \Erm_{\uptheta | \Drm}\big[ \Prm_{\yrm,\xrm | \uptheta} \big] \equiv \mu_{\uptheta | \Drm}$. Thus, the Bayesian approach to prediction uses the model posterior given the observable random elements to integrate out the model dependency of the risk $\Rcal_{\Theta}(f ; \uptheta)$.
-
-\todohigh{Consider notation $\mu_{\upthetac | \xrm,\Drm}(\xrm; \xrm,\Drm)$ !?!?}
+Observe that the marginal and conditional Bayesian distributions can be represented as $\Prm_{\xrm | \Drm} = \Erm_{\uptheta | \Drm}\big[ \Prm_{\xrm | \uptheta} \big] \equiv \mu_{\upthetam | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm} = \Erm_{\uptheta | \xrm,\Drm}\big[ \Prm_{\yrm | \xrm,\uptheta} \big] \equiv \mu_{\upthetac | \xrm,\Drm}(\xrm; \xrm,\Drm)$, the expected values of the corresponding clairvoyant distributions with respect to the model posteriors $\prm_{\upthetam | \Drm}$ and $\prm_{\upthetac | \xrm,\Drm}$, respectively. The predictive distribution can also be represented as $\Prm_{\yrm | \xrm,\Drm}(x,\Drm) = \mu_{\upthetac(x) | \xrm,\Drm}(x,\Drm)$. Also, $\Prm_{\yrm,\xrm | \Drm} = \Erm_{\uptheta | \Drm}\big[ \Prm_{\yrm,\xrm | \uptheta} \big] \equiv \mu_{\uptheta | \Drm}$. Thus, the Bayesian approach to prediction uses the model posterior given the observable random elements to integrate out the model dependency of the risk $\Rcal_{\Theta}(f ; \uptheta)$.
 
 
 The relevant posteriors can be represented as
@@ -1343,7 +1342,7 @@ where
 \end{IEEEeqnarray} 
 and the distinct model conditional PMF's are independent from one another. The Bayes predictive PMF can thus be expressed as
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\yrm | \xrm,\Drm}(x,D) & = & \mu_{\upthetac | \xrm,\Drm}(x; x,D) = \mu_{\upthetac | \Drm}(x; D) \;.
+\Prm_{\yrm | \xrm,\Drm}(x,\Drm) & = & \mu_{\upthetac(x) | \xrm,\Drm}(x,\Drm) = \mu_{\upthetac(x) | \Drm} \;.
 \end{IEEEeqnarray}
 
 A similar treatment demonstrates that
@@ -1378,8 +1377,7 @@ Observe that when the conditioning is performed using the sufficient statistic, 
 
 The Bayes predictive PMF can thus be expressed as 
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\yrm | \xrm,\uppsi}(x,\psi) = \mu_{\upthetac(x) | \xrm,\uppsi}(x,\psi) & \equiv & \mu_{\upthetac(x) | \uppsim(x), \uppsic(x)}\big( \psim(x), \psic(x) \big) \\
-& = & \Prm_{\yrm | \xrm,\uppsim(x),\uppsic(x)}\big( x,\psim(x), \psic(x) \big) \nonumber \;.
+\Prm_{\yrm | \xrm,\uppsi}(x,\uppsi) = \mu_{\upthetac(x) | \xrm,\uppsi}(x,\uppsi) & \equiv & \mu_{\upthetac(x) | \uppsim(x), \uppsic(x)} \nonumber \;.
 \end{IEEEeqnarray}
 %A consequence of the Dirichlet prior is that the predictive PMF for a given value of $\xrm$ only depends on the corresponding training data $\uppsi(\cdot,\xrm)$, such that $\Prm_{\yrm | \xrm,\uppsi}(x,\psi) = \Prm_{\yrm | \xrm,\uppsi(\cdot,\xrm)}\big( x,\psi(\cdot,x) \big)$. This is intuitive considering the independence of the conditional models $\thetac(x)$ from one another.
 
@@ -3231,7 +3229,7 @@ This section details another important property of Dirichlet distributed random 
 The PDF of the original random process $\uptheta$ conditioned on its aggregation $\upthetam$ can be formulated as
 \begin{IEEEeqnarray}{rCl}
 \prm_{\uptheta | \upthetam}(\theta | \thetam) & = & \frac{\beta(\alpha_0 \alpha_m) \prod_{y \in \Ycal} \theta(y)^{\alpha_0 \alpha(y)-1}}{\beta(\alpha_0 \alpha) \prod_{z \in \Zcal} \thetam(z)^{\alpha_0 \alpham(z)-1}} \\
-& = & \prod_{z \in \Zcal} \Bigg[ \beta( \alpha_0 \alpha_z )^{-1} \frac{\prod_{y \in \Scal_z} \theta_z(y)^{\alpha_0 \alpha_z(y)-1}}{\thetam(z)^{\alpha_0 \alpham(z)-1}} \Bigg] \nonumber \\ 
+& \equiv & \prod_{z \in \Zcal} \Bigg[ \beta( \alpha_0 \alpha_z )^{-1} \frac{\prod_{y \in \Scal_z} \theta_z(y)^{\alpha_0 \alpha_z(y)-1}}{\thetam(z)^{\alpha_0 \alpham(z)-1}} \Bigg] \nonumber \\ 
 & = & \prod_{z \in \Zcal} \Bigg[ \frac{\thetam(z)^{1-|\Scal_z|}}{\beta( \alpha_0 \alpha_z )} \prod_{y \in \Scal_z} \left(\frac{\theta_z(y)}{\thetam(z)}\right)^{\alpha_0 \alpha_z(y)-1} \Bigg] \nonumber \;,
 \end{IEEEeqnarray}
 which is defined for $\prod_{z \in \Zcal} \left\{ \theta_z \in {\Rbbgeq}^{\Scal_z} : \sum_{y \in \Scal_z} \theta_z(y) = \thetam(z) \right\}$.
