@@ -2,7 +2,6 @@
 Random elements.
 """
 
-# TODO: docstrings?
 # TODO: do ABC or PyCharm bug?
 
 import math
@@ -199,8 +198,8 @@ class Finite(Base):     # TODO: DRY - use stat approx from the Finite space's me
         return NotImplemented
 
     def __deepcopy__(self, memodict=None):
-        if memodict is None:
-            memodict = {}
+        # if memodict is None:
+        #     memodict = {}
         return type(self)(self.supp, self.p, self.rng)
 
     def __repr__(self):
@@ -230,7 +229,15 @@ class Finite(Base):     # TODO: DRY - use stat approx from the Finite space's me
             raise ValueError(f"Shape of 'p' must be {self.space.set_shape}.")
         self._p_flat = self._p.flatten()
 
-        self._mode = self._supp_flat[np.argmax(self._p_flat)]
+        self._mode = None
+        # self._mode = self._supp_flat[np.argmax(self._p_flat)]
+
+    @property
+    def mode(self):
+        if self._mode is None:
+            self._mode = self._supp_flat[np.argmax(self._p_flat)]
+
+        return self._mode
 
     def _rvs(self, n, rng):
         return rng.choice(self._supp_flat, size=n, p=self._p_flat)
@@ -264,15 +271,32 @@ class FiniteRV(MixinRV, Finite):
 
         # TODO: clean up?
 
-        self._mean = np.tensordot(self._p_flat, self._supp_flat, axes=[0, 0])
+        # self._mean = np.tensordot(self._p_flat, self._supp_flat, axes=[0, 0])
+        #
+        # ctr = self._supp_flat - self._mean
+        # # outer = np.empty((len(ctr), *(2 * self.shape)))
+        # # for i, ctr_i in enumerate(ctr):
+        # #     outer[i] = np.tensordot(ctr_i, ctr_i, 0)
+        # # self._cov = np.tensordot(self._p, outer, axes=[0, 0])
+        # self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p_flat, ctr))
 
-        ctr = self._supp_flat - self._mean
-        # outer = np.empty((len(ctr), *(2 * self.shape)))
-        # for i, ctr_i in enumerate(ctr):
-        #     outer[i] = np.tensordot(ctr_i, ctr_i, 0)
-        # self._cov = np.tensordot(self._p, outer, axes=[0, 0])
-        self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p_flat, ctr))
+        self._mean = None
+        self._cov = None
 
+    @property
+    def mean(self):
+        if self._mean is None:
+            self._mean = np.tensordot(self._p_flat, self._supp_flat, axes=[0, 0])
+
+        return self._mean
+
+    @property
+    def cov(self):
+        if self._cov is None:
+            ctr = self._supp_flat - self._mean
+            self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p_flat, ctr))
+
+        return self._cov
 
 # s = np.random.random((3, 1, 2))
 # pp = np.random.random((3,))
@@ -707,7 +731,7 @@ class EmpiricalScalar(Binomial):
 
 class Uniform(BaseRV):
     """
-    Binomial random variable.
+    Uniform random variable.
     """
 
     def __init__(self, a, b, rng=None):

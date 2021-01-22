@@ -231,7 +231,7 @@ class DataConditional(Base):
 
         self._space['y'] = spaces.check_spaces(self.dists)
 
-        self._update_attr()
+        # self._update_attr()
 
     def __eq__(self, other):
         if isinstance(other, DataConditional):
@@ -255,10 +255,14 @@ class DataConditional(Base):
     @p_x.setter
     def p_x(self, val):
         self.model_x.p = val
-        self._update_attr()
+        # self._update_attr()
 
-    def _update_attr(self):
-        self._mode_x = self.model_x.mode
+    # def _update_attr(self):
+    #     self._mode_x = self.model_x.mode
+
+    @property
+    def mode_x(self):
+        return self.model_x.mode
 
     def model_y_x(self, x):
         # idx = self.space['x'].values.tolist().index(x)
@@ -275,10 +279,18 @@ class DataConditional(Base):
 
 
 class DataConditionalRVx(MixinRVx, DataConditional):
-    def _update_attr(self):
-        super()._update_attr()
-        self._mean_x = self._model_x.mean
-        self._cov_x = self._model_x.cov
+    # def _update_attr(self):
+    #     super()._update_attr()
+    #     self._mean_x = self._model_x.mean
+    #     self._cov_x = self._model_x.cov
+
+    @property
+    def mean_x(self):
+        return self.model_x.mean
+
+    @property
+    def cov_x(self):
+        return self.model_x.cov
 
 
 class DataConditionalRVy(MixinRVy, DataConditional):
@@ -335,10 +347,30 @@ class ClassConditional(MixinRVx, Base):
         self._update_attr()
 
     def _update_attr(self):
-        self._model_x = rand_elements.MixtureRV(self.dists, self.p_y)
-        self._mode_x = self.model_x.mode
-        self._mean_x = self.model_x.mean
-        self._cov_x = self.model_x.cov
+        self._model_x = None
+        # self._model_x = rand_elements.MixtureRV(self.dists, self.p_y)
+        # self._mode_x = self.model_x.mode
+        # self._mean_x = self.model_x.mean
+        # self._cov_x = self.model_x.cov
+
+    @property
+    def model_x(self):
+        if self._model_x is None:
+            self._model_x = rand_elements.MixtureRV(self.dists, self.p_y)
+
+        return self._model_x
+
+    @property
+    def mode_x(self):
+        return self.model_x.mode
+
+    @property
+    def mean_x(self):
+        return self.model_x.mean
+
+    @property
+    def cov_x(self):
+        return self.model_x.cov
 
     def mode_y_x(self, x):
         temp = np.array([dist.pf(x) * p for dist, p in zip(self.dists, self.p_y)])
@@ -402,10 +434,22 @@ class BetaLinear(MixinRVx, MixinRVy, Base):     # TODO: DRY with NormalLinear
     def model_x(self, model_x):
         self._model_x = model_x
 
-        self._mode_x = self._model_x.mode
+        # self._mode_x = self._model_x.mode
+        #
+        # self._mean_x = self._model_x.mean
+        # self._cov_x = self._model_x.cov
 
-        self._mean_x = self._model_x.mean
-        self._cov_x = self._model_x.cov
+    @property
+    def mode_x(self):
+        return self.model_x.mode
+
+    @property
+    def mean_x(self):
+        return self.model_x.mean
+
+    @property
+    def cov_x(self):
+        return self.model_x.cov
 
     def mean_y_x(self, x):
         return sum(weight * func(x) for weight, func in zip(self.weights, self._basis_y_x))
@@ -457,18 +501,22 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
     def model_x(self, model_x):
         self._model_x = model_x
 
-        self._mode_x = self._model_x.mode
+        # self._mode_x = self._model_x.mode
+        #
+        # self._mean_x = self._model_x.mean
+        # self._cov_x = self._model_x.cov
 
-        self._mean_x = self._model_x.mean
-        self._cov_x = self._model_x.cov
+    @property
+    def mode_x(self):
+        return self.model_x.mode
 
-    # @property
-    # def weights(self):
-    #     return self._weights
-    #
-    # @weights.setter
-    # def weights(self, val):
-    #     self._weights = np.array(val)
+    @property
+    def mean_x(self):
+        return self.model_x.mean
+
+    @property
+    def cov_x(self):
+        return self.model_x.cov
 
     @property
     def cov_y_x_(self):
@@ -617,7 +665,7 @@ class DataEmpirical(Base):
 
     @property
     def mode_x(self):
-        return self._model_x.mode
+        return self.model_x.mode
 
     def _get_idx_x(self, x):
         idx = np.flatnonzero(np.all(x == self.model_x.data['x'], axis=tuple(range(1, 1 + self.ndim['x']))))
@@ -669,11 +717,11 @@ class DataEmpiricalRVx(MixinRVx, DataEmpirical):
 
     @property
     def mean_x(self):
-        return self._model_x.mean
+        return self.model_x.mean
 
     @property
     def cov_x(self):
-        return self._model_x.cov
+        return self.model_x.cov
 
 
 class DataEmpiricalRVy(MixinRVy, DataEmpirical):
