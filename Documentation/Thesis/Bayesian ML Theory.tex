@@ -1001,9 +1001,9 @@ Also, for PDF's satisfying $\alpha(y,x) > \alpha_0^{-1}$, the maximizing value o
 \begin{equation}
 \theta_\mathrm{max} = \argmax_{\theta \in \Uptheta} \prm_{\uptheta}(\theta) = \frac{\alpha - \alpha_0^{-1}}{1 - \alpha_0^{-1} |\Ycal||\Xcal|} \;.
 \end{equation}
-This can be easily shown by maximizing the logarithm of the distribution using the method of Lagrange multipliers, as demonstrated in \ref{app:MAP_theta}.
+This can be easily shown by maximizing the logarithm of the distribution using the method of Lagrange multipliers.
 
-\todomid{Mode proof for all values of alpha?}
+\todomid{Reference? Mode proof for all values of alpha?}
 
 \todohigh{HALDANE PRIOR}
 
@@ -3802,47 +3802,6 @@ Additionally, note that $\upthetam | \{\Drm = D\} \sim \upthetam | \big\{ \uppsi
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\chapter{}
-
-
-PGR: Many sections redundant given Dirichlet perspective...
-
-PGR: needs notation/formatting scrub
-
-
-
-\section{Maximum \emph{a Posteriori} estimate of $\uptheta$ given $D$} \label{app:MAP_theta}
-
-PGR: delete? been done...
-
-PGR: for all values of alpha!?
-
-PGR: REDO USING EASY LOG-LIKELIHOOD and LAGRANGE!!!!!!! Generalize for Dirichlet!!! 
-
-To determine the MAP estimate of the model PMF $\uptheta$ given the training data $D$, 
-
-\begin{equation}
-\hat{\theta}_{MAP}(D) = \argmax_{\theta \in \Uptheta} \Prm_{\uptheta | \Drm}(\theta | D) \;,
-\end{equation}
-we perform contrained optimization. Note that the set $\Uptheta = \left\{ \theta \in {\Rbbgeq}^{\Ycal}: \sum_{y \in \Ycal} \theta(y) = 1 \right\}$ implies both equality and inequality constraints...
 
 
 
