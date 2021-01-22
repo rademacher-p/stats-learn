@@ -243,21 +243,22 @@ As shown in Equation \eqref{eq:f_opt_xD}, the decision selected by the optimally
 Due to the independence of the conditional models $\upthetac(x)$ from one another and from the marginal model, $\prm_{\upthetac(x) | \uppsi, \xrm} \equiv \prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \sim \Prm_{\uppsic(x) | \uppsim(x), \upthetac(x)} \prm_{\upthetac(x)}$. Since the conditional PMF of the empirical statistic $\uppsic(x)$ has exponential form, the Dirichlet PDF $\prm_{\upthetac(x)}$ is a conjugate prior \cite{theodoridis-ML}; thus, the true predictive models conditioned on the empirical statistic are independent Dirichlet processes,
 \begin{IEEEeqnarray}{L}
 \upthetac(x) | \uppsim(x),\uppsic(x) \\
-\quad \sim \Dir\Big( \alpha_0 \alpham(x) + N \psim(x), \mu_{\upthetac(x) | \uppsim(\xrm), \uppsic(x)} \Big) \nonumber \;,
+\quad \sim \Dir\Big( \alpha_0 \alpham(x) + N \uppsim(x), \mu_{\upthetac(x) | \uppsim(x), \uppsic(x)} \Big) \nonumber \;,
 \end{IEEEeqnarray}
 with mean functions
 \begin{IEEEeqnarray}{rCl} \label{eq:pred_Bayes_psi}
-\mu_{\upthetac(x) | \uppsim(x), \uppsic(x)} & = & \gamma\big(\uppsim(x)\big) \alphac(x) \nonumber \\
-&& \quad + \Big(1-\gamma\big(\uppsim(x)\big)\Big) \uppsic(x) \nonumber \\
+\mu_{\upthetac(x) | \uppsim(x), \uppsic(x)} & = & \gamma(x; \uppsim) \alphac(x) \nonumber \\
+&& \quad + \big(1 - \gamma(x; \uppsim)\big) \uppsic(x) \nonumber \\
 & \equiv & \Prm_{\yrm | \xrm,\uppsi} \;,
 \end{IEEEeqnarray}
-where $\gamma\big(\psim(x)\big) \equiv \left( 1 + \frac{N \uppsim(x)}{\alpha_0 \alpham(\xrm)} \right)^{-1} \in (0,1]$.
+where $\gamma(x; \uppsim) = \left( 1 + \frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \right)^{-1} \in (0,1]$.
 %\begin{IEEEeqnarray}{rCl} \label{eq:pred_Bayes_psi}
 %\mu_{\upthetac(x) | \uppsim(x), \uppsic(x)} & = & \left( 1 + \frac{N \uppsim(x)}{\alpha_0 \alpham(\xrm)} \right)^{-1} \alphac(x) \nonumber \\
 %&& \quad + \left( 1 + \frac{\alpha_0 \alpham(x)}{N \uppsim(x)} \right)^{-1} \uppsic(x) \nonumber \\
 %& \equiv & \Prm_{\yrm | \xrm,\uppsi}(x,\psi) \;.
 %\end{IEEEeqnarray}
-Note that as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to 0$, the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior mean. Conversely, as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to \infty$, the mean tends to $\uppsic(x)$. Also, for larger training sets $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$ and the model is positively identified. This is a consequence of the full support of the Dirichlet distribution and does not hold in general. The adaptation of the posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde} for $\alpha_0 \alpham(x) = 6$ and $N \psim(x) = 3$.
+Note that as the prior localization increases relative to the training data volume, $\gamma(x; \uppsim) \to 1$ and the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior. Conversely, for large training sets, $\gamma(x; \uppsim) \to 0$ and the mean tends to $\uppsic(x)$. Also, as $N \uppsim(x) \to \infty$, the PDF $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$ and the model is positively identified. This is a consequence of the full support of the Dirichlet distribution and does not hold in general. The adaptation of the posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde} for $\alpha_0 \alpham(x) = 6$ and $N \psim(x) = 3$.
+%Note that as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to 0$, the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior mean. Conversely, as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to \infty$, the mean tends to $\uppsic(x)$. Also, for larger training sets $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$ and the model is positively identified. This is a consequence of the full support of the Dirichlet distribution and does not hold in general. The adaptation of the posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde} for $\alpha_0 \alpham(x) = 6$ and $N \psim(x) = 3$.
 \begin{figure}
 	\centering
 	\includegraphics[width=1\linewidth]{P_theta_post_SSP.pdf}
@@ -288,8 +289,8 @@ Note that as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to 0$, the posterior mea
 
 To find the optimal Bayesian estimator, the Bayesian predictive distribution \eqref{eq:pred_Bayes_psi} is substituted into \eqref{eq:f_opt_xD} and the posterior mean in terms of the empirical statistic is
 \begin{IEEEeqnarray}{rCl} \label{eq:f_opt_SE}
-f^*(x;\psi) & \equiv & \gamma\big(\psim(x)\big) \sum_{y \in \Ycal} \alphac(y;x) \ y \\
-&& \quad + \Big(1-\gamma\big(\psim(x)\big)\Big) \sum_{y \in \Ycal} \psic(y;x) \ y \nonumber \;.
+f^*(x;\psi) & \equiv & \gamma(x; \psim) \sum_{y \in \Ycal} \alphac(y;x) \ y \\
+&& \quad + \big(1-\gamma(x; \psim)\big) \sum_{y \in \Ycal} \psic(y;x) \ y \nonumber \;.
 \end{IEEEeqnarray}
 %\begin{IEEEeqnarray}{rCl} \label{eq:f_opt_SE}
 %f^*(\xrm;\uppsi) & \equiv & \left( 1 + \frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm)} \right)^{-1} \sum_{y \in \Ycal} \alphac(y;\xrm) \ y \\
@@ -318,11 +319,11 @@ Substituting the Bayesian estimator \eqref{eq:f_opt_SE} into \eqref{eq:risk_cond
 \end{IEEEeqnarray}
 a conditional expectation of two weighted functions, where
 \begin{IEEEeqnarray}{rCl} \label{eq:bias}
-\lambda_{\text{Bias}}(x) & = & \Erm_{\uppsim(x) | \upthetam(x)}\left[ \gamma\big(\uppsim(x)\big)^2 \right] 
+\lambda_{\text{Bias}}(x) & = & \Erm_{\uppsim(x) | \upthetam(x)}\left[ \gamma(x; \uppsim)^2 \right] 
 \end{IEEEeqnarray}
 and
 \begin{IEEEeqnarray}{rCl} \label{eq:var}
-\lambda_{\text{Var}}(x) & = & \Erm_{\uppsim(x) | \upthetam(x)}\left[ \frac{\Big( 1 - \gamma\big(\uppsim(x)\big) \Big)^2}{N \uppsim(x)} \right] \;.
+\lambda_{\text{Var}}(x) & = & \Erm_{\uppsim(x) | \upthetam(x)}\left[ \frac{\big( 1 - \gamma(x; \uppsim) \big)^2}{N \uppsim(x)} \right] \;.
 \end{IEEEeqnarray}
 %\begin{IEEEeqnarray}{rCl}
 %lambda__{\text{Var}}(x) & = & \Erm_{\uppsim(x) | \upthetam(x)}\left[ \frac{N \uppsim(x)}{\big( \alpha_0 \alpham(x) + N \uppsim(x) \big)^2} \right]

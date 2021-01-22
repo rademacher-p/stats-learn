@@ -106,6 +106,7 @@
 \DeclareMathOperator{\alpham}{\alpha_\text{m}}
 \DeclareMathOperator{\alphac}{\alpha_\text{c}}
 
+\DeclareMathOperator{\gammam}{\gamma_\text{m}}
 
 
 \usepackage[backend=biber,style=numeric]{biblatex}
@@ -227,6 +228,8 @@ After introducing the problem and discussing the relevant data probability distr
 
 
 \section{Notation}
+
+\todolo{Discuss arithmetic ops on functions? Upcasting?!}
 
 This section details the mathematical notation and typesetting conventions used throughout. Note that many variable scalars and functions including $x$, $y$, $g$, etc. are repeatedly redefined and reused to avoid introducing an excessive volume of symbols; unless explicitly stated, none of these variable definitions will hold in subsequent sections.
 
@@ -612,10 +615,9 @@ and the minimum Bayes risk is
 \todohi{Continuous? sums, PMFs...}
 
 
-
 Observe that the marginal and conditional Bayesian distributions can be represented as $\Prm_{\xrm | \Drm} = \Erm_{\uptheta | \Drm}\big[ \Prm_{\xrm | \uptheta} \big] \equiv \mu_{\upthetam | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm} = \Erm_{\uptheta | \xrm,\Drm}\big[ \Prm_{\yrm | \xrm,\uptheta} \big] \equiv \mu_{\upthetac(\xrm) | \xrm,\Drm}$, the expected values of the corresponding clairvoyant distributions with respect to the model posteriors $\prm_{\upthetam | \Drm}$ and $\prm_{\upthetac(\xrm) | \xrm,\Drm}$, respectively. Also, $\Prm_{\yrm,\xrm | \Drm} = \Erm_{\uptheta | \Drm}\big[ \Prm_{\yrm,\xrm | \uptheta} \big] \equiv \mu_{\uptheta | \Drm}$. Thus, the Bayesian approach to prediction uses the model posterior given the observable random elements to integrate out the model dependency of the risk $\Rcal_{\Theta}(f ; \uptheta)$.
 
-\todomid{Consider notation $\mu_{\upthetac | \xrm,\Drm}(\xrm; \xrm,\Drm)$ !?!?}
+\todohigh{Consider notation $\mu_{\upthetac | \xrm,\Drm}(\xrm; \xrm,\Drm)$ !?!?}
 
 
 The relevant posteriors can be represented as
@@ -1053,9 +1055,9 @@ By the aggregation property \cite{ferguson}, $\upthetam \sim \Dir(\alpha_0,\alph
 & = & \prod_{x \in \Xcal} \Dir\Big( \thetac(x) ; \alpha_0 \alpham(x), \alphac(x) \Big) \nonumber \;,
 \end{IEEEeqnarray}
 \begin{IEEEeqnarray}{rCl}
-\upthetac | \upthetam & \sim & \upthetac \sim \bigotimes_{x \in \Xcal} \Dir\Big( \alpha_0 \alpham(x), \alphac(x) \Big) ?? \;,
+\upthetac | \upthetam & \sim & \upthetac \sim \bigotimes_{x \in \Xcal} \Dir\Big( \alpha_0 \alpham(x), \alphac(x) \Big) \;,
 \end{IEEEeqnarray}
-a product of Dirichlet distributions defined on $\thetac \in \Pcal(\Ycal)^{\Xcal}$. As shown, the processes $\upthetac(x)$ are Dirichlet with parameterizing distributions $\alphac(x)$ and concentrations $\alpha_0 \alpham(x)$, independent of one another, and independent of the marginal distribution $\upthetam$. Note that $\Prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$. 
+a product of Dirichlet distributions defined on $\thetac \in \Pcal(\Ycal)^{\Xcal}$. As shown, the processes $\upthetac(x)$ are Dirichlet with parameterizing distributions $\alphac(x)$ and concentrations $\alpha_0 \alpham(x)$, independent of one another, and independent of the marginal distribution $\upthetam$. Note that $\Prm_{\yrm | \xrm} = \mu_{\upthetac}(\xrm) = \alphac(\xrm)$. 
 
 
 
@@ -1233,8 +1235,13 @@ First observe that since $\Prm_{\Drm | \uptheta}$ is of exponential form, the Di
 a Dirichlet distribution with concentration $\alpha_0 + N$ and parameter distribution 
 \begin{IEEEeqnarray}{rCl}
 \mu_{\uptheta | \Drm} & = & \frac{\alpha_0 \alpha + N \Psi(\Drm)}{\alpha_0 + N} \\
-& = & \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpha + \left(\frac{N}{\alpha_0 + N}\right) \Psi(\Drm) \nonumber \;.
+& = & \gamma \alpha + (1 - \gamma) \Psi(\Drm) \nonumber \;,
 \end{IEEEeqnarray}
+where the weight
+\begin{IEEEeqnarray}{L}
+\gamma = \left(1 + \frac{N}{\alpha_0}\right)^{-1} \in (0, 1]
+\end{IEEEeqnarray}
+is introduced.
 
 \todolo{Comment on N=0 case, psi not a valid PF?}
 
@@ -1247,7 +1254,7 @@ This maximizing value is only valid if $\mu_{\uptheta | \Drm} > (\alpha_0 + N)^{
 
 \todolow{MAP discussion out of place?}
 
-Observe that the concentration parameter increases proportionately with increasing volumes of training data; consequently, as $N / \alpha_0 \to \infty$, the posterior converges to $\prm_{\uptheta | \Drm} \to \delta\big( \cdot - \Psi(\Drm) \big)$. Thus, as more data is collected, the model can be more positively identified and used to formulate minimum risk decisions. Conversely, as $N / \alpha_0 \to 0$, the prior model certainty is stronger and the posterior tends toward $\prm_{\uptheta | \Drm} \to \delta( \cdot - \alpha)$, independent of the training data.
+Observe that the concentration parameter increases proportionately with both the training data volume and the prior concentration. Consequently, as $N \to \infty$, $\gamma \to 0$ and the posterior converges to $\prm_{\uptheta | \Drm} \to \delta\big( \cdot - \Psi(\Drm) \big)$; as more data is collected, the model can be more positively identified and used to formulate minimum risk decisions. Conversely, as $\alpha_0 \to \infty$, $\gamma \to 1$ reflection confidence in the prior and the posterior tends toward $\prm_{\uptheta | \Drm} \to \delta( \cdot - \alpha)$, independent of the training data.
 
 Figure \ref{fig:P_theta_D} shows the influence of the training data on the model distribution; after conditioning on the training data (via $\uppsi$), the PDF concentration shifts away from the models favored by the prior knowledge and towards other models that better account for the observations.
 
@@ -1261,25 +1268,27 @@ Figure \ref{fig:P_theta_D} shows the influence of the training data on the model
 
 Recall that the joint PMF of $\yrm$ and $\xrm$ conditioned on the training data is equivalent to the posterior mean $\mu_{\uptheta | \Drm}$, such that \cite{murphy}
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\yrm,\xrm | \Drm} & = & \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpha + \left(\frac{N}{\alpha_0 + N}\right) \Psi(\Drm) \nonumber \\
-& = & \left(1 + \frac{N}{\alpha_0}\right)^{-1} \alpha + \left(1 + \frac{\alpha_0}{N}\right)^{-1} \Psi(\Drm) \;.
+\Prm_{\yrm,\xrm | \Drm} & = & \gamma \alpha + (1-\gamma) \Psi(\Drm) \;.
 \end{IEEEeqnarray}
-This is a mixture distribution of the prior mean $\mu_{\uptheta} = \alpha/\alpha_0$ and the empirical distribution $\Psi(\Drm)$. The more informative the model prior (i.e. larger $\alpha_0$), the more the prior mean is favored; the more data, the more the empirical model is favored. The marginal distribution for $\xrm$ given $\Drm$ is
+This is a mixture distribution of the prior mean $\mu_{\uptheta} = \alpha$ and the empirical distribution $\Psi(\Drm)$. The more informative the model prior (i.e. larger $\alpha_0$), the more the prior mean is favored; the more data, the more the empirical model is favored. The marginal distribution for $\xrm$ given $\Drm$ is
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\xrm | \Drm} & = & \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpham + \left(\frac{N}{\alpha_0 + N}\right) \Psim(\Drm) \;.
+\Prm_{\xrm | \Drm} \equiv \Prm_{\xrm | \Xrm} & = & \frac{\alpha_0 \alpham + N \Psim(\Xrm)}{\alpha_0 + N} \nonumber \\
+& = & \gamma \alpham + (1-\gamma) \Psim(\Xrm) \;.
 \end{IEEEeqnarray}
 
 Finally, the predictive distribution of interest is generated via Bayes rule as
 \begin{IEEEeqnarray}{rCl} \label{eq:P_y_xD_dir}
 \Prm_{\yrm | \xrm,\Drm} & = & \frac{\alpha_0 \alpha(\cdot,\xrm) + N \Psi(\cdot,\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)} \\
 & = & \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)}\right) \alphac(\xrm) + \left(\frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)}\right) \Psic(\xrm;\Drm) \nonumber \\
-& = & \left(1 + \frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm)}\right)^{-1} \alphac(\xrm) + \left(1 + \frac{\alpha_0 \alpham(\xrm)}{N \Psim(\xrm;\Drm)}\right)^{-1} \Psic(\xrm;\Drm) \nonumber \;.
+& \equiv & \gammam(\xrm;\Xrm) \alphac(\xrm) + \big(1 - \gammam(\xrm;\Xrm)\big) \Psic(\xrm;\Drm) \nonumber \;,
 \end{IEEEeqnarray}
-The last representation views the distribution as a convex combination of two conditional distributions. The first distribution $\Prm_{\yrm | \xrm} = \alphac(\xrm)$ is independent of the training data and based on the prior knowledge implied via the model PDF parameter; the second distribution is the conditional empirical model and depends on $\Drm$, not on $\alpha$.
+where the ``marginal'' weighting function
+\begin{IEEEeqnarray}{L}
+\gammam(X) = \left(1 + \frac{N \Psim(X)}{\alpha_0 \alpham}\right)^{-1} \in (0, 1]^{\Xcal}
+\end{IEEEeqnarray}
+is introduced. The last representation views the distribution as a convex combination of two conditional distributions. The first distribution $\Prm_{\yrm | \xrm} = \alphac(\xrm)$ is independent of the training data and based on the prior knowledge implied via the model PDF parameter; the second distribution is the conditional empirical model and depends on $\Drm$, not on $\alpha$.
 
-Recall that the weighting factors $\alpha_0 \alpham(x)$ and $N \Psim(x;\Drm)$ are the concentration of the conditional prior $\upthetac(x)$ and the number of training samples characterizing the conditional empirical model $\uppsic(x)$ (samples satisfying $X_n = \xrm$), respectively. As $\frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm)} \to 0$, the PMF tends toward the conditional distribution $\alphac(\xrm)$. As $\frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm)} \to \infty$, $\Prm_{\yrm | \xrm,\Drm}$ tends towards the empirical conditional distribution $\Psic(\xrm)$. 
-
-
+Recall that the weighting factors $\alpha_0 \alpham(x)$ and $N \Psim(x;\Drm)$ are the concentration of the conditional prior $\upthetac(x)$ and the number of training samples characterizing the conditional empirical model $\uppsic(x)$ (samples satisfying $X_n = \xrm$), respectively. As the former increases relative to the latter, the weight value $\gammam(x; \Xrm) \to 0$ and $\Prm_{\yrm | \xrm,\Drm}$ tends away from the prior function $\alphac(x)$ and towards the empirical conditional distribution $\Psic(x;\Drm)$.
 
 
 \paragraph{Uniform Prior}
@@ -1300,17 +1309,15 @@ PGR: reference posterior equations!
 PGR: DIR FIGS? for PDF asymptotics?
 
 
-
-
 The Bayesian distributions $\Prm_{\xrm | \Drm}$ and $\Prm_{\yrm | \xrm,\Drm}$ can also be found from the posterior distributions $\prm_{\upthetam | \Drm}$ and $\prm_{\upthetac | \xrm,\Drm}$, respectively. As the Dirichlet assumption renders $\upthetam$ and $\upthetac$ independent, it can be shown that $\Prm_{\Yrm | \Xrm} = \Erm_{\upthetac}\big[ \Prm_{\Yrm | \Xrm,\upthetac} \big]$ and thus that $\upthetam$ is conditionally independent of $\Yrm$ given $\Xrm$. Furthermore, the Dirichlet distribution $\prm_{\upthetam}$ is a conjugate prior for the likelihood $\Prm_{\Xrm | \upthetam}$. As a result, $\upthetam | \Drm \sim \Dir\big (\alpha_0 + N, \mu_{\upthetam | \Xrm} \big)$ and
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\xrm | \Drm}(D) & = & \mu_{\upthetam | \Drm}(D) \\
-& = & \mu_{\upthetam | \Xrm}(X) = \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpham + \left(\frac{N}{\alpha_0 + N}\right) \Psim(\Drm) \nonumber \;.
+\Prm_{\xrm | \Drm} & = & \mu_{\upthetam | \Drm} \\
+& \equiv & \mu_{\upthetam | \Xrm} = \gamma \alpham + (1-\gamma) \Psim(\Xrm) \nonumber \;.
 \end{IEEEeqnarray}
 Similarly, the distribution can be expressed in terms of the empirical model sufficient statistic as
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\xrm | \uppsi}(\psi) & = & \mu_{\upthetam | \uppsi}(\psi) \\
-& \equiv & \mu_{\upthetam | \uppsim}\left( \psim \right) = \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpham + \left(\frac{N}{\alpha_0 + N}\right) \psim \nonumber \;,
+\Prm_{\xrm | \uppsi} & = & \mu_{\upthetam | \uppsi} \\
+& \equiv & \mu_{\upthetam | \uppsim} = \gamma \alpham + (1-\gamma) \uppsim \nonumber \;,
 \end{IEEEeqnarray}
 where the dependency on $\uppsi$ is expressed only through the marginal random process $\uppsim$.
 
@@ -1319,19 +1326,25 @@ where the dependency on $\uppsi$ is expressed only through the marginal random p
 The posterior $\prm_{\upthetac | \xrm,\Drm}$ can be simplified by noting that the independence of $\upthetam$ and $\upthetac$ implies $\Prm_{\Yrm | \Xrm,\xrm} = \Erm_{\upthetac}\big[ \Prm_{\Yrm | \Xrm,\upthetac} \big] = \Prm_{\Yrm | \Xrm}$. Consequently, $\upthetac$ is conditionally independent of $\xrm$ given $\Drm$. Thus, as $\prm_{\upthetac}$ is a conjugate prior for $\Prm_{\Yrm | \Xrm,\upthetac}$ the posterior distribution is
 \begin{IEEEeqnarray}{rCl}
 \prm_{\upthetac | \xrm,\Drm}(\thetac | x,D) & = & \prm_{\upthetac | \Drm}(\thetac | D) = \prod_{x' \in \Xcal} \prm_{\upthetac(x') | \Drm}\big(\thetac(x') | D \big) \\
-& = & \prod_{x' \in \Xcal} \Dir\big( \thetac(x') ; \alpha_0 \alpham(x') + N \Psim(x';D), \mu_{\upthetac(x') | \Drm}(D) \big) \nonumber \;,
+& = & \prod_{x' \in \Xcal} \Dir\big( \thetac(x') ; \alpha_0 \alpham(x') + N \Psim(x';D), \mu_{\upthetac | \Drm}(x'; D) \big) \nonumber \;,
+\end{IEEEeqnarray}
+\begin{IEEEeqnarray}{rCl}
+\prm_{\upthetac | \xrm,\Drm} & = & \prm_{\upthetac | \Drm} = \prod_{x' \in \Xcal} \prm_{\upthetac(x') | \Drm} \\
+& = & \prod_{x' \in \Xcal} \Dir\big( \alpha_0 \alpham(x') + N \Psim(x';\Drm), \mu_{\upthetac(x') | \Drm} \big) \nonumber \;,
 \end{IEEEeqnarray}
 where
 \begin{IEEEeqnarray}{rCl}
-\mu_{\upthetac(x') | \xrm,\Drm}(x,D) & = & \mu_{\upthetac(x') | \Drm}(D) \\
-& = & \left(\frac{\alpha_0 \alpham(x')}{\alpha_0 \alpham(x') + N \Psim(x';D)}\right) \alphac(x') + \left(\frac{N \Psim(x';D)}{\alpha_0 \alpham(x') + N \Psim(x';D)}\right) \Psic(x';D) \nonumber
+\mu_{\upthetac | \xrm,\Drm}(x'; x,D) & = & \mu_{\upthetac | \Drm}(x'; D) \\
+& \equiv & \gammam(x';X) \alphac(x') + \big(1 - \gammam(x';X)\big) \Psic(x';D) \nonumber
+\end{IEEEeqnarray} 
+\begin{IEEEeqnarray}{rCl}
+\mu_{\upthetac | \xrm,\Drm} & = & \mu_{\upthetac | \Drm} = \bigotimes_{x' \in \Xcal} \mu_{\upthetac(x') | \Drm}  \\
+& \equiv & \bigotimes_{x' \in \Xcal} \left( \gammam(x';X) \alphac(x') + \big(1 - \gammam(x';\Xrm)\big) \Psic(x';\Drm) \right) \nonumber
 \end{IEEEeqnarray} 
 and the distinct model conditional PMF's are independent from one another. The Bayes predictive PMF can thus be expressed as
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\yrm | \xrm,\Drm}(x,D) & = & \mu_{\upthetac(x) | \xrm,\Drm}(x,D) = \mu_{\upthetac(x) | \Drm}(D) \;.
+\Prm_{\yrm | \xrm,\Drm}(x,D) & = & \mu_{\upthetac | \xrm,\Drm}(x; x,D) = \mu_{\upthetac | \Drm}(x; D) \;.
 \end{IEEEeqnarray}
-
-\todomid{Consider theta x argument in parentheses, not subscript!}
 
 A similar treatment demonstrates that
 \begin{IEEEeqnarray}{rCl}
@@ -1339,14 +1352,29 @@ A similar treatment demonstrates that
 & = & \prod_{x' \in \Xcal} \prm_{\upthetac(x') | \uppsim(x'), \uppsic(x')}\big(\thetac(x') | \psim(x'), \psic(x') \big) \nonumber \\
 & = & \prod_{x' \in \Xcal} \Dir\Big( \thetac(x') ; \alpha_0 \alpham(x') + N \psim(x'), \mu_{\upthetac(x') | \uppsim(x'), \uppsic(x')}\big( \psim(x'), \psic(x') \big) \Big) \nonumber \;,
 \end{IEEEeqnarray}
+\begin{IEEEeqnarray}{rCl}
+\prm_{\upthetac | \xrm,\uppsi} & = & \prm_{\upthetac | \uppsi} \equiv \prm_{\upthetac | \uppsim, \uppsic} \\
+& = & \bigotimes_{x' \in \Xcal} \prm_{\upthetac(x') | \uppsim(x'), \uppsic(x')} \nonumber \\
+& = & \bigotimes_{x' \in \Xcal} \Dir\Big(\alpha_0 \alpham(x') + N \uppsim(x'), \mu_{\upthetac(x') | \uppsim(x'), \uppsic(x')} \Big) \nonumber \;,
+\end{IEEEeqnarray}
+
 where
 \begin{IEEEeqnarray}{L}
-\mu_{\upthetac(x') | \uppsim(x'), \uppsic(x')}\big( \psim(x'), \psic(x') \big) \\
-\quad = \left(\frac{\alpha_0 \alpham(x')}{\alpha_0 \alpham(x') + N \psim(x')}\right) \alphac(x') + \left(\frac{N \psim(x')}{\alpha_0 \alpham(x') + N \psim(x')}\right) \psic(x') \nonumber \;.
+\mu_{\upthetac(x') | \uppsim(x'), \uppsic(x')} = \gammam(x'; \uppsim) \alphac(x') + \big(1 - \gammam(x'; \uppsim) \big) \uppsic(x') \nonumber \;.
 \end{IEEEeqnarray}
-Observe that when the conditioning is performed using the sufficient statistic, the independent conditional models $\upthetac(x)$ are only dependent on the marginal empirical model value $\uppsim(x)$ and on the corresponding conditional empirical model, $\uppsic(x)$. 
+\begin{IEEEeqnarray}{rCl}
+\mu_{\upthetac | \uppsim, \uppsic} & = & \bigotimes_{x' \in \Xcal} \mu_{\upthetac(x') | \uppsim(x'), \uppsic(x')} \\
+& = & \bigotimes_{x' \in \Xcal} \left( \gammam(x'; \uppsim) \alphac(x') + \big(1 - \gammam(x'; \uppsim) \big) \uppsic(x') \right) \nonumber \;.
+\end{IEEEeqnarray}
+and the modified weighting function
+\begin{IEEEeqnarray}{L}
+\gammam(\psim) = \left(1 + \frac{N \psim}{\alpha_0 \alpham}\right)^{-1} \in (0, 1]^{\Xcal}
+\end{IEEEeqnarray}
+is introduced, operating on the empirical data distribution.
 
-\todomid{coefficient notation from SSP conf paper?}
+\todohi{Reconcile different weighting funcs for D and psi...}
+
+Observe that when the conditioning is performed using the sufficient statistic, the independent conditional models $\upthetac(x)$ are only dependent on the marginal empirical model value $\uppsim(x)$ and on the corresponding conditional empirical model, $\uppsic(x)$. 
 
 The Bayes predictive PMF can thus be expressed as 
 \begin{IEEEeqnarray}{rCl}
@@ -1682,7 +1710,7 @@ and the minimum risk is expressed as
 & = & \left(\frac{|\Ycal|}{N/|\Xcal| + |\Ycal|}\right) \frac{1 - |\Ycal|^{-2}}{12} + \left(\frac{N/|\Xcal|}{N/|\Xcal| + |\Ycal|}\right) \frac{1 - |\Ycal|^{-1}}{12} \nonumber \;.
 \end{IEEEeqnarray}
 
-Interestingly, the minimum squared-error for the uniform prior can be represented as a convex combination of two separate risk values with weighting factors dependent on $|\Ycal|$ and $N/|\Xcal|$. Thus for a uniform prior, the risk depends on the number of elements in $\Ycal$ and the number of training samples ``per element of $\Xcal$''. Note the relationship of these weighting factors to those of the conditional PMF $\Prm_{\yrm | \xrm,\Drm}$, which depend on $\alpha_0 \alpham(\xrm)$ and on $N \Psim(\xrm;\Drm)$. For the uniform prior, $\alpha_0 \alpham(\xrm) = |\Ycal|$ and $N \Erm_{\Drm}\big[ \Psim(\Drm) \big] = N/|\Xcal|$.
+Interestingly, the minimum squared-error for the uniform prior can be represented as a convex combination of two separate risk values with weighting factors dependent on $|\Ycal|$ and $N/|\Xcal|$. Thus for a uniform prior, the risk depends on the number of elements in $\Ycal$ and the number of training samples ``per element of $\Xcal$''. Note the relationship of these weighting factors to those of the conditional PMF $\Prm_{\yrm | \xrm,\Drm}$, which depend on $\alpha_0 \alpham(\xrm)$ and on $N \Psim(\xrm;\Drm)$. For the uniform prior, $\alpha_0 \alpham(\xrm) = |\Ycal|$ and $N \Erm_{\Xrm}\big[ \Psim(\Xrm) \big] = N/|\Xcal|$.
 
 The first risk is the conditional variance $\Sigma_{\yrm|\xrm}$ - this is intuitively satisfying as the corresponding weight becomes unity when $N=0$. The second risk is the squared-error with infinite training data. Note that the reduction of the risk between these two extreme cases is modest, and that the attenuating factor increases towards unity for applications with more possible outcomes. Figure \ref{fig:Risk_SE_uniform_N_lim} illustrates the difference between these cases.
 
@@ -2055,7 +2083,7 @@ providing a lower bound for the achievable 0-1 Bayes risk. The above formulation
 PGR: harmonic reference?
 
 
-Figure \ref{fig:Risk_01_uni_N_leg_My} demonstrates how the minimum 0-1 risk decreases with training volume $N$; observe that the risk is more severe for sequences corresponding to higher $|\Ycal|$. It is sensible that the probability of error should increase when more classes have to be considered. Figure \ref{fig:Risk_01_uni_N_leg_Mx} illustrates the minimum risk with multiple sequences for different cardinalities $|\Xcal|$. Note that risk increases with $|\Xcal|$. Considering $N \Erm_{\Drm}\big[\Psim(\Drm)\big] = N \mu_{\uppsim} = N/|\Xcal|$, this should be intuitive - each conditional empirical distribution $\Psic(x;D)$ is forced to approximate $\upthetac(x)$ with fewer data.
+Figure \ref{fig:Risk_01_uni_N_leg_My} demonstrates how the minimum 0-1 risk decreases with training volume $N$; observe that the risk is more severe for sequences corresponding to higher $|\Ycal|$. It is sensible that the probability of error should increase when more classes have to be considered. Figure \ref{fig:Risk_01_uni_N_leg_Mx} illustrates the minimum risk with multiple sequences for different cardinalities $|\Xcal|$. Note that risk increases with $|\Xcal|$. Considering $N \Erm_{\Xrm}\big[\Psim(\Xrm)\big] = N \mu_{\uppsim} = N/|\Xcal|$, this should be intuitive - each conditional empirical distribution $\Psic(x;D)$ is forced to approximate $\upthetac(x)$ with fewer data.
 
 \begin{figure}
 \centering
@@ -2440,7 +2468,7 @@ The covariance function is thus
 
 The marginal distribution $\upthetam$ and the conditional distribution $\upthetac$ are also of interest. Define the bijection $\alpha \Leftrightarrow (\alpham,\alphac)$, where $\alpham \equiv \int_{\Ycal} \alpha(y,\cdot) {\drm}y$ (and $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x)$) for each $x \in \Xcal$. Again, $\alpham \in \Pcal(\Xcal)$ and $\alphac \in \Pcal(\Ycal)^{\Xcal}$.
 
-By the continuous-domain Dirichlet process properties detailed in Appendix \ref{app:DP}, $\upthetam \sim \DP(\alpha_0,\alpham)$ is a Dirichlet random process parameterized by concentration $\alpha_0$ and distribution $\alpham$; observe that the PDF $\prm_{\xrm} = \mu_{\upthetam} = \alpham$. Also, the functions $\upthetac(x) \sim \DP\big(\delta(0)^{-1} \alpha_0 \alpham(x), \alphac(x)\big)$ are independent Dirichlet processes and are independent of $\upthetam$ as well. Note that $\prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$. 
+By the continuous-domain Dirichlet process properties detailed in Appendix \ref{app:DP}, $\upthetam \sim \DP(\alpha_0,\alpham)$ is a Dirichlet random process parameterized by concentration $\alpha_0$ and distribution $\alpham$; observe that the PDF $\prm_{\xrm} = \mu_{\upthetam} = \alpham$. Also, the functions $\upthetac(x) \sim \DP\big(\delta(0)^{-1} \alpha_0 \alpham(x), \alphac(x)\big)$ are independent Dirichlet processes and are independent of $\upthetam$ as well. Note that $\prm_{\yrm | \xrm} = \mu_{\upthetac}(\xrm) = \alphac(\xrm)$. 
 
 
 
@@ -2455,7 +2483,7 @@ where $\Psi(y,x;D) = N^{-1} \sum_{n=1}^N \delta\big( (y,x) - D_n \big)$.
 
 Recall that $\Drm_n \Leftrightarrow \big( \Yrm_n,\Xrm_n \big)$, where $\Yrm \in \Ycal^N$ and $\Xrm \in \Xcal^N$. Since $\prm_{\yrm,\xrm | \Drm} = \mu_{\uptheta | \Drm}$, by Bayes rule the marginal PDF is
 \begin{IEEEeqnarray}{rCl}
-\prm_{\xrm | \Drm} & = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \alpham + \left(\frac{N}{\alpha_0+N}\right) \Psim(\Drm) \;,
+\prm_{\xrm | \Drm} \equiv \prm_{\xrm | \Xrm} & = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \alpham + \left(\frac{N}{\alpha_0+N}\right) \Psim(\Xrm) \;,
 \end{IEEEeqnarray}
 and the conditional PDF of interest is
 \begin{IEEEeqnarray}{rCl}
@@ -2493,7 +2521,7 @@ Similarly, using the empirical statistic representation, the likelihood of $\xrm
 \begin{IEEEeqnarray}{rCl}
 \mu_{\upthetac(x) | \uppsim(x),\uppsic(x)} & = & \left(\frac{\alpha_0 \alpham(x)}{\alpha_0 \alpham(x)+N \uppsim(x)}\right) \alphac(x) + \left(\frac{N \uppsim(x)}{\alpha_0 \alpham(x)+N \uppsim(x)}\right) \uppsic(x) \nonumber \;.
 \end{IEEEeqnarray}
-Recall that $\prm_{\yrm | \xrm,\uppsi} \equiv \mu_{\upthetac(\xrm) | \uppsim(\xrm),\uppsic(\xrm)}$.
+Recall that $\prm_{\yrm | \xrm,\uppsi}(x, \psi) \equiv \mu_{\upthetac(x) | \uppsim(x),\uppsic(x)}\big( \psim(x), \psic(x) \big)$.
 
 
 \todomid{sim, otimes notation??}
