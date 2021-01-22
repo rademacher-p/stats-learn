@@ -375,7 +375,7 @@ Also observed is a random sequence of $N$ samples from $\uptheta$, denoted $\Drm
 
 \subsection{Marginal and Conditional Model Distributions}
 
-As only $\yrm$ is unobservable, it will be useful to alternatively represent the model distribution via the bijection $\uptheta \Leftrightarrow (\upthetam,\upthetac)$. First, introduce the marginal distribution $\upthetam \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) \in \Pcal(\Xcal)$; note that the summation is replaced by an integral when $\yrm$ is a continuous random variable. Next, introduce the conditional distributions $\upthetac \in \Pcal(\Ycal)^{\Xcal}$ defined as $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x)$. Observe that $\Prm_{\xrm | \uptheta} \equiv \Prm_{\xrm | \upthetam} = \upthetam$ and $\Prm_{\yrm | \xrm, \uptheta} \equiv \Prm_{\yrm | \xrm, \upthetac(\xrm)} = \upthetac(\xrm)$.
+As only $\yrm$ is unobservable, it will be useful to alternatively represent the model distribution via the bijection $\uptheta \Leftrightarrow (\upthetam,\upthetac)$. First, introduce the marginal distribution $\upthetam \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) \in \Pcal(\Xcal)$; note that the summation is replaced by an integral when $\yrm$ is a continuous random variable. Next, introduce the conditional distributions $\upthetac \in \Pcal(\Ycal)^{\Xcal}$ defined as $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x)$. Observe that $\Prm_{\xrm | \uptheta} \equiv \Prm_{\xrm | \upthetam} = \upthetam$ and $\Prm_{\yrm | \xrm, \uptheta} \equiv \Prm_{\yrm | \xrm, \upthetac} = \upthetac(\xrm)$.
 
 
 
@@ -456,8 +456,7 @@ This trend underscores the identifiability of the model $\theta$.
 
 Also, using the maximum likelihood estimate of a Multinomial distribution \cite{rao}, the maximum likelihood estimate of $\theta$ given the training data empirical model is simply
 \begin{IEEEeqnarray}{rCl}
-\theta_\mathrm{ML}\big( \psi \big) & = & \argmax_{\theta \in \Uptheta} \Prm_{\uppsi | \uptheta}(\psi | \theta) \\ \nonumber
-& = & \psi \;.
+\theta_\mathrm{ML}\big( \psi \big) & = & \argmax_{\theta \in \Uptheta} \Prm_{\uppsi | \uptheta}(\psi | \theta) = \psi \;.
 \end{IEEEeqnarray}
 
 
@@ -510,7 +509,7 @@ Also of interest is the conditional distribution of $\uppsic \in \Uppsic$, where
 \Prm_{\uppsic | \uppsim, \uptheta} & \equiv & \bigotimes_{x \in \Xcal} \Prm_{\uppsic(x) | \uppsim(x), \upthetac(x)} \\
 & = & \bigotimes_{x \in \Xcal} \Emp\Big(N \uppsim(x), \upthetac(x) \Big) \nonumber \;,
 \end{IEEEeqnarray}
-over the domain $\prod_{x \in \Xcal} \left\{ \frac{n}{N \psim(x)}: n \in {\Zbbgeq}^{\Ycal}, \ \sum_{y \in \Ycal} n(y) = N \psim(x) \right\}$. Observe that conditioning on the marginal empirical process renders the conditional processes $\uppsic(x)$ independent of one another and that they are also Empirically distributed, such that $\uppsic(x) | \uppsim(x),\upthetac(x) \sim \Emp\big( N \uppsim(x),\upthetac(x) \big)$. 
+over the domain $\prod_{x \in \Xcal} \left\{ \frac{n}{N \psim(x)}: n \in {\Zbbgeq}^{\Ycal}, \ \sum_{y \in \Ycal} n(y) = N \psim(x) \right\}$. Observe that conditioning on the marginal empirical process renders the conditional processes $\uppsic(x)$ independent of one another and that they are also Empirically distributed, such that $\uppsic(x) | \uppsim(x),\upthetac(x) \sim \Emp\big( N \uppsim(x),\upthetac(x) \big)$ for every $x \in \Xcal$. 
 
 \todohigh{otimes for all? ordered set? use sim notation?}
 
@@ -949,8 +948,6 @@ Substituting the optimal learning function \eqref{eq:f_opt_01} into the general 
 
 \todohi{Generalize discussion/math for infinite-countable domains?}
 
-\todomid{Delete unneeded uniform figs}
-
 \todohigh{Figs BROKEN from alpha changes}
 
 \todohigh{Uncoupled m/c alphas = non-Dir Ptheta??}
@@ -1038,14 +1035,7 @@ When the Dirichlet parameters are $\alpha(y,x) = \big( |\Ycal||\Xcal| \big)^{-1}
 \begin{equation}
 \prm_{\uptheta} = \big( |\Ycal||\Xcal|-1 \big)! \;.
 \end{equation}
-Figure \ref{fig:P_theta_uniform} shows the uniform distribution amplitude for $|\Ycal| = 3$ and $|\Xcal| = 1$.
 
-\begin{figure}
-\centering
-\includegraphics[width=0.7\linewidth]{P_theta_uniform.pdf}
-\caption{Uniform model prior PDF, $|\Ycal| = 3$, $|\Xcal| = 1$}
-\label{fig:P_theta_uniform}
-\end{figure}
 
 
 
@@ -1190,12 +1180,6 @@ and
 \Prm_{\uppsi} & = & |\Uppsi|^{-1} = \Mcal\big( (N,|\Ycal||\Xcal|-1) \big)^{-1} \;.
 \end{IEEEeqnarray}
 The distribution of $\uppsi$ is uniform over the set $\Uppsi$. The PMF for $\Drm$ depends on the training data only through the multinomial coefficient; consequently, more ``concentrated''  training sets are more probable.
-\begin{figure}
-\centering
-\includegraphics[width=0.7\linewidth]{P_nbar_uni.pdf}
-\caption{$\Prm_{\uppsi}$ for uniform prior}
-\label{fig:P_nbar_uni}
-\end{figure}
 
 
 
