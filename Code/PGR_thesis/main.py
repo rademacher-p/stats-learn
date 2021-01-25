@@ -15,7 +15,7 @@ from thesis.preprocessing import discretizer
 from thesis.util import spaces
 
 # plt.style.use('seaborn')
-plt.style.use(['science'])
+# plt.style.use(['science'])
 
 
 #%% Sim
