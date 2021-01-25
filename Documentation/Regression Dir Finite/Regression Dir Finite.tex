@@ -260,10 +260,10 @@ where $\gamma(x; \uppsim) = \left( 1 + \frac{N \uppsim(x)}{\alpha_0 \alpham(x)} 
 Note that as the prior localization increases relative to the training data volume, $\gamma(x; \uppsim) \to 1$ and the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior. Conversely, for large training sets, $\gamma(x; \uppsim) \to 0$ and the mean tends to $\uppsic(x)$. Also, as $N \uppsim(x) \to \infty$, the PDF $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$ and the model is positively identified. This is a consequence of the full support of the Dirichlet distribution and does not hold in general. The adaptation of the posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde} for $\alpha_0 \alpham(x) = 6$ and $N \psim(x) = 3$.
 %Note that as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to 0$, the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior mean. Conversely, as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to \infty$, the mean tends to $\uppsic(x)$. Also, for larger training sets $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$ and the model is positively identified. This is a consequence of the full support of the Dirichlet distribution and does not hold in general. The adaptation of the posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde} for $\alpha_0 \alpham(x) = 6$ and $N \psim(x) = 3$.
 \begin{figure}
-	\centering
-	\includegraphics[width=1\linewidth]{P_theta_post_SSP.pdf}
-	\caption{Model prior $\prm_{\upthetac(x)}$ and posterior $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)}$}
-	\label{fig:P_theta_post_tilde}
+\centering
+\includegraphics[width=1\linewidth]{P_theta_post_SSP.pdf}
+\caption{Model prior $\prm_{\upthetac(x)}$ and posterior $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)}$}
+\label{fig:P_theta_post_tilde}
 \end{figure}
 
 
