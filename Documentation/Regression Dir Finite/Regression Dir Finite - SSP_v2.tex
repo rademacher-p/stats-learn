@@ -110,7 +110,7 @@
 
 
 \begin{abstract}
-When taking a Bayesian approach to machine learning applications, the performance of the learned function strongly depends on how well the prior distribution selected by the designer matches the true data-generating model. Dirichlet priors have a number of desirable properties - they result in closed-form posterior distributions given independent training data, have full support over the space of data probability distributions, and can be maximally informative or non-informative depending on their localization parameter. This paper assumes a Dirichlet prior and details the predictive distributions that characterize unobservable random quantities given observed data. The results are then applied to the most common loss function for regression, the squared-error loss. The optimal Bayes estimator and the resultant risk trends are presented for different prior localizations, demonstrating a bias/variance trade-off. 
+When taking a Bayesian approach to machine learning applications, the performance of the learned function strongly depends on how well the prior distribution selected by the designer matches the true data-generating model. Dirichlet priors have a number of desirable properties - they result in closed-form posterior distributions given independent training data, have full support over the space of data probability distributions, and can be maximally informative or non-informative depending on their localization parameter. This paper assumes a Dirichlet prior and details the predictive distributions that characterize unobservable random quantities given observed data. The results are then applied to the most common loss function for regression, the squared-error loss. The optimal Bayes estimator and the resultant risk trends are presented for different prior localizations, demonstrating a bias/variance trade-off.
 \end{abstract}
 
 \begin{keywords}
@@ -123,7 +123,7 @@ Bayesian learning, machine learning, regression, estimation, Dirichlet distribut
 
 The success or failure of Bayesian learning methods hinge on how well the prior knowledge imparted by the designer matches reality. The chosen prior distribution over the set of data-generating probability distributions reflects the users confidence that different models are responsible for generating the observed/unobserved random elements. If a highly localized, ``informative" prior is chosen that strongly weights the actual data model, low risk learning functions are possible even with limited training data; however, if the localized prior is poorly selected, a good solution may not be achieved. Conversely, a non-informative prior provides fast adaptation during training and can be suitable for a variety of problems; if data is limited, however, the learning function may not deliver satisfactory performance.
 
-This work assumes that the observed and unobserved data elements are jointly characterized by a Dirichlet prior. The class of Dirichlet probability density functions (PDF) has the desirable property of full support, guaranteeing consistent estimation of the true data-generating distribution; it also leads to a closed-form posterior distribution for independently and identically distributed (i.i.d.) data \cite{ferguson}. Furthermore, control of the Dirichlet parameters enables both minimally and maximally informative priors, providing a wide range of learning solutions.
+This work assumes that the observed and unobserved data elements are jointly characterized by a Dirichlet prior. The class of Dirichlet probability density functions (PDF) has the desirable properties of full support over the set of possible data-generating distributions and a closed-form posterior distribution for independently and identically distributed (i.i.d.) data \cite{ferguson}. Furthermore, control of the Dirichlet parameters enables both minimally and maximally informative priors, providing a wide range of learning solutions.
 
 After motivating the Bayesian perspective and using the Dirichlet prior to generate the predictive distribution, the results will be applied to the squared error loss function. The Bayes optimal estimator and the achieved risk will be presented. Results will demonstrate a bias/variance risk trade-off dependent on prior parameterization, exemplifying the balance between prior knowledge and data utilization.
 
@@ -344,29 +344,21 @@ Both functions are scaled by factors dependent on the conditional prior localiza
 
 Consider the trends of the excess squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. As $N$ tends to infinity, the distributions $\Prm_{\uppsim(x) | \upthetam(x)}$ concentrate such that $\uppsim(x) \to \thetam(x)$; thus for $\thetam(x) > 0$, the weights $\lambda_{\text{Var}}(x)$ and $\lambda_{\text{Bias}}(x)$ both tend to zero and $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable result is a consequence of the full support of the Dirichlet prior, which ensures the convergence of $\upthetac(x) | \uppsim(x),\uppsic(x) \to \uppsic(x)$ as $N \to \infty$.
 
-%An interesting point regarding the dependency of the excess risk on $N$ is that there may be a local maximum. To demonstrate, consider the case of $|\Xcal| = 1$; treating $N$ as a real number, there would be a maximum at 
-%\begin{equation}
-%N = \alpha_0 \left( 1 - 2 \alpha_0 \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2}{\Sigma_{\yrm | \xrm,\upthetac}} \right) \;.
-%\end{equation}
-%If the prior estimate $\mu_{\yrm | \xrm}$ has low bias and yet the prior confidence $\alpha_0$ is small, a local maximum may occur and additional training data may (temporarily) compromise the estimator performance. 
-%
-%Figure \ref{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased} exemplifies the excess conditional squared-error as a function of $N$ for such estimators with varying localization $\alpha_0$. The variable $\yrm$ is a discretization of the unit interval, such that $\Ycal = \{i/256: i \in 0,\ldots,255\}$, with $\thetac(y;x) = 1/256$ and $\alphac(y;x) = \Bi(256y;255,0.5)$.
-%\begin{figure}
-%\centering
-%\includegraphics[width=1\linewidth]{SSP_2021/Risk_cond_SE_Dir_N_leg_a0_unbiased.pdf}
-%\caption{Squared-Error Risk vs. $N$ for unbiased estimators}
-%\label{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased}
-%\end{figure}
+An interesting point regarding the dependency of the excess risk on $N$ is that there may be a local maximum. To demonstrate, consider the case of $|\Xcal| = 1$; treating $N$ as a real number, there would be a maximum at 
+\begin{equation}
+N = \alpha_0 \left( 1 - 2 \alpha_0 \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2}{\Sigma_{\yrm | \xrm,\upthetac}} \right) \;.
+\end{equation}
+If the prior estimate $\mu_{\yrm | \xrm}$ has low bias and yet the prior confidence $\alpha_0$ is small, a local maximum may occur and additional training data may (temporarily) compromise the estimator performance. 
 
-
-To demonstrate the efficacy of this estimator, consider a data model where $\Xcal$ and $\Ycal$ are 128-point discretizations of the unit interval. The PMF $\thetam(x)$ is constant and $\thetac(y;x) = \Bi(128y; 128, \mu_{\yrm | \xrm,\uptheta}(x))$, where $\mu_{\yrm | \xrm,\uptheta}(x) = 1 / \big(2 + \sin(2\pi x)\big)$. Figure \ref{fig:Risk_cond_SE_N_biased_hard} compares the Dirichlet-based estimator to the clairvoyant estimator $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$, as well as to a Bayesian linear regressor using a Gaussian prior \cite{theodoridis-ML}. Note that only the Dirichlet estimator can achieve zero excess risk.
-
+Figure \ref{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased} exemplifies the excess conditional squared-error as a function of $N$ for such estimators with varying localization $\alpha_0$. The variable $\yrm$ is a discretization of the unit interval, such that $\Ycal = \{i/256: i \in 0,\ldots,255\}$, with $\thetac(y;x) = 1/256$ and $\alphac(y;x) = \Bi(256y;255,0.5)$.
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth]{SSP_2021/Risk_cond_SE_N_biased_hard.png}
-\caption{Squared-Error vs. training data volume $N$}
-\label{fig:Risk_cond_SE_N_biased_hard}
+\includegraphics[width=1\linewidth]{SSP_2021/Risk_cond_SE_Dir_N_leg_a0_unbiased.pdf}
+\caption{Squared-Error Risk vs. $N$ for unbiased estimators}
+\label{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased}
 \end{figure}
+
+
 
 Next consider the effects of the conditional prior localizations $\alpha'(x) \equiv \alpha_0 \alpham(x)$, which control a bias/variance risk trade-off. For maximal localization $\alpha'(x) \to \infty$, $\lambda_{\text{Bias}}(x) \to 1$ and $\lambda_{\text{Var}}(x) \to 0$. This is intuitive given that the estimator tends toward the data-independent solution. Conversely, for $\alpha'(x) \to 0$, $\lambda_{\text{Bias}}(x) \to \big( 1 - \upthetam(\xrm) \big)^N$ and $\lambda_{\text{Var}}(x) \to \Erm_{\uppsim(x) | \upthetam(x)}\left[ \big( N \uppsim(x) \big)^{-1} \right]$. Note that the variance weight is equivalent to the first inverse moment of a positive binomial random variable \cite{stephan}. 
 

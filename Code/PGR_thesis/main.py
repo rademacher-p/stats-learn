@@ -27,24 +27,25 @@ def func_mean_to_models(n, func):
     return [rand_elements.EmpiricalScalar(n - 1, func(x_i)) for x_i in np.linspace(0, 1, n, endpoint=True)]
 
 
-n_x = 11
+n_x = 128
 
 
 # True model
 
-model = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
-                                                supp_x=[0, .5], p_x=None)
+# model = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
+#                                                 supp_x=[0, .5], p_x=None)
 
 
 w_model = [0, 0, 1]
+# w_model = [0, 0, 0, 0, 1]
 # w_model = [.3, 0., .4]
 # w_model = [.5, 0, 0]
 
 
 # model = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_model),
 #                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
-# model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, lambda x: 1 / (2 + np.sin(2*np.pi * x))),
-#                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
+model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, lambda x: 1 / (2 + np.sin(2*np.pi * x))),
+                                                supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
 # model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=100, model_x=rand_elements.Beta())
 # model = rand_models.BetaLinear(weights=[1], basis_y_x=[lambda x: 1 / (2 + np.sin(2*np.pi * x))], alpha_y_x=100,
@@ -73,11 +74,11 @@ w_prior = [.5, 0]
 # Dirichlet learner
 proc_funcs = []
 
-prior_mean = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.9, .1)],
-                                                     supp_x=[0, .5], p_x=None)
+# prior_mean = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.9, .1)],
+#                                                      supp_x=[0, .5], p_x=None)
 
-# prior_mean = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_prior),
-#                                                      supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
+prior_mean = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_prior),
+                                                     supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
 
 # prior_mean_x = rand_elements.Beta()
@@ -95,7 +96,10 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), p
 # dir_params = None
 # dir_params = {'alpha_0': [2, 16]}
 # dir_params = {'alpha_0': [.1, 50]}
-dir_params = {'alpha_0': .001 + np.arange(0, 20, .5)}
+# dir_params = {'alpha_0': [.01, 100]}
+dir_params = {'alpha_0': [.01]}
+# dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
+# dir_params = {'alpha_0': 1e-6 + np.concatenate((np.linspace(0, 10, 100), np.linspace(10, 50, 10)))}
 
 
 # Normal learner
@@ -104,35 +108,39 @@ norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, pr
                                                           model_x=prior_mean.model_x), name='Norm')
 
 # norm_params = None
-norm_params = {'prior_cov': [10, 0.05]}
-# norm_params = {'prior_cov': [10]}
+# norm_params = {'prior_cov': [10, 0.05]}
+# norm_params = {'prior_cov': [100, .01]}
+norm_params = {'prior_cov': [100]}
 
 
 # Plotting
 
-# n_train = 10
-n_train = [0, 2, 8]
-# n_train = np.arange(0, 50, 5)
+n_train = 200
+# n_train = [0, 10, 100]
+# n_train = np.arange(0, 500, 20)
 
 # print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
 # dir_predictor.plot_risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
 
 
 temp = [
-    # (opt_predictor, None),
-    # (norm_predictor, norm_params),
+    (opt_predictor, None),
     (dir_predictor, dir_params),
+    (norm_predictor, norm_params),
 ]
 
 predictors, params = list(zip(*temp))
 
+# FIXME: discrete plot for predict stats
+# TODO: save fig
+# TODO: redo SSP p_dir fig
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=20000,
-                           verbose=True, ax=None, rng=None)
+# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=200,
+#                            verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, n_test=1, verbose=False, ax=None)
 
-# plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=500,
-#                            do_std=True, verbose=True, ax=None, rng=None)
+plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=200,
+                           do_std=True, verbose=True, ax=None, rng=None)
 
 
 # print(f"\nAnalytical Risk = {opt_predictor.evaluate_comp(n_train=n_train)}")
