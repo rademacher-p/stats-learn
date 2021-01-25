@@ -125,7 +125,7 @@ The success or failure of Bayesian learning methods hinge on how well the prior 
 
 This work assumes that the observed and unobserved data elements are jointly characterized by a Dirichlet prior. The class of Dirichlet probability density functions (PDF) has the desirable property of full support, guaranteeing consistent estimation of the true data-generating distribution; it also leads to a closed-form posterior distribution for independently and identically distributed (i.i.d.) data \cite{ferguson}. Furthermore, control of the Dirichlet parameters enables both minimally and maximally informative priors, providing a wide range of learning solutions.
 
-After motivating the Bayesian perspective and using the Dirichlet prior to generate the predictive distribution, the results will be applied to the squared error loss function. The Bayes optimal estimator and the achieved risk will be presented. Results will demonstrate a bias/variance risk trade-off dependent on prior parameterization, exemplifying the balance between prior knowledge and data utilization.
+After motivating the Bayesian perspective and using the Dirichlet prior to generate the predictive distribution, the results will be applied to the squared error loss function. The Bayes optimal estimator and the achieved risk will be presented. Results will demonstrate a bias/variance risk trade-off dependent on prior parameterization, exemplifying the balance between prior knowledge and data utilization. Comparison with a classical Bayesian regressor will be performed.
 
 
 
@@ -342,6 +342,13 @@ Closed-forms have not been found for the empirical process expectations in \eqre
 
 \subsubsection{Trends}
 
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{SSP_2021/Predict_SE_biased_hard_comp_2.png}
+	\caption{Estimator statistics, average and standard deviation}
+	\label{fig:Predict_SE_biased_hard_comp_2}
+\end{figure}
+
 Consider the trends of the excess squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. As $N$ tends to infinity, the distributions $\Prm_{\uppsim(x) | \upthetam(x)}$ concentrate such that $\uppsim(x) \to \thetam(x)$; thus for $\thetam(x) > 0$, the weights $\lambda_{\text{Var}}(x)$ and $\lambda_{\text{Bias}}(x)$ both tend to zero and $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable result is a consequence of the full support of the Dirichlet prior, which ensures the convergence of $\upthetac(x) | \uppsim(x),\uppsic(x) \to \uppsic(x)$ as $N \to \infty$.
 
 %An interesting point regarding the dependency of the excess risk on $N$ is that there may be a local maximum. To demonstrate, consider the case of $|\Xcal| = 1$; treating $N$ as a real number, there would be a maximum at 
@@ -371,19 +378,12 @@ Note that the minimizing localization values $\alpha'(x)$ are inversely proporti
 
 
 \section{Examples}
-To demonstrate the efficacy of Dirichlet prior regressors, consider a data model where $\Xcal$ and $\Ycal$ are 128-point discretizations of the unit interval. The PMF $\thetam$ is uniform and $\thetac(y;x) = \Bi(128y; 128, \mu_{\yrm | \xrm,\uptheta}(x))$, where the clairvoyant regressor $\mu_{\yrm | \xrm,\uptheta}(x) = 1 / \big(2 + \sin(2\pi x)\big)$. The Dirichlet estimator has $\alphac(y;x) = \Bi(128y; 128, 0.5)$. For comparison, a Bayesian linear regressor using a Gaussian prior $\Ncal\big([0, 0.5], \sigma^2_{\uptheta} \bm{I}\big)$ and $\sigma^2_{\yrm | \xrm}$ is evaluated, as well \cite{theodoridis-ML}.
+To demonstrate the efficacy of Dirichlet-based regressors, consider a data model where $\Xcal$ and $\Ycal$ are 128-point discretizations of the unit interval. The PMF $\thetam$ is uniform and $\thetac(y;x) = \Bi\big(128y; 128, \mu_{\yrm | \xrm,\uptheta}(x)\big)$, where the clairvoyant regressor is $\mu_{\yrm | \xrm,\uptheta}(x) = 1 / \big(2 + \sin(2\pi x)\big)$. The Dirichlet estimator is parameterized by $\alpham = \thetam$ and $\alphac(y;x) = \Bi(128y; 128, 0.5)$. For comparison, a Bayesian linear regressor \cite{theodoridis-ML} using $\sigma^2_{\yrm | \xrm}=0.1$ and a Gaussian prior $\Ncal\big([0, 0.5], \sigma^2_{\uptheta} \bm{I}\big)$ is evaluated, as well.
 
-Figure \ref{fig:Predict_SE_biased_hard_comp_2} 
+Figure \ref{fig:Predict_SE_biased_hard_comp_2} provides a statistical visualization (mean and standard deviation) of the achieved regression functions. Observe that lower prior localization decreases prediction bias, but leads to more severe variance. Unlike the Bayesian linear regressor, the Dirichlet estimator has a prior sufficiently rich for approximation of complex non-linear functions.
 
-Figure \ref{fig:Risk_cond_SE_N_biased_hard} compares the Dirichlet-based estimator.... Note that only the Dirichlet estimator can achieve zero excess risk with sufficient data.
 
-\begin{figure}
-\centering
-\includegraphics[width=1\linewidth]{SSP_2021/Predict_SE_biased_hard_comp_2.png}
-\caption{Estimator statistics}
-\label{fig:Predict_SE_biased_hard_comp_2}
-\end{figure}
-
+Figure \ref{fig:Risk_cond_SE_N_biased_hard} shows the resultant expected squared-error as a function of $N$. Note that only the Dirichlet estimator can achieve zero excess risk, by virtue of its full support prior. Furthermore, with sufficient data, its performance will approach that of the clairvoyant estimator regardless of how biased the prior conditional mean $\alphac$ might be, or how much confidence in $\alphac$ is indicated through the prior localization $\alpha_0$.
 \begin{figure}
 \centering
 \includegraphics[width=1\linewidth]{SSP_2021/Risk_cond_SE_N_biased_hard.png}
@@ -393,21 +393,13 @@ Figure \ref{fig:Risk_cond_SE_N_biased_hard} compares the Dirichlet-based estimat
 
 
 
-
-
-These trends are demonstrated in Figure \ref{fig:Risk_cond_SE_Dir_a0_leg_N_biased} for a biased prior distribution with $\alphac(y;x) = \Bi(256y;255,0.75)$.
+%These trends are demonstrated in Figure \ref{fig:Risk_cond_SE_Dir_a0_leg_N_biased} for a biased prior distribution with $\alphac(y;x) = \Bi(256y;255,0.75)$.
 %\begin{figure}
 %	\centering
-%	\includegraphics[width=0.9\linewidth]{Risk_cond_SE_Dir_a0_leg_N_unbiased.pdf}
-%	\caption{Conditional SE Risk versus $\alpha_0 \alpham(x)$, unbiased Dirichlet estimator using varying training set volumes}
-%	\label{fig:Risk_cond_SE_Dir_a0_leg_N_unbiased}
+%	\includegraphics[width=0.95\linewidth]{SSP_2021/Risk_cond_SE_Dir_a0_leg_N_biased.pdf}
+%	\caption{Squared-Error Risk vs. $\alpha_0$ for a biased estimator}
+%	\label{fig:Risk_cond_SE_Dir_a0_leg_N_biased}
 %\end{figure}
-\begin{figure}
-	\centering
-	\includegraphics[width=0.95\linewidth]{SSP_2021/Risk_cond_SE_Dir_a0_leg_N_biased.pdf}
-	\caption{Squared-Error Risk vs. $\alpha_0$ for a biased estimator}
-	\label{fig:Risk_cond_SE_Dir_a0_leg_N_biased}
-\end{figure}
 
 
 
@@ -419,8 +411,7 @@ These trends are demonstrated in Figure \ref{fig:Risk_cond_SE_Dir_a0_leg_N_biase
 
 This paper has assumed a Dirichlet prior for Bayesian learning and applied the resultant predictive distribution to squared-error regression. Closed-forms have been provided for the optimal estimator and the achieved risk. Analysis and graphical examples highlight risk trends as a function of training data volume and the Dirichlet prior localization, demonstrating a bias/variance risk trade-off.
 
-Future work will generalize these concepts for data drawn from continuous spaces using the continuous Dirichlet process \cite{gershman}. Additionally, these estimators will be compared to classical methods such as generalized linear regression. The inherent adaptability due to the full prior support will highlight the utility of these Bayesian estimators for a wide range of regression problems; however, for data-limited problems, the ``prior knowledge'' implied by classical methods can yield superior performance when the data model is well understood.
-
+Future work will generalize these concepts for data drawn from continuous spaces using the continuous Dirichlet process \cite{gershman}. The inherent adaptability due to the full prior support will highlight the utility of these Bayesian estimators for a wide range of regression problems; for data-limited applications, however, additional analysis is required to determine when limited-support priors are a practical necessity.
 
 
 

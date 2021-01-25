@@ -15,7 +15,7 @@ from thesis.preprocessing import discretizer
 from thesis.util import spaces
 
 # plt.style.use('seaborn')
-# plt.style.use(['science'])
+plt.style.use(['science'])
 
 
 #%% Sim
@@ -118,7 +118,7 @@ norm_params = {'prior_cov': [100, .01]}
 
 # n_train = 250
 # n_train = [0, 10, 100]
-n_train = np.arange(0, 620, 20)
+n_train = np.arange(0, 520, 20)
 
 # print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
 # dir_predictor.plot_risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
@@ -136,7 +136,7 @@ predictors, params = list(zip(*temp))
 # TODO: save fig
 # TODO: redo SSP p_dir fig
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=400,
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=200,
                            verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, n_test=1, verbose=False, ax=None)
 
