@@ -333,9 +333,9 @@ and
 %lambda__{\text{Bias}}(x) & = & \Erm_{\uppsim(x) | \upthetam(x)}\left[ \left(\frac{\alpha_0 \alpham(x)}{\alpha_0 \alpham(x) + N \uppsim(x)}\right)^2 \right] \;.
 %\end{IEEEeqnarray}
 
-The first function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. The second function depends on $\Sigma_{\yrm | \xrm,\upthetac}$ and measures the estimator variance in excess of the clairvoyant squared-error $\Rcal_{\Theta}^*(\uptheta)$.
-
-Both functions are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam(x)$ and $N$ via expectations with respect to $\Prm_{\uppsim(x) | \upthetam(x)}$. By the aggregation property of empirical distributions, $N \uppsim(x) | \upthetam(x) \sim \Bi\big(N,\upthetam(x)\big)$ is binomially distributed. Closed-forms have not been found for the empirical process expectations in \eqref{eq:bias} and \eqref{eq:var}.
+The first function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. The second function depends on $\Sigma_{\yrm | \xrm,\upthetac}$ and measures the estimator variance in excess of the clairvoyant squared-error $\Rcal_{\Theta}^*(\uptheta)$. Both functions are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam(x)$ and $N$ via expectations with respect to $\Prm_{\uppsim(x) | \upthetam(x)}$. 
+%By the aggregation property of empirical distributions, $N \uppsim(x) | \upthetam(x) \sim \Bi\big(N,\upthetam(x)\big)$ is binomially distributed. 
+Closed-forms have not been found for the empirical process expectations in \eqref{eq:bias} and \eqref{eq:var}.
 
 
 
@@ -358,8 +358,31 @@ Consider the trends of the excess squared-error risk \eqref{eq:risk_cond_SE_dir_
 %\label{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased}
 %\end{figure}
 
+Next consider the effects of the conditional prior localizations $\alpha'(x) \equiv \alpha_0 \alpham(x)$, which control a bias/variance risk trade-off. For maximal localization $\alpha'(x) \to \infty$, $\lambda_{\text{Bias}}(x) \to 1$ and $\lambda_{\text{Var}}(x) \to 0$. This is intuitive given that the estimator tends toward the data-independent solution. Conversely, for $\alpha'(x) \to 0$, $\lambda_{\text{Bias}}(x) \to \big( 1 - \upthetam(\xrm) \big)^N$ and $\lambda_{\text{Var}}(x) \to \Erm_{\uppsim(x) | \upthetam(x)}\left[ \big( N \uppsim(x) \big)^{-1} \right]$. Note that the variance weight is equivalent to the first inverse moment of a positive binomial random variable \cite{stephan}.
 
-To demonstrate the efficacy of this estimator, consider a data model where $\Xcal$ and $\Ycal$ are 128-point discretizations of the unit interval. The PMF $\thetam(x)$ is constant and $\thetac(y;x) = \Bi(128y; 128, \mu_{\yrm | \xrm,\uptheta}(x))$, where $\mu_{\yrm | \xrm,\uptheta}(x) = 1 / \big(2 + \sin(2\pi x)\big)$. Figure \ref{fig:Risk_cond_SE_N_biased_hard} compares the Dirichlet-based estimator to the clairvoyant estimator $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$, as well as to a Bayesian linear regressor using a Gaussian prior \cite{theodoridis-ML}. Note that only the Dirichlet estimator can achieve zero excess risk.
+The values $\alpha'(x)$ that minimize the excess squared-error for given prior conditional distributions $\alphac(x)$ are of interest. Calculating the first derivative, it can be shown that (for $N > 0$ and $\thetam(x) > 0$) only one stationary point exists, at 
+\begin{equation} \label{eq:alpha_x_min_Rex}
+\alpha'(\xrm) = \frac{\Sigma_{\yrm | \xrm,\upthetac}}{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2} \;.
+\end{equation}
+This can readily be shown to be the global minimum.
+%Evaluation of the second derivative confirms the local minimum and comparison of the local risk value to the $\alpha'(x) \to 0$ and $\alpha'(x) \to \infty$ values confirms the global minimum.
+
+Note that the minimizing localization values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible - the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low localizations are preferable when the conditional models have low variance; these models can be accurately identified by learners that emphasize the empirical mean, even with limited training data. 
+
+
+\section{Examples}
+To demonstrate the efficacy of Dirichlet prior regressors, consider a data model where $\Xcal$ and $\Ycal$ are 128-point discretizations of the unit interval. The PMF $\thetam$ is uniform and $\thetac(y;x) = \Bi(128y; 128, \mu_{\yrm | \xrm,\uptheta}(x))$, where the clairvoyant regressor $\mu_{\yrm | \xrm,\uptheta}(x) = 1 / \big(2 + \sin(2\pi x)\big)$. The Dirichlet estimator has $\alphac(y;x) = \Bi(128y; 128, 0.5)$. For comparison, a Bayesian linear regressor using a Gaussian prior $\Ncal\big([0, 0.5], \sigma^2_{\uptheta} \bm{I}\big)$ and $\sigma^2_{\yrm | \xrm}$ is evaluated, as well \cite{theodoridis-ML}.
+
+Figure \ref{fig:Predict_SE_biased_hard_comp_2} 
+
+Figure \ref{fig:Risk_cond_SE_N_biased_hard} compares the Dirichlet-based estimator.... Note that only the Dirichlet estimator can achieve zero excess risk with sufficient data.
+
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth]{SSP_2021/Predict_SE_biased_hard_comp_2.png}
+\caption{Estimator statistics}
+\label{fig:Predict_SE_biased_hard_comp_2}
+\end{figure}
 
 \begin{figure}
 \centering
@@ -368,17 +391,11 @@ To demonstrate the efficacy of this estimator, consider a data model where $\Xca
 \label{fig:Risk_cond_SE_N_biased_hard}
 \end{figure}
 
-Next consider the effects of the conditional prior localizations $\alpha'(x) \equiv \alpha_0 \alpham(x)$, which control a bias/variance risk trade-off. For maximal localization $\alpha'(x) \to \infty$, $\lambda_{\text{Bias}}(x) \to 1$ and $\lambda_{\text{Var}}(x) \to 0$. This is intuitive given that the estimator tends toward the data-independent solution. Conversely, for $\alpha'(x) \to 0$, $\lambda_{\text{Bias}}(x) \to \big( 1 - \upthetam(\xrm) \big)^N$ and $\lambda_{\text{Var}}(x) \to \Erm_{\uppsim(x) | \upthetam(x)}\left[ \big( N \uppsim(x) \big)^{-1} \right]$. Note that the variance weight is equivalent to the first inverse moment of a positive binomial random variable \cite{stephan}. 
 
 
-Of primary interest are the values $\alpha'(x)$ that minimize the excess squared-error for given prior conditional distributions $\alphac(x)$. Calculating the first derivative, it can be shown that (for $N > 0$ and $\thetam(x) > 0$) only one stationary point exists, 
-\begin{equation} \label{eq:alpha_x_min_Rex}
-\alpha'(\xrm) = \frac{\Sigma_{\yrm | \xrm,\upthetac}}{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2} \;.
-\end{equation}
-Evaluation of the second derivative confirms the local minimum and comparison of the local risk value to the $\alpha'(x) \to 0$ and $\alpha'(x) \to \infty$ values confirms the global minimum.
 
 
-Note that the minimizing localization values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible - the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low localizations are preferable when the conditional models have low variance; these models can be accurately identified by learners that emphasize the empirical mean, even with limited training data. These trends are demonstrated in Figure  \ref{fig:Risk_cond_SE_Dir_a0_leg_N_biased} for a biased prior distribution with $\alphac(y;x) = \Bi(256y;255,0.75)$.
+These trends are demonstrated in Figure \ref{fig:Risk_cond_SE_Dir_a0_leg_N_biased} for a biased prior distribution with $\alphac(y;x) = \Bi(256y;255,0.75)$.
 %\begin{figure}
 %	\centering
 %	\includegraphics[width=0.9\linewidth]{Risk_cond_SE_Dir_a0_leg_N_unbiased.pdf}
