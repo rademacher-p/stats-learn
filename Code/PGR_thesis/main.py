@@ -108,17 +108,17 @@ norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, pr
                                                           basis_y_x=None, cov_y_x=.1,
                                                           model_x=prior_mean.model_x), name='Norm')
 
-# norm_params = None
+norm_params = None
 # norm_params = {'prior_cov': [10, 0.05]}
-norm_params = {'prior_cov': [100, .01]}
+# norm_params = {'prior_cov': [100, .01]}
 # norm_params = {'prior_cov': [100]}
 
 
 # Plotting
 
-# n_train = 250
+n_train = 200
 # n_train = [0, 10, 100]
-n_train = np.arange(0, 520, 20)
+# n_train = np.arange(0, 520, 20)
 
 # print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
 # dir_predictor.plot_risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
@@ -136,12 +136,12 @@ predictors, params = list(zip(*temp))
 # TODO: save fig
 # TODO: redo SSP p_dir fig
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=200,
-                           verbose=True, ax=None, rng=None)
+# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=200,
+#                            verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, n_test=1, verbose=False, ax=None)
 
-# plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=200,
-#                            do_std=True, verbose=True, ax=None, rng=None)
+plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=50000,
+                           do_std=True, verbose=True, ax=None, rng=None)
 
 
 # print(f"\nAnalytical Risk = {opt_predictor.evaluate_comp(n_train=n_train)}")
