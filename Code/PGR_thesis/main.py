@@ -118,7 +118,7 @@ norm_params = {'prior_cov': [100, .01]}
 
 # n_train = 200
 # n_train = [0, 10, 100]
-n_train = np.arange(0, 620, 20)
+n_train = np.arange(0, 605, 5)
 
 # print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
 # dir_predictor.plot_risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
