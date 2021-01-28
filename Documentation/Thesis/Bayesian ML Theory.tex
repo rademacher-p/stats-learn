@@ -797,7 +797,7 @@ f_{\Theta}(\xrm;\uptheta) & = & \argmin_{h \in \Rbb} \Erm_{\yrm | \xrm,\uptheta}
 & = &  \mu_{\yrm | \xrm,\uptheta} \nonumber \;. %= \sum_{y \in \Ycal} y \upthetac(y;\xrm) 
 \end{IEEEeqnarray}
 Substituting the loss and clairvoyant function into \eqref{eq:risk_clv}, the resulting clairvoyant risk is
-\begin{IEEEeqnarray}{rCl}
+\begin{IEEEeqnarray}{rCl} \label{eq:risk_clv_SE}
 \Rcal_{\Theta}^*(\uptheta) & = & \Erm_{\xrm | \uptheta} \Big[ \Erm_{\yrm | \xrm,\uptheta} \big[ (\yrm - \mu_{\yrm | \xrm,\uptheta})^2 \big] \Big] \\
 & = & \Erm_{\xrm | \uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right] \nonumber \;.
 \end{IEEEeqnarray}
@@ -2143,7 +2143,7 @@ PGR: INCOMPLETE
 PGR: comment on alpha0 versus alphax simplification
 
 
-Substituting the optimal Dirichlet-based classifier into the formula for the conditional probability of error \ref{eq:risk_cond_01}, the risk is
+Substituting the optimal Dirichlet-based classifier into the formula for the conditional probability of error \eqref{eq:risk_cond_01}, the risk is
 \begin{IEEEeqnarray}{rCl}
 \Rcal_{\Theta}(f ; \uptheta) & = & 1 - \sum_{x \in \Xcal} \upthetam(x) \Erm_{\uppsi | \upthetam,\upthetac} \bigg[ \upthetac\Big( \argmax_{y \in \Ycal} \big( N \uppsi(y,x) + \alpha_0 \alpha(y,x) \big) ;x \Big) \bigg] \;.
 \end{IEEEeqnarray}
@@ -3818,14 +3818,23 @@ Additionally, note that $\upthetam | \{\Drm = D\} \sim \upthetam | \big\{ \uppsi
 \todomid{introduce and use weighted inner product notation? basis is tuple of functionals?}
 \todomid{comment on low-dim and redefinition of theta}
 
-This appendix form the Bayesian learner that is arguably most recognizable in the literature: a generalized linear regressor using a Normal prior to characterize the weights. The space of data-generating models considered is restricted to a finite-dimensional space, such that $\prm_{\yrm, \xrm | \uptheta}(\cdot, x | \theta) = \prm_{\xrm}(x) \prm_{\yrm | \xrm, \uptheta}(x, \theta)$, where $\theta \in \Uptheta = \Rbb^K$. Note that the space of the data probability distributions considered is a strict subset of the entire function space. The observed data distribution is assumed known; the unknown conditional model PDF is a Normal distribution, such that $\yrm | \xrm, \uptheta \sim \Ncal\big(\mu_{\yrm | \xrm, \uptheta}, \Sigma_{\yrm}\big)$, where $\mu_{\yrm | \xrm, \uptheta} = \phi(\xrm)^\intercal \uptheta$ and $\phi: \Xcal \mapsto \Ycal^K$ is a vector-valued basis function.
+This appendix forms the Bayesian learner that is arguably most recognizable in the literature: a generalized linear regressor using a Normal prior to characterize the weights.
 
-Note that the clairvoyant estimator \ref{eq:f_clv_SE} is $f_{\Theta}(\xrm;\uptheta) = \phi(\xrm)^\intercal \uptheta$ and the clairvoyant squared-error is $\Rcal_{\Theta}^*(\uptheta) = \Sigma_{\yrm}$, which is independent of the true weights.
+The space of data-generating models considered is restricted to a finite-dimensional space, such that $\prm_{\yrm, \xrm | \uptheta}(\cdot, x | \theta) = \prm_{\xrm}(x) \prm_{\yrm | \xrm, \uptheta}(x, \theta)$, where $\theta \in \Uptheta = \Rbb^K$. Note that the space of the data probability distributions considered is a strict subset of the entire function space. The observed data distribution $\prm_{\xrm}$ is assumed known. The conditional mean has the form $\mu_{\yrm | \xrm, \uptheta} = \phi(\xrm)^\intercal \uptheta$, where $\phi: \Xcal \mapsto \Ycal^K$ is a vector-valued basis function. Additionally, the conditional variance is fixed and independent of $\xrm$, such that $\Sigma_{\yrm | \xrm,\uptheta} \equiv \Sigma_{\yrm}$. 
+
+Note that the clairvoyant estimator \eqref{eq:f_clv_SE} is $f_{\Theta}(\xrm;\uptheta) = \phi(\xrm)^\intercal \uptheta$ and the clairvoyant squared-error \eqref{eq:risk_clv_SE} is $\Rcal_{\Theta}^*(\uptheta) = \Sigma_{\yrm}$, which is independent of the true weights. To determine the optimal Bayesian estimator \eqref{eq:f_opt_SE}, note that the weights are conditionally independent of the novel observation $\xrm$ given the data $\Drm$, resulting in $f^*(\xrm;\Drm) = \phi(\xrm)^\intercal \mu_{\uptheta | \Drm}$. Plugging into \eqref{eq:risk_min_SE}, the minimum Bayesian squared-error is 
+\begin{IEEEeqnarray}{rCl}
+\Rcal^* & = & \Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] + \Erm_{\xrm,\Drm} \Big[ \Crm_{\uptheta | \xrm,\Drm} \big[ f_{\Theta}(\xrm;\uptheta) \big] \Big] \nonumber \\
+& = & \Sigma_{\yrm} + \Erm_{\xrm,\Drm} \Big[ \phi(\xrm)^\intercal \Sigma_{\uptheta | \Drm} \phi(\xrm) \Big] \nonumber \\
+& = & \Sigma_{\yrm} + \Erm_{\xrm} \Big[ \phi(\xrm)^\intercal \Erm_{\Drm}\left[ \Sigma_{\uptheta | \Drm} \right] \phi(\xrm) \Big] \;,
+\end{IEEEeqnarray}
+noting that since $\xrm$ is independent of $\uptheta$, it is independent of the data $\Drm$ as well. 
 
 
-\section{Bayesian estimation}
 
-The prior is assumed to be Normal, such that $\prm_{\uptheta} = \Ncal\big(\mu_{\uptheta}, \Sigma_{\uptheta}\big)$. Using linear algebra, it is can be shown \cite{theodoridis-ML} that $\uptheta | \Drm \sim \Ncal\big(\mu_{\uptheta | \Drm}, \Sigma_{\uptheta | \Drm}\big)$, where
+\section{Normal distribution assumptions}
+
+Commonly, the true predictive model is assumed to be Normal, such that $\yrm | \xrm, \uptheta \sim \Ncal\big(\mu_{\yrm | \xrm, \uptheta}, \Sigma_{\yrm}\big)$. Additionally, the weight prior is assumed to be Normal, such that $\prm_{\uptheta} = \Ncal\big(\mu_{\uptheta}, \Sigma_{\uptheta}\big)$. Using linear algebra, it is can be shown \cite{theodoridis-ML} that $\uptheta | \Drm \sim \Ncal\big(\mu_{\uptheta | \Drm}, \Sigma_{\uptheta | \Drm}\big)$, where
 \begin{IEEEeqnarray}{rCl}
 \Sigma_{\uptheta | \Drm} & \equiv & \left( \Sigma_{\uptheta}^{-1} + \sum_{n=1}^N \phi(\Xrm_n) \Sigma_{\yrm}^{-1} \phi(\Xrm_n)^\intercal \right)^{-1}
 \end{IEEEeqnarray}
@@ -3833,20 +3842,12 @@ and
 \begin{IEEEeqnarray}{rCl}
 \mu_{\uptheta | \Drm} & \equiv & \Sigma_{\uptheta | \Drm} \left( \Sigma_{\uptheta}^{-1}\mu_{\uptheta} + \sum_{n=1}^N \phi(\Xrm_n) \Sigma_{\yrm}^{-1} \Yrm_n \right) \;.
 \end{IEEEeqnarray}
-Note that the posterior mean of $\uptheta$ is a convex combination of the prior mean $\mu_{\uptheta}$ and the maximum-likelihood estimate $\theta_{\text{ML}}(\Drm) = \left( \sum_{n=1}^N \phi(\Xrm_n) \Sigma_{\yrm}^{-1} \phi(\Xrm_n)^\intercal \right)^{-1} \sum_{n=1}^N \phi(\Xrm_n) \Sigma_{\yrm}^{-1} \Yrm_n$, which is simply weighted least-squares.
+Note that the posterior mean of $\uptheta$ is a convex combination of the prior mean $\mu_{\uptheta}$ and the maximum-likelihood estimate $\theta_{\text{ML}}(\Drm) = \left( \sum_{n=1}^N \phi(\Xrm_n) \Sigma_{\yrm}^{-1} \phi(\Xrm_n)^\intercal \right)^{-1} \sum_{n=1}^N \phi(\Xrm_n) \Sigma_{\yrm}^{-1} \Yrm_n$, which is simply weighted least-squares. 
 
 \todolow{discuss trends}
-\todolo{move prior agnostic LR results before Normal-specific}
 
-To determine the optimal estimator, note that the weights are conditionally independent of the novel observation $\xrm$ given the data $\Drm$. Thus, using the Normal posterior $\prm_{\uptheta | \Drm}$ in \ref{eq:f_opt_SE}, the Bayesian estimator is shown to be $f^*(\xrm;\Drm) = \phi(\xrm)^\intercal \mu_{\uptheta | \Drm}$.
+It can be further shown that the Bayesian predictive distribution is also Normal, with $\mu_{\yrm | \xrm,\Drm} = \phi(\xrm)^\intercal \mu_{\uptheta | \Drm}$ and $\Sigma_{\yrm | \xrm,\Drm} = \Sigma_{\yrm} + \phi(\xrm)^\intercal \Sigma_{\uptheta | \Drm} \phi(\xrm)$.
 
-Plugging into \ref{eq:risk_min_SE}, the minimum Bayesian squared-error is 
-\begin{IEEEeqnarray}{rCl}
-\Rcal^* & = & \Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] + \Erm_{\xrm,\Drm} \Big[ \Crm_{\uptheta | \xrm,\Drm} \big[ f_{\Theta}(\xrm;\uptheta) \big] \Big] \nonumber \\
-& = & \Sigma_{\yrm} + \Erm_{\xrm,\Drm} \Big[ \phi(\xrm)^\intercal \Crm_{\uptheta | \Drm} \phi(\xrm) \Big] \nonumber \\
-& = & \Sigma_{\yrm} + \Erm_{\xrm} \Big[ \phi(\xrm)^\intercal \Erm_{\Drm}\left[ \Crm_{\uptheta | \Drm} \right] \phi(\xrm) \Big] \;,
-\end{IEEEeqnarray}
-noting that since $\xrm$ is independent of $\uptheta$, it is independent of the data $\Drm$ as well. 
 
 
 
