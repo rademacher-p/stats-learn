@@ -9,9 +9,9 @@
   - nice plots, link to math
   - model estimation perspective, too?
 - **Real data APPLICATION**
-  - Discretization of continuous data??
-- **Include optimal estimator in predict plots**
+  - Discretization of continuous data!?
 - **Try higher order poly for consistency results!**
+- **Include optimal estimator in constant N predict plots**
 - **Dir before Norm on legends**
 
 
@@ -20,6 +20,7 @@
   - realism for reader
 - Find a sensible application for "countable" continuous data support
   - Needed to make continuous Dirichlet viable
+    - **Discretization**
 - Compare to classic algorithms (Normal regressor)
   - help reader relate
   - demonstrate Dirichlet consistency vs Normal loss
