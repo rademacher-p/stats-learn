@@ -92,7 +92,7 @@ prior_mean = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_
 # proc_funcs.append(discretizer(prior_mean_x.dists[0].data['x']))
 
 
-dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs, name='Dir')
+dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=.01), proc_funcs=proc_funcs, name='Dir')
 
 # dir_params = None
 # dir_params = {'alpha_0': [2, 16]}
@@ -116,9 +116,9 @@ norm_params = {'prior_cov': [100, .01]}
 
 # Plotting
 
-# n_train = 200
+n_train = 200
 # n_train = [0, 10, 100]
-n_train = np.arange(0, 605, 5)
+# n_train = np.arange(0, 605, 5)
 
 # print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
 # dir_predictor.plot_risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
@@ -127,7 +127,7 @@ n_train = np.arange(0, 605, 5)
 temp = [
     (opt_predictor, None),
     (dir_predictor, dir_params),
-    (norm_predictor, norm_params),
+    # (norm_predictor, norm_params),
 ]
 
 # FIXME: discrete plot for predict stats
@@ -136,12 +136,12 @@ temp = [
 
 predictors, params = list(zip(*temp))
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=50000,
-                           verbose=True, ax=None, rng=None)
+# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=50000,
+#                            verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, n_test=1, verbose=False, ax=None)
 
-# plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=300,
-#                            do_std=True, verbose=True, ax=None, rng=None)
+plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=300,
+                           do_std=True, verbose=True, ax=None, rng=None)
 
 
 # print(f"\nAnalytical Risk = {opt_predictor.evaluate_comp(n_train=n_train)}")

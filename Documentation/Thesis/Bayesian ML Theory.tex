@@ -240,9 +240,9 @@ Sets will typically be typeset with a calligraphic font, such as $\Xcal$. Except
 
 \todolo{non-calligraphic for risk, loss, etc?}
 
-Various mappings will be defined for which the domain and/or the range \cite{rudin} are function spaces. The set of functions $\Xcal \mapsto \Ycal$ is denoted $\Ycal^{\Xcal}$. For a mapping $g : \Zcal \mapsto \Ycal^{\Xcal}$, the argument notation $g(z) \in \Ycal^{\Xcal}$ denotes a function, while $g(x;z) \in \Ycal$ is a specific value of that function. Semicolons are used to distinguish between the different groups of arguments. A set of sequences $\{1,\ldots,N\} \mapsto \Scal$ will be represented as $\Scal^N$ for brevity.
+Various mappings will be defined for which the domain and/or the range \cite{rudin} are function spaces. The set of functions $\Xcal \mapsto \Ycal$ is denoted $\Ycal^{\Xcal}$. For a mapping $g : \Zcal \mapsto \Ycal^{\Xcal}$, the argument notation $g(z) \in \Ycal^{\Xcal}$ denotes a function, while $g(x;z) \in \Ycal$ is a specific value of that function. Semicolons are used to distinguish between the arguments referring to the domain and arguments that access the resulting function. The mapping $\{1,\ldots,N\} \mapsto \Ycal$ will be represented as $\Ycal^N$ for brevity. Spaces of indexed tuples will be notated as $g \in \Ycal^N$ and items of a tuple are accessed with subscripts rather than parentheses, such that $g_i \in \Ycal$.
 
-The Cartesian product of sets will be frequently used, such that for $x \in \Xcal$ and $y \in \Ycal$, the pair $(x,y) \in \Xcal \times \Ycal$. For a general product of sets $\Scal_i$, $i = 1,\ldots$, the notation $\prod_i \Scal_i = \Scal_1 \times \Scal_2 \ldots$ is used.
+The Cartesian product of sets will be frequently used, such that for $x \in \Xcal$ and $y \in \Ycal$, the pair $(x,y) \in \Xcal \times \Ycal$. For a general product of sets $\Scal_i$, the notation $\prod_i \Scal_i = \Scal_1 \times \Scal_2 \ldots$ is used.
 
 The convention adopted for natural numbers is $\Nbb = \{1,2,\ldots\}$; the set of non-negative integers is denoted $\Zbbgeq = \Nbb \cup \{0\}$. The set of positive real numbers $\Rbb^+$ excludes zero, while non-negative real numbers are represented as $\Rbbgeq = \Rbb^+ \cup \{0\}$. The cardinality of countably infinite sets, including the set of natural numbers, is denoted $\aleph_0 = |\Nbb|$; the cardinality of uncountable sets such as $\Rbb$ is at least $\aleph_1$.
 
@@ -370,7 +370,7 @@ In such cases, the italic $z$ is dropped from the arguments and the formulas $\E
 
 Consider an observable random element $\xrm \in \Xcal$ and an unobservable random element $\yrm \in \Ycal$ which are jointly distributed according to an unknown probability distribution $\uptheta \in \Uptheta \equiv \Pcal(\Ycal \times \Xcal)$, such that $\Prm_{\yrm,\xrm | \uptheta} = \uptheta$. Note that the uppercase PMF notation used throughout this section implies that the random elements are discrete; PDF's are used when $\xrm$ and/or $\yrm$ are continuous random variables/processes.
 
-Also observed is a random sequence of $N$ samples from $\uptheta$, denoted $\Drm \in \Dcal = \{\Ycal \times \Xcal\}^N$; an alternative representation that can be used is $\Drm \Leftrightarrow \big( (\Yrm_1,\Xrm_1),\ldots,(\Yrm_N,\Xrm_N) \big)$, where $\Yrm \in \Ycal^N$ and $\Xrm \in \Xcal^N$. The $N$ data pairs are conditionally independent from one another and are identically distributed as $\Prm_{\Drm_n | \uptheta} = \uptheta$. The samples are also conditionally independent from $(\yrm,\xrm)$. Thus $\Prm_{\yrm,\xrm,\Drm | \uptheta} = \Prm_{\yrm,\xrm | \uptheta} \otimes \left( \bigotimes_{n=1}^N \Prm_{\Drm_n | \uptheta} \right) = \uptheta \otimes \left( \bigotimes_{n=1}^N \uptheta \right)$, or explicitly,
+Also observed is a random sequence of $N$ samples from $\uptheta$, denoted $\Drm \in \Dcal = \{\Ycal \times \Xcal\}^N$; an alternative representation that can be used is $\Drm \Leftrightarrow \big( (\Yrm_1,\Xrm_1),\ldots,(\Yrm_N,\Xrm_N) \big)$, where $\Yrm \in \Ycal^N$ and $\Xrm \in \Xcal^N$. The $N$ data pairs are conditionally independent from one another and are identically distributed as $\Prm_{\Drm_n | \uptheta} = \Prm_{\yrm,\xrm | \uptheta}$. The samples are also conditionally independent from $(\yrm,\xrm)$. Thus $\Prm_{\yrm,\xrm,\Drm | \uptheta} = \Prm_{\yrm,\xrm | \uptheta} \otimes \left( \bigotimes_{n=1}^N \Prm_{\Drm_n | \uptheta} \right) = \uptheta \otimes \left( \bigotimes_{n=1}^N \uptheta \right)$, or explicitly,
 \begin{equation}
 \Prm_{\yrm,\xrm,\Drm | \uptheta}(y,x,D | \theta) = \Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) \prod_{n=1}^N \Prm_{\Drm_n | \uptheta}\big(Y_n,X_n | \theta\big) \;.
 \end{equation}
@@ -582,7 +582,7 @@ Define the PDF $\prm_{\uptheta} \in \Pcal(\Uptheta)$. Now the Bayes risk can be 
 \end{IEEEeqnarray}
 and $\yrm$, $\xrm$, and $\Drm$ are treated as jointly distributed random elements. 
 
-\todolow{Add forumla for f(D)?}
+\todolow{Add formula for f(D)?}
 
 Finally, express the optimal learning function
 \begin{equation} 
@@ -761,6 +761,8 @@ In this section, loss functions typical for classification and regression applic
 The squared-error (SE) loss function is arguably the most commonly used loss function for regression, or in fact for any estimation problem. This can be attributed to its quadratic form, which enables a closed-form expression of the minimizing estimation function.
 
 It is assumed that the unobserved random element $\yrm$ is a scalar random variable; that is, $\Ycal \subseteq \Rbb$. Additionally, the estimator's output is allowed to assume real numbers; thus, $\Hcal = \Rbb \supseteq \Ycal$.
+
+\todohi{Restrict estimate to discrete values? Rounding? Discuss, at least.}
 
 The loss function is defined as
 \begin{equation}
@@ -3811,7 +3813,40 @@ Additionally, note that $\upthetam | \{\Drm = D\} \sim \upthetam | \big\{ \uppsi
 
 
 
+\chapter{Bayesian generalized linear regression using a Normal prior}
 
+\todomid{introduce and use weighted inner product notation? basis is tuple of functionals?}
+\todomid{comment on low-dim and redefinition of theta}
+
+This appendix form the Bayesian learner that is arguably most recognizable in the literature: a generalized linear regressor using a Normal prior to characterize the weights. The space of data-generating models considered is restricted to a finite-dimensional space, such that $\prm_{\yrm, \xrm | \uptheta}(\cdot, x | \theta) = \prm_{\xrm}(x) \prm_{\yrm | \xrm, \uptheta}(x, \theta)$, where $\theta \in \Uptheta = \Rbb^K$. Note that the space of the data probability distributions considered is a strict subset of the entire function space. The observed data distribution is assumed known; the unknown conditional model PDF is a Normal distribution, such that $\yrm | \xrm, \uptheta \sim \Ncal\big(\mu_{\yrm | \xrm, \uptheta}, \Sigma_{\yrm}\big)$, where $\mu_{\yrm | \xrm, \uptheta} = \phi(\xrm)^\intercal \uptheta$ and $\phi: \Xcal \mapsto \Ycal^K$ is a vector-valued basis function.
+
+Note that the clairvoyant estimator \ref{eq:f_clv_SE} is $f_{\Theta}(\xrm;\uptheta) = \phi(\xrm)^\intercal \uptheta$ and the clairvoyant squared-error is $\Rcal_{\Theta}^*(\uptheta) = \Sigma_{\yrm}$, which is independent of the true weights.
+
+
+\section{Bayesian estimation}
+
+The prior is assumed to be Normal, such that $\prm_{\uptheta} = \Ncal\big(\mu_{\uptheta}, \Sigma_{\uptheta}\big)$. Using linear algebra, it is can be shown \cite{theodoridis-ML} that $\uptheta | \Drm \sim \Ncal\big(\mu_{\uptheta | \Drm}, \Sigma_{\uptheta | \Drm}\big)$, where
+\begin{IEEEeqnarray}{rCl}
+\Sigma_{\uptheta | \Drm} & \equiv & \left( \Sigma_{\uptheta}^{-1} + \sum_{n=1}^N \phi(\Xrm_n) \Sigma_{\yrm}^{-1} \phi(\Xrm_n)^\intercal \right)^{-1}
+\end{IEEEeqnarray}
+and
+\begin{IEEEeqnarray}{rCl}
+\mu_{\uptheta | \Drm} & \equiv & \Sigma_{\uptheta | \Drm} \left( \Sigma_{\uptheta}^{-1}\mu_{\uptheta} + \sum_{n=1}^N \phi(\Xrm_n) \Sigma_{\yrm}^{-1} \Yrm_n \right) \;.
+\end{IEEEeqnarray}
+Note that the posterior mean of $\uptheta$ is a convex combination of the prior mean $\mu_{\uptheta}$ and the maximum-likelihood estimate $\theta_{\text{ML}}(\Drm) = \left( \sum_{n=1}^N \phi(\Xrm_n) \Sigma_{\yrm}^{-1} \phi(\Xrm_n)^\intercal \right)^{-1} \sum_{n=1}^N \phi(\Xrm_n) \Sigma_{\yrm}^{-1} \Yrm_n$, which is simply weighted least-squares.
+
+\todolow{discuss trends}
+\todolo{move prior agnostic LR results before Normal-specific}
+
+To determine the optimal estimator, note that the weights are conditionally independent of the novel observation $\xrm$ given the data $\Drm$. Thus, using the Normal posterior $\prm_{\uptheta | \Drm}$ in \ref{eq:f_opt_SE}, the Bayesian estimator is shown to be $f^*(\xrm;\Drm) = \phi(\xrm)^\intercal \mu_{\uptheta | \Drm}$.
+
+Plugging into \ref{eq:risk_min_SE}, the minimum Bayesian squared-error is 
+\begin{IEEEeqnarray}{rCl}
+\Rcal^* & = & \Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] + \Erm_{\xrm,\Drm} \Big[ \Crm_{\uptheta | \xrm,\Drm} \big[ f_{\Theta}(\xrm;\uptheta) \big] \Big] \nonumber \\
+& = & \Sigma_{\yrm} + \Erm_{\xrm,\Drm} \Big[ \phi(\xrm)^\intercal \Crm_{\uptheta | \Drm} \phi(\xrm) \Big] \nonumber \\
+& = & \Sigma_{\yrm} + \Erm_{\xrm} \Big[ \phi(\xrm)^\intercal \Erm_{\Drm}\left[ \Crm_{\uptheta | \Drm} \right] \phi(\xrm) \Big] \;,
+\end{IEEEeqnarray}
+noting that since $\xrm$ is independent of $\uptheta$, it is independent of the data $\Drm$ as well. 
 
 
 
