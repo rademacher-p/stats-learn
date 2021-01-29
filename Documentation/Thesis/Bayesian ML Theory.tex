@@ -845,7 +845,7 @@ The Bayes squared-error risk for a general learning function is
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_SE}
 \Rcal(f) & = & \Erm_{\uptheta} \Bigg[ \Erm_{\Drm | \uptheta} \bigg[ \Erm_{\yrm,\xrm | \uptheta} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \Bigg] \\
 & = & \Erm_{\xrm,\Drm} \bigg[ \Erm_{\yrm | \xrm,\Drm} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \nonumber \\
-& = & \Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] + \Erm_{\xrm,\Drm,\uptheta} \Big[ \big( f(\xrm;\Drm) - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \nonumber \\
+& = & \Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] + \Erm_{\xrm,\Drm,\uptheta} \Big[ \big( f(\xrm;\Drm) - f_{\Theta}(\xrm;\uptheta) \big)^2 \Big] \nonumber \\
 & = & \Erm_{\xrm,\Drm} \left[ \Sigma_{\yrm | \xrm,\Drm} \right] + \Erm_{\xrm,\Drm} \Big[ \big( f(\xrm;\Drm) - \mu_{\yrm | \xrm,\Drm} \big)^2 \Big] \nonumber \;.
 \end{IEEEeqnarray}
 
@@ -1576,8 +1576,8 @@ The elements of the finite cardinality set $\Ycal$ are real numbers, such that $
 Substituting in the Bayes predictive distribution for a Dirichlet prior \eqref{eq:P_y_xD_dir} into \eqref{eq:f_opt_SE}, the optimal Bayesian estimate is
 \begin{IEEEeqnarray}{rCl} \label{eq:f_opt_SE_dir}
 f^*(\xrm;\Drm) & = & \mu_{\yrm | \xrm,\Drm} \\
-& = & \gammam(\xrm; \uppsim) \sum_{y \in \Ycal} y \alphac(y;\xrm) + \big(1-\gammam(\xrm; \uppsim)\big) \sum_{y \in \Ycal} y \Psic(y;\xrm;\Drm) \nonumber \\
-& = & \left( \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)} \right) \mu_{\yrm | \xrm} + \left( \frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)} \right) \frac{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Yrm_n}{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big]} \nonumber \;.
+& = & \left( \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)} \right) \sum_{y \in \Ycal} y \alphac(y;\xrm) + \left( \frac{N \Psim(\xrm;\Drm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Drm)} \right) \sum_{y \in \Ycal} y \Psic(y;\xrm;\Drm) \nonumber \\
+& = & \gammam(\xrm; \uppsim) \mu_{\yrm | \xrm} + \big(1-\gammam(\xrm; \uppsim)\big) \frac{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Yrm_n}{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big]} \nonumber \;.
 \end{IEEEeqnarray}
 
 The optimal estimate is interpreted as a convex combination of two separate estimates - the expected value of $\yrm$ conditioned on the observed $\xrm$ and the mean of the training values $\Yrm_n$ which have a value $\Xrm_n$ matching the observed value $\xrm$. The weighting factors are the same as those of $\Prm_{\yrm | \xrm,\Drm}$; thus, stronger prior information (larger $\alpha_0 \alpham(\xrm)$) provides more weight to the estimate $\mu_{\yrm|\xrm}$ and more voluminous training data puts emphasis on the empirical conditional mean.
@@ -1658,7 +1658,7 @@ The above formulation exploits the statistical characterization of the aggregati
 PGR: move to appendix???
 
 Finally, combine the two formulas to represent the mininum Bayes risk,
-\begin{IEEEeqnarray}{L}
+\begin{IEEEeqnarray}{L} \label{eq:Risk_min_SE_dir}
 \Rcal^* = \Erm_{\xrm,\uppsi} \left[ \Erm_{\yrm | \xrm,\uppsi}[\yrm^2] - \mu_{\yrm | \xrm,\uppsi}^2 \right] \\
 = \Erm_{\xrm} \left[ \frac{\alpha_0 \big(\alpha_0 \alpham(\xrm) + N \alpham(\xrm) + 1 \big)}{\big( \alpha_0 \alpham(\xrm)+1 \big) (\alpha_0+N)} \Sigma_{\yrm | \xrm} \right] \nonumber \\
 = \Erm_{\xrm} \left[ \frac{\alpham(\xrm) + (\alpha_0+N)^{-1}}{\alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right] \nonumber \;.
@@ -2379,8 +2379,6 @@ Also, it is important to consider how a given classifier performs for varying mo
 
 PGR: SPECIFY EUCLIDEAN/HILBERT??
 
-PGR: account for impulsive alpha?
-
 \todohi{discuss otimes for dirac, USE?}
 
 This chapter extends further to the case where $\Ycal$ and $\Xcal$ are continuous spaces and the model $\uptheta$ is a continuous-domain random process. Note that $|\Ycal| \geq \aleph_1$ and $|\Xcal| \geq \aleph_1$. 
@@ -2753,18 +2751,7 @@ PGR: COPIED, incomplete
 
 \subsection{Regression: the Squared-Error Loss}
 
-\begin{equation}
-\Lcal(h,y) = (h-y)^2 \;.
-\end{equation}
-
 Now we choose for the regression function to map to $\Hcal = \Ycal = \Rbb$.
-
-\begin{IEEEeqnarray}{rCl}
-\Rcal(f) & = & \Erm_{\uptheta} \Bigg[ \Erm_{\Drm | \uptheta} \bigg[ \Erm_{\yrm,\xrm | \uptheta} \Big[ \big( f( \xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \Bigg] \\
-& = & \Erm_{\xrm,\uptheta} \Big[ \Erm_{\yrm | \xrm,\uptheta} \big[ (\yrm - \mu_{\yrm | \xrm,\uptheta})^2 \big] \Big] + \Erm_{\uptheta} \bigg[ \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( f(\xrm;\Drm) - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \bigg] \nonumber \\
-& = & \Erm_{\xrm,\uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right] + \Erm_{\uptheta} \bigg[ \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( f(\xrm;\Drm) - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \bigg] \nonumber
-\end{IEEEeqnarray}
-
 
 
 \subsubsection{Optimal Learner}
@@ -2781,27 +2768,7 @@ f^*(\xrm;\Drm) & = & \mu_{\yrm | \xrm,\Drm}  = \Erm_{\uptheta | \xrm,\Drm} \left
 
 \subsubsection{Minimum Risk}
 
-Generalizing from the basic model discussion, we again have
-\begin{IEEEeqnarray}{rCl}
-\Rcal^* & = & \Erm_{\xrm,\Drm} \left[ \Sigma_{\yrm | \xrm,\Drm} \right]
-= \Erm_{\xrm,\uppsi} \left[ \Sigma_{\yrm | \xrm,\uppsi} \right] \\
-& = & \Erm_{\xrm,\uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right] + \Erm_{\xrm,\Drm} \Big[ \Crm_{\uptheta | \xrm,\Drm} \big[ \mu_{\yrm | \xrm,\uptheta} \big] \Big] \nonumber \;,
-\end{IEEEeqnarray}
-where we choose to perform the expectation over $\uppsi$. 
-
-The conditional variance is now
-\begin{IEEEeqnarray}{rCl}
-\Sigma_{\yrm | \xrm,\uppsi} & = & \Erm_{\yrm | \xrm,\uppsi}\big[ \yrm^2 \big]
-- \mu_{\yrm | \xrm,\uppsi}^2 \;.
-\end{IEEEeqnarray}
-and the two terms are independently evaluated.
-
-
-\begin{IEEEeqnarray}{L}
-\Erm_{\xrm,\Drm}\big[ \Erm_{\yrm | \xrm,\Drm}\big[ \yrm^2 \big] \big] = \Erm_{\xrm,\uppsi}\Big[ \Erm_{\yrm | \xrm,\uppsi}\big[ \yrm^2 \big] \Big] \\
-\quad = \Erm_{\yrm}[\yrm^2] \nonumber \\
-\quad = \Erm_{\xrm}\big[ \Erm_{\yrm | \xrm}[\yrm^2] \big] = \int_{\Xcal} \alpham(x) \int_{\Ycal} y^2 \alphac(y;x) {\drm}y {\drm}x \nonumber \;.
-\end{IEEEeqnarray}
+To determine the minimum Bayes squared-error, $\Rcal^* = \Erm_{\xrm,\uppsi} \left[ \Sigma_{\yrm | \xrm,\uppsi} \right]$, a new evaluation of $\mu_{\yrm | \xrm,\uppsi}^2$ must be performed.
 
 
 
@@ -2926,8 +2893,6 @@ Combining with the second moment produces the risk,
 %= \Erm_{\xrm} \left[ \frac{\Prm(\xrm) + (\alpha_0+N)^{-1} \delta(0)}{\Prm(\xrm) + \alpha_0^{-1} \delta(0)} \Sigma_{\yrm | \xrm} \right] \nonumber
 %\end{IEEEeqnarray}
 
-\todohi{Discuss Dirac deltas!!}
-
 
 PGR: DEP PERSPECTIVE???
 
@@ -2960,8 +2925,12 @@ Plugging,
 Combining produces the risk,
 \begin{IEEEeqnarray}{rCl}
 \Rcal^* & = & \Erm_{\xrm} \left[ \frac{\alpha_0 \big(\alpha_0 \alpham(\xrm) + \delta(0) + N \alpham(\xrm) \big)}{(\alpha_0+N)\big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \Sigma_{\yrm | \xrm} \right] \\
-& = & \Erm_{\xrm} \left[ \frac{\delta(0)^{-1} \alpham(\xrm) + (\alpha_0+N)^{-1} }{\delta(0)^{-1} \alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right] \nonumber
+& = & \Erm_{\xrm} \left[ \frac{\delta(0)^{-1} \alpham(\xrm) + (\alpha_0 + N)^{-1} }{\delta(0)^{-1} \alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right] \nonumber
 \end{IEEEeqnarray}
+
+
+The minimum Bayesian squared-error equation is similar to the discrete-domain formula \eqref{eq:Risk_min_SE_dir}, with one difference: the scaling factor for $\Sigma_{\yrm | \xrm}$ depends on the marginal prior mean through $\delta(0)^{-1} \alpham(\xrm)$. As such, if $\alpham$ is upper-bounded, $\Rcal^* \to \Erm_{\xrm} \big[ (1 + N / \alpha_0)^{-1} \Sigma_{\yrm | \xrm} \big]$; this is a consequence of the estimators preference for using the empirical data distribution when available.
+
 
 
 %\begin{IEEEeqnarray}{L}
