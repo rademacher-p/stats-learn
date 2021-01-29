@@ -1460,9 +1460,11 @@ The trends of the bias and variance with the Dirichlet parameters and with the d
 \Prm_{\uppsim(x) | \upthetam(x)}\big(\psim(x) | \thetam(x) \big) & = & \Emp\Big( \big(\psim(x),1-\psim(x)\big); N, \big(\thetam(x),1-\thetam(x)\big) \Big) \nonumber \\
 & = & \Bi\big(N \psim(x); N, \thetam(x)\big) \;,
 \end{IEEEeqnarray}
-where $\Bi$ is the binomial PMF.
+where $\Bi$ is the binomial PMF. Closed-forms have not been found for the expectations of the relevant functions.
 
-First consider the effects of the training data volume. Clearly, if $N=0$, $\gammam(\uppsim)$ is equal to one. Consequently, the prior mean $\alphac(\xrm)$ is used and the bias is maximal; as this estimator is data-independent, the covariance is zero. As $N \to \infty$, the data PMF tends to $\Prm_{\uppsim(x) | \upthetam(x)} \approx \delta[\cdot, \upthetam(x)]$. As a result, the bias scaling factor tends to $\left(1 + \frac{N \upthetam(x)}{\alpha_0 \alpham(x)}\right)^{-1}$, which tends to zero for all values $x \in \Xcal$ satisfying $\upthetam(x) > 0$ and to one otherwise. Thus for observations falling in the support of the marginal model $\upthetam$, the empirical data distribution $\uppsic(\xrm)$ is used and there is no bias. Similarly, the expectations affecting the covariance tend to zero. This demonstrates that the Dirichlet-based Bayesian estimate $\Prm_{\yrm | \xrm,\uppsim,\uppsic}$ converges to the true predictive distribution $\Prm_{\yrm | \xrm,\upthetac}$ in the limit of training data volume.
+\todohi{binomial inverse moment review citations?}
+
+First consider the effects of the training data volume. Clearly, if $N=0$, $\gammam(\uppsim)$ is equal to one. Consequently, the prior mean $\alphac(\xrm)$ is used and the bias is maximal; as this estimator is data-independent, the covariance is zero. As $N \to \infty$, the data PMF tends to $\Prm_{\uppsim(x) | \upthetam(x)} \approx \delta[\cdot, \upthetam(x)]$. As a result, the bias scaling factor tends to $\left(1 + \frac{N \upthetam(x)}{\alpha_0 \alpham(x)}\right)^{-1}$, which tends to zero for all values $x \in \Xcal$ satisfying $\upthetam(x) > 0$ and to one otherwise. Thus for observations falling in the support of the marginal model $\upthetam$, the empirical data distribution $\uppsic(\xrm)$ is used and there is no bias. Similarly, the expectations affecting the covariance tend to zero. This demonstrates that the Dirichlet-based Bayesian estimate $\Prm_{\yrm | \xrm,\uppsim,\uppsic}$ converges to the true predictive distribution $\Prm_{\yrm | \xrm,\upthetac}$ in the limit of training data volume; this is guaranteed due to the full-support of the prior.
 
 
 Next consider the effects of the Dirichlet parameterization. As $\alpha_0 \alpham(x) \to \infty$, $\gammam(\uppsim)$ is again equal to one, the bias is maximized and the covariance is zero. Conversely, as $\alpha_0 \alpham(x) \to 0$, the bias scaling factor tends to its minimal value $\big(1 - \upthetam(x)\big)^{N}$, which is equivalent to $\Prm_{\uppsim(x) | \upthetam(x)}\big(0 | \thetam(x) \big)$, the probability that no training samples satisfy $\Xrm_n = x$. Additionally, the expectations affecting the covariance tend to
@@ -1481,7 +1483,7 @@ This demonstrates the critical bias/variance trade-off that is controlled by sel
 
 \subsection{Example}
 
-\todohigh{REDO FIGURES for new formulae?!}
+\todohigh{REDO FIGURES AND DIALOGUE for new formulae?!}
 
 To exemplify how the model estimate $\Prm_{\yrm | \xrm,\uppsi}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 10$ and $|\Xcal| = 1$ for simplicity. The data-independent PMF $\alphac(x)$ and true model $\upthetac(x)$ are shown in Figure \ref{fig:P_yx_error_N_0} - note the significant mismatch. 
 
@@ -1779,7 +1781,7 @@ Evaluation of the excess risk for an estimator based on the Dirichlet prior will
 \begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
 \quad \equiv \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm,\uppsim,\uppsic | \upthetam,\upthetac} \Big[ \Delta(y; \xrm;\uppsim,\uppsic,\upthetac) \Delta(y'; \xrm;\uppsim,\uppsic,\upthetac) \Big] \nonumber \\
-\quad = \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \mathcal{E}(y,y' ; \xrm,\upthetam,\upthetac) \nonumber \\
+\quad = \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm | \upthetam} \Big[ \mathcal{E}(y,y' ; \xrm,\upthetam,\upthetac) \Big] \nonumber \\
 \quad = \Erm_{\xrm | \upthetam}\left[ \Sigma_{\yrm | \xrm,\upthetac} \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \right] \right] \nonumber \\
 \qquad \qquad + \Erm_{\xrm | \upthetam}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right)^2 \right] \right] \nonumber \\
 \quad = \Erm_{\xrm | \upthetam}\left[ \Sigma_{\yrm | \xrm,\upthetac} \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim\big)^2}{N \uppsim(\xrm)} \right] \right] \nonumber \\
@@ -1794,15 +1796,13 @@ where the function $\mathcal{E}$ is defined in \eqref{eq:predictive_del_sq}.
 
 The excess conditional risk can thus be represented as the conditional expectation (with respect to $\Prm_{\xrm | \uptheta} = \upthetam$) of a sum of two functions of $\xrm$. The first function measures the additional variance beyond that of the clairvoyant estimator (i.e. the clairvoyant squared-error); like the clairvoyant risk, it depends on $\Sigma_{\yrm | \xrm,\upthetac}$, the conditional variance of the clairvoyant estimate for a given observation of $\xrm$. The second function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. This term alone is influenced by the data-independent Bayes predictive distribution $\Prm_{\yrm | \xrm} = \alphac(\xrm)$.
 
-These two second-order terms (of $y$) are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam(x)$ and $N$ via conditional expectations with respect to $\uppsim(x)$. Recall that $N \uppsim(x) | \upthetam(x) \sim \Bi \big(N,\upthetam(x)\big)$. Closed-forms have not been found for the function expectations of binomial random variables above.
-
-\todohi{ binomial inverse moment review citations?}
+These two second-order terms (of $y$) are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam(x)$ and $N$ via conditional expectations with respect to $\uppsim(x)$.
 
 
 It is instructional to consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization.
 
 
-First consider how the excess risk changes with the training volume $N$. For $N=0$, it is evident that the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$,  the expected squared bias between the clairvoyant and data-independent estimators. As $N$ tends to infinity, the binomial distribution controlling the scaling factors concentrates such that $\uppsim(x) \approx \thetam(x)$; thus for $\thetam(x) > 0$, the weight $\gammam(\uppsim) \to 0$, the two expectations of interest tend to zero and thus $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable estimator property is a consequence of the full support of the Dirichlet prior, ensuring that the model posterior concentrates at the empirical PMF.
+First consider how the excess risk changes with the training volume $N$. For $N=0$, it is evident that the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$,  the expected squared bias between the clairvoyant and data-independent estimators. As $N$ tends to infinity, the binomial distribution controlling the scaling factors concentrates such that $\uppsim(x) \approx \thetam(x)$; thus for $\thetam(x) > 0$, the weight function $\gammam(\uppsim) \to 0$, the two expectations of interest tend to zero and thus $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable estimator property is a consequence of the full support of the Dirichlet prior, ensuring that the model posterior concentrates at the empirical PMF.
 
 Another interesting point regarding the dependency of the excess conditional risk on $N$ is that there may be a local maximum, depending on the learner parameterization. To demonstrate, consider the case of $|\Xcal| = 1$ - treating $N$ as a real number, there would be a maximum at 
 \begin{equation}
@@ -2696,50 +2696,33 @@ Observe that by the aggregation principle, $\uppsim \sim \DEP(N,\alpha_0,\alpham
 
 \section{Model Estimation Perspective} \label{sec:predictive_est_cont}
 
-For continuous data, the expected value of the predictive distribution \eqref{eq:predictive_dist_avg} has unique properties.
-%\begin{IEEEeqnarray}{L}
-%\Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] 
-%\equiv \Erm_{\uppsim(\xrm),\uppsic(\xrm) | \upthetam(\xrm),\upthetac(\xrm)}\big[ \Prm_{\yrm | \xrm,\uppsim(\xrm),\uppsic(\xrm)} \big] \\ 
-%\quad = \Erm_{\uppsim(\xrm) | \upthetam(\xrm)} \big[\gammam(\xrm; \uppsim)\big] \alphac(\xrm) + \Erm_{\uppsim(\xrm) | \upthetam(\xrm)} \big[1 - \gammam(\xrm; \uppsim)\big] \upthetac(\xrm) \nonumber
-%\end{IEEEeqnarray}
-Note that by the aggregation property of Empirical distributions, the empirical process value $\uppsim(x)$ conditioned on the model $\upthetam(x)$ is distributed as
-\begin{IEEEeqnarray}{rCl}
-\prm_{\uppsim(x) | \upthetam(x)}\big(\psim(x) | \thetam(x) \big) & = & \Emp\left( \left( \frac{\psim(x)}{\delta(0)},1 - \frac{\psim(x)}{\delta(0)} \right); N, \left( \frac{\thetam(x)}{\delta(0)}, 1 - \frac{\thetam(x)}{\delta(0)} \right) \right) \nonumber \\
-& = & \Bi\left(\frac{N \psim(x)}{\delta(0)}; N, \frac{\thetam(x)}{\delta(0)}\right) \;,
-\end{IEEEeqnarray}
-where $\Bi$ is the binomial PMF. As such, if $\upthetam$ is upper-bounded, the expected value of $\gammam(\uppsim)$ is unity for all values $x \in \Xcal$ and the predictive distribution tends to the conditional prior mean $\alphac$. Conversely, if $\uptheta$ is impulsive at $x$, the weight is $\big(1 - \delta(0)^{-1} \upthetam(x)\big)^N$ if $\alpham$ is bounded and $asdf$ if $\alpham$ is impulsive.
-
-\todohigh{FIXME FIXME}
-
-
-
-To aid characterization of the estimator, define the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \prm_{\yrm | \xrm,\uppsim,\uppsic} - \prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$. For a given $\xrm$, the bias of the conditional PDF estimate is
-\begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias_cont}
-\mathrm{Bias}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim, \uppsic | \upthetam,\upthetac}\big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \big] \\
-& = & \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[\gammam(\xrm; \uppsim)\big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber
-\end{IEEEeqnarray}
-and its covariance function is 
+For continuous data spaces, the analysis of the Bayesian predictive distribution as an estimate of the true predictive distribution has some unique differences from the discrete space analysis put forth in Section \ref{sec:predictive_est}. Redefine the difference function $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \prm_{\yrm | \xrm,\uppsim,\uppsic} - \prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$. Using the properties of the continuous-domain empirical process conditioned on its aggregation, the covariance function takes on the new form
 \begin{IEEEeqnarray}{L} \label{eq:predictive_cov_cont}
-\mathrm{Cov}(\xrm;\upthetam,\upthetac) = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
+\mathrm{Cov}(\xrm;\upthetam,\upthetac) = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
 \quad = \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{\delta(0)^{-1} N \uppsim(\xrm)} \right] \big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \big) \nonumber \\
 \qquad + \Crm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[\gammam(\xrm; \uppsim)\big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber
 \end{IEEEeqnarray}
-
-
-\begin{IEEEeqnarray}{rCl} \label{eq:predictive_del_sq_cont}
-\mathcal{E}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim,\uppsic | \upthetam,\upthetac} \Big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \otimes \Delta(\xrm;\uppsim,\uppsic,\upthetac) \Big] \\
-& = & \mathrm{Bias}(\xrm;\upthetam,\upthetac) \otimes \mathrm{Bias}(\xrm;\upthetam,\upthetac) + \mathrm{Cov}(\xrm;\upthetam,\upthetac) \nonumber \;.
-\end{IEEEeqnarray}
-
-Also of interest, the conditional expectation over $\xrm$ is
+and the expectation of the second moments of the difference function is thus
 \begin{IEEEeqnarray}{L} \label{eq:predictive_E_del_sq_cont}
 \Erm_{\xrm | \upthetam}\Big[ \mathcal{E}(\xrm;\upthetam,\upthetac) \Big] \\
 \quad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[ \gammam(\xrm; \uppsim)^2 \big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big)  \right] \nonumber \\
 \qquad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{\delta(0)^{-1} N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \right] \nonumber \;.
 \end{IEEEeqnarray}
+Note that the dependency on the marginal empirical model can be expressed through the transformed variable $\delta(0)^{-1} N \uppsim(\xrm)$.
 
 
+\subsection{Trends}
 
+The bias/variance trade-off is notably different if $\upthetam$ has a continuous domain and is upper-bounded. Note that by the aggregation property of Empirical distributions, the empirical process value $\uppsim(x)$ conditioned on the model $\upthetam(x)$ is now distributed as
+\begin{IEEEeqnarray}{rCl}
+\prm_{\uppsim(x) | \upthetam(x)}\big(\psim(x) | \thetam(x) \big) & = & \Emp\left( \left( \frac{\psim(x)}{\delta(0)},1 - \frac{\psim(x)}{\delta(0)} \right); N, \left( \frac{\thetam(x)}{\delta(0)}, 1 - \frac{\thetam(x)}{\delta(0)} \right) \right) \nonumber \\
+& = & \Bi\left(\frac{N \psim(x)}{\delta(0)}; N, \frac{\thetam(x)}{\delta(0)}\right) \;,
+\end{IEEEeqnarray}
+where $\Bi$ is the binomial PMF. 
+
+Thus for bounded $\upthetam$, the empirical distribution value $\uppsim(x) \to 0$, the conditional expected value of $\gammam(\uppsim)$ tends to unity, and the predictive distribution tends to the conditional prior mean $\alphac(x)$ regardless of the value $\alpha_0 \alpham(x)$. As a result, the bias is always maximal and the covariance is always zero -- the efficacy of the estimator is entirely dependent on the bias.
+
+If instead $\upthetam$ is a mixture distribution including a Dirac delta function at some value $x \in \Xcal$, the conditional prior concentration $\alpha_0 \alpham(x)$ can affect the bias and variance. If the marginal prior mean $\alpham$ is bounded at the relevant value of $x$, the empirical distribution is used for prediction whenever available and the weight $\Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[ \gammam(\xrm; \uppsim) \big]$ assumes its minimal value $\big(1 - \delta(0)^{-1} \upthetam(x)\big)^N$. Conversely, if $\alpham$ also has a Dirac delta function at $x$, the bias weight behaves as for the discrete-domain case, depending on the relative values of $\delta(0)^{-1} \upthetam(x)$ and $\delta(0)^{-1} \alpham(x)$.
 
 
 \todohigh{example plots?}
@@ -3041,7 +3024,7 @@ Using the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \prm_{\y
 \end{IEEEeqnarray}
 where the function $\mathcal{E}$ is defined in \eqref{eq:predictive_del_sq_cont}. 
 
-\todohigh{WIP WIP - copied stuff below}
+\todohigh{WIP WIP - copied stuff below. ABOVE is outdated!!}
 
 
 Note that by the aggregation property of Empirical distributions, the empirical process $\uppsim(x)$ conditioned on the model $\upthetam(x)$ is distributed as
