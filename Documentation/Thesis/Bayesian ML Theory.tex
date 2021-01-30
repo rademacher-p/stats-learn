@@ -2526,7 +2526,7 @@ and the conditional PDF of interest is
 \end{IEEEeqnarray}
 
 
-The conditional distribution when $\Xcal$ is a continuous space has notable differences from its form for a countable set $\Xcal$. Specifically, since $\Psim(D)$ is a Dirac delta function mixture, its values are either zero or tend towards infinity; thus, if the prior mean $\alpham$ is upper-bounded, the weighting function $\gammam(\Drm)$ will only take values zero or one, similar to the discrete-domain case when $\alpha_0 \to 0$. In this case, the distribution for a given observation $\xrm$ will be either strictly dependent on either the training data or the prior knowledge; if any training data are observed satisfying $\Xrm_n = \xrm$, then the conditional empirical model will be used for prediction.
+The conditional distribution when $\Xcal$ is a continuous space has notable differences from its form for a countable set $\Xcal$. Specifically, since $\Psim(D)$ is a Dirac delta function mixture, its values are either zero or tend towards infinity; thus, if the prior mean $\alpham$ is upper-bounded, the weight $\gammam(D)$ is either zero or one. Consequently, the predictive distribution will equal the conditional empirical distribution $\Psic(x;D)$ at all values $x \in \Xcal$ that have been observed in the training data. The empirical distribution is used for prediction whenever it is available, similar to the discrete-domain case when $\alpha_0 \to 0$.
 
 
 
@@ -2710,16 +2710,16 @@ Note that the dependency on the marginal empirical model can be expressed throug
 
 \subsection{Trends}
 
-The bias/variance trade-off is notably different if $\upthetam$ has a continuous domain and is upper-bounded. Note that by the aggregation property of Empirical distributions, the empirical process value $\uppsim(x)$ conditioned on the model $\upthetam(x)$ is now distributed as
+The bias/variance trade-off for continuous-domain data has notable differences from the discrete-domain results. Note that by the aggregation property of Empirical distributions, the empirical process value $\uppsim(x)$ conditioned on the model $\upthetam(x)$ is now distributed as
 \begin{IEEEeqnarray}{rCl}
 \prm_{\uppsim(x) | \upthetam(x)}\big(\psim(x) | \thetam(x) \big) & = & \Emp\left( \left( \frac{\psim(x)}{\delta(0)},1 - \frac{\psim(x)}{\delta(0)} \right); N, \left( \frac{\thetam(x)}{\delta(0)}, 1 - \frac{\thetam(x)}{\delta(0)} \right) \right) \nonumber \\
 & = & \Bi\left(\frac{N \psim(x)}{\delta(0)}; N, \frac{\thetam(x)}{\delta(0)}\right) \;,
 \end{IEEEeqnarray}
 where $\Bi$ is the binomial PMF. 
 
-Thus for bounded $\upthetam$, the empirical distribution value $\uppsim(x) \to 0$, the conditional expected value of $\gammam(\uppsim)$ tends to unity, and the predictive distribution tends to the conditional prior mean $\alphac(x)$ regardless of the value $\alpha_0 \alpham(x)$. As a result, the bias is always maximal and the covariance is always zero -- the efficacy of the estimator is entirely dependent on the bias.
+Thus for bounded $\upthetam(x)$, the expected number of samples $\delta(0)^{-1} N \uppsim(x) \to 0$, the value $\gammam(x; \uppsim)$ tends to unity, and the expected value of the predictive distribution tends to the conditional prior mean $\alphac(x)$ regardless of the value $\alpha_0 \alpham(x)$. As a result, the bias is always maximal and the covariance is always zero -- the quality of the distribution estimate at $x$ is entirely dependent on the bias.
 
-If instead $\upthetam$ is a mixture distribution including a Dirac delta function at some value $x \in \Xcal$, the conditional prior concentration $\alpha_0 \alpham(x)$ can affect the bias and variance. If the marginal prior mean $\alpham$ is bounded at the relevant value of $x$, the empirical distribution is used for prediction whenever available and the weight $\Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[ \gammam(\xrm; \uppsim) \big]$ assumes its minimal value $\big(1 - \delta(0)^{-1} \upthetam(x)\big)^N$. Conversely, if $\alpham$ also has a Dirac delta function at $x$, the bias weight behaves as for the discrete-domain case, depending on the relative values of $\delta(0)^{-1} \upthetam(x)$ and $\delta(0)^{-1} \alpham(x)$.
+If instead $\upthetam$ includes a Dirac delta function at $x \in \Xcal$, the conditional prior concentration $\alpha_0 \alpham(x)$ can affect the bias and variance. If the marginal prior mean value $\alpham(x)$ is bounded, the empirical distribution is used for prediction whenever available and the weight $\Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[ \gammam(\xrm; \uppsim) \big]$ assumes its minimal value $\big(1 - \delta(0)^{-1} \upthetam(x)\big)^N$, which is not necessarily equal to one. The estimate has minimal bias and maximal variance; the weighting values in \eqref{eq:predictive_E_del_sq_cont} are analagous to those provided in Section \ref{sec:predictive_est}. Conversely, if $\alpham$ also has a Dirac delta function at $x$, the bias weight behaves as for the discrete-domain case, depending on the relative values of $\delta(0)^{-1} \upthetam(x)$ and $\delta(0)^{-1} \alpham(x)$.
 
 
 \todohigh{example plots?}
@@ -2987,42 +2987,20 @@ Using the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \prm_{\y
 \end{IEEEeqnarray}
 where the expectation of the function $\Ecal$ is defined in \eqref{eq:predictive_E_del_sq_cont}. 
 
-\todohigh{WIP WIP - copied stuff below. ABOVE is outdated!!}
 
+It is instructional to consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex_cont} with training data volume $N$ and with Dirichlet prior parameterization. Referencing the predictive distribution estimation discussion in Section \ref{sec:predictive_est_cont}, the bias/variance trends are used. Importantly, if the marginal model $\upthetam$ is upper-bounded, the biased, fixed prior estimator $\mu_{\yrm | \xrm}$ will  always be used (on average) and the excess risk approaches $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, regardless of how large the training data volume $N$ may be. 
 
-It is instructional to consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex_cont} with training data volume $N$ and with Dirichlet prior parameterization.
+\todohigh{add delta mixture trends}
 
-
-
-Consider how the excess risk tends as the priors become maximally concentrated. As $\alpha'(x) \to \infty$, the excess risk tends to $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, the expected conditional squared-error between the means of the Bayesian predictive PMF and the clairvoyant predictive PMF. This is intuitive given that the estimator tends toward a data-independent solution; analogous to the discussion in Section \ref{sec:predictive_est}, the estimator may be biased, but will have no variance due to the training data statistics.
-
-Conversely, if concentrations $\alpha'(x) \to 0$ are chosen, the Bayesian estimate tends to the empirical mean, independent of $\alphac(\xrm)$, and the excess risk tends to
-\begin{IEEEeqnarray}{rCl}
-\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) & \to & \Erm_{\xrm | \upthetam}\left[ \Sigma_{\yrm | \xrm,\upthetac} \sum_{n=1}^N \binom{N}{n} \upthetam(\xrm)^n \big( 1 - \upthetam(\xrm) \big)^{N-n} \frac{1}{n} \right] \nonumber \\
-&& \qquad + \Erm_{\xrm | \upthetam}\left[ \big( 1 - \upthetam(\xrm) \big)^N \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \right] \nonumber \;.
+It instead $\upthetam$ includes Dirac delta functions, there are values $x \in \Xcal$ with non-zero probabilities of being observed. At these values, if $\alpham(x)$ is bounded, the weights tend to
+\begin{IEEEeqnarray}{L} 
+\Erm_{\uppsim(x) | \upthetam(x)}\left[ \frac{\big(1 - \gammam(x; \uppsim)\big)^2}{\delta(0)^{-1} N \uppsim(x)} \right] \to \sum_{n=1}^N \binom{N}{n} \left(\frac{\upthetam(x)}{\delta(0)}\right)^n \left( 1 - \frac{\upthetam(x)}{\delta(0)} \right)^{N-n} \frac{1}{n}
 \end{IEEEeqnarray}
-As $N$ increases, this term tends to zero, the risk due to the prior estimate bias decreases, and the excess risk becomes a function of $\uptheta$ only.
-
-
-
-Of further interest are the values $\alpha'(x)$ that minimize the excess squared-error for given prior conditional distributions $\alphac(x)$. With the asymptotic values of the excess risk known, all that remains is to determine any local minima. Since the $|\Xcal|$ summands of the excess risk depend only on the corresponding concentrations $\alpha'(x)$, each of these values can be optimized separately. 
-
-\todomid{add the derivative details below???}
-
-Calculating the first derivative with respect to $\alpha'(x)$, it can be shown that for $N > 0$ and $\thetam(x) > 0$, only one stationary point exists, at 
-\begin{equation} \label{eq:alpha_x_min_Rex}
-\alpha'(\xrm) = \frac{\Sigma_{\yrm | \xrm,\upthetac}}{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2} \;.
-\end{equation}
-Calculation of the second derivative confirms that this value is a local minimum. Furthermore, the excess risk evaluated at these values is 
-\begin{equation}
-\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{1}{N \uppsim(\xrm) \Sigma_{\yrm | \xrm,\upthetac}^{-1} + \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^{-2}} \right] \right] \;,
-\end{equation}
-which can be easily shown to be less than both the asymptotic values for $\alpha'(x) \to 0$ and $\alpha'(x) \to \infty$. Thus the concentration values \eqref{eq:alpha_x_min_Rex} can be used to find the optimal values of $\alpha_0$ and $\alpham(x)$ leading to the minimum excess risk for the given prior conditional distributions $\alphac(x)$.
-
-Note that the minimizing concentration values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible; the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low concentrations are preferable when the conditional model has low variance; these models can be accurately identified by learners that prioritize the empirical mean over the prior estimate, even with limited training data $N$. Additionally, note that these values $\alpha'(x)$ do not depend on the training volume $N$.
-
-
-
+and
+\begin{IEEEeqnarray}{L} 
+\Erm_{\uppsim(x) | \upthetam(x)}\big[ \gammam(x; \uppsim)^2 \big] \to \left(1 - \frac{\upthetam(x)}{\delta(0)}\right)^{N} \;,
+\end{IEEEeqnarray}
+representing the minimum bias and maximum variance incurred by the empirical estimate. If $\alpham$ also has a Dirac delta function at $x$, the value $\gammam(x; \uppsim)$ may assume values between zero and one and the estimate may convexly combine the prior estimate with the empirical estimate; in this case, the bias/variance weights may take on the same full range of values as for regression using discrete-domain data.
 
 
 
