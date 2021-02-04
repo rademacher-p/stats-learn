@@ -131,7 +131,7 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
     # if x is None:
     #     x = space_x.x_plt
     if ax is None:
-        ax = space_x.make_axes(grid=True)
+        ax = space_x.make_axes()
 
     if params is None:
         params_full = [{} for _ in predictors]

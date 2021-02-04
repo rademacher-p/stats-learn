@@ -315,7 +315,7 @@ class FiniteRV(MixinRV, Finite):
 # qq = None
 
 
-def _dirichlet_check_input(x, alpha_0, mean):
+def _dirichlet_check_input(x, mean, alpha_0):
     x, set_shape = check_valid_pmf(x, shape=mean.shape)
 
     if np.logical_and(x == 0, mean < 1 / alpha_0).any():
@@ -330,7 +330,7 @@ class Dirichlet(BaseRV):
     Dirichlet random process, finite-supp realizations.
     """
 
-    def __init__(self, alpha_0, mean, rng=None):
+    def __init__(self, mean, alpha_0, rng=None):
         super().__init__(rng)
         self._space = spaces.Simplex(np.array(mean).shape)
 
@@ -376,7 +376,7 @@ class Dirichlet(BaseRV):
         return rng.dirichlet(self._alpha_0 * self._mean.flatten(), size=n).reshape(n, *self.shape)
 
     def pf(self, x):
-        x, set_shape = _dirichlet_check_input(x, self._alpha_0, self._mean)
+        x, set_shape = _dirichlet_check_input(x, self._mean, self._alpha_0)
 
         log_pf = self._log_pf_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x).reshape(-1, self.size), -1)
         return np.exp(log_pf).reshape(set_shape)
@@ -414,7 +414,7 @@ class Empirical(BaseRV):
     Empirical random process, finite-supp realizations.
     """
 
-    def __init__(self, n, mean, rng=None):
+    def __init__(self, mean, n, rng=None):
         super().__init__(rng)
         self._space = spaces.SimplexDiscrete(self._n, np.array(mean).shape)
 
@@ -482,7 +482,7 @@ class DirichletEmpirical(BaseRV):
     Dirichlet-Empirical random process, finite-supp realizations.
     """
 
-    def __init__(self, n, alpha_0, mean, rng=None):
+    def __init__(self, n, mean, alpha_0, rng=None):
         super().__init__(rng)
         self._space = spaces.SimplexDiscrete(n, np.array(mean).shape)
 

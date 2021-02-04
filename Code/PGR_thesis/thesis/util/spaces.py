@@ -44,7 +44,7 @@ class Base(ABC):
     def set_x_plot(self, x=None):
         pass
 
-    def make_axes(self, grid=False):        # TODO: axes kwargs
+    def make_axes(self):        # TODO: axes kwargs
         if self.shape == ():
             _, ax = plt.subplots()
             ax.set(xlabel='$x$', ylabel='$f(x)$')
@@ -57,7 +57,6 @@ class Base(ABC):
         else:
             raise NotImplementedError('Plotting only supported for 1- and 2- dimensional data.')
 
-        ax.grid(grid)
         return ax
 
     def plot(self, f, x=None, ax=None, label=None):
@@ -65,7 +64,7 @@ class Base(ABC):
 
     def plot_xy(self, x, y, y_std=None, ax=None, label=None):
         if ax is None:
-            ax = self.make_axes(grid=True)
+            ax = self.make_axes()
 
         x, set_shape = check_data_shape(x, self.shape)
         if y.shape != set_shape:
@@ -366,7 +365,7 @@ class FiniteGeneric(Finite):
 
     def plot(self, f, x=None, ax=None, label=None):
         if ax is None:
-            ax = self.make_axes(grid=True)
+            ax = self.make_axes()
 
         x, y, set_shape = self._eval_func(f, x)
 
@@ -482,7 +481,7 @@ class Box(Continuous):      # TODO: make Box inherit from Euclidean?
 
     def plot(self, f, x=None, ax=None, label=None):
         if ax is None:
-            ax = self.make_axes(grid=True)
+            ax = self.make_axes()
 
         x, y, set_shape = self._eval_func(f, x)
 
