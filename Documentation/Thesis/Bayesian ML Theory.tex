@@ -164,11 +164,9 @@
 
 \todomid{Use $\Pcal$ only? Define discrete version of $\Pcal$?}
 
-\todolo{use clairvoyant/irreducible terms and symbols $\Rcal$}
+\todolo{use clairvoyant terms and symbols $\Rcal$}
 
 \todolo{suppress arguments where sensible? eg Pd = theta}
-
-\todomid{reconsider irreducible terminology}
 
 \todomid{empirical risk terms/discussion?}
 
@@ -539,7 +537,7 @@ over the domain $\prod_{x \in \Xcal} \left\{ \frac{n}{N \psim(x)}: n \in {\Zbbge
 
 The task in supervised machine learning is to design a learning function $f: \Dcal \mapsto \Hcal^{\Xcal}$ which produces a mapping from the space of the observed random elements to a decision space $\Hcal$. Define the function space $\Fcal = \left\{ {\Hcal^{\Xcal}} \right\}^{\Dcal}$, such that $f \in \Fcal$. The learning functions are non-parametric and there are no restrictions on the set of achievable functions $\Fcal$.
 
-The metric guiding the design is a loss function $\Lcal: \Hcal \times \Ycal \mapsto \Rbbgeq$ which penalizes the decision $h \in \Hcal$ based on the value of $\yrm$. The objective is to minimize the conditional expected loss, or conditional ``risk'',
+The metric guiding the design is a loss function $\Lcal: \Hcal \times \Ycal \mapsto \Rbbgeq$ which penalizes the decision $h \in \Hcal$ based on the value of $\yrm$. The objective is to minimize the expected loss, or ``risk'',
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond}
 \Rcal_{\Theta}(f ; \uptheta) & = &  \Erm_{\yrm,\xrm,\Drm | \uptheta} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \\
 & = & \Erm_{\xrm,\Drm | \uptheta} \bigg[ \Erm_{\yrm | \xrm,\uptheta} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \nonumber \\
@@ -561,13 +559,13 @@ For a given set of observations $\xrm$ and $\Drm$, the function $f_{\Theta}(\upt
 \begin{equation} \label{eq:f_clv_x}
 f_{\Theta}(\xrm;\uptheta) = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \;.
 \end{equation}
-The corresponding clairvoyant risk for a given model $\uptheta$ is
+The corresponding ``irreducible" risk for a given model $\uptheta$ is
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_clv}
 \Rcal_{\Theta}^*(\uptheta) & \equiv & \Rcal_{\Theta}\big( f_{\Theta}(\uptheta) ; \uptheta \big) \\
 & = & \min_{f \in \Fcal} \Rcal_{\Theta}(f ; \uptheta) \nonumber \\
 & = & \Erm_{\xrm | \uptheta} \left[ \min_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \right] \nonumber \;.
 \end{IEEEeqnarray}
-Additionally, define the excess conditional risk $\Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta) \equiv \Rcal_{\Theta}(f ; \uptheta) - \Rcal_{\Theta}^*(\uptheta)$; minimization of the learning objective \eqref{eq:risk_cond} is equivalent to minimization of this function.
+Additionally, define the excess risk $\Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta) \equiv \Rcal_{\Theta}(f ; \uptheta) - \Rcal_{\Theta}^*(\uptheta)$; minimization of the learning objective \eqref{eq:risk_cond} is equivalent to minimization of this function.
 
 Note that using the marginal/conditional model representations introduced previously, the clairvoyant decision will depend only on the conditional model $\thetac$.
 
@@ -577,7 +575,7 @@ Note that using the marginal/conditional model representations introduced previo
 
 \subsection{Bayes Decision}
 
-To design an optimal learning function $f \in \Fcal$, an operator must be chosen to remove the dependency of the conditional risk on $\uptheta$ and form an objective function $\Fcal \mapsto \Rbbgeq$. One choice is to integrate over $\Uptheta$; to ensure a non-negative objective value, the weighting function should be non-negative. Also, as scaling the objective function will not change its minimizing argument, the weighting function can be constrained to integrate to one. These are the requirements for a valid probability density function (PDF); as such, the model $\uptheta$ is treated as a random process and a Bayesian approach can be adopted. 
+To design an optimal learning function $f \in \Fcal$, an operator must be chosen to remove the dependency of the risk $\Rcal_{\Theta}$ on $\uptheta$ and form an objective function $\Fcal \mapsto \Rbbgeq$. One choice is to integrate over $\Uptheta$; to ensure a non-negative objective value, the weighting function should be non-negative. Also, as scaling the objective function will not change its minimizing argument, the weighting function can be constrained to integrate to one. These are the requirements for a valid probability density function (PDF); as such, the model $\uptheta$ is treated as a random process and a Bayesian approach can be adopted. 
 
 Define the PDF $\prm_{\uptheta} \in \Pcal(\Uptheta)$. Now the Bayes risk can be formulated as
 \begin{IEEEeqnarray}{rCl} \label{eq:risk}
@@ -712,7 +710,7 @@ where $\Prm_{\uppsic | \uppsim} = \Erm_{\upthetam | \uppsim} \Big[ \Erm_{\upthet
 
 
 
-\subsubsection{Irreducible Risk}
+\subsection{Risk trends}
 
 \todohigh{Location???}
 
@@ -742,9 +740,7 @@ demonstrating consistency of the full support Bayesian learner.
 
 \todohi{terminology?}
 
-The clairvoyant risk \eqref{eq:risk_clv} for a given model satisfies $\Rcal_{\Theta}^*(\theta) \leq \Rcal_{\Theta}(f;\theta) \quad \forall f \in \Fcal, \ \theta \in \Uptheta$. Consequently, the Bayes risk satisfies $\Erm_{\uptheta} \big[ \Rcal_{\Theta}^*(\uptheta) \big] \leq \Rcal(f) \quad \forall f \in \Fcal$; the expected value of the clairvoyant risk will thus be referred to as the ``irreducible'' risk. 
-
-It is important to note that this inequality holds for any number of training samples $N$ and that the irreducible risk does not depend on $N$. Thus, even with unlimited training data, no learning function can provide a Bayes risk lower than this value.
+The irreducible risk \eqref{eq:risk_clv} for a given model satisfies $\Rcal_{\Theta}^*(\theta) \leq \Rcal_{\Theta}(f;\theta) \quad \forall f \in \Fcal, \ \theta \in \Uptheta$. Consequently, the Bayes risk satisfies $\Erm_{\uptheta} \big[ \Rcal_{\Theta}^*(\uptheta) \big] \leq \Rcal(f) \quad \forall f \in \Fcal$. Note that this inequality holds for any number of training samples $N$ and that the lower bound does not depend on $N$. Thus, even with unlimited training data, no learning function can provide a Bayes risk lower than this value.
 
 
 
@@ -759,7 +755,7 @@ It is important to note that this inequality holds for any number of training sa
 \todohi{marginal/conditional??? D or psi? Continuous?}
 
 
-In this section, loss functions typical for classification and regression applications, specifically the 0-1 loss function and the squared-error loss function, are adopted. The conditional risk \eqref{eq:risk_cond} is assessed, clairvoyant decision functions \eqref{eq:f_clv_x} are found, and the clairvoyant risk \eqref{eq:risk_clv} is expressed.
+In this section, loss functions typical for classification and regression applications, specifically the 0-1 loss function and the squared-error loss function, are adopted. The risk \eqref{eq:risk_cond} is assessed, clairvoyant decision functions \eqref{eq:f_clv_x} are found, and the irreducible risk \eqref{eq:risk_clv} is expressed.
 
 
 \subsection{Regression: the Squared-Error Loss}
@@ -783,7 +779,7 @@ Substituting the squared-error loss into \eqref{eq:risk_cond}, the conditional s
 \end{IEEEeqnarray}
 a sum of two terms. The first term is the expected conditional variance of the true predictive distribution $\Prm_{\yrm | \xrm,\uptheta}$. The second term is the expected squared bias between the estimate and the true conditional mean $\mu_{\yrm | \xrm,\uptheta}$.
 
-Note that the risk can also be represented as $\Rcal_{\Theta}(f ; \uptheta) = \Rcal_{\Theta}^*(\uptheta) + \Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta)$, where the first term is the clairvoyant squared-error (as demonstrated in the next sub-section) and the second term is the excess squared-error,
+Note that the risk can also be represented as $\Rcal_{\Theta}(f ; \uptheta) = \Rcal_{\Theta}^*(\uptheta) + \Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta)$, where the first term is the irreducible squared-error (as demonstrated in the next sub-section) and the second term is the excess squared-error,
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond_ex_SE}
 \Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta) & = & \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( f(\xrm;\Drm) - f_{\Theta}(\xrm;\uptheta) \big)^2 \Big] \\
 & = & \Erm_{\xrm | \uptheta} \left[ \Crm_{\Drm | \uptheta} \big[ f(\xrm;\Drm) \big] + \Big( \Erm_{\Drm | \uptheta}\big[ f(\xrm;\Drm) \big] - f_{\Theta}(\xrm;\uptheta) \Big)^2 \right] \nonumber \;,
@@ -802,20 +798,20 @@ To find the clairvoyant estimator, the squared-error loss is substituted into \e
 f_{\Theta}(\xrm;\uptheta) & = & \argmin_{h \in \Rbb} \Erm_{\yrm | \xrm,\uptheta} \left[ (h-\yrm)^2 \right] \\
 & = &  \mu_{\yrm | \xrm,\uptheta} \nonumber \;. %= \sum_{y \in \Ycal} y \upthetac(y;\xrm) 
 \end{IEEEeqnarray}
-Substituting the loss and clairvoyant function into \eqref{eq:risk_clv}, the resulting clairvoyant risk is
+Substituting the loss and clairvoyant function into \eqref{eq:risk_clv}, the irreducible squared-error is
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_clv_SE}
 \Rcal_{\Theta}^*(\uptheta) & = & \Erm_{\xrm | \uptheta} \Big[ \Erm_{\yrm | \xrm,\uptheta} \big[ (\yrm - \mu_{\yrm | \xrm,\uptheta})^2 \big] \Big] \\
 & = & \Erm_{\xrm | \uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right] \nonumber \;.
 \end{IEEEeqnarray}
 
-Observe that the general conditional risk \eqref{eq:risk_cond_SE} can be represented as $\Rcal_{\Theta}(f ; \uptheta) = \Rcal_{\Theta}^*(\uptheta) + \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( f(\xrm;\Drm) - f_{\Theta}(\xrm;\uptheta) \big)^2 \Big]$. The first summand is equal to the clairvoyant squared-error; the second term is dependent on the difference between the general estimate and the clairvoyant estimate. 
+Observe that the general risk \eqref{eq:risk_cond_SE} can be represented as $\Rcal_{\Theta}(f ; \uptheta) = \Rcal_{\Theta}^*(\uptheta) + \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( f(\xrm;\Drm) - f_{\Theta}(\xrm;\uptheta) \big)^2 \Big]$. The first summand is equal to the irreducible squared-error; the second term is dependent on the difference between the general estimate and the clairvoyant estimate. 
 
 
-Figure \ref{fig:Risk_clv_SE_tilde} displays the clairvoyant risk for predictive models $\thetac(x)$ independent of $x$. 
+Figure \ref{fig:Risk_clv_SE_tilde} displays the irreducible risk for predictive models $\thetac(x)$ independent of $x$. 
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_clv_SE_tilde.pdf}
-\caption{Clairvoyant Risk for the Squared-Error Loss Function, constant $\thetac(x)$}
+\caption{Irreducible Squared-Error, constant $\thetac(x)$}
 \label{fig:Risk_clv_SE_tilde}
 \end{figure}
 
@@ -841,7 +837,7 @@ An interesting form for the optimal estimator is $f^*(\xrm;\Drm) = \Erm_{\upthet
 
 
 
-\paragraph{Minimum Risk: the Expected Posterior Variance}
+\paragraph{Minimum Bayes Risk: the Expected Posterior Variance}
 
 The Bayes squared-error risk for a general learning function is
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_SE}
@@ -857,7 +853,7 @@ Substituting the optimal estimator \eqref{eq:f_opt_SE} into Equation \eqref{eq:r
 & = & \Erm_{\xrm,\uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right] + \Erm_{\xrm,\Drm} \left[ \Crm_{\uptheta | \xrm,\Drm} \left[ \mu_{\yrm | \xrm,\uptheta} \right] \right] \nonumber \\
 & = & \Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] + \Erm_{\xrm,\Drm} \Big[ \Crm_{\uptheta | \xrm,\Drm} \big[ f_{\Theta}(\xrm;\uptheta) \big] \Big] \nonumber \;.
 \end{IEEEeqnarray}
-The first term is the irreducible risk. The second term is the expected variance of the clairvoyant estimate $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$ with respect to the model posterior PDF $\prm_{\uptheta | \xrm,\Drm}$
+The first term is the expected irreducible risk. The second term is the expected variance of the clairvoyant estimate $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$ with respect to the model posterior PDF $\prm_{\uptheta | \xrm,\Drm}$
 
 
 
@@ -870,7 +866,7 @@ In this section, the developed framework is applied to a common machine learning
 \begin{equation} \label{eq:loss_01}
 \Lcal(h,y) = 1 - \delta[h,y] \;.
 \end{equation}
-Applying the 0-1 loss, the conditional risk \eqref{eq:risk_cond} for a general classifier is
+Applying the 0-1 loss, the risk \eqref{eq:risk_cond} for a general classifier is
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond_01}
 \Rcal_{\Theta}(f ; \uptheta) & = & 1 - \Erm_{\Drm | \uptheta} \bigg[ \Erm_{\xrm | \uptheta} \Big[ \Prm_{\yrm | \xrm,\uptheta}\big( f(\xrm;\Drm) | \xrm,\uptheta \big) \Big] \bigg] \;.
 % & = & 1 - \sum_{x \in \Xcal} \Erm_{\Drm | \uptheta} \Big[ \uptheta\big( f(x;\Drm),x \big) \Big] \nonumber \\
@@ -890,18 +886,18 @@ f_{\Theta}(\xrm;\uptheta) & = & \argmin_{h \in \Ycal} \Erm_{\yrm | \xrm,\uptheta
 %& = & \argmax_{y \in \Ycal} \upthetac(y;\xrm) \nonumber \\
 & = & \argmax_{y \in \Ycal} \uptheta(y,\xrm) \nonumber \;.
 \end{IEEEeqnarray}
-Substituting the 0-1 loss and clairvoyant hypothesis into \eqref{eq:risk_clv}, the resulting clairvoyant risk is
+Substituting the 0-1 loss and clairvoyant hypothesis into \eqref{eq:risk_clv}, the resulting irreducible probability of error is
 \begin{IEEEeqnarray}{rCl}
 \Rcal_{\Theta}^*(\uptheta) & = & 1 - \Erm_{\xrm | \uptheta} \Big[ \max_{y \in \Ycal} \Prm_{\yrm | \xrm,\uptheta}(y | \xrm,\uptheta) \Big] \;.
 %& = & 1 - \sum_{x \in \Xcal} \upthetam(x) \max_{y \in \Ycal} \upthetac(y;x) \nonumber \\
 %& = & 1 - \sum_{x \in \Xcal} \max_{y \in \Ycal} \uptheta(y,x) \nonumber \;.
 \end{IEEEeqnarray}
 
-Figure \ref{fig:Risk_clv_01_tilde} displays the clairvoyant risk for predictive models $\thetac(x)$ independent of $x$. Intuitively, the models that are more concentrated lead to lower probability of error.
+Figure \ref{fig:Risk_clv_01_tilde} displays the irreducible risk for predictive models $\thetac(x)$ independent of $x$. Intuitively, the models that are more concentrated lead to lower probability of error.
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_clv_01_tilde.pdf}
-\caption{Clairvoyant Risk for the 0--1 Loss Function, constant $\thetac(x)$}
+\caption{Irreducible probability of error, constant $\thetac(x)$}
 \label{fig:Risk_clv_01_tilde}
 \end{figure}
 
@@ -922,7 +918,7 @@ The optimal classifier chooses the value $y \in \Ycal$ that maximizes the condit
 
 
 
-\paragraph{Minimum Risk: Probability of Error}
+\paragraph{Minimum Bayes Risk: Probability of Error}
 
 Using the 0-1 loss, the Bayes probability of error \eqref{eq:risk_min} is
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_01}
@@ -1546,7 +1542,7 @@ PGR: REMOVE GENERAL, RELOCATED MATERIAL!
 
 PGR: equations, plots for specific theta results? informative/non-informative tradeoff??? alpha/theta mismatch results???
 
-In this section, the Dirichlet prior is applied to the regression and classification applications. Optimal learners $f^*$ are found,  the corresponding minimum Bayes risk $\Rcal^*$ is assessed, and the conditional risk $\Rcal_{\Theta}(f^*;\theta)$ is analyzed.
+In this section, the Dirichlet prior is applied to the regression and classification applications. Optimal learners $f^*$ are found,  the corresponding minimum Bayes risk $\Rcal^*$ is assessed, and the risk $\Rcal_{\Theta}(f^*;\theta)$ is analyzed.
 
 PGR: add formula for f(D)??? EMPIRICAL RISK DISCUSS, REGULARIZING weight
 
@@ -1567,8 +1563,6 @@ The metric to be minimized can be represented as a convex combination of two exp
 \subsection{Regression: the Squared-Error Loss}
 
 PGR: Use finite hypothesis space instead, wait for continuous DP???
-
-PGR: add Dir conditional risk and analysis!!!
 
 The elements of the finite cardinality set $\Ycal$ are real numbers, such that $\Ycal \subset \Rbb$. Again, $\Hcal = \Rbb \supset \Ycal$.
 
@@ -1604,12 +1598,10 @@ Now, the model prior contribution to the weighting factors depends on the cardin
 
 
 
-\subsubsection{Minimum Risk: the Expected Posterior Variance}
-
-PGR: determine irreducible risk separately, before??
+\subsubsection{Minimum Bayes Risk: the Expected Posterior Variance}
 
 
-The minimum Bayes squared-error is $\Rcal^* = \Erm_{\xrm,\Drm} \left[ \Sigma_{\yrm | \xrm,\Drm} \right]$. Using the sufficient statistic $\uppsi \equiv \Psi(\Drm)$, the minimum risk can also be represented as $\Erm_{\xrm,\uppsi} \left[ \Sigma_{\yrm | \xrm,\uppsi} \right]$; as such, the expectations are performed over $\uppsi$. Decompose the conditional variance as
+The minimum Bayes squared-error is $\Rcal^* = \Erm_{\xrm,\Drm} \left[ \Sigma_{\yrm | \xrm,\Drm} \right]$. Using the sufficient statistic $\uppsi \equiv \Psi(\Drm)$, it can also be represented as $\Erm_{\xrm,\uppsi} \left[ \Sigma_{\yrm | \xrm,\uppsi} \right]$; as such, the expectations are performed over $\uppsi$. Decompose the conditional variance as
 \begin{IEEEeqnarray}{rCl}
 \Sigma_{\yrm | \xrm,\uppsi} & = & \Erm_{\yrm | \xrm,\uppsi}[\yrm^2] - \mu_{\yrm | \xrm,\uppsi}^2 
 \end{IEEEeqnarray}
@@ -1669,9 +1661,9 @@ Finally, combine the two formulas to represent the mininum Bayes risk,
 = \Erm_{\xrm} \left[ \frac{\alpha_0 \big(\alpha_0 \alpham(\xrm) + N \alpham(\xrm) + 1 \big)}{\big( \alpha_0 \alpham(\xrm)+1 \big) (\alpha_0+N)} \Sigma_{\yrm | \xrm} \right] \nonumber \\
 = \Erm_{\xrm} \left[ \frac{\alpham(\xrm) + (\alpha_0+N)^{-1}}{\alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right] \nonumber \;.
 \end{IEEEeqnarray}
-The minimum risk is the expected value of the scaled conditional variance with respect to $\Prm_{\yrm | \xrm} = \alphac(\xrm)$. The expectation is taken with respect to the prior marginal distribution $\Prm_{\xrm} = \alpham$. 
+The minimum Bayes squared-error is the expected value of the scaled conditional variance with respect to $\Prm_{\yrm | \xrm} = \alphac(\xrm)$. The expectation is taken with respect to the prior marginal distribution $\Prm_{\xrm} = \alpham$. 
 
-The scaling factor for each term $\Sigma_{\yrm | \xrm}$ depends on the marginal $\Prm_{\xrm}$, as well as on the prior concentration $\alpha_0$ and the number of training samples $N$. Observe that with no training data ($N = 0$), the scaling factor becomes unity and the risk is $\Rcal^* = \Erm_{\xrm} \left[ \Sigma_{\yrm | \xrm} \right]$. Conversely, as $N \to \infty$, the Bayes risk is $\Rcal^* \to \Erm_{\xrm} \left[ \frac{\alpham(\xrm)}{\alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right]$; note that this is equivalent to the irreducible risk $\Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] = \Erm_{\xrm,\uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right]$. Also, as the model concentration parameter $\alpha_0 \to 0$, the risk tends to zero (for $N > 0$); as $\alpha_0 \to \infty$, the risk tends toward $\Erm_{\xrm} \left[ \Sigma_{\yrm | \xrm} \right]$.
+The scaling factor for each term $\Sigma_{\yrm | \xrm}$ depends on the marginal $\Prm_{\xrm}$, as well as on the prior concentration $\alpha_0$ and the number of training samples $N$. Observe that with no training data ($N = 0$), the scaling factor becomes unity and the risk is $\Rcal^* = \Erm_{\xrm} \left[ \Sigma_{\yrm | \xrm} \right]$. Conversely, as $N \to \infty$, the Bayes risk is $\Rcal^* \to \Erm_{\xrm} \left[ \frac{\alpham(\xrm)}{\alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right]$; note that this is equivalent to the expected irreducible risk  $\Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] = \Erm_{\xrm,\uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right]$. Also, as the model concentration parameter $\alpha_0 \to 0$, the risk tends to zero (for $N > 0$); as $\alpha_0 \to \infty$, the risk tends toward $\Erm_{\xrm} \left[ \Sigma_{\yrm | \xrm} \right]$.
 
 PGR: first/second derivatives of alpha0??
 
@@ -1740,7 +1732,7 @@ To visualize the performance, use the explicit sets $\Ycal$ and $\Xcal$ defined 
 \begin{equation}
 \Sigma_{\yrm | \xrm} = \frac{|\Ycal|^2 - 1}{12 |\Ycal|^2} = \frac{1 - |\Ycal|^{-2}}{12} 
 \end{equation}
-and the minimum risk is expressed as
+and the minimum Bayes risk is expressed as
 \begin{IEEEeqnarray}{rCl}
 \Rcal^* & = & \frac{\big(1 - |\Ycal|^{-1}\big) \Big(1 + \big(N/|\Xcal| + |\Ycal|\big)^{-1} \Big)}{12} \\
 & = & \left(\frac{|\Ycal|}{N/|\Xcal| + |\Ycal|}\right) \frac{1 - |\Ycal|^{-2}}{12} + \left(\frac{N/|\Xcal|}{N/|\Xcal| + |\Ycal|}\right) \frac{1 - |\Ycal|^{-1}}{12} \nonumber \;.
@@ -1781,7 +1773,7 @@ PGR: additional figures for uniform case?
 
 \subsubsection{Conditional Squared-Error for a Dirichlet-based Estimator}
 
-Having derived the optimal estimator based on a Dirichlet model prior, it is important to consider the conditional risk $\Rcal_{\Theta}(f^* ; \uptheta)$ and analyze how different prior parameterizations $\alpha$ influence the squared-error for different models $\theta$. Starting from the excess conditional squared-error risk \eqref{eq:risk_cond_ex_SE} and substituting the Bayesian estimator \eqref{eq:f_opt_SE}, the formula simplifies to $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big]$.
+Having derived the optimal estimator based on a Dirichlet model prior, it is important to consider the risk $\Rcal_{\Theta}(f^* ; \uptheta)$ and analyze how different prior parameterizations $\alpha$ influence the squared-error for different models $\theta$. Starting from the excess conditional squared-error risk \eqref{eq:risk_cond_ex_SE} and substituting the Bayesian estimator \eqref{eq:f_opt_SE}, the formula simplifies to $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big]$.
 
 Evaluation of the excess risk for an estimator based on the Dirichlet prior will be performed using the sufficient statistic $\uppsi$ in place of the training set $\Drm$. Using the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$ introduced in \ref{sec:predictive_est}, the term is expressed as
 \begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex}
@@ -1800,7 +1792,7 @@ where the expectation of the function $\Ecal$ is defined in \eqref{eq:predictive
 \todolo{note use of new model estimation formulas!}
 \todomid{use weight notation from conf paper? add theta dependency to lambda}
 
-The excess conditional risk can thus be represented as the conditional expectation (with respect to $\Prm_{\xrm | \uptheta} = \upthetam$) of a sum of two functions of $\xrm$.  The first function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. This term alone is influenced by the data-independent Bayes predictive distribution $\Prm_{\yrm | \xrm} = \alphac(\xrm)$. The second function measures the additional variance beyond that of the clairvoyant estimator (i.e. the clairvoyant squared-error); like the clairvoyant risk, it depends on $\Sigma_{\yrm | \xrm,\upthetac}$, the conditional variance of the clairvoyant estimate for a given observation of $\xrm$. These two second-order terms (of $y$) are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam(x)$ and $N$ via conditional expectations with respect to $\uppsim(x)$.
+The excess risk can thus be represented as the conditional expectation (with respect to $\Prm_{\xrm | \uptheta} = \upthetam$) of a sum of two functions of $\xrm$.  The first function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. This term alone is influenced by the data-independent Bayes predictive distribution $\Prm_{\yrm | \xrm} = \alphac(\xrm)$. The second function measures the additional variance beyond that of the clairvoyant estimator (i.e. the irreducible squared-error); like the irreducible squared-error, it depends on $\Sigma_{\yrm | \xrm,\upthetac}$, the conditional variance of the clairvoyant estimate for a given observation of $\xrm$. These two second-order terms (of $y$) are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam(x)$ and $N$ via conditional expectations with respect to $\uppsim(x)$.
 
 
 It is instructional to consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. As these weights depend on the bias and variance scaling factors introduced in Section \ref{sec:predictive_est}, the analysis performed there is directly applicable.
@@ -1808,7 +1800,7 @@ It is instructional to consider the trends of the squared-error risk \eqref{eq:r
 
 First consider how the excess risk changes with the training volume $N$. For $N=0$, it is evident that the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$,  the expected squared bias between the clairvoyant and data-independent estimators. Recall that as $N \to \infty$, the bias and variance both vanish, resulting in $\Ecal(\xrm; \upthetam, \upthetac) \to 0$; as a result, $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable estimator property is a consequence of the full support of the Dirichlet prior, ensuring that the model posterior concentrates at the empirical PMF.
 
-Another interesting point regarding the dependency of the excess conditional risk on $N$ is that there may be a local maximum, depending on the learner parameterization. To demonstrate, consider the case of $|\Xcal| = 1$ - treating $N$ as a real number, there would be a maximum at 
+Another interesting point regarding the dependency of the excess risk on $N$ is that there may be a local maximum, depending on the learner parameterization. To demonstrate, consider the case of $|\Xcal| = 1$ - treating $N$ as a real number, there would be a maximum at 
 \begin{equation}
 N = \alpha_0 \left( 1 - 2 \alpha_0 \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2}{\Sigma_{\yrm | \xrm,\upthetac}} \right) \;.
 \end{equation}
@@ -1845,11 +1837,11 @@ Figures \ref{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased} and \ref{fig:Risk_cond_SE_D
 
 Next consider the effects of the Dirichlet prior parameters. The analysis will interpret the Dirichlet parameters as the conditional prior means $\alphac(x)$ and the corresponding concentrations $\alpha'(x) \equiv \alpha_0 \alpham(x)$; the latter affects the risk through the value $\gammam(\uppsi)$.
 
-First consider the conditional prior PMF's $\alphac(x)$; as shown, they manifest themselves in the risk through the squared estimator bias. It is clear that regardless of how the values $\alpha_0$ and $\alpham(x)$ are chosen, the best selections for these conditional priors must have first moments matching those of the corresponding clairvoyant predictive distributions $\Prm_{\yrm | \xrm,\uptheta}$ for each $x \in \Xcal$. The resultant estimators $\mu_{\yrm | \xrm}$ are unbiased and the excess conditional risk is equivalent to the first term in \eqref{eq:risk_cond_SE_dir_ex}, measuring additional variance due to model uncertainty.
+First consider the conditional prior PMF's $\alphac(x)$; as shown, they manifest themselves in the risk through the squared estimator bias. It is clear that regardless of how the values $\alpha_0$ and $\alpham(x)$ are chosen, the best selections for these conditional priors must have first moments matching those of the corresponding true predictive distributions $\Prm_{\yrm | \xrm,\uptheta}$ for each $x \in \Xcal$. The resultant estimators $\mu_{\yrm | \xrm}$ are unbiased and the excess risk is equivalent to the first term in \eqref{eq:risk_cond_SE_dir_ex}, measuring additional variance due to model uncertainty.
 
-The other user-selected Dirichlet parameters manifest themselves in the conditional risk as $\alpha'(x)$, the concentrations of the corresponding conditional distributions $\upthetac(x)$; these values control important bias/variance trade-offs via the two scaling factors in \eqref{eq:risk_cond_SE_dir_ex}. First, consider the asymptotic trends, again referencing the distribution estimation analysis in Section \ref{sec:predictive_est}.
+The other user-selected Dirichlet parameters manifest themselves in the risk as $\alpha'(x)$, the concentrations of the corresponding conditional distributions $\upthetac(x)$; these values control important bias/variance trade-offs via the two scaling factors in \eqref{eq:risk_cond_SE_dir_ex}. First, consider the asymptotic trends, again referencing the distribution estimation analysis in Section \ref{sec:predictive_est}.
 
-Consider how the excess risk tends as the priors become maximally concentrated. Recall that as $\alpha'(x) \to \infty$, the estimate of $\upthetac$ is maximally biased and has no variance; thus, the excess risk tends to $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, the expected conditional squared-error between the means of the Bayesian predictive PMF and the clairvoyant predictive PMF. This is intuitive given that the estimator tends toward a data-independent solution; the estimator may be biased, but will have no variance due to the training data statistics.
+Consider how the excess risk tends as the priors become maximally concentrated. Recall that as $\alpha'(x) \to \infty$, the estimate of $\upthetac$ is maximally biased and has no variance; thus, the excess risk tends to $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, the expected conditional squared-error between the means of the Bayesian predictive PMF and the true predictive PMF. This is intuitive given that the estimator tends toward a data-independent solution; the estimator may be biased, but will have no variance due to the training data statistics.
 
 Conversely, if concentrations $\alpha'(x) \to 0$ are chosen, the Bayesian estimate tends to the empirical mean, independent of $\alphac$. Using the limits demonstrated in \ref{sec:predictive_est}, it can be shown that the excess risk tends to
 \begin{IEEEeqnarray}{rCl}
@@ -1949,12 +1941,12 @@ the maximizing argument of the conditional empirical model. This effects a condi
 
 
 
-\subsubsection{Minimum Risk: Probability of Error}
+\subsubsection{Minimum Bayes Risk: Probability of Error}
 
 \todohigh{no closed-forms found??? Find closed-form BOUNDS???}
 
 
-Evaluating the minimum risk \eqref{eq:risk_min_01} using the distributions derived from the Dirichlet prior, the Bayes minimum probability of error is 
+Evaluating the minimum Bayes risk \eqref{eq:risk_min_01} using the distributions derived from the Dirichlet prior, the Bayes minimum probability of error is 
 \begin{IEEEeqnarray}{rCl}
 \Rcal^* & = & 1 - \Erm_{\xrm,\Drm} \left[ \max_{y \in \Ycal} \Prm_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) \right] \\
 & = & 1 - \Erm_{\xrm,\uppsim,\uppsic} \left[ \frac{ \max_{y \in \Ycal} \big( \alpha_0 \alpham(x) \alphac(y;x) + N \uppsim(x) \uppsi(y;x) \big)}{\alpha_0 \alpham(x) + N \uppsim(x)} \right] \nonumber \\
@@ -2092,11 +2084,11 @@ It is instructional to express the risk for minimal and maximal volumes of train
 \begin{equation}
 \sum_{m=0}^M \binom{M}{m} (-1)^m g(m) = 0 \; ,
 \end{equation}
-where $g$ is a polynomial function of degree less than $M$ \cite{graham}, it can be shown that for $N = 0$, the minimum risk is $\Rcal^*  = 1 - |\Ycal|^{-1}$. This is sensible, as the classes are equiprobable with $\Prm_{\yrm} = |\Ycal|^{-1}$.
+where $g$ is a polynomial function of degree less than $M$ \cite{graham}, it can be shown that for $N = 0$, the minimum Bayes risk is $\Rcal^*  = 1 - |\Ycal|^{-1}$. This is sensible, as the classes are equiprobable with $\Prm_{\yrm} = |\Ycal|^{-1}$.
 
 PGR: use ruiz citation for identity?
 
-PGR: find irreducible risk explicitly from theta?
+PGR: find min Bayes risk explicitly from theta?
 
 To find the risk for $N \to \infty$, note that
 \begin{IEEEeqnarray}{L}
@@ -2105,17 +2097,17 @@ To find the risk for $N \to \infty$, note that
 \qquad = \frac{|\Xcal|}{m} \int_0^1 (1-t)^{|\Ycal||\Xcal|-1} {\drm}t \nonumber \\
 \qquad = \frac{1}{m|\Ycal|} \nonumber \;.
 \end{IEEEeqnarray}
-The irreducible 0-1 risk for the uniform prior tends toward
+The minimum Bayes probability of error for the uniform prior tends toward
 \begin{IEEEeqnarray}{rCl}
 \Rcal^* & \to & 1 - |\Ycal|^{-1} \sum_{m=1}^{|\Ycal|} \binom{|\Ycal|}{m} (-1)^{m-1} m^{-1} \\
 & = & 1 - |\Ycal|^{-1} \sum_{m=1}^{|\Ycal|} m^{-1} \nonumber \;,
 \end{IEEEeqnarray}
-providing a lower bound for the achievable 0-1 Bayes risk. The above formulation has made use of the alternating summation identity from \cite{roman} to display the risk with a form including the $|\Ycal|^\mathrm{th}$ harmonic number $H_{|\Ycal|} \equiv \sum_{m=1}^{|\Ycal|} m^{-1}$. Observe that the irreducible risk does not depend on the cardinality $|\Xcal|$.
+providing a lower bound for the achievable 0-1 Bayes risk. The above formulation has made use of the alternating summation identity from \cite{roman} to display the risk with a form including the $|\Ycal|^\mathrm{th}$ harmonic number $H_{|\Ycal|} \equiv \sum_{m=1}^{|\Ycal|} m^{-1}$. Observe that the minimum Bayes risk does not depend on the cardinality $|\Xcal|$.
 
 \todohi{harmonic reference}
 
 
-Figure \ref{fig:Risk_01_uni_N_leg_My} demonstrates how the minimum 0-1 risk decreases with training volume $N$; observe that the risk is more severe for sequences corresponding to higher $|\Ycal|$. It is sensible that the probability of error should increase when more classes have to be considered. Figure \ref{fig:Risk_01_uni_N_leg_Mx} illustrates the minimum risk with multiple sequences for different cardinalities $|\Xcal|$. Note that risk increases with $|\Xcal|$. Considering $N \Erm_{\Xrm}\big[\Psim(\Xrm)\big] = N \mu_{\uppsim} = N/|\Xcal|$, this should be intuitive - each conditional empirical distribution $\Psic(x;D)$ is forced to approximate $\upthetac(x)$ with fewer data.
+Figure \ref{fig:Risk_01_uni_N_leg_My} demonstrates how the minimum 0-1 risk decreases with training volume $N$; observe that the risk is more severe for sequences corresponding to higher $|\Ycal|$. It is sensible that the probability of error should increase when more classes have to be considered. Figure \ref{fig:Risk_01_uni_N_leg_Mx} illustrates the Bayes risk with multiple sequences for different cardinalities $|\Xcal|$. Note that risk increases with $|\Xcal|$. Considering $N \Erm_{\Xrm}\big[\Psim(\Xrm)\big] = N \mu_{\uppsim} = N/|\Xcal|$, this should be intuitive - each conditional empirical distribution $\Psic(x;D)$ is forced to approximate $\upthetac(x)$ with fewer data.
 
 \begin{figure}
 \centering
@@ -2141,7 +2133,7 @@ Further insight into how $|\Xcal|$ affects the risk can be acquired by plotting 
 \end{figure}
 
 
-It is also useful to graph the $N=0$ and $N \to \infty$ minimum risk as a function of $|\Ycal|$; both formulas are independent of $|\Xcal|$. Figure \ref{fig:Risk_01_uni_N_bounds} displays these bounds; note the margin in the probability of error between the optimal $N=0$ and $N \to \infty$ classifiers. For $|\Ycal| = 2$ binary classification, both sequences are at their minimum and infinite training data provides a reduction in expected probability of error from 0.5 to 0.25. As $|\Ycal|$ increases, the classification risk for both the $N=0$ and $N \to \infty$ cases tend to unity and the error reduction for $N \to \infty$ decreases. 
+It is also useful to graph the $N=0$ and $N \to \infty$ Bayes risk as a function of $|\Ycal|$; both formulas are independent of $|\Xcal|$. Figure \ref{fig:Risk_01_uni_N_bounds} displays these bounds; note the margin in the probability of error between the optimal $N=0$ and $N \to \infty$ classifiers. For $|\Ycal| = 2$ binary classification, both sequences are at their minimum and infinite training data provides a reduction in expected probability of error from 0.5 to 0.25. As $|\Ycal|$ increases, the classification risk for both the $N=0$ and $N \to \infty$ cases tend to unity and the error reduction for $N \to \infty$ decreases. 
 
 
 
@@ -2171,7 +2163,7 @@ Substituting the optimal Dirichlet-based classifier into the formula for the con
 \begin{IEEEeqnarray}{rCl}
 \Rcal_{\Theta}(f ; \uptheta) & = & 1 - \sum_{x \in \Xcal} \upthetam(x) \Erm_{\uppsi | \upthetam,\upthetac} \bigg[ \upthetac\Big( \argmax_{y \in \Ycal} \big( N \uppsi(y,x) + \alpha_0 \alpha(y,x) \big) ;x \Big) \bigg] \;.
 \end{IEEEeqnarray}
-Figures \ref{fig:Risk_cond_01_Dir_N_leg_a0__subj_good} and \ref{fig:Risk_cond_01_Dir_N_leg_a0__subj_bad} show how the conditional risk trends for classifiers based on well-matched and poorly-matched informative Dirichlet priors, respectively. Note that the well-matched prior does better with higher prior concentrations $\alpha_0$; this is reflective of the fact that the maximizing arguments $y \in \Ycal$ of both the true model $\thetac(x)$ and the prior mean $\alphac(x)$ are the same.
+Figures \ref{fig:Risk_cond_01_Dir_N_leg_a0__subj_good} and \ref{fig:Risk_cond_01_Dir_N_leg_a0__subj_bad} show how the risk trends for classifiers based on well-matched and poorly-matched informative Dirichlet priors, respectively. Note that the well-matched prior does better with higher prior concentrations $\alpha_0$; this is reflective of the fact that the maximizing arguments $y \in \Ycal$ of both the true model $\thetac(x)$ and the prior mean $\alphac(x)$ are the same.
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_cond_01_Dir_N_leg_a0__subj_good.pdf}
@@ -2186,7 +2178,7 @@ Figures \ref{fig:Risk_cond_01_Dir_N_leg_a0__subj_good} and \ref{fig:Risk_cond_01
 \label{fig:Risk_cond_01_Dir_N_leg_a0__subj_bad}
 \end{figure}
 
-Also, it is important to consider how a given classifier performs for varying models $\thetac(x)$. Figures \ref{fig:Risk_cond_ex_01_Dir_theta__uni} and \ref{fig:Risk_cond_ex_01_Dir_theta__subj} demonstrate the excess conditional probability of error achieved by the conditional majority decision (based on a non-informative Dirichlet prior) and by a classifier derived from an informative Dirichlet prior, respectively. Note that while the former has fewer models for which the error is critically high, the latter has more models for which the clairvoyant risk $\Rcal_{\Theta}^*(\theta)$ is achieved. This a fundamental trade-off between Bayesian learners based on non-informative versus informative priors.
+Also, it is important to consider how a given classifier performs for varying models $\thetac(x)$. Figures \ref{fig:Risk_cond_ex_01_Dir_theta__uni} and \ref{fig:Risk_cond_ex_01_Dir_theta__subj} demonstrate the excess conditional probability of error achieved by the conditional majority decision (based on a non-informative Dirichlet prior) and by a classifier derived from an informative Dirichlet prior, respectively. Note that while the former has fewer models for which the error is critically high, the latter has more models for which the irreducible risk $\Rcal_{\Theta}^*(\theta)$ is achieved. This a fundamental trade-off between Bayesian learners based on non-informative versus informative priors.
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_cond_ex_01_Dir_theta__uni.pdf}
@@ -2765,7 +2757,7 @@ f^*(\xrm;\Drm) & = & \mu_{\yrm | \xrm,\Drm}  = \Erm_{\uptheta | \xrm,\Drm} \left
 
 
 
-\subsubsection{Minimum Risk}
+\subsubsection{Minimum Bayes Risk}
 
 To determine the minimum Bayes squared-error, $\Rcal^* = \Erm_{\xrm,\uppsi} \left[ \Sigma_{\yrm | \xrm,\uppsi} \right]$, a new evaluation of $\mu_{\yrm | \xrm,\uppsi}^2$ must be performed.
 
@@ -3747,7 +3739,7 @@ Additionally, note that $\upthetam | \{\Drm = D\} \sim \upthetam | \big\{ \uppsi
 
 For generalized linear regression, the space of data-generating models considered is restricted to a finite-dimensional space, such that $\prm_{\yrm, \xrm | \uptheta}(\cdot, x | \theta) = \prm_{\xrm}(x) \prm_{\yrm | \xrm, \uptheta}(x, \theta)$, where $\theta \in \Uptheta = \Rbb^K$. Note that the space of the data probability distributions considered is a strict subset of the entire function space. The observed data distribution $\prm_{\xrm}$ is assumed known. The conditional mean has the form $\mu_{\yrm | \xrm, \uptheta} = \phi(\xrm)^\intercal \uptheta$, where $\phi: \Xcal \mapsto \Ycal^K$ is a vector-valued basis function. Additionally, the conditional variance is fixed and independent of $\xrm$, such that $\Sigma_{\yrm | \xrm,\uptheta} \equiv \Sigma_{\yrm}$. 
 
-Note that the clairvoyant estimator \eqref{eq:f_clv_SE} is $f_{\Theta}(\xrm;\uptheta) = \phi(\xrm)^\intercal \uptheta$ and the clairvoyant squared-error \eqref{eq:risk_clv_SE} is $\Rcal_{\Theta}^*(\uptheta) = \Sigma_{\yrm}$, which is independent of the true weights. To determine the optimal Bayesian estimator \eqref{eq:f_opt_SE}, note that the weights are conditionally independent of the novel observation $\xrm$ given the data $\Drm$, resulting in $f^*(\xrm;\Drm) = \phi(\xrm)^\intercal \mu_{\uptheta | \Drm}$. Plugging into \eqref{eq:risk_min_SE}, the minimum Bayesian squared-error is 
+Note that the clairvoyant estimator \eqref{eq:f_clv_SE} is $f_{\Theta}(\xrm;\uptheta) = \phi(\xrm)^\intercal \uptheta$ and the irreducible squared-error \eqref{eq:risk_clv_SE} is $\Rcal_{\Theta}^*(\uptheta) = \Sigma_{\yrm}$, which is independent of the true weights. To determine the optimal Bayesian estimator \eqref{eq:f_opt_SE}, note that the weights are conditionally independent of the novel observation $\xrm$ given the data $\Drm$, resulting in $f^*(\xrm;\Drm) = \phi(\xrm)^\intercal \mu_{\uptheta | \Drm}$. Plugging into \eqref{eq:risk_min_SE}, the minimum Bayesian squared-error is 
 \begin{IEEEeqnarray}{rCl}
 \Rcal^* & = & \Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] + \Erm_{\xrm,\Drm} \Big[ \Crm_{\uptheta | \xrm,\Drm} \big[ f_{\Theta}(\xrm;\uptheta) \big] \Big] \nonumber \\
 & = & \Sigma_{\yrm} + \Erm_{\xrm,\Drm} \Big[ \phi(\xrm)^\intercal \Sigma_{\uptheta | \Drm} \phi(\xrm) \Big] \nonumber \\
