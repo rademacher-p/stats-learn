@@ -57,6 +57,8 @@ class Base(RandomGeneratorMixin):
 
 
 class NormalLinear(Base):
+    # tex_params = {'prior_mean': r'\mu_{\theta}', 'prior_cov': r'\Sigma_{\theta}'}
+
     def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
                  model_x=rand_elements.Normal(),
                  rng=None):
@@ -92,6 +94,23 @@ class NormalLinear(Base):
         self.posterior_model = rand_models.NormalLinear(**self._prior_model_kwargs)
         # self.posterior_model = rand_models.NormalLinear(model_x=model_x, basis_y_x=basis_y_x,
         #                                                 **self._prior_model_kwargs)
+
+    def tex_params(self, key, val):
+        val = np.array(val)
+        if key == 'prior_mean':
+            val_str = str(val)
+            if self.prior.shape != () and val.shape == ():
+                val_str += r"\bm{1}"
+
+            return r"\mu_{\theta} = " + val_str
+        elif key == 'prior_cov':
+            val_str = str(val)
+            if self.prior.shape != () and val.shape == ():
+                val_str += r"\boldsymbol{I}"
+
+            return r"\Sigma_{\theta} = " + val_str
+        else:
+            raise ValueError
 
     # Methods
     def random_model(self, rng=None):
@@ -212,6 +231,8 @@ if __name__ == '__main__':
 
 
 class Dirichlet(Base):      # TODO: DRY from random.elements?
+    # tex_params = {'prior_mean': r'\alpha', 'alpha_0': r'\alpha_0'}
+
     def __init__(self, prior_mean, alpha_0, rng=None):
         super().__init__(prior=None, rng=rng)
         self._space = prior_mean.space
@@ -221,6 +242,13 @@ class Dirichlet(Base):      # TODO: DRY from random.elements?
 
     def __repr__(self):
         return f"Dirichlet(alpha_0={self.alpha_0}, n={self.n}, prior_mean={self.prior_mean})"
+
+    @staticmethod
+    def tex_params(key, val):
+        if key == 'alpha_0':
+            return r"\alpha_0 = " + str(val)
+        else:
+            raise ValueError
 
     def __setattr__(self, name, value):
         if name.startswith('prior_mean.'):

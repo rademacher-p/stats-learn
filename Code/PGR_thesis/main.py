@@ -16,6 +16,7 @@ from thesis.util import spaces
 
 # plt.style.use('seaborn')
 # plt.style.use(['science'])
+# plt.rcParams['text.usetex'] = True
 
 
 #%% Sim
@@ -63,7 +64,7 @@ if do_bayes:
     opt_predictor = BayesRegressor(model_eval, name=r'$f^*$')
 else:
     model_eval = model
-    opt_predictor = ModelRegressor(model_eval, name=r'$f_{\Theta}$')
+    opt_predictor = ModelRegressor(model_eval, name=r'$f_{\Theta}(\theta)$')
 
 
 # Bayesian learners
@@ -92,7 +93,8 @@ prior_mean = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_
 # proc_funcs.append(discretizer(prior_mean_x.dists[0].data['x']))
 
 
-dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=.01), proc_funcs=proc_funcs, name='Dir')
+dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=.01), proc_funcs=proc_funcs,
+                               name='$\mathrm{Dir}$')
 
 # dir_params = None
 # dir_params = {'alpha_0': [2, 16]}
@@ -106,12 +108,12 @@ dir_params = {'alpha_0': [.01, 100]}
 # Normal learner
 norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=100 * np.eye(len(w_prior)),
                                                           basis_y_x=None, cov_y_x=.1,
-                                                          model_x=prior_mean.model_x), name='Norm')
+                                                          model_x=prior_mean.model_x), name='$\mathcal{N}$')
 
 # norm_params = None
 # norm_params = {'prior_cov': [10, 0.05]}
-norm_params = {'prior_cov': [100, .01]}
-# norm_params = {'prior_cov': [100]}
+# norm_params = {'prior_cov': [100, .01]}
+norm_params = {'prior_cov': [100]}
 
 
 # Plotting
@@ -127,20 +129,24 @@ n_train = 200
 temp = [
     (opt_predictor, None),
     (dir_predictor, dir_params),
-    # (norm_predictor, norm_params),
+    (norm_predictor, norm_params),
 ]
 
 # FIXME: discrete plot for predict stats
 # TODO: save fig
 # TODO: redo SSP p_dir fig
 
+# plt.rcParams['text.usetex'] = True
+plt.rc('text', usetex=True)
+plt.rc('text.latex', preamble=r"\usepackage{amsmath}")
+
 predictors, params = list(zip(*temp))
 
-# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=50000,
+# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=50,
 #                            verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, n_test=1, verbose=False, ax=None)
 
-plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=300,
+plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=50,
                            do_std=True, verbose=True, ax=None, rng=None)
 
 
