@@ -33,7 +33,7 @@ class Base(ABC):
         self._dtype = dtype
 
         self.x_plt = None
-        self.set_x_plot()
+        # self.set_x_plot()
 
     shape = property(lambda self: self._shape)
     size = property(lambda self: self._size)
@@ -41,8 +41,15 @@ class Base(ABC):
 
     dtype = property(lambda self: self._dtype)
 
-    def set_x_plot(self, x=None):
-        pass
+    # @property
+    # def x_plt(self):
+    #     if self._x_plt is None:
+    #         self.set_x_plot()
+    #     return self._x_plt
+
+    def set_x_plot(self):
+        # self.x_plt = np.array(x)
+        self.x_plt = None
 
     def make_axes(self):        # TODO: axes kwargs
         if self.shape == ():
@@ -91,6 +98,8 @@ class Base(ABC):
 
     def _eval_func(self, f, x=None):
         if x is None:
+            if self.x_plt is None:
+                self.set_x_plot()
             x = self.x_plt
 
         x, set_shape = check_data_shape(x, self.shape)
@@ -357,11 +366,8 @@ class FiniteGeneric(Finite):
         # y_flat = np.stack([f(val) for val in self._vals_flat])
         return y_flat.sum(0)
 
-    def set_x_plot(self, x=None):
-        if x is None:
-            self.x_plt = self.values
-        else:
-            self.x_plt = np.array(x)
+    def set_x_plot(self):
+        self.x_plt = self.values
 
     def plot(self, f, x=None, ax=None, label=None):
         if ax is None:
@@ -437,13 +443,7 @@ class Continuous(Base):
 
 class Box(Continuous):      # TODO: make Box inherit from Euclidean?
     def __init__(self, lims):
-        self.lims = np.array(lims)
-
-        if self.lims.shape[-1] != 2:
-            raise ValueError("Trailing shape must be (2,)")
-        elif not (self.lims[..., 0] <= self.lims[..., 1]).all():
-            raise ValueError("Upper values must meet or exceed lower values.")
-
+        self.lims = lims
         super().__init__(shape=self.lims.shape[:-1])
 
     def __repr__(self):
@@ -466,18 +466,30 @@ class Box(Continuous):      # TODO: make Box inherit from Euclidean?
         return {'x0': self.lims_plot.mean(-1), 'bounds': self.lims.reshape(-1, 2), 'constraints': ()}
 
     @property
-    def lims_plot(self):
-        return self.lims
+    def lims(self):
+        return self._lims
 
-    def set_x_plot(self, x=None):   # TODO: simplify?
-        if x is None:
-            self.x_plt = box_grid(self.lims_plot, 100, endpoint=False)
-            # if self.shape in {(), (2,)}:
-            #     self.x_plt = box_grid(self.lims_plot, 100, endpoint=False)
-            # else:
-            #     self.x_plt = None
-        else:
-            self.x_plt = np.array(x)
+    @lims.setter
+    def lims(self, val):
+        self._lims = np.array(val)
+
+        if self.lims.shape[-1] != 2:
+            raise ValueError("Trailing shape must be (2,)")
+        elif not (self.lims[..., 0] <= self.lims[..., 1]).all():
+            raise ValueError("Upper values must meet or exceed lower values.")
+
+        self.x_plt = None
+
+    @property
+    def lims_plot(self):
+        return self._lims
+
+    def set_x_plot(self):
+        self.x_plt = box_grid(self.lims_plot, 100, endpoint=False)
+        # if self.shape in {(), (2,)}:
+        #     self.x_plt = box_grid(self.lims_plot, 100, endpoint=False)
+        # else:
+        #     self.x_plt = None
 
     def plot(self, f, x=None, ax=None, label=None):
         if ax is None:
@@ -503,9 +515,10 @@ class Box(Continuous):      # TODO: make Box inherit from Euclidean?
 class Euclidean(Box):
     def __init__(self, shape):
         lims = np.broadcast_to([-np.inf, np.inf], (*shape, 2))
+        super().__init__(lims)
+
         # self._lims_plot = np.array([-1, 1])  # defaults
         self._lims_plot = np.broadcast_to([-1, 1], shape=(*shape, 2))
-        super().__init__(lims)
 
     def __repr__(self):
         return f"Euclidean{self.shape}"
@@ -535,13 +548,14 @@ class Euclidean(Box):
     @lims_plot.setter
     def lims_plot(self, val):
         self._lims_plot = np.broadcast_to(val, shape=(*self.shape, 2))
-        super().set_x_plot()
-        # self.set_x_plot()
+        self.x_plt = None
 
-    def set_x_plot(self, x=None):   # TODO: simplify?
-        super().set_x_plot(x)
-        temp = self.x_plt.reshape(-1, *self.shape)
-        self._lims_plot = np.array([temp.min(0), temp.max(0)])
+    # def set_x_plot(self, x=None):   # TODO: simplify? delete?
+    #     if x is not None:
+    #         super().set_x_plot(x)
+    #     else:
+    #         temp = self.x_plt.reshape(-1, *self.shape)
+    #         self._lims_plot = np.array([temp.min(0), temp.max(0)])
 
 
 #%%
@@ -550,10 +564,8 @@ class Euclidean(Box):
 
 class Simplex(Continuous):
     def __init__(self, shape):
-        self._n_plot = 40
         super().__init__(shape)
-
-        # self.set_x_plot()
+        self._n_plot = 40
 
     def __repr__(self):
         return f"Simplex{self.shape}"
@@ -581,16 +593,11 @@ class Simplex(Continuous):
     @n_plot.setter
     def n_plot(self, val):
         self._n_plot = val
-        self.set_x_plot()
+        self.x_plt = None
 
-    def set_x_plot(self, x=None):
-        if x is None:
-            if self.shape in {(2,), (3,)}:
-                self.x_plt = simplex_grid(self.n_plot, self._shape)
-            else:
-                self.x_plt = None
-        else:
-            self.x_plt = np.array(x)
+    def set_x_plot(self):
+        if self.shape in {(2,), (3,)}:
+            self.x_plt = simplex_grid(self.n_plot, self._shape)
 
     def make_axes(self):
         if self.shape == (2,):
