@@ -550,10 +550,10 @@ class Euclidean(Box):
 
 class Simplex(Continuous):
     def __init__(self, shape):
+        self._n_plot = 40
         super().__init__(shape)
 
         # self.set_x_plot()
-        self.n_plot = 40
 
     def __repr__(self):
         return f"Simplex{self.shape}"
@@ -606,6 +606,8 @@ class Simplex(Continuous):
             raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
     def plot(self, f, x=None, ax=None, label=None):
+        size = 5
+
         if ax is None:
             ax = self.make_axes()
 
@@ -617,14 +619,14 @@ class Simplex(Continuous):
             raise ValueError()
 
         if self.shape == (2,):
-            plt_data = ax.scatter(x[:, 0], x[:, 1], s=15, c=y, label=label)
+            plt_data = ax.scatter(x[:, 0], x[:, 1], s=size, c=y, label=label)
         elif self.shape == (3,):
-            plt_data = ax.scatter(x[:, 0], x[:, 1], x[:, 2], s=15, c=y, label=label)
+            plt_data = ax.scatter(x[:, 0], x[:, 1], x[:, 2], s=size, c=y, label=label)
         else:
             raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
-        c_bar = plt.colorbar(plt_data)
-        c_bar.set_label('$f(x)$')
+        # c_bar = plt.colorbar(plt_data)
+        # c_bar.set_label('$f(x)$')
 
         return plt_data
 
