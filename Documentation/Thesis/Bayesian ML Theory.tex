@@ -770,7 +770,7 @@ The loss function is defined as
 \begin{equation}
 \Lcal(h,y) = (h-y)^2 \;.
 \end{equation}
-Substituting the squared-error loss into \eqref{eq:risk_cond}, the conditional squared-error risk is
+Substituting the squared-error loss into \eqref{eq:risk_cond}, the squared-error risk is
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond_SE}
 \Rcal_{\Theta}(f ; \uptheta) & = & \Erm_{\Drm | \uptheta} \bigg[ \Erm_{\yrm,\xrm | \uptheta} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \\
 & = & \Erm_{\xrm | \uptheta}\Bigg[ \Erm_{\yrm| \xrm,\uptheta}\bigg[ \Erm_{\Drm | \uptheta}\Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \Bigg] \nonumber \\
@@ -829,7 +829,7 @@ f^*(\xrm;\Drm) & = & \argmin_{h \in \Rbb} \Erm_{\yrm | \xrm,\Drm} \left[ (h-\yrm
 & = & \mu_{\yrm | \xrm,\Drm} = \Erm_{\uptheta | \xrm,\Drm} \left[ \mu_{\yrm | \xrm,\uptheta} \right] \nonumber \;.
 \end{IEEEeqnarray}
 
-An interesting form for the optimal estimator is $f^*(\xrm;\Drm) = \Erm_{\uptheta | \xrm,\Drm} \big[ f_{\Theta}(\xrm;\uptheta) \big]$. Substituting the squared-error loss into the second line of \eqref{eq:f_opt_xD}, the optimal Bayes estimator is the condtional expected value of the clairvoyant estimate with respect to the model posterior distribution.
+An interesting form for the optimal estimator is $f^*(\xrm;\Drm) = \Erm_{\uptheta | \xrm,\Drm} \big[ f_{\Theta}(\xrm;\uptheta) \big]$. Substituting the squared-error loss into the second line of \eqref{eq:f_opt_xD}, the optimal Bayes estimator is the conditional expected value of the clairvoyant estimate with respect to the model posterior distribution.
 
 
 
@@ -1568,8 +1568,9 @@ The elements of the finite cardinality set $\Ycal$ are real numbers, such that $
 
 
 
+\subsubsection{Bayesian Estimation}
 
-\subsubsection{Optimal Estimate: the Posterior Mean}
+\paragraph{Optimal Estimate: the Posterior Mean}
 
 \todohi{add mean/var plots with true model, derived from model est. sec., similar to Theodoridis-ML!?}
 
@@ -1586,7 +1587,7 @@ The optimal estimate is interpreted as a convex combination of two separate esti
 
 
 
-\paragraph{Uniform Prior}
+\subparagraph{Uniform Prior}
 
 The optimal estimator for a uniform prior is
 \begin{IEEEeqnarray}{rCl}
@@ -1598,7 +1599,7 @@ Now, the model prior contribution to the weighting factors depends on the cardin
 
 
 
-\subsubsection{Minimum Bayes Risk: the Expected Posterior Variance}
+\paragraph{Minimum Bayes Risk: the Expected Posterior Variance}
 
 
 The minimum Bayes squared-error is $\Rcal^* = \Erm_{\xrm,\Drm} \left[ \Sigma_{\yrm | \xrm,\Drm} \right]$. Using the sufficient statistic $\uppsi \equiv \Psi(\Drm)$, it can also be represented as $\Erm_{\xrm,\uppsi} \left[ \Sigma_{\yrm | \xrm,\uppsi} \right]$; as such, the expectations are performed over $\uppsi$. Decompose the conditional variance as
@@ -1719,7 +1720,7 @@ Next, consider the effect of the marginal distribution $\alpham$. Figure \ref{fi
 
 
 
-\paragraph{Uniform Prior}
+\subparagraph{Uniform Prior}
 
 For the uniform model prior, the risk reduces to
 \begin{IEEEeqnarray}{rCl}
@@ -1771,9 +1772,9 @@ PGR: additional figures for uniform case?
 
 
 
-\subsubsection{Conditional Squared-Error for a Dirichlet-based Estimator}
+\subsubsection{Squared-Error Trends}
 
-Having derived the optimal estimator based on a Dirichlet model prior, it is important to consider the risk $\Rcal_{\Theta}(f^* ; \uptheta)$ and analyze how different prior parameterizations $\alpha$ influence the squared-error for different models $\theta$. Starting from the excess conditional squared-error risk \eqref{eq:risk_cond_ex_SE} and substituting the Bayesian estimator \eqref{eq:f_opt_SE}, the formula simplifies to $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big]$.
+Having derived the optimal estimator based on a Dirichlet model prior, it is important to consider the risk $\Rcal_{\Theta}(f^* ; \uptheta)$ and analyze how different prior parameterizations $\alpha$ influence the squared-error for different models $\theta$. Starting from the excess squared-error risk \eqref{eq:risk_cond_ex_SE} and substituting the Bayesian estimator \eqref{eq:f_opt_SE}, the formula simplifies to $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big]$.
 
 Evaluation of the excess risk for an estimator based on the Dirichlet prior will be performed using the sufficient statistic $\uppsi$ in place of the training set $\Drm$. Using the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$ introduced in \ref{sec:predictive_est}, the term is expressed as
 \begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex}
@@ -1815,7 +1816,7 @@ The excess risk at this potentially non-integral value would be
 PGR: better form above???
 
 
-Figures \ref{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased} and \ref{fig:Risk_cond_SE_Dir_N_leg_a0_biased} exemplify the excess conditional squared-error as a function of $N$ for estimators based on Dirichlet priors of varying concentration $\alpha_0$. The former shows local maxima for an unbiased estimator; note that higher concentration results in superior performance. The latter uses biased estimators and as such, learners based on low concentration achieve lower risk.
+Figures \ref{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased} and \ref{fig:Risk_cond_SE_Dir_N_leg_a0_biased} exemplify the excess squared-error as a function of $N$ for estimators based on Dirichlet priors of varying concentration $\alpha_0$. The former shows local maxima for an unbiased estimator; note that higher concentration results in superior performance. The latter uses biased estimators and as such, learners based on low concentration achieve lower risk.
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_cond_SE_Dir_N_leg_a0_unbiased.pdf}
@@ -1841,7 +1842,7 @@ First consider the conditional prior PMF's $\alphac(x)$; as shown, they manifest
 
 The other user-selected Dirichlet parameters manifest themselves in the risk as $\alpha'(x)$, the concentrations of the corresponding conditional distributions $\upthetac(x)$; these values control important bias/variance trade-offs via the two scaling factors in \eqref{eq:risk_cond_SE_dir_ex}. First, consider the asymptotic trends, again referencing the distribution estimation analysis in Section \ref{sec:predictive_est}.
 
-Consider how the excess risk tends as the priors become maximally concentrated. Recall that as $\alpha'(x) \to \infty$, the estimate of $\upthetac$ is maximally biased and has no variance; thus, the excess risk tends to $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, the expected conditional squared-error between the means of the Bayesian predictive PMF and the true predictive PMF. This is intuitive given that the estimator tends toward a data-independent solution; the estimator may be biased, but will have no variance due to the training data statistics.
+Consider how the excess risk tends as the priors become maximally concentrated. Recall that as $\alpha'(x) \to \infty$, the estimate of $\upthetac$ is maximally biased and has no variance; thus, the excess risk tends to $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, the expected squared-error between the means of the Bayesian predictive PMF and the true predictive PMF. This is intuitive given that the estimator tends toward a data-independent solution; the estimator may be biased, but will have no variance due to the training data statistics.
 
 Conversely, if concentrations $\alpha'(x) \to 0$ are chosen, the Bayesian estimate tends to the empirical mean, independent of $\alphac$. Using the limits demonstrated in \ref{sec:predictive_est}, it can be shown that the excess risk tends to
 \begin{IEEEeqnarray}{rCl}
@@ -1873,7 +1874,7 @@ Note that the minimizing concentration values $\alpha'(x)$ are inversely proport
 %\qquad \qquad + \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right)^2 \right] \right] \nonumber
 
 
-Figures \ref{fig:Risk_cond_SE_Dir_a0_leg_N_unbiased} and \ref{fig:Risk_cond_SE_Dir_a0_leg_N_biased} show how the excess conditional squared-error trends as a function of the Dirichlet learner concentration. Note that the latter is based on a biased prior estimate and thus the optimal Dirichlet concentration value is lower.
+Figures \ref{fig:Risk_cond_SE_Dir_a0_leg_N_unbiased} and \ref{fig:Risk_cond_SE_Dir_a0_leg_N_biased} show how the excess squared-error trends as a function of the Dirichlet learner concentration. Note that the latter is based on a biased prior estimate and thus the optimal Dirichlet concentration value is lower.
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_cond_SE_Dir_a0_leg_N_unbiased.pdf}
@@ -1910,7 +1911,9 @@ PGR: newpage
 
 This section derives 0-1 loss classifiers based on the Dirichlet prior distribution and assesses their performance.
 
-\subsubsection{Optimal Hypothesis: Conditional Maximum \emph{a posteriori}}
+\subsubsection{Bayesian Classification}
+
+\paragraph{Optimal Hypothesis: Conditional Maximum \emph{a posteriori}}
 
 PGR: decision region figures??
 
@@ -1927,7 +1930,7 @@ Using the Dirichlet prior, different classes are ``scored'' by counting the numb
 
 
 
-\paragraph{Uniform Prior}
+\subparagraph{Uniform Prior}
 
 When the uniform prior is used, the Bayes classifier simplifies to 
 \begin{IEEEeqnarray}{rCl}
@@ -1941,7 +1944,7 @@ the maximizing argument of the conditional empirical model. This effects a condi
 
 
 
-\subsubsection{Minimum Bayes Risk: Probability of Error}
+\paragraph{Minimum Bayes Risk: Probability of Error}
 
 \todohigh{no closed-forms found??? Find closed-form BOUNDS???}
 
@@ -2026,7 +2029,7 @@ PGR: comment on simulation!
 
 
 
-\paragraph{Uniform Prior}
+\subparagraph{Uniform Prior}
 
 PGR: COMPUTATIONAL COMPLEXITY savings for risk formula?
 
@@ -2152,14 +2155,14 @@ It is also useful to graph the $N=0$ and $N \to \infty$ Bayes risk as a function
 \newpage
 PGR: newpage
 
-\subsubsection{Conditional Probability of Error for a Dirichlet-based Classifier}
+\subsubsection{Probability of Error Trends}
 
 PGR: INCOMPLETE
 
 PGR: comment on alpha0 versus alphax simplification
 
 
-Substituting the optimal Dirichlet-based classifier into the formula for the conditional probability of error \eqref{eq:risk_cond_01}, the risk is
+Substituting the optimal Dirichlet-based classifier into the formula for the probability of error \eqref{eq:risk_cond_01}, the risk is
 \begin{IEEEeqnarray}{rCl}
 \Rcal_{\Theta}(f ; \uptheta) & = & 1 - \sum_{x \in \Xcal} \upthetam(x) \Erm_{\uppsi | \upthetam,\upthetac} \bigg[ \upthetac\Big( \argmax_{y \in \Ycal} \big( N \uppsi(y,x) + \alpha_0 \alpha(y,x) \big) ;x \Big) \bigg] \;.
 \end{IEEEeqnarray}
@@ -2167,29 +2170,29 @@ Figures \ref{fig:Risk_cond_01_Dir_N_leg_a0__subj_good} and \ref{fig:Risk_cond_01
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_cond_01_Dir_N_leg_a0__subj_good.pdf}
-\caption{Excess conditional probability of error, well-matched informative Dirichlet-based classifier}
+\caption{Excess probability of error, well-matched informative Dirichlet-based classifier}
 \label{fig:Risk_cond_01_Dir_N_leg_a0__subj_good}
 \end{figure}
 %
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_cond_01_Dir_N_leg_a0__subj_bad.pdf}
-\caption{Excess conditional probability of error, poorly-matched informative Dirichlet-based classifier}
+\caption{Excess probability of error, poorly-matched informative Dirichlet-based classifier}
 \label{fig:Risk_cond_01_Dir_N_leg_a0__subj_bad}
 \end{figure}
 
-Also, it is important to consider how a given classifier performs for varying models $\thetac(x)$. Figures \ref{fig:Risk_cond_ex_01_Dir_theta__uni} and \ref{fig:Risk_cond_ex_01_Dir_theta__subj} demonstrate the excess conditional probability of error achieved by the conditional majority decision (based on a non-informative Dirichlet prior) and by a classifier derived from an informative Dirichlet prior, respectively. Note that while the former has fewer models for which the error is critically high, the latter has more models for which the irreducible risk $\Rcal_{\Theta}^*(\theta)$ is achieved. This a fundamental trade-off between Bayesian learners based on non-informative versus informative priors.
+Also, it is important to consider how a given classifier performs for varying models $\thetac(x)$. Figures \ref{fig:Risk_cond_ex_01_Dir_theta__uni} and \ref{fig:Risk_cond_ex_01_Dir_theta__subj} demonstrate the excess probability of error achieved by the conditional majority decision (based on a non-informative Dirichlet prior) and by a classifier derived from an informative Dirichlet prior, respectively. Note that while the former has fewer models for which the error is critically high, the latter has more models for which the irreducible risk $\Rcal_{\Theta}^*(\theta)$ is achieved. This a fundamental trade-off between Bayesian learners based on non-informative versus informative priors.
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_cond_ex_01_Dir_theta__uni.pdf}
-\caption{Excess conditional probability of error, conditional majority decision}
+\caption{Excess probability of error, conditional majority decision}
 \label{fig:Risk_cond_ex_01_Dir_theta__uni}
 \end{figure}
 %
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_cond_ex_01_Dir_theta__subj.pdf}
-\caption{Excess conditional probability of error, informative Dirichlet-based classifier}
+\caption{Excess probability of error, informative Dirichlet-based classifier}
 \label{fig:Risk_cond_ex_01_Dir_theta__subj}
 \end{figure}
 
@@ -2745,7 +2748,9 @@ PGR: COPIED, incomplete
 Now we choose for the regression function to map to $\Hcal = \Ycal = \Rbb$.
 
 
-\subsubsection{Optimal Learner}
+\subsubsection{Bayesian Estimation}
+
+\paragraph{Optimal Estimator}
 
 The optimal function is the expected value of the output conditional PDF,
 \begin{IEEEeqnarray}{rCl}
@@ -2757,7 +2762,7 @@ f^*(\xrm;\Drm) & = & \mu_{\yrm | \xrm,\Drm}  = \Erm_{\uptheta | \xrm,\Drm} \left
 
 
 
-\subsubsection{Minimum Bayes Risk}
+\paragraph{Minimum Bayes Risk}
 
 To determine the minimum Bayes squared-error, $\Rcal^* = \Erm_{\xrm,\uppsi} \left[ \Sigma_{\yrm | \xrm,\uppsi} \right]$, a new evaluation of $\mu_{\yrm | \xrm,\uppsi}^2$ must be performed.
 
@@ -2966,7 +2971,7 @@ The minimum Bayesian squared-error equation is similar to the discrete-domain fo
 
 
 
-\subsubsection{Conditional Squared-Error for a Dirichlet-based Estimator}
+\subsubsection{Squared-Error Trends}
 
 Using the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \prm_{\yrm | \xrm,\uppsim,\uppsic} - \prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$ introduced in \ref{sec:predictive_est_cont}, the excess squared-error is redefined as
 \begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex_cont}
