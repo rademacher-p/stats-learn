@@ -27,8 +27,13 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
                           rng=None):
 
     space_x = check_spaces([pr.model.model_x for pr in predictors])
+    # if x is None:
+    #     x = space_x.x_plt
     if x is None:
+        if space_x.x_plt is None:
+            space_x.set_x_plot()
         x = space_x.x_plt
+
 
     if params is None:
         params_full = [{} for _ in predictors]
@@ -121,7 +126,11 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
                                ax=None, rng=None):
 
     space_x = check_spaces([pr.model.model_x for pr in predictors])
+    # if x is None:
+    #     x = space_x.x_plt
     if x is None:
+        if space_x.x_plt is None:
+            space_x.set_x_plot()
         x = space_x.x_plt
 
     stats = ('mean', 'std') if do_std else ('mean',)  # TODO: generalize for mode, etc.

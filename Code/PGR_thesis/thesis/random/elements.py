@@ -286,7 +286,7 @@ class FiniteRV(MixinRV, Finite):
     @property
     def mean(self):
         if self._mean is None:
-            self._mean = np.tensordot(self._p_flat, self._supp_flat, axes=[0, 0])
+            self._mean = np.tensordot(self._p_flat, self._supp_flat, axes=(0, 0))
 
         return self._mean
 
@@ -370,7 +370,7 @@ class Dirichlet(BaseRV):
 
         self._log_pf_coef = gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
 
-        self._set_x_plot()
+        self.space.x_plt = None
 
     def _rvs(self, n, rng):
         return rng.dirichlet(self._alpha_0 * self._mean.flatten(), size=n).reshape(n, *self.shape)
@@ -381,9 +381,10 @@ class Dirichlet(BaseRV):
         log_pf = self._log_pf_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x).reshape(-1, self.size), -1)
         return np.exp(log_pf).reshape(set_shape)
 
-    def _set_x_plot(self):
-        x = plotting.simplex_grid(30, self.shape, hull_mask=(self.mean < 1 / self.alpha_0))
-        self._space.set_x_plot(x)
+    def plot_pf(self, x=None, ax=None):
+        if x is None and self.space.x_plt is None:
+            self.space.x_plt = plotting.simplex_grid(30, self.shape, hull_mask=(self.mean < 1 / self.alpha_0))
+        return self.space.plot(self.pf, x, ax)
 
 
 # rng_ = np.random.default_rng()
@@ -834,7 +835,7 @@ class Normal(BaseRV):
         self._mode = self._mean
 
         if hasattr(self, '_cov'):
-            self._set_x_plot()      # avoids call before cov is set
+            self._set_lims_plot()      # avoids call before cov is set
 
     @property
     def cov(self):
@@ -856,7 +857,7 @@ class Normal(BaseRV):
         self.prec_U = psd.U
         self._log_pf_coef = -0.5 * (psd.rank * np.log(2 * np.pi) + psd.log_pdet)
 
-        self._set_x_plot()
+        self._set_lims_plot()
 
     def _rvs(self, n, rng):
         return rng.multivariate_normal(self._mean_flat, self._cov_flat, size=n).reshape(n, *self.shape)
@@ -870,7 +871,7 @@ class Normal(BaseRV):
         log_pf = self._log_pf_coef + -0.5 * maha.reshape(set_shape)
         return np.exp(log_pf)
 
-    def _set_x_plot(self):
+    def _set_lims_plot(self):
         if self.shape in {(), (2,)}:
             if self.shape == ():
                 lims = self._mean.item() + np.array([-1, 1]) * 3 * np.sqrt(self._cov.item())
@@ -973,7 +974,7 @@ class DataEmpirical(Base):
         return np.unique(d, return_counts=True, axis=0)
 
     def _structure_data(self, values, counts):
-        return np.array(list(zip(values, counts)), dtype=[('x', self.dtype, self.shape), ('n', np.int,)])
+        return np.array(list(zip(values, counts)), dtype=[('x', self.dtype, self.shape), ('n', np.int32,)])
 
     def _get_idx(self, value):
         idx = np.flatnonzero(np.all(value == self.data['x'], axis=tuple(range(1, 1 + self.ndim))))
@@ -989,7 +990,7 @@ class DataEmpirical(Base):
 
     def add_values(self, values, counts):
         values, counts = map(np.array, (values, counts))
-        n_new = counts.sum(dtype=np.int)
+        n_new = counts.sum(dtype=np.int32)
         if n_new == 0:
             return
 
@@ -1014,7 +1015,7 @@ class DataEmpirical(Base):
         self._mode = None
         # self._mode = self.data['x'][self.data['n'].argmax()]
 
-        self._set_x_plot()
+        self.space.x_plt = None
 
     @property
     def mode(self):
@@ -1039,11 +1040,14 @@ class DataEmpirical(Base):
         else:
             return 0.
 
-    def _set_x_plot(self):
-        if isinstance(self.space, spaces.Continuous) and self.shape in {()}:
-            # add empirical values to the plot support (so impulses are not missed)
-            x = np.sort(np.unique(np.concatenate((self.space.x_plt, self.data['x']))))
-            self._space.set_x_plot(x)
+    def plot_pf(self, x=None, ax=None):
+        if x is None and self.space.x_plt is None:
+            self.space.set_x_plot()
+            if isinstance(self.space, spaces.Continuous) and self.shape in {()}:
+                # add empirical values to the plot support (so impulses are not missed)
+                self.space.x_plt = np.sort(np.unique(np.concatenate((self.space.x_plt, self.data['x']))))
+
+        return self.space.plot(self.pf, x, ax)
 
 
 class DataEmpiricalRV(MixinRV, DataEmpirical):
@@ -1065,7 +1069,7 @@ class DataEmpiricalRV(MixinRV, DataEmpirical):
     @property
     def mean(self):
         if self._mean is None:
-            self._mean = np.tensordot(self._p, self.data['x'], axes=[0, 0])
+            self._mean = np.tensordot(self._p, self.data['x'], axes=(0, 0))
 
         return self._mean
 
@@ -1160,7 +1164,7 @@ class Mixture(Base):
         return np.flatnonzero(self._weights)
 
     def _update_attr(self):
-        self._set_x_plot()
+        self.space.x_plt = None
 
         self._p = self._weights / self._weights.sum()
 
@@ -1190,22 +1194,26 @@ class Mixture(Base):
         # return sum(prob * dist.pf(x) for prob, dist in zip(self._p, self.dists) if prob > 0)
         return sum(self._p[i] * self.dists[i].pf(x) for i in self._idx_nonzero)
 
-    def _set_x_plot(self):
-        # dists_nonzero = [dist for (w, dist) in zip(self.weights, self.dists) if w > 0]
-        dists_nonzero = [self.dists[i] for i in self._idx_nonzero]
+    def plot_pf(self, x=None, ax=None):
+        if x is None and self.space.x_plt is None:
+            self.space.set_x_plot()
 
-        if isinstance(self.space, spaces.Euclidean):
-            temp = np.stack(list(dist.space.lims_plot for dist in dists_nonzero))
-            self._space.lims_plot = [temp[:, 0].min(), temp[:, 1].max()]
+            # dists_nonzero = [dist for (w, dist) in zip(self.weights, self.dists) if w > 0]
+            dists_nonzero = [self.dists[i] for i in self._idx_nonzero]
 
-        if isinstance(self.space, spaces.Continuous) and self.shape in {()}:
-            x = self.space.x_plt
-            for dist in dists_nonzero:
-                if isinstance(dist, DataEmpirical):
-                    x = np.concatenate((x, dist.data['x']))
+            if isinstance(self.space, spaces.Euclidean):
+                temp = np.stack(list(dist.space.lims_plot for dist in dists_nonzero))
+                self._space.lims_plot = [temp[:, 0].min(), temp[:, 1].max()]
 
-            x = np.sort(np.unique(x))
-            self._space.set_x_plot(x)
+            if isinstance(self.space, spaces.Continuous) and self.shape in {()}:
+                x = self.space.x_plt
+                for dist in dists_nonzero:
+                    if isinstance(dist, DataEmpirical):
+                        x = np.concatenate((x, dist.data['x']))
+
+                self.space.x_plt = np.sort(np.unique(x))
+
+        return self.space.plot(self.pf, x, ax)
 
 
 class MixtureRV(MixinRV, Mixture):
