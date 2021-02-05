@@ -15,7 +15,6 @@ import matplotlib.pyplot as plt
 
 from thesis.util import spaces
 from thesis.util.base import vectorize_func, check_data_shape
-from thesis.util.plotting import format_math_tex
 from thesis.loss_funcs import loss_se, loss_01
 
 from thesis.random import elements as rand_elements, models as rand_models
@@ -33,7 +32,6 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
         if space_x.x_plt is None:
             space_x.set_x_plot()
         x = space_x.x_plt
-
 
     if params is None:
         params_full = [{} for _ in predictors]
@@ -89,7 +87,7 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
         else:
             raise ValueError
         _samp += (np.empty(stat_shape),)
-        dtype.append((stat, np.float, stat_shape))  # TODO: dtype float? need model dtype attribute?!
+        dtype.append((stat, np.float64, stat_shape))  # TODO: dtype float? need model dtype attribute?!
 
     y_stats_full = [np.tile(np.array(_samp, dtype=dtype), reps=(len(n_train_delta),) + param_shape)
                     for param_shape in params_shape_full]
@@ -188,7 +186,6 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
             # plt_data = predictor.plot_xy(x, y_mean, y_std, ax, label=label)
             # plt_data = plot_xy(x, y_mean, y_std, space_x, ax, label=label)
             plt_data = space_x.plot_xy(x, y_mean, y_std, ax, label=label)
-            # plt_data = space_x.plot_xy(x, y_mean, y_std, ax, label=format_math_tex(label))
             out.append(plt_data)
 
         if labels != [None]:
@@ -212,7 +209,6 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
                     y_mean = y_stat['mean']
                     y_std = y_stat['std'] if do_std else None
                     plt_data = space_x.plot_xy(x, y_mean, y_std, ax, label=label)
-                    # plt_data = space_x.plot_xy(x, y_mean, y_std, ax, label=format_math_tex(label))
                     out.append(plt_data)
         else:
             raise ValueError("Plotting not supported for multiple predictors and multiple values of n_train.")
@@ -220,7 +216,6 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
         ax.legend()
 
     ax.set_title(title)
-    # ax.set_title(format_math_tex(title))
 
     return out
 

@@ -118,9 +118,9 @@ norm_params = {'prior_cov': [100]}
 
 # Plotting
 
-n_train = 200
+# n_train = 200
 # n_train = [0, 10, 100]
-# n_train = np.arange(0, 650, 50)
+n_train = np.arange(0, 650, 50)
 
 # print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
 # dir_predictor.plot_risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
@@ -141,12 +141,12 @@ plt.rc('text.latex', preamble=r"\usepackage{amsmath}")
 
 predictors, params = list(zip(*temp))
 
-# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=50,
-#                            verbose=True, ax=None, rng=None)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=50,
+                           verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, n_test=1, verbose=False, ax=None)
 
-plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=50,
-                           do_std=True, verbose=True, ax=None, rng=None)
+# plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=50,
+#                            do_std=True, verbose=True, ax=None, rng=None)
 
 
 # print(f"\nAnalytical Risk = {opt_predictor.evaluate_comp(n_train=n_train)}")

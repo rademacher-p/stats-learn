@@ -1042,7 +1042,7 @@ class DataEmpirical(Base):
 
     def plot_pf(self, x=None, ax=None):
         if x is None and self.space.x_plt is None:
-            self.space.set_x_plot()
+            # self.space.set_x_plot()
             if isinstance(self.space, spaces.Continuous) and self.shape in {()}:
                 # add empirical values to the plot support (so impulses are not missed)
                 self.space.x_plt = np.sort(np.unique(np.concatenate((self.space.x_plt, self.data['x']))))
@@ -1196,7 +1196,7 @@ class Mixture(Base):
 
     def plot_pf(self, x=None, ax=None):
         if x is None and self.space.x_plt is None:
-            self.space.set_x_plot()
+            # self.space.set_x_plot()
 
             # dists_nonzero = [dist for (w, dist) in zip(self.weights, self.dists) if w > 0]
             dists_nonzero = [self.dists[i] for i in self._idx_nonzero]
