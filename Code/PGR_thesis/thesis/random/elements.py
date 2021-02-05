@@ -48,8 +48,8 @@ class Base(RandomGeneratorMixin):
         raise NotImplementedError("Method must be overwritten.")
         pass
 
-    def plot_pf(self, x=None, ax=None):
-        return self.space.plot(self.pf, x, ax)
+    def plot_pf(self, x=None, ax=None, **kwargs):
+        return self.space.plot(self.pf, x, ax, **kwargs)
 
     def rvs(self, size=None, rng=None):
         if size is None:
@@ -417,10 +417,12 @@ class Empirical(BaseRV):
 
     def __init__(self, mean, n, rng=None):
         super().__init__(rng)
-        self._space = spaces.SimplexDiscrete(self._n, np.array(mean).shape)
 
         self._n = n
         self._mean = check_valid_pmf(mean)
+
+        self._space = spaces.SimplexDiscrete(self.n, self.mean.shape)
+
         self._update_attr()
 
     # Input properties
@@ -635,7 +637,7 @@ class Binomial(BaseRV):
     Binomial random variable.
     """
 
-    def __init__(self, n, p, rng=None):
+    def __init__(self, p, n, rng=None):
         super().__init__(rng)
         self._space = spaces.FiniteGeneric(np.arange(n + 1))
 
@@ -702,8 +704,8 @@ class EmpiricalScalar(Binomial):
     Scalar empirical random variable. Equivalent to normalized Binomial RV.
     """
 
-    def __init__(self, n, mean, rng=None):
-        super().__init__(n, mean, rng)
+    def __init__(self, mean, n, rng=None):
+        super().__init__(mean, n, rng)
         if self.n == 0:
             raise ValueError
         self._space = spaces.FiniteGeneric(np.arange(n + 1) / n)

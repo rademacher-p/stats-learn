@@ -26,7 +26,7 @@ def poly_mean_to_models(n, weights):
 
 
 def func_mean_to_models(n, func):
-    return [rand_elements.EmpiricalScalar(n - 1, func(x_i)) for x_i in np.linspace(0, 1, n, endpoint=True)]
+    return [rand_elements.EmpiricalScalar(func(x_i), n - 1) for x_i in np.linspace(0, 1, n, endpoint=True)]
 
 
 n_x = 128
@@ -137,7 +137,7 @@ temp = [
 # TODO: redo SSP p_dir fig
 
 plt.rc('text', usetex=True)
-plt.rc('text.latex', preamble=r"\usepackage{amsmath}")
+plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek}")
 
 predictors, params = list(zip(*temp))
 
