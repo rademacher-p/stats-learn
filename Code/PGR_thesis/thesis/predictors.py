@@ -658,7 +658,7 @@ class BayesRegressor(RegressorMixin, Bayes):
                 w_bias = np.zeros((n_train.size, p_x.size))
                 for i_n, n_i in enumerate(n_train.flatten()):
                     # rv = rand_elements.EmpiricalScalar(n_i, .5)
-                    rv = rand_elements.Binomial(n_i, .5)
+                    rv = rand_elements.Binomial(.5, n_i)
                     supp = rv.space.values
                     for i_x, (p_i, a_i) in enumerate(zip(p_x, alpha_x)):
                         rv.p = p_i

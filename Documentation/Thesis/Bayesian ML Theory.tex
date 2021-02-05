@@ -20,6 +20,7 @@
 \usepackage[retainorgcmds]{IEEEtrantools}
 
 \usepackage{hyperref}
+\usepackage{cleveref}
 
 \usepackage[colorinlistoftodos,color=yellow!50,linecolor=red]{todonotes}
 \newcommand{\todolow}[1]{\todo[inline,color=blue!50,linecolor=red]{#1}}
@@ -1379,7 +1380,7 @@ and the modified weighting function
 \end{IEEEeqnarray}
 is introduced, operating on the empirical data distribution.
 
-\todohi{Reconcile different weighting funcs for D and psi...}
+\todohigh{Reconcile different weighting funcs for D and psi...}
 
 Observe that when the conditioning is performed using the sufficient statistic, the independent conditional models $\upthetac(x)$ are only dependent on the marginal empirical model value $\uppsim(x)$ and on the corresponding conditional empirical model, $\uppsic(x)$. 
 
@@ -1407,7 +1408,7 @@ The Bayes predictive PMF can thus be expressed as
 
 
 
-\section{Model Estimation Perspective} \label{sec:predictive_est}
+\section{Predictive Model Estimation} \label{sec:predictive_est}
 
 \todohi{generalize for Bayesian learners, move before Dirichlet!?}
 
@@ -1431,14 +1432,14 @@ To aid characterization of the estimator, define the random process $\Delta(\xrm
 and, noting that
 \begin{IEEEeqnarray}{L}
 \Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
-\quad = \big(1 - \gammam(\xrm; \uppsim)\big) \big(\uppsic(\xrm) - \upthetac(\xrm)\big) \nonumber \\
-\qquad + \Big( \gammam(\xrm; \uppsim) - \Erm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \Big) \big(\alphac(\xrm) - \upthetac(\xrm)\big) \nonumber \;,
+\quad = \Big( \gammam(\xrm; \uppsim) - \Erm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \Big) \big(\alphac(\xrm) - \upthetac(\xrm)\big) \nonumber \\
+\qquad + \big(1 - \gammam(\xrm; \uppsim)\big) \big(\uppsic(\xrm) - \upthetac(\xrm)\big) \nonumber \;,
 \end{IEEEeqnarray}
 its covariance function is 
 \begin{IEEEeqnarray}{L} \label{eq:predictive_cov}
 \mathrm{Cov}(\xrm;\upthetam,\upthetac) = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
 \quad = \Crm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[ \gammam(\xrm; \uppsim) \big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
-\qquad + \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \big) \nonumber \;,
+\qquad + \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \nonumber \;,
 \end{IEEEeqnarray}
 where the properties of Empirical random processes have been used. Note that the bias is proportionate to the difference between the true conditional model and the data-independent estimate, while the covariance also depends on $\Sigma_{\uppsic(x) | \uppsim(x), \upthetac(x)}$. 
 
@@ -1482,41 +1483,78 @@ Note that the latter is equivalent to the first inverse moment of a positive bin
 This demonstrates the critical bias/variance trade-off that is controlled by selection of the Dirichlet concentration parameter. For common applications, both distribution estimate bias and variance contribute to the overall risk and an optimal value of $\alpha_0$ can be found to optimally balance these competing sources of error.
 
 
-
 \subsection{Example}
 
-\todohigh{REDO FIGURES AND DIALOGUE for new formulae?!}
-
-To exemplify how the model estimate $\Prm_{\yrm | \xrm,\uppsi}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 10$ and $|\Xcal| = 1$ for simplicity. The data-independent PMF $\alphac(x)$ and true model $\upthetac(x)$ are shown in Figure \ref{fig:P_yx_error_N_0} - note the significant mismatch. 
-
-
-Figures \ref{fig:P_yx_error_a0_0_1} and \ref{fig:P_yx_error_a0_10} show how the bias and variance of the estimate change for different values of $N \uppsim(x)$ and $\alpha_0 \alpham(x)$. The plot markers represent the conditional mean of the estimator, $\Erm_{\uppsic | \uppsim,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big]$; the upper and lower error bars represent the square-root of the expected squared deviation above and below the conditional mean, respectively. Each individual plot heading provides the error $\sqrt{\sum_{y \in \Ycal} \Ecal(y,y ; \xrm;\uppsim,\upthetac)}$ to assess the quality of the PMF estimate. 
-
-Observe that for $N \uppsim(x) = 1$, the high variance of the $\alpha_0 \alpham(x) = 0.1$ estimate (favoring the empirical PMF) renders it worse than the $\alpha_0 \alpham(x) = 10$ estimate; in fact, the variance is so high that the error exceeds that of the data-independent estimate $\alphac(x)$ (Figure \ref{fig:P_yx_error_N_0}). Conversely, for $N \uppsim(x) = 10$, the confidence of the $ \alpha_0 \alpham(x) = 10$ estimate leads to high bias and the $ \alpha_0 \alpham(x) = 0.1$ estimate is superior. For $N \uppsim(x) = 100$, both the $ \alpha_0 \alpham(x) = 0.1$ and $ \alpha_0 \alpham(x) = 10$ estimates begin converging to the true distribution - this is guaranteed due to the full support of the Dirichlet prior.
-
-PGR: full support discussion?
-
-
+To exemplify how the model estimate $\Prm_{\yrm | \xrm,\uppsi}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 60$ and $|\Xcal| = 1$; the singular observation set enables visualization of the bias/variance trade-off. The prior mean $\alphac(x)$ and true model $\upthetac(x)$ are distributed as $\alphac(y;x) = \Bi(y/60; 60, .3)$ and $\thetac(y;x) = \Bi(y/60; 60, .7)$, respectively, and are shown in Figure \ref{fig:model_est/N_0} - note the significant mismatch.
 \begin{figure}
 \centering
-\includegraphics[width=0.7\linewidth]{P_yx_error_N_0.pdf}
-\caption{Model $\uptheta$ estimate, no training data}
-\label{fig:P_yx_error_N_0}
+\includegraphics[width=0.8\linewidth]{model_est/N_0.png}
+\caption{Model $\uptheta$ estimate, $N=0$}
+\label{fig:model_est/N_0}
 \end{figure}
 
+\Cref{fig:model_est/N_1,fig:model_est/N_100,fig:model_est/N_10000} show how the bias and variance of the estimate changes with different values of $N$ and $\alpha_0$. The plot lines represent the mean of the estimator, $\Erm_{\uppsi | \uptheta}\big[ \Prm_{\yrm | \xrm,\uppsi} \big]$; the shaded regions represent the square-root of the expected variance above and below the conditional mean. 
 \begin{figure}
 \centering
-\includegraphics[width=0.7\linewidth]{P_yx_error_a0_0_1.pdf}
-\caption{Model $\uptheta$ estimates, $\alpha_0 = 0.1$}
-\label{fig:P_yx_error_a0_0_1}
+\includegraphics[width=0.8\linewidth]{model_est/N_1.png}
+\caption{Model $\uptheta$ estimate, $N=1$}
+\label{fig:model_est/N_1}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=0.8\linewidth]{model_est/N_100.png}
+\caption{Model $\uptheta$ estimate, $N=100$}
+\label{fig:model_est/N_100}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=0.8\linewidth]{model_est/N_10000.png}
+\caption{Model $\uptheta$ estimate, $N=10000$}
+\label{fig:model_est/N_10000}
 \end{figure}
 
-\begin{figure}
-\centering
-\includegraphics[width=0.7\linewidth]{P_yx_error_a0_10.pdf}
-\caption{Model $\uptheta$ estimates, $\alpha_0 = 10$}
-\label{fig:P_yx_error_a0_10}
-\end{figure}
+Observe that for $N = 1$, the $\alpha_0 = 0.1$ estimate (favoring the empirical PMF) has negligible bias but massive variance where $\uptheta$ is highest; conversely, the $\alpha_0 = 10$ estimate has low variance but high bias, favoring the erroneous prior mean $\alpha$. The $N=100$ and $N=10000$ figures show that, given sufficient data, the $\alpha_0 = 0.1$ and $\alpha_0 = 10$ estimators will eliminate their high variance and high bias, respectively, leading to perfect estimation of the true model $\theta$. The consistency of this estimate is guaranteed due to the full support of the Dirichlet prior.
+
+
+
+
+
+
+
+%\subsection{Example}
+%
+%\todohigh{REDO FIGURES AND DIALOGUE for new formulae?!}
+%
+%To exemplify how the model estimate $\Prm_{\yrm | \xrm,\uppsi}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 10$ and $|\Xcal| = 1$ for simplicity. The data-independent PMF $\alphac(x)$ and true model $\upthetac(x)$ are shown in Figure \ref{fig:P_yx_error_N_0} - note the significant mismatch. 
+%
+%
+%Figures \ref{fig:P_yx_error_a0_0_1} and \ref{fig:P_yx_error_a0_10} show how the bias and variance of the estimate change for different values of $N \uppsim(x)$ and $\alpha_0 \alpham(x)$. The plot markers represent the conditional mean of the estimator, $\Erm_{\uppsic | \uppsim,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big]$; the upper and lower error bars represent the square-root of the expected squared deviation above and below the conditional mean, respectively. Each individual plot heading provides the error $\sqrt{\sum_{y \in \Ycal} \Ecal(y,y ; \xrm;\uppsim,\upthetac)}$ to assess the quality of the PMF estimate. 
+%
+%Observe that for $N \uppsim(x) = 1$, the high variance of the $\alpha_0 \alpham(x) = 0.1$ estimate (favoring the empirical PMF) renders it worse than the $\alpha_0 \alpham(x) = 10$ estimate; in fact, the variance is so high that the error exceeds that of the data-independent estimate $\alphac(x)$ (Figure \ref{fig:P_yx_error_N_0}). Conversely, for $N \uppsim(x) = 10$, the confidence of the $ \alpha_0 \alpham(x) = 10$ estimate leads to high bias and the $ \alpha_0 \alpham(x) = 0.1$ estimate is superior. For $N \uppsim(x) = 100$, both the $ \alpha_0 \alpham(x) = 0.1$ and $ \alpha_0 \alpham(x) = 10$ estimates begin converging to the true distribution - this is guaranteed due to the full support of the Dirichlet prior.
+%
+%PGR: full support discussion?
+%
+%
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.7\linewidth]{P_yx_error_N_0.pdf}
+%\caption{Model $\uptheta$ estimate, no training data}
+%\label{fig:P_yx_error_N_0}
+%\end{figure}
+%
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.7\linewidth]{P_yx_error_a0_0_1.pdf}
+%\caption{Model $\uptheta$ estimates, $\alpha_0 = 0.1$}
+%\label{fig:P_yx_error_a0_0_1}
+%\end{figure}
+%
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.7\linewidth]{P_yx_error_a0_10.pdf}
+%\caption{Model $\uptheta$ estimates, $\alpha_0 = 10$}
+%\label{fig:P_yx_error_a0_10}
+%\end{figure}
 
 
 
@@ -2686,7 +2724,7 @@ Observe that by the aggregation principle, $\uppsim \sim \DEP(N,\alpha_0,\alpham
 
 
 
-\section{Model Estimation Perspective} \label{sec:predictive_est_cont}
+\section{Predictive Model Estimation} \label{sec:predictive_est_cont}
 
 For continuous data spaces, the analysis of the Bayesian predictive distribution as an estimate of the true predictive distribution has some unique differences from the discrete space analysis put forth in Section \ref{sec:predictive_est}. Redefine the difference function $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \prm_{\yrm | \xrm,\uppsim,\uppsic} - \prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$. Using the properties of the continuous-domain empirical process conditioned on its aggregation, the covariance function takes on the new form
 \begin{IEEEeqnarray}{L} \label{eq:predictive_cov_cont}
@@ -2997,7 +3035,7 @@ and
 representing the minimum bias and maximum variance incurred by the empirical estimate. If $\alpham$ also has a Dirac delta function at $x$, the value $\gammam(x; \uppsim)$ may assume values between zero and one and the estimate may convexly combine the prior estimate with the empirical estimate; in this case, the bias/variance weights may take on the same full range of values as for regression using discrete-domain data.
 
 
-
+\todohi{comment on total risk with N - equal to prob thetam is continuous times sq bias?!}
 
 
 

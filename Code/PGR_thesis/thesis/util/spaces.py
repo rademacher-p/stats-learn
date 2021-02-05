@@ -68,10 +68,10 @@ class Base(ABC):
 
         return ax
 
-    def plot(self, f, x=None, ax=None, label=None):
+    def plot(self, f, x=None, ax=None, label=None, **kwargs):
         raise Exception
 
-    def plot_xy(self, x, y, y_std=None, ax=None, label=None):
+    def plot_xy(self, x, y, y_std=None, y_std_hi=None, ax=None, label=None):
         if ax is None:
             ax = self.make_axes()
 
@@ -82,15 +82,21 @@ class Base(ABC):
         if len(set_shape) == 1 and self.shape == ():
             plt_data = ax.plot(x, y, label=label)
             if y_std is not None:
+                if y_std_hi is None:
+                    y_std_hi = y_std
+
                 # plt_data_std = ax.errorbar(x, y_mean, yerr=y_std)
-                plt_data_std = ax.fill_between(x, y - y_std, y + y_std, alpha=0.5)
+                plt_data_std = ax.fill_between(x, y - y_std, y + y_std_hi, alpha=0.5)
                 plt_data = (plt_data, plt_data_std)
 
         elif len(set_shape) == 2 and self.shape == (2,):
             plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, cmap=plt.cm.viridis)
             if y_std is not None:
+                if y_std_hi is None:
+                    y_std_hi = y_std
+
                 plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y - y_std, cmap=plt.cm.viridis)
-                plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y + y_std, cmap=plt.cm.viridis)
+                plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y + y_std_hi, cmap=plt.cm.viridis)
                 plt_data = (plt_data, (plt_data_lo, plt_data_hi))
 
         else:
@@ -371,7 +377,7 @@ class FiniteGeneric(Finite):
     def set_x_plot(self):
         self.x_plt = self.values
 
-    def plot(self, f, x=None, ax=None, label=None):
+    def plot(self, f, x=None, ax=None, label=None, **kwargs):
         if ax is None:
             ax = self.make_axes()
 
@@ -493,7 +499,7 @@ class Box(Continuous):      # TODO: make Box inherit from Euclidean?
         # else:
         #     self.x_plt = None
 
-    def plot(self, f, x=None, ax=None, label=None):
+    def plot(self, f, x=None, ax=None, label=None, **kwargs):
         if ax is None:
             ax = self.make_axes()
 
@@ -614,9 +620,7 @@ class Simplex(Continuous):
         else:
             raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
-    def plot(self, f, x=None, ax=None, label=None):
-        size = 5
-
+    def plot(self, f, x=None, ax=None, label=None, **scatter_kwargs):
         if ax is None:
             ax = self.make_axes()
 
@@ -627,15 +631,18 @@ class Simplex(Continuous):
         if len(set_shape) != 1:
             raise ValueError()
 
+        kwargs = {'label': label, 's': 5, 'c': y}
+        kwargs.update(scatter_kwargs)
+
         if self.shape == (2,):
-            plt_data = ax.scatter(x[:, 0], x[:, 1], s=size, c=y, label=label)
+            plt_data = ax.scatter(x[:, 0], x[:, 1], **kwargs)
         elif self.shape == (3,):
-            plt_data = ax.scatter(x[:, 0], x[:, 1], x[:, 2], s=size, c=y, label=label)
+            plt_data = ax.scatter(x[:, 0], x[:, 1], x[:, 2], **kwargs)
         else:
             raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
-        # c_bar = plt.colorbar(plt_data)
-        # c_bar.set_label('$f(x)$')
+        c_bar = plt.colorbar(plt_data)
+        c_bar.set_label('$f(x)$')
 
         return plt_data
 
