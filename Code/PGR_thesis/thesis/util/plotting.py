@@ -5,8 +5,8 @@ import numpy as np
 # from scipy.special import binom
 
 
-def format_math_tex(s):
-    return f"${s.strip('$')}$"
+# def format_math_tex(s):
+#     return f"${s.strip('$')}$"
 
 
 def simplex_grid(n, shape, hull_mask=None):

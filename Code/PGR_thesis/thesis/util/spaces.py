@@ -32,8 +32,7 @@ class Base(ABC):
 
         self._dtype = dtype
 
-        self.x_plt = None
-        # self.set_x_plot()
+        self._x_plt = None
 
     shape = property(lambda self: self._shape)
     size = property(lambda self: self._size)
@@ -41,15 +40,18 @@ class Base(ABC):
 
     dtype = property(lambda self: self._dtype)
 
-    # @property
-    # def x_plt(self):
-    #     if self._x_plt is None:
-    #         self.set_x_plot()
-    #     return self._x_plt
+    @property
+    def x_plt(self):
+        if self._x_plt is None:
+            self.set_x_plot()
+        return self._x_plt
+
+    @x_plt.setter
+    def x_plt(self, val):
+        self._x_plt = val
 
     def set_x_plot(self):
-        # self.x_plt = np.array(x)
-        self.x_plt = None
+        pass
 
     def make_axes(self):        # TODO: axes kwargs
         if self.shape == ():
@@ -98,8 +100,8 @@ class Base(ABC):
 
     def _eval_func(self, f, x=None):
         if x is None:
-            if self.x_plt is None:
-                self.set_x_plot()
+            # if self.x_plt is None:
+            #     self.set_x_plot()
             x = self.x_plt
 
         x, set_shape = check_data_shape(x, self.shape)
