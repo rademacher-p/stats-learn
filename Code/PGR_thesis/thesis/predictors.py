@@ -185,7 +185,7 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
             y_std = y_stat['std'] if do_std else None
             # plt_data = predictor.plot_xy(x, y_mean, y_std, ax, label=label)
             # plt_data = plot_xy(x, y_mean, y_std, space_x, ax, label=label)
-            plt_data = space_x.plot_xy(x, y_mean, y_std, ax, label=label)
+            plt_data = space_x.plot_xy(x, y_mean, y_std, ax=ax, label=label)
             out.append(plt_data)
 
         if labels != [None]:
@@ -208,7 +208,7 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
                 for y_stat, label in zip(y_stats, labels):
                     y_mean = y_stat['mean']
                     y_std = y_stat['std'] if do_std else None
-                    plt_data = space_x.plot_xy(x, y_mean, y_std, ax, label=label)
+                    plt_data = space_x.plot_xy(x, y_mean, y_std, ax=ax, label=label)
                     out.append(plt_data)
         else:
             raise ValueError("Plotting not supported for multiple predictors and multiple values of n_train.")
