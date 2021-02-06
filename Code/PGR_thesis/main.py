@@ -101,9 +101,9 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), p
 # dir_params = {'alpha_0': [.1, 50]}
 # dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [100]}
-dir_params = {'alpha_0': 1e-6 + np.linspace(0, 30, 30)}
-# dir_params = {'alpha_0': 1e-6 + np.concatenate((np.linspace(0, 10, 100), np.linspace(10, 50, 10)))}
-
+# dir_params = {'alpha_0': 1e-6 + np.linspace(0, 100, 100)}
+# dir_params = {'alpha_0': 1e-6 + np.concatenate((np.linspace(0, 20, 100), np.linspace(20, 100000, 1000)))}
+dir_params = {'alpha_0': np.logspace(-0., 6., 100)}
 
 # Normal learner
 norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=100 * np.eye(len(w_prior)),
@@ -118,8 +118,8 @@ norm_params = {'prior_cov': [100, .01]}
 
 # Plotting
 
-n_train = 10
-# n_train = [0, 100, 1000]
+# n_train = 100
+n_train = [0, 100, 1000]
 # n_train = [0, 5, 10]
 # n_train = np.arange(0, 650, 50)
 
@@ -134,7 +134,7 @@ temp = [
 ]
 
 # FIXME: discrete plot for predict stats
-# TODO: save fig
+# TODO: save fig, png and object!
 # TODO: redo SSP p_dir fig
 
 plt.rc('text', usetex=True)
@@ -142,7 +142,7 @@ plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek}")
 
 predictors, params = list(zip(*temp))
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=100,
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=50000,
                            verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, n_test=1, verbose=False, ax=None)
 
