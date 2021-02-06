@@ -57,7 +57,7 @@ class Base(RandomGeneratorMixin):
 
 
 class NormalLinear(Base):
-    # tex_params = {'prior_mean': r'\mu_{\theta}', 'prior_cov': r'\Sigma_{\theta}'}
+    # tex_params = {'prior_mean': r'\mu_{\uptheta}', 'prior_cov': r'\Sigma_{\uptheta}'}
 
     def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
                  model_x=rand_elements.Normal(),
@@ -102,13 +102,13 @@ class NormalLinear(Base):
             if self.prior.shape != () and val.shape == ():
                 val_str += r"\bm{1}"
 
-            return r"\mu_{\theta} = " + val_str
+            return r"\mu_{\uptheta} = " + val_str
         elif key == 'prior_cov':
             val_str = str(val)
             if self.prior.shape != () and val.shape == ():
                 val_str += r"\boldsymbol{I}"
 
-            return r"\Sigma_{\theta} = " + val_str
+            return r"\Sigma_{\uptheta} = " + val_str
         else:
             raise ValueError
 
