@@ -40,8 +40,8 @@ n_x = 128
 
 # w_model = [0, 0, 1]
 # w_model = [0, 0, 0, 0, 1]
-# w_model = [.3, 0., .4]
-w_model = [.5, 0, 0]
+w_model = [.3, 0., .4]
+# w_model = [.5, 0, 0]
 
 
 # model = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_model),
@@ -99,9 +99,9 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), p
 # dir_params = None
 # dir_params = {'alpha_0': [1, 10, 100]}
 # dir_params = {'alpha_0': [.1, 50]}
-dir_params = {'alpha_0': [.01, 100]}
+# dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [100]}
-# dir_params = {'alpha_0': 1e-6 + np.linspace(0, 30, 30)}
+dir_params = {'alpha_0': 1e-6 + np.linspace(0, 30, 30)}
 # dir_params = {'alpha_0': 1e-6 + np.concatenate((np.linspace(0, 10, 100), np.linspace(10, 50, 10)))}
 
 
@@ -118,19 +118,19 @@ norm_params = {'prior_cov': [100, .01]}
 
 # Plotting
 
-# n_train = 200
+n_train = 10
 # n_train = [0, 100, 1000]
 # n_train = [0, 5, 10]
-n_train = np.arange(0, 605, 5)
+# n_train = np.arange(0, 650, 50)
 
 # print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
 # dir_predictor.plot_risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
 
 
 temp = [
-    (opt_predictor, None),
+    # (opt_predictor, None),
     (dir_predictor, dir_params),
-    (norm_predictor, norm_params),
+    # (norm_predictor, norm_params),
 ]
 
 # FIXME: discrete plot for predict stats
@@ -142,7 +142,7 @@ plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek}")
 
 predictors, params = list(zip(*temp))
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=50000,
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=100,
                            verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, n_test=1, verbose=False, ax=None)
 
