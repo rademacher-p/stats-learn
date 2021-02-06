@@ -95,20 +95,26 @@ class NormalLinear(Base):
         # self.posterior_model = rand_models.NormalLinear(model_x=model_x, basis_y_x=basis_y_x,
         #                                                 **self._prior_model_kwargs)
 
-    def tex_params(self, key, val):
+    def tex_params(self, key, val=None):
         val = np.array(val)
         if key == 'prior_mean':
-            val_str = str(val)
-            if self.prior.shape != () and val.shape == ():
-                val_str += r"\bm{1}"
+            if val is None:
+                return r"$\mu_{\uptheta}$"
+            else:
+                val_str = str(val)
+                if self.prior.shape != () and val.shape == ():
+                    val_str += r"\boldsymbol{1}"
 
-            return r"\mu_{\uptheta} = " + val_str
+                return r"$\mu_{\uptheta} = " + val_str + "$"
         elif key == 'prior_cov':
-            val_str = str(val)
-            if self.prior.shape != () and val.shape == ():
-                val_str += r"\boldsymbol{I}"
+            if val is None:
+                return r"$\Sigma_{\uptheta}$"
+            else:
+                val_str = str(val)
+                if self.prior.shape != () and val.shape == ():
+                    val_str += r"\boldsymbol{I}"
 
-            return r"\Sigma_{\uptheta} = " + val_str
+                return r"$\Sigma_{\uptheta} = " + val_str + "$"
         else:
             raise ValueError
 
@@ -244,9 +250,12 @@ class Dirichlet(Base):      # TODO: DRY from random.elements?
         return f"Dirichlet(alpha_0={self.alpha_0}, n={self.n}, prior_mean={self.prior_mean})"
 
     @staticmethod
-    def tex_params(key, val):
+    def tex_params(key, val=None):
         if key == 'alpha_0':
-            return r"\alpha_0 = " + str(val)
+            if val is None:
+                return r"$\alpha_0$"
+            else:
+                return r"$\alpha_0 = {}$".format(val)
         else:
             raise ValueError
 

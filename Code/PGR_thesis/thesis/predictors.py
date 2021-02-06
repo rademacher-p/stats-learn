@@ -166,15 +166,15 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
                 if len(param_vals) == 1:
                     labels = [None]
                     # title += f", ${param_name} = {param_vals[0]}$"
-                    title += f", ${predictor.tex_params(param_name, param_vals[0])}$"
+                    title += f", {predictor.tex_params(param_name, param_vals[0])}"
                 else:
                     # labels = [f"${param_name} = {val}$" for val in param_vals]
-                    labels = [f"${predictor.tex_params(param_name, val)}$" for val in param_vals]
+                    labels = [f"{predictor.tex_params(param_name, val)}" for val in param_vals]
             elif len(param_vals) == 1:
                 y_stats = y_stats.squeeze(axis=1)
                 labels = [f"$N = {n}$" for n in n_train]
                 # title += f", ${param_name} = {param_vals[0]}$"
-                title += f", ${predictor.tex_params(param_name, param_vals[0])}$"
+                title += f", {predictor.tex_params(param_name, param_vals[0])}"
             else:
                 raise ValueError
         else:
@@ -201,7 +201,7 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
                     y_stats = y_stats.squeeze(0)
                     param_name, param_vals = list(params.items())[0]
                     # labels = [f"{predictor.name}, ${param_name} = {val}$" for val in param_vals]
-                    labels = [f"{predictor.name}, ${predictor.tex_params(param_name, val)}$" for val in param_vals]
+                    labels = [f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals]
                 else:
                     raise ValueError
 
@@ -332,7 +332,7 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
         elif len(params) == 1:
             param_name, param_vals = list(params.items())[0]
             if len(n_train) < len(param_vals):
-                xlabel, x_plt = param_name, param_vals
+                xlabel, x_plt = predictor.tex_params(param_name), param_vals
                 if len(n_train) == 1:
                     title += f", $N = {n_train[0]}$"
                     labels = [None]
@@ -343,11 +343,11 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
                 xlabel, x_plt = '$N$', n_train
                 if len(param_vals) == 1:
                     # title += f", {param_name} = {param_vals[0]}"
-                    title += f", ${predictor.tex_params(param_name, param_vals[0])}$"
+                    title += f", {predictor.tex_params(param_name, param_vals[0])}"
                     labels = [None]
                 else:
                     # labels = [f"{param_name} = {val}" for val in param_vals]
-                    labels = [f"${predictor.tex_params(param_name, val)}$" for val in param_vals]
+                    labels = [f"{predictor.tex_params(param_name, val)}" for val in param_vals]
         else:
             raise ValueError
 
@@ -368,7 +368,7 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
                 loss = np.transpose(loss)
                 param_name, param_vals = list(params.items())[0]
                 # labels = [f"{predictor.name}, {param_name} = {val}" for val in param_vals]
-                labels = [f"{predictor.name}, ${predictor.tex_params(param_name, val)}$" for val in param_vals]
+                labels = [f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals]
             else:
                 raise ValueError
 
@@ -427,7 +427,7 @@ class Base(ABC):
         for key, val in kwargs.items():
             setattr(self._model_obj, key, val)
 
-    def tex_params(self, key, val):
+    def tex_params(self, key, val=None):
         return self._model_obj.tex_params(key, val)
 
     # def get_params(self, *args):
