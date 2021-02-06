@@ -12,7 +12,6 @@
   - Discretization of continuous data!?
 - **Try higher order poly for consistency results!**
 - **Include optimal estimator in constant N predict plots**
-- **Dir before Norm on legends**
 
 
 ## Outstanding goals
