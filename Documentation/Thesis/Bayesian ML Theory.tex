@@ -1441,14 +1441,12 @@ To further aid characterization of the estimator, define the random process $\De
 \mathrm{Bias}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim, \uppsic | \upthetam,\upthetac}\big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \big] \\
 & = & \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[\gammam(\xrm; \uppsim)\big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \;.
 \end{IEEEeqnarray}
-Note that the bias is proportionate to the difference between the true conditional model and the data-independent estimate, while the covariance also depends on $\Sigma_{\uppsic(x) | \uppsim(x), \upthetac(x)}$. 
-
 Combining the estimator bias and variance, the conditional second moments of $\Delta(\xrm;\uppsim,\uppsic,\upthetac)$ are
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_del_sq}
 \Ecal(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim,\uppsic | \upthetam,\upthetac} \Big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \otimes \Delta(\xrm;\uppsim,\uppsic,\upthetac) \Big] \\
 & = & \mathrm{Bias}(\xrm;\upthetam,\upthetac) \otimes \mathrm{Bias}(\xrm;\upthetam,\upthetac) + \mathrm{Cov}(\xrm;\upthetam,\upthetac) \nonumber \;.
 \end{IEEEeqnarray}
-The conditional expectation over $\xrm$ is
+Note that the bias is proportionate to the difference between the true conditional model and the data-independent estimate, while the covariance also depends on $\Sigma_{\uppsic(x) | \uppsim(x), \upthetac(x)}$. The conditional expectation over $\xrm$ is
 \begin{IEEEeqnarray}{L} \label{eq:predictive_E_del_sq}
 \Erm_{\xrm | \upthetam}\Big[ \Ecal(\xrm;\upthetam,\upthetac) \Big] \\
 \quad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \gammam(\xrm; \uppsim)^2 \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big)  \right] \nonumber \\
