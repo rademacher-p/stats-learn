@@ -302,7 +302,7 @@ class Dirichlet(Base):      # TODO: DRY from random.elements?
         _out = np.array([tuple(np.empty(self.shape[c], self.dtype[c]) for c in 'xy') for _ in range(n)],
                         dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
         for i in range(n):
-            if rng.random() <= self.alpha_0 / (self.alpha_0 + i):
+            if rng.random() <= (1 + i / self.alpha_0) ** -1:
                 _out[i] = self.prior_mean.rvs(rng=rng)     # sample from mean distribution
             else:
                 _out[i] = rng.choice(_out[:i])
