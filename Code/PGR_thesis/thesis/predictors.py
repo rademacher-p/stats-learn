@@ -246,6 +246,7 @@ def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n
             print(f"Loss iteration: {i_mc+1}/{n_mc}")
 
         d = model.rvs(n_test + n_train_delta.sum())
+        # np.random.default_rng().shuffle(d)      # FIXME
         d_test, _d_train = d[:n_test], d[n_test:]
         d_train_iter = np.split(_d_train, np.cumsum(n_train_delta)[:-1])
 

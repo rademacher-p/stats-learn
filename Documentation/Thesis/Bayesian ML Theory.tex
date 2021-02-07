@@ -1868,15 +1868,15 @@ PGR: better form above???
 
 
 
-Next consider the effects of the Dirichlet prior parameters. The analysis will interpret the Dirichlet parameters as the conditional prior means $\alphac(x)$ and the corresponding concentrations $\alpha'(x) \equiv \alpha_0 \alpham(x)$; the latter affects the risk through the value $\gammam(\uppsi)$.
+Next consider the effects of the Dirichlet prior parameters. The analysis will interpret the Dirichlet parameters as the conditional prior means $\alphac(x)$ and the corresponding concentrations $\bar{\alpha}_0(x) \equiv \alpha_0 \alpham(x)$; the latter affects the risk through the value $\gammam(\uppsi)$.
 
 First consider the conditional prior PMF's $\alphac(x)$; as shown, they manifest themselves in the risk through the squared estimator bias. It is clear that regardless of how the values $\alpha_0$ and $\alpham(x)$ are chosen, the best selections for these conditional priors must have first moments matching those of the corresponding true predictive distributions $\Prm_{\yrm | \xrm,\uptheta}$ for each $x \in \Xcal$. The resultant estimators $\mu_{\yrm | \xrm}$ are unbiased and the excess risk is equivalent to the first term in \eqref{eq:risk_cond_SE_dir_ex}, measuring additional variance due to model uncertainty.
 
-The other user-selected Dirichlet parameters manifest themselves in the risk as $\alpha'(x)$, the concentrations of the corresponding conditional distributions $\upthetac(x)$; these values control important bias/variance trade-offs via the two scaling factors in \eqref{eq:risk_cond_SE_dir_ex}. First, consider the asymptotic trends, again referencing the distribution estimation analysis in Section \ref{sec:predictive_est}.
+The concentrations $\bar{\alpha}_0(x)$ of the conditional distributions $\upthetac(x)$ control important bias/variance trade-offs via the two scaling factors in \eqref{eq:risk_cond_SE_dir_ex}. First, consider the asymptotic trends, again referencing the distribution estimation analysis in Section \ref{sec:predictive_est}.
 
-Consider how the excess risk tends as the priors become maximally concentrated. Recall that as $\alpha'(x) \to \infty$, the estimate of $\upthetac$ is maximally biased and has no variance; thus, the excess risk tends to $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, the expected squared-error between the means of the Bayesian predictive PMF and the true predictive PMF. This is intuitive given that the estimator tends toward a data-independent solution; the estimator may be biased, but will have no variance due to the training data statistics.
+Consider how the excess risk tends as the priors become maximally concentrated. Recall that as $\bar{\alpha}_0(x) \to \infty$, the estimate of $\upthetac$ is maximally biased and has no variance; thus, the excess risk tends to $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, the expected squared-error between the means of the Bayesian predictive PMF and the true predictive PMF. This is intuitive given that the estimator tends toward a data-independent solution; the estimator may be biased, but will have no variance due to the training data statistics.
 
-Conversely, if concentrations $\alpha'(x) \to 0$ are chosen, the Bayesian estimate tends to the empirical mean, independent of $\alphac$. Using the limits displayed in \ref{sec:predictive_est}, it can be shown that the excess risk tends to
+Conversely, if concentrations $\bar{\alpha}_0(x) \to 0$ are chosen, the Bayesian estimate tends to the empirical mean, independent of $\alphac$. Using the limits displayed in \ref{sec:predictive_est}, it can be shown that the excess risk tends to
 \begin{IEEEeqnarray}{rCl}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) & \to & \Erm_{\xrm | \upthetam}\left[ \big( 1 - \upthetam(\xrm) \big)^N \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \right] \nonumber \\
 && \quad + \Erm_{\xrm | \upthetam}\left[ \left( \sum_{n=1}^N \binom{N}{n} \upthetam(\xrm)^n \big( 1 - \upthetam(\xrm) \big)^{N-n} \frac{1}{n} \right) \Sigma_{\yrm | \xrm,\upthetac} \right] \nonumber \;.
@@ -1884,21 +1884,21 @@ Conversely, if concentrations $\alpha'(x) \to 0$ are chosen, the Bayesian estima
 Observe that the squared-bias contributes to the sum for a given value $x$, proportionate to the probability that no training samples are observed matching this value.
 
 
-Of further interest are the values $\alpha'(x)$ that minimize the excess squared-error for given prior conditional distributions $\alphac(x)$. With the asymptotic values of the excess risk known, all that remains is to determine any local minima. Since the $|\Xcal|$ summands of the excess risk depend only on the corresponding concentrations $\alpha'(x)$, each of these values can be optimized separately. 
+Of further interest are the values $\bar{\alpha}_0(x)$ that minimize the excess squared-error for given prior conditional distributions $\alphac(x)$. With the asymptotic values of the excess risk known, all that remains is to determine any local minima. Since the $|\Xcal|$ summands of the excess risk depend only on the corresponding concentrations $\bar{\alpha}_0(x)$, each of these values can be optimized separately. 
 
 \todomid{add the derivative details below???}
 
-Calculating the first derivative with respect to $\alpha'(x)$, it can be shown that for $N > 0$ and $\thetam(x) > 0$, only one stationary point exists, at 
+Calculating the first derivative with respect to $\bar{\alpha}_0(x)$, it can be shown that for $N > 0$ and $\thetam(x) > 0$, only one stationary point exists, at 
 \begin{equation} \label{eq:alpha_x_min_Rex}
-\alpha'(\xrm) = \frac{\Sigma_{\yrm | \xrm,\upthetac}}{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2} \;.
+\bar{\alpha}_0(\xrm) = \frac{\Sigma_{\yrm | \xrm,\upthetac}}{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2} \;.
 \end{equation}
 Calculation of the second derivative confirms that this value is a local minimum. Furthermore, the excess risk evaluated at these values is 
 \begin{equation}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{1}{N \uppsim(\xrm) \Sigma_{\yrm | \xrm,\upthetac}^{-1} + \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^{-2}} \right] \right] \;,
 \end{equation}
-which can be easily shown to be less than both the asymptotic values for $\alpha'(x) \to 0$ and $\alpha'(x) \to \infty$. Thus the concentration values \eqref{eq:alpha_x_min_Rex} can be used to find the optimal values of $\alpha_0$ and $\alpham(x)$ leading to the minimum excess risk for the given prior conditional distributions $\alphac(x)$.
+which can be easily shown to be less than both the asymptotic values for $\bar{\alpha}_0(x) \to 0$ and $\bar{\alpha}_0(x) \to \infty$. Thus the concentration values \eqref{eq:alpha_x_min_Rex} can be used to find the optimal values of $\alpha_0$ and $\alpham(x)$, yielding the minimum excess risk for the given prior conditional distributions $\alphac(x)$.
 
-Note that the minimizing concentration values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible; the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low concentrations are preferable when the conditional model has low variance; these models can be accurately identified by learners that prioritize the empirical mean over the prior estimate, even with limited training data $N$. Additionally, note that these values $\alpha'(x)$ do not depend on the training volume $N$.
+Note that the minimizing concentration values $\bar{\alpha}_0(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible; the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low concentrations are preferable when the conditional model has low variance; these models can be accurately identified by learners that prioritize the empirical mean over the prior estimate, even with limited training data $N$. Additionally, note that these values $\bar{\alpha}_0(x)$ do not depend on the training volume $N$.
 
 
 
@@ -1930,56 +1930,66 @@ To demonstrate the efficacy of Dirichlet-based regressors, consider a data model
 
 \todohi{Simulation details, reference? Github release??}
 
-\Cref{fig:Predict_SE_biased_hard,fig:Predict_SE_biased_hard_N} provides visualization of the statistics of the achieved regression functions. The lines represent $\Erm_{\Drm | \uptheta}\big[\mu_{\yrm | \xrm, \Drm}\big]$, the expectation of the Bayesian regressors with respect to the training data; the filled regions represent the square-root of $\Crm_{\Drm | \uptheta}\big[\mu_{\yrm | \xrm, \Drm}\big]$, the regressor variance. Observe that the Dirichlet-based estimator with $\alpha_0 = 0.01$ has lower prediction bias, but incurs additional error due to high variance. Conversely, the estimator using $\alpha_0 = 100$ is hindered by its confidence in the biased estimator $\mu_{\yrm | \xrm}$, but is less sensitive to differences in the observed training set.
+\Cref{fig:SSP_2021/Predict_SE_biased_hard,fig:SSP_2021/Predict_SE_biased_hard_N} provides visualization of the statistics of the achieved regression functions. The lines represent $\Erm_{\Drm | \uptheta}\big[\mu_{\yrm | \xrm, \Drm}\big]$, the expectation of the Bayesian regressors with respect to the training data; the filled regions represent the square-root of $\Crm_{\Drm | \uptheta}\big[\mu_{\yrm | \xrm, \Drm}\big]$, the regressor variance. Observe that the Dirichlet-based estimator with $\alpha_0 = 0.01$ has lower prediction bias, but incurs additional error due to high variance. Conversely, the estimator using $\alpha_0 = 100$ is hindered by its confidence in the biased estimator $\mu_{\yrm | \xrm}$, but is less sensitive to differences in the observed training set. Also note that both the bias and variance of the estimator tend to zero in the limit $N \to \infty$, even when using the concentrated $\alpha_0 = 100$ prior.
 \begin{figure}
 \centering
 \includegraphics[width=0.8\linewidth]{SSP_2021/Predict_SE_biased_hard.png}
 \caption{Comparative estimator statistics}
-\label{fig:Predict_SE_biased_hard}
+\label{fig:SSP_2021/Predict_SE_biased_hard}
 \end{figure}
 \begin{figure}
 \centering
 \includegraphics[width=0.8\linewidth]{SSP_2021/Predict_SE_biased_hard_N.png}
 \caption{Dirichlet-based prediction statistics, different training volume $N$}
-\label{fig:Predict_SE_biased_hard_N}
+\label{fig:SSP_2021/Predict_SE_biased_hard_N}
 \end{figure}
 
-Additionally, note that the linear regressor with the Normal prior is highly biased, as its set of achievable estimator functions is critically limited; it also has lower variance that the Dirichlet-based estimators. This is a consequence of the lower-dimensionality, limited-support prior -- there are fewer models $\theta \in \Pcal(\Ycal \times \Xcal)$ that are considered and thus fewer functions $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$ that can be realized. Unlike the Bayesian linear regressor, the Dirichlet estimator uses a full-support prior, which is necessary to ensure that any complex clairvoyant estimator can be learned.
+The Bayesian linear regressor with the Normal prior is highly biased, as its set of achievable estimator functions is critically limited; it also has lower variance than the Dirichlet-based estimators. This is a consequence of the lower-dimensionality, limited-support prior -- there are fewer models $\theta \in \Pcal(\Ycal \times \Xcal)$ that are considered and thus fewer functions $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$ that can be realized. Contrasting, the Dirichlet estimator uses a full-support prior, which is necessary to ensure that any complex clairvoyant estimator can be learned.
 
-Figure \ref{fig:Risk_cond_SE_N_biased_hard} shows the resultant expected squared-error as a function of $N$. Observe that the Dirichlet-based estimator trends toward the irreducible risk $\Rcal_{\Theta}^*(\theta)$, regardless of how much confidence in $\alphac$ is indicated through the prior localization $\alpha_0$. Furthermore this trend holds no matter how severe the bias of $\alphac$ might be. This is a consequence of the Bayesian predictive distribution $\Prm_{\yrm | \xrm,\Drm}$ being a consistent estimator of the true predictive model $\thetac$, which is guaranteed by the prior's full support. In contrast, the Bayesian linear regressor will always result in non-zero excess squared-error, no matter how much training data is available. 
+Figure \ref{fig:SSP_2021/Risk_cond_SE_N_biased_hard} shows the resultant expected squared-error as a function of $N$. Observe that the Dirichlet-based estimator trends toward the irreducible risk $\Rcal_{\Theta}^*(\theta)$, regardless of how much confidence in the data-independent regressor $\alphac$ is indicated through the prior localization $\alpha_0$. Furthermore this trend holds no matter how severe the bias of $\alphac$ might be. This is a consequence of the Bayesian predictive distribution $\Prm_{\yrm | \xrm,\Drm}$ being a consistent estimator of the true predictive model $\thetac$, which is guaranteed by the Dirichlet prior's full support. In contrast, the Bayesian linear regressor will always result in non-zero excess squared-error, no matter how much training data is available. 
 \begin{figure}
 \centering
 \includegraphics[width=0.8\linewidth]{SSP_2021/Risk_cond_SE_N_biased_hard.png}
 \caption{Squared-Error vs. training data volume $N$}
-\label{fig:Risk_cond_SE_N_biased_hard}
+\label{fig:SSP_2021/Risk_cond_SE_N_biased_hard}
 \end{figure}
 
-Note that, due to the high initial bias, both the Dirichlet-based estimator and Bayesian linear regressor perform better when projecting relatively low confidence in their data-independent prediction via high prior variance (low $\alpha_0$, high $\Sigma_{\uptheta}$). \Cref{fig:Risk_cond_SE_a0_biased_hard} demonstrates the error trends of the Dirichlet-based estimator for different prior localizations $\alpha_0$.
+Note that due to the high initial bias, both the Dirichlet-based estimator and Bayesian linear regressor perform better when projecting relatively low confidence in their data-independent prediction via high prior variance (low $\alpha_0$, high $\Sigma_{\uptheta}$). \Cref{fig:SSP_2021/Risk_cond_SE_a0_biased_hard} demonstrates the error trends of the Dirichlet-based estimator for different prior localizations $\alpha_0$.
 \begin{figure}
 \centering
 \includegraphics[width=0.8\linewidth]{SSP_2021/Risk_cond_SE_a0_biased_hard.png}
 \caption{Squared-Error vs. prior localization $\alpha_0$}
-\label{fig:Risk_cond_SE_a0_biased_hard}
+\label{fig:SSP_2021/Risk_cond_SE_a0_biased_hard}
 \end{figure} 
-\Cref{fig:Risk_cond_SE_a0_biased_hard_zoom} highlights the value $\alpha_0$ that optimizes the bias/variance trade-off, independent of the training volume $N$; due to the severity of the bias, the corresponding optimal Dirichlet estimator is only marginally better than the empirical estimator with $\alpha_0 \to 0$.
+\Cref{fig:SSP_2021/Risk_cond_SE_a0_biased_hard_zoom} highlights the localization $\alpha_0$ that optimizes the bias/variance trade-off; this value is independent of the training volume $N$. Due to the severity of the bias, the corresponding optimal Dirichlet estimator is only marginally better than the empirical estimator with $\alpha_0 \to 0$.
 \begin{figure}
 \centering
 \includegraphics[width=0.8\linewidth]{SSP_2021/Risk_cond_SE_a0_biased_hard_zoom.png}
 \caption{Squared-Error vs. prior localization $\alpha_0$, minimum}
-\label{fig:Risk_cond_SE_a0_biased_hard_zoom}
+\label{fig:SSP_2021/Risk_cond_SE_a0_biased_hard_zoom}
 \end{figure}
 
-\todohigh{Make hi-fi a0 figs}
+
+\subparagraph{Bayes SE}
+
+\todohigh{location??? HI-FI figs!!}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\linewidth]{SSP_2021/Risk_SE_N.png}
+\caption{Bayes Squared-Error vs. $N$}
+\label{fig:SSP_2021/Risk_SE_N}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=0.8\linewidth]{SSP_2021/Risk_SE_a0.png}
+\caption{Bayes Squared-Error vs. prior localization $\alpha_0$}
+\label{fig:SSP_2021/Risk_SE_a0}
+\end{figure}
 
 
 
 
-
-
-
-\newpage
-
-PGR: newpage
 
 
 \subsection{Classification: the 0-1 Loss}

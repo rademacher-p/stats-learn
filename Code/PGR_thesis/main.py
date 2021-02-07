@@ -40,14 +40,14 @@ n_x = 128
 
 # w_model = [0, 0, 1]
 # w_model = [0, 0, 0, 0, 1]
-w_model = [.3, 0., .4]
-# w_model = [.5, 0, 0]
+# w_model = [.3, 0., .4]
+w_model = [.5, 0, 0]
 
 
-# model = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_model),
-#                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
-model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, lambda x: 1 / (2 + np.sin(2*np.pi * x))),
+model = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_model),
                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
+# model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, lambda x: 1 / (2 + np.sin(2*np.pi * x))),
+#                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
 # model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=100, model_x=rand_elements.Beta())
 # model = rand_models.BetaLinear(weights=[1], basis_y_x=[lambda x: 1 / (2 + np.sin(2*np.pi * x))], alpha_y_x=100,
@@ -57,10 +57,10 @@ model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, lambda 
 # model = rand_models.NormalLinear(weights=np.ones(2), basis_y_x=None, cov_y_x=.1, model_x=rand_elements.Normal(0, 10))
 
 
-# do_bayes = True
-do_bayes = False
+do_bayes = True
+# do_bayes = False
 if do_bayes:
-    model_eval = bayes_models.Dirichlet(model, alpha_0=10)
+    model_eval = bayes_models.Dirichlet(model, alpha_0=100)
     opt_predictor = BayesRegressor(model_eval, name=r'$f^*$')
 else:
     model_eval = model
@@ -81,7 +81,8 @@ proc_funcs = []
 
 prior_mean = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_prior),
                                                      supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
-
+# prior_mean = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, lambda x: 1 / (2 + np.sin(2*np.pi * x))),
+#                                                      supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
 # prior_mean_x = rand_elements.Beta()
 
@@ -97,13 +98,13 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), p
                                name='$\mathrm{Dir}$')
 
 # dir_params = None
-# dir_params = {'alpha_0': [1, 10, 100]}
+# dir_params = {'alpha_0': [1, 100, 10000]}
 # dir_params = {'alpha_0': [.1, 50]}
 # dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [100]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 100, 100)}
 # dir_params = {'alpha_0': 1e-6 + np.concatenate((np.linspace(0, 20, 100), np.linspace(20, 100000, 1000)))}
-dir_params = {'alpha_0': np.logspace(-0., 6., 100)}
+dir_params = {'alpha_0': np.logspace(-1., 5., 100)}
 
 # Normal learner
 norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=100 * np.eye(len(w_prior)),
@@ -121,7 +122,9 @@ norm_params = {'prior_cov': [100, .01]}
 # n_train = 100
 n_train = [0, 100, 1000]
 # n_train = [0, 5, 10]
-# n_train = np.arange(0, 650, 50)
+# n_train = np.arange(0, 110, 10)
+# n_train = np.arange(0, 1100, 100)
+
 
 # print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
 # dir_predictor.plot_risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
@@ -133,7 +136,7 @@ temp = [
     # (norm_predictor, norm_params),
 ]
 
-# FIXME: discrete plot for predict stats
+# TODO: discrete plot for predict stats
 # TODO: save fig, png and object!
 # TODO: redo SSP p_dir fig
 
