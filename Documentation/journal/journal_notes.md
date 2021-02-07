@@ -10,8 +10,6 @@
   - model estimation perspective, too?
 - **Real data APPLICATION**
   - Discretization of continuous data!?
-- **Try higher order poly for consistency results!**
-- **Include optimal estimator in constant N predict plots**
 
 
 ## Outstanding goals
