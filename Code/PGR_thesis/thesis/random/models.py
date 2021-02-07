@@ -105,6 +105,9 @@ class MixinRVy:
     def _cov_y_x_single(self, x):
         raise Exception
 
+    def plot_cov_y_x(self, x=None, ax=None):
+        return self.space['x'].plot(self.cov_y_x, x, ax)
+
 
 # class DataConditionalGeneric(Base):
 #     def __new__(cls, model_x, model_y_x, rng=None):

@@ -1415,33 +1415,33 @@ The Bayes predictive PMF can thus be expressed as
 PGR: use poster table??
 
 
-It is instructive to treat the distribution $\Prm_{\yrm | \xrm,\uppsi}$ as an estimate of the unknown conditional PMF $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$ and investigate the effects of informative prior knowledge. For a given $\xrm$, the expected value of the estimate conditioned on the true model is
+It is instructive to treat the Bayesian predictive distribution $\Prm_{\yrm | \xrm,\Drm}$ as an estimator of the clairvoyant predictive distribution $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$ and investigate the effects of prior knowledge. Of specific interest are the mean $\Erm_{\Drm | \uptheta}\big[\mu_{\yrm | \xrm, \Drm}\big]$ and covariance $\Crm_{\Drm | \uptheta}\big[\mu_{\yrm | \xrm, \Drm}\big]$ with respect to the true model $\uptheta$.  To simplify the analysis, the training data $\Drm$ will be represented using the marginal and conditional sufficient statistics $(\uppsim, \uppsic)$. 
+
+For a given $\xrm$, the expected value of the estimate conditioned on the true model is
 \begin{IEEEeqnarray}{L} \label{eq:predictive_dist_avg}
 \Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] 
 = \Erm_{\uppsim(\xrm),\uppsic(\xrm) | \upthetam(\xrm),\upthetac(\xrm)}\big[ \Prm_{\yrm | \xrm,\uppsim(\xrm),\uppsic(\xrm)} \big] \\ 
 \quad = \Erm_{\uppsim(\xrm) | \upthetam(\xrm)} \big[\gammam(\xrm; \uppsim)\big] \alphac(\xrm) + \Erm_{\uppsim(\xrm) | \upthetam(\xrm)} \big[1 - \gammam(\xrm; \uppsim)\big] \upthetac(\xrm) \nonumber
 \end{IEEEeqnarray}
-where the properties of an Empirical distribution conditioned on its aggregation have been used. The result is a convex combination of the conditional data-independent distribution $\alphac(\xrm)$ and the true conditional distribution $\upthetac(\xrm)$. 
-
-
-To aid characterization of the estimator, define the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$. For a given $\xrm$, the bias of the conditional PMF estimate is
-\begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias}
-\mathrm{Bias}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim, \uppsic | \upthetam,\upthetac}\big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \big] \\
-& = & \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[\gammam(\xrm; \uppsim)\big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber
-\end{IEEEeqnarray}
-and, noting that
+where the properties of an Empirical distribution (Appendix \ref{app:emp}) conditioned on its aggregation have been used. The result is a convex combination of the conditional data-independent distribution $\alphac(\xrm)$ and the true conditional distribution $\upthetac(\xrm)$. Noting that
 \begin{IEEEeqnarray}{L}
 \Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
 \quad = \Big( \gammam(\xrm; \uppsim) - \Erm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \Big) \big(\alphac(\xrm) - \upthetac(\xrm)\big) \nonumber \\
 \qquad + \big(1 - \gammam(\xrm; \uppsim)\big) \big(\uppsic(\xrm) - \upthetac(\xrm)\big) \nonumber \;,
 \end{IEEEeqnarray}
-its covariance function is 
+the covariance of the estimate can be represented as
 \begin{IEEEeqnarray}{L} \label{eq:predictive_cov}
 \mathrm{Cov}(\xrm;\upthetam,\upthetac) = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
 \quad = \Crm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[ \gammam(\xrm; \uppsim) \big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
-\qquad + \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \nonumber \;,
+\qquad + \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \nonumber \;.
 \end{IEEEeqnarray}
-where the properties of Empirical random processes have been used. Note that the bias is proportionate to the difference between the true conditional model and the data-independent estimate, while the covariance also depends on $\Sigma_{\uppsic(x) | \uppsim(x), \upthetac(x)}$. 
+
+To further aid characterization of the estimator, define the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$, measuring the difference between the true and estimated predictive PMF. For a given $\xrm$, the bias of the estimate is thus
+\begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias}
+\mathrm{Bias}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim, \uppsic | \upthetam,\upthetac}\big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \big] \\
+& = & \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[\gammam(\xrm; \uppsim)\big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \;.
+\end{IEEEeqnarray}
+Note that the bias is proportionate to the difference between the true conditional model and the data-independent estimate, while the covariance also depends on $\Sigma_{\uppsic(x) | \uppsim(x), \upthetac(x)}$. 
 
 Combining the estimator bias and variance, the conditional second moments of $\Delta(\xrm;\uppsim,\uppsic,\upthetac)$ are
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_del_sq}
@@ -1493,7 +1493,7 @@ To exemplify how the model estimate $\Prm_{\yrm | \xrm,\uppsi}$ approximates $\P
 \label{fig:model_est/N_0}
 \end{figure}
 
-\Cref{fig:model_est/N_1,fig:model_est/N_100,fig:model_est/N_10000} show how the bias and variance of the estimate changes with different values of $N$ and $\alpha_0$. The plot lines represent the mean of the estimator, $\Erm_{\uppsi | \uptheta}\big[ \Prm_{\yrm | \xrm,\uppsi} \big]$; the shaded regions represent the square-root of the expected variance above and below the conditional mean. 
+\Cref{fig:model_est/N_1,fig:model_est/N_100,fig:model_est/N_10000} show how the bias and variance of the estimate changes with different values of $N$ and $\alpha_0$. The plot lines represent the mean of the estimator, $\Erm_{\uppsi | \uptheta}\big[ \Prm_{\yrm | \xrm,\uppsi} \big]$; the shaded regions represent the square-root of the expected variance $\Crm_{\uppsi | \uptheta}\big[ \Prm_{\yrm | \xrm,\uppsi} \big]$ above and below the conditional mean. 
 \begin{figure}
 \centering
 \includegraphics[width=0.8\linewidth]{model_est/N_1.png}
@@ -1970,9 +1970,12 @@ Note that due to the high initial bias, both the Dirichlet-based estimator and B
 \end{figure}
 
 
+
 \subparagraph{Bayes SE}
 
-\todohigh{location??? HI-FI figs!!}
+\todohigh{location??? HI-FI N fig!!}
+
+\Cref{fig:SSP_2021/Risk_SE_N,fig:SSP_2021/Risk_SE_a0} display the Bayesian squared-error realized by the Dirichlet-based regressor. The model $\uptheta$ is randomly selected from a Dirichlet distribution with the same $\alpham$ and $\alphac$ used for the regressor design and with the localization fixed at $\alpha_0 = 100$. Observe that with increasing training data volume $N$, all the regressors tend towards the expected irreducible risk. Additionally, the regressor performs best when its localization matches $\alpha_0 = 100$, regardless of the value $N$, achieving the Bayesian squared-error \eqref{eq:Risk_min_SE_dir}.
 
 \begin{figure}
 \centering
@@ -1986,6 +1989,11 @@ Note that due to the high initial bias, both the Dirichlet-based estimator and B
 \caption{Bayes Squared-Error vs. prior localization $\alpha_0$}
 \label{fig:SSP_2021/Risk_SE_a0}
 \end{figure}
+
+
+
+
+
 
 
 
