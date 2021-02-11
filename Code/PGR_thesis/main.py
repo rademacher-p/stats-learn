@@ -29,7 +29,7 @@ def func_mean_to_models(n, func):
     return [rand_elements.EmpiricalScalar(func(x_i), n - 1) for x_i in np.linspace(0, 1, n, endpoint=True)]
 
 
-n_x = 11
+n_x = 5
 
 
 # True model
@@ -49,8 +49,8 @@ w_model = [.5, 0, 0]
 # model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, lambda x: 1 / (2 + np.sin(2*np.pi * x))),
 #                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
-# model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=100, model_x=rand_elements.Beta())
-model = rand_models.BetaLinear(weights=[1], basis_y_x=[lambda x: 1 / (2 + np.sin(2*np.pi * x))], alpha_y_x=100,
+# model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=126, model_x=rand_elements.Beta())
+model = rand_models.BetaLinear(weights=[1], basis_y_x=[lambda x: 1 / (2 + np.sin(2*np.pi * x))], alpha_y_x=126,
                                model_x=rand_elements.Beta())
 
 
@@ -86,8 +86,8 @@ proc_funcs = []
 prior_mean_x = rand_elements.Mixture([rand_elements.DataEmpirical(np.linspace(0, 1, n_x, endpoint=True),
                                                                   counts=np.ones(n_x), space=model.space['x']),
                                       rand_elements.Beta()],
-                                     weights=[1000, 1])
-prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=100, model_x=prior_mean_x)
+                                     weights=[1e6, 1])
+prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=126, model_x=prior_mean_x)
 proc_funcs.append(discretizer(prior_mean_x.dists[0].data['x']))
 
 
@@ -114,10 +114,10 @@ norm_params = {'prior_cov': [100]}
 
 # Plotting
 
-n_train = 100
+# n_train = 200
 # n_train = [0, 100, 1000]
 # n_train = [0, 5, 10]
-# n_train = np.arange(0, 550, 50)
+n_train = np.arange(0, 650, 50)
 # n_train = np.arange(0, 1100, 100)
 
 
@@ -140,12 +140,12 @@ plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek}")
 
 predictors, params = list(zip(*temp))
 
-# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=200,
-#                            verbose=True, ax=None, rng=None)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=200,
+                           verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, n_test=1, verbose=False, ax=None)
 
-plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=500,
-                           do_std=True, verbose=True, ax=None, rng=None)
+# plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=500,
+#                            do_std=True, verbose=True, ax=None, rng=None)
 
 
 # print(f"\nAnalytical Risk = {opt_predictor.evaluate_comp(n_train=n_train)}")

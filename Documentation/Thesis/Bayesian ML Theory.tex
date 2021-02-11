@@ -296,7 +296,7 @@ will be used repeatedly.
 
 \subsection*{Random elements, variables, and processes}
 
-Random elements are denoted with roman font (e.g. $\xrm$), while specific values are denoted with italics (e.g. $x$). Random elements that assume numerical scalars/functions are referred to as random variables/processes, respectively.
+Random elements are denoted with roman font (e.g., $\xrm$), while specific values are denoted with italics (e.g., $x$). Random elements that assume numerical scalars/functions are referred to as random variables/processes, respectively.
 
 Consider a random element $\xrm \in \Xcal$. If $\Xcal$ is countable, either finite with $|\Xcal| \in \Nbb$ or countably infinite with $|\Xcal| = \aleph_0$, then $\xrm$ is a discrete random element and is characterized by a probability mass function (PMF) \cite {papoulis}, denoted $\Prm_{\xrm} \in \Pcal(\Xcal)$. If $\Xcal$ is a Euclidean space and is thus uncountable with $|\Xcal| \geq \aleph_1$, then $\xrm$ is a continuous random variable/process characterized by a probability density function (PDF), denoted $\prm_{\xrm} \in \Pcal(\Xcal)$.
 
@@ -363,7 +363,7 @@ In such cases, the italic $z$ is dropped from the arguments and the formulas $\E
 
 \chapter{Problem Statement}
 
-\todohigh{REWORK TEXT}
+\todohigh{Generalize for limited dimensionality models?}
 
 \section{Data Model}
 
@@ -506,7 +506,7 @@ Note that the dependency of the conditional distribution on the model $\uptheta$
 
 
 
-Analogous to the decomposition of the model $\uptheta$ into its marginal and conditional models, the empirical process can be decomposed into marginal and conditional empirical processes via a bijection $\uppsi \Leftrightarrow (\uppsim, \uppsic)$. Introduce the ``marginalized'' random process $\uppsim$ over the set $\Xcal$, defined as $\uppsim \equiv \sum_{y \in \Ycal} \uppsi(y,\cdot) \equiv \Psim(\Xrm) \in \Uppsim$. Similar to the Multinomial random processes \cite{johnson}, the Empirical random process has an aggregation property (Appendix \ref{app:emp}) - using this principle, it can be shown that conditioned on the model $\uptheta$, the marginal model is distributed as $\uppsim | \upthetam \sim \Emp(N,\upthetam)$. 
+Analogous to the decomposition of the model $\uptheta$ into its marginal and conditional models, the empirical process can be decomposed into marginal and conditional empirical processes via a bijection $\uppsi \Leftrightarrow (\uppsim, \uppsic)$. Introduce the ``marginalized'' random process $\uppsim$ over the set $\Xcal$, defined as $\uppsim \equiv \sum_{y \in \Ycal} \uppsi(y,\cdot) \equiv \Psim(\Xrm) \in \Uppsim$. Similar to the Multinomial random processes \cite{johnson}, the Empirical random process has an aggregation property (Appendix \ref{app:emp}). Using this principle, it can be shown that conditioned on the model $\uptheta$, the marginal model is distributed as $\uppsim | \upthetam \sim \Emp(N,\upthetam)$. 
 
 Also of interest is the conditional distribution of $\uppsic \in \Uppsic$, where $\uppsic(x) \equiv \uppsi(\cdot,x) / \uppsim(x)$. Using the Empirical process properties proven in Appendix \ref{app:emp}, it can be shown that when conditioned on $\uppsi$ and on the model $\uptheta$, the PMF of $\uppsic$ is
 \begin{IEEEeqnarray}{rCl}
@@ -542,9 +542,9 @@ The metric guiding the design is a loss function $\Lcal: \Hcal \times \Ycal \map
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond}
 \Rcal_{\Theta}(f ; \uptheta) & = &  \Erm_{\yrm,\xrm,\Drm | \uptheta} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \\
 & = & \Erm_{\xrm,\Drm | \uptheta} \bigg[ \Erm_{\yrm | \xrm,\uptheta} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \nonumber \\
-& = & \Erm_{\Drm | \uptheta}\Bigg[ \Erm_{\xrm | \uptheta}\bigg[ \Erm_{\yrm | \xrm,\uptheta}\Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \Bigg] \nonumber \;.
+& = & \Erm_{\Drm | \uptheta}\Bigg[ \Erm_{\xrm | \uptheta}\bigg[ \Erm_{\yrm | \xrm,\uptheta}\Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \Bigg] \nonumber \;,
 \end{IEEEeqnarray}
-where the conditional independence of random element $\yrm$ from the training data $\Drm$ given the model $\uptheta$ is used. As the model $\uptheta$ is not observed, $\Rcal_{\Theta}: \Theta \mapsto {\Rbbgeq}^{\Fcal}$ is not a feasible objective function for optimization. This is the fundamental challenge of supervised learning: the true risk objective cannot be evaluated and the designer can never be precisely sure how well any learning function performs. 
+where the conditional independence of random element $\yrm$ from the training data $\Drm$ given the model $\uptheta$ is used. As the model $\uptheta$ is not observed, $\Rcal_{\Theta}: \Theta \mapsto {\Rbbgeq}^{\Fcal}$ is not a feasible objective function for optimization. This is the fundamental challenge of supervised learning -- the true risk objective cannot be evaluated and the designer can never be precisely sure how well any learning function performs. 
 
 
 
@@ -556,7 +556,7 @@ It is instructive to formulate the optimal decision function assuming the model 
 \begin{equation}
 f_{\Theta}(\uptheta) = \argmin_{f \in \Fcal} \Rcal_{\Theta}(f ; \uptheta) \;.
 \end{equation}
-For a given set of observations $\xrm$ and $\Drm$, the function $f_{\Theta}(\uptheta) \in \Fcal$ selects the decision $h = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big]$. Note the conditional independence of $\yrm$ from $\Drm$ in \eqref{eq:risk_cond} - the knowledge of $\uptheta$ renders the training data $\Drm$ valueless. As such, the range of the clairvoyant function is recast as $f_{\Theta} : \Theta \mapsto \Hcal^{\Xcal}$ and the decisions are
+For a given set of observations $\xrm$ and $\Drm$, the function $f_{\Theta}(\uptheta) \in \Fcal$ selects the decision $h = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big]$. Note the conditional independence of $\yrm$ from $\Drm$ in \eqref{eq:risk_cond} -- the knowledge of $\uptheta$ renders the training data $\Drm$ valueless. As such, the range of the clairvoyant function is recast as $f_{\Theta} : \Theta \mapsto \Hcal^{\Xcal}$ and the decisions are
 \begin{equation} \label{eq:f_clv_x}
 f_{\Theta}(\xrm;\uptheta) = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \;.
 \end{equation}
@@ -657,7 +657,7 @@ where $\Prm_{\Yrm | \Xrm} = \Erm_{\upthetam | \Xrm} \Big[ \Erm_{\upthetac | \upt
 
 Additionally, since $\Psi(\Drm)$ is a sufficient statistic for the model $\uptheta$, the Bayesian distributions of interest $\Prm_{\Drm}$, $\Prm_{\xrm | \Drm}$, and $\Prm_{\yrm | \xrm,\Drm}$ will also depend on $\Drm$ only through $\Psi(\Drm)$; as such, the training data can be transformed into the empirical process $\uppsi$ for Bayesian prediction without incurring any additional risk. 
 
-For this approach, the distributions $\Prm_{\uppsi}$, $\Prm_{\xrm | \uppsi}$, and $\Prm_{\yrm | \xrm,\uppsi}$ are required. Note that $\Mcal\big( N \Psi(D) \big) \Prm_{\Drm | \uptheta}(D | \theta) = \Prm_{\uppsi | \uptheta}\big( \Psi(D) | \theta \big)$. Also, observe that the relevant posterior distributions satisfy $\prm_{\upthetam | \Drm}(D) = \prm_{\upthetam | \uppsi}\big( \Psi(D) \big)$ and $\prm_{\upthetac(x) | \xrm,\Drm}(x,D) = \prm_{\upthetac(x) | \xrm,\uppsi}\big( x,\Psi(D) \big)$; consequently, $\Prm_{\xrm | \Drm}(D) = \Prm_{\xrm | \uppsi}\big( \Psi(D) \big)$, and $\Prm_{\yrm | \xrm,\Drm}(x,D) = \Prm_{\yrm | \xrm,\uppsi}\big( x,\Psi(D) \big)$.
+For this approach, the distributions $\Prm_{\uppsi}$, $\Prm_{\xrm | \uppsi}$, and $\Prm_{\yrm | \xrm,\uppsi}$ are required. Note that $\Prm_{\Drm | \uptheta}(D | \theta) = \Mcal\big( N \Psi(D) \big)^{-1} \Prm_{\uppsi | \uptheta}\big( \Psi(D) | \theta \big)$. Also, observe that the relevant posterior distributions satisfy $\prm_{\upthetam | \Drm}(D) = \prm_{\upthetam | \uppsi}\big( \Psi(D) \big)$ and $\prm_{\upthetac(x) | \xrm,\Drm}(x,D) = \prm_{\upthetac(x) | \xrm,\uppsi}\big( x,\Psi(D) \big)$; consequently, $\Prm_{\xrm | \Drm}(D) = \Prm_{\xrm | \uppsi}\big( \Psi(D) \big)$, and $\Prm_{\yrm | \xrm,\Drm}(x,D) = \Prm_{\yrm | \xrm,\uppsi}\big( x,\Psi(D) \big)$.
 
 
 
@@ -854,7 +854,7 @@ Substituting the optimal estimator \eqref{eq:f_opt_SE} into Equation \eqref{eq:r
 & = & \Erm_{\xrm,\uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right] + \Erm_{\xrm,\Drm} \left[ \Crm_{\uptheta | \xrm,\Drm} \left[ \mu_{\yrm | \xrm,\uptheta} \right] \right] \nonumber \\
 & = & \Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] + \Erm_{\xrm,\Drm} \Big[ \Crm_{\uptheta | \xrm,\Drm} \big[ f_{\Theta}(\xrm;\uptheta) \big] \Big] \nonumber \;.
 \end{IEEEeqnarray}
-The first term is the expected irreducible risk. The second term is the expected variance of the clairvoyant estimate $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$ with respect to the model posterior PDF $\prm_{\uptheta | \xrm,\Drm}$
+The first term is the expected irreducible risk. The second term is the expected variance of the clairvoyant estimate $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$ with respect to the model posterior PDF $\prm_{\uptheta | \xrm,\Drm}$.
 
 
 
@@ -863,7 +863,7 @@ The first term is the expected irreducible risk. The second term is the expected
 
 \subsection{Classification: the 0-1 Loss}
 
-In this section, the developed framework is applied to a common machine learning task: classification. In classification problems, the set $\Ycal$ is countable and typically finite. Furthermore, the hypothesis space is usually identical to the unobserved variable space; that is $\Hcal = \Ycal$. The 0-1 loss function is the most widely used for these problems; it is represented as
+In this section, the developed framework is applied to a common machine learning task: classification. In classification problems, the set $\Ycal$ is countable and typically finite. Furthermore, the hypothesis space is usually identical to the unobserved variable space; that is, $\Hcal = \Ycal$. The 0-1 loss function is the most widely used for these problems; it is represented as
 \begin{equation} \label{eq:loss_01}
 \Lcal(h,y) = 1 - \delta[h,y] \;.
 \end{equation}
@@ -1274,7 +1274,7 @@ Recall that the joint PMF of $\yrm$ and $\xrm$ conditioned on the training data 
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\yrm,\xrm | \Drm} & = & \gamma \alpha + (1-\gamma) \Psi(\Drm) \;.
 \end{IEEEeqnarray}
-This is a mixture distribution of the prior mean $\mu_{\uptheta} = \alpha$ and the empirical distribution $\Psi(\Drm)$. The more informative the model prior (i.e. larger $\alpha_0$), the more the prior mean is favored; the more data, the more the empirical model is favored. The marginal distribution for $\xrm$ given $\Drm$ is
+This is a mixture distribution of the prior mean $\mu_{\uptheta} = \alpha$ and the empirical distribution $\Psi(\Drm)$. The more informative the model prior (i.e., larger $\alpha_0$), the more the prior mean is favored; the more data, the more the empirical model is favored. The marginal distribution for $\xrm$ given $\Drm$ is
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\xrm | \Drm} \equiv \Prm_{\xrm | \Xrm} & = & \frac{\alpha_0 \alpham + N \Psim(\Xrm)}{\alpha_0 + N} \nonumber \\
 & = & \gamma \alpham + (1-\gamma) \Psim(\Xrm) \;.
@@ -1382,7 +1382,7 @@ is introduced, operating on the empirical data distribution.
 
 \todohigh{Reconcile different weighting funcs for D and psi...}
 
-Observe that when the conditioning is performed using the sufficient statistic, the independent conditional models $\upthetac(x)$ are only dependent on the marginal empirical model value $\uppsim(x)$ and on the corresponding conditional empirical model, $\uppsic(x)$. 
+Observe that when the conditioning is performed using the sufficient statistic, the independent conditional models $\upthetac(x)$ are only dependent on the marginal empirical model value $\uppsim(x)$ and on the corresponding conditional empirical model $\uppsic(x)$. 
 
 The Bayes predictive PMF can thus be expressed as 
 \begin{IEEEeqnarray}{rCl}
@@ -1410,7 +1410,7 @@ The Bayes predictive PMF can thus be expressed as
 
 \section{Predictive Model Estimation} \label{sec:predictive_est}
 
-\todohi{generalize for Bayesian learners, move before Dirichlet!?}
+\todohigh{generalize for Bayesian learners, move before Dirichlet!?}
 
 PGR: use poster table??
 
@@ -1483,7 +1483,7 @@ This demonstrates the critical bias/variance trade-off that is controlled by sel
 
 \subsection{Example}
 
-To exemplify how the model estimate $\Prm_{\yrm | \xrm,\uppsi}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 60$ and $|\Xcal| = 1$; the singular observation set enables visualization of the bias/variance trade-off. The prior mean $\alphac(x)$ and true model $\upthetac(x)$ are distributed as $\alphac(y;x) = \Bi(y/60; 60, 0.3)$ and $\thetac(y;x) = \Bi(y/60; 60, 0.7)$, respectively, and are shown in Figure \ref{fig:model_est/N_0} - note the significant mismatch.
+To exemplify how the model estimate $\Prm_{\yrm | \xrm,\uppsi}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 60$ and $|\Xcal| = 1$; the singular observation set enables visualization of the bias/variance trade-off. The prior mean $\alphac(x)$ and true model $\upthetac(x)$ are distributed as $\alphac(y;x) = \Bi(y/60; 60, 0.3)$ and $\thetac(y;x) = \Bi(y/60; 60, 0.7)$, respectively, and are shown in Figure \ref{fig:model_est/N_0} -- note the significant mismatch.
 \begin{figure}
 \centering
 \includegraphics[width=0.8\linewidth]{model_est/N_0.png}
@@ -1613,7 +1613,7 @@ f^*(\xrm;\Drm) & = & \mu_{\yrm | \xrm,\Drm} \\
 & = & \gammam(\xrm; \uppsim) \mu_{\yrm | \xrm} + \big(1-\gammam(\xrm; \uppsim)\big) \frac{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Yrm_n}{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big]} \nonumber \;.
 \end{IEEEeqnarray}
 
-The optimal estimate is interpreted as a convex combination of two separate estimates - the expected value of $\yrm$ conditioned on the observed $\xrm$ and the mean of the training values $\Yrm_n$ which have a value $\Xrm_n$ matching the observed value $\xrm$. The weighting factors are the same as those of $\Prm_{\yrm | \xrm,\Drm}$; thus, stronger prior information (larger $\alpha_0 \alpham(\xrm)$) provides more weight to the estimate $\mu_{\yrm|\xrm}$ and more voluminous training data puts emphasis on the empirical conditional mean.
+The optimal estimate is interpreted as a convex combination of two separate estimates -- the expected value of $\yrm$ conditioned on the observed $\xrm$ and the mean of the training values $\Yrm_n$ which have a value $\Xrm_n$ matching the observed value $\xrm$. The weighting factors are the same as those of $\Prm_{\yrm | \xrm,\Drm}$; thus, stronger prior information (larger $\alpha_0 \alpham(\xrm)$) provides more weight to the estimate $\mu_{\yrm|\xrm}$ and more voluminous training data puts emphasis on the empirical conditional mean.
 
 
 
@@ -1716,7 +1716,7 @@ To illustrate these trends, explicitly define the sets $\Ycal = \{ i/M_{\yrm} : 
 \label{fig:Risk_SE_Dir_IO_a0_leg_N}
 \end{figure}
 
-It may not seem intutitve for the risk to decrease when $\alpha_0$ is smaller -- the variance of the model $\uptheta$ increases and the prior knowledge is less definitive. This is a result of the Dirichlet PDF weight shifting towards the $|\Ycal||\Xcal|$ models which have $\ell_0$ norms satisfying $\| \theta \|_0 = 1$. Although these PMF's are maximally separated (and uncorrelated), they all have zero variance. The optimal learner \eqref{eq:f_opt_SE_dir} will simply use the empirical distribution supplied via the training data - this allows exact identification of $\uptheta$ with a single training pair.
+It may not seem intuitive for the risk to decrease when $\alpha_0$ is smaller -- the variance of the model $\uptheta$ increases and the prior knowledge is less definitive. This is a result of the Dirichlet PDF weight shifting towards the $|\Ycal||\Xcal|$ models which have $\ell_0$ norms satisfying $\| \theta \|_0 = 1$. Although these PMF's are maximally separated (and uncorrelated), they all have zero variance. The optimal learner \eqref{eq:f_opt_SE_dir} will simply use the empirical distribution supplied via the training data -- this allows exact identification of $\uptheta$ with a single training pair.
 
 It is also instructional to visualize how the minimum squared-error changes for fixed volume of training data $N$ and a fixed prior concentration $\alpha_0$. First, consider how the risk changes with the conditional PMF $\alphac(\xrm)$. Figure \ref{fig:Risk_SE_Dir_IO_Pyx} demonstrates how the squared-error tends towards zero for PMFs that have $\ell_0$-norm equal to one.
 \begin{figure}
@@ -1773,7 +1773,7 @@ and the minimum Bayes risk is expressed as
 
 Interestingly, the minimum squared-error for the uniform prior can be represented as a convex combination of two separate risk values with weighting factors dependent on $|\Ycal|$ and $N/|\Xcal|$. Thus for a uniform prior, the risk depends on the number of elements in $\Ycal$ and the number of training samples ``per element of $\Xcal$''. Note the relationship of these weighting factors to those of the conditional PMF $\Prm_{\yrm | \xrm,\Drm}$, which depend on $\alpha_0 \alpham(\xrm)$ and on $N \Psim(\xrm;\Drm)$. For the uniform prior, $\alpha_0 \alpham(\xrm) = |\Ycal|$ and $N \Erm_{\Xrm}\big[ \Psim(\Xrm) \big] = N/|\Xcal|$.
 
-The first risk is the conditional variance $\Sigma_{\yrm|\xrm}$ - this is intuitively satisfying as the corresponding weight becomes unity when $N=0$. The second risk is the squared-error with infinite training data. Note that the reduction of the risk between these two extreme cases is modest, and that the attenuating factor increases towards unity for applications with more possible outcomes. Figure \ref{fig:Risk_SE_uniform_N_lim} illustrates the difference between these cases.
+The first risk is the conditional variance $\Sigma_{\yrm|\xrm}$ -- this is intuitively satisfying as the corresponding weight becomes unity when $N=0$. The second risk is the squared-error with infinite training data. Note that the reduction of the risk between these two extreme cases is modest, and that the attenuating factor increases towards unity for applications with more possible outcomes. Figure \ref{fig:Risk_SE_uniform_N_lim} illustrates the difference between these cases.
 
 \begin{figure}
 \centering
@@ -1825,7 +1825,7 @@ where the expectation of the function $\Ecal$ is defined in \eqref{eq:predictive
 \todolo{note use of new model estimation formulas!}
 \todomid{use weight notation from conf paper? add theta dependency to lambda}
 
-The excess risk can thus be represented as the conditional expectation (with respect to $\Prm_{\xrm | \uptheta} = \upthetam$) of a sum of two functions of $\xrm$.  The first function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. This term alone is influenced by the data-independent Bayes predictive distribution $\Prm_{\yrm | \xrm} = \alphac(\xrm)$. The second function measures the additional variance beyond that of the clairvoyant estimator (i.e. the irreducible squared-error); like the irreducible squared-error, it depends on $\Sigma_{\yrm | \xrm,\upthetac}$, the conditional variance of the clairvoyant estimate for a given observation of $\xrm$. These two second-order terms (of $y$) are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam(x)$ and $N$ via conditional expectations with respect to $\uppsim(x)$.
+The excess risk can thus be represented as the conditional expectation (with respect to $\Prm_{\xrm | \uptheta} = \upthetam$) of a sum of two functions of $\xrm$.  The first function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. This term alone is influenced by the data-independent Bayes predictive distribution $\Prm_{\yrm | \xrm} = \alphac(\xrm)$. The second function measures the additional variance beyond that of the clairvoyant estimator (i.e., the irreducible squared-error); like the irreducible squared-error, it depends on $\Sigma_{\yrm | \xrm,\upthetac}$, the conditional variance of the clairvoyant estimate for a given observation of $\xrm$. These two second-order terms (of $y$) are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam(x)$ and $N$ via conditional expectations with respect to $\uppsim(x)$.
 
 
 It is instructional to consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. As these weights depend on the bias and variance scaling factors introduced in Section \ref{sec:predictive_est}, the analysis performed there is directly applicable.
@@ -1833,7 +1833,7 @@ It is instructional to consider the trends of the squared-error risk \eqref{eq:r
 
 First consider how the excess risk changes with the training volume $N$. For $N=0$, it is evident that the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$,  the expected squared bias between the clairvoyant and data-independent estimators. Recall that as $N \to \infty$, the bias and variance both vanish, resulting in $\Ecal(\xrm; \upthetam, \upthetac) \to 0$; as a result, $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable estimator property is a consequence of the full support of the Dirichlet prior, ensuring that the model posterior concentrates at the empirical PMF.
 
-Another interesting point regarding the dependency of the excess risk on $N$ is that there may be a local maximum, depending on the learner parameterization. To demonstrate, consider the case of $|\Xcal| = 1$ - treating $N$ as a real number, there would be a maximum at 
+Another interesting point regarding the dependency of the excess risk on $N$ is that there may be a local maximum, depending on the learner parameterization. To demonstrate, consider the case of $|\Xcal| = 1$ -- treating $N$ as a real number, there would be a maximum at 
 \begin{equation}
 N = \alpha_0 \left( 1 - 2 \alpha_0 \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2}{\Sigma_{\yrm | \xrm,\upthetac}} \right) \;.
 \end{equation}
@@ -1922,13 +1922,29 @@ PGR: plot captions, alpha zero or x???
 
 
 
-\paragraph{Example}
+\subsubsection{Example}
 
-To demonstrate the efficacy of Dirichlet-based regressors, consider a data model where $\Xcal$ and $\Ycal$ are 128-point discretizations of the unit interval $[0, 1]$, inclusive, such that $\Xcal = \Ycal = \{n/127: n = 0, \ldots, 127\}$. The PMF $\thetam = 1/128$ is uniform and $\thetac(y;x) = \Bi\Big(127y; 127, 1 / \big(2 + \sin(2\pi x)\big)\Big)$; note that the clairvoyant regressor is $\mu_{\yrm | \xrm,\uptheta} = 1 / \big(2 + \sin(2\pi \xrm)\big)$. The Dirichlet estimator is parameterized by $\alpham = \thetam$ and $\alphac(y;x) = \Bi(127y; 127, 0.5)$, such that the prior estimator $\mu_{\yrm | \xrm} = 0.5$ is biased; various localizations $\alpha_0$ will be used. For comparison, a Bayesian linear regressor (Appendix \ref{app:norm_reg}) using $\Sigma_{\yrm}=0.1$, $\phi(x) = (1, x)$, and a Gaussian prior $\Ncal\big((0, 0.5), \Sigma_{\uptheta}\big)$ is evaluated, as well; different prior covariance functions $\Sigma_{\uptheta}$ will be used. Note that the linear regressor will also predict $\mu_{\yrm | \xrm, \Drm} = 0.5$ when $N=0$. Results were generated by averaging 50,000 iterations of a novel Python learning simulation.
+To demonstrate the efficacy of Dirichlet-based regressors, consider a data model where $\Xcal$ and $\Ycal$ are 128-point discretizations of the unit interval $[0, 1]$, inclusive, such that $\Xcal = \Ycal = \{n/127: n = 0, \ldots, 127\}$. The Dirichlet estimator is parameterized by $\alpham = 1 / 128$ and $\alphac(y;x) = \Bi(127y; 127, 0.5)$, such that the prior estimator $\mu_{\yrm | \xrm} = 0.5$ is constant; various localizations $\alpha_0$ will be used. Results were generated by averaging 50,000 iterations of a novel Python learning simulation.
 
 \todohi{Simulation details, reference? Github release??}
 
-\Cref{fig:SSP_2021/Predict_SE_biased_hard,fig:SSP_2021/Predict_SE_biased_hard_N} provides visualization of the statistics of the achieved regression functions. The lines represent $\Erm_{\Drm | \uptheta}\big[\mu_{\yrm | \xrm, \Drm}\big]$, the expectation of the Bayesian regressors with respect to the training data; the filled regions represent the square-root of $\Crm_{\Drm | \uptheta}\big[\mu_{\yrm | \xrm, \Drm}\big]$, the regressor variance. Observe that the Dirichlet-based estimator with $\alpha_0 = 0.01$ has lower prediction bias, but incurs additional error due to high variance. Conversely, the estimator using $\alpha_0 = 100$ is hindered by its confidence in the biased estimator $\mu_{\yrm | \xrm}$, but is less sensitive to differences in the observed training set. Also note that both the bias and variance of the estimator tend to zero in the limit $N \to \infty$, even when using the concentrated $\alpha_0 = 100$ prior.
+\Cref{fig:SSP_2021/Risk_SE_N,fig:SSP_2021/Risk_SE_a0} display the Bayesian squared-error realized by the Dirichlet-based regressor. The model $\uptheta$ is randomly selected from a Dirichlet distribution with the same $\alpham$ and $\alphac$ used for the regressor design and with the localization fixed at $\alpha_0 = 100$. Observe that with increasing training data volume $N$, all the regressors tend towards the expected irreducible risk. Additionally, the regressor performs best when its localization matches $\alpha_0 = 100$, regardless of the value $N$, achieving the Bayesian squared-error \eqref{eq:Risk_min_SE_dir}.
+\begin{figure}
+\centering
+\includegraphics[width=0.8\linewidth]{SSP_2021/Risk_SE_N.png}
+\caption{Bayes Squared-Error vs. $N$}
+\label{fig:SSP_2021/Risk_SE_N}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=0.8\linewidth]{SSP_2021/Risk_SE_a0.png}
+\caption{Bayes Squared-Error vs. prior localization $\alpha_0$}
+\label{fig:SSP_2021/Risk_SE_a0}
+\end{figure}
+
+Next, consider the risk trends when the true model is fixed. The PMF $\thetam = 1/128$ is uniform and $\thetac(y;x) = \Bi\Big(127y; 127, 1 / \big(2 + \sin(2\pi x)\big)\Big)$; note that the clairvoyant regressor is $\mu_{\yrm | \xrm,\uptheta} = 1 / \big(2 + \sin(2\pi \xrm)\big)$ and thus that the Dirichlet prior estimator $\mu_{\yrm | \xrm} = 0.5$ is biased. For comparison, a Bayesian linear regressor (Appendix \ref{app:norm_reg}) using $\Sigma_{\yrm}=0.1$, $\phi(x) = (1, x)$, and a Gaussian prior $\Ncal\big((0, 0.5), \Sigma_{\uptheta}\big)$ is evaluated, as well; different prior covariance functions $\Sigma_{\uptheta}$ will be used. Note that the linear regressor will also predict $\mu_{\yrm | \xrm, \Drm} = 0.5$ when $N=0$.
+
+\Cref{fig:SSP_2021/Predict_SE_biased_hard,fig:SSP_2021/Predict_SE_biased_hard_N} provide visualization of the statistics of the achieved regression functions. The lines represent $\Erm_{\Drm | \uptheta}\big[\mu_{\yrm | \xrm, \Drm}\big]$, the expectation of the Bayesian regressors with respect to the training data; the filled regions represent the square-root of $\Crm_{\Drm | \uptheta}\big[\mu_{\yrm | \xrm, \Drm}\big]$, the regressor variance. Observe that the Dirichlet-based estimator with $\alpha_0 = 0.01$ has lower prediction bias, but incurs additional error due to high variance. Conversely, the estimator using $\alpha_0 = 100$ is hindered by its confidence in the biased estimator $\mu_{\yrm | \xrm}$, but is less sensitive to differences in the observed training set. Also note that both the bias and variance of the estimator tend to zero in the limit $N \to \infty$, even when using the concentrated $\alpha_0 = 100$ prior.
 \begin{figure}
 \centering
 \includegraphics[width=0.8\linewidth]{SSP_2021/Predict_SE_biased_hard.png}
@@ -1969,24 +1985,7 @@ Note that due to the high initial bias, both the Dirichlet-based estimator and B
 
 
 
-\subparagraph{Bayes SE}
 
-\todohigh{location??? HI-FI N fig!!}
-
-\Cref{fig:SSP_2021/Risk_SE_N,fig:SSP_2021/Risk_SE_a0} display the Bayesian squared-error realized by the Dirichlet-based regressor. The model $\uptheta$ is randomly selected from a Dirichlet distribution with the same $\alpham$ and $\alphac$ used for the regressor design and with the localization fixed at $\alpha_0 = 100$. Observe that with increasing training data volume $N$, all the regressors tend towards the expected irreducible risk. Additionally, the regressor performs best when its localization matches $\alpha_0 = 100$, regardless of the value $N$, achieving the Bayesian squared-error \eqref{eq:Risk_min_SE_dir}.
-
-\begin{figure}
-\centering
-\includegraphics[width=0.8\linewidth]{SSP_2021/Risk_SE_N.png}
-\caption{Bayes Squared-Error vs. $N$}
-\label{fig:SSP_2021/Risk_SE_N}
-\end{figure}
-\begin{figure}
-\centering
-\includegraphics[width=0.8\linewidth]{SSP_2021/Risk_SE_a0.png}
-\caption{Bayes Squared-Error vs. prior localization $\alpha_0$}
-\label{fig:SSP_2021/Risk_SE_a0}
-\end{figure}
 
 
 
@@ -2147,7 +2146,7 @@ To evaluate this expectation, new random variables $\uppsi_{\max}(x) \equiv \max
 \end{IEEEeqnarray}
 where $H: \Zbb \mapsto \{0,1\}$ is the discrete Heaviside step function. For $n < 0$, the cardinality is equivalent to $|\Uppsi|$. 
 
-For $0 \leq n < N$, the cardinality is an alternating binomial summation where the $m^\mathrm{th}$ term accounts for the different intersections of $m$ of the $|\Ycal|$ individual sets $\{ \psi : \psi(y,x) \geq n/N \}$. Observe that the cardinality of the intersections is only dependent on the number of contributing sets $m$ and not on which sets intersect. Furthermore, note the dependency of the intersection cardinalities on the argument $n$. The step function contributes such that if $n > \big\lfloor\frac{N}{m}\big\rfloor$, only up to $m-1$ individual sets will intersect. The binomial coefficient $\Mcal\big( (N-mn,|\Ycal||\Xcal|-1) \big)$ provides the intersection cardinality for a given $m$; note the similarity to the cardinality $|\Uppsi|$ - the only difference is the number of points that grid the $|\Ycal||\Xcal|-1$ dimensional region.
+For $0 \leq n < N$, the cardinality is an alternating binomial summation where the $m^\mathrm{th}$ term accounts for the different intersections of $m$ of the $|\Ycal|$ individual sets $\{ \psi : \psi(y,x) \geq n/N \}$. Observe that the cardinality of the intersections is only dependent on the number of contributing sets $m$ and not on which sets intersect. Furthermore, note the dependency of the intersection cardinalities on the argument $n$. The step function contributes such that if $n > \big\lfloor\frac{N}{m}\big\rfloor$, only up to $m-1$ individual sets will intersect. The binomial coefficient $\Mcal\big( (N-mn,|\Ycal||\Xcal|-1) \big)$ provides the intersection cardinality for a given $m$; note the similarity to the cardinality $|\Uppsi|$ -- the only difference is the number of points that grid the $|\Ycal||\Xcal|-1$ dimensional region.
 
 The probability of interest can thus be expressed as
 \begin{IEEEeqnarray}{L}
@@ -2201,7 +2200,7 @@ providing a lower bound for the achievable 0-1 Bayes risk. The above formulation
 \todohi{harmonic reference}
 
 
-Figure \ref{fig:Risk_01_uni_N_leg_My} demonstrates how the minimum 0-1 risk decreases with training volume $N$; observe that the risk is more severe for sequences corresponding to higher $|\Ycal|$. It is sensible that the probability of error should increase when more classes have to be considered. Figure \ref{fig:Risk_01_uni_N_leg_Mx} illustrates the Bayes risk with multiple sequences for different cardinalities $|\Xcal|$. Note that risk increases with $|\Xcal|$. Considering $N \Erm_{\Xrm}\big[\Psim(\Xrm)\big] = N \mu_{\uppsim} = N/|\Xcal|$, this should be intuitive - each conditional empirical distribution $\Psic(x;D)$ is forced to approximate $\upthetac(x)$ with fewer data.
+Figure \ref{fig:Risk_01_uni_N_leg_My} demonstrates how the minimum 0-1 risk decreases with training volume $N$; observe that the risk is more severe for sequences corresponding to higher $|\Ycal|$. It is sensible that the probability of error should increase when more classes have to be considered. Figure \ref{fig:Risk_01_uni_N_leg_Mx} illustrates the Bayes risk with multiple sequences for different cardinalities $|\Xcal|$. Note that risk increases with $|\Xcal|$. Considering $N \Erm_{\Xrm}\big[\Psim(\Xrm)\big] = N \mu_{\uppsim} = N/|\Xcal|$, this should be intuitive -- each conditional empirical distribution $\Psic(x;D)$ is forced to approximate $\upthetac(x)$ with fewer data.
 
 \begin{figure}
 \centering
@@ -2522,7 +2521,7 @@ As shown in Appendix \ref{app:EP}, given $\uptheta$, the empirical model is a co
 
 \subsubsection{Marginal and Conditional Data Distributions}
 
-The marginal and conditional distributions of the data using the representation $\Drm \Leftrightarrow (\Yrm,\Xrm)$ is of use.
+The marginal and conditional distributions of the data using the representation $\Drm \Leftrightarrow (\Yrm,\Xrm)$ are of use.
 
 The dependency of
 \begin{IEEEeqnarray}{rCl}
@@ -2566,7 +2565,7 @@ Additionally, given the model $\uptheta$, the conditional processes $\uppsic \in
 
 \subsection{Model $\uptheta$ Characterization}
 
-The model is characterized by a Dirichlet process $\uptheta \sim \DP(\alpha_0, \alpha)$ with concentration $\alpha_0$ and mean function $\alpha \in \Pcal(\Ycal \times \Xcal)$. In Appendix \ref{app:DP}, it is shown that the mean and covariance functions of the continuous process have the same form as those of the discrete process (using the continuous variant of the $\diag$ operator.)
+The model is characterized by a Dirichlet process $\uptheta \sim \DP(\alpha_0, \alpha)$ with concentration $\alpha_0$ and mean function $\alpha \in \Pcal(\Ycal \times \Xcal)$. In Appendix \ref{app:DP}, it is shown that the mean and covariance functions of the continuous process have the same form as those of the discrete process (using the continuous variant of the $\diag$ operator).
 
 %As shown in Appendix \ref{app:DP}, the expected value of a Dirichlet process is $\DP(\alpha_0, \alpha)$
 %\begin{equation}
@@ -2720,7 +2719,7 @@ Note that the independent observations $\Yrm_n | \Xrm_n,\upthetac$ are condition
 
 The first and second order conditional distributions are of specific interest. The first order conditional distributions are
 \begin{IEEEeqnarray}{rCl}
-\prm_{\Yrm_n | \Xrm}(X) & = & \prm_{\Yrm_n | \Xrm_n}(X_n) = \prm_{\yrm | \xrm}(X_n) = \mu_{\upthetac(X_n)} = \alphac(X_n) \;,
+\prm_{\Yrm_n | \Xrm}(X) & = & \prm_{\Yrm_n | \Xrm_n}(X_n) = \prm_{\yrm | \xrm}(X_n) = \mu_{\upthetac(X_n)} = \alphac(X_n) \;.
 \end{IEEEeqnarray}
 To determine the second order conditional distributions, first note that for $\Xrm_n \neq \Xrm_{n'}$, $\prm_{\Yrm_n,\Yrm_{n'} | \Xrm_n,\Xrm_{n'}} = \mu_{\upthetac}(\Xrm_n) \otimes \mu_{\upthetac}(\Xrm_{n'}) = \alphac(\Xrm_n) \otimes \alphac(\Xrm_{n'})$. Conversely, if $\Xrm_n = \Xrm_{n'}$, then
 \begin{IEEEeqnarray}{L}
@@ -2746,7 +2745,7 @@ Combining, the second order distribution formula is
 
 PGR: Dirichlet-Empirical Process perspective
 
-The marginalized data can also be represented using the empirical transform. As demonstrated in Appendix \ref{app:data_dist_cont}, the transformed process is Dirichlet-Empirical $\uppsi \equiv \Psi(\Drm) \sim \DEP(N,\alpha_0,\alpha)$. The mean and correlation functions have the same form as those of a discrete DEP (with the continuous space definitions of the $\diag$ operator.)
+The marginalized data can also be represented using the empirical transform. As demonstrated in Appendix \ref{app:data_dist_cont}, the transformed process is Dirichlet-Empirical $\uppsi \equiv \Psi(\Drm) \sim \DEP(N,\alpha_0,\alpha)$. The mean and correlation functions have the same form as those of a discrete DEP (with the continuous space definitions of the $\diag$ operator).
 
 %\begin{IEEEeqnarray}{rCl}
 %\mu_{\uppsi} & = & \alpha 
@@ -2764,7 +2763,7 @@ The marginalized data can also be represented using the empirical transform. As 
 
 Observe that by the aggregation principle, $\uppsim \sim \DEP(N,\alpha_0,\alpham)$ is a DEP over the set $\Xcal$. Additionally, the 1-dimensional subsets conditioned on the marginalized DEP are characterized as
 \begin{equation}
-\uppsic(x) \big| \uppsim(x) \sim \DEP\left( \frac{N \uppsim(x)}{\delta(0)}, \frac{\alpha_0 \alpham(x)}{\delta(0)}, \alphac(x) \right)
+\uppsic(x) \big| \uppsim(x) \sim \DEP\left( \frac{N \uppsim(x)}{\delta(0)}, \frac{\alpha_0 \alpham(x)}{\delta(0)}, \alphac(x) \right) \;.
 \end{equation}
 
 
@@ -2871,7 +2870,7 @@ Solving,
 \begin{IEEEeqnarray}{rCl}
 \Erm_{\xrm,\Drm} \left[ \mu_{\yrm | \xrm,\Drm}^2 \right] & = & \Erm_{\xrm,\Drm} \left[ \left( \frac{\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big)}{\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big)} \right)^2 \right] \nonumber \\
 & = & \Erm_{\xrm} \left[ \Erm_{\Drm} \left[ \frac{\left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 }{\alpham(\xrm) \left(\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0 + N)} \right] \right] \nonumber \\
-& = & \Erm_{\xrm} \left[ \Erm_{\Xrm} \left[ \frac{\Erm_{\Yrm | \Xrm} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 \right] }{\alpham(\xrm) \left(\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0+N)} \right] \right] \nonumber 
+& = & \Erm_{\xrm} \left[ \Erm_{\Xrm} \left[ \frac{\Erm_{\Yrm | \Xrm} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 \right] }{\alpham(\xrm) \left(\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0+N)} \right] \right] \nonumber \;.
 \end{IEEEeqnarray}
 
 Evaluating the expectation over $\Yrm$ given $\Xrm$, we have
@@ -2886,7 +2885,7 @@ Evaluating the expectation over $\Yrm$ given $\Xrm$, we have
 \quad + \frac{\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 + \Erm_{\yrm|\xrm}\big[ \yrm^2  \big] \delta(0)}{\alpha_0 \alpham(\xrm) + \delta(0)} \sum_{n \neq n'} \delta\big( \xrm - \Xrm_n \big) \delta\big( \xrm - \Xrm_{n'} \big) \nonumber \\
 \ldots \nonumber \\
 = \frac{\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big)}{\alpha_0 \alpham(\xrm) + \delta(0)} \nonumber \\
-\quad \left( \Erm_{\yrm|\xrm}\big[ \yrm^2  \big] \delta(0) \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) + \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \left( \alpha_0 \alpham(\xrm) + \delta(0) + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \right) \right) \nonumber
+\quad \left( \Erm_{\yrm|\xrm}\big[ \yrm^2  \big] \delta(0) \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) + \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \left( \alpha_0 \alpham(\xrm) + \delta(0) + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \right) \right) \nonumber \;.
 \end{IEEEeqnarray}
 
 
@@ -2899,27 +2898,27 @@ Plugging,
 \begin{IEEEeqnarray}{L}
 \Erm_{\xrm,\Drm} \Big[ \mu_{\yrm | \xrm,\Drm}^2 \Big] \\
 \quad = \Erm_{\xrm} \left[ \Erm_{\Xrm} \left[ \frac{\Erm_{\Yrm | \Xrm} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + \sum_{n=1}^N \Yrm_n \delta\big( \xrm - \Xrm_n \big) \right)^2 \right] }{\alpham(\xrm) \left(\alpha_0 \alpham(\xrm) + \sum_{n=1}^N \delta\big( \xrm - \Xrm_n \big) \right) (\alpha_0+N)} \right] \right] \nonumber \\
-\quad = \Erm_{\xrm} \left[ \frac{\Erm_{\Xrm} \left[ \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) + \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \left( \alpha_0 \alpham(\xrm) + \delta(0) + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \right) \right] }{\alpham(\xrm) \big( \alpha_0 \alpham(\xrm) + \delta(0) \big) (\alpha_0+N)} \right] \nonumber 
+\quad = \Erm_{\xrm} \left[ \frac{\Erm_{\Xrm} \left[ \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) + \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \left( \alpha_0 \alpham(\xrm) + \delta(0) + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \right) \right] }{\alpham(\xrm) \big( \alpha_0 \alpham(\xrm) + \delta(0) \big) (\alpha_0+N)} \right] \nonumber \;.
 \end{IEEEeqnarray}
 
 Evaluating the expectation over $\Xrm$,
 \begin{IEEEeqnarray}{L}
 \Erm_{\Xrm} \left[ \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) + \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \left( \alpha_0 \alpham(\xrm) + \delta(0) + \sum_{n=1}^N \delta\big( \xrm-\Xrm_n \big) \right) \right] \nonumber \\
 \quad = \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N \alpham(\xrm) + \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 \big( \alpha_0 \alpham(\xrm) + \delta(0) + N \alpham(\xrm) \big) \nonumber \\
-\quad = \alpham(\xrm) \Big( \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N + \mu_{\yrm | \xrm}^2 \alpha_0 \big( \alpha_0 \alpham(\xrm) + \delta(0) + N \alpham(\xrm) \big) \Big) \nonumber
+\quad = \alpham(\xrm) \Big( \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N + \mu_{\yrm | \xrm}^2 \alpha_0 \big( \alpha_0 \alpham(\xrm) + \delta(0) + N \alpham(\xrm) \big) \Big) \nonumber \;.
 \end{IEEEeqnarray}
 
 Plugging,
 \begin{IEEEeqnarray}{L}
 \Erm_{\xrm,\Drm} \Big[ \mu_{\yrm | \xrm,\Drm}^2 \Big] \\
-\quad = \Erm_{\xrm} \left[ \frac{\Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N + \mu_{\yrm | \xrm}^2 \alpha_0 \big( \alpha_0 \alpham(\xrm) + \delta(0) + N \alpham(\xrm) \big)}{ \big( \alpha_0 \alpham(\xrm) + \delta(0) \big) (\alpha_0+N)} \right] \nonumber
+\quad = \Erm_{\xrm} \left[ \frac{\Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N + \mu_{\yrm | \xrm}^2 \alpha_0 \big( \alpha_0 \alpham(\xrm) + \delta(0) + N \alpham(\xrm) \big)}{ \big( \alpha_0 \alpham(\xrm) + \delta(0) \big) (\alpha_0+N)} \right] \nonumber \;.
 \end{IEEEeqnarray}
 
 Combining with the second moment produces the risk,
 \begin{IEEEeqnarray}{L}
 \Rcal^* = \Erm_{\xrm,\Drm} \Big[ \Erm_{\yrm | \xrm,\Drm}\big[ \yrm^2 \big] - \mu_{\yrm | \xrm,\Drm}^2 \Big] \\
 = \Erm_{\xrm} \left[ \frac{\alpha_0 \big( \alpha_0 \alpham(\xrm) + \delta(0) + N \alpham(\xrm) \big)}{(\alpha_0+N) \big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \Sigma_{\yrm | \xrm} \right] \nonumber \\
-= \Erm_{\xrm} \left[ \frac{\delta(0)^{-1} \alpham(\xrm) + (\alpha_0+N)^{-1}}{\delta(0)^{-1} \alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right] \nonumber
+= \Erm_{\xrm} \left[ \frac{\delta(0)^{-1} \alpham(\xrm) + (\alpha_0+N)^{-1}}{\delta(0)^{-1} \alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right] \nonumber \;.
 \end{IEEEeqnarray}
 
 %\begin{IEEEeqnarray}{L}
@@ -2987,7 +2986,7 @@ To perform the expectation over the Dirichlet-Empirical process $\uppsi \sim \DE
 
 \begin{IEEEeqnarray}{rCl}
 \Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] & = & \Erm_{\xrm,\uppsi} \left[ \left( \frac{\alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + N \int_{\Ycal} y \uppsi(y,\xrm) {\drm}y}{\alpha_0 \alpham(\xrm) + N \int_{\Ycal} \uppsi(y,\xrm) {\drm}y} \right)^2 \right] \nonumber \\
-& = & \Erm_{\xrm} \left[ \Erm_{\uppsim} \left[ \frac{\Erm_{\uppsic | \uppsim} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + N \uppsim(\xrm) \int_{\Ycal} y \uppsic(y;\xrm) {\drm}y \right)^2 \right] }{\alpham(\xrm)\big(\alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber
+& = & \Erm_{\xrm} \left[ \Erm_{\uppsim} \left[ \frac{\Erm_{\uppsic | \uppsim} \left[ \left( \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm} + N \uppsim(\xrm) \int_{\Ycal} y \uppsic(y;\xrm) {\drm}y \right)^2 \right] }{\alpham(\xrm)\big(\alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big) (\alpha_0+N)} \right] \right] \nonumber \;.
 \end{IEEEeqnarray}
 
 
@@ -2999,20 +2998,20 @@ Evaluating the conditional expectation,
 \qquad \qquad + \left( \frac{\delta(0)}{\alpha_0 \alpham(\xrm)} + \frac{\delta(0)}{N \uppsim(\xrm)} \right) \alphac(y;\xrm) \delta(y-y') \Bigg] {\drm}y {\drm}y' \nonumber \\
 \quad = \alpha_0^2 \alpham(\xrm)^2 \mu_{\yrm | \xrm}^2 + 2 \alpha_0 \alpham(\xrm) N \uppsim(\xrm) \mu_{\yrm | \xrm}^2 \nonumber \\
 \qquad + \frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm)+\delta(0)} \Big[ \big( N \uppsim(\xrm) - \delta(0) \big) \alpha_0 \alpham(\xrm) \mu_{\yrm | \xrm}^2 + \delta(0) \big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big) \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \Big] \nonumber \\
-\quad = \frac{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm)+\delta(0)} \Big[ \mu_{\yrm | \xrm}^2 \alpha_0 \alpham(\xrm) \big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N \uppsim(\xrm) \Big] \nonumber
+\quad = \frac{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm)+\delta(0)} \Big[ \mu_{\yrm | \xrm}^2 \alpha_0 \alpham(\xrm) \big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N \uppsim(\xrm) \Big] \nonumber \;.
 \end{IEEEeqnarray}
 
 Plugging,
 \begin{IEEEeqnarray}{L}
 \Erm_{\xrm,\uppsi} \Big[ \mu_{\yrm | \xrm,\uppsi}^2 \Big] \\
 \quad = \Erm_{\xrm} \left[ \frac{\Erm_{\uppsim} \Big[ \mu_{\yrm | \xrm}^2 \alpha_0 \alpham(\xrm) \big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N \uppsim(\xrm) \Big] }{\alpham(\xrm) \big( \alpha_0 \alpham(\xrm)+\delta(0) \big) (\alpha_0+N)} \right] \nonumber \\ 
-\quad = \Erm_{\xrm} \left[ \frac{\mu_{\yrm | \xrm}^2 \alpha_0 \big( \alpha_0 \alpham(\xrm) + N \alpham(\xrm) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N}{(\alpha_0+N) \big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \right] \nonumber
+\quad = \Erm_{\xrm} \left[ \frac{\mu_{\yrm | \xrm}^2 \alpha_0 \big( \alpha_0 \alpham(\xrm) + N \alpham(\xrm) + \delta(0) \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N}{(\alpha_0+N) \big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \right] \nonumber \;.
 \end{IEEEeqnarray}
 
 Combining produces the risk,
 \begin{IEEEeqnarray}{rCl}
 \Rcal^* & = & \Erm_{\xrm} \left[ \frac{\alpha_0 \big(\alpha_0 \alpham(\xrm) + \delta(0) + N \alpham(\xrm) \big)}{(\alpha_0+N)\big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \Sigma_{\yrm | \xrm} \right] \\
-& = & \Erm_{\xrm} \left[ \frac{\delta(0)^{-1} \alpham(\xrm) + (\alpha_0 + N)^{-1} }{\delta(0)^{-1} \alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right] \nonumber
+& = & \Erm_{\xrm} \left[ \frac{\delta(0)^{-1} \alpham(\xrm) + (\alpha_0 + N)^{-1} }{\delta(0)^{-1} \alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right] \nonumber \;.
 \end{IEEEeqnarray}
 
 
@@ -3246,7 +3245,7 @@ where the transform $\thetac(z) \equiv \theta_z / \thetam(z) \in {\Uptheta''}_z 
 
 \subsection{Conditioned on its Aggregation}
 
-This section details another important property of Dirichlet distributed random processes: when conditioned on its own aggregation $\upthetam$, the partitioned segments $\uptheta_z$ of the process become independent. Furthermore, the normalized functions $\upthetac(z)$ are also Dirichlet processes. 
+This section details another important property of Dirichlet distributed random processes -- when conditioned on its own aggregation $\upthetam$, the partitioned segments $\uptheta_z$ of the process become independent. Furthermore, the normalized functions $\upthetac(z)$ are also Dirichlet processes. 
 
 The PDF of the original random process $\uptheta$ conditioned on its aggregation $\upthetam$ can be formulated as
 \begin{IEEEeqnarray}{rCl}
@@ -3282,12 +3281,12 @@ PGR: discuss transform Jacobian and dimensionality?
 
 The Dirichlet-Empirical distribution is so named since it is the expectation of a Empirical distribution $\Emp(N,\uptheta)$ with respect to its mean function, a Dirichlet process $\uptheta \sim \Dir(\alpha_0, \alpha)$. Naturally, these random processes share many properties with the Empirical distribution.
 
-A characteristic of a Dirichlet-Empirical random process is that its aggregations are also Dirichlet-Empirical - this is inherited from the related Dirichlet-Multinomial distribution \cite{johnson}. Consider a DE random process $\uppsi \sim \DE(N,\alpha_0,\alpha)$ drawn from $\Uppsi \subset \Pcal(\Ycal)$ of $N$ samples, concentration $\alpha_0$ and mean function $\alpha$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$ and the corresponding function partitions $\uppsi_z \in \Rbbgeq^{\Scal_z}$, such that $\uppsi = \left( \ldots,\uppsi_z,\ldots \right)$, and $\alpha_z \in {\Rbb^+}^{\Scal_z}$, such that $\alpha = \left( \ldots,\alpha_z,\ldots \right)$. The transformed random process $\uppsim \in \Uppsim \subset \Pcal(\Zcal)$, defined as $\uppsim(z) \equiv \sum_{y \in \Scal_z} \uppsi_z(y)$, is distributed as $\uppsim \sim \DE(N,\alpha_0,\alpham)$ with mean function $\alpham$ defined as $\alpham(z) = \sum_{y \in \Scal_z} \alpha_z(y)$.
+A characteristic of a Dirichlet-Empirical random process is that its aggregations are also Dirichlet-Empirical -- this is inherited from the related Dirichlet-Multinomial distribution \cite{johnson}. Consider a DE random process $\uppsi \sim \DE(N,\alpha_0,\alpha)$ drawn from $\Uppsi \subset \Pcal(\Ycal)$ of $N$ samples, concentration $\alpha_0$ and mean function $\alpha$. Define an arbitrary partition of $\Ycal$: $\left\{ \ldots,\Scal_z,\ldots \right\}$, $z \in \Zcal$ and the corresponding function partitions $\uppsi_z \in \Rbbgeq^{\Scal_z}$, such that $\uppsi = \left( \ldots,\uppsi_z,\ldots \right)$, and $\alpha_z \in {\Rbb^+}^{\Scal_z}$, such that $\alpha = \left( \ldots,\alpha_z,\ldots \right)$. The transformed random process $\uppsim \in \Uppsim \subset \Pcal(\Zcal)$, defined as $\uppsim(z) \equiv \sum_{y \in \Scal_z} \uppsi_z(y)$, is distributed as $\uppsim \sim \DE(N,\alpha_0,\alpham)$ with mean function $\alpham$ defined as $\alpham(z) = \sum_{y \in \Scal_z} \alpha_z(y)$.
 
 To prove this principle, define the subset 
 \begin{IEEEeqnarray}{rCl}
 \Uppsi'(\psim) & = & \prod_{z \in \Zcal} \Uppsi'_z\big( \psim(z) \big) \nonumber \\
-& = & \prod_{z \in \Zcal} \left\{ n_z / N : n_z \in \Zbbgeq^{\Scal_z}, \ \sum_{y \in \Scal_z} n_z(y) = N \psim(z) \right\} \subset \Uppsi
+& = & \prod_{z \in \Zcal} \left\{ n_z / N : n_z \in \Zbbgeq^{\Scal_z}, \ \sum_{y \in \Scal_z} n_z(y) = N \psim(z) \right\} \subset \Uppsi \;.
 \end{IEEEeqnarray}
 %\begin{IEEEeqnarray}{rCl}
 %\Uppsim(\psim) & = & \big\{ \psi \in \Uppsi : \sum_{y \in \Scal_z} \psi_z(y) = \psim(z), \ \forall z \in \Zcal \big\} \nonumber \\
@@ -3318,7 +3317,7 @@ If the Dirichlet-Empirical random process $\uppsi$ is conditioned on its aggrega
 \Prm_{\uppsi | \uppsim}(\psi | \psim) & = & \frac{\Mcal(N \psi) \beta(\alpha_0 \alpha)^{-1} \beta(\alpha_0 \alpha + N \psi)}{\Mcal(N \psim) \beta(\alpha_0 \alpham)^{-1} \beta(\alpha_0 \alpham + N \psim)} \\
 & = & \left( \prod_{z \in \Zcal} \frac{\Gamma\big( \alpha_0 \alpham(z)+N \psim(z) \big)}{\big(N \psim(z)\big)! \ \Gamma\big( \alpham(z) \big)} \right)^{-1} \left( \prod_{y \in \Ycal} \frac{\Gamma\big( \alpha_0 \alpha(y) + N \psi(y) \big)}{\big(N \psi(y)\big)! \ \Gamma\big( \alpha_0 \alpha(y) \big)} \right) \nonumber \\
 & = & \prod_{z \in \Zcal} \left[ \frac{\big(N \psim(z)\big)! \ \Gamma\big( \alpham(z) \big)}{\Gamma\big( \alpha_0 \alpham(z)+N \psim(z) \big)} \prod_{y \in \Scal_z} \frac{\Gamma\big( \alpha_0 \alpha_z(y) + N \psi_z(y) \big)}{\big(N \psi_z(y)\big)! \ \Gamma\big( \alpha_0 \alpha_z(y) \big)} \right] \nonumber \\
-& = & \prod_{z \in \Zcal} \Mcal(N \psi_z) \frac{\beta(\alpha_0 \alpha_z + N \psi_z)}{\beta(\alpha_0 \alpha_z)} \nonumber ;.
+& = & \prod_{z \in \Zcal} \Mcal(N \psi_z) \frac{\beta(\alpha_0 \alpha_z + N \psi_z)}{\beta(\alpha_0 \alpha_z)} \nonumber \;.
 \end{IEEEeqnarray}
 
 While these individual function segments are independent, they are not Dirichlet-Empirical processes. Defining the functions $\alphac(z) \equiv \alpha_z / \alpham(z) \in \Pcal(\Scal_z)$ and the normalized segments $\uppsic(z) \equiv \uppsi_z / \uppsim(z) \in \Pcal(\Scal_z)$, it can be shown that
@@ -3442,9 +3441,9 @@ g(t_1,t_2) = \Erm_{\uppsi}\left[ \int_{-\infty}^{y_1} \uppsi(t_1) {\drm}t_1 \int
 \end{IEEEeqnarray}
 Following the same steps provides the values of $g$ for $t_2 \leq t_1$; the combined formula can be given as
 \begin{IEEEeqnarray}{L}
-g(t_1,t_2) = \frac{1}{N} \left( \int_{-\infty}^{\min(y_1,y_2)} \theta(t_1) {\drm}t_1 \right) + \left(1-\frac{1}{N}\right) \left( \int_{-\infty}^{y_1} \theta(t_1) {\drm}t_1 \right) \left( \int_{-\infty}^{y_2} \theta(t_2) {\drm}t_2 \right) \;. 
+g(t_1,t_2) = \frac{1}{N} \left( \int_{-\infty}^{\min(y_1,y_2)} \theta(t_1) {\drm}t_1 \right) + \left(1-\frac{1}{N}\right) \left( \int_{-\infty}^{y_1} \theta(t_1) {\drm}t_1 \right) \left( \int_{-\infty}^{y_2} \theta(t_2) {\drm}t_2 \right)
 \end{IEEEeqnarray}
-Finally,
+and, finally,
 \begin{IEEEeqnarray}{L}
 \Erm_{\uppsi}\big[ \uppsi(y_1)\uppsi(y_2) \big] = \frac{{\drm}^2}{{\drm}t_1 {\drm}t_2} g(t_1,t_2) \\
 \quad = \frac{{\drm}}{{\drm}t_2} \left[ \frac{1}{N} u(t_2-t_1) \theta\big( \min(t_1,t_2) \big) + \left(1-\frac{1}{N}\right) \theta(y_1) \left( \int_{-\infty}^{y_2} \theta(t_2) {\drm}t_2 \right) \right] \nonumber \\
@@ -3457,7 +3456,7 @@ Finally,
 
 \subsection{Continuous aggregation}
 
-The aggregation property has been stated for countable partitions of the process domain - it also holds for continuous aggregations. Define an Empirical process $\uppsi \in \Uppsi$ parameterized by $N$ samples and a mean function $\theta \in \Pcal(\Ycal \times \Xcal)$. The process assumes functions from the set $\Uppsi = \left\{ N^{-1} \sum_{n=1}^N \delta(\cdot - Y_n) \delta(\cdot - X_n) : Y \in \Ycal^N, X \in \Xcal^N \right\}$. The aggregation $\uppsim \equiv \int_{\Ycal} \uppsi(y,\cdot) {\drm}y$ is an Empirical process with $N$ samples and mean function $\thetam \equiv \int_{\Ycal} \theta(y,\cdot) {\drm}y$; this characterization is inherited from the original Empirical process, as aggregations of $\uppsim$ are equivalent to aggregations of $\uppsi$. Note that $\uppsim \in \Uppsim = \left\{ N^{-1} \sum_{n=1}^N \delta(\cdot - X_n) : X \in \Xcal^N \right\}$.
+The aggregation property has been stated for countable partitions of the process domain -- it also holds for continuous aggregations. Define an Empirical process $\uppsi \in \Uppsi$ parameterized by $N$ samples and a mean function $\theta \in \Pcal(\Ycal \times \Xcal)$. The process assumes functions from the set $\Uppsi = \left\{ N^{-1} \sum_{n=1}^N \delta(\cdot - Y_n) \delta(\cdot - X_n) : Y \in \Ycal^N, X \in \Xcal^N \right\}$. The aggregation $\uppsim \equiv \int_{\Ycal} \uppsi(y,\cdot) {\drm}y$ is an Empirical process with $N$ samples and mean function $\thetam \equiv \int_{\Ycal} \theta(y,\cdot) {\drm}y$; this characterization is inherited from the original Empirical process, as aggregations of $\uppsim$ are equivalent to aggregations of $\uppsi$. Note that $\uppsim \in \Uppsim = \left\{ N^{-1} \sum_{n=1}^N \delta(\cdot - X_n) : X \in \Xcal^N \right\}$.
 
 Additionally, when also conditioned on the aggregation $\uppsim$, the normalized random processes $\uppsic(x) \equiv \uppsi(\cdot,x) / \uppsim(x)$ are independent continuous-domain Empirical processes, $\uppsic(x) | \uppsim(x), \upthetac(x) \sim \EP\big(\delta(0)^{-1} N \uppsim(x), \upthetac(x)\big)$, where $\thetac(x) \equiv \theta(\cdot,x) / \thetam(x) \in \Pcal(\Ycal)$.
 
@@ -3536,7 +3535,7 @@ Finally,
 
 \todomid{provide full proof here?}
 
-The aggregation property has been stated for countable partitions of the process domain - it also holds for continuous aggregations. Define an Dirichlet process $\uptheta \in \Pcal(\Ycal \times \Xcal)$ parameterized by concentration $\alpha_0$ and mean function $\alpha$. Using a procedure similar to that used in \ref{app:EP}, the aggregation $\upthetam \equiv \int_{\Ycal} \uptheta(y,\cdot) {\drm}y \in \Pcal(\Xcal)$ is shown to be a Dirichlet process with concentration $\alpha_0$ and parameterizing function $\alpham \equiv \int_{\Ycal} \alpha(y,\cdot) {\drm}y$. 
+The aggregation property has been stated for countable partitions of the process domain -- it also holds for continuous aggregations. Define an Dirichlet process $\uptheta \in \Pcal(\Ycal \times \Xcal)$ parameterized by concentration $\alpha_0$ and mean function $\alpha$. Using a procedure similar to that used in \ref{app:EP}, the aggregation $\upthetam \equiv \int_{\Ycal} \uptheta(y,\cdot) {\drm}y \in \Pcal(\Xcal)$ is shown to be a Dirichlet process with concentration $\alpha_0$ and parameterizing function $\alpham \equiv \int_{\Ycal} \alpha(y,\cdot) {\drm}y$. 
 
 Additionally, the normalized functions $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x) \in \Pcal(\Ycal)$ are independent continuous-domain Dirichlet processes, $\upthetac(x) \sim \DP\big(\delta(0) ^{-1} \alpha_0 \alpham(x), \alphac(x)\big)$, where $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x) \in \Pcal(\Ycal)$, and are independent of the aggregation process $\upthetam$.
 
@@ -3642,7 +3641,7 @@ Finally,
 
 \todomid{provide full proof here?}
 
-The aggregation property has been stated for countable partitions of the process domain - it also holds for continuous aggregations. Define an Dirichlet-Empirical process $\uppsi \in \Pcal(\Ycal \times \Xcal)$ parameterized by $N$ samples, concentration $\alpha_0$, and mean function $\alpha$. Using a procedure similar to that used in \ref{app:EP}, the aggregation $\uppsim \equiv \int_{\Ycal} \uptheta(y,\cdot) {\drm}y \in \Pcal(\Xcal)$ is shown to be a Dirichlet-Empirical process with $N$ samples, concentration $\alpha_0$, and parameterizing function $\alpham \equiv \int_{\Ycal} \alpha(y,\cdot) {\drm}y$. 
+The aggregation property has been stated for countable partitions of the process domain -- it also holds for continuous aggregations. Define an Dirichlet-Empirical process $\uppsi \in \Pcal(\Ycal \times \Xcal)$ parameterized by $N$ samples, concentration $\alpha_0$, and mean function $\alpha$. Using a procedure similar to that used in \ref{app:EP}, the aggregation $\uppsim \equiv \int_{\Ycal} \uptheta(y,\cdot) {\drm}y \in \Pcal(\Xcal)$ is shown to be a Dirichlet-Empirical process with $N$ samples, concentration $\alpha_0$, and parameterizing function $\alpham \equiv \int_{\Ycal} \alpha(y,\cdot) {\drm}y$. 
 
 Additionally, when conditioned on the aggregation $\uppsim$, the normalized functions $\uppsic(x) \equiv \uppsi(\cdot,x) / \uppsim(x) \in \Pcal(\Ycal)$ are independent continuous-domain Dirichlet-Empirical processes, $\uppsic(x) | \uppsim(x) \sim \DEP\big(\delta(0) ^{-1} N \uppsim(x), \delta(0) ^{-1} \alpha_0 \alpham(x), \alphac(x)\big)$, where $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x) \in \Pcal(\Ycal)$.
 
@@ -3785,7 +3784,7 @@ To demonstrate this property, exploit the results of Appendix \ref{app:Dir_agg} 
 \prm_{\Drm | \upthetam}(D | \upthetam) & = & \Erm_{\upthetac | \upthetam}\big[ \prm_{\Drm | \upthetam,\upthetac}(D | \upthetam,\upthetac) \big] \\
 & = & \Erm_{\upthetac | \upthetam}\left[ \prod_{n=1}^N \prod_{z \in \Zcal} \big( \upthetam(z) \upthetac(D_n;z) \big)^{\chi(D_n; \Scal_z)} \right] \nonumber \\
 & = & \left( \prod_{z \in \Zcal} \prod_{n=1}^N \upthetam(z)^{\chi(D_n; \Scal_z)} \right) \prod_{z \in \Zcal} \Erm_{\upthetac(z)}\left[ \prod_{n=1}^N \upthetac(D_n; z)^{\chi(D_n; \Scal_z)} \right] \nonumber \\
-& = & \left( \prod_{z \in \Zcal} \upthetam(z)^{\Psim(z;D)} \right)^N \prod_{z \in \Zcal} \Erm_{\upthetac(z)}\left[ \prod_{n=1}^N \upthetac(D_n; z)^{\chi(D_n; \Scal_z)} \right] \nonumber \;,
+& = & \left( \prod_{z \in \Zcal} \upthetam(z)^{\Psim(z;D)} \right)^N \prod_{z \in \Zcal} \Erm_{\upthetac(z)}\left[ \prod_{n=1}^N \upthetac(D_n; z)^{\chi(D_n; \Scal_z)} \right] \nonumber \;.
 \end{IEEEeqnarray}
 Observe that the dependency of this likelihood function on $\upthetam$ is polynomial. Thus, $\upthetam$ is a conjugate prior for $\Drm$ and the training data marginal distribution is
 \begin{IEEEeqnarray}{rCl}
@@ -3818,7 +3817,7 @@ a function only dependent on the data through the empirical statistic $\Psi(\Drm
 As a result, $\uptheta | \{\Drm = D\} \sim \uptheta | \left\{ \uppsi = \Psi(D)\right\}$. 
 This is a natural generalization of the results for the discrete-domain model process. In general, when an Empirical process $\uppsi | \uptheta \sim \EP(N,\uptheta)$ has a mean function which is characterized by a Dirichlet process $\uptheta \sim \DP(\alpha_0,\alpha)$, the posterior $\uptheta | \uppsi \sim \DP(\alpha_0 + N, \mu_{\uptheta | \uppsi})$, where
 \begin{IEEEeqnarray}{rCl}
-\mu_{\uptheta | \uppsi} & = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \alpha + \left(\frac{N}{\alpha_0+N}\right) \uppsi
+\mu_{\uptheta | \uppsi} & = & \left(\frac{\alpha_0}{\alpha_0+N}\right) \alpha + \left(\frac{N}{\alpha_0+N}\right) \uppsi \;.
 \end{IEEEeqnarray}
 
 Additionally, note that $\upthetam | \{\Drm = D\} \sim \upthetam | \big\{ \uppsim = \Psim(D)\big\}$. The model aggregation process is only dependent on the aggregation of the empirical distribution. These properties result from the independence of $\upthetam$ from $\upthetac$, a property that Dirichlet processes hold.
