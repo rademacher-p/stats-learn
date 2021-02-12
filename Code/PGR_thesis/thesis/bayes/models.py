@@ -241,6 +241,7 @@ class Dirichlet(Base):      # TODO: DRY from random.elements?
 
     def __init__(self, prior_mean, alpha_0, rng=None):
         super().__init__(prior=None, rng=rng)
+
         self._space = prior_mean.space
 
         _emp_dist = rand_models.DataEmpirical([], [], space=self.space)

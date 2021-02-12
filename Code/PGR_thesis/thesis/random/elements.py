@@ -194,7 +194,7 @@ class Finite(Base):     # TODO: DRY - use stat approx from the Finite space's me
 
     def __eq__(self, other):
         if isinstance(other, Finite):
-            return (self.supp == other.supp).all() and (self.p == other.p).all()
+            return np.all(self.supp == other.supp) and np.all(self.p == other.p)
         return NotImplemented
 
     def __deepcopy__(self, memodict=None):
@@ -381,7 +381,7 @@ class Dirichlet(BaseRV):
         log_pf = self._log_pf_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x).reshape(-1, self.size), -1)
         return np.exp(log_pf).reshape(set_shape)
 
-    def plot_pf(self, x=None, ax=None):
+    def plot_pf(self, x=None, ax=None, **kwargs):
         if x is None and self.space.x_plt is None:
             self.space.x_plt = plotting.simplex_grid(30, self.shape, hull_mask=(self.mean < 1 / self.alpha_0))
         return self.space.plot(self.pf, x, ax)
@@ -1042,7 +1042,7 @@ class DataEmpirical(Base):
         else:
             return 0.
 
-    def plot_pf(self, x=None, ax=None):
+    def plot_pf(self, x=None, ax=None, **kwargs):
         if x is None and self.space.x_plt is None:
             # self.space.set_x_plot()
             if isinstance(self.space, spaces.Continuous) and self.shape in {()}:
@@ -1196,7 +1196,7 @@ class Mixture(Base):
         # return sum(prob * dist.pf(x) for prob, dist in zip(self._p, self.dists) if prob > 0)
         return sum(self._p[i] * self.dists[i].pf(x) for i in self._idx_nonzero)
 
-    def plot_pf(self, x=None, ax=None):
+    def plot_pf(self, x=None, ax=None, **kwargs):
         if x is None and self.space.x_plt is None:
             # self.space.set_x_plot()
 
