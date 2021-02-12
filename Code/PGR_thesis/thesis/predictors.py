@@ -397,22 +397,18 @@ class Base(ABC):
         self.loss_func = loss_func
 
         self._space = space
-        # if space is not None:
-        #     self._space = space
-        # else:
-        #     self._space = None
 
         self.proc_funcs = list(proc_funcs)
         self.name = name
 
         self.model = None
 
-    @property
-    def space(self):    # FIXME??
-        if self._space is None:
-            self._space = self._model_obj.space
-        return self._space
-    # space = property(lambda self: self._space)
+    # @property
+    # def space(self):
+    #     if self._space is None:
+    #         self._space = self._model_obj.space
+    #     return self._space
+    space = property(lambda self: self._space)
 
     # space = property(lambda self: self._model_obj.space)
 
@@ -549,6 +545,8 @@ class RegressorMixin:
 #%% Fixed model
 class Model(Base):
     def __init__(self, model, loss_func, space=None, proc_funcs=(), name=None):
+        if space is None:
+            space = model.space
         super().__init__(loss_func, space, proc_funcs, name)
         self.model = model
 
@@ -603,6 +601,8 @@ class ModelRegressor(RegressorMixin, Model):
 
 class Bayes(Base):
     def __init__(self, bayes_model, loss_func, space=None, proc_funcs=(), name=None):
+        if space is None:
+            space = bayes_model.space
         super().__init__(loss_func, space, proc_funcs, name=name)
 
         self.bayes_model = bayes_model
