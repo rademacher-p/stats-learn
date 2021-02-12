@@ -72,7 +72,7 @@
 \DeclareMathOperator{\Scal}{\mathcal{S}}
 \DeclareMathOperator{\Pcal}{\mathcal{P}}
 \DeclareMathOperator{\Lcal}{\mathcal{L}}
-\DeclareMathOperator{\Ecal}{\mathcal{E}}
+%\DeclareMathOperator{\Ecal}{\mathcal{E}}
 
 \DeclareMathOperator{\Rbb}{\mathbb{R}}
 \DeclareMathOperator{\Rbbgeq}{\mathbb{R}_{\geq 0}}
@@ -747,6 +747,31 @@ The irreducible risk \eqref{eq:risk_clv} for a given model satisfies $\Rcal_{\Th
 
 
 
+\section{Predictive Model Estimation} \label{sec:predictive_est}
+
+It is instructive to treat the Bayesian predictive distribution $\Prm_{\yrm | \xrm,\Drm}$ as an estimator of the clairvoyant predictive distribution $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$ and investigate the effects of prior knowledge. Of specific interest are the mean $\Erm_{\Drm | \uptheta}\big[\mu_{\yrm | \xrm, \Drm}\big]$ and covariance $\Crm_{\Drm | \uptheta}\big[\mu_{\yrm | \xrm, \Drm}\big]$ with respect to the true model $\uptheta$.  To simplify the analysis, the training data $\Drm$ will be represented using the marginal and conditional sufficient statistics $(\uppsim, \uppsic)$. 
+
+To aid characterization of the estimator, define the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$. The expected bias of the estimator is thus
+\begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias}
+\mathrm{Bias}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim, \uppsic | \upthetam,\upthetac}\big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \big] \\
+& = & \Erm_{\uppsim, \uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] - \Prm_{\yrm | \xrm,\upthetac} \nonumber \;,
+\end{IEEEeqnarray}
+measuring the difference between the clairvoyant distribution and the expected Bayesian distribution.
+
+Defining the covariance of the Bayesian predictive distribution as
+\begin{IEEEeqnarray}{L}
+\mathrm{Cov}(\xrm;\upthetam,\upthetac) = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \;,
+\end{IEEEeqnarray}
+the conditional second moments of $\Delta(\xrm;\uppsim,\uppsic,\upthetac)$ can be readily shown to be
+\begin{IEEEeqnarray}{L} \label{eq:predictive_del_sq}
+\Erm_{\uppsim,\uppsic | \upthetam,\upthetac} \Big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \otimes \Delta(\xrm;\uppsim,\uppsic,\upthetac) \Big] \nonumber \\
+\quad = \mathrm{Bias}(\xrm;\upthetam,\upthetac) \otimes \mathrm{Bias}(\xrm;\upthetam,\upthetac) + \mathrm{Cov}(\xrm;\upthetam,\upthetac) \;.
+\end{IEEEeqnarray}
+
+
+
+
+
 
 
 
@@ -835,10 +860,6 @@ An interesting form for the optimal estimator is $f^*(\xrm;\Drm) = \Erm_{\upthet
 
 
 
-
-
-
-
 \paragraph{Minimum Bayes Risk: the Expected Posterior Variance}
 
 The Bayes squared-error risk for a general learning function is
@@ -857,6 +878,20 @@ Substituting the optimal estimator \eqref{eq:f_opt_SE} into Equation \eqref{eq:r
 \end{IEEEeqnarray}
 The first term is the expected irreducible risk. The second term is the expected variance of the clairvoyant estimate $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$ with respect to the model posterior PDF $\prm_{\uptheta | \xrm,\Drm}$.
 
+
+
+\subsubsection{Squared-Error}
+
+\todomid{Rename section}
+
+Substituting in the clairvoyant and Bayesian estimators, the excess squared-error \eqref{eq:risk_cond_ex_SE} can be represented as
+\begin{IEEEeqnarray}{rCl} \label{eq:risk_cond_ex_SE_bayes}
+\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) & = & \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
+& = & \Erm_{\xrm | \uptheta} \left[ \Big( \Erm_{\Drm | \uptheta}\big[ \mu_{\yrm | \xrm,\Drm} \big] - \mu_{\yrm | \xrm,\uptheta} \Big)^2 + \Crm_{\Drm | \uptheta}\big[ \mu_{\yrm | \xrm,\Drm} \big] \right] \nonumber \\
+& \equiv & \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm,\uppsim,\uppsic | \upthetam,\upthetac} \Big[ \Delta(y; \xrm;\uppsim,\uppsic,\upthetac) \Delta(y'; \xrm;\uppsim,\uppsic,\upthetac) \Big] \nonumber \\
+& = & \Erm_{\xrm | \uptheta} \left[ \left( \sum_{y \in \Ycal} y \ \mathrm{Bias}(y; \xrm; \upthetam,\upthetac) \right)^2 + \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \ \mathrm{Cov}(y,y'; \xrm; \upthetam,\upthetac) \right] \nonumber \;,
+\end{IEEEeqnarray}
+where the formulae for the predictive distribution bias and variance from Section \ref{sec:predictive_est} have been used. 
 
 
 
@@ -1409,50 +1444,48 @@ The Bayes predictive PMF can thus be expressed as
 
 
 
-\section{Predictive Model Estimation} \label{sec:predictive_est}
+\section{Predictive Model Estimation} \label{sec:predictive_est_dir}
 
-\todohigh{generalize for Bayesian learners, move before Dirichlet!?}
-
-PGR: use poster table??
-
-
-It is instructive to treat the Bayesian predictive distribution $\Prm_{\yrm | \xrm,\Drm}$ as an estimator of the clairvoyant predictive distribution $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$ and investigate the effects of prior knowledge. Of specific interest are the mean $\Erm_{\Drm | \uptheta}\big[\mu_{\yrm | \xrm, \Drm}\big]$ and covariance $\Crm_{\Drm | \uptheta}\big[\mu_{\yrm | \xrm, \Drm}\big]$ with respect to the true model $\uptheta$.  To simplify the analysis, the training data $\Drm$ will be represented using the marginal and conditional sufficient statistics $(\uppsim, \uppsic)$. 
+This section analyzes the bias and variance of the Dirichlet-based $\Prm_{\yrm | \xrm,\Drm}$ when used to estimate the clairvoyant predictive distribution $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$.
 
 For a given $\xrm$, the expected value of the estimate conditioned on the true model is
-\begin{IEEEeqnarray}{L} \label{eq:predictive_dist_avg}
+\begin{IEEEeqnarray}{L} \label{eq:predictive_dist_avg_dir}
 \Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] 
 = \Erm_{\uppsim(\xrm),\uppsic(\xrm) | \upthetam(\xrm),\upthetac(\xrm)}\big[ \Prm_{\yrm | \xrm,\uppsim(\xrm),\uppsic(\xrm)} \big] \\ 
-\quad = \Erm_{\uppsim(\xrm) | \upthetam(\xrm)} \big[\gammam(\xrm; \uppsim)\big] \alphac(\xrm) + \Erm_{\uppsim(\xrm) | \upthetam(\xrm)} \big[1 - \gammam(\xrm; \uppsim)\big] \upthetac(\xrm) \nonumber
+\quad = \Erm_{\uppsim(\xrm) | \upthetam(\xrm)} \big[\gammam(\xrm; \uppsim)\big] \alphac(\xrm) + \Erm_{\uppsim(\xrm) | \upthetam(\xrm)} \big[1 - \gammam(\xrm; \uppsim)\big] \upthetac(\xrm) \nonumber \;,
 \end{IEEEeqnarray}
-where the properties of an Empirical distribution (Appendix \ref{app:emp}) conditioned on its aggregation have been used. The result is a convex combination of the conditional data-independent distribution $\alphac(\xrm)$ and the true conditional distribution $\upthetac(\xrm)$. Noting that
+where the properties of an Empirical distribution (Appendix \ref{app:emp}) conditioned on its aggregation have been used. The result is a convex combination of the conditional data-independent distribution $\alphac(\xrm)$ and the true conditional distribution $\upthetac(\xrm)$. Substituting into \eqref{eq:predictive_bias}, the expected bias is
+\begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias_dir}
+\mathrm{Bias}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[\gammam(\xrm; \uppsim)\big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \;.
+\end{IEEEeqnarray}
+and noting that
 \begin{IEEEeqnarray}{L}
 \Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
 \quad = \Big( \gammam(\xrm; \uppsim) - \Erm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \Big) \big(\alphac(\xrm) - \upthetac(\xrm)\big) \nonumber \\
 \qquad + \big(1 - \gammam(\xrm; \uppsim)\big) \big(\uppsic(\xrm) - \upthetac(\xrm)\big) \nonumber \;,
 \end{IEEEeqnarray}
 the covariance of the estimate can be represented as
-\begin{IEEEeqnarray}{L} \label{eq:predictive_cov}
+\begin{IEEEeqnarray}{L} \label{eq:predictive_cov_dir}
 \mathrm{Cov}(\xrm;\upthetam,\upthetac) = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
 \quad = \Crm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[ \gammam(\xrm; \uppsim) \big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
 \qquad + \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \nonumber \;.
 \end{IEEEeqnarray}
 
-To further aid characterization of the estimator, define the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$, measuring the difference between the true and estimated predictive PMF. For a given $\xrm$, the bias of the estimate is thus
-\begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias}
-\mathrm{Bias}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim, \uppsic | \upthetam,\upthetac}\big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \big] \\
-& = & \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[\gammam(\xrm; \uppsim)\big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \;.
+
+Substituting the estimator bias and variance into \eqref{eq:predictive_del_sq}, the conditional second moments of $\Delta(\xrm;\uppsim,\uppsic,\upthetac)$ are
+\begin{IEEEeqnarray}{L} \label{eq:predictive_del_sq_dir}
+\Erm_{\uppsim,\uppsic | \upthetam,\upthetac} \Big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \otimes \Delta(\xrm;\uppsim,\uppsic,\upthetac) \Big] \\
+\quad = \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \gammam(\xrm; \uppsim)^2 \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
+\qquad + \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \nonumber \;.
 \end{IEEEeqnarray}
-Combining the estimator bias and variance, the conditional second moments of $\Delta(\xrm;\uppsim,\uppsic,\upthetac)$ are
-\begin{IEEEeqnarray}{rCl} \label{eq:predictive_del_sq}
-\Ecal(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim,\uppsic | \upthetam,\upthetac} \Big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \otimes \Delta(\xrm;\uppsim,\uppsic,\upthetac) \Big] \\
-& = & \mathrm{Bias}(\xrm;\upthetam,\upthetac) \otimes \mathrm{Bias}(\xrm;\upthetam,\upthetac) + \mathrm{Cov}(\xrm;\upthetam,\upthetac) \nonumber \;.
-\end{IEEEeqnarray}
-Note that the bias is proportionate to the difference between the true conditional model and the data-independent estimate, while the covariance also depends on $\Sigma_{\uppsic(x) | \uppsim(x), \upthetac(x)}$. The conditional expectation over $\xrm$ is
-\begin{IEEEeqnarray}{L} \label{eq:predictive_E_del_sq}
-\Erm_{\xrm | \upthetam}\Big[ \Ecal(\xrm;\upthetam,\upthetac) \Big] \\
-\quad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \gammam(\xrm; \uppsim)^2 \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big)  \right] \nonumber \\
-\qquad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \right] \nonumber \;.
-\end{IEEEeqnarray}
+Note that the bias is proportionate to the difference between the true conditional model and the data-independent estimate, while the covariance also depends on $\Sigma_{\uppsic(x) | \uppsim(x), \upthetac(x)}$. 
+
+%The conditional expectation over $\xrm$ is
+%\begin{IEEEeqnarray}{L} \label{eq:predictive_E_del_sq_dir}
+%\Erm_{\xrm | \upthetam}\Big[ \Ecal(\xrm;\upthetam,\upthetac) \Big] \\
+%\quad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \gammam(\xrm; \uppsim)^2 \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big)  \right] \nonumber \\
+%\qquad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \right] \nonumber \;.
+%\end{IEEEeqnarray}
 
 
 \subsection{Trends}
@@ -1807,32 +1840,40 @@ PGR: additional figures for uniform case?
 
 \subsubsection{Squared-Error Trends}
 
-Having derived the optimal estimator based on a Dirichlet model prior, it is important to consider the risk $\Rcal_{\Theta}(f^* ; \uptheta)$ and analyze how different prior parameterizations $\alpha$ influence the squared-error for different models $\theta$. Starting from the excess squared-error risk \eqref{eq:risk_cond_ex_SE} and substituting the Bayesian estimator \eqref{eq:f_opt_SE}, the formula simplifies to $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big]$.
+Having derived the optimal estimator based on a Dirichlet model prior, it is important to consider the risk $\Rcal_{\Theta}(f^* ; \uptheta)$ and analyze how different prior parameterizations $\alpha$ influence the squared-error for different models $\theta$.
 
-Evaluation of the excess risk for an estimator based on the Dirichlet prior will be performed using the sufficient statistic $\uppsi$ in place of the training set $\Drm$. Using the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$ introduced in \ref{sec:predictive_est}, the term is expressed as
+Substituting the second moments of $\Delta(\xrm;\uppsim,\uppsic,\upthetac)$ \eqref{eq:predictive_del_sq_dir} into \eqref{eq:risk_cond_ex_SE_bayes}, the excess squared-error can be represented as
 \begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex}
-\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
-\quad \equiv \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm,\uppsim,\uppsic | \upthetam,\upthetac} \Big[ \Delta(y; \xrm;\uppsim,\uppsic,\upthetac) \Delta(y'; \xrm;\uppsim,\uppsic,\upthetac) \Big] \nonumber \\
-\quad = \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm | \upthetam} \Big[ \Ecal(y,y' ; \xrm; \upthetam,\upthetac) \Big] \nonumber \\
+\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm,\uppsim,\uppsic | \upthetam,\upthetac} \Big[ \Delta(y; \xrm;\uppsim,\uppsic,\upthetac) \Delta(y'; \xrm;\uppsim,\uppsic,\upthetac) \Big] \nonumber \\
 \quad = \Erm_{\xrm | \upthetam}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right)^2 \right] \right] \nonumber \\
 \qquad \quad + \Erm_{\xrm | \upthetam}\left[ \Sigma_{\yrm | \xrm,\upthetac} \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \right] \right] \nonumber \\
 \quad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \gammam(\xrm; \uppsim)^2 \right] \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \right] \nonumber \\
-\qquad \quad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim\big)^2}{N \uppsim(\xrm)} \right]  \Sigma_{\yrm | \xrm,\upthetac} \right] \nonumber \;,
-%\quad = \Erm_{\xrm | \uptheta}\left[ \Sigma_{\yrm | \xrm,\uptheta} \Erm_{\uppsim(\xrm) | \uptheta}\left[ \frac{\alpha_0^{-2} \uppsim(\xrm)}{\big( \Prm_{\xrm}(\xrm) + \alpha_0^{-1} \uppsim(\xrm) \big)^2} \right] \right] \nonumber \\
-%\qquad \qquad + \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \Erm_{\uppsim(\xrm) | \uptheta}\left[ \left(\frac{\Prm_{\xrm}(\xrm)}{\Prm_{\xrm}(\xrm) + \alpha_0^{-1} \uppsim(\xrm)}\right)^2 \right] \right] \nonumber \;,
+\qquad \quad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim\big)^2}{N \uppsim(\xrm)} \right]  \Sigma_{\yrm | \xrm,\upthetac} \right] \;.
 \end{IEEEeqnarray}
-where the expectation of the function $\Ecal$ is defined in \eqref{eq:predictive_E_del_sq}.
 
-\todolo{note use of new model estimation formulas!}
-\todomid{use weight notation from conf paper? add theta dependency to lambda}
+
+%Evaluation of the excess risk for an estimator based on the Dirichlet prior will be performed using the sufficient statistic $\uppsi$ in place of the training set $\Drm$. Using the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$ introduced in \ref{sec:predictive_est_dir}, the term is expressed as
+%\begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex}
+%\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
+%\quad \equiv \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm,\uppsim,\uppsic | \upthetam,\upthetac} \Big[ \Delta(y; \xrm;\uppsim,\uppsic,\upthetac) \Delta(y'; \xrm;\uppsim,\uppsic,\upthetac) \Big] \nonumber \\
+%\quad = \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm | \upthetam} \Big[ \Ecal(y,y' ; \xrm; \upthetam,\upthetac) \Big] \nonumber \\
+%\quad = \Erm_{\xrm | \upthetam}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right)^2 \right] \right] \nonumber \\
+%\qquad \quad + \Erm_{\xrm | \upthetam}\left[ \Sigma_{\yrm | \xrm,\upthetac} \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \right] \right] \nonumber \\
+%\quad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \gammam(\xrm; \uppsim)^2 \right] \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \right] \nonumber \\
+%\qquad \quad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim\big)^2}{N \uppsim(\xrm)} \right]  \Sigma_{\yrm | \xrm,\upthetac} \right] \nonumber \;,
+%%\quad = \Erm_{\xrm | \uptheta}\left[ \Sigma_{\yrm | \xrm,\uptheta} \Erm_{\uppsim(\xrm) | \uptheta}\left[ \frac{\alpha_0^{-2} \uppsim(\xrm)}{\big( \Prm_{\xrm}(\xrm) + \alpha_0^{-1} \uppsim(\xrm) \big)^2} \right] \right] \nonumber \\
+%%\qquad \qquad + \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \Erm_{\uppsim(\xrm) | \uptheta}\left[ \left(\frac{\Prm_{\xrm}(\xrm)}{\Prm_{\xrm}(\xrm) + \alpha_0^{-1} \uppsim(\xrm)}\right)^2 \right] \right] \nonumber \;,
+%\end{IEEEeqnarray}
+%where the expectation of the function $\Ecal$ is defined in \eqref{eq:predictive_E_del_sq_dir}.
+
 
 The excess risk can thus be represented as the conditional expectation (with respect to $\Prm_{\xrm | \uptheta} = \upthetam$) of a sum of two functions of $\xrm$.  The first function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. This term alone is influenced by the data-independent Bayes predictive distribution $\Prm_{\yrm | \xrm} = \alphac(\xrm)$. The second function measures the additional variance beyond that of the clairvoyant estimator (i.e., the irreducible squared-error); like the irreducible squared-error, it depends on $\Sigma_{\yrm | \xrm,\upthetac}$, the conditional variance of the clairvoyant estimate for a given observation of $\xrm$. These two second-order terms (of $y$) are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam(x)$ and $N$ via conditional expectations with respect to $\uppsim(x)$.
 
 
-It is instructional to consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. As these weights depend on the bias and variance scaling factors introduced in Section \ref{sec:predictive_est}, the analysis performed there is directly applicable.
+It is instructional to consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. As these weights depend on the bias and variance scaling factors introduced in Section \ref{sec:predictive_est_dir}, the analysis performed there is directly applicable.
 
 
-First consider how the excess risk changes with the training volume $N$. For $N=0$, it is evident that the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$,  the expected squared bias between the clairvoyant and data-independent estimators. Recall that as $N \to \infty$, the bias and variance both vanish, resulting in $\Ecal(\xrm; \upthetam, \upthetac) \to 0$; as a result, $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable estimator property is a consequence of the full support of the Dirichlet prior, ensuring that the model posterior concentrates at the empirical PMF.
+First consider how the excess risk changes with the training volume $N$. For $N=0$, it is evident that the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$,  the expected squared bias between the clairvoyant and data-independent estimators. Recall that as $N \to \infty$, the bias and variance both vanish; as a result, $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable estimator property is a consequence of the full support of the Dirichlet prior, ensuring that the model posterior concentrates at the empirical PMF.
 
 Another interesting point regarding the dependency of the excess risk on $N$ is that there may be a local maximum, depending on the learner parameterization. To demonstrate, consider the case of $|\Xcal| = 1$ -- treating $N$ as a real number, there would be a maximum at 
 \begin{equation}
@@ -1871,11 +1912,11 @@ Next consider the effects of the Dirichlet prior parameters. The analysis will i
 
 First consider the conditional prior PMF's $\alphac(x)$; as shown, they manifest themselves in the risk through the squared estimator bias. It is clear that regardless of how the values $\alpha_0$ and $\alpham(x)$ are chosen, the best selections for these conditional priors must have first moments matching those of the corresponding true predictive distributions $\Prm_{\yrm | \xrm,\uptheta}$ for each $x \in \Xcal$. The resultant estimators $\mu_{\yrm | \xrm}$ are unbiased and the excess risk is equivalent to the first term in \eqref{eq:risk_cond_SE_dir_ex}, measuring additional variance due to model uncertainty.
 
-The concentrations $\bar{\alpha}_0(x)$ of the conditional distributions $\upthetac(x)$ control important bias/variance trade-offs via the two scaling factors in \eqref{eq:risk_cond_SE_dir_ex}. First, consider the asymptotic trends, again referencing the distribution estimation analysis in Section \ref{sec:predictive_est}.
+The concentrations $\bar{\alpha}_0(x)$ of the conditional distributions $\upthetac(x)$ control important bias/variance trade-offs via the two scaling factors in \eqref{eq:risk_cond_SE_dir_ex}. First, consider the asymptotic trends, again referencing the distribution estimation analysis in Section \ref{sec:predictive_est_dir}.
 
 Consider how the excess risk tends as the priors become maximally concentrated. Recall that as $\bar{\alpha}_0(x) \to \infty$, the estimate of $\upthetac$ is maximally biased and has no variance; thus, the excess risk tends to $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, the expected squared-error between the means of the Bayesian predictive PMF and the true predictive PMF. This is intuitive given that the estimator tends toward a data-independent solution; the estimator may be biased, but will have no variance due to the training data statistics.
 
-Conversely, if concentrations $\bar{\alpha}_0(x) \to 0$ are chosen, the Bayesian estimate tends to the empirical mean, independent of $\alphac$. Using the limits displayed in \ref{sec:predictive_est}, it can be shown that the excess risk tends to
+Conversely, if concentrations $\bar{\alpha}_0(x) \to 0$ are chosen, the Bayesian estimate tends to the empirical mean, independent of $\alphac$. Using the limits displayed in \ref{sec:predictive_est_dir}, it can be shown that the excess risk tends to
 \begin{IEEEeqnarray}{rCl}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) & \to & \Erm_{\xrm | \upthetam}\left[ \big( 1 - \upthetam(\xrm) \big)^N \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \right] \nonumber \\
 && \quad + \Erm_{\xrm | \upthetam}\left[ \left( \sum_{n=1}^N \binom{N}{n} \upthetam(\xrm)^n \big( 1 - \upthetam(\xrm) \big)^{N-n} \frac{1}{n} \right) \Sigma_{\yrm | \xrm,\upthetac} \right] \nonumber \;.
@@ -2777,17 +2818,17 @@ Observe that by the aggregation principle, $\uppsim \sim \DEP(N,\alpha_0,\alpham
 
 
 
-\section{Predictive Model Estimation} \label{sec:predictive_est_cont}
+\section{Predictive Model Estimation} \label{sec:predictive_est_dir_cont}
 
-For continuous data spaces, the analysis of the Bayesian predictive distribution as an estimate of the true predictive distribution has some unique differences from the discrete space analysis put forth in Section \ref{sec:predictive_est}. Redefine the difference function $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \prm_{\yrm | \xrm,\uppsim,\uppsic} - \prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$. Using the properties of the continuous-domain empirical process conditioned on its aggregation, the covariance function takes on the new form
+For continuous data spaces, the analysis of the Bayesian predictive distribution as an estimate of the true predictive distribution has some unique differences from the discrete space analysis put forth in Section \ref{sec:predictive_est_dir}. Redefine the difference function $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \prm_{\yrm | \xrm,\uppsim,\uppsic} - \prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$. Using the properties of the continuous-domain empirical process conditioned on its aggregation, the covariance function takes on the new form
 \begin{IEEEeqnarray}{L} \label{eq:predictive_cov_cont}
 \mathrm{Cov}(\xrm;\upthetam,\upthetac) = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
 \quad = \Crm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[\gammam(\xrm; \uppsim)\big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
 \qquad + \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{\delta(0)^{-1} N \uppsim(\xrm)} \right] \big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \big) \nonumber
 \end{IEEEeqnarray}
 and the expectation of the second moments of the difference function is thus
-\begin{IEEEeqnarray}{L} \label{eq:predictive_E_del_sq_cont}
-\Erm_{\xrm | \upthetam}\Big[ \Ecal(\xrm;\upthetam,\upthetac) \Big] \\
+\begin{IEEEeqnarray}{L} \label{eq:predictive_del_sq_dir_cont}
+\Erm_{\uppsim,\uppsic | \upthetam,\upthetac} \Big[ \Delta(\xrm;\uppsim,\uppsic,\upthetac) \otimes \Delta(\xrm;\uppsim,\uppsic,\upthetac) \Big] \\
 \quad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[ \gammam(\xrm; \uppsim)^2 \big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big)  \right] \nonumber \\
 \qquad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{\delta(0)^{-1} N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \right] \nonumber \;.
 \end{IEEEeqnarray}
@@ -2805,7 +2846,7 @@ where $\Bi$ is the binomial PMF.
 
 Thus for bounded $\upthetam(x)$, the expected number of samples $\delta(0)^{-1} N \uppsim(x) \to 0$, the value $\gammam(x; \uppsim)$ tends to unity, and the expected value of the predictive distribution tends to the conditional prior mean $\alphac(x)$ regardless of the value $\alpha_0 \alpham(x)$. As a result, the bias is always maximal and the covariance is always zero, no matter how large $N$ is -- the quality of the distribution estimate at $x$ is entirely dependent on the bias.
 
-If instead $\upthetam$ includes a Dirac delta function at $x \in \Xcal$, the conditional prior concentration $\alpha_0 \alpham(x)$ can affect the bias and variance. If the marginal prior mean value $\alpham(x)$ is bounded, the empirical distribution is used for prediction whenever available and the weight $\Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[ \gammam(\xrm; \uppsim) \big]$ assumes its minimal value $\big(1 - \delta(0)^{-1} \upthetam(x)\big)^N$, which is not necessarily equal to one. The estimate has minimal bias and maximal variance; the weighting values in \eqref{eq:predictive_E_del_sq_cont} are analagous to those provided in Section \ref{sec:predictive_est}. Conversely, if $\alpham$ also has a Dirac delta function at $x$, the bias weight behaves as for the discrete-domain case, depending on the relative values of $\delta(0)^{-1} \upthetam(x)$ and $\delta(0)^{-1} \alpham(x)$.
+If instead $\upthetam$ includes a Dirac delta function at $x \in \Xcal$, the conditional prior concentration $\alpha_0 \alpham(x)$ can affect the bias and variance. If the marginal prior mean value $\alpham(x)$ is bounded, the empirical distribution is used for prediction whenever available and the weight $\Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[ \gammam(\xrm; \uppsim) \big]$ assumes its minimal value $\big(1 - \delta(0)^{-1} \upthetam(x)\big)^N$, which is not necessarily equal to one. The estimate has minimal bias and maximal variance; the weighting values in \eqref{eq:predictive_del_sq_dir_cont} are analogous to those provided in Section \ref{sec:predictive_est_dir}. Conversely, if $\alpham$ also has a Dirac delta function at $x$, the bias weight behaves as for the discrete-domain case, depending on the relative values of $\delta(0)^{-1} \upthetam(x)$ and $\delta(0)^{-1} \alpham(x)$.
 
 
 \todohigh{example plots?}
@@ -3018,11 +3059,11 @@ Combining produces the risk,
 \end{IEEEeqnarray}
 
 
-The minimum Bayesian squared-error equation is similar to the discrete-domain formula \eqref{eq:Risk_min_SE_dir}, with one difference: the scaling factor for $\Sigma_{\yrm | \xrm}$ depends on the marginal prior mean through $\delta(0)^{-1} \alpham(\xrm)$. 
+The minimum Bayesian squared-error equation is similar to the discrete-domain formula \eqref{eq:Risk_min_SE_dir}, with one difference -- the scaling factor for $\Sigma_{\yrm | \xrm}$ depends on the marginal prior mean through $\delta(0)^{-1} \alpham(\xrm)$. 
 
 Note that as $N \to \infty$, the Bayesian risk tends to $\Rcal^* \to \Erm_{\xrm} \left[ \frac{\delta(0)^{-1} \alpham(\xrm)}{\delta(0)^{-1} \alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right]$, which can readily be shown to be the expected irreducible risk, $\Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] = \Erm_{\xrm,\uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right]$. This result is dependent on the fact that models $\uptheta$ drawn from the prior will be Dirac delta mixtures with countable support; as shown in the following section, if the true model $\theta$ is bounded, then the excess risk will never vanish and the irreducible squared-error will not be achieved. 
 
-Other notable difference from the discrete space results occur if $\alpham$ is bounded. If this is the case, $\Rcal^* \approx \Erm_{\xrm} \big[ (1 + N / \alpha_0)^{-1} \Sigma_{\yrm | \xrm} \big]$; this is a consequence of the estimator preference for using the empirical data distribution when available. Additionally, $\Rcal^* \to 0$ as $N \to \infty$. This is analogous to the $\alpha_0 \to 0$ case for discrete data, where the model $\uptheta$ will be concentrated at a single value $(y,x)$. With continuous data, for any localization $\alpha_0$, the probability that two of the Dirac delta functions comprising the mixture $\prm_{\uptheta}$ are located at the same value $x$ is zero. As such, every predictive distribution $\upthetac(x)$ will be supported at a single value $y$, the conditional variance $\Sigma_{\yrm | \xrm,\upthetac}$ is zero, and the irreducible squared-error is zero. With sufficient data, the probability that the novel data pair $(\yrm, \xrm)$ is represented in the training set tends to one, and thus the empirical predictive distribution $\uppsic(\xrm)$ will precisely identify $\uptheta(\xrm)$.
+Other notable difference from the discrete space results occur if $\alpham$ is bounded. If this is the case, $\Rcal^* \approx \Erm_{\xrm} \big[ (1 + N / \alpha_0)^{-1} \Sigma_{\yrm | \xrm} \big]$; this is a consequence of the estimator preference for using the empirical data distribution when available. Additionally, as $N \to \infty$, the Bayes squared-error tends to zero. With continuous data, for any localization $\alpha_0$, the probability that two of the Dirac delta functions comprising the mixture $\prm_{\uptheta}$ are located at the same value $x$ is zero. As such, every predictive distribution $\upthetac(x)$ will be supported at a single value $y$, the conditional variance $\Sigma_{\yrm | \xrm,\upthetac}$ is zero, and the irreducible squared-error is zero. With sufficient data, the probability that the novel data pair $(\yrm, \xrm)$ is represented in the training set tends to one, and thus the empirical predictive distribution $\uppsic(\xrm)$ will precisely identify $\uptheta(\xrm)$. This is analogous to the $\alpha_0 \to 0$ case for discrete data, where the model $\uptheta$ will be concentrated at a single value $(y,x)$.
 
 \todohigh{improve above discussion?? NEED DP CITATIONS!!!}
 
@@ -3072,18 +3113,16 @@ Other notable difference from the discrete space results occur if $\alpham$ is b
 
 \subsubsection{Squared-Error Trends}
 
-Using the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \prm_{\yrm | \xrm,\uppsim,\uppsic} - \prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$ introduced in \ref{sec:predictive_est_cont}, the excess squared-error is redefined as
+Using the second moments of the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac)$ formulated in \eqref{eq:predictive_del_sq_dir_cont}, the excess squared-error is redefined as
 \begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex_cont}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
 \quad \equiv \int_{\Ycal} y \int_{\Ycal} y' \Erm_{\xrm,\uppsim,\uppsic | \upthetam,\upthetac} \Big[ \Delta(y; \xrm;\uppsim,\uppsic,\upthetac) \Delta(y'; \xrm;\uppsim,\uppsic,\upthetac) \Big] {\drm}y {\drm}y' \nonumber \\
-\quad = \int_{\Ycal} y \int_{\Ycal} y' \Erm_{\xrm | \upthetam}\Big[ \Ecal(y,y' ; \xrm; \uppsim,\upthetac) \Big] {\drm}y {\drm}y' \nonumber \\
 \quad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\big[ \gammam(\xrm; \uppsim)^2 \big] \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \right] \nonumber \\
-\qquad \quad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{\delta(0)^{-1} N \uppsim(\xrm)} \right] \Sigma_{\yrm | \xrm,\upthetac} \right] \nonumber \;,
+\qquad \quad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{\delta(0)^{-1} N \uppsim(\xrm)} \right] \Sigma_{\yrm | \xrm,\upthetac} \right] \nonumber \;.
 \end{IEEEeqnarray}
-where the expectation of the function $\Ecal$ is defined in \eqref{eq:predictive_E_del_sq_cont}. 
 
 
-It is instructional to consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex_cont} with training data volume $N$ and with Dirichlet prior parameterization. Referencing the predictive distribution estimation discussion in Section \ref{sec:predictive_est_cont}, the bias/variance trends are used. Importantly, if the marginal model $\upthetam$ is upper-bounded, the biased, fixed prior estimator $\mu_{\yrm | \xrm}$ will  always be used (on average) and the excess risk approaches $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, regardless of how large the training data volume $N$ may be. 
+It is instructional to consider the trends of the excess squared-error \eqref{eq:risk_cond_SE_dir_ex_cont} with training data volume $N$ and with Dirichlet prior parameterization. Referencing the predictive distribution estimation discussion in Section \ref{sec:predictive_est_dir_cont}, the bias/variance trends are used. Importantly, if the marginal model $\upthetam$ is upper-bounded, the biased, fixed prior estimator $\mu_{\yrm | \xrm}$ will  always be used (on average) and the excess risk approaches $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, regardless of how large the training data volume $N$ may be. 
 
 If instead $\upthetam$ includes Dirac delta functions, there are values $x \in \Xcal$ with non-zero probabilities of being observed. At these values, if $\alpham(x)$ is bounded, the weights tend to
 \begin{IEEEeqnarray}{L} 
@@ -3101,7 +3140,7 @@ representing the minimum bias and maximum variance incurred by the empirical est
 
 \subsubsection{Example}
 
-Consider a data model where $\Xcal = \Ycal = [0, 1]$, the unit interval. The Dirichlet estimator is parameterized by $\alpham = 1$ and $\alphac(x) = \Beta(63, 63)$, such that the prior estimator $\mu_{\yrm | \xrm} = 0.5$ is constant; various localizations $\alpha_0$ will be used. Results were generated by averaging 50,000 iterations of a novel Python learning simulation.
+Consider a data model where $\Xcal = \Ycal = [0, 1]$, the unit interval. The Dirichlet estimator is parameterized by $\alpham = 1$ and $\alphac(x) = \Beta(63, 63)$, such that the prior estimator $\mu_{\yrm | \xrm} = 0.5$ is constant; various localizations $\alpha_0$ will be used. 
 
 \Cref{fig:SSP_2021/Risk_SE_N_cont} displays the Bayesian squared-error realized by the Dirichlet-based regressor. The model $\uptheta$ is randomly selected from a Dirichlet process with the same $\alpham$ and $\alphac$ used for the regressor design and with the localization fixed at $\alpha_0 = 100$. Since $\alpham$ is bounded, the Bayes risk is $\Rcal^* \approx \Erm_{\xrm} \big[ (1 + N / \alpha_0)^{-1} \Sigma_{\yrm | \xrm} \big]$. Observe that the risk is independent of the value $\alpha_0$ chosen for the estimator, since $\delta(0)^{-1} \alpha_0 \alpham(x) \to 0$. Additionally, note that $\Rcal^* \to 0$ as $N \to \infty$.
 \begin{figure}
