@@ -784,9 +784,9 @@ a sum of two terms. The first term is the expected conditional variance of the t
 Note that the risk can also be represented as $\Rcal_{\Theta}(f ; \uptheta) = \Rcal_{\Theta}^*(\uptheta) + \Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta)$, where the first term is the irreducible squared-error (as demonstrated in the next sub-section) and the second term is the excess squared-error,
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond_ex_SE}
 \Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta) & = & \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( f(\xrm;\Drm) - f_{\Theta}(\xrm;\uptheta) \big)^2 \Big] \\
-& = & \Erm_{\xrm | \uptheta} \left[ \Crm_{\Drm | \uptheta} \big[ f(\xrm;\Drm) \big] + \Big( \Erm_{\Drm | \uptheta}\big[ f(\xrm;\Drm) \big] - f_{\Theta}(\xrm;\uptheta) \Big)^2 \right] \nonumber \;,
+& = & \Erm_{\xrm | \uptheta} \left[ \Big( \Erm_{\Drm | \uptheta}\big[ f(\xrm;\Drm) \big] - f_{\Theta}(\xrm;\uptheta) \Big)^2 + \Crm_{\Drm | \uptheta}\big[ f(\xrm;\Drm) \big] \right] \nonumber \;,
 \end{IEEEeqnarray}
-where $f_{\Theta}(\xrm;\uptheta)$ is the clairvoyant estimator. Observe that the excess risk can be further decomposed as a sum of the estimator's variance and expected bias, respectively.
+where $f_{\Theta}(\xrm;\uptheta)$ is the clairvoyant estimator. Observe that the excess risk can be further decomposed as a sum of the estimator's expected bias and variance, respectively.
 
 \todohi{additional bias/variance trade-off discussion?}
 
