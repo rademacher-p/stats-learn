@@ -24,6 +24,17 @@ def check_spaces(iter_):
         raise ValueError("All objects must have the same space attribute.")
 
 
+# def get_superset(spaces):     # TODO: improve or delete
+#     shape = spaces[0].shape
+#     if not all(s.shape == shape for s in spaces[1:]):
+#         raise ValueError("All spaces must have the same shape.")
+#
+#     if any(isinstance(s, Euclidean) for s in spaces):
+#         return Euclidean(shape)
+#     elif any(isinstance(s, Box) for s in spaces):
+#         pass
+
+
 class Base(ABC):
     def __init__(self, shape, dtype):
         self._shape = tuple(shape)

@@ -25,9 +25,7 @@ from thesis.util.spaces import check_spaces
 def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False,
                           rng=None):
 
-    space_x = check_spaces([pr.model.model_x for pr in predictors])
-    # if x is None:
-    #     x = space_x.x_plt
+    space_x = check_spaces(predictors)['x']
     if x is None:
         if space_x.x_plt is None:
             space_x.set_x_plot()
@@ -123,9 +121,7 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
 def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, do_std=False, verbose=False,
                                ax=None, rng=None):
 
-    space_x = check_spaces([pr.model.model_x for pr in predictors])
-    # if x is None:
-    #     x = space_x.x_plt
+    space_x = check_spaces(predictors)['x']
     if x is None:
         if space_x.x_plt is None:
             space_x.set_x_plot()
@@ -134,9 +130,6 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
     stats = ('mean', 'std') if do_std else ('mean',)  # TODO: generalize for mode, etc.
     y_stats_full = predict_stats_compare(predictors, model, params, x, n_train, n_mc, stats, verbose, rng)
 
-    # space_x = check_spaces([pr.model.model_x for pr in predictors])
-    # if x is None:
-    #     x = space_x.x_plt
     if ax is None:
         ax = space_x.make_axes()
 
@@ -400,14 +393,28 @@ def plot_risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_tes
 
 #%%
 class Base(ABC):
-    def __init__(self, loss_func, proc_funcs=(), name=None):
+    def __init__(self, loss_func, space=None, proc_funcs=(), name=None):
         self.loss_func = loss_func
+
+        self._space = space
+        # if space is not None:
+        #     self._space = space
+        # else:
+        #     self._space = None
+
         self.proc_funcs = list(proc_funcs)
         self.name = name
 
         self.model = None
 
-    space = property(lambda self: self._model_obj.space)
+    @property
+    def space(self):    # FIXME??
+        if self._space is None:
+            self._space = self._model_obj.space
+        return self._space
+    # space = property(lambda self: self._space)
+
+    # space = property(lambda self: self._model_obj.space)
 
     shape = property(lambda self: {key: space.shape for key, space in self.space.items()})
     size = property(lambda self: {key: space.size for key, space in self.space.items()})
@@ -541,8 +548,8 @@ class RegressorMixin:
 
 #%% Fixed model
 class Model(Base):
-    def __init__(self, model, loss_func, proc_funcs=(), name=None):
-        super().__init__(loss_func, proc_funcs, name)
+    def __init__(self, model, loss_func, space=None, proc_funcs=(), name=None):
+        super().__init__(loss_func, space, proc_funcs, name)
         self.model = model
 
     def __repr__(self):
@@ -560,13 +567,13 @@ class Model(Base):
 
 
 class ModelClassifier(ClassifierMixin, Model):
-    def __init__(self, model, proc_funcs=(), name=None):
-        super().__init__(model, loss_01, proc_funcs, name)
+    def __init__(self, model, space=None, proc_funcs=(), name=None):
+        super().__init__(model, loss_01, space, proc_funcs, name)
 
 
 class ModelRegressor(RegressorMixin, Model):
-    def __init__(self, model, proc_funcs=(), name=None):
-        super().__init__(model, loss_se, proc_funcs, name)
+    def __init__(self, model, space=None, proc_funcs=(), name=None):
+        super().__init__(model, loss_se, space, proc_funcs, name)
 
     def evaluate_comp(self, model=None, n_train=0, n_test=1):
         if model is None:
@@ -595,8 +602,8 @@ class ModelRegressor(RegressorMixin, Model):
 #%% Bayes model
 
 class Bayes(Base):
-    def __init__(self, bayes_model, loss_func, proc_funcs=(), name=None):
-        super().__init__(loss_func, proc_funcs, name=name)
+    def __init__(self, bayes_model, loss_func, space=None, proc_funcs=(), name=None):
+        super().__init__(loss_func, space, proc_funcs, name=name)
 
         self.bayes_model = bayes_model
 
@@ -629,13 +636,13 @@ class Bayes(Base):
 
 
 class BayesClassifier(ClassifierMixin, Bayes):
-    def __init__(self, bayes_model, proc_funcs=(), name=None):
-        super().__init__(bayes_model, loss_01, proc_funcs, name)
+    def __init__(self, bayes_model, space=None, proc_funcs=(), name=None):
+        super().__init__(bayes_model, loss_01, space, proc_funcs, name)
 
 
 class BayesRegressor(RegressorMixin, Bayes):
-    def __init__(self, bayes_model, proc_funcs=(), name=None):
-        super().__init__(bayes_model, loss_se, proc_funcs, name)
+    def __init__(self, bayes_model, space=None, proc_funcs=(), name=None):
+        super().__init__(bayes_model, loss_se, space, proc_funcs, name)
 
     def evaluate_comp(self, model=None, n_train=0, n_test=1):
         if model is None:
@@ -699,135 +706,3 @@ class BayesRegressor(RegressorMixin, Bayes):
                     raise NotImplementedError
             else:
                 raise NotImplementedError
-
-
-
-#%%
-
-# class DirichletFiniteClassifier(BaseLearner):
-#     def __init__(self, alpha_0, mean_y_x):
-#         super().__init__()
-#         self.loss_func = loss_01
-#
-#         self.alpha_0 = alpha_0
-#         self.mean_y_x = mean_y_x
-#
-#     def fit(self, d):
-#
-#
-#     def _predict_single(self, x):
-#         pass
-
-
-# class BetaEstimatorTemp(Bayes):
-#     def __init__(self, n_x=10):
-#         super().__init__()
-#         self.loss_fcn = loss_se
-#         self.n_x = n_x
-#         self.avg_y_x = np.zeros(n_x)
-#
-#     def fit(self, d=None):
-#         delta = 1 / self.n_x
-#         for i in range(self.n_x):
-#             flag_match = np.logical_and(d['x'] >= i * delta, d['x'] < (i + 1) * delta)
-#             if flag_match.any():
-#                 self.avg_y_x[i] = d[flag_match]['y'].mean()
-#
-#     def _predict_single(self, x):
-#         i = floor(x * self.n_x)
-#         return self.avg_y_x[i]
-
-
-# class Bayes(BaseLearner):
-#     def __init__(self, supp_x, supp_y, alpha_0, mean):
-#         super().__init__()
-#
-#         self.supp_x = supp_x        # Assumed to be my SL structured arrays!
-#         self.supp_y = supp_y
-#
-#         self._supp_shape_x = supp_x.shape
-#         self._supp_shape_y = supp_y.shape
-#         self.data_shape_x = supp_x.dtype['x'].shape
-#         self.data_shape_y = supp_y.dtype['y'].shape
-#
-#         self.alpha_0 = alpha_0
-#         self.mean = mean
-#
-#         self._mean_x = mean.reshape(self._supp_shape_x + (-1,)).sum(axis=-1)
-#
-#         def _mean_y_x(x):
-#             _mean_flat = mean.reshape((-1,) + self._supp_shape_y)
-#             _mean_slice = _mean_flat[np.all(x.flatten()
-#                                      == self.supp_x['x'].reshape(self.supp_x.size, -1), axis=-1)].squeeze(axis=0)
-#             mean_y = _mean_slice / _mean_slice.sum()
-#             return mean_y
-#
-#         self._mean_y_x = _mean_y_x
-#
-#         self._model_gen = functools.partial(DataConditional.finite_model,
-#                                             supp_x=supp_x['x'], supp_y=supp_y['y'], rng=None)
-#         self._posterior_mean = None
-#         self.fit()
-#
-#     @property
-#     def mean_x(self):
-#         return self._mean_x
-#
-#     @property
-#     def posterior_model(self):
-#         return self._posterior_mean
-#
-#     def fit(self, d=np.array([])):
-#         n = len(d)
-#
-# if n == 0:
-#     p_x, p_y_x = self._mean_x, self._mean_y_x
-# else:
-#
-#     emp_dist_x = empirical_pmf(d['x'], self.supp_x['x'], self.data_shape_x)
-#
-#     def emp_dist_y_x(x):
-#         d_match = d[np.all(x.flatten() == d['x'].reshape(n, -1), axis=-1)].squeeze()
-#         if d_match.size == 0:
-#             return np.empty(self._supp_shape_y)
-#         return empirical_pmf(d_match['y'], self.supp_y['y'], self.data_shape_y)
-#
-#     c_prior_x = 1 / (1 + n / self.alpha_0)
-#     p_x = c_prior_x * self._mean_x + (1 - c_prior_x) * emp_dist_x
-#
-#     def p_y_x(x):
-#         i = (self.supp_x['x'].reshape(self._supp_shape_x + (-1,)) == x.flatten()).all(-1)
-#         c_prior_y = 1 / (1 + (n * emp_dist_x[i]) / (self.alpha_0 * self._mean_x[i]))
-#         return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist_y_x(x)
-#
-# self._posterior_mean = self._model_gen(p_x=p_x, p_y_x=p_y_x)
-#
-#     # @classmethod
-#     # def prior_gen(cls, bayes_model):
-#     #     return cls(bayes_model.supp_x, bayes_model.supp_y, bayes_model.prior.alpha_0, bayes_model.prior.mean)
-#
-#
-# class ModelClassifier(Bayes):
-#     def __init__(self, supp_x, supp_y, alpha_0, mean):
-#         super().__init__(supp_x, supp_y, alpha_0, mean)
-#         self.loss_func = loss_01
-#
-#     def _predict_single(self, x):
-#         return self._posterior_mean.mode_y_x(x)
-#
-#
-# class BayesEstimator(Bayes):
-#     def __init__(self, supp_x, supp_y, alpha_0, mean):
-#         super().__init__(supp_x, supp_y, alpha_0, mean)
-#         self.loss_func = loss_se
-#
-#     def _predict_single(self, x):
-#         return self._posterior_mean.mean_y_x(x)
-
-
-def main():
-    pass
-
-
-if __name__ == '__main__':
-    main()
