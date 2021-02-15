@@ -411,9 +411,9 @@ with range
 
 This function determines the empirical probability of the pair $(y,x)$. Note that the set $\Uppsi$ is a finite subset of $\Uptheta$ and thus that the empirical model $\Psi(\Drm)$ is a valid probability distribution.
 
-The distribution $\Prm_{\Drm | \uptheta}$ depends on the training data $\Drm$ only through the transform $\Psi$; as such, it is useful to define a new random process $\uppsi \equiv \Psi(\Drm) \in \Uppsi$. It can be shown that $\Prm_{\Drm | \uppsi,\uptheta}$ is a uniform distribution over $\{D \in \Dcal: \Psi(D) = \uppsi\}$ and thus that the empirical model $\uppsi$ is a sufficient statistic \cite{bernardo} for the model $\uptheta$.  
+The distribution $\Prm_{\Drm | \uptheta}$ depends on the training data $\Drm$ only through the transform $\Psi$; as such, it is useful to define a new random process $\uppsi \equiv \Psi(\Drm) \in \Uppsi$. It can be shown using Neyman-Pearson factorization \cite{kay-est} that the data $\Drm$ is conditionally independent of the model given $\uppsi$ -- as such, $\Psi(\Drm)$ is a sufficient statistic for the model $\uptheta$.
 
-\todomid{show SS via Kay, data likelihood?! D AND x?}
+\todomid{D AND x jointly sufficient!?}
 
 The cardinality of the random process' domain is $|\Uppsi| = \Mcal\big( (N,|\Ycal||\Xcal|-1) \big)$; this can be shown using the stars-and-bars method \cite{feller}. The cardinality of original set is $|\Dcal| = \big( |\Ycal| |\Xcal| \big)^N$; thus $|\Uppsi| \leq |\Dcal|$ and the sufficient statistic compactly represents the valuable information in the training data. 
 
@@ -658,7 +658,7 @@ where $\Prm_{\Yrm | \Xrm} = \Erm_{\upthetam | \Xrm} \Big[ \Erm_{\upthetac | \upt
 
 Additionally, since $\Psi(\Drm)$ is a sufficient statistic for the model $\uptheta$, the Bayesian distributions of interest $\Prm_{\Drm}$, $\Prm_{\xrm | \Drm}$, and $\Prm_{\yrm | \xrm,\Drm}$ will also depend on $\Drm$ only through $\Psi(\Drm)$; as such, the training data can be transformed into the empirical process $\uppsi$ for Bayesian prediction without incurring any additional risk. 
 
-For this approach, the distributions $\Prm_{\uppsi}$, $\Prm_{\xrm | \uppsi}$, and $\Prm_{\yrm | \xrm,\uppsi}$ are required. Note that $\Prm_{\Drm | \uptheta}(D | \theta) = \Mcal\big( N \Psi(D) \big)^{-1} \Prm_{\uppsi | \uptheta}\big( \Psi(D) | \theta \big)$. Also, observe that the relevant posterior distributions satisfy $\prm_{\upthetam | \Drm}(D) = \prm_{\upthetam | \uppsi}\big( \Psi(D) \big)$ and $\prm_{\upthetac(x) | \xrm,\Drm}(x,D) = \prm_{\upthetac(x) | \xrm,\uppsi}\big( x,\Psi(D) \big)$; consequently, $\Prm_{\xrm | \Drm}(D) = \Prm_{\xrm | \uppsi}\big( \Psi(D) \big)$, and $\Prm_{\yrm | \xrm,\Drm}(x,D) = \Prm_{\yrm | \xrm,\uppsi}\big( x,\Psi(D) \big)$.
+For this approach, the distributions $\Prm_{\uppsi}$, $\Prm_{\xrm | \uppsi}$, and $\Prm_{\yrm | \xrm,\uppsi}$ are required. Note that $\Prm_{\Drm | \uptheta}(D | \theta) = \Mcal\big( N \Psi(D) \big)^{-1} \Prm_{\uppsi | \uptheta}\big( \Psi(D) | \theta \big)$. Also, observe that the relevant posterior distributions satisfy $\prm_{\upthetam | \Drm}(D) = \prm_{\upthetam | \uppsi}\big( \Psi(D) \big)$ and $\prm_{\upthetac(x) | \xrm,\Drm}(x,D) = \prm_{\upthetac(x) | \xrm,\uppsi}\big( x,\Psi(D) \big)$, due to the sufficiency of the statistic $\Psi(\Drm)$ \cite{bernardo}. Consequently, $\Prm_{\xrm | \Drm}(D) = \Prm_{\xrm | \uppsi}\big( \Psi(D) \big)$, and $\Prm_{\yrm | \xrm,\Drm}(x,D) = \Prm_{\yrm | \xrm,\uppsi}\big( x,\Psi(D) \big)$.
 
 
 
@@ -2503,7 +2503,7 @@ Also, it is important to consider how a given classifier performs for varying mo
 
 
 
-\chapter{Continuous-Domain Dirichlet Model}
+\chapter{Continuous-Domain Dirichlet Model} \label{ch:dir_cont}
 
 PGR: SPECIFY EUCLIDEAN/HILBERT??
 
@@ -2642,7 +2642,7 @@ By the properties of the Dirichlet process proven in Appendix \ref{app:DP_post},
 
 
 Again, by Bayes rule the marginal PDF is
-\begin{IEEEeqnarray}{rCl}
+\begin{IEEEeqnarray}{rCl} \label{eq:P_y_xD_dir_cont}
 \prm_{\xrm | \Drm} \equiv \prm_{\xrm | \Xrm} & = & \gamma \alpham + (1-\gamma) \Psim(\Xrm) \;,
 \end{IEEEeqnarray}
 and the conditional PDF of interest is
@@ -3151,6 +3151,46 @@ Consider a data model where $\Xcal = \Ycal = [0, 1]$, the unit interval. The Dir
 \end{figure}
 
 Next, consider the risk trends when the true model is fixed. The marginal distribution $\thetam = 1$ is uniform and $\thetac(\xrm) = \Beta\big(126 \mu_{\yrm | \xrm,\uptheta}, 126 (1- \mu_{\yrm | \xrm,\uptheta})\big)$, where the clairvoyant regressor is $\mu_{\yrm | \xrm,\uptheta} = 1 / \big(2 + \sin(2\pi \xrm)\big)$. Comparing with the discrete-space models used for demonstration in Section \ref{sec:SE_ex}, observe that the optimal regressor $\mu_{\yrm | \xrm, \uptheta}$ and true predictive variance $\Sigma_{\yrm | \xrm, \uptheta} = \frac{1}{127} \mu_{\yrm | \xrm, \uptheta} (1 - \mu_{\yrm | \xrm, \uptheta})$ are the same. However, since $\upthetam$ is bounded, no effective learning is possible, the Bayesian estimator tends to $\mu_{\yrm | \xrm, \Drm} \to \mu_{\yrm | \xrm}$, and the excess risk tends to the fixed, biased value $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \approx \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right] \approx 0.059$.
+
+
+
+
+
+
+
+
+\chapter{Discretized Dirichlet Model}
+
+
+\section{From the continuous DP}
+
+As seen in Chapter \ref{ch:dir_cont}, the flexibility of using a full-support prior, while beneficial for countable data spaces, has severe drawbacks when operating on observations drawn from continuous spaces. This section develops a new Bayesian predictive distribution using discretization that may be used to realize much of the power of Dirichlet process priors while avoiding the aforementioned limitation. 
+
+\todohi{CITE for discretization work}
+
+Define a discretizing data transformation $T: \Xcal \mapsto \Xcal'$, where the range is a countable subset $\Xcal' \subset \Xcal$. This transform is applied to each element of the training values $\Xrm$, as well as to the new observation $\xrm$, and can be thought of as a dimensionality-reducing feature transformation.
+
+Having effectively changed the domain of the observations, the Dirichlet prior marginal mean is re-defined as $\alpham = \sum_{x' \in \Xcal'} \alpham'(x') \delta(\cdot - x')$, a mixture of delta functions at the discretized values. 
+
+Starting from the Dirichlet-based Bayesian predictive distribution \eqref{eq:P_y_xD_dir_cont}, substitute for the discretized observations, such that
+\begin{IEEEeqnarray}{rCl}
+\prm_{\yrm | \xrm,\Drm} & = & \gammam'\big(T(x); \Xrm \big) \alphac\big(T(x)\big) + \left(1 - \gammam'\big(T(x); \Xrm \big)\right) \Psic\big(T(x); \Drm\big) \;,
+\end{IEEEeqnarray}
+where the modified weighting function is 
+\begin{IEEEeqnarray}{rCl}
+\gammam'\big(x'; X \big) & = & \left(1 + \frac{\sum_{n=1}^N \delta\big(x' - T(X_n)\big)}{\alpha_0 \sum_{x'' \in \Xcal'} \alpham'(x'') \delta(x' - x'')}\right)^{-1} \nonumber \\
+& = & \left(1 + \frac{\sum_{n=1}^N \delta\big[x', T(X_n)\big]}{\alpha_0 \sum_{x'' \in \Xcal'} \alpham'(x'') \delta[x', x'']}\right)^{-1} \nonumber \\
+& = & \left(1 + \frac{N \Psim'(x'; X)}{\alpha_0 \alpham'(x') }\right)^{-1} \;,
+\end{IEEEeqnarray}
+and the modified marginal empirical function is 
+\begin{IEEEeqnarray}{rCl}
+\Psim'(X) & = & \frac{1}{N} \sum_{n=1}^N \delta\big[\cdot, T(X_n)\big] \in \Pcal(\Xcal') \;.
+\end{IEEEeqnarray}
+
+
+
+
+
 
 
 
@@ -3890,7 +3930,7 @@ Additionally, note that $\upthetam | \{\Drm = D\} \sim \upthetam | \big\{ \uppsi
 \todomid{introduce and use weighted inner product notation? basis is tuple of functionals?}
 \todomid{comment on low-dim and redefinition of theta}
 
-For generalized linear regression, the space of data-generating models considered is restricted to a finite-dimensional space, such that $\prm_{\yrm, \xrm | \uptheta}(\cdot, x | \theta) = \prm_{\xrm}(x) \prm_{\yrm | \xrm, \uptheta}(x, \theta)$, where $\theta \in \Uptheta = \Rbb^K$. Note that the space of the data probability distributions considered is a strict subset of the entire function space. The observed data distribution $\prm_{\xrm}$ is assumed known. The conditional mean has the form $\mu_{\yrm | \xrm, \uptheta} = \phi(\xrm)^\intercal \uptheta$, where $\phi: \Xcal \mapsto \Ycal^K$ is a vector-valued basis function. Additionally, the conditional variance is fixed and independent of $\xrm$, such that $\Sigma_{\yrm | \xrm,\uptheta} \equiv \Sigma_{\yrm}$. 
+For generalized linear regression, the space of data-generating models $\prm_{\yrm | \xrm, \uptheta}$ considered is restricted to a finite-dimensional space $\theta \in \Uptheta = \Rbb^K$. The observed data distribution $\prm_{\xrm | \uptheta} = \prm_{\xrm}$ is fixed. Note that the space of the data probability distributions considered is a strict subset of the entire function space. The conditional mean has the form $\mu_{\yrm | \xrm, \uptheta} = \phi(\xrm)^\intercal \uptheta$, where $\phi: \Xcal \mapsto \Ycal^K$ is a vector-valued basis function. Additionally, the conditional variance is fixed and independent of $\xrm$, such that $\Sigma_{\yrm | \xrm,\uptheta} \equiv \Sigma_{\yrm}$. 
 
 Note that the clairvoyant estimator \eqref{eq:f_clv_SE} is $f_{\Theta}(\xrm;\uptheta) = \phi(\xrm)^\intercal \uptheta$ and the irreducible squared-error \eqref{eq:risk_clv_SE} is $\Rcal_{\Theta}^*(\uptheta) = \Sigma_{\yrm}$, which is independent of the true weights. To determine the optimal Bayesian estimator \eqref{eq:f_opt_SE}, note that the weights are conditionally independent of the novel observation $\xrm$ given the data $\Drm$, resulting in $f^*(\xrm;\Drm) = \phi(\xrm)^\intercal \mu_{\uptheta | \Drm}$. Plugging into \eqref{eq:risk_min_SE}, the minimum Bayesian squared-error is 
 \begin{IEEEeqnarray}{rCl}
@@ -3903,6 +3943,8 @@ noting that since $\xrm$ is independent of $\uptheta$, it is independent of the 
 
 
 \section{Normal distribution assumptions}
+
+\todolo{joint sufficient statistics?}
 
 Commonly, the true predictive model is assumed to be Normal, such that $\yrm | \xrm, \uptheta \sim \Ncal\big(\mu_{\yrm | \xrm, \uptheta}, \Sigma_{\yrm}\big)$. Additionally, the weight prior is assumed to be Normal, such that $\prm_{\uptheta} = \Ncal\big(\mu_{\uptheta}, \Sigma_{\uptheta}\big)$. Using linear algebra, it is can be shown \cite{theodoridis-ML} that $\uptheta | \Drm \sim \Ncal\big(\mu_{\uptheta | \Drm}, \Sigma_{\uptheta | \Drm}\big)$, where
 \begin{IEEEeqnarray}{rCl}
