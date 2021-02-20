@@ -333,7 +333,7 @@ and
 %lambda__{\text{Bias}}(x) & = & \Erm_{\uppsim(x) | \upthetam(x)}\left[ \left(\frac{\alpha_0 \alpham(x)}{\alpha_0 \alpham(x) + N \uppsim(x)}\right)^2 \right] \;.
 %\end{IEEEeqnarray}
 
-The first function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. The second function depends on $\Sigma_{\yrm | \xrm,\upthetac}$ and measures the estimator variance in excess of the minimum squared-error $\Rcal_{\Theta}^*(\uptheta)$. Both functions are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam(x)$ and $N$ via expectations with respect to $\Prm_{\uppsim(x) | \upthetam(x)}$. 
+The first function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. The second function depends on $\Sigma_{\yrm | \xrm,\upthetac}$ and measures the estimator variance in excess of the minimum squared-error $\Rcal_{\Theta}^*(\uptheta)$. Both functions are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam$ and $N$ via expectations with respect to $\Prm_{\uppsim | \upthetam}$. 
 %By the aggregation property of empirical distributions, $N \uppsim(x) | \upthetam(x) \sim \Bi\big(N,\upthetam(x)\big)$ is binomially distributed. 
 Closed-forms have not been found for the empirical process expectations in \eqref{eq:bias} and \eqref{eq:var}.
 
@@ -349,7 +349,7 @@ Closed-forms have not been found for the empirical process expectations in \eqre
 \label{fig:Predict_SE_biased_hard}
 \end{figure}
 
-Consider the trends of the excess squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. As $N$ tends to infinity, the distributions $\Prm_{\uppsim(x) | \upthetam(x)}$ concentrate such that $\uppsim(x) \to \thetam(x)$; thus for $\thetam(x) > 0$, the weights $\lambda_{\text{Var}}(x)$ and $\lambda_{\text{Bias}}(x)$ both tend to zero and $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable result is a consequence of the full support of the Dirichlet prior, which ensures the convergence of $\upthetac(x) | \uppsim(x),\uppsic(x) \to \uppsic(x)$ as $N \to \infty$.
+Consider the trends of the excess squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. As $N$ tends to infinity, the distribution $\Prm_{\uppsim | \upthetam}$ concentrates such that $\uppsim \to \thetam$; thus for $\thetam(x) > 0$, the weights $\lambda_{\text{Var}}(x)$ and $\lambda_{\text{Bias}}(x)$ both tend to zero and $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable result is a consequence of the full support of the Dirichlet prior, which ensures the convergence of $\upthetac(x) | \uppsim(x),\uppsic(x) \to \uppsic(x)$ as $N \to \infty$.
 
 %An interesting point regarding the dependency of the excess risk on $N$ is that there may be a local maximum. To demonstrate, consider the case of $|\Xcal| = 1$; treating $N$ as a real number, there would be a maximum at 
 %\begin{equation}
