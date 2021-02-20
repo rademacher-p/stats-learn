@@ -3170,6 +3170,8 @@ As seen in Chapter \ref{ch:dir_cont}, the flexibility of using a full-support pr
 
 \todohi{CITE for discretization work}
 
+\todohigh{USE DQE feature transform NOTATION!!}
+
 Define a discretizing data transformation $T: \Xcal \mapsto \Xcal'$, where the range is a countable subset $\Xcal' \subset \Xcal$, such that $|\Xcal'| \leq \aleph_0$. This transform is applied to each of the training values $\Xrm_n$, as well as to the novel observation $\xrm$. Note that $T$ is effectively a dimensionality-reducing feature transformation.
 
 Having effectively changed the domain of the observations, the Dirichlet prior marginal mean is re-defined as $\alpham = \sum_{x' \in \Xcal'} \alpham'(x') \delta(\cdot - x')$, a mixture of delta functions at the discretized values, where $\alpham' \in \Pcal(\Xcal')$ is the discrete space marginal function.
@@ -3225,6 +3227,8 @@ convexly combining the true predictive distributions $\upthetac(x)$ for observat
 
 \todohi{LOCATION?}
 
+\todohigh{USE TRANSFORMED OBS t in place of x, use for expectations!??!}
+
 The Bayesian predictive distribution in terms of the discretized statistics is
 \begin{IEEEeqnarray}{rCl}
 \prm_{\yrm | \xrm,\uppsim',\uppsic'} & = & \gammam'\big(T(\xrm); \uppsim' \big) \alphac\big(T(\xrm)\big) + \Big(1 - \gammam'\big(T(\xrm); \uppsim' \big)\Big) \uppsic'\big(T(\xrm)\big) \;.
@@ -3242,6 +3246,7 @@ To evaluate the bias and covariance functions of the Bayesian predictive distrib
 
 \todohigh{RECONSIDER use of subscript arguments EVERYWHERE?!?!!?}
 \todohigh{RECONSIDER use of subscript arguments EVERYWHERE?!?!!?}
+\todohigh{FIX SSP PAPER!}
 
 The expected value of the estimate conditioned on the true model is
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_dist_avg_dir_disc}
@@ -3254,6 +3259,8 @@ Note that the distributions being mixed no longer includes the true predictive d
 \mathrm{Bias}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim' | \upthetam'}\big[\gammam'(\uppsim')\big]\big(T(\xrm)\big) \big( \alphac - \upthetac' \big)\big(T(\xrm)\big) \nonumber \\
 && \quad + \left(\upthetac'\big(T(\xrm)\big) - \upthetac(\xrm) \right) \;.
 \end{IEEEeqnarray}
+
+\todomid{in terms of original model? excess space above?}
 
 Observe that while similar in form to \eqref{eq:predictive_bias_dir}, the bias includes an additional term that captures the approximation error due to discretization. Since the discretized conditional empirical function $\uppsic(x')$ integrates all training samples falling in the subset $\Scal(x') \subset \Xcal$, its expected value integrates the true predictive distributions $\upthetac$ in the same region.
 

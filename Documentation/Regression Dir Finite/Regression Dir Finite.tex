@@ -110,7 +110,7 @@
 
 
 \begin{abstract}
-When taking a Bayesian approach to machine learning applications, the performance of the learned function strongly depends on how well the prior distribution selected by the designer matches the true data-generating model. Dirichlet priors have a number of desirable properties - they result in closed-form posterior distributions given independent training data, have full support over the space of data probability distributions, and can be maximally informative or non-informative depending on their localization parameter. This paper assumes a Dirichlet prior and details the predictive distributions that characterize unobservable random quantities given observed data. The results are then applied to the most common loss function for regression, the squared-error loss. The optimal Bayes estimator and the resultant risk trends are presented for different prior localizations, demonstrating a bias/variance trade-off. 
+When taking a Bayesian approach to machine learning applications, the performance of the learned function strongly depends on how well the prior distribution selected by the designer matches the true data-generating model. Dirichlet priors have a number of desirable properties -- they result in closed-form posterior distributions given independent training data, have full support over the space of data probability distributions, and can be maximally informative or non-informative depending on their localization parameter. This paper assumes a Dirichlet prior and details the predictive distributions that characterize unobservable random quantities given observed data. The results are then applied to the most common loss function for regression, the squared-error loss. The optimal Bayes estimator and the resultant risk trends are presented for different prior localizations, demonstrating a bias/variance trade-off. 
 \end{abstract}
 
 \begin{keywords}
@@ -300,7 +300,7 @@ f^*(x;\psi) & \equiv & \gamma(x; \psim) \sum_{y \in \Ycal} \alphac(y;x) \ y \\
 %f^*(\xrm;\uppsi) & \equiv & \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right) \sum_{y \in \Ycal} \alphac(y;\xrm) \ y \\
 %&& \quad + \left(\frac{N \uppsim(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right) \sum_{y \in \Ycal} \uppsic(y;\xrm) \ y \nonumber
 %\end{IEEEeqnarray}
-The optimal estimate is a convex combination of two mean values - the first moment of the data-independent PMF $\Prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$, and the conditional empirical mean.
+The optimal estimate is a convex combination of two mean values -- the first moment of the data-independent PMF $\Prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$, and the conditional empirical mean.
 
 The weighting factors are inherited from $\Prm_{\yrm | \xrm,\uppsi}$; thus, stronger prior information (larger $\alpha_0 \alpham(x)$) provides more emphasis on the data-independent estimate $\mu_{\yrm|\xrm}$ and higher data volume $N \uppsim(x)$ puts emphasis on the empirical mean.
 
@@ -319,11 +319,11 @@ Substituting the Bayesian estimator \eqref{eq:f_opt_SE} into \eqref{eq:risk_cond
 \end{IEEEeqnarray}
 a conditional expectation of two weighted functions, where
 \begin{IEEEeqnarray}{rCl} \label{eq:bias}
-\lambda_{\text{Bias}}(x) & = & \Erm_{\uppsim(x) | \upthetam(x)}\left[ \gamma(x; \uppsim)^2 \right] 
+\lambda_{\text{Bias}}(x) & = & \Erm_{\uppsim | \upthetam}\left[ \gamma(x; \uppsim)^2 \right] 
 \end{IEEEeqnarray}
 and
 \begin{IEEEeqnarray}{rCl} \label{eq:var}
-\lambda_{\text{Var}}(x) & = & \Erm_{\uppsim(x) | \upthetam(x)}\left[ \frac{\big( 1 - \gamma(x; \uppsim) \big)^2}{N \uppsim(x)} \right] \;.
+\lambda_{\text{Var}}(x) & = & \Erm_{\uppsim | \upthetam}\left[ \frac{\big( 1 - \gamma(x; \uppsim) \big)^2}{N \uppsim(x)} \right] \;.
 \end{IEEEeqnarray}
 %\begin{IEEEeqnarray}{rCl}
 %lambda__{\text{Var}}(x) & = & \Erm_{\uppsim(x) | \upthetam(x)}\left[ \frac{N \uppsim(x)}{\big( \alpha_0 \alpham(x) + N \uppsim(x) \big)^2} \right]
@@ -365,7 +365,7 @@ Consider the trends of the excess squared-error risk \eqref{eq:risk_cond_SE_dir_
 %\label{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased}
 %\end{figure}
 
-Next consider the effects of the conditional prior localizations $\alpha'(x) \equiv \alpha_0 \alpham(x)$, which control a bias/variance risk trade-off. For maximal localization $\alpha'(x) \to \infty$, $\lambda_{\text{Bias}}(x) \to 1$ and $\lambda_{\text{Var}}(x) \to 0$. This is intuitive given that the estimator tends toward the data-independent solution. Conversely, for $\alpha'(x) \to 0$, $\lambda_{\text{Bias}}(x) \to \big( 1 - \upthetam(\xrm) \big)^N$ and $\lambda_{\text{Var}}(x) \to \Erm_{\uppsim(x) | \upthetam(x)}\left[ \big( N \uppsim(x) \big)^{-1} \right]$. Note that the variance weight is equivalent to the first inverse moment of a positive binomial random variable \cite{stephan}.
+Next consider the effects of the conditional prior localizations $\alpha'(x) \equiv \alpha_0 \alpham(x)$, which control a bias/variance risk trade-off. For maximal localization $\alpha'(x) \to \infty$, $\lambda_{\text{Bias}}(x) \to 1$ and $\lambda_{\text{Var}}(x) \to 0$. This is intuitive given that the estimator tends toward the data-independent solution. Conversely, for $\alpha'(x) \to 0$, $\lambda_{\text{Bias}}(x) \to \big( 1 - \upthetam(x) \big)^N$ and $\lambda_{\text{Var}}(x) \to \Erm_{\uppsim | \upthetam}\left[ \big( N \uppsim(x) \big)^{-1} \right]$. Note that the variance weight is equivalent to the first inverse moment of a positive binomial random variable \cite{stephan}.
 
 The values $\alpha'(x)$ that minimize the excess squared-error for given prior conditional distributions $\alphac(x)$ are of interest. Calculating the first derivative, it can be shown that (for $N > 0$ and $\thetam(x) > 0$) only one stationary point exists, at 
 \begin{equation} \label{eq:alpha_x_min_Rex}
@@ -374,7 +374,7 @@ The values $\alpha'(x)$ that minimize the excess squared-error for given prior c
 This can readily be shown to be the global minimum.
 %Evaluation of the second derivative confirms the local minimum and comparison of the local risk value to the $\alpha'(x) \to 0$ and $\alpha'(x) \to \infty$ values confirms the global minimum.
 
-Note that the minimizing localization values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible - the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low localizations are preferable when the conditional models have low variance; these models can be accurately identified by learners that emphasize the empirical mean, even with limited training data. 
+Note that the minimizing localization values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible -- the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low localizations are preferable when the conditional models have low variance; these models can be accurately identified by learners that emphasize the empirical mean, even with limited training data. 
 
 
 \section{Examples}
