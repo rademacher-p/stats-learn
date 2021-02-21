@@ -889,7 +889,7 @@ Substituting in the clairvoyant and Bayesian estimators, the excess squared-erro
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) & = & \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
 & = & \Erm_{\xrm | \uptheta} \left[ \Big( \Erm_{\Drm | \uptheta}\big[ \mu_{\yrm | \xrm,\Drm} \big] - \mu_{\yrm | \xrm,\uptheta} \Big)^2 + \Crm_{\Drm | \uptheta}\big[ \mu_{\yrm | \xrm,\Drm} \big] \right] \nonumber \\
 & \equiv & \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm,\uppsim,\uppsic | \upthetam,\upthetac} \Big[ \Delta(y; \xrm;\uppsim,\uppsic,\upthetac) \Delta(y'; \xrm;\uppsim,\uppsic,\upthetac) \Big] \nonumber \\
-& = & \Erm_{\xrm | \uptheta} \left[ \left( \sum_{y \in \Ycal} y \ \mathrm{Bias}(y; \xrm; \upthetam,\upthetac) \right)^2 + \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \ \mathrm{Cov}(y,y'; \xrm; \upthetam,\upthetac) \right] \nonumber \;,
+& = & \Erm_{\xrm | \upthetam} \left[ \left( \sum_{y \in \Ycal} y \ \mathrm{Bias}(y; \xrm; \upthetam,\upthetac) \right)^2 + \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \ \mathrm{Cov}(y,y'; \xrm; \upthetam,\upthetac) \right] \nonumber \;,
 \end{IEEEeqnarray}
 where the formulae for the predictive distribution bias and variance from Section \ref{sec:predictive_est} have been used. 
 
@@ -3160,14 +3160,14 @@ Next, consider the risk trends when the true model is fixed. The marginal distri
 
 \chapter{Discretized Dirichlet Model}
 
+\todohi{CITE for discretization work}
+
 \todomid{prime accent formatting}
 
 
 \section{From the continuous DP}
 
 As seen in Chapter \ref{ch:dir_cont}, the flexibility of using a full-support prior, while effective for countable data spaces, has severe drawbacks when operating on observations drawn from continuous spaces. This section develops a new Bayesian predictive distribution using discretization that may be used to realize the benefits of Dirichlet process priors while avoiding the aforementioned limitation. 
-
-\todohi{CITE for discretization work}
 
 \todohigh{USE DQE feature transform NOTATION??!!}
 
