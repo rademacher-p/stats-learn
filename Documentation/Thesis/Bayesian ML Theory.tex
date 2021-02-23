@@ -41,11 +41,13 @@
 \newcommand{\todohi}[1]{\todo[inline,color=orange!50,linecolor=red]{#1}}
 \newcommand{\todohigh}[1]{\todo[inline,color=red!50,linecolor=red]{#1}}
 
-
 %\usepackage{tikz}
 %\usepackage{listings}
 %\usepackage{booktabs, multicol}
 
+\usepackage{etoolbox}
+\undef{\Bbb}
+\usepackage{mathfont_shortcuts}
 
 
 \DeclareMathOperator*{\argmin}{arg\,min}
@@ -54,38 +56,7 @@
 %\newcommand{\diag}{\mathop{\rm diag}}
 \DeclareMathOperator{\diag}{\mathrm{diag}}
 
-\DeclareMathOperator{\xrm}{\mathrm{x}}
-\DeclareMathOperator{\Xrm}{\mathrm{X}}
-\DeclareMathOperator{\yrm}{\mathrm{y}}
-\DeclareMathOperator{\Yrm}{\mathrm{Y}}
-\DeclareMathOperator{\Drm}{\mathrm{D}}
-\DeclareMathOperator{\nrm}{\mathrm{n}}
-\DeclareMathOperator{\zrm}{\mathrm{z}}
-
-\DeclareMathOperator{\Prm}{\mathrm{P}}
-\DeclareMathOperator{\prm}{\mathrm{p}}
-\DeclareMathOperator{\Erm}{\mathrm{E}}
-\DeclareMathOperator{\Crm}{\mathrm{C}}
-\DeclareMathOperator{\drm}{\mathrm{d}}
-
-\DeclareMathOperator{\Xcal}{\mathcal{X}}
-\DeclareMathOperator{\Ycal}{\mathcal{Y}}
-\DeclareMathOperator{\Dcal}{\mathcal{D}}
-\DeclareMathOperator{\Ncal}{\mathcal{N}}
-\DeclareMathOperator{\Zcal}{\mathcal{Z}}
-\DeclareMathOperator{\Hcal}{\mathcal{H}}
-\DeclareMathOperator{\Fcal}{\mathcal{F}}
-\DeclareMathOperator{\Rcal}{\mathcal{R}}
-\DeclareMathOperator{\Mcal}{\mathcal{M}}
-\DeclareMathOperator{\Scal}{\mathcal{S}}
-\DeclareMathOperator{\Pcal}{\mathcal{P}}
-\DeclareMathOperator{\Lcal}{\mathcal{L}}
-%\DeclareMathOperator{\Ecal}{\mathcal{E}}
-
-\DeclareMathOperator{\Rbb}{\mathbb{R}}
 \DeclareMathOperator{\Rbbgeq}{\mathbb{R}_{\geq 0}}
-\DeclareMathOperator{\Nbb}{\mathbb{N}}
-\DeclareMathOperator{\Zbb}{\mathbb{Z}}
 \DeclareMathOperator{\Zbbgeq}{\mathbb{Z}_{\geq 0}}
 
 \DeclareMathOperator{\Dir}{\mathrm{Dir}}
