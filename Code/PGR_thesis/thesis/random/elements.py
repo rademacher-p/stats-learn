@@ -5,19 +5,18 @@ Random elements.
 # TODO: do ABC or PyCharm bug?
 
 import math
-from typing import Optional, Union
 from numbers import Integral
+from typing import Optional, Union
 
 import numpy as np
-from scipy.stats._multivariate import _PSD
 from scipy.special import gammaln, xlogy, xlog1py, betaln
-import matplotlib.pyplot as plt
+from scipy.stats._multivariate import _PSD
 
-from thesis.util.base import DELTA, RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func
 from thesis.util import plotting, spaces
+from thesis.util.base import DELTA, RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func
 
 
-#%% Base RE classes
+# %% Base RE classes
 
 class Base(RandomGeneratorMixin):
     """
@@ -27,9 +26,9 @@ class Base(RandomGeneratorMixin):
     def __init__(self, rng=None):
         super().__init__(rng)
 
-        self._space = None      # TODO: arg?
+        self._space = None  # TODO: arg?
 
-        self._mode = None       # TODO: make getter do numerical approx if None!?
+        self._mode = None  # TODO: make getter do numerical approx if None!?
 
     space = property(lambda self: self._space)
 
@@ -41,8 +40,8 @@ class Base(RandomGeneratorMixin):
 
     mode = property(lambda self: self._mode)
 
-    def pf(self, x):    # TODO: perform input checks using `space.__contains__`?
-        return vectorize_func(self._pf_single, self.shape)(x)     # TODO: decorator? better way?
+    def pf(self, x):  # TODO: perform input checks using `space.__contains__`?
+        return vectorize_func(self._pf_single, self.shape)(x)  # TODO: decorator? better way?
 
     def _pf_single(self, x):
         raise NotImplementedError("Method must be overwritten.")
@@ -64,7 +63,7 @@ class Base(RandomGeneratorMixin):
         rng = self._get_rng(rng)
         # return self._rvs(math.prod(shape), rng).reshape(shape + self.shape)
         rvs = self._rvs(math.prod(shape), rng)
-        return rvs.reshape(shape + rvs.shape[1:])    # TODO: use np.asscalar if possible?
+        return rvs.reshape(shape + rvs.shape[1:])  # TODO: use np.asscalar if possible?
 
     def _rvs(self, n, rng):
         raise NotImplementedError("Method must be overwritten.")
@@ -98,7 +97,7 @@ class BaseRV(MixinRV, Base):
         # self._cov = None
 
 
-#%% Specific RE's
+# %% Specific RE's
 
 class Deterministic(Base):
     """
@@ -166,7 +165,7 @@ class DeterministicRV(MixinRV, Deterministic):
 
 
 # TODO: rename generic?
-class Finite(Base):     # TODO: DRY - use stat approx from the Finite space's methods?
+class Finite(Base):  # TODO: DRY - use stat approx from the Finite space's methods?
     """
     Generic RE drawn from a finite support set using an explicitly defined PMF.
     """
@@ -298,6 +297,7 @@ class FiniteRV(MixinRV, Finite):
 
         return self._cov
 
+
 # s = np.random.random((3, 1, 2))
 # pp = np.random.random((3,))
 # pp = pp / pp.sum()
@@ -363,7 +363,7 @@ class Dirichlet(BaseRV):
             self._mode = (self._mean - 1 / self._alpha_0) / (1 - self.size / self._alpha_0)
         else:
             # warnings.warn("Mode method currently supported for mean > 1/alpha_0 only")
-            self._mode = None       # TODO: complete with general formula
+            self._mode = None  # TODO: complete with general formula
 
         self._cov = (np.diagflat(self._mean).reshape(2 * self.shape)
                      - np.tensordot(self._mean, self._mean, 0)) / (self._alpha_0 + 1)
@@ -540,7 +540,7 @@ class DirichletEmpirical(BaseRV):
     def pf(self, x):
         x, set_shape = _empirical_check_input(x, self._n, self._mean)
 
-        log_pf = self._log_pf_coef + (gammaln(self._alpha_0 * self._mean + self._n * x) - gammaln(self._n * x + 1))\
+        log_pf = self._log_pf_coef + (gammaln(self._alpha_0 * self._mean + self._n * x) - gammaln(self._n * x + 1)) \
             .reshape(-1, self.size).sum(axis=-1)
         return np.exp(log_pf).reshape(set_shape)
 
@@ -616,9 +616,9 @@ class Beta(BaseRV):
             if self._b > 1:
                 self._mode = 0
             elif self._a == 1 and self._b == 1:
-                self._mode = 0      # any in unit interval
+                self._mode = 0  # any in unit interval
             else:
-                self._mode = 0      # any in {0,1}
+                self._mode = 0  # any in {0,1}
 
         self._mean = self._a / (self._a + self._b)
         self._cov = self._a * self._b / (self._a + self._b) ** 2 / (self._a + self._b + 1)
@@ -837,7 +837,7 @@ class Normal(BaseRV):
         self._mode = self._mean
 
         if hasattr(self, '_cov'):
-            self._set_lims_plot()      # avoids call before cov is set
+            self._set_lims_plot()  # avoids call before cov is set
 
     @property
     def cov(self):
@@ -848,7 +848,7 @@ class Normal(BaseRV):
     def cov(self, cov):
         self._cov = np.array(cov)
 
-        if self._cov.shape == () and self.ndim == 1:    # TODO: hack-ish?
+        if self._cov.shape == () and self.ndim == 1:  # TODO: hack-ish?
             self._cov = self._cov * np.eye(self.size)
 
         if self._cov.shape != self.shape * 2:
@@ -877,11 +877,12 @@ class Normal(BaseRV):
         if self.shape in {(), (2,)}:
             if self.shape == ():
                 lims = self._mean.item() + np.array([-1, 1]) * 3 * np.sqrt(self._cov.item())
-            else:   # self.shape == (2,):
+            else:  # self.shape == (2,):
                 lims = [(self._mean[i] - 3 * np.sqrt(self._cov[i, i]), self._mean[i] + 3 * np.sqrt(self._cov[i, i]))
                         for i in range(2)]
 
             self._space.lims_plot = lims
+
 
 # # mean_, cov_ = 1., 1.
 # mean_, cov_ = np.ones(2), np.eye(2)
@@ -897,7 +898,7 @@ class Normal(BaseRV):
 # print(delta**2*y.sum())
 
 
-class NormalLinear(Normal):     # TODO: rework, only allow weights and cov to be set?
+class NormalLinear(Normal):  # TODO: rework, only allow weights and cov to be set?
     def __init__(self, weights=(0.,), basis=np.ones(1), cov=(1.,), rng=None):
         self._basis = np.array(basis)
 
@@ -923,6 +924,7 @@ class NormalLinear(Normal):     # TODO: rework, only allow weights and cov to be
     @property
     def basis(self):
         return self._basis
+
 
 # bs = [[1, 0], [0, 1], [1, 1]]
 # a = NormalLinear(weights=np.ones(2), basis=np.array(bs), cov=np.eye(3))
@@ -1107,7 +1109,7 @@ class Mixture(Base):
         else:
             return super().__new__(cls)
 
-    def __init__(self, dists, weights, rng=None):       # TODO: special implementation for Finite? get modes, etc?
+    def __init__(self, dists, weights, rng=None):  # TODO: special implementation for Finite? get modes, etc?
         super().__init__(rng)
         self._dists = list(dists)
 
@@ -1173,7 +1175,7 @@ class Mixture(Base):
         self._mode = None
 
     @property
-    def mode(self):     # TODO: implement similar functionality throughout for costly dependent attributes!!!
+    def mode(self):  # TODO: implement similar functionality throughout for costly dependent attributes!!!
         if self._mode is None:
             if self._idx_nonzero.size == 1:
                 self._mode = self._dists[self._idx_nonzero.item()].mode

@@ -1,14 +1,14 @@
 import math
-from functools import partial
-from abc import ABC, abstractmethod
+from abc import ABC
 
 import numpy as np
-from scipy import optimize, integrate
 from matplotlib import pyplot as plt
+from scipy import optimize, integrate
 
-from thesis.util.plotting import simplex_grid, box_grid
-from thesis.util.base import check_data_shape
 from thesis.util import plotting
+from thesis.util.base import check_data_shape
+from thesis.util.plotting import simplex_grid, box_grid
+
 
 # plt.style.use('seaborn')
 
@@ -64,7 +64,7 @@ class Base(ABC):
     def set_x_plot(self):
         pass
 
-    def make_axes(self):        # TODO: axes kwargs
+    def make_axes(self):  # TODO: axes kwargs
         if self.shape == ():
             _, ax = plt.subplots()
             ax.set(xlabel='$x$', ylabel='$f(x)$')
@@ -130,25 +130,25 @@ class Base(ABC):
         return x, y, set_shape
 
     def _minimize(self, f):
-        pass    # TODO
+        pass  # TODO
 
     def argmin(self, f):
         return self._minimize(f)
 
     def argmax(self, f):
-        return self.argmin(lambda x: -1*f(x))
+        return self.argmin(lambda x: -1 * f(x))
 
     def integrate(self, f):
-        pass    # TODO
+        pass  # TODO
 
     def moment(self, f, order=1, center=False):
-        if not np.issubdtype(self.dtype, np.number):    # TODO: dispatch to subclass with __new__? use mixin?
+        if not np.issubdtype(self.dtype, np.number):  # TODO: dispatch to subclass with __new__? use mixin?
             raise TypeError("Moments only supported for numeric spaces.")
 
         if order == 1 and not center:
             return self.integrate(lambda x: np.array(x) * f(x))
         else:
-            raise NotImplementedError        # TODO
+            raise NotImplementedError  # TODO
 
 
 class Discrete(Base):
@@ -159,7 +159,7 @@ class Finite(Discrete):
     pass
 
 
-#%%
+# %%
 
 
 # class Categorical(Finite):
@@ -327,7 +327,7 @@ class Finite(Discrete):
 
 
 class FiniteGeneric(Finite):
-    def __init__(self, values, shape=()):       # TODO: flatten and ignore set shape?
+    def __init__(self, values, shape=()):  # TODO: flatten and ignore set shape?
         self.values = np.array(values)
         super().__init__(shape, self.values.dtype)
 
@@ -417,7 +417,7 @@ class FiniteGeneric(Finite):
             raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
 
 
-#%%
+# %%
 class Continuous(Base):
     def __init__(self, shape):
         super().__init__(shape, np.float64)
@@ -426,7 +426,7 @@ class Continuous(Base):
     def optimize_kwargs(self):
         return {'x0': np.zeros(self.shape), 'bounds': None, 'constraints': ()}
 
-    def _minimize(self, f):     # TODO: add `brute` method option?
+    def _minimize(self, f):  # TODO: add `brute` method option?
         kwargs = self.optimize_kwargs.copy()
         x0 = kwargs.pop('x0')
 
@@ -460,7 +460,7 @@ class Continuous(Base):
         #     raise NotImplementedError        # TODO
 
 
-class Box(Continuous):      # TODO: make Box inherit from Euclidean?
+class Box(Continuous):  # TODO: make Box inherit from Euclidean?
     def __init__(self, lims):
         self.lims = lims
         super().__init__(shape=self.lims.shape[:-1])
@@ -481,7 +481,7 @@ class Box(Continuous):      # TODO: make Box inherit from Euclidean?
             return False
 
     @property
-    def optimize_kwargs(self):      # bounds reshaped for scipy optimizer
+    def optimize_kwargs(self):  # bounds reshaped for scipy optimizer
         return {'x0': self.lims_plot.mean(-1), 'bounds': self.lims.reshape(-1, 2), 'constraints': ()}
 
     @property
@@ -577,7 +577,7 @@ class Euclidean(Box):
     #         self._lims_plot = np.array([temp.min(0), temp.max(0)])
 
 
-#%%
+# %%
 
 # TODO: add integration and mode finding
 

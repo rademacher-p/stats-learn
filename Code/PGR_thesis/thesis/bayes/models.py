@@ -2,19 +2,16 @@
 Bayesian SL models.
 """
 
-import functools
-
 import numpy as np
-from matplotlib import pyplot as plt
 from scipy.stats._multivariate import _PSD
 
 from thesis.random import elements as rand_elements
 from thesis.random import models as rand_models
-
-from thesis.util.base import RandomGeneratorMixin, vectorize_func
 from thesis.util import spaces
+from thesis.util.base import RandomGeneratorMixin, vectorize_func
 
-#%% Priors
+
+# %% Priors
 
 # TODO: Add deterministic DEP to effect a DP realization and sample!!
 
@@ -236,7 +233,7 @@ if __name__ == '__main__':
     qq = None
 
 
-class Dirichlet(Base):      # TODO: DRY from random.elements?
+class Dirichlet(Base):  # TODO: DRY from random.elements?
     # tex_params = {'prior_mean': r'\alpha', 'alpha_0': r'\alpha_0'}
 
     def __init__(self, prior_mean, alpha_0, rng=None):
@@ -295,7 +292,7 @@ class Dirichlet(Base):      # TODO: DRY from random.elements?
     n = property(lambda self: self.emp_dist.n)
 
     def random_model(self, rng=None):
-        raise NotImplementedError       # TODO: implement for finite in subclass?
+        raise NotImplementedError  # TODO: implement for finite in subclass?
 
     def _rvs(self, n, rng):
         # Samples directly from the marginal Dirichlet-Empirical data distribution
@@ -304,7 +301,7 @@ class Dirichlet(Base):      # TODO: DRY from random.elements?
                         dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
         for i in range(n):
             if rng.random() <= (1 + i / self.alpha_0) ** -1:
-                _out[i] = self.prior_mean.rvs(rng=rng)     # sample from mean distribution
+                _out[i] = self.prior_mean.rvs(rng=rng)  # sample from mean distribution
             else:
                 _out[i] = rng.choice(_out[:i])
 

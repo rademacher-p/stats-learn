@@ -1,8 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from thesis.random import elements as rand_elements, models as rand_models
-from thesis.bayes import models as bayes_models
+from thesis.random import elements as rand_elements
 from thesis.util import spaces
 
 plt.rc('text', usetex=True)
@@ -19,7 +18,6 @@ alpha = rand_elements.EmpiricalScalar(.3, n_x)
 n = 10000
 alpha_0 = 10
 
-
 space = spaces.check_spaces([model, alpha])
 y = space.x_plt
 __, ax = plt.subplots()
@@ -32,7 +30,7 @@ for alpha_0 in [.1, 10]:
 
     gamma = 1 / (1 + n / alpha_0)
     mean = gamma * alpha.pf(y) + (1 - gamma) * model_pf
-    cov = n / (alpha_0 + n)**2 * model_pf * (1 - model_pf)
+    cov = n / (alpha_0 + n) ** 2 * model_pf * (1 - model_pf)
     bias = mean - model_pf
 
     # cov_lo = cov_hi = cov
@@ -45,14 +43,14 @@ for alpha_0 in [.1, 10]:
             emp_pf = emp.pf(supp)
 
             idx = supp <= p
-            cov_lo[i] += ((supp[idx] - p)**2 * emp_pf[idx]).sum()
+            cov_lo[i] += ((supp[idx] - p) ** 2 * emp_pf[idx]).sum()
             # cov_lo[i] += ((supp - p) ** 2 * emp_pf).sum()
 
-    cov_lo *= (1 - gamma)**2
+    cov_lo *= (1 - gamma) ** 2
     cov_hi = cov - cov_lo
     # cov_hi = cov_lo
 
-    err = np.sqrt((bias**2 + cov).sum())
+    err = np.sqrt((bias ** 2 + cov).sum())
 
     # label = r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \uppsi}$'
     # label = r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \uppsi}$, ' + f'$N={n}$'

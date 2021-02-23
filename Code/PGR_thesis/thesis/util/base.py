@@ -1,13 +1,9 @@
-from numbers import Integral
-from collections.abc import Iterable
 from functools import wraps
-from copy import deepcopy
-import math
+from numbers import Integral
 
 import numpy as np
 
-
-DELTA = 1e250       # large value approximating the value of the Dirac delta function at zero
+DELTA = 1e250  # large value approximating the value of the Dirac delta function at zero
 
 
 class RandomGeneratorMixin:
@@ -132,7 +128,7 @@ def vectorize_func(func, shape):
     return func_vec
 
 
-def vectorize_func_dec(shape):     # TODO: use?
+def vectorize_func_dec(shape):  # TODO: use?
     def wrapper(func):
         @wraps(func)
         def func_vec(x):
@@ -149,8 +145,8 @@ def vectorize_func_dec(shape):     # TODO: use?
             return _out.reshape(set_shape + _out.shape[1:])
 
         return func_vec
-    return wrapper
 
+    return wrapper
 
 # def vectorize_first_arg(func):
 #     @wraps(func)

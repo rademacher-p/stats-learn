@@ -2,29 +2,27 @@
 Supervised learning functions.
 """
 
-import math
-from numbers import Integral
-from itertools import product
 import copy
+import math
 from abc import ABC, abstractmethod
+from itertools import product
+from numbers import Integral
 from typing import Union
 
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import mode
-import matplotlib.pyplot as plt
 
+from thesis.bayes import models as bayes_models
+from thesis.loss_funcs import loss_se, loss_01
+from thesis.random import elements as rand_elements, models as rand_models
 from thesis.util import spaces
 from thesis.util.base import vectorize_func, check_data_shape
-from thesis.loss_funcs import loss_se, loss_01
-
-from thesis.random import elements as rand_elements, models as rand_models
-from thesis.bayes import models as bayes_models
 from thesis.util.spaces import check_spaces
 
 
 def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False,
                           rng=None):
-
     space_x = check_spaces(predictors)['x']
     if x is None:
         if space_x.x_plt is None:
@@ -57,7 +55,7 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
 
     for i_mc in range(n_mc):
         if verbose:
-            print(f"Stats iteration: {i_mc+1}/{n_mc}")
+            print(f"Stats iteration: {i_mc + 1}/{n_mc}")
 
         d = model.rvs(n_train_delta.sum())
         d_iter = np.split(d, np.cumsum(n_train_delta)[:-1])
@@ -120,7 +118,6 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
 
 def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, do_std=False, verbose=False,
                                ax=None, rng=None):
-
     space_x = check_spaces(predictors)['x']
     if x is None:
         if space_x.x_plt is None:
@@ -214,7 +211,6 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
 
 
 def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, rng=None):
-
     if params is None:
         params_full = [{} for _ in predictors]
     else:
@@ -236,7 +232,7 @@ def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n
 
     for i_mc in range(n_mc):
         if verbose:
-            print(f"Loss iteration: {i_mc+1}/{n_mc}")
+            print(f"Loss iteration: {i_mc + 1}/{n_mc}")
 
         d = model.rvs(n_test + n_train_delta.sum())
         # np.random.default_rng().shuffle(d)      # FIXME
@@ -261,7 +257,6 @@ def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n
 
 
 def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, verbose=False):
-
     if params is None:
         params_full = [{} for _ in predictors]
     else:
@@ -296,7 +291,6 @@ def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, 
 
 
 def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0, ax=None):
-
     if params is None:
         params_full = [{} for _ in predictors]
     else:
@@ -391,7 +385,7 @@ def plot_risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_tes
     return _plot_risk_eval_compare(losses, do_bayes, predictors, params, n_train, ax)
 
 
-#%%
+# %%
 class Base(ABC):
     def __init__(self, loss_func, space=None, proc_funcs=(), name=None):
         self.loss_func = loss_func
@@ -427,7 +421,7 @@ class Base(ABC):
     def _model_obj(self):
         raise NotImplementedError
 
-    def set_params(self, **kwargs):     # TODO: improve? wrapper to ignore non-changing param set?
+    def set_params(self, **kwargs):  # TODO: improve? wrapper to ignore non-changing param set?
         for key, val in kwargs.items():
             setattr(self._model_obj, key, val)
 
@@ -542,7 +536,7 @@ class RegressorMixin:
         return self.model.mean_y_x(x)
 
 
-#%% Fixed model
+# %% Fixed model
 class Model(Base):
     def __init__(self, model, loss_func, space=None, proc_funcs=(), name=None):
         if space is None:
@@ -561,7 +555,7 @@ class Model(Base):
         pass
 
     def fit_from_model(self, model, n_train=0, rng=None, warm_start=False):
-        pass    # skip unnecessary data generation
+        pass  # skip unnecessary data generation
 
 
 class ModelClassifier(ClassifierMixin, Model):
@@ -597,7 +591,7 @@ class ModelRegressor(RegressorMixin, Model):
             raise NotImplementedError
 
 
-#%% Bayes model
+# %% Bayes model
 
 class Bayes(Base):
     def __init__(self, bayes_model, loss_func, space=None, proc_funcs=(), name=None):
@@ -610,7 +604,7 @@ class Bayes(Base):
         self.prior = self.bayes_model.prior
         self.posterior = self.bayes_model.posterior
 
-        self.model = self.bayes_model.posterior_model       # updates in-place with set_params() and fit()
+        self.model = self.bayes_model.posterior_model  # updates in-place with set_params() and fit()
 
         self.fit()
 
@@ -626,7 +620,7 @@ class Bayes(Base):
 
     def plot_param_dist(self, x=None, ax_prior=None):  # TODO: improve or remove?
         if x is None:
-            raise ValueError        # TODO
+            raise ValueError  # TODO
 
         self.prior.plot_pf(x, ax=ax_prior)
         # ax_posterior= plt_prior.axes

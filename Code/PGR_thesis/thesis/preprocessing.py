@@ -1,11 +1,12 @@
 import numpy as np
 
 
-def discretizer(vals):      # TODO: use sklearn.preprocessing.KBinsDiscretizer?
+def discretizer(vals):  # TODO: use sklearn.preprocessing.KBinsDiscretizer?
     def func(x):
         x = np.array(x)
         delta = np.abs(x - vals[:, np.newaxis])
         return vals[delta.argmin(axis=0)]
+
     return func
 
 

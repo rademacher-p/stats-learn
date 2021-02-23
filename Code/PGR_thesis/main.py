@@ -2,24 +2,24 @@
 Main.
 """
 
+from pathlib import Path
+import pickle
+from time import strftime
+
 import numpy as np
 from matplotlib import pyplot as plt
 
-from thesis.random import elements as rand_elements, models as rand_models
 from thesis.bayes import models as bayes_models
-from thesis.predictors import (ModelRegressor, BayesRegressor, ModelClassifier, BayesClassifier,
-                               plot_risk_eval_sim_compare, plot_predict_stats_compare,
-                               plot_risk_eval_comp_compare,
-                               risk_eval_sim_compare, predict_stats_compare)
-from thesis.preprocessing import discretizer
-from thesis.util import spaces
+from thesis.predictors import (ModelRegressor, BayesRegressor, plot_risk_eval_sim_compare)
+from thesis.random import elements as rand_elements, models as rand_models
+
 
 # plt.style.use('seaborn')
 # plt.style.use(['science'])
 # plt.rcParams['text.usetex'] = True
 
 
-#%% Sim
+# %% Sim
 
 def poly_mean_to_models(n, weights):
     return func_mean_to_models(n, lambda x_: sum(w * x_ ** i for i, w in enumerate(weights)))
@@ -30,7 +30,6 @@ def func_mean_to_models(n, func):
 
 
 n_x = 128
-
 
 # True model
 
@@ -43,16 +42,14 @@ n_x = 128
 # w_model = [.3, 0., .4]
 w_model = [.5, 0, 0]
 
-
 # model = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_model),
 #                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 # model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, lambda x: 1 / (2 + np.sin(2*np.pi * x))),
 #                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
 # model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=126, model_x=rand_elements.Beta())
-model = rand_models.BetaLinear(weights=[1], basis_y_x=[lambda x: 1 / (2 + np.sin(2*np.pi * x))], alpha_y_x=126,
+model = rand_models.BetaLinear(weights=[1], basis_y_x=[lambda x: 1 / (2 + np.sin(2 * np.pi * x))], alpha_y_x=126,
                                model_x=rand_elements.Beta())
-
 
 # model = rand_models.NormalLinear(weights=np.ones(2), basis_y_x=None, cov_y_x=.1, model_x=rand_elements.Normal(0, 10))
 
@@ -65,7 +62,6 @@ if do_bayes:
 else:
     model_eval = model
     opt_predictor = ModelRegressor(model_eval, name=r'$f_{\Theta}(\theta)$')
-
 
 # Bayesian learners
 
@@ -96,10 +92,8 @@ prior_mean_x = rand_elements.Beta()
 
 prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=126, model_x=prior_mean_x)
 
-
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), space=model.space, proc_funcs=proc_funcs,
                                name='$\mathrm{Dir}$')
-
 
 # dir_params = None
 # dir_params = {'alpha_0': [1, 100, 10000]}
@@ -117,7 +111,6 @@ norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, pr
 # norm_params = {'prior_cov': [10, 0.05]}
 # norm_params = {'prior_cov': [100, .01]}
 norm_params = {'prior_cov': [100]}
-
 
 # Plotting
 
@@ -155,6 +148,16 @@ plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_te
 #                            do_std=True, verbose=True, ax=None, rng=None)
 
 
+time_str = strftime('%Y-%m-%d_%H-%M-%S')
+image_path = Path('./images/temp/')
+
+fig = plt.gcf()
+fig.savefig(image_path.joinpath(f"{time_str}.png"))
+with open(image_path.joinpath(f"{time_str}.mpl"), 'wb') as fid:
+    pickle.dump(fig, fid)
+
+# plt.figure('Results (Normalized, BB excluded)').savefig(image_path)
+
 # print(f"\nAnalytical Risk = {opt_predictor.evaluate_comp(n_train=n_train)}")
 
 # if isinstance(model, rand_models.Base):
@@ -165,5 +168,6 @@ plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_te
 #     print(f"Min Bayes risk = {risk_an}")
 # else:
 #     raise TypeError
+
 
 print('Done')

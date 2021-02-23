@@ -1,26 +1,23 @@
-import numpy as np
 # import matplotlib as mpl
 import matplotlib.pyplot as plt
+import numpy as np
 
-from thesis.random import elements as rand_elements, models as rand_models
-from thesis.bayes import models as bayes_models
+from thesis.random import elements as rand_elements
 from thesis.util import spaces
 
 plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{amsmath}")
 
-
 mean = np.array([.4, .3, .3])
 alpha_0 = 6
 dir_prior = rand_elements.Dirichlet(mean, alpha_0)
 
-psi = np.array([0, 1/3, 2/3])
+psi = np.array([0, 1 / 3, 2 / 3])
 n = 3
 
 alpha_0_post = alpha_0 + n
 mean_post = (alpha_0 * mean + n * psi) / alpha_0_post
 dir_post = rand_elements.Dirichlet(mean_post, alpha_0_post)
-
 
 dir_prior.space.n_plot = 150
 dir_post.space.n_plot = 150
@@ -31,7 +28,6 @@ titles = [r'$\mathrm{Prior}: \alpha_\mathrm{c}(x) = ' + f"{tuple(mean)}$",
           r'$\mathrm{Posterior}: \psi_\mathrm{c}(x) = ' + f"{tuple(psi)}$"]
 
 fig, axes = plt.subplots(1, 2, subplot_kw={'projection': '3d'})
-
 
 space = spaces.check_spaces([dir_prior, dir_post])
 x = space.x_plt
@@ -85,4 +81,3 @@ for i, (r, ax, title) in enumerate(zip([dir_prior, dir_post], axes, titles)):
 
 # dir_prior.plot_pf(ax=ax[0])
 # dir_post.plot_pf(ax=ax[1])
-
