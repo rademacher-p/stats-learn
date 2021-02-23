@@ -1,26 +1,38 @@
 \documentclass[12pt]{report}
 
-\linespread{1.5}
-\usepackage[margin=1.0in]{geometry}
-
+\linespread{1.6}
 %\interdisplaylinepenalty=2500
 %\pretolerance=150
-
 
 \setcounter{secnumdepth}{3}
 \setcounter{tocdepth}{3}
 
-\usepackage{amsmath,amssymb,amsfonts}
-\usepackage{algorithmic}
+\usepackage[letterpaper,vmargin=1in,hmargin=1.25in]{geometry}
+%\usepackage[a4paper,width=150mm,top=25mm,bottom=25mm]{geometry}
+
+\usepackage{microtype}
+
 \usepackage{graphicx}
-\usepackage{textcomp}
+\graphicspath{{../Figures/}}
+
+\usepackage[backend=biber,style=numeric]{biblatex}
+\addbibresource{../References/PhD_refs.bib}
+
+\usepackage{amsmath,amssymb,amsfonts}
 \usepackage{bm}
 \usepackage{upgreek}
-
 \usepackage[retainorgcmds]{IEEEtrantools}
 
 \usepackage{hyperref}
 \usepackage{cleveref}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\leftmark}
+\rhead{\thepage}
+\renewcommand{\headrulewidth}{2pt}
+%\renewcommand{\footrulewidth}{1pt}
 
 \usepackage[colorinlistoftodos,color=yellow!50,linecolor=red]{todonotes}
 \newcommand{\todolow}[1]{\todo[inline,color=blue!50,linecolor=red]{#1}}
@@ -30,13 +42,9 @@
 \newcommand{\todohigh}[1]{\todo[inline,color=red!50,linecolor=red]{#1}}
 
 
-\usepackage{fancyhdr}
-\pagestyle{fancy}
-\fancyhf{}
-\lhead{\leftmark}
-\rhead{\thepage}
-\renewcommand{\headrulewidth}{2pt}
-%\renewcommand{\footrulewidth}{1pt}
+%\usepackage{tikz}
+%\usepackage{listings}
+%\usepackage{booktabs, multicol}
 
 
 
@@ -111,11 +119,6 @@
 
 \DeclareMathOperator{\gammam}{\gamma_\text{m}}
 
-
-\usepackage[backend=biber,style=numeric]{biblatex}
-\addbibresource{../References/PhD_refs.bib}
-
-\graphicspath{{../Figures/}}
 
 \title{Bayesian Learning using a Dirichlet Prior for Regression and Classification}
 \author{Paul Rademacher}
@@ -4215,7 +4218,7 @@ It can be further shown that the Bayesian predictive distribution is also Normal
 
 
 %\bibliographystyle{plain}
-%\bibliography{{../References/PhD_refs}}
+%\bibliography{../References/PhD_refs}
 \printbibliography[heading=bibintoc]
 
 

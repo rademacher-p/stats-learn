@@ -103,7 +103,7 @@ class NormalLinear(Base):
             else:
                 val_str = str(val)
                 if self.prior.shape != () and val.shape == ():
-                    val_str += r"\boldsymbol{1}"
+                    val_str += r"\bm{1}"
 
                 return r"$\mu_{\uptheta} = " + val_str + "$"
         elif key == 'prior_cov':
@@ -112,7 +112,7 @@ class NormalLinear(Base):
             else:
                 val_str = str(val)
                 if self.prior.shape != () and val.shape == ():
-                    val_str += r"\boldsymbol{I}"
+                    val_str += r"\bm{I}"
 
                 return r"$\Sigma_{\uptheta} = " + val_str + "$"
         else:
