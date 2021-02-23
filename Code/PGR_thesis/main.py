@@ -135,7 +135,7 @@ n_train = np.arange(0, 650, 50)
 temp = [
     (opt_predictor, None),
     (dir_predictor, dir_params),
-    # (norm_predictor, norm_params),
+    (norm_predictor, norm_params),
 ]
 
 # TODO: discrete plot for predict stats
@@ -143,7 +143,7 @@ temp = [
 # TODO: make latex use optional
 
 plt.rc('text', usetex=True)
-plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek}")
+plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepackage{bm}")
 
 predictors, params = list(zip(*temp))
 
