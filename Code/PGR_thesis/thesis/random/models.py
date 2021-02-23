@@ -2,16 +2,15 @@
 SL models.
 """
 
-from typing import Optional, Dict
 from copy import deepcopy
+from typing import Optional, Dict
 
 import numpy as np
-from matplotlib import pyplot as plt
 
 from thesis.random import elements as rand_elements
-
-from thesis.util.base import RandomGeneratorMixin, vectorize_func, vectorize_func_dec
 from thesis.util import spaces
+from thesis.util.base import RandomGeneratorMixin, vectorize_func
+
 
 # TODO: add marginal/conditional pf methods
 
@@ -401,7 +400,7 @@ class ClassConditional(MixinRVx, Base):
 # qq = None
 
 
-class BetaLinear(MixinRVx, MixinRVy, Base):     # TODO: DRY with NormalLinear
+class BetaLinear(MixinRVx, MixinRVy, Base):  # TODO: DRY with NormalLinear
     def __init__(self, weights=(0.,), basis_y_x=None, alpha_y_x=2., model_x=rand_elements.Beta(), rng=None):
         super().__init__(rng)
 
@@ -771,7 +770,7 @@ class Mixture(Base):
             else:
                 return super().__new__(cls)
 
-    def __init__(self, dists, weights, rng=None):       # TODO: special implementation for Finite? get modes, etc?
+    def __init__(self, dists, weights, rng=None):  # TODO: special implementation for Finite? get modes, etc?
         super().__init__(rng)
         self._dists = list(dists)
 
@@ -803,7 +802,7 @@ class Mixture(Base):
 
         self._update_attr()
 
-    def set_dist_attr(self, idx, **dist_kwargs):      # TODO: improved implementation w/ direct self.dists access?
+    def set_dist_attr(self, idx, **dist_kwargs):  # TODO: improved implementation w/ direct self.dists access?
         for key, val in dist_kwargs.items():
             setattr(self._dists[idx], key, val)
         self._update_attr()
@@ -936,7 +935,6 @@ class MixtureRVxy(MixtureRVx, MixtureRVy):
     def __repr__(self):
         _str = "; ".join([f"{w}: {dist}" for w, dist in zip(self.weights, self.dists)])
         return f"MixtureRVxy({_str})"
-
 
 # dists_ = [NormalLinear(basis_y_x=(lambda x: x,), weights=(w,), cov_y_x=10) for w in [0, 4]]
 # # dists_ = [ClassConditional.from_finite([rand_elements.Normal(mean) for mean in [i, i+2]], ['a', 'b']) for i in (0, 4)]

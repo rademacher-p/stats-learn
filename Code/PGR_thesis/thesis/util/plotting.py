@@ -1,6 +1,8 @@
 import math
 
 import numpy as np
+
+
 # from matplotlib import pyplot as plt
 # from scipy.special import binom
 
@@ -47,9 +49,9 @@ def simplex_grid(n, shape, hull_mask=None):
     g = np.arange(s, n + e)[:, np.newaxis]
     # g = np.arange(n + 1)[:, np.newaxis]
 
-    for i in range(1, d-1):
+    for i in range(1, d - 1):
         s = 1 if hull_mask[i] else 0
-        e = 0 if (i == d-2 and hull_mask[i+1]) else 1
+        e = 0 if (i == d - 2 and hull_mask[i + 1]) else 1
 
         g_new = []
         for v in g:

@@ -2,22 +2,21 @@
 Bayesian random elements.
 """
 
-import math
-
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy.stats._multivariate import _PSD
 
 from thesis.random import elements as rand_elements
-from thesis.util.base import RandomGeneratorMixin
 from thesis.util import spaces
+from thesis.util.base import RandomGeneratorMixin
 
 np.set_printoptions(precision=2)
+
 
 # TODO: rename `model` attributes to `element`?
 
 
-#%% Priors
+# %% Priors
 
 class Base(RandomGeneratorMixin):
     def __init__(self, prior=None, rng=None):
@@ -226,7 +225,7 @@ class Dirichlet(Base):
     n = property(lambda self: self.emp_dist.n)
 
     def random_model(self, rng=None):
-        raise NotImplementedError       # TODO: implement for finite in subclass?
+        raise NotImplementedError  # TODO: implement for finite in subclass?
 
     def _rvs(self, n, rng):
         # Samples directly from the marginal Dirichlet-Empirical data distribution
@@ -234,7 +233,7 @@ class Dirichlet(Base):
         _out = np.empty((n, *self.shape), dtype=self.space.dtype)
         for i in range(n):
             if rng.random() <= self.alpha_0 / (self.alpha_0 + i):
-                _out[i] = self.prior_mean.rvs(rng=rng)     # sample from mean distribution
+                _out[i] = self.prior_mean.rvs(rng=rng)  # sample from mean distribution
             else:
                 _out[i] = rng.choice(_out[:i])
 
