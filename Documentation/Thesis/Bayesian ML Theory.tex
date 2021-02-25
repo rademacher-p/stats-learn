@@ -1467,7 +1467,7 @@ Note that the bias is proportionate to the difference between the true condition
 
 \subsection{Trends}
 
-The trends of the bias and variance with the Dirichlet parameters and with the data volume $N$ are of interest. These values effect a bias/variance trade-off via expectations of functions of $\gammam(\uppsim)$ given the marginal model value $\upthetam(x)$ (and implicitly the marginal prior mean $\alpham(\xrm)$). Note that as a result of its aggregation property, the empirical process value $\uppsim(x)$ conditioned on the model $\upthetam(x)$ is distributed as
+The trends of the bias and variance with the Dirichlet parameters and with the data volume $N$ are of interest. These values effect a bias/variance trade-off via expectations of functions of $\gammam(\uppsim)$ given the marginal model $\upthetam$ (and implicitly the marginal prior mean $\alpham$). Note that as a result of its aggregation property, the empirical process value $\uppsim(x)$ conditioned on the model $\upthetam(x)$ is distributed as
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\uppsim(x) | \upthetam(x)}\big(\psim(x) | \thetam(x) \big) & = & \Emp\Big( \big(\psim(x),1-\psim(x)\big); N, \big(\thetam(x),1-\thetam(x)\big) \Big) \nonumber \\
 & = & \Bi\big(N \psim(x); N, \thetam(x)\big) \;,
@@ -1476,12 +1476,11 @@ where $\Bi$ is the binomial PMF. Closed-forms have not been found for the expect
 
 \todohi{binomial inverse moment review citations?}
 
-First consider the effects of the training data volume. Clearly, if $N=0$, $\gammam(\uppsim)$ is equal to one. Consequently, the prior mean $\alphac(\xrm)$ is used and the bias weight is maximal at unity; as this estimator is data-independent, the covariance is zero. As $N \to \infty$, the data PMF tends to $\Prm_{\uppsim | \upthetam} \to \delta[\cdot, \upthetam]$ and $\gammam(\uppsim) \to \left(1 + \frac{N \upthetam}{\alpha_0 \alpham}\right)^{-1}$. As a result, the bias scaling factor tends to zero for all values $x \in \Xcal$ satisfying $\upthetam(x) > 0$ and to one otherwise. Thus for observations falling in the support of the marginal model $\upthetam$, the empirical data distribution $\uppsic(\xrm)$ is used and there is no bias. Similarly, the expectations affecting the covariance tend to zero. This demonstrates that the Dirichlet-based Bayesian estimate $\Prm_{\yrm | \xrm,\uppsim,\uppsic}$ converges to the true predictive distribution $\Prm_{\yrm | \xrm,\upthetac}$ in the limit of training data volume; this is guaranteed due to the full-support of the prior.
+First consider the effects of the training data volume. Clearly, if $N=0$, $\gammam(\uppsim)$ is equal to one. Consequently, the prior mean $\alphac(\xrm)$ is used and the bias weight is maximal at unity; as this estimator is data-independent, the covariance is zero. As $N \to \infty$, the data PMF tends to $\Prm_{\uppsim | \upthetam} \to \delta[\cdot, \upthetam]$ and $\gammam(\uppsim) \to \left(1 + \frac{N \upthetam}{\alpha_0 \alpham}\right)^{-1}$. As a result, the bias scaling factor tends to zero for all values $x \in \Xcal$ satisfying $\upthetam(x) > 0$ and to one otherwise. Thus for observations falling in the support of the marginal model $\upthetam$, the empirical data distribution $\uppsic(x)$ is used and there is no bias. Similarly, the expectations affecting the covariance tend to zero. This demonstrates that the Dirichlet-based Bayesian estimate $\Prm_{\yrm | \xrm,\Drm}$ converges to the true predictive distribution $\Prm_{\yrm | \xrm,\upthetac}$ in the limit of training data volume; this is guaranteed due to the full-support of the prior.
 
-
-Next consider the effects of the Dirichlet parameterization. As $\alpha_0 \alpham(x) \to \infty$, $\gammam(x; \uppsim)$ is again equal to one, the bias is maximized and the covariance is zero. Conversely, as $\alpha_0 \alpham(x) \to 0$, the empirical data distribution is emphasized and the bias scaling factor tends to its minimal value $\big(1 - \upthetam(x)\big)^{N}$; this value is equivalent to $\Prm_{\uppsim(x) | \upthetam(x)}\big(0 | \thetam(x) \big)$, the probability that no training samples satisfy $\Xrm_n = x$ and thus that $\uppsic(x)$ is undefined. Additionally, the expectations affecting the covariance tend to
+Next consider the effects of the Dirichlet parameterization. As $\alpha_0 \to \infty$, $\gammam(\uppsim)$ is again equal to one, the bias is maximized and the covariance is zero. Conversely, as $\alpha_0 \to 0$, the empirical data distribution is emphasized and the bias scaling factor tends to its minimal value $\big(1 - \upthetam(x)\big)^{N}$; this value is equivalent to $\Prm_{\uppsim(x) | \upthetam}\big(0 | \thetam \big)$, the probability that no training samples satisfy $\Xrm_n = x$ and thus that $\uppsic(x)$ is undefined. Additionally, the expectations affecting the covariance tend to
 \begin{IEEEeqnarray}{L} 
-\Crm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \to \big(1 - \upthetam(\xrm) \big)^{N} \left( 1 - \big(1 - \upthetam(\xrm)\big)^{N} \right) \nonumber
+\Crm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \to \big(1 - \upthetam(\xrm) \big)^{N} \left( 1 - \big(1 - \upthetam(\xrm)\big)^{N} \right) 
 \end{IEEEeqnarray}
 and
 \begin{IEEEeqnarray}{L} 
@@ -3150,12 +3149,13 @@ As seen in Chapter \ref{ch:dir_cont}, the flexibility of using a full-support pr
 
 Define a discretizing data transformation $T: \Xcal \mapsto \Tcal$, where the range is a countable subset $\Tcal \subset \Xcal$, such that $|\Tcal| \leq \aleph_0$. This transform is applied to each of the training values $\Xrm_n$, as well as to the novel observation $\xrm$. Note that $T$ is effectively a dimensionality-reducing feature transformation.
 
-Having effectively changed the domain of the observations, the Dirichlet prior marginal mean is re-defined as $\alpham = \sum_{t \in \Tcal} \alpham'(t) \delta(\cdot - t)$, a mixture of delta functions at the discretized values, where $\alpham' \in \Pcal(\Tcal)$ is the discrete space marginal function.
+Having effectively changed the domain of the observations, the Dirichlet prior marginal mean is re-defined as $\alpham = \sum_{t \in \Tcal} \alpham'(t) \delta(\cdot - t)$, a mixture of delta functions at the discretized values, where $\alpham' \in \Pcal(\Tcal)$ is the discrete space marginal function. 
 
+%Additionally, the conditional prior mean is $\alphac(x) = \sum_{t \in \Tcal} \alphac'(t) \delta\big[t, T(x)\big]$
 \todohi{discretized conditional alpha?? generic marginal alpha to start?}
 
 Starting from the Dirichlet-based Bayesian predictive distribution \eqref{eq:P_y_xD_dir_cont}, substitute for the discretized observations, such that
-\begin{IEEEeqnarray}{rCl}
+\begin{IEEEeqnarray}{rCl} \label{eq:P_y_xD_dir_cont_disc}
 \prm_{\yrm | \xrm,\Drm} & = & \gammam'\big(T(\xrm); \Xrm \big) \alphac\big(T(\xrm)\big) + \Big(1 - \gammam'\big(T(\xrm); \Xrm \big)\Big) \Psic'\big(T(\xrm); \Drm\big) \;,
 \end{IEEEeqnarray}
 where the discretized weighting function $\gammam'(X): \Xcal^N \mapsto (0,1]^{\Tcal}$ is defined as 
@@ -3205,7 +3205,7 @@ convexly combining the true predictive distributions $\upthetac(x)$ for observat
 
 \todohi{LOCATION?}
 
-The Bayesian predictive distribution in terms of the discretized sufficient statistics is
+The Bayesian predictive distribution \eqref{eq:P_y_xD_dir_cont_disc} in terms of the discretized sufficient statistics is
 \begin{IEEEeqnarray}{rCl}
 \prm_{\yrm | \trm,\uppsim',\uppsic'} & = & \gammam'(\trm; \uppsim') \alphac(\trm) + \big(1 - \gammam'(\trm; \uppsim')\big) \uppsic'(\trm) \;.
 \end{IEEEeqnarray}
@@ -3232,7 +3232,7 @@ Comparing to \ref{eq:predictive_dist_avg_dir}, observe that the mixture distribu
 
 Using the equivalence $\prm_{\yrm | \xrm,\uppsim',\uppsic'} = \prm_{\yrm | \trm, \uppsim', \uppsic'}\big(T(\xrm), \uppsim',\uppsic' \big)$ and substituting into \eqref{eq:predictive_bias}, the expected bias is
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias_dir_disc}	
-\mathrm{Bias}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim' | \upthetam'}\Big[\gammam'\big(T(\xrm); \uppsim'\big)\Big] \Big( \alphac\big(T(\xrm)\big) - \upthetac'\big(T(\xrm)\big) \Big) \nonumber \\
+\mathrm{Bias}(\xrm; \upthetam,\upthetac) & = & \Erm_{\uppsim' | \upthetam'}\Big[\gammam'\big(T(\xrm); \uppsim'\big)\Big] \Big( \alphac\big(T(\xrm)\big) - \upthetac'\big(T(\xrm)\big) \Big) \nonumber \\
 && \quad + \Big(\upthetac'\big(T(\xrm)\big) - \upthetac(\xrm) \Big) \;.
 \end{IEEEeqnarray}
 While similar in form to \eqref{eq:predictive_bias_dir}, observe that the bias includes an additional term that captures an ``approximation'' error due to discretization. Since the discretized conditional empirical function $\uppsic(t)$ integrates all training samples falling in the subset $\Scal(t) \subset \Xcal$, its expected value integrates the true predictive distributions $\upthetac$ in the same region.
@@ -3240,12 +3240,13 @@ While similar in form to \eqref{eq:predictive_bias_dir}, observe that the bias i
 
 Following a procedure similar to that employed in Section \ref{sec:predictive_est_dir}, the covariance of the estimate in terms of the transform $\trm$ is
 \begin{IEEEeqnarray}{L} \label{eq:predictive_cov_dir_disc}
-\Crm_{\uppsim',\uppsic' | \upthetam,\upthetac} \big[\Prm_{\yrm | \trm,\uppsim',\uppsic'} \big] = \Crm_{\uppsim' | \upthetam'}\big[ \gammam'(\trm; \uppsim') \big] \big( \alphac(\trm) - \upthetac'(\trm) \big) \otimes \big( \alphac(\trm) - \upthetac'(\trm) \big) \nonumber \\
-\quad + \Erm_{\uppsim' | \upthetam'}\left[ \frac{\big(1 - \gammam'(\trm; \uppsim')\big)^2}{N \uppsim'(\trm)} \right] \Big( \diag\big(\upthetac'(\trm)\big) - \upthetac'(\trm) \otimes \upthetac'(\trm) \Big) 
+\Crm_{\uppsim',\uppsic' | \upthetam,\upthetac} \big[\Prm_{\yrm | \trm,\uppsim',\uppsic'} \big] \nonumber \\
+\quad = \Crm_{\uppsim' | \upthetam'}\big[ \gammam'(\trm; \uppsim') \big] \big( \alphac(\trm) - \upthetac'(\trm) \big) \otimes \big( \alphac(\trm) - \upthetac'(\trm) \big) \nonumber \\
+\qquad + \Erm_{\uppsim' | \upthetam'}\left[ \frac{\big(1 - \gammam'(\trm; \uppsim')\big)^2}{N \uppsim'(\trm)} \right] \Big( \diag\big(\upthetac'(\trm)\big) - \upthetac'(\trm) \otimes \upthetac'(\trm) \Big) 
 \end{IEEEeqnarray}
 and thus the covariance \eqref{eq:predictive_cov} can be represented as 
-\begin{IEEEeqnarray}{L} 
-\mathrm{Cov}(\xrm; \upthetam,\upthetac) = \Crm_{\uppsim',\uppsic' | \upthetam,\upthetac} \big[\Prm_{\yrm | \trm,\uppsim',\uppsic'} \big] \big(T(\xrm); \upthetam,\upthetac\big) \;,
+\begin{IEEEeqnarray}{L} \label{eq:predictive_cov_dir_disc}
+\mathrm{Cov}(\xrm; \upthetam,\upthetac) = \Crm_{\uppsim',\uppsic' | \upthetam,\upthetac} \big[\Prm_{\yrm | \trm,\uppsim',\uppsic'} \big] \big(T(\xrm); \upthetam,\upthetac\big) \;.
 \end{IEEEeqnarray}
 
 Substituting the estimator bias and variance into \eqref{eq:predictive_del_sq}, the conditional second moments of $\Delta(\xrm; \Drm,\upthetac)$ are
@@ -3259,7 +3260,20 @@ Substituting the estimator bias and variance into \eqref{eq:predictive_del_sq}, 
 \todolo{bracket formatting}
 
 
+\subsection{Trends}
 
+The bias/variance trends for the discretized Dirichlet distribution estimate \eqref{eq:P_y_xD_dir_cont_disc} have similarities and important differences from the trends of the discrete-domain Dirichlet distribution as detailed in Section \ref{sec:predictive_est_dir}. Note that $N \uppsim'(t) | \upthetam'(t) \sim \Bi\big(N, \upthetam'(t)\big)$; the relevant expectations will thus depend on the selection of the discretization function $T$.
+
+First consider the effect of the training volume $N$. For $N=0$, the data-independent distribution is again maximally biased and has zero variance; the bias $\mathrm{Bias}(\xrm; \upthetam,\upthetac) = \alphac\big(T(\xrm)\big) - \upthetac(\xrm)$ now depends on the conditional prior mean only at values $t \in \Tcal \subset \Xcal$. As $N \to \infty$, the discretization has notable effects. For values $x$ outside the support of $\upthetam$, the bias again reaches its maximal value, as no data satisfying $\Xrm_n = x$ will be observed. However, for values satisfying $\upthetam(x) > 0$, only the first term in \eqref{eq:predictive_bias_dir_disc} vanishes, leaving the residual $\mathrm{Bias}(\xrm; \upthetam,\upthetac) = \upthetac'\big(T(\xrm)\big) - \upthetac(\xrm)$. Observe that this term is independent of $N$ and the Dirichlet parameterization -- the bias can not be reduced beyond this minimum value. Regardless of the discretization transform $T$, the covariance function \eqref{eq:predictive_cov_dir_disc} will tend to zero. Combining these effects, it is clear that, unlike its discrete-domain relative \eqref{eq:P_y_xD_dir}, the distribution estimate \eqref{eq:P_y_xD_dir_cont_disc} will \emph{not} necessarily converge to the true predictive distribution $\upthetac$ in the limit of training data volume. 
+
+The dependency of the bias/variance trade-off on the Dirichlet prior parameterization is conceptually identical to that of the discrete-domain scenario in Section \ref{sec:predictive_est_dir}. Again, as $\alpha_0 \to \infty$, the bias is maximal and the covariance is zero. As $\alpha_0 \to 0$ the expectations of $\uppsim'$ take the same forms, substituting $\upthetam'$ for $\upthetam$. 
+
+\todohi{Generalize expectation comment, move to front}
+
+\todohigh{discretization degree trade-off!!}
+
+
+	
 
 
 
