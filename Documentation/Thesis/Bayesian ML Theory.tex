@@ -248,6 +248,7 @@ Consider a set $\Xcal$; the Kronecker delta function has domain $\Xcal \times \X
 \end{equation}
 As both functions are denoted by the symbol $\delta$, they are distinguished by the use of parentheses or square brackets. The relation $\delta(\cdot - x) = \delta(0) \delta[\cdot, x]$ may be used to relate the two functions.
 
+\todomid{Add Dirac subscript to explictly define domain?}
 \todolo{reference Dirac/Kronecker}
 
 The multinomial coefficient and multivariate beta function, which typically operate on sequences, are defined more generally for function inputs. The multinomial operator $\Mcal$ is used for functions $g : \Xcal \mapsto \Zbbgeq$ that map to non-negative integers from an arbitrary countable domain $\Xcal$. The output of the operator is
@@ -632,7 +633,7 @@ where $\Prm_{\Yrm | \Xrm} = \Erm_{\upthetam | \Xrm} \Big[ \Erm_{\upthetac | \upt
 
 Additionally, since $\Psi(\Drm)$ is a sufficient statistic for the model $\uptheta$, the Bayesian distributions of interest $\Prm_{\Drm}$, $\Prm_{\xrm | \Drm}$, and $\Prm_{\yrm | \xrm,\Drm}$ will also depend on $\Drm$ only through $\Psi(\Drm)$; as such, the training data can be transformed into the empirical process $\uppsi$ for Bayesian prediction without incurring any additional risk. 
 
-For this approach, the distributions $\Prm_{\uppsi}$, $\Prm_{\xrm | \uppsi}$, and $\Prm_{\yrm | \xrm,\uppsi}$ are required. Note that $\Prm_{\Drm | \uptheta}(D | \theta) = \Mcal\big( N \Psi(D) \big)^{-1} \Prm_{\uppsi | \uptheta}\big( \Psi(D) | \theta \big)$. Also, observe that the relevant posterior distributions satisfy $\prm_{\upthetam | \Drm}(D) = \prm_{\upthetam | \uppsi}\big( \Psi(D) \big)$ and $\prm_{\upthetac(x) | \xrm,\Drm}(x,D) = \prm_{\upthetac(x) | \xrm,\uppsi}\big( x,\Psi(D) \big)$, due to the sufficiency of the statistic $\Psi(\Drm)$ \cite{bernardo}. Consequently, $\Prm_{\xrm | \Drm}(D) = \Prm_{\xrm | \uppsi}\big( \Psi(D) \big)$, and $\Prm_{\yrm | \xrm,\Drm}(x,D) = \Prm_{\yrm | \xrm,\uppsi}\big( x,\Psi(D) \big)$.
+For this approach, the distributions $\Prm_{\uppsi}$, $\Prm_{\xrm | \uppsi}$, and $\Prm_{\yrm | \xrm,\uppsi}$ are required. Note that $\Prm_{\Drm | \uptheta}(D | \theta) = \Mcal\big( N \Psi(D) \big)^{-1} \Prm_{\uppsi | \uptheta}\big( \Psi(D) | \theta \big)$. Also, observe that the relevant posterior distributions satisfy $\prm_{\upthetam | \Drm} = \prm_{\upthetam | \uppsi}\big( \Psi(\Drm) \big)$ and $\prm_{\upthetac(x) | \xrm,\Drm} = \prm_{\upthetac(x) | \xrm,\uppsi}\big( \xrm,\Psi(\Drm) \big)$, due to the sufficiency of the statistic $\Psi(\Drm)$ \cite{bernardo}; consequently, $\Prm_{\xrm | \Drm} = \Prm_{\xrm | \uppsi}\big( \Psi(\Drm) \big)$, and $\Prm_{\yrm | \xrm,\Drm} = \Prm_{\yrm | \xrm,\uppsi}\big( \xrm,\Psi(\Drm) \big)$.
 
 
 
@@ -723,7 +724,11 @@ The irreducible risk \eqref{eq:risk_clv} for a given model satisfies $\Rcal_{\Th
 
 \section{Predictive Model Estimation} \label{sec:predictive_est}
 
-It is instructive to treat the Bayesian predictive distribution $\Prm_{\yrm | \xrm,\Drm}$ as an estimator of the clairvoyant predictive distribution $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$ and investigate the effects of prior knowledge. Of specific interest are the mean $\Erm_{\Drm | \uptheta}\big[\Prm_{\yrm | \xrm, \Drm}\big]$ and covariance $\Crm_{\Drm | \uptheta}\big[\Prm_{\yrm | \xrm, \Drm}\big]$ with respect to the true model $\uptheta$.  To simplify the analysis, the training data $\Drm$ will be represented using the marginal and conditional sufficient statistics $(\uppsim, \uppsic)$. 
+It is instructive to treat the Bayesian predictive distribution $\Prm_{\yrm | \xrm,\Drm}$ as an estimator of the clairvoyant predictive distribution $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$ and investigate the effects of prior knowledge. Of specific interest are the mean $\Erm_{\Drm | \uptheta}\big[\Prm_{\yrm | \xrm, \Drm}\big]$ and covariance $\Crm_{\Drm | \uptheta}\big[\Prm_{\yrm | \xrm, \Drm}\big]$ with respect to the true model $\uptheta$.  
+
+\todohi{move psi}
+
+To simplify the analysis, the training data $\Drm$ will be represented using the marginal and conditional sufficient statistics $(\uppsim, \uppsic)$. 
 
 To aid characterization of the estimator, define the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$. The expected bias of the estimator is thus
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias}
@@ -733,7 +738,7 @@ To aid characterization of the estimator, define the random process $\Delta(\xrm
 measuring the difference between the clairvoyant distribution and the expected Bayesian distribution.
 
 Defining the covariance of the Bayesian predictive distribution as
-\begin{IEEEeqnarray}{L}
+\begin{IEEEeqnarray}{L} \label{eq:predictive_cov}
 \mathrm{Cov}(\xrm;\upthetam,\upthetac) = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \;,
 \end{IEEEeqnarray}
 the conditional second moments of $\Delta(\xrm;\uppsim,\uppsic,\upthetac)$ can be readily shown to be
@@ -1433,11 +1438,12 @@ where the properties of an Empirical distribution (Appendix \ref{app:emp}) condi
 \mathrm{Bias}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim | \upthetam}\big[\gammam(\xrm; \uppsim)\big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \;.
 \end{IEEEeqnarray}
 and noting that
-\begin{IEEEeqnarray}{rCl}
-\Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] & = & \Big( \gammam(\xrm; \uppsim) - \Erm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \Big) \big(\alphac(\xrm) - \upthetac(\xrm)\big) \nonumber \\
-&& \quad + \big(1 - \gammam(\xrm; \uppsim)\big) \big(\uppsic(\xrm) - \upthetac(\xrm)\big) \;,
+\begin{IEEEeqnarray}{L}
+\Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \nonumber \\
+\quad = \Big( \gammam(\xrm; \uppsim) - \Erm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \Big) \big(\alphac(\xrm) - \upthetac(\xrm)\big) \nonumber \\
+\qquad + \big(1 - \gammam(\xrm; \uppsim)\big) \big(\uppsic(\xrm) - \upthetac(\xrm)\big) \;,
 \end{IEEEeqnarray}
-the covariance of the estimate can be represented as
+the covariance \eqref{eq:predictive_cov} of the estimate can be represented as
 \begin{IEEEeqnarray}{L} \label{eq:predictive_cov_dir}
 \mathrm{Cov}(\xrm;\upthetam,\upthetac) = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
 \quad = \Crm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
@@ -2555,9 +2561,10 @@ The conditional distribution of the values $\Yrm$ given the corresponding $\Xrm$
 & = & \prod_{\Xcal} \left( \prod_{\Ycal} \thetac(y;x)^{\Psic(y;x;Y,X) {\drm}y} \right)^{N \Psim(x;X) {\drm}x} 
 \end{IEEEeqnarray}
 depends only on the conditional models $\upthetac(x)$. The dependency on the data $\Drm$ can be expressed using $\Psim$ and $\Psic : \{\Ycal \times \Xcal\}^N \mapsto \Uppsic \subset \Pcal(\Ycal)^{\Xcal}$, defined as
-\begin{equation}
-\Psic(x;Y,X) = \frac{\Psi(\cdot,x;Y,X)}{\Psim(x;X)} = \frac{\sum_{n=1}^N \delta\big( \cdot - Y_n \big) \delta\big[ x,X_n \big]}{\sum_{n=1}^N \delta\big[ x,X_n \big]} \;.
-\end{equation}
+\begin{IEEEeqnarray}{rCl}
+\Psic(x;Y,X) & = & \frac{\Psi(\cdot,x;Y,X)}{\Psim(x;X)} \nonumber \\
+& = & \frac{\sum_{n=1}^N \delta(\cdot - Y_n) \delta(x-X_n)}{\sum_{n=1}^N \delta(x-X_n)} = \frac{\sum_{n=1}^N \delta(\cdot - Y_n) \delta[x,X_n]}{\sum_{n=1}^N \delta[x,X_n]} \;.
+\end{IEEEeqnarray}
 
 
 The same bijection can be used to decompose the empirical process into marginal and conditional empirical processes. The ``marginalized'' random process $\uppsim \in \Uppsim \subset \Pcal(\Xcal)$ is now defined as $\uppsim \equiv \int_{\Ycal} \uppsi(y,\cdot) {\drm}y$. Using the aggregation property of empirical processes detailed in Appendix \ref{app:EP}, it can be shown that conditioned on the model $\uptheta$, the marginal model is also an Empirical process, $\uppsim | \upthetam \sim \EP(N,\upthetam)$. Note the conditional independence from $\upthetac$. 
@@ -3143,11 +3150,9 @@ Next, consider the risk trends when the true model is fixed. The marginal distri
 
 As seen in Chapter \ref{ch:dir_cont}, the flexibility of using a full-support prior, while effective for countable data spaces, has severe drawbacks when operating on observations drawn from continuous spaces. This section develops a new Bayesian predictive distribution using discretization that may be used to realize the benefits of Dirichlet process priors while avoiding the aforementioned limitation. 
 
-\todohigh{USE DQE feature transform NOTATION??!!}
+Define a discretizing data transformation $T: \Xcal \mapsto \Tcal$, where the range is a countable subset $\Tcal \subset \Xcal$, such that $|\Tcal| \leq \aleph_0$. This transform is applied to each of the training values $\Xrm_n$, as well as to the novel observation $\xrm$. Note that $T$ is effectively a dimensionality-reducing feature transformation.
 
-Define a discretizing data transformation $T: \Xcal \mapsto \Xcal'$, where the range is a countable subset $\Xcal' \subset \Xcal$, such that $|\Xcal'| \leq \aleph_0$. This transform is applied to each of the training values $\Xrm_n$, as well as to the novel observation $\xrm$. Note that $T$ is effectively a dimensionality-reducing feature transformation.
-
-Having effectively changed the domain of the observations, the Dirichlet prior marginal mean is re-defined as $\alpham = \sum_{x' \in \Xcal'} \alpham'(x') \delta(\cdot - x')$, a mixture of delta functions at the discretized values, where $\alpham' \in \Pcal(\Xcal')$ is the discrete space marginal function.
+Having effectively changed the domain of the observations, the Dirichlet prior marginal mean is re-defined as $\alpham = \sum_{t \in \Tcal} \alpham'(t) \delta(\cdot - t)$, a mixture of delta functions at the discretized values, where $\alpham' \in \Pcal(\Tcal)$ is the discrete space marginal function.
 
 \todohi{discretized conditional alpha?? generic marginal alpha to start?}
 
@@ -3155,19 +3160,19 @@ Starting from the Dirichlet-based Bayesian predictive distribution \eqref{eq:P_y
 \begin{IEEEeqnarray}{rCl}
 \prm_{\yrm | \xrm,\Drm} & = & \gammam'\big(T(\xrm); \Xrm \big) \alphac\big(T(\xrm)\big) + \Big(1 - \gammam'\big(T(\xrm); \Xrm \big)\Big) \Psic'\big(T(\xrm); \Drm\big) \;,
 \end{IEEEeqnarray}
-where the discretized weighting function $\gammam'(X) \in (0,1]^{\Xcal'}$ is defined as 
+where the discretized weighting function $\gammam'(X): \Xcal^N \mapsto (0,1]^{\Tcal}$ is defined as 
 \begin{IEEEeqnarray}{rCl}
-\gammam'(x'; X) & = & \left(1 + \frac{\sum_{n=1}^N \delta\big(x' - T(X_n)\big)}{\alpha_0 \sum_{x'' \in \Xcal'} \alpham'(x'') \delta(x' - x'')}\right)^{-1} \nonumber \\
-& = & \left(1 + \frac{\sum_{n=1}^N \delta\big[x', T(X_n)\big]}{\alpha_0 \sum_{x'' \in \Xcal'} \alpham'(x'') \delta[x', x'']}\right)^{-1} \nonumber \\
-& = & \left(1 + \frac{N \Psim'(x'; X)}{\alpha_0 \alpham'(x') }\right)^{-1} \;.
+\gammam'(t; X) & = & \left(1 + \frac{\sum_{n=1}^N \delta\big(t - T(X_n)\big)}{\alpha_0 \sum_{t' \in \Tcal} \alpham'(t') \delta(t - t')}\right)^{-1} \nonumber \\
+& = & \left(1 + \frac{\sum_{n=1}^N \delta\big[t, T(X_n)\big]}{\alpha_0 \sum_{t' \in \Tcal} \alpham'(t') \delta[t, t']}\right)^{-1} \nonumber \\
+& = & \left(1 + \frac{N \Psim'(t; X)}{\alpha_0 \alpham'(t) }\right)^{-1} \;.
 \end{IEEEeqnarray}
 The discretized marginal empirical function is 
 \begin{IEEEeqnarray}{rCl}
-\Psim'(X) & = & \frac{1}{N} \sum_{n=1}^N \delta\big[\cdot, T(X_n)\big] \in \Pcal(\Xcal')
+\Psim'(X) & = & \frac{1}{N} \sum_{n=1}^N \delta\big[\cdot, T(X_n)\big] \in \Pcal(\Tcal)
 \end{IEEEeqnarray}
-and the discretized conditional empirical transform $\Psic'(D) \in \Pcal(\Ycal)^{\Xcal'}$ is defined as 
+and the discretized conditional empirical transform $\Psic'(D) \in \Pcal(\Ycal)^{\Tcal}$ is defined as 
 \begin{IEEEeqnarray}{rCl}
-\Psic'(x'; D) & = & \frac{\sum_{n=1}^N \delta\big( \cdot - Y_n \big) \delta\big[x', T(X_n) \big]}{\sum_{n=1}^N \delta\big[x', T(X_n) \big]} \;.
+\Psic'(t; D) & = & \frac{\sum_{n=1}^N \delta\big( \cdot - Y_n \big) \delta\big[t, T(X_n) \big]}{\sum_{n=1}^N \delta\big[t, T(X_n) \big]} \;.
 \end{IEEEeqnarray}
 
 
@@ -3176,22 +3181,24 @@ and the discretized conditional empirical transform $\Psic'(D) \in \Pcal(\Ycal)^
 
 \todohigh{Formulate from new low-dim likelihood func}
 
-As with the original empirical transform, it is useful to define and characterize new random processes. Introduce a partitioning of the observation space $\Xcal$ as $\{\ldots, \Scal(x'), \ldots\}$, where $\Scal(x') = \{x \in \Xcal: T(x) = x'\}$.
+Inspecting the new predictive distribution $\prm_{\yrm | \xrm,\Drm}$, it is clear that the dependency on the joint observations $(\xrm, \Drm)$ can be represented using the sufficient statistics $\big(T(\xrm), \Psim'(\Xrm), \Psic'(\Drm)\big)$. Again, it is useful to define and characterize new random processes. Introduce a partitioning $\{\ldots, \Scal(t), \ldots\}$ of the observation space $\Xcal$, where $\Scal(t) = \{x \in \Xcal: T(x) = t\}$.
 
-Define the discretized empirical process $\uppsi' \equiv \Psi'(D) \in \Pcal(\Ycal \times \Xcal')$, where
-\begin{IEEEeqnarray}{rCl}
-\Psi'(y, x'; D) & \equiv & \frac{1}{N} \sum_{n=1}^N \delta(y - Y_n) \delta\big[x', T(X_n) \big] \nonumber \\
-& = & \frac{1}{N} \sum_{n=1}^{N} \delta(y - Y_n) \chi\big(X_n; \Scal(x')\big) \nonumber \\
-& = & \frac{1}{N} \sum_{n=1}^{N} \delta(y - Y_n) \int_{\Scal(x')} \delta(x - X_n) {\drm}x \nonumber \\
-& = & \int_{\Scal(x')} \Psi(y,x; D) {\drm}x \;.
-\end{IEEEeqnarray}
-By the aggregation property of Empirical processes (Appendix \ref{app:EP}), $\uppsi' | \uptheta \sim \EP(N, \uptheta')$, where the dependency on the model is expressed through the discretized $\uptheta' \in \Pcal(\Ycal \times \Xcal')$, defined as $\uptheta'(y,x') = \int_{\Scal(x')} \uptheta(y,x) {\drm}x$.
+Defining the novel feature $\trm \equiv T(\xrm)$, it is evident that $\Prm_{\trm | \uptheta} = \Pr\big(T(\xrm) = \trm | \uptheta\big) = \Pr\big(\xrm \in \Scal(\trm) | \uptheta\big)$. As a result, $\Prm_{\trm | \uptheta} \equiv \upthetam' \in \Pcal(\Tcal)$, where $\upthetam'$ is the discretized marginal model defined as $\upthetam'(t) = \int_{\Scal(t)} \upthetam(x) {\drm}x$.
 
-Consequently, when conditioned on the model, the marginal process $\uppsim' \equiv \Psim'(X) \equiv \int_{\Ycal} \uppsi'(y,x') {\drm}y$ is also Empirical with $N$ samples and mean $\upthetam' \in \Pcal(\Xcal')$, defined as $\upthetam'(x') = \int_{\Scal(x')} \upthetam(x) {\drm}x$. Additionally, the conditional processes $\uppsic'(x')$ are conditionally independent and distributed as $\uppsic'(x') | \uppsim'(x'), \upthetac'(x') \sim \EP\big(N \uppsim'(x'), \upthetac'(x')\big)$, where
+Next, characterize the new empirical processes. Define the discretized empirical process $\uppsi' \equiv \Psi'(D) \in \Pcal(\Ycal \times \Tcal)$, where
 \begin{IEEEeqnarray}{rCl}
-\upthetac'(x') & \equiv & \frac{\uptheta'(\cdot,x')}{\upthetam'(x')} = \int_{\Scal(x')} \upthetac(x) \frac{\upthetam(x)}{\upthetam'(x')} {\drm}x \;,
+\Psi'(y, t; D) & \equiv & \frac{1}{N} \sum_{n=1}^N \delta(y - Y_n) \delta\big[t, T(X_n) \big] \nonumber \\
+& = & \frac{1}{N} \sum_{n=1}^{N} \delta(y - Y_n) \chi\big(X_n; \Scal(t)\big) \nonumber \\
+& = & \frac{1}{N} \sum_{n=1}^{N} \delta(y - Y_n) \int_{\Scal(t)} \delta(x - X_n) {\drm}x \nonumber \\
+& = & \int_{\Scal(t)} \Psi(y,x; D) {\drm}x \;.
 \end{IEEEeqnarray}
-convexly combining the true predictive distributions $\upthetac(x)$ for observations $x \in \Scal(x')$. 
+By the aggregation property of Empirical processes (Appendix \ref{app:EP}), it is shown that $\uppsi' | \uptheta \sim \EP(N, \uptheta')$, where the dependency on the model is expressed through the discretized $\uptheta' \in \Pcal(\Ycal \times \Tcal)$, defined as $\uptheta'(y,t) = \int_{\Scal(t)} \uptheta(y,x) {\drm}x$.
+
+Consequently, when conditioned on the model, the marginal process $\uppsim' \equiv \Psim'(\Xrm) \equiv \int_{\Ycal} \uppsi'(y,\cdot) {\drm}y$ is also Empirical with $N$ samples and mean $\upthetam'$. Additionally, the conditional processes $\uppsic'(t) \equiv \Psic'(t; \Drm)$ are conditionally independent and distributed as $\uppsic'(t) | \uppsim'(t), \upthetac'(t) \sim \EP\big(N \uppsim'(t), \upthetac'(t)\big)$, where
+\begin{IEEEeqnarray}{rCl}
+\upthetac'(t) & \equiv & \frac{\uptheta'(\cdot,t)}{\upthetam'(t)} = \int_{\Scal(t)} \upthetac(x) \frac{\upthetam(x)}{\upthetam'(t)} {\drm}x \;,
+\end{IEEEeqnarray}
+convexly combining the true predictive distributions $\upthetac(x)$ for observations $x \in \Scal(t)$. 
 
 \todomid{Discuss: no longer independent of thetam!?}
 
@@ -3200,13 +3207,11 @@ convexly combining the true predictive distributions $\upthetac(x)$ for observat
 
 \todohi{LOCATION?}
 
-\todohigh{USE TRANSFORMED OBS t in place of x, use for expectations!??!}
-
-The Bayesian predictive distribution in terms of the discretized statistics is
+The Bayesian predictive distribution in terms of the discretized sufficient statistics is
 \begin{IEEEeqnarray}{rCl}
-\prm_{\yrm | \xrm,\uppsim',\uppsic'} & = & \gammam'\big(T(\xrm); \uppsim' \big) \alphac\big(T(\xrm)\big) + \Big(1 - \gammam'\big(T(\xrm); \uppsim' \big)\Big) \uppsic'\big(T(\xrm)\big) \;.
+\prm_{\yrm | \trm,\uppsim',\uppsic'} & = & \gammam'(\trm; \uppsim') \alphac(\trm) + \big(1 - \gammam'(\trm; \uppsim')\big) \uppsic'(\trm) \;.
 \end{IEEEeqnarray}
-Note that the domain of the function $\gammam'$ will be changed from $\Xcal^N$ to $\Pcal(\Xcal)$, operating on the discretized empirical distribution rather than the raw observations, such that
+Note that the weighting function is redefined to operate on the discretized empirical distribution rather than the raw observations, such that $\gammam': \Pcal(\Xcal) \mapsto (0,1]^{\Tcal}$ and 
 \begin{IEEEeqnarray}{rCl}
 \gammam'(\psim') & = & \left(1 + \frac{N \psim'}{\alpha_0 \alpham'}\right)^{-1} \;.
 \end{IEEEeqnarray}
@@ -3215,42 +3220,38 @@ Note that the domain of the function $\gammam'$ will be changed from $\Xcal^N$ t
 
 \section{Predictive Model Estimation}
 
+\todomid{Check for residual uses of subscript args on gamma expectations}
+
 To evaluate the bias and covariance functions of the Bayesian predictive distribution $\prm_{\yrm | \xrm,\Drm}$, the training data will be represented by the discretized sufficient statistics $(\uppsim', \uppsic')$. 
 
-\todohigh{RECONSIDER use of subscript arguments EVERYWHERE?!?!!?}
-\todohigh{RECONSIDER use of subscript arguments EVERYWHERE?!?!!?}
+Additionally, redefine the  define the random process $\Delta(\xrm;\uppsim,\uppsic,\upthetac) \equiv \Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$.
 
-The expected value of the estimate conditioned on the true model is
+In terms of the transformed observation $\trm$, the expected value of the estimate conditioned on the true model is
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_dist_avg_dir_disc}
-\Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] 
-& = & \Erm_{\uppsim' | \upthetam'}\big[\gammam'(\uppsim')\big]\big(T(\xrm)\big) \alphac\big(T(\xrm)\big) \\
-&& \quad + \Big(1 - \Erm_{\uppsim' | \upthetam'} \big[\gammam'(\uppsim')\big]\big(T(\xrm)\big)\Big) \upthetac'\big(T(\xrm)\big) \nonumber \;.
+\Erm_{\uppsim',\uppsic' | \upthetam,\upthetac}\big[ \prm_{\yrm | \trm,\uppsim',\uppsic'} \big] 
+& = & \Erm_{\uppsim' | \upthetam'}\big[\gammam'(\trm; \uppsim')\big] \alphac(\trm) \\
+&& \quad + \Big(1 - \Erm_{\uppsim' | \upthetam'} \big[\gammam'(\trm; \uppsim')\big]\Big) \upthetac'(\trm) \nonumber \;.
 \end{IEEEeqnarray}
-Note that the distributions being mixed no longer includes the true predictive distribution $\upthetac(\xrm)$, but rather an approximation $\upthetac'\big(T(\xrm)\big)$. Substituting into \eqref{eq:predictive_bias}, the expected bias is
+Note that the mixture distribution no longer includes the true predictive distribution $\upthetac$, but rather an approximation $\upthetac'$. Noting that $\prm_{\yrm | \xrm,\uppsim',\uppsic'} = \prm_{\yrm | \trm, \uppsim', \uppsic'}\big(T(\xrm), \uppsim',\uppsic' \big)$ and substituting into \eqref{eq:predictive_bias}, the expected bias is
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias_dir_disc}	
-\mathrm{Bias}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim' | \upthetam'}\big[\gammam'(\uppsim')\big]\big(T(\xrm)\big) \big( \alphac - \upthetac' \big)\big(T(\xrm)\big) \nonumber \\
+\mathrm{Bias}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim' | \upthetam'}\Big[\gammam'\big(T(\xrm); \uppsim'\big)\Big] \Big( \alphac\big(T(\xrm)\big) - \upthetac'\big(T(\xrm)\big) \Big) \nonumber \\
 && \quad + \left(\upthetac'\big(T(\xrm)\big) - \upthetac(\xrm) \right) \;.
 \end{IEEEeqnarray}
 
-\todomid{in terms of original model? excess space above?}
+\todomid{in terms of original model?}
 
-Observe that while similar in form to \eqref{eq:predictive_bias_dir}, the bias includes an additional term that captures the approximation error due to discretization. Since the discretized conditional empirical function $\uppsic(x')$ integrates all training samples falling in the subset $\Scal(x') \subset \Xcal$, its expected value integrates the true predictive distributions $\upthetac$ in the same region.
+While similar in form to \eqref{eq:predictive_bias_dir}, observe that the bias includes an additional term that captures the approximation error due to discretization. Since the discretized conditional empirical function $\uppsic(t)$ integrates all training samples falling in the subset $\Scal(t) \subset \Xcal$, its expected value integrates the true predictive distributions $\upthetac$ in the same region.
 
-PGR PGR
 
-and noting that
-\begin{IEEEeqnarray}{L}
-\Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
-\quad = \Big( \gammam(\xrm; \uppsim) - \Erm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \Big) \big(\alphac(\xrm) - \upthetac(\xrm)\big) \nonumber \\
-\qquad + \big(1 - \gammam(\xrm; \uppsim)\big) \big(\uppsic(\xrm) - \upthetac(\xrm)\big) \nonumber \;,
-\end{IEEEeqnarray}
-the covariance of the estimate can be represented as
+Following a procedure similar to that employed in Section \ref{sec:predictive_est_dir}, the covariance of the estimate in terms of the transform $\trm$ is
 \begin{IEEEeqnarray}{L} \label{eq:predictive_cov_dir_disc}
-\mathrm{Cov}(\xrm;\upthetam,\upthetac) = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
-\quad = \Crm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
-\qquad + \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \nonumber \;.
+\Crm_{\uppsim',\uppsic' | \upthetam,\upthetac} \big[\Prm_{\yrm | \trm,\uppsim',\uppsic'} \big] = \Crm_{\uppsim' | \upthetam'}\big[ \gammam'(\trm; \uppsim') \big] \big( \alphac(\trm) - \upthetac'(\trm) \big) \otimes \big( \alphac(\trm) - \upthetac'(\trm) \big) \nonumber \\
+\quad + \Erm_{\uppsim' | \upthetam'}\left[ \frac{\big(1 - \gammam'(\trm; \uppsim')\big)^2}{N \uppsim'(\trm)} \right] \Big( \diag\big(\upthetac'(\trm)\big) - \upthetac'(\trm) \otimes \upthetac'(\trm) \Big) 
 \end{IEEEeqnarray}
-
+and thus the covariance \eqref{eq:predictive_cov} can be represented as 
+\begin{IEEEeqnarray}{L} 
+\mathrm{Cov}(\xrm; \upthetam,\upthetac) = \Crm_{\uppsim',\uppsic' | \upthetam,\upthetac} \big[\Prm_{\yrm | \trm,\uppsim',\uppsic'} \big] \big(T(\xrm); \upthetam,\upthetac\big) \;,
+\end{IEEEeqnarray}
 
 Substituting the estimator bias and variance into \eqref{eq:predictive_del_sq}, the conditional second moments of $\Delta(\xrm;\uppsim,\uppsic,\upthetac)$ are
 \begin{IEEEeqnarray}{L} \label{eq:predictive_del_sq_dir_disc}
@@ -3258,7 +3259,7 @@ Substituting the estimator bias and variance into \eqref{eq:predictive_del_sq}, 
 \quad = \Erm_{\uppsim | \upthetam}\left[ \gammam(\xrm; \uppsim)^2 \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
 \qquad + \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \nonumber \;.
 \end{IEEEeqnarray}
-Note that the bias is proportionate to the difference between the true conditional model and the data-independent estimate, while the covariance also depends on $\Sigma_{\uppsic(x) | \uppsim(x), \upthetac(x)}$. 
+
 
 
 

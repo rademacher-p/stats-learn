@@ -148,6 +148,7 @@ plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_te
 #                            do_std=True, verbose=True, ax=None, rng=None)
 
 
+#%% Save image and Figure
 time_str = strftime('%Y-%m-%d_%H-%M-%S')
 image_path = Path('./images/temp/')
 
@@ -156,7 +157,6 @@ fig.savefig(image_path.joinpath(f"{time_str}.png"))
 with open(image_path.joinpath(f"{time_str}.mpl"), 'wb') as fid:
     pickle.dump(fig, fid)
 
-# plt.figure('Results (Normalized, BB excluded)').savefig(image_path)
 
 # print(f"\nAnalytical Risk = {opt_predictor.evaluate_comp(n_train=n_train)}")
 
