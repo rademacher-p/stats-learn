@@ -11,7 +11,6 @@ from matplotlib import pyplot as plt
 
 from thesis.bayes import models as bayes_models
 from thesis.predictors import (ModelRegressor, BayesRegressor, plot_risk_eval_sim_compare)
-from thesis.preprocessing import discretizer
 from thesis.random import elements as rand_elements, models as rand_models
 
 
@@ -30,7 +29,7 @@ def func_mean_to_models(n, func):
     return [rand_elements.EmpiricalScalar(func(x_i), n - 1) for x_i in np.linspace(0, 1, n, endpoint=True)]
 
 
-n_x = 5
+n_x = 128
 
 # True model
 
@@ -41,7 +40,7 @@ n_x = 5
 # w_model = [0, 0, 1]
 # w_model = [0, 0, 0, 0, 1]
 # w_model = [.3, 0., .4]
-# w_model = [.5, 0, 0]
+w_model = [.5, 0, 0]
 
 # model = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_model),
 #                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
@@ -80,10 +79,10 @@ proc_funcs = []
 #                                                      supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
 
-# prior_mean_x = rand_elements.Beta()
+prior_mean_x = rand_elements.Beta()
 
-prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_x, endpoint=True))
-proc_funcs.append(discretizer(prior_mean_x.supp))
+# prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_x, endpoint=True))
+# proc_funcs.append(discretizer(prior_mean_x.supp))
 
 # prior_mean_x = rand_elements.Mixture([rand_elements.DataEmpirical(np.linspace(0, 1, n_x, endpoint=True),
 #                                                                   counts=np.ones(n_x), space=model.space['x']),
@@ -94,7 +93,7 @@ proc_funcs.append(discretizer(prior_mean_x.supp))
 prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=126, model_x=prior_mean_x)
 
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), space=model.space, proc_funcs=proc_funcs,
-                               name=r'$\mathrm{Dir}$')
+                               name='$\mathrm{Dir}$')
 
 # dir_params = None
 # dir_params = {'alpha_0': [1, 100, 10000]}
@@ -106,7 +105,7 @@ dir_params = {'alpha_0': [.01, 100]}
 # Normal learner
 norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=100 * np.eye(len(w_prior)),
                                                           basis_y_x=None, cov_y_x=.1,
-                                                          model_x=prior_mean.model_x), name=r'$\mathcal{N}$')
+                                                          model_x=prior_mean.model_x), name='$\mathcal{N}$')
 
 # norm_params = None
 # norm_params = {'prior_cov': [10, 0.05]}
