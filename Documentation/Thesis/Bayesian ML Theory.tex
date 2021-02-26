@@ -3149,7 +3149,7 @@ As seen in Chapter \ref{ch:dir_cont}, the flexibility of using a full-support pr
 
 Define a discretizing data transformation $T: \Xcal \mapsto \Tcal$, where the range is a countable subset $\Tcal \subset \Xcal$, such that $|\Tcal| \leq \aleph_0$. This transform is applied to each of the training values $\Xrm_n$, as well as to the novel observation $\xrm$. Note that $T$ is effectively a dimensionality-reducing feature transformation.
 
-Having effectively changed the domain of the observations, the Dirichlet prior marginal mean is re-defined as $\alpham = \sum_{t \in \Tcal} \alpham'(t) \delta(\cdot - t)$, a mixture of delta functions at the discretized values, where $\alpham' \in \Pcal(\Tcal)$ is the discrete space marginal function. 
+Having effectively changed the domain of the observations, the Dirichlet prior marginal mean is re-defined as $\alpham = \sum_{t \in \Tcal} \alpham'(t) \delta(\cdot - t)$, a mixture of delta functions at the discretized values, where $\alpham' \in \Pcal(\Tcal)$ is the discrete space marginal function.
 
 %Additionally, the conditional prior mean is $\alphac(x) = \sum_{t \in \Tcal} \alphac'(t) \delta\big[t, T(x)\big]$
 \todohi{discretized conditional alpha?? generic marginal alpha to start?}
@@ -3602,7 +3602,7 @@ In this section, it is shown that the expected value of an Empirical process $\u
 \mu_{\uppsi} = \theta \;.
 \end{equation}
 
-A defining characteristic of Empirical processes is that their aggregations are also Empirical. Define the partition of $\Ycal = \Rbb$, $\big\{ \Scal(y),S^\text{c}(y) \big\}$ where $\Scal(y) = (-\infty,y]$. The transform random process $\big(\uppsim, \uppsim^\text{c}\big)$, where $\uppsim \equiv \int_{\infty}^y \uppsi(t) {\drm}t$, is thus a discrete-domain Empirical random process for $N$ samples and mean $\big(\thetam,\thetam^\text{c}\big)$, where $\thetam = \int_{-\infty}^y \theta(t) {\drm}t$ and $\thetam^\text{c} = \int_y^\infty \theta(t) {\drm}t$. Dependency on $y$ is suppressed for brevity. Observe that $\mu_{\uppsim}(y) = \thetam$ and thus that 
+A defining characteristic of Empirical processes is that their aggregations are also Empirical. Define the partition of $\Ycal = \Rbb$, $\big\{ \Scal(y),S^\mathrm{c}(y) \big\}$ where $\Scal(y) = (-\infty,y]$. The transform random process $\big(\uppsim, \uppsim^\mathrm{c}\big)$, where $\uppsim \equiv \int_{\infty}^y \uppsi(t) {\drm}t$, is thus a discrete-domain Empirical random process for $N$ samples and mean $\big(\thetam,\thetam^\mathrm{c}\big)$, where $\thetam = \int_{-\infty}^y \theta(t) {\drm}t$ and $\thetam^\mathrm{c} = \int_y^\infty \theta(t) {\drm}t$. Dependency on $y$ is suppressed for brevity. Observe that $\mu_{\uppsim}(y) = \thetam$ and thus that 
 \begin{IEEEeqnarray}{rCl}
 \mu_{\uppsim} & = & \int_{-\infty}^y \theta(t) {\drm}t = \int_{-\infty}^y \mu_{\uppsi}(t) {\drm}t \nonumber \;.
 \end{IEEEeqnarray}
@@ -3680,9 +3680,9 @@ In this section, it is shown that the expected value of a Dirichlet process $\up
 \mu_{\uptheta} = \alpha \;.
 \end{equation}
 
-A defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Define the partition of $\Ycal = \Rbb$, $\big\{ \Scal(y),S^\text{c}(y) \big\}$ where $\Scal(y) = (-\infty,y]$. The transform random variable $\upthetam \equiv \int_{-\infty}^y \uptheta(t) {\drm}t$ is thus a Beta random variable with parameters $\lambda = \alpha_0 \int_{-\infty}^y \alpha(t) {\drm}t$ and $\lambda^\text{c} = \alpha_0 \int_y^\infty \alpha(t) {\drm}t$. Dependency on $y$ is suppressed for brevity. Observe that $\mu_{\upthetam} \equiv \int_{-\infty}^y \mu_{\uptheta}(t) {\drm}t$ and that using the formula for the expected value of a beta random variable \cite{papoulis},
+A defining characteristic of Dirichlet processes is that their aggregations are also Dirichlet. Define the partition of $\Ycal = \Rbb$, $\big\{ \Scal(y),S^\mathrm{c}(y) \big\}$ where $\Scal(y) = (-\infty,y]$. The transform random variable $\upthetam \equiv \int_{-\infty}^y \uptheta(t) {\drm}t$ is thus a Beta random variable with parameters $\lambda = \alpha_0 \int_{-\infty}^y \alpha(t) {\drm}t$ and $\lambda^\mathrm{c} = \alpha_0 \int_y^\infty \alpha(t) {\drm}t$. Dependency on $y$ is suppressed for brevity. Observe that $\mu_{\upthetam} \equiv \int_{-\infty}^y \mu_{\uptheta}(t) {\drm}t$ and that using the formula for the expected value of a beta random variable \cite{papoulis},
 \begin{IEEEeqnarray}{rCl}
-\mu_{\upthetam} & = & \frac{\lambda}{\lambda + \lambda^\text{c}} \\
+\mu_{\upthetam} & = & \frac{\lambda}{\lambda + \lambda^\mathrm{c}} \\
 & = & \int_{-\infty}^y \alpha(t) {\drm}t = \int_{-\infty}^y \mu_{\uptheta}(t) {\drm}t \nonumber \;.
 \end{IEEEeqnarray}
 Differentiating with respect to $y$, we have the expected value of the DP.
@@ -3783,7 +3783,7 @@ In this section, it is shown that the expected value of a Dirichlet-Empirical pr
 \mu_{\uppsi} = \alpha \;.
 \end{equation}
 
-A defining characteristic of Dirichlet-Empirical processes is that their aggregations are also Dirichlet-Empirical. Define the partition of $\Ycal = \Rbb$, $\big\{ \Scal(y),S^\text{c}(y) \big\}$ where $\Scal(y) = (-\infty,y]$. The transform random process $\big(\uppsim, \uppsim^\text{c}\big)$, where $\uppsim \equiv \int_{\infty}^y \uppsi(t) {\drm}t$, is thus a discrete-domain Dirichlet-Empirical random process for $N$ samples, concentration $\alpha_0$, and mean $\big(\alpham,\alpham^\text{c}\big)$, where $\alpham = \int_{-\infty}^y \alpha(t) {\drm}t$ and $\alpham^\text{c} = \int_y^\infty \alpha(t) {\drm}t$. Dependency on $y$ is suppressed for brevity. Observe that $\mu_{\uppsim}(y) = \alpham$ and thus that 
+A defining characteristic of Dirichlet-Empirical processes is that their aggregations are also Dirichlet-Empirical. Define the partition of $\Ycal = \Rbb$, $\big\{ \Scal(y),S^\mathrm{c}(y) \big\}$ where $\Scal(y) = (-\infty,y]$. The transform random process $\big(\uppsim, \uppsim^\mathrm{c}\big)$, where $\uppsim \equiv \int_{\infty}^y \uppsi(t) {\drm}t$, is thus a discrete-domain Dirichlet-Empirical random process for $N$ samples, concentration $\alpha_0$, and mean $\big(\alpham, \alpham^\mathrm{c}\big)$, where $\alpham = \int_{-\infty}^y \alpha(t) {\drm}t$ and $\alpham^\mathrm{c} = \int_y^\infty \alpha(t) {\drm}t$. Dependency on $y$ is suppressed for brevity. Observe that $\mu_{\uppsim}(y) = \alpham$ and thus that 
 \begin{IEEEeqnarray}{rCl}
 \mu_{\uppsim} & = & \int_{-\infty}^y \alpha(t) {\drm}t = \int_{-\infty}^y \mu_{\uppsi}(t) {\drm}t \nonumber \;.
 \end{IEEEeqnarray}
@@ -4038,7 +4038,7 @@ and
 \begin{IEEEeqnarray}{rCl}
 \mu_{\uptheta | \Drm} & \equiv & \Sigma_{\uptheta | \Drm} \left( \Sigma_{\uptheta}^{-1}\mu_{\uptheta} + \sum_{n=1}^N \phi(\Xrm_n) \Sigma_{\yrm}^{-1} \Yrm_n \right) \;.
 \end{IEEEeqnarray}
-Note that the posterior mean of $\uptheta$ is a convex combination of the prior mean $\mu_{\uptheta}$ and the maximum-likelihood estimate $\theta_{\text{ML}}(\Drm) = \left( \sum_{n=1}^N \phi(\Xrm_n) \Sigma_{\yrm}^{-1} \phi(\Xrm_n)^\intercal \right)^{-1} \sum_{n=1}^N \phi(\Xrm_n) \Sigma_{\yrm}^{-1} \Yrm_n$, which is simply weighted least-squares. 
+Note that the posterior mean of $\uptheta$ is a convex combination of the prior mean $\mu_{\uptheta}$ and the maximum-likelihood estimate $\theta_{\mathrm{ML}}(\Drm) = \left( \sum_{n=1}^N \phi(\Xrm_n) \Sigma_{\yrm}^{-1} \phi(\Xrm_n)^\intercal \right)^{-1} \sum_{n=1}^N \phi(\Xrm_n) \Sigma_{\yrm}^{-1} \Yrm_n$, which is simply weighted least-squares. 
 
 \todolow{discuss trends}
 
