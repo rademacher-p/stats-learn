@@ -267,9 +267,9 @@ Similarly, the beta function $\beta$ operates on functions $g : \Xcal \mapsto \R
 \end{equation}
 Note that the countable domains of the input functions may have an infinite number of elements. 
 
-The indicator function $\chi$, defined as
+For a given subset $\Scal \subset \Xcal$, the indicator function $\chi(\Scal): \Xcal \mapsto \{0, 1\}$, defined as
 \begin{equation}
-	\chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S \;, \end{cases}
+\chi(x; \Scal) = \begin{cases} 1 & \mathrm{if} \ x \in \Scal, \\ 0 & \mathrm{if} \ x \notin \Scal \;, \end{cases}
 \end{equation}
 will be used repeatedly.
 
@@ -872,9 +872,9 @@ The first term is the expected irreducible risk. The second term is the expected
 Substituting in the clairvoyant and Bayesian estimators, the excess squared-error \eqref{eq:risk_cond_ex_SE} can be represented as
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond_ex_SE_bayes}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) & = & \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
-& = & \Erm_{\xrm | \uptheta} \left[ \Big( \Erm_{\Drm | \uptheta}\big[ \mu_{\yrm | \xrm,\Drm} \big] - \mu_{\yrm | \xrm,\uptheta} \Big)^2 + \Crm_{\Drm | \uptheta}\big[ \mu_{\yrm | \xrm,\Drm} \big] \right] \nonumber \\
 & \equiv & \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm,\Drm | \upthetam,\upthetac} \Big[ \Delta(y; \xrm; \Drm,\upthetac) \Delta(y'; \xrm; \Drm,\upthetac) \Big] \nonumber \\
-& = & \Erm_{\xrm | \upthetam} \left[ \left( \sum_{y \in \Ycal} y \ \mathrm{Bias}(y; \xrm; \upthetam,\upthetac) \right)^2 + \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \ \mathrm{Cov}(y,y'; \xrm; \upthetam,\upthetac) \right] \nonumber \;,
+& = & \Erm_{\xrm | \uptheta} \left[ \Big( \Erm_{\Drm | \uptheta}\big[ \mu_{\yrm | \xrm,\Drm} \big] - \mu_{\yrm | \xrm,\uptheta} \Big)^2 + \Crm_{\Drm | \uptheta}\big[ \mu_{\yrm | \xrm,\Drm} \big] \right] \nonumber \\
+& \equiv & \Erm_{\xrm | \upthetam} \left[ \left( \sum_{y \in \Ycal} y \ \mathrm{Bias}(y; \xrm; \upthetam,\upthetac) \right)^2 + \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \ \mathrm{Cov}(y,y'; \xrm; \upthetam,\upthetac) \right] \nonumber \;,
 \end{IEEEeqnarray}
 where the formulae for the predictive distribution bias and variance from Section \ref{sec:predictive_est} have been used. 
 
@@ -1491,13 +1491,15 @@ First consider the effects of the training data volume. Clearly, if $N=0$, $\gam
 
 Next consider the effects of the Dirichlet parameterization. As $\alpha_0 \to \infty$, $\gammam(\uppsim)$ is again equal to one, the bias is maximized and the covariance is zero. Conversely, as $\alpha_0 \to 0$, the empirical data distribution is emphasized and the bias scaling factor tends to its minimal value $\big(1 - \upthetam(x)\big)^{N}$; this value is equivalent to $\Prm_{\uppsim(x) | \upthetam}\big(0 | \thetam \big)$, the probability that no training samples satisfy $\Xrm_n = x$ and thus that $\uppsic(x)$ is undefined. Additionally, the expectations affecting the covariance tend to
 \begin{IEEEeqnarray}{L} 
-\Crm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \to \big(1 - \upthetam(\xrm) \big)^{N} \left( 1 - \big(1 - \upthetam(\xrm)\big)^{N} \right) 
+\Crm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \to \big(1 - \upthetam(\xrm) \big)^{N} \left( 1 - \big(1 - \upthetam(\xrm)\big)^{N} \right) \;,
 \end{IEEEeqnarray}
-and
+proportionate to the variance of the number of matching samples $N \uppsim(x)$, and
 \begin{IEEEeqnarray}{L} 
 \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \to \sum_{n=1}^N \binom{N}{n} \upthetam(\xrm)^n \big( 1 - \upthetam(\xrm) \big)^{N-n} \frac{1}{n} \;.
 \end{IEEEeqnarray}
 Note that the latter is equivalent to the first inverse moment of a positive binomial random variable \cite{stephan}.
+
+\todolo{Intuitive explanation for empirical predictor variance?}
 
 This demonstrates the critical bias/variance trade-off that is controlled by selection of the Dirichlet concentration parameter. For common applications, both distribution estimate bias and variance contribute to the overall risk and an optimal value of $\alpha_0$ can be found to optimally balance these competing sources of error.
 
@@ -1613,7 +1615,7 @@ The metric to be minimized can be represented as a convex combination of two exp
 
 
 
-\subsection{Regression: the Squared-Error Loss}
+\subsection{Regression: the Squared-Error Loss} \label{sec:SE_dir}
 
 PGR: Use finite hypothesis space instead, wait for continuous DP???
 
@@ -1825,7 +1827,7 @@ PGR: additional figures for uniform case?
 
 
 
-\subsubsection{Squared-Error Trends}
+\subsubsection{Squared-Error Trends} 
 
 Having derived the optimal estimator based on a Dirichlet model prior, it is important to consider the risk $\Rcal_{\Theta}(f^* ; \uptheta)$ and analyze how different prior parameterizations $\alpha$ influence the squared-error for different models $\theta$.
 
@@ -1951,7 +1953,7 @@ PGR: plot captions, alpha zero or x???
 
 
 
-\subsubsection{Example} \label{sec:SE_ex}
+\subsubsection{Example} \label{sec:SE_dir_example}
 
 To demonstrate the efficacy of Dirichlet-based regressors, consider a data model where $\Xcal$ and $\Ycal$ are 128-point discretizations of the unit interval $[0, 1]$, inclusive, such that $\Xcal = \Ycal = \{n/127: n = 0, \ldots, 127\}$. The Dirichlet estimator is parameterized by $\alpham = 1 / 128$ and $\alphac(y;x) = \Bi(127y; 127, 0.5)$, such that the prior estimator $\mu_{\yrm | \xrm} = 0.5$ is constant; various localizations $\alpha_0$ will be used. Results were generated by averaging 50,000 iterations of a novel Python learning simulation.
 
@@ -3052,7 +3054,7 @@ Combining produces the risk,
 
 The minimum Bayesian squared-error equation is similar to the discrete-domain formula \eqref{eq:Risk_min_SE_dir}, with one difference -- the scaling factor for $\Sigma_{\yrm | \xrm}$ depends on the marginal prior mean through $\delta(0)^{-1} \alpham(\xrm)$. 
 
-Note that as $N \to \infty$, the Bayesian risk tends to $\Rcal^* \to \Erm_{\xrm} \left[ \frac{\delta(0)^{-1} \alpham(\xrm)}{\delta(0)^{-1} \alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right]$, which can readily be shown to be the expected irreducible risk, $\Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] = \Erm_{\xrm,\uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right]$. This result is dependent on the fact that models $\uptheta$ drawn from the prior will be Dirac delta mixtures with countable support; as shown in the following section, if the true model $\theta$ is bounded, then the excess risk will never vanish and the irreducible squared-error will not be achieved. 
+Note that as $N \to \infty$, the Bayesian risk tends to $\Rcal^* \to \Erm_{\xrm} \left[ \frac{\delta(0)^{-1} \alpham(\xrm)}{\delta(0)^{-1} \alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right]$, which can readily be shown to be the expected irreducible risk, $\Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] = \Erm_{\xrm,\uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right]$. This result is dependent on the fact that models $\uptheta$ drawn from the prior will be Dirac delta mixtures with countable support, enabling effective learning; as shown in the following section, if the true model $\theta$ is bounded, then the excess risk will never vanish and the irreducible squared-error will not be achieved. 
 
 Other notable difference from the discrete space results occur if $\alpham$ is bounded; specifically, $\Rcal^* \approx (1 + N / \alpha_0)^{-1} \Erm_{\xrm}\big[ \Sigma_{\yrm | \xrm} \big]$. This is a consequence of the estimator preference for using the empirical data distribution when available; the scaling factor $(1 + N / \alpha_0)^{-1}$ is equal to the probability that the novel data pair $(\yrm, \xrm)$ is not represented in the training set and thus that the prior estimator is used. Additionally, as $N \to \infty$, the Bayes squared-error tends to zero. With continuous data, for any localization $\alpha_0$, the probability that two of the Dirac delta functions comprising the mixture $\prm_{\uptheta}$ are located at the same value $x$ is zero. As such, every predictive distribution $\upthetac(x)$ will be supported at a single value $y$, the conditional variance $\Sigma_{\yrm | \xrm,\upthetac}$ is zero, and the irreducible squared-error is zero. With sufficient data, the probability that the novel data pair $(\yrm, \xrm)$ is represented in the training set tends to one, and thus the empirical predictive distribution $\uppsic(\xrm)$ will precisely identify $\uptheta(\xrm)$. This is analogous to the $\alpha_0 \to 0$ case for discrete data, where the model $\uptheta$ will be concentrated at a single value $(y,x)$.
 
@@ -3141,7 +3143,7 @@ Consider a data model where $\Xcal = \Ycal = [0, 1]$, the unit interval. The Dir
 \label{fig:SSP_2021/Risk_SE_N_cont}
 \end{figure}
 
-Next, consider the risk trends when the true model is fixed. The marginal distribution $\thetam = 1$ is uniform and $\thetac(\xrm) = \Beta\big(126 \mu_{\yrm | \xrm,\uptheta}, 126 (1- \mu_{\yrm | \xrm,\uptheta})\big)$, where the clairvoyant regressor is $\mu_{\yrm | \xrm,\uptheta} = 1 / \big(2 + \sin(2\pi \xrm)\big)$. Comparing with the discrete-space models used for demonstration in Section \ref{sec:SE_ex}, observe that the optimal regressor $\mu_{\yrm | \xrm, \uptheta}$ and true predictive variance $\Sigma_{\yrm | \xrm, \uptheta} = \frac{1}{127} \mu_{\yrm | \xrm, \uptheta} (1 - \mu_{\yrm | \xrm, \uptheta})$ are the same. However, since $\upthetam$ is bounded, no effective learning is possible, the Bayesian estimator tends to $\mu_{\yrm | \xrm, \Drm} \to \mu_{\yrm | \xrm}$, and the excess risk tends to the fixed, biased value $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \approx \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right] \approx 0.059$.
+Next, consider the risk trends when the true model is fixed. The marginal distribution $\thetam = 1$ is uniform and $\thetac(\xrm) = \Beta\big(126 \mu_{\yrm | \xrm,\uptheta}, 126 (1- \mu_{\yrm | \xrm,\uptheta})\big)$, where the clairvoyant regressor is $\mu_{\yrm | \xrm,\uptheta} = 1 / \big(2 + \sin(2\pi \xrm)\big)$. Comparing with the discrete-space models used for demonstration in Section \ref{sec:SE_dir_example}, observe that the optimal regressor $\mu_{\yrm | \xrm, \uptheta}$ and true predictive variance $\Sigma_{\yrm | \xrm, \uptheta} = \frac{1}{127} \mu_{\yrm | \xrm, \uptheta} (1 - \mu_{\yrm | \xrm, \uptheta})$ are the same. However, since $\upthetam$ is bounded, no effective learning is possible, the Bayesian estimator tends to $\mu_{\yrm | \xrm, \Drm} \to \mu_{\yrm | \xrm}$, and the excess risk tends to the fixed, biased value $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \approx \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right] \approx 0.059$.
 
 
 
@@ -3165,7 +3167,7 @@ Next, consider the risk trends when the true model is fixed. The marginal distri
 
 As seen in Chapter \ref{ch:dir_cont}, the flexibility of using a full-support prior, while effective for countable data spaces, has severe drawbacks when operating on observations drawn from continuous spaces. This section develops a new Bayesian predictive distribution using discretization that may be used to realize the benefits of Dirichlet process priors while avoiding the aforementioned limitation. 
 
-Define a discretizing data transformation $T: \Xcal \mapsto \Tcal$, where the range is a countable subset $\Tcal \subset \Xcal$, such that $|\Tcal| \leq \aleph_0$. This transform is applied to each of the training values $\Xrm_n$, as well as to the novel observation $\xrm$. Note that $T$ is effectively a dimensionality-reducing feature transformation. Use $T$ to define a partitioning $\{\ldots, \Xcal'(t), \ldots\}$ of the observation space $\Xcal$, where $\Xcal'(t) = \{x \in \Xcal: T(x) = t\}$; it is assumed that these subsets are contiguous. Furthermore, assume that $t \in S(t), \ \forall \ t \in \Tcal$, such that the transform maps $T(t) = t$.
+Define a discretizing data transformation $T: \Xcal \mapsto \Tcal$, where the range is a countable subset $\Tcal \subset \Xcal$, such that $|\Tcal| \leq \aleph_0$. This transform is applied to each of the training values $\Xrm_n$, as well as to the novel observation $\xrm$. Note that $T$ is effectively a dimensionality-reducing feature transformation. Use $T$ to define a partitioning $\{\ldots, \Xcal'(t), \ldots\}$ of the observation space $\Xcal$, where $\Xcal'(t) = \{x \in \Xcal: T(x) = t\}$. It is assumed that these subsets are contiguous; furthermore, assume that $t \in \Xcal'(t), \ \forall \ t \in \Tcal$, such that the transform maps $T(t) = t$.
 
 Having effectively changed the domain of the observations, the Dirichlet prior marginal mean is re-defined as $\alpham = \sum_{t \in \Tcal} \alphamd(t) \delta(\cdot - t)$, a mixture of delta functions at the discretized values, where $\alphamd \in \Pcal(\Tcal)$ is the discrete space marginal function. 
 
@@ -3173,7 +3175,7 @@ Having effectively changed the domain of the observations, the Dirichlet prior m
 \todohi{discretized conditional alpha?? generic marginal alpha to start?}
 
 Starting from the Dirichlet-based Bayesian predictive distribution \eqref{eq:P_y_xD_dir_cont}, substitute for the discretized observations, such that
-\begin{IEEEeqnarray}{rCl} \label{eq:P_y_xD_dir_cont_disc}
+\begin{IEEEeqnarray}{rCl} \label{eq:P_y_xD_dir_disc}
 \prm_{\yrm | \xrm,\Drm} & = & \gammamd\big(T(\xrm); \Xrm \big) \alphac\big(T(\xrm)\big) + \Big(1 - \gammamd\big(T(\xrm); \Xrm \big)\Big) \Psicd\big(T(\xrm); \Drm\big) \;,
 \end{IEEEeqnarray}
 where the discretized weighting function $\gammamd(X): \Xcal^N \mapsto (0,1]^{\Tcal}$ is defined as 
@@ -3190,7 +3192,7 @@ and the discretized conditional empirical transform $\Psicd(D) \in \Pcal(\Ycal)^
 \begin{IEEEeqnarray}{rCl}
 \Psicd(t; D) & = & \frac{\sum_{n=1}^N \delta\big( \cdot - Y_n \big) \delta\big[t, T(X_n) \big]}{\sum_{n=1}^N \delta\big[t, T(X_n) \big]} \;.
 \end{IEEEeqnarray}
-Observe that for a novel observation $\xrm$, the convex weight will now depend on $\sum_{n=1}^N \delta\big[T(\xrm), T(X_n)\big]$, the number of training samples that discretize to the same value. This contrasts with the pure continuous-domain Dirichlet predictive distribution, which only counts training values that match precisely. Similarly, the conditional empirical distribution being mixed in \eqref{eq:P_y_xD_dir_cont_disc} is formed using the same, larger group of training observations.
+Observe that for a novel observation $\xrm$, the convex weight will now depend on $\sum_{n=1}^N \delta\big[T(\xrm), T(X_n)\big]$, the number of training samples that discretize to the same value. This contrasts with the pure continuous-domain Dirichlet predictive distribution, which only counts training values that match precisely. Similarly, the conditional empirical distribution being mixed in \eqref{eq:P_y_xD_dir_disc} is formed using the same, larger group of training observations.
 
 
 
@@ -3198,9 +3200,9 @@ Observe that for a novel observation $\xrm$, the convex weight will now depend o
 
 Inspecting the new predictive distribution $\prm_{\yrm | \xrm,\Drm}$, it is clear that the dependency on the joint observations $(\xrm, \Drm)$ can be represented using the sufficient statistics $\big(T(\xrm), \Psimd(\Xrm), \Psicd(\Drm)\big)$. Again, it is useful to define and characterize new random processes. 
 
-Defining the novel feature $\trm \equiv T(\xrm)$, it is evident that $\Prm_{\trm | \uptheta} = \Pr\big(T(\xrm) = \trm | \uptheta\big) = \Pr\big(\xrm \in \Xcal'(\trm) | \uptheta\big)$. As a result, $\Prm_{\trm | \uptheta} \equiv \upthetamd \in \Pcal(\Tcal)$, where $\upthetamd$ is the discretized marginal model defined as $\upthetamd(t) = \int_{\Xcal'(t)} \upthetam(x) {\drm}x$. Also, note that given the discretization, the raw observation PDF is
+Defining the novel feature $\trm \equiv T(\xrm)$, it is evident that $\Prm_{\trm | \uptheta} = \Pr\big(T(\xrm) = \trm | \uptheta\big) = \Pr\big(\xrm \in \Xcal'(\trm) | \uptheta\big)$. As a result, $\Prm_{\trm | \uptheta} \equiv \upthetamd \in \Pcal(\Tcal)$, where $\upthetamd$ is the discretized marginal model defined as $\upthetamd(t) = \int_{\Xcal'(t)} \upthetam(x) {\drm}x$. Also, note that given the discretization, the observation PDF is
 \begin{IEEEeqnarray}{rCl}
-\prm_{\xrm | \trm, \uptheta} \equiv \frac{\upthetam}{\upthetamd(\trm)} \in \Pcal\big( \Xcal'(\trm) \big) \;.
+\prm_{\xrm | \trm, \uptheta} \equiv \frac{\upthetam}{\upthetamd(\trm)} \chi\big( \Xcal'(\trm) \big) \;.
 \end{IEEEeqnarray}
 
 Next, characterize the new empirical processes. Define the discretized empirical process $\uppsid \equiv \Psid(D) \in \Pcal(\Ycal \times \Tcal)$, where
@@ -3216,17 +3218,17 @@ Consequently, when conditioned on the model, the marginal process $\uppsimd \equ
 \begin{IEEEeqnarray}{rCl}
 \upthetacd(t) & \equiv & \frac{\upthetad(\cdot,t)}{\upthetamd(t)} = \int_{\Xcal'(t)} \upthetac(x) \frac{\upthetam(x)}{\upthetamd(t)} {\drm}x \;,
 \end{IEEEeqnarray}
-convexly combining the true predictive distributions $\upthetac(x)$ for observations $x \in \Xcal'(t)$. More compactly, the discretized conditional model can be represented as $\upthetacd(\trm) = \Erm_{\xrm | \trm, \upthetam}\big[\upthetac(\xrm)\big]$.
+convexly combining the true predictive distributions $\upthetac(x)$ for observations $x \in \Xcal'(t)$.The discretized conditional model can be simply represented as $\upthetacd(\trm) = \Erm_{\xrm | \trm, \upthetam}\big[\upthetac(\xrm)\big]$.
 
 
 
 \subsection{PGR predictive dist w psi}
 
-The Bayesian predictive distribution \eqref{eq:P_y_xD_dir_cont_disc} can be represented in terms of the discretized sufficient statistics as $\prm_{\yrm | \xrm,\Drm} = \prm_{\yrm | \trm,\uppsimd,\uppsicd}\big(T(\xrm), \Psimd(\Xrm), \Psicd(\Drm)\big)$, where
+The Bayesian predictive distribution \eqref{eq:P_y_xD_dir_disc} can be represented in terms of the discretized sufficient statistics as $\prm_{\yrm | \xrm,\Drm} = \prm_{\yrm | \trm,\uppsimd,\uppsicd}\big(T(\xrm), \Psimd(\Xrm), \Psicd(\Drm)\big)$, where
 \begin{IEEEeqnarray}{rCl}
 \prm_{\yrm | \trm,\uppsimd,\uppsicd} & = & \gammamd(\trm; \uppsimd) \alphac(\trm) + \big(1 - \gammamd(\trm; \uppsimd)\big) \uppsicd(\trm) \;.
 \end{IEEEeqnarray}
-Note that the weighting function is redefined to operate on the discretized empirical distribution rather than the raw observations, such that $\gammamd: \Pcal(\Xcal) \mapsto (0,1]^{\Tcal}$ and 
+Note that the weighting function is redefined to operate on the discretized empirical distribution rather than the raw observations, such that $\gammamd: \Pcal(\Tcal) \mapsto (0,1]^{\Tcal}$ and 
 \begin{IEEEeqnarray}{rCl}
 \gammamd(\psim') & = & \left(1 + \frac{N \psimd}{\alpha_0 \alphamd}\right)^{-1} \;.
 \end{IEEEeqnarray}
@@ -3235,7 +3237,7 @@ Note that the weighting function is redefined to operate on the discretized empi
 
 \section{Predictive Model Estimation} \label{sec:predictive_est_dir_disc}
 
-To evaluate the bias and covariance functions of the Bayesian predictive distribution $\prm_{\yrm | \xrm,\Drm}$, the training data will be represented by the discretized sufficient statistics $(\uppsimd, \uppsicd)$. Note that $\Erm_{\Drm | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\Drm} \big] = \Erm_{\uppsimd,\uppsicd | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsimd,\uppsicd} \big]$ and $\Crm_{\Drm | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\Drm} \big] = \Crm_{\uppsimd,\uppsicd | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsimd,\uppsicd} \big]$. 
+To evaluate the bias and covariance functions of the Bayesian predictive distribution $\prm_{\yrm | \xrm,\Drm}$, the training data will be represented by the discretized sufficient statistics $(\uppsimd, \uppsicd)$. Note that $\Erm_{\Drm | \upthetam,\upthetac}\big[ \prm_{\yrm | \xrm,\Drm} \big] = \Erm_{\uppsimd,\uppsicd | \upthetam,\upthetac}\big[ \prm_{\yrm | \xrm,\uppsimd,\uppsicd} \big]$ and $\Crm_{\Drm | \upthetam,\upthetac}\big[ \prm_{\yrm | \xrm,\Drm} \big] = \Crm_{\uppsimd,\uppsicd | \upthetam,\upthetac}\big[ \prm_{\yrm | \xrm,\uppsimd,\uppsicd} \big]$. 
 
 In terms of the transformed observation $\trm$, the expected value of the estimate conditioned on the true model is
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_dist_avg_dir_disc}
@@ -3250,7 +3252,7 @@ Using the equivalence $\prm_{\yrm | \xrm,\uppsimd,\uppsicd} = \prm_{\yrm | \trm,
 \mathrm{Bias}(\xrm; \upthetam,\upthetac) & = & \Erm_{\uppsimd | \upthetamd} \Big[\gammamd\big(T(\xrm); \uppsimd\big)\Big] \Big( \alphac\big(T(\xrm)\big) - \upthetacd\big(T(\xrm)\big) \Big) \nonumber \\
 && \quad + \Big(\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big) \;.
 \end{IEEEeqnarray}
-While similar in form to \eqref{eq:predictive_bias_dir}, observe that the bias includes an additional term that quantifies a ``discretization bias''. Since the discretized conditional empirical function $\uppsic(t)$ integrates all training samples falling in the subset $\Xcal'(t) \subset \Xcal$, its expected value integrates the true predictive distributions $\upthetac$ in the same region.
+While similar in form to \eqref{eq:predictive_bias_dir}, observe that the bias includes an additional term that quantifies a ``discretization bias''. Since the discretized conditional empirical function $\uppsic(t)$ integrates all training samples falling in the subset $\Xcal'(t) \subset \Xcal$, its expected value integrates the true predictive distributions $\upthetac(x)$ in the same region.
 
 
 Following a procedure similar to that employed in Section \ref{sec:predictive_est_dir}, the covariance of the estimate in terms of the transform $\trm$ is
@@ -3267,30 +3269,30 @@ and thus the covariance \eqref{eq:predictive_cov} can be represented as
 Substituting the estimator bias and variance into \eqref{eq:predictive_del_sq}, the conditional second moments of $\Delta(\xrm; \Drm,\upthetac)$ are
 \begin{IEEEeqnarray}{L} \label{eq:predictive_del_sq_dir_disc}
 \Erm_{\Drm | \upthetam,\upthetac} \big[ \Delta(\xrm; \Drm,\upthetac) \otimes \Delta(\xrm; \Drm,\upthetac) \big] \nonumber \\
-\quad \equiv \Erm_{\uppsimd | \upthetamd}\Big[ \gammamd\big(T(\xrm); \uppsimd\big)^2 \Big] \Big( \alphac\big(T(\xrm)\big) - \upthetac\big(T(\xrm)\big) \Big) \otimes \Big( \alphac\big(T(\xrm)\big) - \upthetac\big(T(\xrm)\big) \Big) \nonumber \\
+\quad \equiv \Erm_{\uppsimd | \upthetamd}\Big[ \gammamd\big(T(\xrm); \uppsimd\big)^2 \Big] \Big( \alphac\big(T(\xrm)\big) - \upthetacd\big(T(\xrm)\big) \Big) \otimes \Big( \alphac\big(T(\xrm)\big) - \upthetacd\big(T(\xrm)\big) \Big) \nonumber \\
 \qquad + \Erm_{\uppsimd | \upthetamd}\left[ \frac{\Big(1 - \gammamd\big(T(\xrm); \uppsimd\big)\Big)^2}{N \uppsimd\big(T(\xrm)\big)} \right] \bigg( \diag\Big( \upthetacd\big(T(\xrm)\big) \Big) - \upthetacd\big(T(\xrm)\big) \otimes \upthetacd\big(T(\xrm)\big) \bigg) \nonumber \\
 \qquad + \Erm_{\uppsimd | \upthetamd}\Big[\gammamd\big(T(\xrm); \uppsimd\big)\Big] \Big( \alphac\big(T(\xrm)\big) - \upthetacd\big(T(\xrm)\big) \Big) \otimes \Big(\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big) \nonumber \\
 \qquad + \Erm_{\uppsimd | \upthetamd}\Big[\gammamd\big(T(\xrm); \uppsimd\big)\Big] \Big(\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big) \otimes \Big( \alphac\big(T(\xrm)\big) - \upthetacd\big(T(\xrm)\big) \Big) \nonumber \\
 \qquad + \Big(\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big) \otimes \Big(\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big) \;.
 \end{IEEEeqnarray}
-Note that the first two terms are similar to the two terms in  \eqref{eq:predictive_del_sq_dir}, with the evaluations performed in terms of the transformed observation $\trm$; the final three terms quantify additional deviation due to the discretization bias.
+Note that the first two terms are analogous to the two terms in  \eqref{eq:predictive_del_sq_dir}, with $T(\xrm)$ in place of $\xrm$ and the appropriate substitutions for the discretized functions; the remaining terms quantify additional deviation due to the discretization bias.
 
 
 
 
 \subsection{Trends}
 
-The bias/variance trends for the discretized Dirichlet distribution estimate \eqref{eq:P_y_xD_dir_cont_disc} have similarities with the trends of the discrete-domain Dirichlet distribution as detailed in Section \ref{sec:predictive_est_dir}. The bias and covariance formulae contain the same expectation forms as before, with $\upthetam$, $\upthetac$, $\uppsim$, and $\gammam$ being replaced by their new discretization variants; the earlier analysis is directly applicable with the appropriate substitutions. Note that $N \uppsimd(t) | \upthetamd(t) \sim \Bi\big(N, \upthetamd(t)\big)$; the relevant expectations will thus depend on the selection of the discretization function $T$.
+The bias/variance trends for the discretized Dirichlet distribution estimate \eqref{eq:P_y_xD_dir_disc} have similarities with the trends of the discrete-domain Dirichlet distribution as detailed in Section \ref{sec:predictive_est_dir}. The bias and covariance formulae contain the same expectation forms as before, with $\upthetam$, $\upthetac$, $\uppsim$, and $\gammam$ being replaced by their new discretization variants; the earlier analysis is directly applicable with the appropriate substitutions. Note that $N \uppsimd(t) | \upthetamd(t) \sim \Bi\big(N, \upthetamd(t)\big)$; thus, the relevant expectations will implicitly depend on the selection of the discretization function $T$.
 
-There is one critical difference from the previous results: since the distribution estimate \eqref{eq:P_y_xD_dir_cont_disc} tends to the discretized $\upthetacd$ instead of the true model $\upthetac$, the new bias formula \eqref{eq:predictive_bias_dir_disc} contains an additional discretization term. This term depends neither on the training data volume $N$ nor on the Dirichlet parameterization $(\alpha_0, \alpham, \alphac)$. Consider the effect of the training volume $N$ on the bias. For $N=0$, the data-independent distribution is again maximally biased and has zero variance; the bias $\mathrm{Bias}(\xrm; \upthetam,\upthetac) = \alphac\big(T(\xrm)\big) - \upthetac(\xrm)$ now depends on the conditional prior mean only at values $t \in \Tcal \subset \Xcal$. As $N \to \infty$, for values $x$ satisfying $\upthetam(x) > 0$, only the first term in \eqref{eq:predictive_bias_dir_disc} vanishes. The residual $\mathrm{Bias}(\xrm; \upthetam,\upthetac) = \upthetacd\big(T(\xrm)\big) - \upthetac(\xrm)$ can not be reduced any further. It is clear that, unlike its discrete-domain relative \eqref{eq:P_y_xD_dir}, the distribution estimate \eqref{eq:P_y_xD_dir_cont_disc} will \emph{not} necessarily converge to the true predictive distribution $\upthetac$ in the limit of training data volume. 
+There is one critical difference from the previous results: since the distribution estimate \eqref{eq:P_y_xD_dir_disc} mixes the discretized $\upthetacd$ instead of the true model $\upthetac$, the new bias formula \eqref{eq:predictive_bias_dir_disc} contains an additional discretization term. This term depends neither on the training data volume $N$ nor on the Dirichlet parameterization $(\alpha_0, \alpham, \alphac)$. Consider the effect of the training volume $N$ on the bias. For $N=0$, the data-independent distribution is again maximally biased and has zero variance; the bias $\mathrm{Bias}(\xrm; \upthetam,\upthetac) = \alphac\big(T(\xrm)\big) - \upthetac(\xrm)$ now depends on the conditional prior mean only at values $t \in \Tcal \subset \Xcal$. As $N \to \infty$, for values $x$ satisfying $\upthetam(x) > 0$, only the first term in \eqref{eq:predictive_bias_dir_disc} vanishes. The residual $\mathrm{Bias}(\xrm; \upthetam,\upthetac) = \upthetacd\big(T(\xrm)\big) - \upthetac(\xrm)$ can not be reduced any further. It is clear that, unlike its discrete-domain relative \eqref{eq:P_y_xD_dir}, the distribution estimate \eqref{eq:P_y_xD_dir_disc} will \emph{not} necessarily converge to the true predictive distribution $\upthetac$ in the limit of training data volume. 
 
 Next, consider the effects of the user-selected parameters. The dependency of the bias/variance trade-off on the Dirichlet prior parameterization is conceptually identical to that of the discrete-domain scenario in Section \ref{sec:predictive_est_dir}. However, the design of the discretization transform $T$ also affects the bias and variance of the predictive distribution estimation. The extreme cases will be analyzed. 
 
-First, consider the finest discretization, such that $|\Tcal| \to \infty$; assume that $\Xcal$ is bounded, such that the volume of the sets $\Xcal'(t)$ tend to zero. As a result, $T(x) \approx x$ and any smooth function $g$ over the domain $\Xcal$ will satisfy $g(x) \approx g(t), \ \forall x \in \Xcal'(t)$. Consequently, the discretized predictive model tends to $\upthetacd\big(T(x)\big) \approx \upthetac(x)$ and the discretization bias $\Big\|\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big\| \to 0$. However, the overall bias may still be high. If the marginal model $\upthetam$ is bounded, the discretized model tends to $\upthetamd \to 0$ and thus $\uppsimd | \upthetamd \to 0$. As a result, $\gammamd(\uppsimd) \to 1$ and the first term in \eqref{eq:predictive_bias_dir_disc} is maximal. Also, observe that the covariance function \eqref{eq:predictive_cov_dir_disc} will tend to zero. Note that these trends are the same as those exhibited by the continuous-domain Dirichlet predictive distribution, as detailed in Section \ref{sec:predictive_est_dir_cont}; the higher the cardinality of the transformed observation set, the larger the training volume $N$ required to effectively learn the true model.
+First, consider the finest discretization, such that $|\Tcal| \to \infty$; assume that $\Xcal$ is bounded and the function $T$ is selected such that the volume of the sets $\Xcal'(t)$ tend to $\int_{\Xcal'(t)} {\drm}x \to 0$. As a result, $T(x) \approx x$ and any smooth function $g$ over the domain $\Xcal$ will satisfy $g(x) \approx g(t), \ \forall x \in \Xcal'(t)$. Consequently, the discretized predictive model tends to $\upthetacd\big(T(x)\big) \approx \upthetac(x)$ and the discretization bias $\Big\|\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big\| \to 0$. However, the overall bias may still be high. If the marginal model $\upthetam$ is bounded, the discretized model tends to $\upthetamd \to 0$ and thus $\uppsimd | \upthetamd \to 0$. As a result, $\gammamd(\uppsimd) \to 1$ and the first term in \eqref{eq:predictive_bias_dir_disc} is maximal. Also, observe that the covariance function \eqref{eq:predictive_cov_dir_disc} will tend to zero. Note that these trends are the same as those exhibited by the continuous-domain Dirichlet predictive distribution, as detailed in Section \ref{sec:predictive_est_dir_cont}; the higher the cardinality of the transformed observation set, the larger the training volume $N$ required to effectively learn the true model.
 
-Next, consider $\Tcal$ to be a singleton, such that $|\Tcal| = 1$ and thus $\Xcal'(t) = \Xcal$. The discretization bias is at its highest, as the discretized conditional model is $\upthetacd(t) = \int_{\Xcal} \upthetac(x) \upthetam(x) {\drm}x$ and the same predictive model $\upthetacd\big(T(x)\big)$ is used for all $x \in \Xcal$. The benefit to such coarse discretization is that, on average, more data is available for each transformed observation. In this case, $\upthetamd = 1$, such that $\uppsimd | \upthetamd \to 1$ and the weighting function tends to $\gammamd(\uppsimd) \to \left(1 + \frac{N}{\alpha_0 \alphamd(t)}\right)^{-1}$. As a result, the first term in the bias formula \eqref{eq:predictive_bias_dir_disc} is minimal for a given value $x$ (assuming the Dirichlet parameters are held constant). Additionally, if the training data volume $N$ is sufficiently high, this will cause the variance to decrease; this is a consequence of the conditional variance of $\uppsicd$ being inversely proportional to $\uppsimd$.
+Next, consider $\Tcal$ to be a singleton, such that $|\Tcal| = 1$ and thus $\Xcal'(t) = \Xcal$. The discretization bias is at its highest, as the discretized conditional model is $\upthetacd(t) = \int_{\Xcal} \upthetac(x) \upthetam(x) {\drm}x$ and the same predictive model $\upthetacd\big(T(x)\big)$ is used for all $x \in \Xcal$. The benefit to such coarse discretization is that, on average, more data is available for each transformed observation. In this case, $\upthetamd = 1$, such that $\uppsimd | \upthetamd \to 1$ and the weighting function tends to $\gammamd(\uppsimd) \to \left(1 + \frac{N}{\alpha_0 \alphamd(t)}\right)^{-1}$. As a result, the first term in the bias formula \eqref{eq:predictive_bias_dir_disc} is minimal (assuming the Dirichlet parameters are held constant). Additionally, if the training data volume $N$ is sufficiently high, this will cause the variance to decrease; this is a consequence of the conditional variance of $\uppsicd$ being inversely proportional to $\uppsimd$.
 
-Evidently, the choice of how heavily to discretize the observation effects its own trade-off. Finer discretization is required to avoid irreducible discretization bias, yet may incur higher bias overall if the prior mean $\alphac$ is poorly selected. Coarser discretization provides more data for the estimation of each distribution $\upthetacd(t)$, but the discretization bias may severe if the true predictive distribution $\upthetac$ changes rapidly with $x$.
+Evidently, the choice of how heavy a discretization to use effects its own trade-off. Finer discretization is required to avoid data-independent discretization bias, yet it may incur higher bias overall if the prior mean $\alphac$ is poorly selected. Coarser discretization provides more data for the estimation of each distribution $\upthetacd(t)$, reducing the variance, but the discretization bias may severe if the true predictive distribution $\upthetac$ changes rapidly with $x$.
 
 
 
@@ -3325,7 +3327,7 @@ f^*(\xrm;\Drm) & = & \mu_{\yrm | \xrm,\Drm} \\
 & = & \gammamd\big(T(\xrm); \Xrm\big) \mu_{\yrm | \xrm} + \Big(1 - \gammamd\big(T(\xrm); \Xrm\big)\Big) \frac{\sum_{n=1}^N \delta\big[T(\xrm), T(\Xrm_n)\big] \Yrm_n}{\sum_{n=1}^N \delta\big[T(\xrm), T(\Xrm_n)\big]} \nonumber \;.
 \end{IEEEeqnarray}
 
-Inheriting the properties of the discretized predictive distribution \eqref{eq:P_y_xD_dir_cont_disc}, the empirical mean for a given observation $\xrm$ now averages all values $\Yrm_n$ whose corresponding observation satisfy $\Xrm_n \in \Xcal'\big(T(\xrm)\big)$.
+Inheriting the properties of the discretized predictive distribution \eqref{eq:P_y_xD_dir_disc}, the empirical mean for a given observation $\xrm$ averages all values $\Yrm_n$ whose corresponding observation satisfy $\Xrm_n \in \Xcal'\big(T(\xrm)\big)$.
 
 
 
@@ -3344,18 +3346,26 @@ PGR
 
 The effects of discretization on the squared-error will be analyzed next. Using the second moments of the random process $\Delta(\xrm; \Drm,\upthetac)$ formulated in \eqref{eq:predictive_del_sq_dir_disc}, the excess squared-error is formulated as
 \begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex_disc}
-\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
+\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \nonumber \\
 \quad \equiv \int_{\Ycal} y \int_{\Ycal} y' \Erm_{\xrm,\Drm | \upthetam,\upthetac} \Big[ \Delta(y; \xrm; \Drm,\upthetac) \Delta(y'; \xrm; \Drm,\upthetac) \Big] {\drm}y {\drm}y' \nonumber \\
 \quad \equiv \Erm_{\trm | \upthetam}\Big[ \Erm_{\uppsimd | \upthetamd}\big[ \gammamd(\trm; \uppsimd)^2 \big] \big( \mu_{\yrm | \xrm}(\trm) - \Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \big)^2 \Big] \nonumber \\
 \qquad + \Erm_{\trm | \upthetam}\left[ \Erm_{\uppsimd | \upthetamd}\left[ \frac{\big(1 - \gammamd(\trm; \uppsimd)\big)^2}{N \uppsimd(\trm)} \right] \big( \Erm_{\xrm | \trm, \upthetam}[\Sigma_{\yrm | \xrm,\upthetac}] + \Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \big) \right] \nonumber \\
 \qquad + \Erm_{\trm | \upthetam}\big[ \Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \big] \nonumber \\
 \quad \equiv \Erm_{\trm | \upthetam}\Big[ \Erm_{\uppsimd | \upthetamd}\big[ \gammamd(\trm; \uppsimd)^2 \big] \big( \mu_{\yrm | \xrm}(\trm) - \Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \big)^2 \Big] \nonumber \\
 \qquad + \Erm_{\trm | \upthetam}\left[ \Erm_{\uppsimd | \upthetamd}\left[ \frac{\big(1 - \gammamd(\trm; \uppsimd)\big)^2}{N \uppsimd(\trm)} \right] \Erm_{\xrm | \trm, \upthetam}[\Sigma_{\yrm | \xrm,\upthetac}] \right] \nonumber \\
-\qquad + \Erm_{\trm | \upthetam}\left[ \Erm_{\uppsimd | \upthetamd}\left[ 1 + \frac{\big(1 - \gammamd(\trm; \uppsimd)\big)^2}{N \uppsimd(\trm)} \right] \Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \right] \;.
+\qquad + \Erm_{\trm | \upthetam}\left[ \left( 1 + \Erm_{\uppsimd | \upthetamd}\left[ \frac{\big(1 - \gammamd(\trm; \uppsimd)\big)^2}{N \uppsimd(\trm)} \right] \right) \Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \right] \;,
 \end{IEEEeqnarray}
-Comparing with the discrete-domain excess squared-error \eqref{eq:risk_cond_SE_dir_ex}, there are, as with the predictive distribution estimation, both similar and new terms. The first two terms are directly comparable; however, instead of integrating over the observation space $\Xcal$, the expectation is evaluated using $\trm$. Additionally, note that the clairvoyant regressor \eqref{eq:f_clv_SE} and the its conditional variance $[\Sigma_{\yrm | \xrm,\upthetac}$ are replaced by their expectations with respect to the conditional distribution $\prm_{\xrm | \trm, \upthetam}$. The new third term quantifies the discretization error via $\Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$, measuring the variation of the clairvoyant regressor within each discretization subset $\Xcal'(t)$. 
+a weighted summation of three terms, each of which can be viewed as second-order in terms of $y$. Note that the expectations over the observations space are performed using the operator equivalence $\Erm_{\xrm | \upthetam} \equiv \Erm_{\trm | \upthetam} \Erm_{\xrm | \trm, \upthetam}$, allowing select terms in \eqref{eq:predictive_del_sq_dir_disc} to be evaluated strictly in terms of the transform $\trm$. The representation $\upthetacd(\trm) = \Erm_{\xrm | \trm, \upthetam}\big[ \upthetac(\xrm) \big] = \Erm_{\xrm | \trm, \upthetam}[\prm_{\yrm | \xrm,\upthetac}]$ is used throughout.
 
-Next, consider the trends of the excess squared-error \eqref{eq:risk_cond_SE_dir_ex_disc}. 
+Comparing with the discrete-domain excess squared-error \eqref{eq:risk_cond_SE_dir_ex}, there are both similar and new terms. The first two terms are directly comparable; instead of integrating over the observation space $\Xcal$, however, the expectation is evaluated using $\trm$. Additionally, note that the clairvoyant regressor \eqref{eq:f_clv_SE} and the its conditional variance $\Sigma_{\yrm | \xrm,\upthetac}$ are replaced by their expectations with respect to the conditional distribution $\prm_{\xrm | \trm, \upthetam}$. The new additional term quantifies the discretization error via $\Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$, measuring the variation of the clairvoyant regressor within each discretization subset $\Xcal'(t)$. Following the tends discussed in Section \ref{sec:predictive_est_dir_disc}, is is intuitive that finer discretizations with smaller subsets $\Xcal'(t)$ will mitigate this variance.
+
+Next, consider the trends of the excess squared-error \eqref{eq:risk_cond_SE_dir_ex_disc}; the trends will have similarities with those of the discrete-domain observation problem discussed in Section \ref{sec:SE_dir}, with the appropriate deviations detailed in Section \ref{sec:predictive_est_dir_disc}.
+
+First, consider the trends with training data volume $N$. For $N = 0$, the three weighting factors equate to one, zero, and one, respectively; as such, the excess squared-error measures the deviation between the data-independent estimator $\mu_{\yrm|\xrm}$ and the discretized clairvoyant estimator $\Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$, as well as the variance of the clairvoyant estimator within the discretized subsets. Combined the formula can also be represented as $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm | \upthetam}\bigg[ \Big( \mu_{\yrm | \xrm}\big(T(\xrm)\big) - \mu_{\yrm | \xrm,\upthetac} \Big)^2 \bigg]$, demonstrating error due to the maximal bias. Conversely, as $N \to \infty$, only the new discretization error remains, such that $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\trm | \upthetam}\big[ \Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \big]$, the average variance of the clairvoyant estimate within the subsets $\Xrm'(t)$. Because of this unavoidable bias, the discretized regressor is unable to achieve the irreducible risk $\Rcal_{\Theta}^*$, no matter how much data is available for training.
+
+Next, consider the trends with the user-defined parameters. Again, for $\alpha_0 \to \infty$, the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm | \upthetam}\bigg[ \Big( \mu_{\yrm | \xrm}\big(T(\xrm)\big) - \mu_{\yrm | \xrm,\upthetac} \Big)^2 \bigg]$ due to the maximally biased estimation. For $\alpha_0 \to 0$, the expectations with respect to $\uppsimd$ will be analogous to those provided in Section \ref{sec:SE_dir}.
+
+Lastly, consider the excess risk trends with the selection of the discretization transform $T$. For the finest discretization, with $|\Tcal| \to \infty$ and $\int_{\Xcal'(t)} {\drm}x \to 0$, the discretized conditional model $\upthetacd$ tends to the true model $\upthetac$; as a result, $\Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \to 0$ and the discretization error is eliminated. However, with fewer data for each transformed observation (on average), 
 
 
 PGR: WIP BELOW
@@ -3388,7 +3398,7 @@ Consider a data model where $\Xcal = \Ycal = [0, 1]$, the unit interval. The Dir
 	\label{fig:SSP_2021/Risk_SE_N_cont}
 \end{figure}
 
-Next, consider the risk trends when the true model is fixed. The marginal distribution $\thetam = 1$ is uniform and $\thetac(\xrm) = \Beta\big(126 \mu_{\yrm | \xrm,\uptheta}, 126 (1- \mu_{\yrm | \xrm,\uptheta})\big)$, where the clairvoyant regressor is $\mu_{\yrm | \xrm,\uptheta} = 1 / \big(2 + \sin(2\pi \xrm)\big)$. Comparing with the discrete-space models used for demonstration in Section \ref{sec:SE_ex}, observe that the optimal regressor $\mu_{\yrm | \xrm, \uptheta}$ and true predictive variance $\Sigma_{\yrm | \xrm, \uptheta} = \frac{1}{127} \mu_{\yrm | \xrm, \uptheta} (1 - \mu_{\yrm | \xrm, \uptheta})$ are the same. However, since $\upthetam$ is bounded, no effective learning is possible, the Bayesian estimator tends to $\mu_{\yrm | \xrm, \Drm} \to \mu_{\yrm | \xrm}$, and the excess risk tends to the fixed, biased value $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \approx \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right] \approx 0.059$.
+Next, consider the risk trends when the true model is fixed. The marginal distribution $\thetam = 1$ is uniform and $\thetac(\xrm) = \Beta\big(126 \mu_{\yrm | \xrm,\uptheta}, 126 (1- \mu_{\yrm | \xrm,\uptheta})\big)$, where the clairvoyant regressor is $\mu_{\yrm | \xrm,\uptheta} = 1 / \big(2 + \sin(2\pi \xrm)\big)$. Comparing with the discrete-space models used for demonstration in Section \ref{sec:SE_dir_example}, observe that the optimal regressor $\mu_{\yrm | \xrm, \uptheta}$ and true predictive variance $\Sigma_{\yrm | \xrm, \uptheta} = \frac{1}{127} \mu_{\yrm | \xrm, \uptheta} (1 - \mu_{\yrm | \xrm, \uptheta})$ are the same. However, since $\upthetam$ is bounded, no effective learning is possible, the Bayesian estimator tends to $\mu_{\yrm | \xrm, \Drm} \to \mu_{\yrm | \xrm}$, and the excess risk tends to the fixed, biased value $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \approx \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right] \approx 0.059$.
 
 
 
@@ -3977,11 +3987,7 @@ Additionally, when conditioned on the aggregation $\uppsim$, the normalized func
 %%
 %%Next, it is demonstrated that the random process $\uppsi(y) \equiv \Psi(y;\Drm) = \sum_{n=1}^N \delta\big( y-\Drm_n \big)$ is a DMP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta(D_n)$ and $\uptheta \sim \DP(\alpha_0, \alpha)$. 
 %%
-%%Observe that $\uppsim(z) \equiv \sum_{n=1}^N \chi(\Drm_n;\Scal_z)$, where $\chi$ is the indicator function
-%%\begin{equation}
-%%\chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S.  \end{cases}
-%%\end{equation}
-%%and note that $\Prm\Big( \chi(\Drm_n;\Scal_z) = 1 \big| \uptheta \Big) = \int_{\Scal_z} \uptheta(y) {\drm}y$. As such, $\uppsim$ conditioned on the model $\uptheta$ is characterized by a multinomial distribution 
+%%Observe that $\uppsim(z) \equiv \sum_{n=1}^N \chi(\Drm_n;\Scal_z)$ and note that $\Prm\Big( \chi(\Drm_n;\Scal_z) = 1 \big| \uptheta \Big) = \int_{\Scal_z} \uptheta(y) {\drm}y$. As such, $\uppsim$ conditioned on the model $\uptheta$ is characterized by a multinomial distribution 
 %%\begin{equation}
 %%\Prm_{\uppsim | \uptheta}(\psim | \theta) = \Mcal(N \psim) \prod_{z \in \Zcal} \left( \int_{\Scal_z} \theta(y) {\drm}y \right)^{N \psim(z)} = \Multi\left( n' ; N,\thetam(z) \right) \;,
 %%\end{equation}
@@ -4038,11 +4044,7 @@ Additionally, when conditioned on the aggregation $\uppsim$, the normalized func
 
 It is demonstrated that conditioned on $\uptheta$, the random process $\uppsi \equiv \Psi(\Drm) = N^{-1} \sum_{n=1}^N \delta(\cdot - \Drm_n)$ is an EP, given that $\prm_{\Drm|\uptheta}(D|\theta) = \prod_{n=1}^N \theta(D_n)$.
 
-Define the aggregation $\uppsim$, where $\uppsim(z) \equiv \int_{\Scal_z} \uppsi(y) {\drm}y \equiv N^{-1} \sum_{n=1}^N \chi(\Drm_n;\Scal_z)$ and $\chi$ is the indicator function
-\begin{equation}
-\chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S \;.  \end{cases}
-\end{equation}
-Note that $\Prm\big( \chi(\Drm_n;\Scal_z) = 1 \big| \uptheta \big) \equiv \upthetam(z)$, where $\upthetam(z) \equiv \int_{\Scal_z} \uptheta(y) {\drm}y$. As the events $\Drm_n \in \Scal_z$ are independent given $\uptheta$, $\uppsim$ conditioned on the model $\uptheta$ is characterized by an Empirical distribution 
+Define the aggregation $\uppsim$, where $\uppsim(z) \equiv \int_{\Scal_z} \uppsi(y) {\drm}y \equiv N^{-1} \sum_{n=1}^N \chi(\Drm_n;\Scal_z)$ and note that $\Prm\big( \chi(\Drm_n;\Scal_z) = 1 \big| \uptheta \big) \equiv \upthetam(z)$, where $\upthetam(z) \equiv \int_{\Scal_z} \uptheta(y) {\drm}y$. As the events $\Drm_n \in \Scal_z$ are independent given $\uptheta$, $\uppsim$ conditioned on the model $\uptheta$ is characterized by an Empirical distribution 
 \begin{equation}
 \Prm_{\uppsim | \uptheta}(\psim | \theta) \equiv \Mcal(N \psim) \prod_{z \in \Zcal} \left( \thetam(z) ^{\psim(z)} \right)^{N} = \Emp\big( \psim; N,\thetam \big)
 \end{equation}
@@ -4078,11 +4080,7 @@ where
 \begin{equation}
 \mu_{\upthetam | \Drm} = \left(\frac{\alpha_0}{\alpha_0 + N}\right) \alpham + \left(\frac{N}{\alpha_0 + N}\right) \Psim(D) 
 \end{equation}
-and $\Psim(z;D) = \int_{\Scal_z} \Psi(y;D) {\drm}y = N^{-1} \sum_{n=1}^N \chi(D_n;\Scal_z)$. Note that $\chi$ is the indicator function
-\begin{equation}
-\chi(x;S) = \begin{cases} 1 & \mathrm{if} \ x \in S, \\ 0 & \mathrm{if} \ x \notin S.  \end{cases}
-\end{equation}
-
+and $\Psim(z;D) = \int_{\Scal_z} \Psi(y;D) {\drm}y = N^{-1} \sum_{n=1}^N \chi(D_n;\Scal_z)$. 
 
 To demonstrate this property, exploit the results of Appendix \ref{app:Dir_agg} to represent the training data distribution conditioned on the aggregation $\upthetam$. Introduce the normalized functions $\upthetac(z) \equiv \uptheta_z / \upthetam(z) \in \Pcal(\Scal_z)$, which are continuous-domain Dirichlet processes, independent from one another, and independent from the aggregation process $\upthetam$. The conditional distribution of interest is
 \begin{IEEEeqnarray}{rCl}
