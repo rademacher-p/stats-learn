@@ -2868,7 +2868,7 @@ PGR: COPIED, incomplete
 
 
 
-\subsection{Regression: the Squared-Error Loss}
+\subsection{Regression: the Squared-Error Loss} \label{sec:SE_dir_cont}
 
 Now we choose for the regression function to map to $\Hcal = \Ycal = \Rbb$.
 
@@ -3288,7 +3288,7 @@ There is one critical difference from the previous results: since the distributi
 
 Next, consider the effects of the user-selected parameters. The dependency of the bias/variance trade-off on the Dirichlet prior parameterization is conceptually identical to that of the discrete-domain scenario in Section \ref{sec:predictive_est_dir}. However, the design of the discretization transform $T$ also affects the bias and variance of the predictive distribution estimation. The extreme cases will be analyzed. 
 
-First, consider the finest discretization, such that $|\Tcal| \to \infty$; assume that $\Xcal$ is bounded and the function $T$ is selected such that the volume of the sets $\Xcal'(t)$ tend to $\int_{\Xcal'(t)} {\drm}x \to 0$. As a result, $T(x) \approx x$ and any smooth function $g$ over the domain $\Xcal$ will satisfy $g(x) \approx g(t), \ \forall x \in \Xcal'(t)$. Consequently, the discretized predictive model tends to $\upthetacd\big(T(x)\big) \approx \upthetac(x)$ and the discretization bias $\Big\|\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big\| \to 0$. However, the overall bias may still be high. If the marginal model $\upthetam$ is bounded, the discretized model tends to $\upthetamd \to 0$ and thus $\uppsimd | \upthetamd \to 0$. As a result, $\gammamd(\uppsimd) \to 1$ and the first term in \eqref{eq:predictive_bias_dir_disc} is maximal. Also, observe that the covariance function \eqref{eq:predictive_cov_dir_disc} will tend to zero. Note that these trends are the same as those exhibited by the continuous-domain Dirichlet predictive distribution, as detailed in Section \ref{sec:predictive_est_dir_cont}; the higher the cardinality of the transformed observation set, the larger the training volume $N$ required to effectively learn the true model.
+First, consider the finest discretization, such that $|\Tcal| \to \infty$; assume that $\Xcal$ is bounded and the function $T$ is selected such that the volume of the sets $\Xcal'(t)$ tend to $\int_{\Xcal'(t)} {\drm}x \to 0$. Consequently, $\prm_{\xrm | \trm, \upthetam} \to \delta(\cdot - \trm)$ and thus $\upthetacd(t) \to \upthetac(t)$. Based on our assumptions regarding the transform, $T(x) \approx x$ and any smooth function $g$ over the domain $\Xcal$ will satisfy $g(x) \approx g(t), \ \forall x \in \Xcal'(t)$. Together, these properties dictate that the discretization bias $\Big\|\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big\| \to 0$. However, the overall bias may still be high. If the marginal model $\upthetam$ is bounded, the discretized model tends to $\upthetamd \to 0$ and thus $\uppsimd | \upthetamd \to 0$. As a result, $\gammamd(\uppsimd) \to 1$ and the first term in \eqref{eq:predictive_bias_dir_disc} is maximal. Also, observe that the covariance function \eqref{eq:predictive_cov_dir_disc} will tend to zero. Note that these trends are the same as those exhibited by the continuous-domain Dirichlet predictive distribution, as detailed in Section \ref{sec:predictive_est_dir_cont}; the higher the cardinality of the transformed observation set, the larger the training volume $N$ required to effectively learn the true model.
 
 Next, consider $\Tcal$ to be a singleton, such that $|\Tcal| = 1$ and thus $\Xcal'(t) = \Xcal$. The discretization bias is at its highest, as the discretized conditional model is $\upthetacd(t) = \int_{\Xcal} \upthetac(x) \upthetam(x) {\drm}x$ and the same predictive model $\upthetacd\big(T(x)\big)$ is used for all $x \in \Xcal$. The benefit to such coarse discretization is that, on average, more data is available for each transformed observation. In this case, $\upthetamd = 1$, such that $\uppsimd | \upthetamd \to 1$ and the weighting function tends to $\gammamd(\uppsimd) \to \left(1 + \frac{N}{\alpha_0 \alphamd(t)}\right)^{-1}$. As a result, the first term in the bias formula \eqref{eq:predictive_bias_dir_disc} is minimal (assuming the Dirichlet parameters are held constant). Additionally, if the training data volume $N$ is sufficiently high, this will cause the variance to decrease; this is a consequence of the conditional variance of $\uppsicd$ being inversely proportional to $\uppsimd$.
 
@@ -3324,7 +3324,7 @@ Evidently, the choice of how heavy a discretization to use effects its own trade
 The optimal function is the expected value of the output conditional PDF,
 \begin{IEEEeqnarray}{rCl}
 f^*(\xrm;\Drm) & = & \mu_{\yrm | \xrm,\Drm} \\
-& = & \gammamd\big(T(\xrm); \Xrm\big) \mu_{\yrm | \xrm} + \Big(1 - \gammamd\big(T(\xrm); \Xrm\big)\Big) \frac{\sum_{n=1}^N \delta\big[T(\xrm), T(\Xrm_n)\big] \Yrm_n}{\sum_{n=1}^N \delta\big[T(\xrm), T(\Xrm_n)\big]} \nonumber \;.
+& = & \gammamd\big(T(\xrm); \Xrm\big) \mu_{\yrm | \xrm}\big(T(\xrm)\big) + \Big(1 - \gammamd\big(T(\xrm); \Xrm\big)\Big) \frac{\sum_{n=1}^N \delta\big[T(\xrm), T(\Xrm_n)\big] \Yrm_n}{\sum_{n=1}^N \delta\big[T(\xrm), T(\Xrm_n)\big]} \nonumber \;.
 \end{IEEEeqnarray}
 
 Inheriting the properties of the discretized predictive distribution \eqref{eq:P_y_xD_dir_disc}, the empirical mean for a given observation $\xrm$ averages all values $\Yrm_n$ whose corresponding observation satisfy $\Xrm_n \in \Xcal'\big(T(\xrm)\big)$.
@@ -3365,28 +3365,16 @@ First, consider the trends with training data volume $N$. For $N = 0$, the three
 
 Next, consider the trends with the user-defined parameters. Again, for $\alpha_0 \to \infty$, the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm | \upthetam}\bigg[ \Big( \mu_{\yrm | \xrm}\big(T(\xrm)\big) - \mu_{\yrm | \xrm,\upthetac} \Big)^2 \bigg]$ due to the maximally biased estimation. For $\alpha_0 \to 0$, the expectations with respect to $\uppsimd$ will be analogous to those provided in Section \ref{sec:SE_dir}.
 
-Lastly, consider the excess risk trends with the selection of the discretization transform $T$. For the finest discretization, with $|\Tcal| \to \infty$ and $\int_{\Xcal'(t)} {\drm}x \to 0$, the discretized conditional model $\upthetacd$ tends to the true model $\upthetac$; as a result, $\Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \to 0$ and the discretization error is eliminated. However, with fewer data for each transformed observation (on average), 
+Lastly, consider the excess risk trends with the selection of the discretization transform $T$. For the finest discretization, with $|\Tcal| \to \infty$ and $\int_{\Xcal'(t)} {\drm}x \to 0$, the conditional distribution $\prm_{\xrm | \trm, \upthetam}$ concentrates and the discretized conditional model $\upthetacd$ tends to the true model $\upthetac$; as a result, $\Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \to 0$ and the discretization error is eliminated. However, with a decreasing expected volume of data $N \uppsimd(t)$ for each transformed observation, the expected value of the regressor tends to $f^*(\xrm; \Drm) \to \mu_{\yrm | \xrm}\big(T(\xrm)\big) \approx \mu_{\yrm | \xrm}$ and the excess risk tends to the maximum bias, zero variance value, $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\trm | \upthetam}\Big[ \big( \mu_{\yrm | \xrm}(\trm) - \Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \big)^2 \Big] \approx \Erm_{\xrm | \upthetam}\Big[ \big( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \big)^2 \Big]$. Note that this is the same as the continuous-domain Dirichlet regressor error for bounded $\thetam$, as detailed in Section \ref{sec:SE_dir_cont}.
+
+Contrasting, if the transform set is singleton, the expectations of $\uppsimd$ used for weighting will, given sufficient training data, be at their lowest values; see the discussion in Section \ref{sec:predictive_est_dir_disc}. However, the extremity of the averaging in $\Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$ and in the discretization variance term $\Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$ will generally cause the total excess error to be prohibitively high. In practice, the degree of discretization must balance these competing sources of error.
 
 
-PGR: WIP BELOW
-
-It is instructional to consider the trends of the excess squared-error \eqref{eq:risk_cond_SE_dir_ex_cont} with training data volume $N$ and with Dirichlet prior parameterization. Referencing the predictive distribution estimation discussion in Section \ref{sec:predictive_est_dir_cont}, the bias/variance trends are used. Importantly, if the marginal model $\upthetam$ is upper-bounded, the biased, fixed prior estimator $\mu_{\yrm | \xrm}$ will  always be used (on average) and the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \approx \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, regardless of how large the training data volume $N$ may be. 
-
-If instead $\upthetam$ includes Dirac delta functions, there are values $x \in \Xcal$ with non-zero probabilities of being observed. At these values, if $\alpham(x)$ is bounded, the weights tend to
-\begin{IEEEeqnarray}{L} 
-	\Erm_{\uppsim | \upthetam}\big[ \gammam(x; \uppsim)^2 \big] \to \left(1 - \frac{\upthetam(x)}{\delta(0)}\right)^{N} 
-\end{IEEEeqnarray}
-and
-\begin{IEEEeqnarray}{L} 
-	\Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(x; \uppsim)\big)^2}{\delta(0)^{-1} N \uppsim(x)} \right] \to \sum_{n=1}^N \binom{N}{n} \left(\frac{\upthetam(x)}{\delta(0)}\right)^n \left( 1 - \frac{\upthetam(x)}{\delta(0)} \right)^{N-n} \frac{1}{n} \;,
-\end{IEEEeqnarray}
-representing the minimum bias and maximum variance incurred by the empirical estimate. If $\alpham$ also has a Dirac delta function at $x$, the value $\gammam(x; \uppsim)$ may assume values between zero and one and the estimate may convexly combine the prior estimate with the empirical estimate; in this case, the bias/variance weights may take on the same full range of values as for regression using discrete-domain data.
-
-
-\todohi{comment on total risk with N - equal to prob thetam is continuous times sq bias?!}
 
 
 \subsubsection{Example}
+
+PGR: WIP
 
 Consider a data model where $\Xcal = \Ycal = [0, 1]$, the unit interval. The Dirichlet estimator is parameterized by $\alpham = 1$ and $\alphac(x) = \Beta(63, 63)$, such that the prior estimator $\mu_{\yrm | \xrm} = 0.5$ is constant; various localizations $\alpha_0$ will be used. 
 
