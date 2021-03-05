@@ -24,6 +24,14 @@ def check_spaces(iter_):
         raise ValueError("All objects must have the same space attribute.")
 
 
+def check_spaces_x(iter_):
+    space = iter_[0].space['x']
+    if all(obj.space['x'] == space for obj in iter_[1:]):
+        return space
+    else:
+        raise ValueError("All objects must have the same space attribute.")
+
+
 # def get_superset(spaces):     # TODO: improve or delete
 #     shape = spaces[0].shape
 #     if not all(s.shape == shape for s in spaces[1:]):

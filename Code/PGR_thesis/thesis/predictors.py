@@ -18,12 +18,12 @@ from thesis.loss_funcs import loss_se, loss_01
 from thesis.random import elements as rand_elements, models as rand_models
 from thesis.util import spaces
 from thesis.util.base import vectorize_func, check_data_shape
-from thesis.util.spaces import check_spaces
+from thesis.util.spaces import check_spaces_x
 
 
 def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False,
                           rng=None):
-    space_x = check_spaces(predictors)['x']
+    space_x = check_spaces_x(predictors)
     if x is None:
         if space_x.x_plt is None:
             space_x.set_x_plot()
@@ -118,7 +118,7 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
 
 def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, do_std=False, verbose=False,
                                ax=None, rng=None):
-    space_x = check_spaces(predictors)['x']
+    space_x = check_spaces_x(predictors)
     if x is None:
         if space_x.x_plt is None:
             space_x.set_x_plot()

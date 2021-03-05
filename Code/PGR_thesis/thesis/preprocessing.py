@@ -2,6 +2,8 @@ import numpy as np
 
 
 def discretizer(vals):  # TODO: use sklearn.preprocessing.KBinsDiscretizer?
+    """Create a rounding discretizer."""
+
     def func(x):
         x = np.array(x)
         delta = np.abs(x - vals[:, np.newaxis])
