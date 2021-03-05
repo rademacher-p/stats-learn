@@ -10,8 +10,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from thesis.bayes import models as bayes_models
-from thesis.predictors import (ModelRegressor, BayesRegressor, plot_risk_eval_sim_compare)
+from thesis.predictors import (ModelRegressor, BayesRegressor, plot_risk_eval_sim_compare, plot_predict_stats_compare)
 from thesis.random import elements as rand_elements, models as rand_models
+from thesis.preprocessing import discretizer
 
 
 # plt.style.use('seaborn')
@@ -29,7 +30,7 @@ def func_mean_to_models(n, func):
     return [rand_elements.EmpiricalScalar(func(x_i), n - 1) for x_i in np.linspace(0, 1, n, endpoint=True)]
 
 
-n_x = 128
+n_x = 4
 
 # True model
 
@@ -79,10 +80,12 @@ proc_funcs = []
 #                                                      supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
 
-prior_mean_x = rand_elements.Beta()
+# prior_mean_x = rand_elements.Beta()
 
-# prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_x, endpoint=True))
-# proc_funcs.append(discretizer(prior_mean_x.supp))
+_temp = np.full(n_x, 2)
+_temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
+prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_x, endpoint=True), p=_temp / _temp.sum())
+proc_funcs.append(discretizer(prior_mean_x.supp))
 
 # prior_mean_x = rand_elements.Mixture([rand_elements.DataEmpirical(np.linspace(0, 1, n_x, endpoint=True),
 #                                                                   counts=np.ones(n_x), space=model.space['x']),
@@ -92,12 +95,14 @@ prior_mean_x = rand_elements.Beta()
 
 prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=126, model_x=prior_mean_x)
 
-dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), space=model.space, proc_funcs=proc_funcs,
-                               name='$\mathrm{Dir}$')
+dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=100), space=model.space, proc_funcs=proc_funcs,
+                               # name='$\mathrm{Dir}$',
+                               name='$\mathrm{Dir}$, $|\mathcal{T}| = card$'.replace('card', str(n_x)),
+                               )
 
-# dir_params = None
+dir_params = None
 # dir_params = {'alpha_0': [1, 100, 10000]}
-dir_params = {'alpha_0': [.01, 100]}
+# dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [100]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 100, 100)}
 # dir_params = {'alpha_0': np.logspace(-1., 5., 100)}
@@ -105,7 +110,8 @@ dir_params = {'alpha_0': [.01, 100]}
 # Normal learner
 norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=100 * np.eye(len(w_prior)),
                                                           basis_y_x=None, cov_y_x=.1,
-                                                          model_x=prior_mean.model_x), name='$\mathcal{N}$')
+                                                          model_x=model.model_x), name='$\mathcal{N}$')
+# TODO: check model_x change
 
 # norm_params = None
 # norm_params = {'prior_cov': [10, 0.05]}
@@ -115,9 +121,9 @@ norm_params = {'prior_cov': [100]}
 # Plotting
 
 # n_train = 200
-# n_train = [0, 100, 1000]
+n_train = [0, 100, 1000]
 # n_train = [0, 5, 10]
-n_train = np.arange(0, 650, 50)
+# n_train = np.arange(0, 650, 50)
 # n_train = np.arange(0, 5500, 500)
 
 
@@ -132,7 +138,6 @@ temp = [
 ]
 
 # TODO: discrete plot for predict stats
-# TODO: save fig, png and object!
 # TODO: make latex use optional
 
 plt.rc('text', usetex=True)
@@ -140,12 +145,12 @@ plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepa
 
 predictors, params = list(zip(*temp))
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=300,
-                           verbose=True, ax=None, rng=None)
+# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=100,
+#                            verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, n_test=1, verbose=False, ax=None)
 
-# plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=300,
-#                            do_std=True, verbose=True, ax=None, rng=None)
+plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=300,
+                           do_std=True, verbose=True, ax=None, rng=None)
 
 
 #%% Save image and Figure
