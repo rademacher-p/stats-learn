@@ -15,6 +15,7 @@
     - demonstrate trade-off
 
 # Notes
+- Include an a0 legend fig to show gaussian?
 - SE_predict_leg_T
   - Coarse has low variance, no bias relative to thetacd, but high disc bias. Fine has high bias relative to thetacd because of insufficient data. Middle optimizes the trade-off.
   - *move alpha from legend to title*
@@ -24,5 +25,6 @@
 
 - SE_risk_N_leg_T
   - Coarse has fastest convergence, but worst asymptote. Fine can barely adapt, so perfect asymptote is never realized. Middle optimizes the trade-off for middle N values.
+  - Gaussian demonstrates same trade-off!
   - *add more gaussian or just remove*
   - *move alpha from legend to title*
