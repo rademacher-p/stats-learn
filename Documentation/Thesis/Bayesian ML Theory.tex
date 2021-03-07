@@ -3400,13 +3400,13 @@ PGR: WIP
 	\centering
 	\includegraphics[width=0.8\linewidth]{SSP_2021/Predict_SE_biased_hard.png}
 	\caption{Comparative estimator statistics}
-	\label{fig:SSP_2021/Predict_SE_biased_hard}
+%	\label{fig:SSP_2021/Predict_SE_biased_hard}
 \end{figure}
 \begin{figure}
 	\centering
 	\includegraphics[width=0.8\linewidth]{SSP_2021/Predict_SE_biased_hard_N.png}
 	\caption{Dirichlet-based prediction statistics, different training volume $N$}
-	\label{fig:SSP_2021/Predict_SE_biased_hard_N}
+%	\label{fig:SSP_2021/Predict_SE_biased_hard_N}
 \end{figure}
 
 The Bayesian linear regressor with the Normal prior is highly biased, as its set of achievable estimator functions is critically limited; it also has lower variance than the Dirichlet-based estimators. This is a consequence of the lower-dimensionality, limited-support prior -- there are fewer models $\theta \in \Pcal(\Ycal \times \Xcal)$ that are considered and thus fewer functions $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$ that can be realized. Contrasting, the Dirichlet estimator uses a full-support prior, which is necessary to ensure that any complex clairvoyant estimator can be learned.
@@ -3416,7 +3416,7 @@ Figure \ref{fig:SSP_2021/Risk_cond_SE_N_biased_hard} shows the resultant expecte
 	\centering
 	\includegraphics[width=0.8\linewidth]{SSP_2021/Risk_cond_SE_N_biased_hard.png}
 	\caption{Squared-Error vs. training data volume $N$}
-	\label{fig:SSP_2021/Risk_cond_SE_N_biased_hard}
+%	\label{fig:SSP_2021/Risk_cond_SE_N_biased_hard}
 \end{figure}
 
 Note that due to the high initial bias, both the Dirichlet-based estimator and Bayesian linear regressor perform better when projecting relatively low confidence in their data-independent prediction via high prior variance (low $\alpha_0$, high $\Sigma_{\uptheta}$). \Cref{fig:SSP_2021/Risk_cond_SE_a0_biased_hard} demonstrates the error trends of the Dirichlet-based estimator for different prior localizations $\alpha_0$.
@@ -3424,14 +3424,14 @@ Note that due to the high initial bias, both the Dirichlet-based estimator and B
 	\centering
 	\includegraphics[width=0.8\linewidth]{SSP_2021/Risk_cond_SE_a0_biased_hard.png}
 	\caption{Squared-Error vs. prior localization $\alpha_0$}
-	\label{fig:SSP_2021/Risk_cond_SE_a0_biased_hard}
+%	\label{fig:SSP_2021/Risk_cond_SE_a0_biased_hard}
 \end{figure} 
 \Cref{fig:SSP_2021/Risk_cond_SE_a0_biased_hard_zoom} highlights the localization $\alpha_0$ that optimizes the bias/variance trade-off; this value is independent of the training volume $N$. Due to the severity of the bias, the corresponding optimal Dirichlet estimator is only marginally better than the empirical estimator used for $\alpha_0 \approx 0$.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.8\linewidth]{SSP_2021/Risk_cond_SE_a0_biased_hard_zoom.png}
 	\caption{Squared-Error vs. prior localization $\alpha_0$, minimum}
-	\label{fig:SSP_2021/Risk_cond_SE_a0_biased_hard_zoom}
+%	\label{fig:SSP_2021/Risk_cond_SE_a0_biased_hard_zoom}
 \end{figure}
 
 
