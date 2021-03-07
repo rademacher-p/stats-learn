@@ -1999,14 +1999,15 @@ Figure \ref{fig:SSP_2021/Risk_cond_SE_N_biased_hard} shows the resultant expecte
 \label{fig:SSP_2021/Risk_cond_SE_N_biased_hard}
 \end{figure}
 
-Note that due to the high initial bias, both the Dirichlet-based estimator and Bayesian linear regressor perform better when projecting relatively low confidence in their data-independent prediction via high prior variance (low $\alpha_0$, high $\Sigma_{\uptheta}$). \Cref{fig:SSP_2021/Risk_cond_SE_a0_biased_hard} demonstrates the error trends of the Dirichlet-based estimator for different prior localizations $\alpha_0$.
+\todomid{Use my argmin marker plot!}
+
+Note that due to the high initial bias, both the Dirichlet-based estimator and Bayesian linear regressor perform better when projecting relatively low confidence in their data-independent prediction via high prior variance (low $\alpha_0$, high $\Sigma_{\uptheta}$). \Cref{fig:SSP_2021/Risk_cond_SE_a0_biased_hard} demonstrates the error trends of the Dirichlet-based estimator for different prior localizations $\alpha_0$. \Cref{fig:SSP_2021/Risk_cond_SE_a0_biased_hard_zoom} highlights the localization $\alpha_0$ that optimizes the bias/variance trade-off; this value is independent of the training volume $N$. Due to the severity of the bias, the corresponding optimal Dirichlet estimator is only marginally better than the empirical estimator used for $\alpha_0 \approx 0$.
 \begin{figure}
 \centering
 \includegraphics[width=0.8\linewidth]{SSP_2021/Risk_cond_SE_a0_biased_hard.png}
 \caption{Squared-Error vs. prior localization $\alpha_0$}
 \label{fig:SSP_2021/Risk_cond_SE_a0_biased_hard}
 \end{figure} 
-\Cref{fig:SSP_2021/Risk_cond_SE_a0_biased_hard_zoom} highlights the localization $\alpha_0$ that optimizes the bias/variance trade-off; this value is independent of the training volume $N$. Due to the severity of the bias, the corresponding optimal Dirichlet estimator is only marginally better than the empirical estimator used for $\alpha_0 \approx 0$.
 \begin{figure}
 \centering
 \includegraphics[width=0.8\linewidth]{SSP_2021/Risk_cond_SE_a0_biased_hard_zoom.png}
