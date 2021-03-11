@@ -31,7 +31,7 @@ def func_mean_to_models(n, func):
     return [rand_elements.EmpiricalScalar(func(x_i), n - 1) for x_i in np.linspace(0, 1, n, endpoint=True)]
 
 
-n_x = 128
+n_x = 512
 
 # True model
 
@@ -125,8 +125,8 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=100),
 # dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [0.01]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 100, 100)}
-# dir_params = {'alpha_0': np.logspace(-0., 6., 40)}
-dir_params = {'alpha_0': np.logspace(-1., 2., 60)}
+dir_params = {'alpha_0': np.logspace(-0., 6., 40)}
+# dir_params = {'alpha_0': np.logspace(1., 2., 60)}
 
 # Normal learner
 norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=100 * np.eye(len(w_prior)),
@@ -166,7 +166,7 @@ plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepa
 
 predictors, params = list(zip(*temp))
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=5000,
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=500,
                            verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, n_test=1, verbose=False, ax=None)
 
