@@ -1,14 +1,14 @@
 import math
 from abc import ABC
 
-from more_itertools import all_equal
+# from more_itertools import all_equal
 
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy import optimize, integrate
 
 from thesis.util import plotting
-from thesis.util.base import check_data_shape
+from thesis.util.base import check_data_shape, all_equal
 from thesis.util.plotting import simplex_grid, box_grid
 
 
