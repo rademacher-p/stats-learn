@@ -235,7 +235,6 @@ def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n
             print(f"Loss iteration: {i_mc + 1}/{n_mc}")
 
         d = model.rvs(n_test + n_train_delta.sum())
-        # np.random.default_rng().shuffle(d)      # FIXME
         d_test, _d_train = d[:n_test], d[n_test:]
         d_train_iter = np.split(_d_train, np.cumsum(n_train_delta)[:-1])
 
@@ -306,7 +305,6 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
         else:
             ylabel = r'$\mathcal{R}_{\Theta}(f;\theta)$'
         ax.set(ylabel=ylabel)
-        ax.grid(True)
 
     out = []
     if len(predictors) == 1:
@@ -337,7 +335,7 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
                     # labels = [f"{param_name} = {val}" for val in param_vals]
                     labels = [f"{predictor.tex_params(param_name, val)}" for val in param_vals]
         else:
-            raise ValueError
+            raise NotImplementedError("Only up to one varying parameter currently supported.")
 
         for loss_plt, label in zip(loss, labels):
             plt_data = ax.plot(x_plt, loss_plt, label=label)
@@ -358,7 +356,7 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
                 # labels = [f"{predictor.name}, {param_name} = {val}" for val in param_vals]
                 labels = [f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals]
             else:
-                raise ValueError
+                raise NotImplementedError("Only up to one varying parameter currently supported.")
 
             for loss_plt, label in zip(loss, labels):
                 plt_data = ax.plot(x_plt, loss_plt, label=label)
