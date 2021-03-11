@@ -14,6 +14,7 @@
   - [] *vs T, various N*
     - demonstrate trade-off
 
+
 # Notes
 - Include an a0 legend fig to show gaussian?
 - SE_predict_leg_T
