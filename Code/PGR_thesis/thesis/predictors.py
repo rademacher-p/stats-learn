@@ -9,6 +9,8 @@ from itertools import product
 from numbers import Integral
 from typing import Union
 
+from more_itertools import all_equal
+
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import mode
@@ -344,25 +346,41 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
         if labels != [None]:
             ax.legend()
     else:
-        title = ''
-        xlabel, x_plt = '$N$', n_train
-        for predictor, params, loss in zip(predictors, params_full, losses):
-            if len(params) == 0:
-                loss = loss[np.newaxis]
-                labels = [predictor.name]
-            elif len(params) == 1:
-                loss = np.transpose(loss)
-                param_name, param_vals = list(params.items())[0]
-                # labels = [f"{predictor.name}, {param_name} = {val}" for val in param_vals]
-                labels = [f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals]
-            else:
-                raise NotImplementedError("Only up to one varying parameter currently supported.")
+        if all_equal(params_full) and len(n_train) == 1 and len(params_full[0]) == 1:
+            param_name, param_vals = list(params_full[0].items())[0]
 
-            for loss_plt, label in zip(loss, labels):
+            title = f"$N = {n_train[0]}$"
+            xlabel, x_plt = predictors[0].tex_params(param_name), param_vals
+
+            for predictor, loss in zip(predictors, losses):
+                loss_plt = loss[0]
+                label = predictor.name
+
                 plt_data = ax.plot(x_plt, loss_plt, label=label)
                 out.append(plt_data)
 
-            ax.legend()
+                ax.legend()
+
+        else:
+            title = ''
+            xlabel, x_plt = '$N$', n_train
+            for predictor, params, loss in zip(predictors, params_full, losses):
+                if len(params) == 0:
+                    loss = loss[np.newaxis]
+                    labels = [predictor.name]
+                elif len(params) == 1:
+                    loss = np.transpose(loss)
+                    param_name, param_vals = list(params.items())[0]
+                    # labels = [f"{predictor.name}, {param_name} = {val}" for val in param_vals]
+                    labels = [f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals]
+                else:
+                    raise NotImplementedError("Only up to one varying parameter currently supported.")
+
+                for loss_plt, label in zip(loss, labels):
+                    plt_data = ax.plot(x_plt, loss_plt, label=label)
+                    out.append(plt_data)
+
+                ax.legend()
 
     ax.set(xlabel=xlabel)
     ax.set_title(title)
