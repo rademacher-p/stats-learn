@@ -11,8 +11,10 @@
   - [x] vs alpha, various N
   - [] *vs alpha, various T*
     - different argmins **add min markers to plot?!**
+    - sims show lower T -> lower opt alpha
   - [] *vs T, various N*
     - demonstrate trade-off
+  - [] *vs T, various alpha*
 
 
 - **higher variance plots?!**

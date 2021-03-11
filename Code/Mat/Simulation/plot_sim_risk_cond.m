@@ -6,11 +6,11 @@ clear;
 
 %%% Inputs
 
-en_emp = 1;
+en_emp = 0;
 N_mc = 5000;                  % Number of monte carlo iterations
 
 
-M_reg = [2,2];
+M_reg = [2,3];
 Y = num2cell((0:M_reg(1)-1)'/M_reg(1));             % output set
 X = num2cell((0:M_reg(2)-1)'/M_reg(2));             % input set
 
