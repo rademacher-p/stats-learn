@@ -122,10 +122,10 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=100),
 
 # dir_params = None
 # dir_params = {'alpha_0': [1, 100, 10000]}
-dir_params = {'alpha_0': [.01, 100]}
+# dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [0.01]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 100, 100)}
-# dir_params = {'alpha_0': np.logspace(-0., 6., 20)}
+dir_params = {'alpha_0': np.logspace(-0., 6., 20)}
 
 # Normal learner
 norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=100 * np.eye(len(w_prior)),
@@ -140,9 +140,9 @@ norm_params = {'prior_cov': [100]}
 # Plotting
 
 # n_train = 100
-# n_train = [0, 100, 1000]
+n_train = [0, 100, 1000]
 # n_train = [0, 5, 10]
-n_train = np.arange(0, 650, 50)
+# n_train = np.arange(0, 650, 50)
 # n_train = np.arange(0, 5500, 500)
 
 
@@ -151,10 +151,10 @@ n_train = np.arange(0, 650, 50)
 
 
 temp = [
-    (opt_predictor, None),
+    # (opt_predictor, None),
     (dir_predictor, dir_params),
     # *((pr, dir_params) for pr in dir_predictors),
-    (norm_predictor, norm_params),
+    # (norm_predictor, norm_params),
 ]
 
 # TODO: discrete plot for predict stats
@@ -165,7 +165,7 @@ plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepa
 
 predictors, params = list(zip(*temp))
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=50,
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=500,
                            verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, n_test=1, verbose=False, ax=None)
 

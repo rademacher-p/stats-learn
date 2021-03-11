@@ -1,6 +1,8 @@
 import math
 from abc import ABC
 
+from more_itertools import all_equal
+
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy import optimize, integrate
@@ -17,30 +19,27 @@ from thesis.util.plotting import simplex_grid, box_grid
 # TODO: issubset method?
 
 def check_spaces(iter_):
-    space = iter_[0].space
-    if all(obj.space == space for obj in iter_[1:]):
-        return space
+    # space = iter_[0].space
+    # if all(obj.space == space for obj in iter_[1:]):
+    #     return space
+    # else:
+    #     raise ValueError("All objects must have the same space attribute.")
+    if all_equal((obj.space for obj in iter_)):
+        return iter_[0].space
     else:
         raise ValueError("All objects must have the same space attribute.")
 
 
 def check_spaces_x(iter_):
-    space = iter_[0].space['x']
-    if all(obj.space['x'] == space for obj in iter_[1:]):
-        return space
+    # space = iter_[0].space['x']
+    # if all(obj.space['x'] == space for obj in iter_[1:]):
+    #     return space
+    # else:
+    #     raise ValueError("All objects must have the same space attribute.")
+    if all_equal((obj.space['x'] for obj in iter_)):
+        return iter_[0].space['x']
     else:
         raise ValueError("All objects must have the same space attribute.")
-
-
-# def get_superset(spaces):     # TODO: improve or delete
-#     shape = spaces[0].shape
-#     if not all(s.shape == shape for s in spaces[1:]):
-#         raise ValueError("All spaces must have the same shape.")
-#
-#     if any(isinstance(s, Euclidean) for s in spaces):
-#         return Euclidean(shape)
-#     elif any(isinstance(s, Box) for s in spaces):
-#         pass
 
 
 class Base(ABC):
