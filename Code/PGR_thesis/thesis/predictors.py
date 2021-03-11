@@ -401,6 +401,68 @@ def plot_risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_tes
     return _plot_risk_eval_compare(losses, do_bayes, predictors, params, n_train, ax)
 
 
+def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500, verbose=True, ax=None, rng=None):
+    if params is None:
+        params_full = [{} for _ in predictors]
+    else:
+        params_full = [item if item is not None else {} for item in params]
+
+    if not all_equal(params_full):
+        raise ValueError
+
+    losses = risk_eval_sim_compare(predictors, model, params, n_train, n_test, n_mc, verbose, rng)
+
+    if isinstance(n_train, (Integral, np.integer)):
+        n_train = [n_train]
+
+    if ax is None:
+        _, ax = plt.subplots()
+        if isinstance(model, bayes_models.Base):
+            ylabel = r'$\mathcal{R}(f)$'
+        else:
+            ylabel = r'$\mathcal{R}_{\Theta}(f;\theta)$'
+        ax.set(ylabel=ylabel)
+
+    ##
+
+    # ll = np.empty((*losses[0].shape, len(predictors)))
+    # for i, loss in enumerate(losses):
+    #     ll[..., i] = loss
+    loss = np.stack(losses, axis=-1)
+
+    params = params_full[0]
+
+    x_plt = np.array([len(pr.model.space['x'].values) for pr in predictors])
+    # title = str(predictors[0].name)
+    title = '$\mathrm{Dir}$'
+
+    out = []
+    if len(params) == 0:
+        if len(n_train) == 1:
+            title += f", $N = {n_train[0]}$"
+            labels = [None]
+        else:
+            labels = [f"$N = {n}$" for n in n_train]
+
+    elif len(params) == 1:
+        losses.squeeze(axis=1)
+        param_name, param_vals = list(params.items())[0]
+    else:
+        raise ValueError
+
+    for loss_plt, label in zip(loss, labels):
+        plt_data = ax.plot(x_plt, loss_plt, label=label, marker='.')
+        out.append(plt_data)
+
+    if labels != [None]:
+        ax.legend()
+
+    ax.set(xlabel=r'$|\mathcal{T}|$')
+    ax.set_title(title)
+
+    return out
+
+
 # %%
 class Base(ABC):
     def __init__(self, loss_func, space=None, proc_funcs=(), name=None):
