@@ -105,8 +105,8 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=100),
 dir_predictors = []
 # n_x_iter = [4, 128, 4096]
 # n_x_iter = [64, 128, 256]
-n_x_iter = 2 ** np.arange(1, 6)
-# n_x_iter = list(range(2, 33))
+# n_x_iter = 2 ** np.arange(1, 6)
+n_x_iter = list(range(2, 33, 2))
 for n_x in n_x_iter:
     _temp = np.full(n_x, 2)
     _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
@@ -119,9 +119,9 @@ for n_x in n_x_iter:
                                          ))
 
 
-dir_params = None
+# dir_params = None
 # dir_params = {'alpha_0': [1, 100, 10000]}
-# dir_params = {'alpha_0': [.01, 100]}
+dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [0.01]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
 # dir_params = {'alpha_0': np.logspace(-0., 6., 40)}
@@ -139,8 +139,8 @@ norm_params = {'prior_cov': [100]}
 
 # Plotting
 
-# n_train = 10
-n_train = [0, 10, 50, 100]
+n_train = 100
+# n_train = [0, 10, 50, 100]
 # n_train = [0, 100, 200]
 # n_train = [0, 2, 8]
 # n_train = np.arange(0, 650, 50)
@@ -171,7 +171,6 @@ predictors, params = list(zip(*temp))
 
 # plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=300,
 #                            do_std=True, verbose=True, ax=None, rng=None)
-
 
 
 plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=500, verbose=True, ax=None, rng=None)
