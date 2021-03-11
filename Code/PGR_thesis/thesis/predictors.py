@@ -409,6 +409,7 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
 
     if not all_equal(params_full):
         raise ValueError
+    # TODO: check models for equality
 
     losses = risk_eval_sim_compare(predictors, model, params, n_train, n_test, n_mc, verbose, rng)
 
@@ -423,13 +424,7 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
             ylabel = r'$\mathcal{R}_{\Theta}(f;\theta)$'
         ax.set(ylabel=ylabel)
 
-    ##
-
-    # ll = np.empty((*losses[0].shape, len(predictors)))
-    # for i, loss in enumerate(losses):
-    #     ll[..., i] = loss
     loss = np.stack(losses, axis=-1)
-
     params = params_full[0]
 
     x_plt = np.array([len(pr.model.space['x'].values) for pr in predictors])
@@ -445,8 +440,19 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
             labels = [f"$N = {n}$" for n in n_train]
 
     elif len(params) == 1:
-        losses.squeeze(axis=1)
         param_name, param_vals = list(params.items())[0]
+
+        if len(n_train) > 1 and len(param_vals) == 1:
+            loss = loss.squeeze(axis=1)
+            title += f", {predictors[0].tex_params(param_name, param_vals[0])}"
+            labels = [f"$N = {n}$" for n in n_train]
+        elif len(n_train) == 1 and len(param_vals) > 1:
+            loss = loss.squeeze(axis=0)
+            title += f", $N = {n_train[0]}$"
+            labels = [f"{predictors[0].tex_params(param_name, val)}" for val in param_vals]
+        else:
+            raise ValueError
+
     else:
         raise ValueError
 
