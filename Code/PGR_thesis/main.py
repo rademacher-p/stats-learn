@@ -31,7 +31,7 @@ def func_mean_to_models(n, func):
     return [rand_elements.EmpiricalScalar(func(x_i), n - 1) for x_i in np.linspace(0, 1, n, endpoint=True)]
 
 
-n_x = 512
+n_x = 128
 
 # True model
 
@@ -88,12 +88,6 @@ _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uni
 prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_x, endpoint=True), p=_temp / _temp.sum())
 proc_funcs.append(discretizer(prior_mean_x.supp))
 
-# prior_mean_x = rand_elements.Mixture([rand_elements.DataEmpirical(np.linspace(0, 1, n_x, endpoint=True),
-#                                                                   counts=np.ones(n_x), space=model.space['x']),
-#                                       rand_elements.Beta()],
-#                                      weights=[1e6, 1])
-# proc_funcs.append(discretizer(prior_mean_x.dists[0].data['x']))
-
 prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=126, model_x=prior_mean_x)
 
 _name = r'$\mathrm{Dir}$'
@@ -107,17 +101,19 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=100),
 
 
 ##
-# dir_predictors = []
-# for n_x in [4, 128, 4096]:
-#     _temp = np.full(n_x, 2)
-#     _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
-#     prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_x, endpoint=True), p=_temp / _temp.sum())
-#     prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=126, model_x=prior_mean_x)
-#
-#     dir_predictors.append(BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=100),
-#                                          space=model.space, proc_funcs=[discretizer(prior_mean_x.supp)],
-#                                          name='$\mathrm{Dir}$, $|\mathcal{T}| = card$'.replace('card', str(n_x)),
-#                                          ))
+dir_predictors = []
+n_x_iter = [4, 128, 4096]
+# n_x_iter = [64, 128, 256]
+for n_x in n_x_iter:
+    _temp = np.full(n_x, 2)
+    _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
+    prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_x, endpoint=True), p=_temp / _temp.sum())
+    prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=126, model_x=prior_mean_x)
+
+    dir_predictors.append(BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=100),
+                                         space=model.space, proc_funcs=[discretizer(prior_mean_x.supp)],
+                                         name='$\mathrm{Dir}$, $|\mathcal{T}| = card$'.replace('card', str(n_x)),
+                                         ))
 
 
 # dir_params = None
@@ -141,8 +137,8 @@ norm_params = {'prior_cov': [100]}
 # Plotting
 
 # n_train = 100
-n_train = [0, 50, 100, 200]
-# n_train = [0, 5, 10]
+n_train = [0, 10, 50, 100]
+# n_train = [0, 100, 200]
 # n_train = np.arange(0, 650, 50)
 # n_train = np.arange(0, 5500, 500)
 
