@@ -292,7 +292,7 @@ class FiniteRV(MixinRV, Finite):
     @property
     def cov(self):
         if self._cov is None:
-            ctr = self._supp_flat - self._mean
+            ctr = self._supp_flat - self.mean
             self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p_flat, ctr))
 
         return self._cov

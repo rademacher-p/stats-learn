@@ -11,7 +11,7 @@ from matplotlib import pyplot as plt
 
 from thesis.bayes import models as bayes_models
 from thesis.predictors import (ModelRegressor, BayesRegressor, plot_risk_eval_sim_compare, plot_predict_stats_compare,
-                               risk_eval_sim_compare)
+                               risk_eval_sim_compare, plot_risk_eval_comp_compare)
 from thesis.random import elements as rand_elements, models as rand_models
 from thesis.preprocessing import discretizer
 
@@ -35,8 +35,8 @@ n_x = 128
 
 # True model
 
-model = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
-                                                supp_x=[0, .5], p_x=None)
+# model = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
+#                                                 supp_x=[0, .5], p_x=None)
 
 
 # w_model = [0, 0, 1]
@@ -50,8 +50,8 @@ w_model = [.5, 0, 0]
 #                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
 # model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=126, model_x=rand_elements.Beta())
-# model = rand_models.BetaLinear(weights=[1], basis_y_x=[lambda x: 1 / (2 + np.sin(2 * np.pi * x))], alpha_y_x=6,
-#                                model_x=rand_elements.Beta())
+model = rand_models.BetaLinear(weights=[1], basis_y_x=[lambda x: 1 / (2 + np.sin(2 * np.pi * x))], alpha_y_x=6,
+                               model_x=rand_elements.Beta())
 
 # model = rand_models.NormalLinear(weights=np.ones(2), basis_y_x=None, cov_y_x=.1, model_x=rand_elements.Normal(0, 10))
 
@@ -74,8 +74,8 @@ w_prior = [.5, 0]
 # Dirichlet learner
 proc_funcs = []
 
-prior_mean = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.9, .9)],
-                                                     supp_x=[0, .5], p_x=None)
+# prior_mean = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.9, .9)],
+#                                                      supp_x=[0, .5], p_x=None)
 
 # prior_mean = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, w_prior),
 #                                                      supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
@@ -83,12 +83,12 @@ prior_mean = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .
 
 # prior_mean_x = rand_elements.Beta()
 
-# _temp = np.full(n_x, 2)
-# _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
-# prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_x, endpoint=True), p=_temp / _temp.sum())
-# proc_funcs.append(discretizer(prior_mean_x.supp))
+_temp = np.full(n_x, 2)
+_temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
+prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_x, endpoint=True), p=_temp / _temp.sum())
+proc_funcs.append(discretizer(prior_mean_x.supp))
 
-# prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=126, model_x=prior_mean_x)
+prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=126, model_x=prior_mean_x)
 
 _name = r'$\mathrm{Dir}$'
 if len(proc_funcs) > 0:
@@ -101,28 +101,29 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=100),
 
 
 ##
-# dir_predictors = []
-# # n_x_iter = [4, 128, 4096]
+dir_predictors = []
+# n_x_iter = [4, 128, 4096]
 # n_x_iter = [64, 128, 256]
-# for n_x in n_x_iter:
-#     _temp = np.full(n_x, 2)
-#     _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
-#     prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_x, endpoint=True), p=_temp / _temp.sum())
-#     prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=126, model_x=prior_mean_x)
-#
-#     dir_predictors.append(BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=100),
-#                                          space=model.space, proc_funcs=[discretizer(prior_mean_x.supp)],
-#                                          name='$\mathrm{Dir}$, $|\mathcal{T}| = card$'.replace('card', str(n_x)),
-#                                          ))
+n_x_iter = [4, 16, 64]
+for n_x in n_x_iter:
+    _temp = np.full(n_x, 2)
+    _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
+    prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_x, endpoint=True), p=_temp / _temp.sum())
+    prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=126, model_x=prior_mean_x)
+
+    dir_predictors.append(BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=100),
+                                         space=model.space, proc_funcs=[discretizer(prior_mean_x.supp)],
+                                         name='$\mathrm{Dir}$, $|\mathcal{T}| = card$'.replace('card', str(n_x)),
+                                         ))
 
 
 # dir_params = None
 # dir_params = {'alpha_0': [1, 100, 10000]}
 # dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [0.01]}
-dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
-# dir_params = {'alpha_0': np.logspace(-0., 6., 40)}
-# dir_params = {'alpha_0': np.logspace(1., 2., 60)}
+# dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
+dir_params = {'alpha_0': np.logspace(-0., 6., 40)}
+
 
 # Normal learner
 norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=100 * np.eye(len(w_prior)),
@@ -136,10 +137,10 @@ norm_params = {'prior_cov': [100]}
 
 # Plotting
 
-# n_train = 100
+n_train = 100
 # n_train = [0, 10, 50, 100]
 # n_train = [0, 100, 200]
-n_train = [0, 2, 8]
+# n_train = [0, 2, 8]
 # n_train = np.arange(0, 650, 50)
 # n_train = np.arange(0, 5500, 500)
 
@@ -150,8 +151,8 @@ n_train = [0, 2, 8]
 
 temp = [
     # (opt_predictor, None),
-    (dir_predictor, dir_params),
-    # *((pr, dir_params) for pr in dir_predictors),
+    # (dir_predictor, dir_params),
+    *((pr, dir_params) for pr in dir_predictors),
     # (norm_predictor, norm_params),
 ]
 
@@ -163,9 +164,8 @@ plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepa
 
 predictors, params = list(zip(*temp))
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train=n_train, n_test=1, n_mc=500,
-                           verbose=True, ax=None, rng=None)
-# plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, n_test=1, verbose=False, ax=None)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True, ax=None, rng=None)
+# plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
 
 # plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=300,
 #                            do_std=True, verbose=True, ax=None, rng=None)

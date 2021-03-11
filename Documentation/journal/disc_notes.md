@@ -15,6 +15,10 @@
     - demonstrate trade-off
 
 
+- **higher variance plots?!**
+- **predict with N=100, not 200?**
+
+
 # Notes
 - Include an a0 legend fig to show gaussian?
 - SE_predict_leg_T
