@@ -348,11 +348,9 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
     else:
         if all_equal(params.keys() for params in params_full) and len(n_train) == 1 and len(params_full[0]) == 1:
             # Plot versus parameter for multiple predictors of same type
-            param_name, param_vals = list(params_full[0].items())[0]
 
             title = f"$N = {n_train[0]}$"
             xlabel = predictors[0].tex_params(list(params_full[0].keys())[0])
-            # xlabel, x_plt = predictors[0].tex_params(param_name), param_vals
 
             for predictor, params, loss in zip(predictors, params_full, losses):
                 x_plt = list(params.values())[0]
@@ -360,8 +358,7 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
                 loss_plt = loss[0]
                 label = predictor.name
 
-                # plt_data = ax.plot(x_plt, loss_plt, label=label)
-                plt_data = ax.plot(x_plt / len(predictor.model.space['x'].values), loss_plt, label=label)
+                plt_data = ax.plot(x_plt, loss_plt, label=label)
 
                 out.append(plt_data)
 
