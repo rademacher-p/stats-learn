@@ -28,9 +28,6 @@
   - higher |T|, same a0bar, higher a0. Same R_min
 
 
-
-
-
 # Notes
 - Include an a0 legend fig to show gaussian?
 - SE_predict_leg_T

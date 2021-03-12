@@ -432,7 +432,7 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
 
     x_plt = np.array([len(pr.model.space['x'].values) for pr in predictors])  # discretization set size
     # title = str(predictors[0].name)
-    title = '$\mathrm{Dir}$'
+    title = r'$\mathrm{Dir}$'
 
     out = []
     if len(params) == 0:
