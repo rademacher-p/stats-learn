@@ -173,9 +173,7 @@ predictors, params = list(zip(*temp))
 #                            do_std=True, verbose=True, ax=None, rng=None)
 
 
-plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=500, verbose=True, ax=None, rng=None)
-
-
+plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None, rng=None)
 
 
 # Find localization minimum
