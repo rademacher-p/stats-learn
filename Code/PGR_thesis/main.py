@@ -104,16 +104,16 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=100),
 ##
 dir_predictors = []
 # n_x_iter = [4, 128, 4096]
-# n_x_iter = [64, 128, 256]
+n_x_iter = [4, 8, 16, 32]
 # n_x_iter = 2 ** np.arange(1, 6)
-n_x_iter = list(range(2, 33, 2))
+# n_x_iter = list(range(2, 33, 2))
 for n_x in n_x_iter:
     _temp = np.full(n_x, 2)
     _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
     prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_x, endpoint=True), p=_temp / _temp.sum())
     prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=126, model_x=prior_mean_x)
 
-    dir_predictors.append(BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=100),
+    dir_predictors.append(BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=0.01),
                                          space=model.space, proc_funcs=[discretizer(prior_mean_x.supp)],
                                          name='$\mathrm{Dir}$, $|\mathcal{T}| = card$'.replace('card', str(n_x)),
                                          ))
@@ -121,10 +121,11 @@ for n_x in n_x_iter:
 
 # dir_params = None
 # dir_params = {'alpha_0': [1, 100, 10000]}
-dir_params = {'alpha_0': [.01, 100]}
+# dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [0.01]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
 # dir_params = {'alpha_0': np.logspace(-0., 6., 40)}
+dir_params = {'alpha_0': np.logspace(0., 2., 60)}
 
 
 # Normal learner
@@ -166,14 +167,14 @@ plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepa
 
 predictors, params = list(zip(*temp))
 
-# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True, ax=None, rng=None)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=5000, verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
 
 # plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=300,
 #                            do_std=True, verbose=True, ax=None, rng=None)
 
 
-plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None, rng=None)
+# plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None, rng=None)
 
 
 # Find localization minimum

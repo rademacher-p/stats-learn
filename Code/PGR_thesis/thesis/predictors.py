@@ -347,6 +347,7 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
             ax.legend()
     else:
         if all_equal(params_full) and len(n_train) == 1 and len(params_full[0]) == 1:
+            # Plot versus parameter for multiple predictors of same type
             param_name, param_vals = list(params_full[0].items())[0]
 
             title = f"$N = {n_train[0]}$"
@@ -356,7 +357,8 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
                 loss_plt = loss[0]
                 label = predictor.name
 
-                plt_data = ax.plot(x_plt, loss_plt, label=label)
+                # plt_data = ax.plot(x_plt, loss_plt, label=label)
+                plt_data = ax.plot(x_plt / len(predictor.model.space['x'].values), loss_plt, label=label)
                 out.append(plt_data)
 
                 ax.legend()
@@ -427,7 +429,7 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
     loss = np.stack(losses, axis=-1)
     params = params_full[0]
 
-    x_plt = np.array([len(pr.model.space['x'].values) for pr in predictors])
+    x_plt = np.array([len(pr.model.space['x'].values) for pr in predictors])  # discretization set size
     # title = str(predictors[0].name)
     title = '$\mathrm{Dir}$'
 
