@@ -58,8 +58,8 @@ model = rand_models.BetaLinear(weights=[1], basis_y_x=[lambda x: 1 / (2 + np.sin
 # model = rand_models.NormalLinear(weights=np.ones(2), basis_y_x=None, cov_y_x=.1, model_x=rand_elements.Normal(0, 10))
 
 
-# do_bayes = True
 do_bayes = False
+# do_bayes = True
 if do_bayes:
     model_eval = bayes_models.Dirichlet(model, alpha_0=100)
     opt_predictor = BayesRegressor(model_eval, name=r'$f^*$')
@@ -107,22 +107,20 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=100),
 # dir_params = {'alpha_0': [0.01]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
 # dir_params = {'alpha_0': np.logspace(-0., 6., 40)}
-dir_params = {'alpha_0': np.logspace(-1., 5., 80)}
-# dir_params = {'alpha_0': np.logspace(-1, 1., 40)}
+dir_params = {'alpha_0': np.logspace(-2., 4., 80)}
 
 
 ##
 # n_x_iter = [4, 128, 4096]
-n_x_iter = [4, 8, 16, 32]
-# n_x_iter = [4, 8, 16, 32]
+n_x_iter = [4, 8, 16]
 # n_x_iter = 2 ** np.arange(1, 6)
 # n_x_iter = list(range(2, 33, 2))
 
 dir_predictors = []
 dir_params_full = [deepcopy(dir_params) for __ in n_x_iter]
 
-scale_alpha = False
-# scale_alpha = True
+# scale_alpha = False
+scale_alpha = True
 for n_x, _params in zip(n_x_iter, dir_params_full):
     _temp = np.full(n_x, 2)
     _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
@@ -131,7 +129,7 @@ for n_x, _params in zip(n_x_iter, dir_params_full):
 
     dir_predictors.append(BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=0.01),
                                          space=model.space, proc_funcs=[discretizer(prior_mean_x.supp)],
-                                         name='$\mathrm{Dir}$, $|\mathcal{T}| = card$'.replace('card', str(n_x)),
+                                         name=r'$\mathrm{Dir}$, $|\mathcal{T}| = card$'.replace('card', str(n_x)),
                                          ))
 
     if scale_alpha and _params is not None:
@@ -178,7 +176,7 @@ plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepa
 
 predictors, params = list(zip(*temp))
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True, ax=None, rng=None)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=50, verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
 
 # plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=300,
