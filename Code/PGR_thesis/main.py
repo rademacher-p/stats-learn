@@ -103,18 +103,18 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=100),
 
 # dir_params = None
 # dir_params = {'alpha_0': [1, 100, 10000]}
-dir_params = {'alpha_0': [.01, 100]}
-# dir_params = {'alpha_0': [0.01]}
+# dir_params = {'alpha_0': [.01, 100]}
+dir_params = {'alpha_0': [0.01]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
 # dir_params = {'alpha_0': np.logspace(-0., 6., 40)}
 # dir_params = {'alpha_0': np.logspace(-2., 4., 80)}
 
 
 ##
-# n_x_iter = [4, 128, 4096]
+n_x_iter = [4, 128, 4096]
 # n_x_iter = [4, 8, 16]
 # n_x_iter = 2 ** np.arange(1, 6)
-n_x_iter = list(range(1, 33, 1))
+# n_x_iter = list(range(1, 33, 1))
 
 dir_predictors = []
 dir_params_full = [deepcopy(dir_params) for __ in n_x_iter]
@@ -143,16 +143,16 @@ norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, pr
 
 # norm_params = None
 # norm_params = {'prior_cov': [10, 0.05]}
-# norm_params = {'prior_cov': [100, .01]}
-norm_params = {'prior_cov': [100]}
+norm_params = {'prior_cov': [100, .01]}
+# norm_params = {'prior_cov': [100]}
 
 # Plotting
 
-n_train = 100
+# n_train = 100
 # n_train = [0, 10, 50, 100]
 # n_train = [0, 100, 200]
 # n_train = [0, 2, 8]
-# n_train = np.arange(0, 650, 50)
+n_train = np.arange(0, 605, 5)
 # n_train = np.arange(0, 5500, 500)
 
 
@@ -161,11 +161,10 @@ n_train = 100
 
 
 temp = [
-    # (opt_predictor, None),
+    (opt_predictor, None),
     # (dir_predictor, dir_params),
     *(zip(dir_predictors, dir_params_full)),
-    # *((pr, dir_params_full) for pr in dir_predictors),
-    # (norm_predictor, norm_params),
+    (norm_predictor, norm_params),
 ]
 
 # TODO: discrete plot for predict stats
@@ -176,14 +175,14 @@ plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepa
 
 predictors, params = list(zip(*temp))
 
-# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=50, verbose=True, ax=None, rng=None)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
 
 # plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=300,
 #                            do_std=True, verbose=True, ax=None, rng=None)
 
 
-plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None, rng=None)
+# plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None, rng=None)
 
 
 # Find localization minimum
