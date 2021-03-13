@@ -9,13 +9,13 @@
   - [x] *vs N, various T (add gaussian)*
     - different asymptotes, different convergence speed
   - [x] vs alpha, various N
-  - [] *vs alpha, various T*
+  - [x] *vs alpha, various T*
     - different argmins **add min markers to plot?!**
     - sims show lower T -> lower opt alpha (due to summation effect...)
     - **higher alpha/|T|** = average conditional concentration!!
-  - [] *vs T, various N*
+  - [x] *vs T, various N*
     - demonstrate trade-off and argmin dependency on N
-  - [] *vs T, various alpha*
+  - [x] *vs T, various alpha*
     - sims suggest same argmin?
 
 
