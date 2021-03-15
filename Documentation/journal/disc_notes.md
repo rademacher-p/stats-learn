@@ -12,7 +12,8 @@
   - [x] *vs alpha, various T*
     - different argmins **add min markers to plot?!**
     - sims show lower T -> lower opt alpha (due to summation effect...)
-    - **higher alpha/|T|** = average conditional concentration!!
+      - same R_min, same a0bar, lower summed a0
+      - **higher alpha/|T|** = average conditional concentration!!
   - [x] *vs T, various N*
     - demonstrate trade-off and argmin dependency on N
   - [x] *vs T, various alpha*
@@ -20,12 +21,6 @@
 
 
 - **higher variance plots?!**
-- **predict with N=100, not 200?**
-
-- discrete
-  - higher |X|, same a0bar(x), higher a0. Same R_min.
-- continuous
-  - higher |T|, same a0bar, higher a0. Same R_min
 
 
 # Notes

@@ -52,7 +52,7 @@ w_model = [.5, 0, 0]
 #                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
 # model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=126, model_x=rand_elements.Beta())
-model = rand_models.BetaLinear(weights=[1], basis_y_x=[lambda x: 1 / (1e-9 + 2 + np.sin(2 * np.pi * x))], alpha_y_x=126,
+model = rand_models.BetaLinear(weights=[1], basis_y_x=[lambda x: 1 / (1e-9 + 2 + np.sin(2 * np.pi * x))], alpha_y_x=4,
                                model_x=rand_elements.Beta())
 
 # model = rand_models.NormalLinear(weights=np.ones(2), basis_y_x=None, cov_y_x=.1, model_x=rand_elements.Normal(0, 10))
@@ -112,7 +112,8 @@ dir_params = {'alpha_0': np.logspace(-2., 4., 40)}
 
 ##
 # n_x_iter = [4, 128, 4096]
-n_x_iter = [2, 4, 8]
+# n_x_iter = [2, 4, 8]
+n_x_iter = [2, 4, 8, 16]
 # n_x_iter = 2 ** np.arange(1, 6)
 # n_x_iter = list(range(1, 33, 1))
 
@@ -176,7 +177,7 @@ plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepa
 
 predictors, params = list(zip(*temp))
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True, ax=None, rng=None)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=5000, verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
 
 # plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=50000,

@@ -7,9 +7,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy import optimize, integrate
 
-from thesis.util import plotting
 from thesis.util.base import check_data_shape, all_equal
-from thesis.util.plotting import simplex_grid, box_grid
+from thesis.util.plotting import simplex_grid, box_grid, mesh_grid
 
 
 # plt.style.use('seaborn')
@@ -358,7 +357,7 @@ class FiniteGeneric(Finite):
         if len(vecs) == 1:
             return cls(vecs, ())
         else:
-            return cls(plotting.mesh_grid(*vecs), shape=(len(vecs),))
+            return cls(mesh_grid(*vecs), shape=(len(vecs),))
 
     def __repr__(self):
         return f"FiniteGeneric({self.values})"

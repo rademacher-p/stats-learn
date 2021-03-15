@@ -382,8 +382,9 @@ class Dirichlet(BaseRV):
         return np.exp(log_pf).reshape(set_shape)
 
     def plot_pf(self, x=None, ax=None, **kwargs):
-        if x is None and self.space.x_plt is None:
-            self.space.x_plt = plotting.simplex_grid(30, self.shape, hull_mask=(self.mean < 1 / self.alpha_0))
+        if x is None and self.space._x_plt is None:
+            self.space.x_plt = plotting.simplex_grid(self.space.n_plot, self.shape,
+                                                     hull_mask=(self.mean < 1 / self.alpha_0))
         return self.space.plot(self.pf, x, ax)
 
 
@@ -391,7 +392,7 @@ class Dirichlet(BaseRV):
 # a0 = 10
 # m = np.random.random(3)
 # m = m / m.sum()
-# d = Dirichlet(a0, m, rng_)
+# d = Dirichlet(m, a0, rng_)
 # d.plot_pf()
 # d.mean
 # d.mode
@@ -470,7 +471,7 @@ class Empirical(BaseRV):
 # # m = np.random.random((1, 3))
 # m = np.random.default_rng().integers(10, size=(3,))
 # m = m / m.sum()
-# d = Empirical(n, m, rng)
+# d = Empirical(m, n, rng)
 # d.plot_pf()
 # d.mean
 # d.mode
@@ -485,23 +486,25 @@ class DirichletEmpirical(BaseRV):
     Dirichlet-Empirical random process, finite-supp realizations.
     """
 
-    def __init__(self, n, mean, alpha_0, rng=None):
+    def __init__(self, mean, alpha_0, n, rng=None):
         super().__init__(rng)
         self._space = spaces.SimplexDiscrete(n, np.array(mean).shape)
 
-        self._n = n
-        self._alpha_0 = alpha_0
         self._mean = check_valid_pmf(mean)
+        self._alpha_0 = alpha_0
+        self._n = n
         self._update_attr()
 
     # Input properties
     @property
-    def n(self):
-        return self._n
+    def mean(self):
+        return self._mean
 
-    @n.setter
-    def n(self, n):
-        self._n = n
+    @mean.setter
+    def mean(self, mean):
+        self._mean = check_valid_pmf(mean)
+        if self._mean.shape != self.shape:
+            raise ValueError(f"Mean shape must be {self.shape}.")
         self._update_attr()
 
     @property
@@ -514,14 +517,12 @@ class DirichletEmpirical(BaseRV):
         self._update_attr()
 
     @property
-    def mean(self):
-        return self._mean
+    def n(self):
+        return self._n
 
-    @mean.setter
-    def mean(self, mean):
-        self._mean = check_valid_pmf(mean)
-        if self._mean.shape != self.shape:
-            raise ValueError(f"Mean shape must be {self.shape}.")
+    @n.setter
+    def n(self, n):
+        self._n = n
         self._update_attr()
 
     # Attribute Updates
@@ -535,13 +536,14 @@ class DirichletEmpirical(BaseRV):
                              + gammaln(self._n + 1) - gammaln(self._alpha_0 + self._n))
 
     def _rvs(self, n, rng):
-        raise NotImplementedError
+        theta_flat = rng.dirichlet(self._alpha_0 * self._mean.flatten())
+        return rng.multinomial(self._n, theta_flat, size=n).reshape(n, *self.shape) / self._n
 
     def pf(self, x):
         x, set_shape = _empirical_check_input(x, self._n, self._mean)
 
-        log_pf = self._log_pf_coef + (gammaln(self._alpha_0 * self._mean + self._n * x) - gammaln(self._n * x + 1)) \
-            .reshape(-1, self.size).sum(axis=-1)
+        log_pf = self._log_pf_coef + (gammaln(self._alpha_0 * self._mean + self._n * x)
+                                      - gammaln(self._n * x + 1)).reshape(-1, self.size).sum(axis=-1)
         return np.exp(log_pf).reshape(set_shape)
 
 
@@ -550,11 +552,71 @@ class DirichletEmpirical(BaseRV):
 # a0 = 600
 # m = np.ones((3,))
 # m = m / m.sum()
-# d = DirichletEmpirical(n, a0, m, rng_)
+# d = DirichletEmpirical(m, a0, n, rng_)
 # d.plot_pf()
 # d.mean
 # d.mode
 # d.cov
+
+
+class DirichletEmpiricalScalar(BaseRV):
+    """
+    Scalar Dirichlet-Empirical random variable.
+    """
+
+    def __init__(self, mean, alpha_0, n, rng=None):
+        super().__init__(rng)
+
+        self._multi = DirichletEmpirical([mean, 1 - mean], alpha_0, n, rng)
+        self._space = spaces.FiniteGeneric(np.arange(n + 1) / n)
+
+    # Input properties
+    @property
+    def mean(self):
+        return self._multi.mean[0]
+
+    @mean.setter
+    def mean(self, mean):
+        self._multi.mean = [mean, 1 - mean]
+
+    @property
+    def alpha_0(self):
+        return self._multi.alpha_0
+
+    @alpha_0.setter
+    def alpha_0(self, alpha_0):
+        self._multi.alpha_0 = alpha_0
+
+    @property
+    def n(self):
+        return self._multi.n
+
+    @n.setter
+    def n(self, n):
+        self._multi.n = n
+
+    # Attribute Updates
+    @property
+    def mean(self):
+        return self._multi.mean[0]
+
+    @property
+    def cov(self):
+        return self._multi.cov[0, 0]
+
+    def _rvs(self, n, rng):
+        a, b = self.alpha_0 * self._multi.mean
+        p = rng.beta(a, b)
+        return rng.binomial(self.n, p, size=n) / self.n
+
+    def pf(self, x):
+        x = np.array(x)
+        return self._multi.pf(np.stack((x, 1 - x), axis=-1))
+
+
+# de = DirichletEmpiricalScalar(.8, 5, 10)
+# de.pf(.3)
+# de.plot_pf()
 
 
 class Beta(BaseRV):
@@ -651,7 +713,7 @@ class Binomial(BaseRV):
         self._update_attr()
 
     def __repr__(self):
-        return f"Binomial({self.n}, {self.p})"
+        return f"Binomial(p={self.p}, n={self.n})"
 
     # Input properties
     @property
@@ -711,7 +773,7 @@ class EmpiricalScalar(Binomial):
         self._space = spaces.FiniteGeneric(np.arange(n + 1) / n)
 
     def __repr__(self):
-        return f"EmpiricalScalar({self.n}, {self.p})"
+        return f"EmpiricalScalar(p={self.p}, n={self.n})"
 
     def __eq__(self, other):
         if isinstance(other, EmpiricalScalar):
