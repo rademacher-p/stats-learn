@@ -22,7 +22,7 @@ from thesis.util.base import all_equal
 # plt.style.use(['science'])
 
 
-# %% Sim
+#%% Sim
 
 # def poly_mean_to_models(n, weights):
 #     return func_mean_to_models(n, lambda x: sum(w * x ** i for i, w in enumerate(weights)))
@@ -47,7 +47,7 @@ n_x = 128
 var_y_x_const = 1/5
 
 alpha_y_x_beta = 1/var_y_x_const - 1
-alpha_y_x_de = (1-var_y_x_const) / (var_y_x_const - 1/(n_x-1))
+alpha_y_x_DE = (1-var_y_x_const) / (var_y_x_const - 1/(n_x-1))
 
 # True model
 
@@ -65,9 +65,9 @@ def nonlinear_model(x):
     # return 1 / (1e-9 + 2+np.sin(2*np.pi * x))
 
 
-# model = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, alpha_y_x_de, w_model),
+# model = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, alpha_y_x_DE, w_model),
 #                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
-model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, alpha_y_x_de, nonlinear_model),
+model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, alpha_y_x_DE, nonlinear_model),
                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
 # model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta)
@@ -97,7 +97,7 @@ proc_funcs = []
 # prior_mean = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.9, .9)],
 #                                                      supp_x=[0, .5], p_x=None)
 
-prior_mean = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, alpha_y_x_de, w_prior),
+prior_mean = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, alpha_y_x_DE, w_prior),
                                                      supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
 
@@ -135,11 +135,12 @@ n_x_iter = [2, 4, 8, 16]
 # n_x_iter = 2 ** np.arange(1, 6)
 # n_x_iter = list(range(1, 33, 1))
 
+scale_alpha = False
+# scale_alpha = True
+
 dir_predictors = []
 dir_params_full = [deepcopy(dir_params) for __ in n_x_iter]
 
-scale_alpha = False
-# scale_alpha = True
 # for n_x, _params in zip(n_x_iter, dir_params_full):
 #     _temp = np.full(n_x, 2)
 #     _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
