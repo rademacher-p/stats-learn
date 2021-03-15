@@ -57,7 +57,7 @@ def check_data_shape(x, shape=()):
     if x.shape[idx:] == shape:
         set_shape = x.shape[:idx]
     else:
-        raise TypeError("Trailing dimensions of 'x.shape' must be equal to 'data_shape_x'.")
+        raise TypeError(f"Trailing dimensions of 'x.shape' must be equal to {shape}.")
 
     # if data_shape == ():      # TODO
     #     set_shape = x.shape
