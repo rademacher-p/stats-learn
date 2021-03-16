@@ -338,6 +338,9 @@ class Dirichlet(BaseRV):
         self._mean = check_valid_pmf(mean, full_support=True)
         self._update_attr()
 
+    def __repr__(self):
+        return f"Dirichlet(mean={self.mean}, alpha_0={self.alpha_0})"
+
     # Input properties
     @property
     def alpha_0(self):
@@ -426,6 +429,9 @@ class Empirical(BaseRV):
 
         self._update_attr()
 
+    def __repr__(self):
+        return f"Empirical(mean={self.mean}, n={self.n})"
+
     # Input properties
     @property
     def n(self):
@@ -494,6 +500,9 @@ class DirichletEmpirical(BaseRV):
         self._alpha_0 = alpha_0
         self._n = n
         self._update_attr()
+
+    def __repr__(self):
+        return f"DirichletEmpirical(mean={self.mean}, alpha_0={self.alpha_0}, n={self.n})"
 
     # Input properties
     @property
@@ -569,6 +578,9 @@ class DirichletEmpiricalScalar(BaseRV):
 
         self._multi = DirichletEmpirical([mean, 1 - mean], alpha_0, n, rng)
         self._space = spaces.FiniteGeneric(np.arange(n + 1) / n)
+
+    def __repr__(self):
+        return f"DirichletEmpiricalScalar(mean={self.mean}, alpha_0={self.alpha_0}, n={self.n})"
 
     # Input properties
     @property
@@ -773,7 +785,7 @@ class EmpiricalScalar(Binomial):
         self._space = spaces.FiniteGeneric(np.arange(n + 1) / n)
 
     def __repr__(self):
-        return f"EmpiricalScalar(p={self.p}, n={self.n})"
+        return f"EmpiricalScalar(mean={self.p}, n={self.n})"
 
     def __eq__(self, other):
         if isinstance(other, EmpiricalScalar):
