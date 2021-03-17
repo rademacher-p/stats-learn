@@ -21,6 +21,8 @@
   - Bayes: a0=400
 
 
+**BAYES FIGS!?**
+
 # Notes
 - Include an a0 legend fig to show gaussian?
 - SE_predict_leg_T
