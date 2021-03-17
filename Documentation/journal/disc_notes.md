@@ -22,6 +22,7 @@
 
 
 **BAYES FIGS!?**
+*Predict y-axis Y*
 
 # Notes
 - Include an a0 legend fig to show gaussian?
