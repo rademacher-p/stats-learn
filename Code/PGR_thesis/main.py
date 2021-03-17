@@ -39,9 +39,9 @@ def poly_mean_to_models(n, alpha_0, weights):
 def func_mean_to_models(n, alpha_0, func):
     x_supp = np.linspace(0, 1, n, endpoint=True)
     if np.isinf(alpha_0):
-        return [rand_elements.EmpiricalScalar(func(x_i), n-1) for x_i in x_supp]
+        return [rand_elements.EmpiricalScalar(func(_x), n-1) for _x in x_supp]
     else:
-        return [rand_elements.DirichletEmpiricalScalar(func(x_i), alpha_0, n-1) for x_i in x_supp]
+        return [rand_elements.DirichletEmpiricalScalar(func(_x), alpha_0, n-1) for _x in x_supp]
 
 
 n_x = 128
@@ -129,13 +129,14 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10),
 # dir_params = {'alpha_0': [10, 1000]}
 # dir_params = {'alpha_0': [1000]}
 # dir_params = {'alpha_0': [.01, 100]}
-# dir_params = {'alpha_0': [1, 100, 10000]}
+dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
-dir_params = {'alpha_0': np.logspace(-1., 5., 60)}
+# dir_params = {'alpha_0': np.logspace(-1., 5., 60)}
 # dir_params = {'alpha_0': np.logspace(-2., 4., 40)}
 
 if do_bayes:  # add true bayes model concentration
-    dir_params['alpha_0'] = np.sort(np.concatenate((dir_params['alpha_0'], [model_eval.alpha_0])))
+    if model_eval.alpha_0 not in dir_params['alpha_0']:
+        dir_params['alpha_0'] = np.sort(np.concatenate((dir_params['alpha_0'], [model_eval.alpha_0])))
 
 
 ###
@@ -181,11 +182,11 @@ norm_params = {'prior_cov': [.1, .001]}
 # n_train = 800
 # n_train = [0, 10, 50, 100]
 # n_train = [0, 800, 3000]
-n_train = [0, 100, 200, 400, 800]
+# n_train = [0, 100, 200, 400, 800]
 # n_train = [0, 2, 8]
 # n_train = np.arange(0, 1300, 100)
-# n_train = np.arange(0, 4050, 50)
-# n_train = np.concatenate((np.arange(0, 200, 10), np.arange(200, 4050, 50)))
+# n_train = np.arange(0, 4500, 500)
+n_train = np.concatenate((np.arange(0, 200, 10), np.arange(200, 4050, 50)))
 
 
 # print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
