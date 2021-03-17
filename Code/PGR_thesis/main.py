@@ -84,7 +84,7 @@ model = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, alpha_y
 # do_bayes = False
 do_bayes = True
 if do_bayes:
-    model_eval = bayes_models.Dirichlet(model, alpha_0=1e3)
+    model_eval = bayes_models.Dirichlet(model, alpha_0=4e2)
     opt_predictor = BayesRegressor(model_eval, name=r'$f^*$')
 else:
     model_eval = model
@@ -134,6 +134,9 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10),
 dir_params = {'alpha_0': np.logspace(-1., 5., 60)}
 # dir_params = {'alpha_0': np.logspace(-2., 4., 40)}
 
+if do_bayes:  # add true bayes model concentration
+    dir_params['alpha_0'] = np.sort(np.concatenate((dir_params['alpha_0'], [model_eval.alpha_0])))
+
 
 ###
 # n_x_iter = [4, 128, 4096]
@@ -176,9 +179,9 @@ norm_params = {'prior_cov': [.1, .001]}
 # Plotting
 
 # n_train = 800
-n_train = [0, 10, 50, 100]
+# n_train = [0, 10, 50, 100]
 # n_train = [0, 800, 3000]
-# n_train = [0, 100, 200, 400, 800]
+n_train = [0, 100, 200, 400, 800]
 # n_train = [0, 2, 8]
 # n_train = np.arange(0, 1300, 100)
 # n_train = np.arange(0, 4050, 50)
@@ -205,7 +208,7 @@ plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepa
 
 predictors, params = list(zip(*temp))
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True, ax=None, rng=None)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=50000, verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
 
 # plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=50000,
@@ -216,6 +219,8 @@ plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, ve
 
 
 # Find localization minimum
+do_argmin = False
+# do_argmin = True
 ax = plt.gca()
 if ax.get_xlabel() == r'$\alpha_0$':
     ax.set_xscale('log')
@@ -223,13 +228,14 @@ if ax.get_xlabel() == r'$\alpha_0$':
     for line in lines:
         x_, y_ = line.get_data()
         idx = y_.argmin()
+        x_i, y_i = x_[idx], y_[idx]
         if scale_alpha:
             label = line.get_label()
             _n_x = int(label[label.find('=')+1:-1])
             line.set_data(x_ / _n_x, y_)
-            ax.plot(x_[idx] / _n_x, y_[idx], 'k*', markersize=8)  # TODO: color?
-        else:
-            ax.plot(x_[idx], y_[idx], 'k*', markersize=8)
+            x_i /= _n_x
+        if do_argmin:
+            ax.plot(x_i, y_i, marker='.', markersize=8, color=line.get_color())
     if scale_alpha:
         ax.set_xlabel(r'$\alpha_0 / |\mathcal{T}|$ ')
         _vals = dir_params['alpha_0']

@@ -21,6 +21,7 @@
 
 
 - **higher variance plots?!**
+  - **argmin unneeded!**
 
 
 # Notes
