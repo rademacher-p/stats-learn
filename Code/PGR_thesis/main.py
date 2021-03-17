@@ -70,10 +70,10 @@ def nonlinear_model(x):
     # return 1 / (1e-9 + 2+np.sin(2*np.pi * x))
 
 
-# model = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, alpha_y_x_d, w_model),
-#                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
-model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model),
+model = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, alpha_y_x_d, w_model),
                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
+# model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model),
+#                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
 # model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta)
 # model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta)
@@ -81,10 +81,10 @@ model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, alpha_y
 # model = rand_models.NormalLinear(weights=np.ones(2), basis_y_x=None, cov_y_x=.1, model_x=rand_elements.Normal(0, 10))
 
 
-do_bayes = False
-# do_bayes = True
+# do_bayes = False
+do_bayes = True
 if do_bayes:
-    model_eval = bayes_models.Dirichlet(model, alpha_0=100)
+    model_eval = bayes_models.Dirichlet(model, alpha_0=1e3)
     opt_predictor = BayesRegressor(model_eval, name=r'$f^*$')
 else:
     model_eval = model
@@ -120,18 +120,18 @@ _name = r'$\mathrm{Dir}$'
 if len(proc_funcs) > 0:
     _name += r', $|\mathcal{T}| = __card__$'.replace('__card__', str(n_x))
 
-dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=100),
+dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10),
                                space=model.space, proc_funcs=proc_funcs,
                                name=_name,
                                )
 
 # dir_params = None
-# dir_params = {'alpha_0': [1, 100, 10000]}
-dir_params = {'alpha_0': [10, 1000]}
+# dir_params = {'alpha_0': [10, 1000]}
+# dir_params = {'alpha_0': [1000]}
 # dir_params = {'alpha_0': [.01, 100]}
-# dir_params = {'alpha_0': [10]}
+# dir_params = {'alpha_0': [1, 100, 10000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
-# dir_params = {'alpha_0': np.logspace(-1., 5., 80)}
+dir_params = {'alpha_0': np.logspace(-1., 5., 60)}
 # dir_params = {'alpha_0': np.logspace(-2., 4., 40)}
 
 
@@ -170,19 +170,19 @@ norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, pr
 
 # norm_params = None
 norm_params = {'prior_cov': [.1, .001]}
+# norm_params = {'prior_cov': [.1]}
 # norm_params = {'prior_cov': [100, .01]}
-# norm_params = {'prior_cov': [100]}
 
 # Plotting
 
-# n_train = 10
-# n_train = [0, 10, 50, 100, 200]
-# n_train = [0, 5, 10, 20]
+# n_train = 800
+n_train = [0, 10, 50, 100]
+# n_train = [0, 800, 3000]
 # n_train = [0, 100, 200, 400, 800]
 # n_train = [0, 2, 8]
 # n_train = np.arange(0, 1300, 100)
 # n_train = np.arange(0, 4050, 50)
-n_train = np.concatenate((np.arange(0, 200, 10), np.arange(200, 4050, 50)))
+# n_train = np.concatenate((np.arange(0, 200, 10), np.arange(200, 4050, 50)))
 
 
 # print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
@@ -190,11 +190,11 @@ n_train = np.concatenate((np.arange(0, 200, 10), np.arange(200, 4050, 50)))
 
 
 temp = [
-    (opt_predictor, None),
+    # (opt_predictor, None),
     (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
     # *((pr, dir_params) for pr in dir_predictors),
-    (norm_predictor, norm_params),
+    # (norm_predictor, norm_params),
 ]
 
 # TODO: discrete plot for predict stats
@@ -205,10 +205,10 @@ plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepa
 
 predictors, params = list(zip(*temp))
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=50000, verbose=True, ax=None, rng=None)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
 
-# plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=500,
+# plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=50000,
 #                            do_std=True, verbose=True, ax=None, rng=None)
 
 
