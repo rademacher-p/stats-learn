@@ -510,7 +510,7 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
         return self._lims
 
     def set_x_plot(self):
-        self.x_plt = box_grid(self.lims_plot, 100, endpoint=False)
+        self.x_plt = box_grid(self.lims_plot, 1000, endpoint=False)
         # if self.shape in {(), (2,)}:
         #     self.x_plt = box_grid(self.lims_plot, 100, endpoint=False)
         # else:
