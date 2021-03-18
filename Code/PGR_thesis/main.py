@@ -66,14 +66,14 @@ def nonlinear_model(x):
 # model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model),
 #                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
-# model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta)
-model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta)
+model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta)
+# model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta)
 
 # model = rand_models.NormalLinear(weights=np.ones(2), basis_y_x=None, cov_y_x=.1, model_x=rand_elements.Normal(0, 10))
 
 
-do_bayes = False
-# do_bayes = True
+# do_bayes = False
+do_bayes = True
 if do_bayes:
     model_eval = bayes_models.Dirichlet(model, alpha_0=4e2)
     opt_predictor = BayesRegressor(model_eval, name=r'$f^*$')
@@ -98,13 +98,13 @@ proc_funcs = []
 #                                                      supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
 
-# prior_mean_x = rand_elements.Beta()
+prior_mean_x = rand_elements.Beta()
 
-n_t = 4
-_temp = np.full(n_t, 2)
-_temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
-prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_t, endpoint=True), p=_temp / _temp.sum())
-proc_funcs.append(discretizer(prior_mean_x.supp))
+# n_t = 4
+# _temp = np.full(n_t, 2)
+# _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
+# prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_t, endpoint=True), p=_temp / _temp.sum())
+# proc_funcs.append(discretizer(prior_mean_x.supp))
 
 prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
 
@@ -118,10 +118,10 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10),
                                )
 
 # dir_params = None
-dir_params = {'alpha_0': [10, 1000]}
+# dir_params = {'alpha_0': [10, 1000]}
 # dir_params = {'alpha_0': [10]}
 # dir_params = {'alpha_0': [.01, 100]}
-# dir_params = {'alpha_0': [40, 400, 4000]}
+dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
 # dir_params = {'alpha_0': np.logspace(-1., 5., 60)}
 # dir_params = {'alpha_0': np.logspace(-3., 3., 100)}
@@ -172,13 +172,13 @@ norm_params = {'prior_cov': [.1, .001]}
 
 # Plotting
 
-# n_train = 400
+# n_train = 40
 # n_train = [0, 4, 40, 400]
 # n_train = [0, 800, 4000]
 # n_train = [0, 100, 200, 400, 800]
 # n_train = np.arange(0, 650, 50)
-n_train = np.arange(0, 4500, 500)
-# n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4500, 500)))
+# n_train = np.arange(0, 4500, 500)
+n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
 
 # print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
@@ -202,7 +202,7 @@ predictors, params = list(zip(*temp))
 
 # TODO: efficient sequential ops for loss, mean, etc.?
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True, ax=None, rng=None)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=50000, verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
 
 # plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=50000,
