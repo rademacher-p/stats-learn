@@ -110,7 +110,7 @@ prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=a
 
 _name = r'$\mathrm{Dir}$'
 if len(proc_funcs) > 0:
-    _name += r', $|\mathcal{T}| = __card__$'.replace('__card__', str(n_t))
+    _name += r', $|\mathcal{T}| = __card__$'.replace('__card__', str(prior_mean_x.supp.size))
 
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10),
                                space=model.space, proc_funcs=proc_funcs,
@@ -118,8 +118,8 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10),
                                )
 
 # dir_params = None
-# dir_params = {'alpha_0': [10, 1000]}
-dir_params = {'alpha_0': [10]}
+dir_params = {'alpha_0': [10, 1000]}
+# dir_params = {'alpha_0': [10]}
 # dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
@@ -137,6 +137,8 @@ if do_bayes:  # add true bayes model concentration
 # n_t_iter = [2, 4, 8, 16]
 # n_t_iter = 2 ** np.arange(1, 6)
 n_t_iter = list(range(1, 33, 1))
+# n_t_iter = list(range(4, 64, 4))
+
 
 scale_alpha = False
 # scale_alpha = True
@@ -170,12 +172,12 @@ norm_params = {'prior_cov': [.1, .001]}
 
 # Plotting
 
-# n_train = 4
-n_train = [0, 4, 40, 400]
+# n_train = 400
+# n_train = [0, 4, 40, 400]
 # n_train = [0, 800, 4000]
 # n_train = [0, 100, 200, 400, 800]
 # n_train = np.arange(0, 650, 50)
-# n_train = np.arange(0, 4500, 500)
+n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4500, 500)))
 
 
@@ -185,8 +187,8 @@ n_train = [0, 4, 40, 400]
 
 temp = [
     # (opt_predictor, None),
-    # (dir_predictor, dir_params),
-    *(zip(dir_predictors, dir_params_full)),
+    (dir_predictor, dir_params),
+    # *(zip(dir_predictors, dir_params_full)),
     # (norm_predictor, norm_params),
 ]
 
@@ -198,14 +200,16 @@ plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepa
 
 predictors, params = list(zip(*temp))
 
-# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=50, verbose=True, ax=None, rng=None)
+# TODO: efficient sequential ops for loss, mean, etc.?
+
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
 
 # plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=50000,
 #                            do_std=True, verbose=True, ax=None, rng=None)
 
 
-plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=500, verbose=True, ax=None, rng=None)
+# plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=500, verbose=True, ax=None, rng=None)
 
 
 # Find localization minimum

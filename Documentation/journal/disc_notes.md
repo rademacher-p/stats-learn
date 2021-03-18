@@ -15,7 +15,7 @@
 
 
 *Redo discrete predict_N with leg N=4000*
-**Pure continuous results HIGH VARIANCE redo**
+*Redo continuous bayes fig HI-FI*
 
 
 # Notes
