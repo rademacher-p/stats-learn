@@ -23,15 +23,6 @@ from thesis.util.base import all_equal
 
 
 #%% Sim
-
-# def poly_mean_to_models(n, weights):
-#     return func_mean_to_models(n, lambda x: sum(w * x ** i for i, w in enumerate(weights)))
-#
-#
-# def func_mean_to_models(n, func):
-#     # return [rand_elements.EmpiricalScalar(func(x_i), n - 1) for x_i in np.linspace(0, 1, n, endpoint=True)]
-
-
 def poly_mean_to_models(n, alpha_0, weights):
     return func_mean_to_models(n, alpha_0, lambda x: sum(w * x ** i for i, w in enumerate(weights)))
 
@@ -128,12 +119,12 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10),
 
 # dir_params = None
 # dir_params = {'alpha_0': [10, 1000]}
-# dir_params = {'alpha_0': [10]}
+dir_params = {'alpha_0': [10]}
 # dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
 # dir_params = {'alpha_0': np.logspace(-1., 5., 60)}
-dir_params = {'alpha_0': np.logspace(-3., 3., 100)}
+# dir_params = {'alpha_0': np.logspace(-3., 3., 100)}
 
 if do_bayes:  # add true bayes model concentration
     if model_eval.alpha_0 not in dir_params['alpha_0']:
@@ -141,14 +132,14 @@ if do_bayes:  # add true bayes model concentration
 
 
 ###
-# n_t_iter = [4, 128, 4096]
+n_t_iter = [4, 128, 4096]
 # n_t_iter = [4, 16, 32, 64, 128]
-n_t_iter = [2, 4, 8, 16]
+# n_t_iter = [2, 4, 8, 16]
 # n_t_iter = 2 ** np.arange(1, 6)
 # n_t_iter = list(range(1, 33, 1))
 
-# scale_alpha = False
-scale_alpha = True
+scale_alpha = False
+# scale_alpha = True
 
 dir_predictors = []
 dir_params_full = [deepcopy(dir_params) for __ in n_t_iter]
@@ -179,14 +170,13 @@ norm_params = {'prior_cov': [.1, .001]}
 
 # Plotting
 
-n_train = 4
+# n_train = 4
 # n_train = [0, 10, 50, 100]
-# n_train = [0, 800, 3000]
+# n_train = [0, 800, 4000]
 # n_train = [0, 100, 200, 400, 800]
-# n_train = [0, 2, 8]
-# n_train = np.arange(0, 1300, 100)
+# n_train = np.arange(0, 650, 50)
 # n_train = np.arange(0, 4500, 500)
-# n_train = np.concatenate((np.arange(0, 200, 10), np.arange(200, 4050, 50)))
+n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4500, 500)))
 
 
 # print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
@@ -194,10 +184,10 @@ n_train = 4
 
 
 temp = [
-    # (opt_predictor, None),
+    (opt_predictor, None),
     # (dir_predictor, dir_params),
     *(zip(dir_predictors, dir_params_full)),
-    # (norm_predictor, norm_params),
+    (norm_predictor, norm_params),
 ]
 
 # TODO: discrete plot for predict stats
@@ -208,7 +198,7 @@ plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepa
 
 predictors, params = list(zip(*temp))
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True, ax=None, rng=None)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=50, verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
 
 # plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=50000,
@@ -251,7 +241,10 @@ fig.savefig(image_path.joinpath(f"{time_str}.png"))
 with open(image_path.joinpath(f"{time_str}.mpl"), 'wb') as fid:
     pickle.dump(fig, fid)
 
+print('Done')
 
+
+#%%
 # print(f"\nAnalytical Risk = {opt_predictor.evaluate_comp(n_train=n_train)}")
 
 # if isinstance(model, rand_models.Base):
@@ -262,6 +255,3 @@ with open(image_path.joinpath(f"{time_str}.mpl"), 'wb') as fid:
 #     print(f"Min Bayes risk = {risk_an}")
 # else:
 #     raise TypeError
-
-
-print('Done')
