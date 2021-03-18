@@ -211,7 +211,7 @@ predictors, params = list(zip(*temp))
 # plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=50000, verbose=True, ax=None, rng=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
 
-plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=500,
+plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=50000,
                            do_std=True, verbose=True, ax=None, rng=None)
 
 

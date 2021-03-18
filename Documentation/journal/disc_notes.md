@@ -20,7 +20,7 @@
   - N=128, var_const=1/5, thetac(x) = DE(n=127,a0=(1-var)/(var-1/(n-1)),nonlin(x))
   - Bayes: a0=400
 
-
+*Redo discrete predict_N with leg N=4000*
 **BAYES FIGS!?**
 *Predict y-axis Y*
 
