@@ -23,6 +23,7 @@
 *Redo discrete predict_N with leg N=4000*
 **BAYES FIGS!?**
 *Predict y-axis Y*
+**Pure continuous results redo**
 
 # Notes
 - Include an a0 legend fig to show gaussian?
