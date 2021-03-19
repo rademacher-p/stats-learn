@@ -97,12 +97,14 @@ class Base(ABC):
             raise NotImplementedError
 
         if len(set_shape) == 1 and self.shape == ():
-            plt_data = ax.plot(x, y, label=label)
+            fmt = '-'
+            # fmt = '.' if isinstance(self, Discrete) else '-'
+
+            plt_data = ax.plot(x, y, fmt, label=label)
             if y_std is not None:
                 if y_std_hi is None:
                     y_std_hi = y_std
 
-                # plt_data_std = ax.errorbar(x, y_mean, yerr=y_std)
                 plt_data_std = ax.fill_between(x, y - y_std, y + y_std_hi, alpha=0.5)
                 plt_data = (plt_data, plt_data_std)
 
@@ -123,8 +125,6 @@ class Base(ABC):
 
     def _eval_func(self, f, x=None):
         if x is None:
-            # if self.x_plt is None:
-            #     self.set_x_plot()
             x = self.x_plt
 
         x, set_shape = check_data_shape(x, self.shape)
@@ -159,6 +159,56 @@ class Base(ABC):
 
 class Discrete(Base):
     pass
+
+    # def plot_xy(self, x, y, y_std=None, y_std_hi=None, ax=None, label=None, **error_kwargs):
+    #     if ax is None:
+    #         ax = self.make_axes()
+    #
+    #     x, set_shape = check_data_shape(x, self.shape)
+    #     if y.shape != set_shape:
+    #         raise NotImplementedError
+    #
+    #     if len(set_shape) == 1 and self.shape == ():
+    #         plt_data = ax.plot(x, y, '.', label=label)
+    #         if y_std is not None:
+    #             if y_std_hi is None:
+    #                 y_std_hi = y_std
+    #
+    #             error_kwargs = {'color': ax.lines[-1].get_color(), 'alpha': .5, 'markersize': 2}
+    #             ax.plot(x, y - y_std, '.', label=None, **error_kwargs)
+    #             ax.plot(x, y + y_std_hi, '.', label=None, **error_kwargs)
+    #
+    #             # format_kwargs = {'fmt': fmt}
+    #             # format_kwargs.update(error_kwargs)
+    #             # plt_data = ax.errorbar(x, y, yerr=y_std, label=label, **format_kwargs)
+    #     else:
+    #         raise NotImplementedError
+    #
+    #     return plt_data
+
+    # def plot_xy(self, x, y, y_std=None, y_std_hi=None, ax=None, label=None, **error_kwargs):
+    #     if ax is None:
+    #         ax = self.make_axes()
+    #
+    #     x, set_shape = check_data_shape(x, self.shape)
+    #     if y.shape != set_shape:
+    #         raise NotImplementedError
+    #
+    #     if len(set_shape) == 1 and self.shape == ():
+    #         fmt = '.'
+    #         if y_std is None:
+    #             plt_data = ax.plot(x, y, fmt, label=label)
+    #         else:
+    #             if y_std_hi is not None:
+    #                 y_std = np.stack((y_std, y_std_hi))
+    #
+    #             format_kwargs = {'fmt': fmt}
+    #             format_kwargs.update(error_kwargs)
+    #             plt_data = ax.errorbar(x, y, yerr=y_std, label=label, **format_kwargs)
+    #     else:
+    #         raise NotImplementedError
+    #
+    #     return plt_data
 
 
 class Finite(Discrete):
