@@ -2,7 +2,6 @@
 Supervised learning functions.
 """
 
-# from copy import deepcopy
 import math
 from abc import ABC, abstractmethod
 from itertools import product
