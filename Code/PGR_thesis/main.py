@@ -20,6 +20,8 @@ from thesis.util.base import all_equal
 
 # plt.style.use('seaborn')
 # plt.style.use(['science'])
+plt.rc('text', usetex=True)
+plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepackage{bm}")
 
 
 #%% Sim
@@ -180,8 +182,8 @@ n_train = [0, 800, 4000]
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
 
-# print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
-# dir_predictor.plot_risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True, rng=None)
+# print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True))
+# dir_predictor.plot_risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True)
 
 
 temp = [
@@ -190,25 +192,18 @@ temp = [
     # *(zip(dir_predictors, dir_params_full)),
     # (norm_predictor, norm_params),
 ]
-
-# TODO: discrete plot for predict stats
-# TODO: make latex use optional
-
-plt.rc('text', usetex=True)
-plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepackage{bm}")
-
 predictors, params = list(zip(*temp))
 
+# TODO: discrete plot for predict stats
 # TODO: efficient sequential ops for loss, mean, etc.?
 
-# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True, ax=None, rng=None)
+# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True, ax=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
 
-plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=50000, do_std=True,
+plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=500, do_std=True,
                            verbose=True, ax=None)
 
-
-# plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=500, verbose=True, ax=None, rng=None)
+# plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=500, verbose=True, ax=None)
 
 
 # Find localization minimum
