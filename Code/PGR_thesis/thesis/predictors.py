@@ -2,7 +2,7 @@
 Supervised learning functions.
 """
 
-import copy
+# from copy import deepcopy
 import math
 from abc import ABC, abstractmethod
 from itertools import product
@@ -23,8 +23,7 @@ from thesis.util.base import vectorize_func, check_data_shape, all_equal
 from thesis.util.spaces import check_spaces_x
 
 
-def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False,
-                          rng=None):
+def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False):
     space_x = check_spaces_x(predictors)
     if x is None:
         x = space_x.x_plt
@@ -41,8 +40,7 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
     x, set_shape = check_data_shape(x, shape['x'])
     n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
 
-    model = copy.deepcopy(model)
-    model.rng = rng
+    # model = deepcopy(model)
 
     # Generate random data and make predictions
     params_shape_full = []
@@ -117,13 +115,13 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
 
 
 def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, do_std=False, verbose=False,
-                               ax=None, rng=None):
+                               ax=None):
     space_x = check_spaces_x(predictors)
     if x is None:
         x = space_x.x_plt
 
     stats = ('mean', 'std') if do_std else ('mean',)  # TODO: generalize for mode, etc.
-    y_stats_full = predict_stats_compare(predictors, model, params, x, n_train, n_mc, stats, verbose, rng)
+    y_stats_full = predict_stats_compare(predictors, model, params, x, n_train, n_mc, stats, verbose)
 
     if ax is None:
         ax = space_x.make_axes()
@@ -208,7 +206,7 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
     return out
 
 
-def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, rng=None):
+def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False):
     if params is None:
         params_full = [{} for _ in predictors]
     else:
@@ -219,8 +217,7 @@ def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n
 
     n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
 
-    model = copy.deepcopy(model)
-    model.rng = rng
+    # model = deepcopy(model)
 
     loss_full = []
     for params in params_full:
@@ -262,7 +259,7 @@ def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, 
     if isinstance(n_train, (Integral, np.integer)):
         n_train = [n_train]
 
-    model = copy.deepcopy(model)
+    # model = deepcopy(model)
 
     loss_full = []
     for predictor, params in zip(predictors, params_full):
@@ -387,9 +384,8 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
     return out
 
 
-def plot_risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None,
-                               rng=None):
-    losses = risk_eval_sim_compare(predictors, model, params, n_train, n_test, n_mc, verbose, rng)
+def plot_risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None):
+    losses = risk_eval_sim_compare(predictors, model, params, n_train, n_test, n_mc, verbose)
     do_bayes = isinstance(model, bayes_models.Base)
     return _plot_risk_eval_compare(losses, do_bayes, predictors, params, n_train, ax)
 
@@ -400,7 +396,7 @@ def plot_risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_tes
     return _plot_risk_eval_compare(losses, do_bayes, predictors, params, n_train, ax)
 
 
-def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500, verbose=True, ax=None, rng=None):
+def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500, verbose=True, ax=None):
     if params is None:
         params_full = [{} for _ in predictors]
     else:
@@ -410,7 +406,7 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
         raise ValueError
     # TODO: check models for equality
 
-    losses = risk_eval_sim_compare(predictors, model, params, n_train, n_test, n_mc, verbose, rng)
+    losses = risk_eval_sim_compare(predictors, model, params, n_train, n_test, n_mc, verbose)
 
     if isinstance(n_train, (Integral, np.integer)):
         n_train = [n_train]
@@ -570,29 +566,27 @@ class Base(ABC):
         return self.space['x'].plot(self.predict, x, ax=ax, label=label)
 
     # Prediction statistics
-    def predict_stats(self, model=None, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False,
-                      rng=None):
+    def predict_stats(self, model=None, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False):
         if model is None:
             model = self._model_obj
-        return predict_stats_compare([self], model, [params], x, n_train, n_mc, stats, verbose, rng)[0]
+        return predict_stats_compare([self], model, [params], x, n_train, n_mc, stats, verbose)[0]
 
     def plot_predict_stats(self, model=None, params=None, x=None, n_train=0, n_mc=1, do_std=False, verbose=False,
-                           ax=None, rng=None):
+                           ax=None):
         if model is None:
             model = self._model_obj
-        return plot_predict_stats_compare([self], model, [params], x, n_train, n_mc, do_std, verbose, ax, rng)
+        return plot_predict_stats_compare([self], model, [params], x, n_train, n_mc, do_std, verbose, ax)
 
     # Risk evaluation
-    def risk_eval_sim(self, model=None, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, rng=None):
+    def risk_eval_sim(self, model=None, params=None, n_train=0, n_test=1, n_mc=1, verbose=False):
         if model is None:
             model = self._model_obj
-        return risk_eval_sim_compare([self], model, [params], n_train, n_test, n_mc, verbose, rng)[0]
+        return risk_eval_sim_compare([self], model, [params], n_train, n_test, n_mc, verbose)[0]
 
-    def plot_risk_eval_sim(self, model=None, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None,
-                           rng=None):
+    def plot_risk_eval_sim(self, model=None, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None):
         if model is None:
             model = self._model_obj
-        return plot_risk_eval_sim_compare([self], model, [params], n_train, n_test, n_mc, verbose, ax, rng)
+        return plot_risk_eval_sim_compare([self], model, [params], n_train, n_test, n_mc, verbose, ax)
 
     def risk_eval_comp(self, model=None, params=None, n_train=0, n_test=1, verbose=False):
         if model is None:

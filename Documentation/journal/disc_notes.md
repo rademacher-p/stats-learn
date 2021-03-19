@@ -14,9 +14,6 @@
     - sims suggest same argmin??
 
 
-*Redo discrete predict_N with leg N=4000*
-
-
 # Notes
 - SE_predict_leg_T
   - Coarse has low variance, low bias relative to thetacd, but high disc bias. Fine has high bias relative to thetacd because of insufficient data, but low disc bias. Middle optimizes the trade-off.
