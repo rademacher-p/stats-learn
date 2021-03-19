@@ -217,12 +217,11 @@ def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n
 
     n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
 
-    # model = deepcopy(model)
-
     loss_full = []
     for params in params_full:
         params_shape = tuple(len(vals) for _, vals in params.items())
-        loss = np.empty((n_mc, len(n_train_delta)) + params_shape)
+        # loss = np.empty((n_mc, len(n_train_delta), *params_shape))
+        loss = np.empty((len(n_train_delta), *params_shape))
         loss_full.append(loss)
 
     for i_mc in range(n_mc):
@@ -239,14 +238,16 @@ def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n
                 predictor.fit(d_train, warm_start=warm_start)
 
                 if len(params) == 0:
-                    loss[i_mc, i_n] = predictor.evaluate(d_test)
+                    # loss[i_mc, i_n] = predictor.evaluate(d_test)
+                    loss[i_n] += predictor.evaluate(d_test)
                 else:
                     for i_v, param_vals in enumerate(list(product(*params.values()))):
                         predictor.set_params(**dict(zip(params.keys(), param_vals)))
-                        # loss[i_mc, i_n][np.unravel_index([i_v], loss.shape[2:])] = predictor.evaluate(d_test)
-                        loss[i_mc, i_n][np.unravel_index(i_v, loss.shape[2:])] = predictor.evaluate(d_test)
+                        # loss[i_mc, i_n][np.unravel_index(i_v, loss.shape[2:])] = predictor.evaluate(d_test)
+                        loss[i_n][np.unravel_index(i_v, loss.shape[1:])] += predictor.evaluate(d_test)
 
-    loss_full = [loss.mean(axis=0) for loss in loss_full]
+    # loss_full = [loss.mean() for loss in loss_full]
+    loss_full = [loss / n_mc for loss in loss_full]
     return loss_full
 
 
@@ -258,8 +259,6 @@ def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, 
 
     if isinstance(n_train, (Integral, np.integer)):
         n_train = [n_train]
-
-    # model = deepcopy(model)
 
     loss_full = []
     for predictor, params in zip(predictors, params_full):
