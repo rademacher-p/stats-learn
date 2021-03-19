@@ -23,6 +23,9 @@ from thesis.util.spaces import check_spaces_x
 
 
 def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False):
+
+    # TODO: Welford's online algorithm for mean and var calculation
+
     space_x = check_spaces_x(predictors)
     if x is None:
         x = space_x.x_plt
@@ -165,8 +168,6 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
         for y_stat, label in zip(y_stats, labels):
             y_mean = y_stat['mean']
             y_std = y_stat['std'] if do_std else None
-            # plt_data = predictor.plot_xy(x, y_mean, y_std, ax, label=label)
-            # plt_data = plot_xy(x, y_mean, y_std, space_x, ax, label=label)
             plt_data = space_x.plot_xy(x, y_mean, y_std, ax=ax, label=label)
             out.append(plt_data)
 
@@ -175,6 +176,10 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
 
     else:
         if len(n_train) == 1:
+            # TODO: enumerates and kwargs for errorbar predict. keep?
+            # lens = [1 if len(p) == 0 else len(list(p.values())[0]) for p in params_full]
+            # n_lines = sum(lens)
+
             title = f'$N = {n_train[0]}$'
             for predictor, params, y_stats in zip(predictors, params_full, y_stats_full):
                 if len(params) == 0:
@@ -186,6 +191,16 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
                     labels = [f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals]
                 else:
                     raise ValueError
+
+                # for i_v, (y_stat, label) in enumerate(zip(y_stats, labels)):
+                #     xy_kwargs = {}
+                #     if isinstance(space_x, spaces.Discrete):
+                #         xy_kwargs['errorevery'] = (sum(lens[:i_p]) + i_v, n_lines)
+                #
+                #     y_mean = y_stat['mean']
+                #     y_std = y_stat['std'] if do_std else None
+                #     plt_data = space_x.plot_xy(x, y_mean, y_std, ax=ax, label=label, **xy_kwargs)
+                #     out.append(plt_data)
 
                 for y_stat, label in zip(y_stats, labels):
                     y_mean = y_stat['mean']
