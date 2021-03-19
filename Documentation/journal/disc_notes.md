@@ -15,14 +15,11 @@
 
 
 *Redo discrete predict_N with leg N=4000*
-*Redo continuous bayes fig HI-FI*
 
 
 # Notes
-- Include an a0 legend fig to show gaussian?
 - SE_predict_leg_T
   - Coarse has low variance, low bias relative to thetacd, but high disc bias. Fine has high bias relative to thetacd because of insufficient data, but low disc bias. Middle optimizes the trade-off.
-  - *move alpha from legend to title*
 
 - SE_predict_leg_N_t4_v2
   - Convergence to thetacd (no related bias), no variance, but disc bias remains. Contrast with discrete-domain consistency plot.
@@ -30,8 +27,6 @@
 - SE_risk_N_leg_T
   - Coarse has fastest convergence (data sensitivity), but worst asymptote (disc bias). Fine can barely adapt, so perfect asymptote is never realized in practice. Middle optimizes the trade-off for middle N values.
   - Gaussian demonstrates same trade-off!
-  - *add more gaussian or just remove*
-  - *move alpha from legend to title*
 
 - SE_risk_a0norm_leg_T
   - different argmins

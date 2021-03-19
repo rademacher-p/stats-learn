@@ -3188,12 +3188,10 @@ representing the minimum bias and maximum variance incurred by the empirical est
 
 Consider a data model where $\Xcal = \Ycal = [0, 1]$, the closed unit interval. The Dirichlet estimator is parameterized by $\alpham = 1$ and $\alphac(x) = \Beta(2, 2)$, such that the prior estimator $\mu_{\yrm | \xrm} = 0.5$ is constant; various localizations $\alpha_0$ will be used. 
 
-\todohi{HI-FI FIG!}
-
 \Cref{fig:Continuous/SE/risk_bayes_N_leg_a0} displays the Bayesian squared-error realized by the Dirichlet-based regressor. The model $\uptheta$ is randomly selected from a Dirichlet process with the same $\alpham$ and $\alphac$ used for the regressor design and with the localization fixed at $\alpha_0 = 400$. Since $\alpham$ is bounded, the Bayes risk is $\Rcal^* \approx (1 + N / \alpha_0)^{-1} \Erm_{\xrm}\big[ \Sigma_{\yrm | \xrm} \big]$. Observe that the risk is independent of the value $\alpha_0$ chosen for the estimator, since $\delta(0)^{-1} \alpha_0 \alpham(x) \to 0$ and thus the empirical estimate will always be used when available. Additionally, note that $\Rcal^* \to 0$ as $N \to \infty$.
 \begin{figure}
 	\centering
-	\includegraphics[width=0.8\linewidth]{Continuous/SE/_lofi_risk_bayes_N_leg_a0.png}
+	\includegraphics[width=0.8\linewidth]{Continuous/SE/risk_bayes_N_leg_a0.png}
 	\caption{Bayes Squared-Error vs. $N$}
 	\label{fig:Continuous/SE/risk_bayes_N_leg_a0}
 \end{figure}
@@ -3482,21 +3480,21 @@ Figure \ref{fig:Discretization/SE/risk_N_leg_T} displays the squared-error achie
 	\label{fig:Discretization/SE/risk_a0norm_leg_T}
 \end{figure} 
 
-To further demonstrate the importance of the selection of the discretization function, \Cref{fig:Discretization/SE/_lofi_risk_T_leg_N,fig:Discretization/SE/_lofi_risk_T_leg_a0} demonstrate the error trends as a function of $|\Tcal|$ for different data volumes and prior concentrations, respectively. In the former, note that the transform set cardinality that minimizes the squared-error is directly proportionate to the training data volume $N$. Conforming with the previous results, more data allows finer discretizers to be used, reducing the discretization error without the severe consequences of lower data sensitivity.
+To further demonstrate the importance of the selection of the discretization function, \Cref{fig:Discretization/SE/risk_T_leg_N,fig:Discretization/SE/risk_T_leg_a0} demonstrate the error trends as a function of $|\Tcal|$ for different data volumes and prior concentrations, respectively. In the former, note that the transform set cardinality that minimizes the squared-error is directly proportionate to the training data volume $N$. Conforming with the previous results, more data allows finer discretizers to be used, reducing the discretization error without the severe consequences of lower data sensitivity.
 \begin{figure}
 	\centering
-	\includegraphics[width=0.8\linewidth]{Discretization/SE/_lofi_risk_T_leg_N.png}
+	\includegraphics[width=0.8\linewidth]{Discretization/SE/risk_T_leg_N.png}
 	\caption{Squared-Error vs. discretization $|\Tcal|$, various $N$}
-	\label{fig:Discretization/SE/_lofi_risk_T_leg_N}
+	\label{fig:Discretization/SE/risk_T_leg_N}
 \end{figure} 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.8\linewidth]{Discretization/SE/_lofi_risk_T_leg_a0.png}
 	\caption{Squared-Error vs. discretization $|\Tcal|$, various $\alpha_0$}
-	\label{fig:Discretization/SE/_lofi_risk_T_leg_a0}
+	\label{fig:Discretization/SE/risk_T_leg_a0}
 \end{figure} 
 
-\todohi{Remove alpha fig or add discussion! Equal argmins???}
+\todohi{Remove alpha fig or do hifi, add discussion! Equal argmins???}
 
 
 
