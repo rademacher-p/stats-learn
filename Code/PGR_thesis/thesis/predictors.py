@@ -217,7 +217,7 @@ def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n
     for params in params_full:
         params_shape = tuple(len(vals) for _, vals in params.items())
         # loss = np.empty((n_mc, len(n_train_delta), *params_shape))
-        loss = np.empty((len(n_train_delta), *params_shape))
+        loss = np.zeros((len(n_train_delta), *params_shape))
         loss_full.append(loss)
 
     for i_mc in range(n_mc):
