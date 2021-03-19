@@ -40,8 +40,6 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
     x, set_shape = check_data_shape(x, shape['x'])
     n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
 
-    # model = deepcopy(model)
-
     # Generate random data and make predictions
     params_shape_full = []
     y_full = []
@@ -68,7 +66,6 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
                     for i_v, param_vals in enumerate(list(product(*params.values()))):
                         predictor.set_params(**dict(zip(params.keys(), param_vals)))
                         # params_shape = y.shape[2:-(len(set_shape) + ndim['y'])]
-                        # y[i_mc, i_n][np.unravel_index([i_v], params_shape)] = predictor.predict(x)
                         y[i_mc, i_n][np.unravel_index(i_v, params_shape)] = predictor.predict(x)
 
     # Generate statistics
