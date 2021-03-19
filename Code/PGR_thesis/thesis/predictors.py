@@ -72,7 +72,7 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
                         y[i_mc, i_n][np.unravel_index(i_v, params_shape)] = predictor.predict(x)
 
     # Generate statistics
-    _samp, dtype = (), []
+    _samp, dtype = [], []
     for stat in stats:
         if stat in {'mode', 'median', 'mean'}:
             stat_shape = set_shape + shape['y']
@@ -80,10 +80,10 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
             stat_shape = set_shape + 2 * shape['y']
         else:
             raise ValueError
-        _samp += (np.empty(stat_shape),)
+        _samp.append(np.empty(stat_shape))
         dtype.append((stat, np.float64, stat_shape))  # TODO: dtype float? need model dtype attribute?!
 
-    y_stats_full = [np.tile(np.array(_samp, dtype=dtype), reps=(len(n_train_delta),) + param_shape)
+    y_stats_full = [np.tile(np.array(tuple(_samp), dtype=dtype), reps=(len(n_train_delta), *param_shape))
                     for param_shape in params_shape_full]
 
     for y, y_stats in zip(y_full, y_stats_full):
