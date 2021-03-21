@@ -3463,7 +3463,7 @@ To underscore the limitation of predictors with coarse discretization, consider 
 Figure \ref{fig:Discretization/SE/risk_N_leg_T} displays the squared-error achieved by the Dirichlet-based regressors for varying data volumes $N$ and for different discretization set sizes $|\Tcal|$. Unlike the regressors derived from full support priors (see the discrete domain results in Section \ref{sec:SE_dir_example}), these regressors do not achieve the irreducible squared-error $\Rcal_{\Theta}^*(\theta)$ in the limit of training data volume $N$. The $|\Tcal| = 4$ regressor is extremely sensitive to $N$ and consequently outperforms the learners using finer discretization if $N$ is relatively small; however, it produces the highest discretization error, making the discretization excessive when the training set is more voluminous. The $|\Tcal| = 4096$ regressor uses such fine discretization that it it under-utilizes the data and it barely improves over the range of values $N$ shown. Nonetheless, it has the smallest discretization error; if enough data is collected, it will eventually outperform all the other regressors and tend to a loss even lower than that realized by the $|\Tcal| = 128$ regressor. Clearly, for more middling training data volumes, the $|\Tcal| = 128$ regressor strikes the best balance between the two sources of risk. Also note that the Bayesian linear regressors suffer from the worst excess squared-error due to their low-dimensionality priors and poorly-matched set of achievable prediction functions.
 \begin{figure}
 	\centering
-	\includegraphics[width=0.8\linewidth]{Discretization/SE/_lofi_risk_N_leg_T.png}
+	\includegraphics[width=0.8\linewidth]{Discretization/SE/risk_N_leg_T.png}
 	\caption{Squared-Error vs. training data volume $N$}
 	\label{fig:Discretization/SE/risk_N_leg_T}
 \end{figure}
@@ -3485,7 +3485,7 @@ To further demonstrate the importance of the selection of the discretization fun
 \end{figure} 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.8\linewidth]{Discretization/SE/_lofi_risk_T_leg_a0.png}
+	\includegraphics[width=0.8\linewidth]{Discretization/SE/risk_T_leg_a0.png}
 	\caption{Squared-Error vs. discretization $|\Tcal|$, various $\alpha_0$}
 	\label{fig:Discretization/SE/risk_T_leg_a0}
 \end{figure} 
