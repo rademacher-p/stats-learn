@@ -51,10 +51,10 @@ alpha_y_x_beta = 1/var_y_x_const - 1
 # model = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
 #                                                 supp_x=[0, .5], p_x=None)
 
-# w_model = [0, 0, 1]
+# w_model = [.5]
+w_model = [0, 0, 1]
 # w_model = [0, 0, 0, 0, 1]
 # w_model = [.3, 0., .4]
-w_model = [.5, 0, 0]
 
 
 def nonlinear_model(x):
@@ -67,10 +67,10 @@ def nonlinear_model(x):
 # model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model),
 #                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
-# model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta)
-model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta)
+model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta)
+# model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta)
 
-# model = rand_models.NormalLinear(weights=np.ones(2), basis_y_x=None, cov_y_x=.1, model_x=rand_elements.Normal(0, 10))
+# model = rand_models.NormalLinear(weights=w_model, basis_y_x=None, cov_y_x=.05, model_x=rand_elements.Normal())
 
 
 do_bayes = False
@@ -127,38 +127,39 @@ dir_params = {'alpha_0': [10, 1000]}
 # dir_params = {'alpha_0': np.logspace(-0., 5., 60)}
 # dir_params = {'alpha_0': np.logspace(-3., 3., 100)}
 
+
 if do_bayes:  # add true bayes model concentration
     if model_eval.alpha_0 not in dir_params['alpha_0']:
         dir_params['alpha_0'] = np.sort(np.concatenate((dir_params['alpha_0'], [model_eval.alpha_0])))
 
 
-###
-n_t_iter = [4, 128, 4096]
-# n_t_iter = [4, 16, 32, 64, 128]
-# n_t_iter = [2, 4, 8, 16]
-# n_t_iter = 2 ** np.arange(1, 14)
-# n_t_iter = list(range(1, 33, 1))
-# n_t_iter = list(range(4, 64, 4))
-
-
-scale_alpha = False
-# scale_alpha = True
-
-dir_predictors = []
-dir_params_full = [deepcopy(dir_params) for __ in n_t_iter]
-for n_t, _params in zip(n_t_iter, dir_params_full):
-    _temp = np.full(n_t, 2)
-    _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
-    prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_t, endpoint=True), p=_temp / _temp.sum())
-    prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
-
-    dir_predictors.append(BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=0.01),
-                                         space=model.space, proc_funcs=[discretizer(prior_mean_x.supp)],
-                                         name=r'$\mathrm{Dir}$, $|\mathcal{T}| = card$'.replace('card', str(n_t)),
-                                         ))
-
-    if scale_alpha and _params is not None:
-        _params['alpha_0'] *= n_t
+# ###
+# n_t_iter = [4, 128, 4096]
+# # n_t_iter = [4, 16, 32, 64, 128]
+# # n_t_iter = [2, 4, 8, 16]
+# # n_t_iter = 2 ** np.arange(1, 14)
+# # n_t_iter = list(range(1, 33, 1))
+# # n_t_iter = list(range(4, 64, 4))
+#
+#
+# scale_alpha = False
+# # scale_alpha = True
+#
+# dir_predictors = []
+# dir_params_full = [deepcopy(dir_params) for __ in n_t_iter]
+# for n_t, _params in zip(n_t_iter, dir_params_full):
+#     _temp = np.full(n_t, 2)
+#     _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
+#     prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_t, endpoint=True), p=_temp / _temp.sum())
+#     prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
+#
+#     dir_predictors.append(BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=0.01),
+#                                          space=model.space, proc_funcs=[discretizer(prior_mean_x.supp)],
+#                                          name=r'$\mathrm{Dir}$, $|\mathcal{T}| = card$'.replace('card', str(n_t)),
+#                                          ))
+#
+#     if scale_alpha and _params is not None:
+#         _params['alpha_0'] *= n_t
 
 
 # Normal learner
@@ -204,28 +205,29 @@ plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, ve
 # plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None)
 # plt.xscale('log', base=2)
 
-# Find localization minimum
-do_argmin = False
-# do_argmin = True
-ax = plt.gca()
-if ax.get_xlabel() == r'$\alpha_0$':
-    ax.set_xscale('log')
-    lines = ax.get_lines()
-    for line in lines:
-        x_, y_ = line.get_data()
-        idx = y_.argmin()
-        x_i, y_i = x_[idx], y_[idx]
-        if scale_alpha:
-            label = line.get_label()
-            _n_t = int(label[label.find('=')+1:-1])
-            line.set_data(x_ / _n_t, y_)
-            x_i /= _n_t
-        if do_argmin:
-            ax.plot(x_i, y_i, marker='.', markersize=8, color=line.get_color())
-    if scale_alpha:
-        ax.set_xlabel(r'$\alpha_0 / |\mathcal{T}|$ ')
-        _vals = dir_params['alpha_0']
-        ax.set_xlim((_vals.min(), _vals.max()))
+
+# # Find localization minimum
+# do_argmin = False
+# # do_argmin = True
+# ax = plt.gca()
+# if ax.get_xlabel() == r'$\alpha_0$':
+#     ax.set_xscale('log')
+#     lines = ax.get_lines()
+#     for line in lines:
+#         x_, y_ = line.get_data()
+#         idx = y_.argmin()
+#         x_i, y_i = x_[idx], y_[idx]
+#         if scale_alpha:
+#             label = line.get_label()
+#             _n_t = int(label[label.find('=')+1:-1])
+#             line.set_data(x_ / _n_t, y_)
+#             x_i /= _n_t
+#         if do_argmin:
+#             ax.plot(x_i, y_i, marker='.', markersize=8, color=line.get_color())
+#     if scale_alpha:
+#         ax.set_xlabel(r'$\alpha_0 / |\mathcal{T}|$ ')
+#         _vals = dir_params['alpha_0']
+#         ax.set_xlim((_vals.min(), _vals.max()))
 
 
 #%% Save image and Figure
