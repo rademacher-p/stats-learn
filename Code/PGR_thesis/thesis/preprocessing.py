@@ -1,21 +1,47 @@
+import math
+
 import numpy as np
+
+from thesis.util.base import check_data_shape
+from thesis.util.plotting import box_grid
 
 
 def discretizer(vals):  # TODO: use sklearn.preprocessing.KBinsDiscretizer?
     """Create a rounding discretizer."""
+    vals = np.array(vals)
+    shape = vals.shape[1:]
+    size = math.prod(shape)
+    vals_flat = vals.reshape(-1, size)
 
     def func(x):
-        x = np.array(x)
-        delta = np.abs(x - vals[:, np.newaxis])
-        return vals[delta.argmin(axis=0)]
+        x, set_shape = check_data_shape(x, shape)
+        x = x.reshape(-1, size)
+
+        delta = x - vals_flat[:, np.newaxis]
+        idx = (np.linalg.norm(delta, axis=-1)).argmin(axis=0)
+
+        return vals[idx].reshape(set_shape + shape)
 
     return func
 
 
-if __name__ == '__main__':
-    values = np.random.default_rng().random(10)
-    print(values)
+def main():
+    x = np.random.default_rng().random(10)
+    print(x)
 
-    func_ = discretizer(np.linspace(0, 1, 11, endpoint=True))
-    vals_discrete = func_(values)
-    print(vals_discrete)
+    vals = np.linspace(0, 1, 11, endpoint=True)
+    func_ = discretizer(vals)
+    x_d = func_(x)
+    print(x_d)
+
+    x = np.random.default_rng().random((10, 2))
+    print(x)
+
+    vals = box_grid([[0, 1], [0, 1]], 11, True).reshape(-1, 2)
+    func_ = discretizer(vals)
+    x_d = func_(x)
+    print(x_d)
+
+
+if __name__ == '__main__':
+    main()

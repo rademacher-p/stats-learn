@@ -25,6 +25,25 @@ plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepackage{bm}")
 
 
+# x = np.random.default_rng().random(10)
+# print(x)
+#
+# vals = np.linspace(0, 1, 11, endpoint=True)
+# func_ = discretizer(vals)
+# x_d = func_(x)
+# print(x_d)
+#
+# x = np.random.default_rng().random((10, 2))
+# print(x)
+#
+# vals = box_grid([[0, 1], [0, 1]], 11, True).reshape(-1, 2)
+# func_ = discretizer(vals)
+# x_d = func_(x)
+# print(x_d)
+#
+# qq=1
+
+
 #%% Sim
 def poly_mean_to_models(n, alpha_0, weights):
     return func_mean_to_models(n, alpha_0, lambda x: sum(w * x ** i for i, w in enumerate(weights)))
@@ -66,12 +85,12 @@ def nonlinear_model(x):
 # model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model),
 #                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
-model_x = rand_elements.Beta()
-# model_x = rand_elements.Uniform([[0, 1], [0, 1]])
-# model_x.space.x_plt = box_grid(model_x.lims, 100, endpoint=False)
+# model_x = rand_elements.Beta()
+model_x = rand_elements.Uniform([[0, 1], [0, 1]])
+model_x.space.x_plt = box_grid(model_x.lims, 100, endpoint=False)
 
-# model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
-model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta)
+model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
+# model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta)
 
 # model = rand_models.NormalLinear(weights=w_model, basis_y_x=None, cov_y_x=.05, model_x=rand_elements.Normal())
 
@@ -106,10 +125,14 @@ proc_funcs = []
 # prior_mean_x = rand_elements.Uniform([[0, 1], [0, 1]])
 
 n_t = 4
-_temp = np.full(n_t, 2)
-_temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
-prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_t, endpoint=True), p=_temp / _temp.sum())
-proc_funcs.append(discretizer(prior_mean_x.supp))
+prior_mean_x = rand_elements.Finite(box_grid([[0, 1], [0, 1]], n_t, endpoint=True), p=None)
+proc_funcs.append(discretizer(prior_mean_x.supp.reshape(-1, 2)))
+
+# n_t = 4
+# _temp = np.full(n_t, 2)
+# _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
+# prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_t, endpoint=True), p=_temp / _temp.sum())
+# proc_funcs.append(discretizer(prior_mean_x.supp))
 
 prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
 
@@ -195,7 +218,7 @@ temp = [
     (opt_predictor, None),
     (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
-    (norm_predictor, norm_params),
+    # (norm_predictor, norm_params),
 ]
 predictors, params = list(zip(*temp))
 
@@ -203,7 +226,7 @@ predictors, params = list(zip(*temp))
 # plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True, ax=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
 
-plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=500, do_std=True,
+plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=10, do_std=True,
                            verbose=True, ax=None)
 
 # plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None)
