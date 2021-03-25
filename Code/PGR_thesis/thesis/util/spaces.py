@@ -18,11 +18,6 @@ from thesis.util.plotting import simplex_grid, box_grid, mesh_grid
 # TODO: issubset method?
 
 def check_spaces(iter_):
-    # space = iter_[0].space
-    # if all(obj.space == space for obj in iter_[1:]):
-    #     return space
-    # else:
-    #     raise ValueError("All objects must have the same space attribute.")
     if all_equal((obj.space for obj in iter_)):
         return iter_[0].space
     else:
@@ -30,11 +25,6 @@ def check_spaces(iter_):
 
 
 def check_spaces_x(iter_):
-    # space = iter_[0].space['x']
-    # if all(obj.space['x'] == space for obj in iter_[1:]):
-    #     return space
-    # else:
-    #     raise ValueError("All objects must have the same space attribute.")
     if all_equal((obj.space['x'] for obj in iter_)):
         return iter_[0].space['x']
     else:
@@ -77,6 +67,9 @@ class Base(ABC):
         elif self.shape == (2,):
             _, ax = plt.subplots(subplot_kw={'projection': '3d'})
             ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$f(x)$')
+
+            ax.set_prop_cycle('color', ['1f77b4', 'ff7f0e', '2ca02c', 'd62728', '9467bd', '8c564b', 'e377c2',
+                                        '7f7f7f', 'bcbd22', '17becf'])
         elif self.shape == (3,):
             _, ax = plt.subplots(subplot_kw={'projection': '3d'})
             ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
@@ -97,7 +90,7 @@ class Base(ABC):
             raise NotImplementedError
 
         if len(set_shape) == 1 and self.shape == ():
-            fmt = '-'
+            fmt = '-'  # TODO: remove?
             # fmt = '.' if isinstance(self, Discrete) else '-'
 
             plt_data = ax.plot(x, y, fmt, label=label)
@@ -109,7 +102,12 @@ class Base(ABC):
                 plt_data = (plt_data, plt_data_std)
 
         elif len(set_shape) == 2 and self.shape == (2,):
-            plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, cmap=plt.cm.viridis)
+            plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, shade=False, label=label)
+            plt_data._facecolors2d = plt_data._facecolor3d
+            plt_data._edgecolors2d = plt_data._edgecolor3d
+            # FIXME: use MAYAVI package for 3D??
+
+            # plt_data = ax.plot_wireframe(x[..., 0], x[..., 1], y, label=label)
             if y_std is not None:
                 if y_std_hi is None:
                     y_std_hi = y_std
@@ -563,21 +561,23 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
         self.x_plt = box_grid(self.lims_plot, 1000, endpoint=False)
 
     def plot(self, f, x=None, ax=None, label=None, **kwargs):
-        if ax is None:
-            ax = self.make_axes()
+        # if ax is None:
+        #     ax = self.make_axes()
 
         x, y, set_shape = self._eval_func(f, x)
 
-        set_ndim = len(set_shape)
-        if set_ndim == 1 and self.shape == ():
-            return ax.plot(x, y, label=label)
+        return self.plot_xy(x, y, ax=ax, label=label)
 
-        elif set_ndim == 2 and self.shape == (2,):
-            # return ax.plot_wireframe(x[..., 0], x[..., 1], y)
-            return ax.plot_surface(x[..., 0], x[..., 1], y, cmap=plt.cm.viridis)
-
-        else:
-            raise NotImplementedError('Plot method only supported for 1- and 2-dimensional data.')
+        # set_ndim = len(set_shape)
+        # if set_ndim == 1 and self.shape == ():
+        #     return ax.plot(x, y, label=label)
+        #
+        # elif set_ndim == 2 and self.shape == (2,):
+        #     # return ax.plot_wireframe(x[..., 0], x[..., 1], y)
+        #     return ax.plot_surface(x[..., 0], x[..., 1], y, cmap=plt.cm.viridis)
+        #
+        # else:
+        #     raise NotImplementedError('Plot method only supported for 1- and 2-dimensional data.')
 
 
 class Euclidean(Box):
