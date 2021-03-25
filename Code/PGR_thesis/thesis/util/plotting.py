@@ -73,8 +73,8 @@ def simplex_grid(n, shape, hull_mask=None):
 def box_grid(lims, n=100, endpoint=False):
     lims = np.array(lims)
 
-    if endpoint:
-        n += 1
+    # if endpoint:
+    #     n += 1
 
     if lims.shape == (2,):
         return np.linspace(*lims, n, endpoint=endpoint)

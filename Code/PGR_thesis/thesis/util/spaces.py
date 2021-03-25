@@ -103,18 +103,17 @@ class Base(ABC):
 
         elif len(set_shape) == 2 and self.shape == (2,):
             plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, shade=False, label=label)
-            plt_data._facecolors2d = plt_data._facecolor3d
-            plt_data._edgecolors2d = plt_data._edgecolor3d
+            plt_data._facecolors2d, plt_data._edgecolors2d = plt_data._facecolor3d, plt_data._edgecolor3d
             # FIXME: use MAYAVI package for 3D??
-
             # plt_data = ax.plot_wireframe(x[..., 0], x[..., 1], y, label=label)
-            if y_std is not None:
-                if y_std_hi is None:
-                    y_std_hi = y_std
 
-                plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y - y_std, cmap=plt.cm.viridis)
-                plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y + y_std_hi, cmap=plt.cm.viridis)
-                plt_data = (plt_data, (plt_data_lo, plt_data_hi))
+            # if y_std is not None:
+            #     if y_std_hi is None:
+            #         y_std_hi = y_std
+            #
+            #     plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y - y_std, shade=False)
+            #     plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y + y_std_hi, shade=False)
+            #     plt_data = (plt_data, (plt_data_lo, plt_data_hi))
 
         else:
             raise NotImplementedError
@@ -561,23 +560,8 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
         self.x_plt = box_grid(self.lims_plot, 1000, endpoint=False)
 
     def plot(self, f, x=None, ax=None, label=None, **kwargs):
-        # if ax is None:
-        #     ax = self.make_axes()
-
         x, y, set_shape = self._eval_func(f, x)
-
         return self.plot_xy(x, y, ax=ax, label=label)
-
-        # set_ndim = len(set_shape)
-        # if set_ndim == 1 and self.shape == ():
-        #     return ax.plot(x, y, label=label)
-        #
-        # elif set_ndim == 2 and self.shape == (2,):
-        #     # return ax.plot_wireframe(x[..., 0], x[..., 1], y)
-        #     return ax.plot_surface(x[..., 0], x[..., 1], y, cmap=plt.cm.viridis)
-        #
-        # else:
-        #     raise NotImplementedError('Plot method only supported for 1- and 2-dimensional data.')
 
 
 class Euclidean(Box):
