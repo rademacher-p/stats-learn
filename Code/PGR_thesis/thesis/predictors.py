@@ -22,9 +22,100 @@ from thesis.util.base import vectorize_func, check_data_shape, all_equal
 from thesis.util.spaces import check_spaces_x
 
 
+# def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False):
+#
+#     # TODO: Welford's online algorithm for mean and var calculation
+#
+#     space_x = check_spaces_x(predictors)
+#     if x is None:
+#         x = space_x.x_plt
+#
+#     if params is None:
+#         params_full = [{} for _ in predictors]
+#     else:
+#         params_full = [item if item is not None else {} for item in params]
+#
+#     if isinstance(n_train, (Integral, np.integer)):
+#         n_train = [n_train]
+#
+#     shape, size, ndim = model.shape, model.size, model.ndim
+#     x, set_shape = check_data_shape(x, shape['x'])
+#     n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
+#
+#     # Generate random data and make predictions
+#     params_shape_full = []
+#     y_full = []
+#     for params in params_full:
+#         params_shape = tuple(len(vals) for _, vals in params.items())
+#         y = np.empty((n_mc, len(n_train_delta)) + params_shape + set_shape + shape['y'])
+#         params_shape_full.append(params_shape)
+#         y_full.append(y)
+#
+#     for i_mc in range(n_mc):
+#         if verbose:
+#             print(f"Stats iteration: {i_mc + 1}/{n_mc}")
+#
+#         d = model.rvs(n_train_delta.sum())
+#         d_iter = np.split(d, np.cumsum(n_train_delta)[:-1])
+#
+#        for i_n, d in enumerate(d_iter):
+#            warm_start = i_n > 0  # resets learner for new iteration
+#            for predictor, params, params_shape, y in zip(predictors, params_full, params_shape_full, y_full):
+#                predictor.fit(d, warm_start=warm_start)
+#                if len(params) == 0:
+#                    y[i_mc, i_n] = predictor.predict(x)
+#                else:
+#                    for i_v, param_vals in enumerate(list(product(*params.values()))):
+#                        predictor.set_params(**dict(zip(params.keys(), param_vals)))
+#                        # params_shape = y.shape[2:-(len(set_shape) + ndim['y'])]
+#                        y[i_mc, i_n][np.unravel_index(i_v, params_shape)] = predictor.predict(x)
+#
+#     # Generate statistics
+#     _samp, dtype = [], []
+#     for stat in stats:
+#         if stat in {'mode', 'median', 'mean'}:
+#             stat_shape = set_shape + shape['y']
+#         elif stat in {'std', 'cov'}:
+#             stat_shape = set_shape + 2 * shape['y']
+#         else:
+#             raise ValueError
+#         _samp.append(np.empty(stat_shape))
+#         dtype.append((stat, np.float64, stat_shape))  # TODO: dtype float? need model dtype attribute?!
+#
+#     y_stats_full = [np.tile(np.array(tuple(_samp), dtype=dtype), reps=(len(n_train_delta), *param_shape))
+#                     for param_shape in params_shape_full]
+#
+#     for y, y_stats in zip(y_full, y_stats_full):
+#         if 'mode' in stats:
+#             y_stats['mode'] = mode(y, axis=0)
+#
+#         if 'median' in stats:
+#             y_stats['median'] = np.median(y, axis=0)
+#
+#         if 'mean' in stats:
+#             y_stats['mean'] = y.mean(axis=0)
+#
+#         if 'std' in stats:
+#             if ndim['y'] == 0:
+#                 y_stats['std'] = y.std(axis=0)
+#             else:
+#                 raise ValueError("Standard deviation is only supported for singular data shapes.")
+#
+#         if 'cov' in stats:
+#             if size['y'] == 1:
+#                 _temp = y.var(axis=0)
+#             else:
+#                 _temp = np.moveaxis(y.reshape((n_mc, math.prod(set_shape), size['y'])), 0, -1)
+#                 _temp = np.array([np.cov(t) for t in _temp])
+#
+#             y_stats['cov'] = _temp.reshape(set_shape + 2 * shape['y'])
+#
+#     return y_stats_full
+
+
 def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False):
 
-    # TODO: Welford's online algorithm for mean and var calculation
+    # uses Welford's online algorithm https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
 
     space_x = check_spaces_x(predictors)
     if x is None:
@@ -42,15 +133,43 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
     x, set_shape = check_data_shape(x, shape['x'])
     n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
 
-    # Generate random data and make predictions
+    # Initialize arrays
     params_shape_full = []
-    y_full = []
     for params in params_full:
         params_shape = tuple(len(vals) for _, vals in params.items())
-        y = np.empty((n_mc, len(n_train_delta)) + params_shape + set_shape + shape['y'])
         params_shape_full.append(params_shape)
-        y_full.append(y)
 
+    stats = set(stats)
+    if 'std' in stats:
+        stats.add('cov')
+    if 'cov' in stats:
+        stats.add('mean')
+
+    _samp, dtype = [], []
+    for stat in stats:
+        if stat in {'mode', 'median', 'mean'}:
+            stat_shape = set_shape + shape['y']
+        elif stat in {'std', 'cov'}:
+            stat_shape = set_shape + 2 * shape['y']
+        else:
+            raise ValueError
+        _samp.append(np.zeros(stat_shape))
+        dtype.append((stat, np.float64, stat_shape))  # TODO: dtype float? need model dtype attribute?!
+
+    y_stats_full = [np.tile(np.array(tuple(_samp), dtype=dtype), reps=(len(n_train_delta), *param_shape))
+                    for param_shape in params_shape_full]
+
+    def _update_stats(array, y):
+        if 'mean' in stats:
+            _mean_prev = array['mean']
+            array['mean'] += (y - _mean_prev) / (i_mc + 1)
+            if 'cov' in stats:
+                _temp_1 = (y - _mean_prev).reshape(math.prod(set_shape), size['y'])
+                _temp_2 = (y - array['mean']).reshape(math.prod(set_shape), size['y'])
+                _temp = np.array([np.tensordot(t1, t2, 0) for t1, t2 in zip(_temp_1, _temp_2)])
+                array['cov'] += _temp.reshape(set_shape + 2 * shape['y'])
+
+    # Generate random data and make predictions
     for i_mc in range(n_mc):
         if verbose:
             print(f"Stats iteration: {i_mc + 1}/{n_mc}")
@@ -60,55 +179,43 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
 
         for i_n, d in enumerate(d_iter):
             warm_start = i_n > 0  # resets learner for new iteration
-            for predictor, params, params_shape, y in zip(predictors, params_full, params_shape_full, y_full):
+            for predictor, params, params_shape, y_stats in zip(predictors, params_full, params_shape_full,
+                                                                y_stats_full):
                 predictor.fit(d, warm_start=warm_start)
+
                 if len(params) == 0:
-                    y[i_mc, i_n] = predictor.predict(x)
+                    y_mc = predictor.predict(x)
+                    _update_stats(y_stats[i_n], y_mc)
+                    # if 'mean' in stats:
+                    #     _mean_prev = y_stats[i_n]['mean']
+                    #     y_stats[i_n]['mean'] += (y_mc - _mean_prev) / (i_mc + 1)
+                    #     if 'cov' in stats:
+                    #         _temp_1 = (y_mc - _mean_prev).reshape(math.prod(set_shape), size['y'])
+                    #         _temp_2 = (y_mc - y_stats[i_n]['mean']).reshape(math.prod(set_shape), size['y'])
+                    #         _temp = np.array([np.tensordot(t1, t2, 0) for t1, t2 in zip(_temp_1, _temp_2)])
+                    #         y_stats[i_n]['cov'] += _temp.reshape(set_shape + 2 * shape['y'])
                 else:
                     for i_v, param_vals in enumerate(list(product(*params.values()))):
                         predictor.set_params(**dict(zip(params.keys(), param_vals)))
-                        # params_shape = y.shape[2:-(len(set_shape) + ndim['y'])]
-                        y[i_mc, i_n][np.unravel_index(i_v, params_shape)] = predictor.predict(x)
+                        y_mc = predictor.predict(x)
 
-    # Generate statistics
-    _samp, dtype = [], []
-    for stat in stats:
-        if stat in {'mode', 'median', 'mean'}:
-            stat_shape = set_shape + shape['y']
-        elif stat in {'std', 'cov'}:
-            stat_shape = set_shape + 2 * shape['y']
-        else:
-            raise ValueError
-        _samp.append(np.empty(stat_shape))
-        dtype.append((stat, np.float64, stat_shape))  # TODO: dtype float? need model dtype attribute?!
+                        idx = (i_n, *np.unravel_index(i_v, params_shape))
+                        _update_stats(y_stats[idx], y_mc)
+                        # if 'mean' in stats:
+                        #     _mean_prev = y_stats[idx]['mean']
+                        #     y_stats[idx]['mean'] += (y_mc - _mean_prev) / (i_mc + 1)
+                        #     if 'cov' in stats:
+                        #         _temp_1 = (y_mc - _mean_prev).reshape(math.prod(set_shape), size['y'])
+                        #         _temp_2 = (y_mc - y_stats[idx]['mean']).reshape(math.prod(set_shape), size['y'])
+                        #         _temp = np.array([np.tensordot(t1, t2, 0) for t1, t2 in zip(_temp_1, _temp_2)])
+                        #         y_stats[idx]['cov'] += _temp.reshape(set_shape + 2 * shape['y'])
 
-    y_stats_full = [np.tile(np.array(tuple(_samp), dtype=dtype), reps=(len(n_train_delta), *param_shape))
-                    for param_shape in params_shape_full]
-
-    for y, y_stats in zip(y_full, y_stats_full):
-        if 'mode' in stats:
-            y_stats['mode'] = mode(y, axis=0)
-
-        if 'median' in stats:
-            y_stats['median'] = np.median(y, axis=0)
-
-        if 'mean' in stats:
-            y_stats['mean'] = y.mean(axis=0)
-
-        if 'std' in stats:
-            if ndim['y'] == 0:
-                y_stats['std'] = y.std(axis=0)
-            else:
-                raise ValueError("Standard deviation is only supported for singular data shapes.")
-
-        if 'cov' in stats:
-            if size['y'] == 1:
-                _temp = y.var(axis=0)
-            else:
-                _temp = np.moveaxis(y.reshape((n_mc, math.prod(set_shape), size['y'])), 0, -1)
-                _temp = np.array([np.cov(t) for t in _temp])
-
-            y_stats['cov'] = _temp.reshape(set_shape + 2 * shape['y'])
+    if 'cov' in stats:
+        for y_stats in y_stats_full:
+            y_stats['cov'] /= n_mc
+    if 'std' in stats:
+        for y_stats in y_stats_full:
+            y_stats['std'] = np.sqrt(y_stats['cov'])
 
     return y_stats_full
 

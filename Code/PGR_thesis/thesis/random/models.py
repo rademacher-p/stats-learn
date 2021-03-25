@@ -414,7 +414,7 @@ class BetaLinear(MixinRVx, MixinRVy, Base):  # TODO: DRY with NormalLinear
 
         if basis_y_x is None:
             def power_func(i):
-                return vectorize_func(lambda x: np.full(self.shape['y'], (x ** i).sum()), shape=self.shape['x'])
+                return vectorize_func(lambda x: np.full(self.shape['y'], (x ** i).mean()), shape=self.shape['x'])
 
             self._basis_y_x = tuple(power_func(i) for i in range(len(self.weights)))
         else:
@@ -481,7 +481,7 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
 
         if basis_y_x is None:
             def power_func(i):
-                return vectorize_func(lambda x: np.full(self.shape['y'], (x ** i).sum()), shape=self.shape['x'])
+                return vectorize_func(lambda x: np.full(self.shape['y'], (x ** i).mean()), shape=self.shape['x'])
 
             self._basis_y_x = tuple(power_func(i) for i in range(len(self.weights)))
         else:

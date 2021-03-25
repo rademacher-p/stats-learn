@@ -16,6 +16,7 @@ from thesis.predictors import (ModelRegressor, BayesRegressor, plot_risk_eval_si
 from thesis.random import elements as rand_elements, models as rand_models
 from thesis.preprocessing import discretizer
 from thesis.util.base import all_equal
+from thesis.util.plotting import box_grid
 
 
 # plt.style.use('seaborn')
@@ -53,8 +54,6 @@ alpha_y_x_beta = 1/var_y_x_const - 1
 
 # w_model = [.5]
 w_model = [0, 0, 1]
-# w_model = [0, 0, 0, 0, 1]
-# w_model = [.3, 0., .4]
 
 
 def nonlinear_model(x):
@@ -67,8 +66,12 @@ def nonlinear_model(x):
 # model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model),
 #                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
-model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta)
-# model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta)
+model_x = rand_elements.Beta()
+# model_x = rand_elements.Uniform([[0, 1], [0, 1]])
+# model_x.space.x_plt = box_grid(model_x.lims, 100, endpoint=False)
+
+# model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
+model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta)
 
 # model = rand_models.NormalLinear(weights=w_model, basis_y_x=None, cov_y_x=.05, model_x=rand_elements.Normal())
 
@@ -100,6 +103,7 @@ proc_funcs = []
 
 
 # prior_mean_x = rand_elements.Beta()
+# prior_mean_x = rand_elements.Uniform([[0, 1], [0, 1]])
 
 n_t = 4
 _temp = np.full(n_t, 2)
@@ -119,8 +123,8 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10),
                                )
 
 # dir_params = None
-dir_params = {'alpha_0': [10, 1000]}
-# dir_params = {'alpha_0': [10]}
+# dir_params = {'alpha_0': [10, 1000]}
+dir_params = {'alpha_0': [10]}
 # dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
@@ -168,17 +172,17 @@ norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, pr
                                                           model_x=model.model_x), name=r'$\mathcal{N}$')
 
 # norm_params = None
-norm_params = {'prior_cov': [.1, .001]}
-# norm_params = {'prior_cov': [.1]}
+# norm_params = {'prior_cov': [.1, .001]}
+norm_params = {'prior_cov': [.1]}
 # norm_params = {'prior_cov': [100, .01]}
 
 # Plotting
 
-# n_train = 400
+n_train = 400
 # n_train = [0, 4, 40, 400]
 # n_train = [0, 800, 4000]
 # n_train = [0, 100, 200, 400, 800]
-n_train = np.arange(0, 650, 50)
+# n_train = np.arange(0, 650, 50)
 # n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
@@ -196,11 +200,11 @@ temp = [
 predictors, params = list(zip(*temp))
 
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True, ax=None)
+# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True, ax=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
 
-# plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=50, do_std=True,
-#                            verbose=True, ax=None)
+plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=500, do_std=True,
+                           verbose=True, ax=None)
 
 # plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None)
 # plt.xscale('log', base=2)
