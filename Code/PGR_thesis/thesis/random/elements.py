@@ -811,61 +811,46 @@ class Uniform(BaseRV):
     Uniform random variable.
     """
 
-    def __init__(self, a, b, rng=None):
+    def __init__(self, lims, rng=None):
         super().__init__(rng)
-        self._space = spaces.Box((a, b))
-
-        if b < a:
-            raise ValueError
-        self._a = a
-        self._b = b
-
+        self._space = spaces.Box(lims)
         self._update_attr()
 
     def __repr__(self):
-        return f"Uniform({self.a}, {self.b})"
-
-    lims = property(lambda self: (self.a, self.b))
+        return f"Uniform({self.lims})"
 
     # Input properties
     @property
-    def a(self):
-        return self._a
+    def lims(self):
+        return self.space.lims
 
-    @a.setter
-    def a(self, a):
-        if a > self._b:
-            raise ValueError
-        self._a = a
-        self._update_attr()
-
-    @property
-    def b(self):
-        return self._b
-
-    @b.setter
-    def b(self, b):
-        if b < self._a:
-            raise ValueError
-        self._b = b
+    @lims.setter
+    def lims(self, val):
+        self.space.lims = val
         self._update_attr()
 
     # Attribute Updates
     def _update_attr(self):
-        self._mode = sum(self.lims) / 2
-
-        self._mean = sum(self.lims) / 2
-        self._cov = (self._b - self._a) ** 2 / 12
+        self._mean = np.mean(self.lims, axis=-1)
+        self._mode = self._mean
+        _temp = (self.lims[..., 1] - self.lims[..., 0]).flatten() ** 2 / 12
+        self._cov = np.diag(_temp).reshape(2 * self.shape)
 
     def _rvs(self, n, rng):
-        return rng.uniform(self._a, self._b, size=n)
+        a_flat = self.lims[..., 0].flatten()
+        b_flat = self.lims[..., 1].flatten()
+        _temp = np.stack(tuple(rng.uniform(a, b, size=n) for a, b in zip(a_flat, b_flat)), axis=-1)
+        return _temp.reshape((n, *self.shape))
+        # return rng.uniform(self._a, self._b, size=n)
 
     def pf(self, x):
-        x = np.array(x)
-        if not ((x >= self._a).all() and (x <= self._b).all()):
+        val = 1 / np.prod(self.lims[..., 1] - self.lims[..., 0])
+
+        x, set_shape = check_data_shape(x, self.shape)
+        if not np.all((x >= self.lims[..., 0])) and np.all((x <= self.lims[..., 1])):
             raise ValueError(f"Values must be in interval {self.lims}")
 
-        return np.full(x.shape, 1 / (self._b - self._a))
+        return np.full(set_shape, val)
 
 
 class Normal(BaseRV):
@@ -928,6 +913,7 @@ class Normal(BaseRV):
         if self._cov.shape != self.shape * 2:
             raise ValueError(f"Covariance array shape must be {self.shape * 2}.")
         self._cov_flat = self._cov.reshape(2 * (self.size,))
+        # self._cov_flat = self._cov.reshape(2 * self.shape)
 
         psd = _PSD(self._cov_flat, allow_singular=False)
         self.prec_U = psd.U

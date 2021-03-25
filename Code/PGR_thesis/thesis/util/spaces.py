@@ -550,10 +550,10 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
 
         if self.lims.shape[-1] != 2:
             raise ValueError("Trailing shape must be (2,)")
-        elif not (self.lims[..., 0] <= self.lims[..., 1]).all():
+        elif not np.all(self.lims[..., 0] <= self.lims[..., 1]):
             raise ValueError("Upper values must meet or exceed lower values.")
 
-        self.x_plt = None
+        self._x_plt = None
 
     @property
     def lims_plot(self):
@@ -561,10 +561,6 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
 
     def set_x_plot(self):
         self.x_plt = box_grid(self.lims_plot, 1000, endpoint=False)
-        # if self.shape in {(), (2,)}:
-        #     self.x_plt = box_grid(self.lims_plot, 100, endpoint=False)
-        # else:
-        #     self.x_plt = None
 
     def plot(self, f, x=None, ax=None, label=None, **kwargs):
         if ax is None:
@@ -577,9 +573,6 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
             return ax.plot(x, y, label=label)
 
         elif set_ndim == 2 and self.shape == (2,):
-            _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-            ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$f(x)$')
-
             # return ax.plot_wireframe(x[..., 0], x[..., 1], y)
             return ax.plot_surface(x[..., 0], x[..., 1], y, cmap=plt.cm.viridis)
 
@@ -623,14 +616,7 @@ class Euclidean(Box):
     @lims_plot.setter
     def lims_plot(self, val):
         self._lims_plot = np.broadcast_to(val, shape=(*self.shape, 2))
-        self.x_plt = None
-
-    # def set_x_plot(self, x=None):   # TODO: simplify? delete?
-    #     if x is not None:
-    #         super().set_x_plot(x)
-    #     else:
-    #         temp = self.x_plt.reshape(-1, *self.shape)
-    #         self._lims_plot = np.array([temp.min(0), temp.max(0)])
+        self._x_plt = None
 
 
 # %%
@@ -668,11 +654,10 @@ class Simplex(Continuous):
     @n_plot.setter
     def n_plot(self, val):
         self._n_plot = val
-        self.x_plt = None
+        self._x_plt = None
 
     def set_x_plot(self):
-        if self.shape in {(2,), (3,)}:
-            self.x_plt = simplex_grid(self.n_plot, self._shape)
+        self.x_plt = simplex_grid(self.n_plot, self._shape)
 
     def make_axes(self):
         if self.shape == (2,):
