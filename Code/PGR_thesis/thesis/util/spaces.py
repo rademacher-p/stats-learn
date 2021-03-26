@@ -105,6 +105,7 @@ class Base(ABC):
             plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, shade=False, label=label)
             plt_data._facecolors2d, plt_data._edgecolors2d = plt_data._facecolor3d, plt_data._edgecolor3d
             # FIXME: use MAYAVI package for 3D??
+            # plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, cmap='viridis')
             # plt_data = ax.plot_wireframe(x[..., 0], x[..., 1], y, label=label)
 
             # if y_std is not None:
@@ -557,7 +558,8 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
         return self._lims
 
     def set_x_plot(self):
-        self.x_plt = box_grid(self.lims_plot, 1000, endpoint=False)
+        n_plt = 1000 if self.ndim == 0 else 100
+        self.x_plt = box_grid(self.lims_plot, n_plt, endpoint=False)
 
     def plot(self, f, x=None, ax=None, label=None, **kwargs):
         x, y, set_shape = self._eval_func(f, x)

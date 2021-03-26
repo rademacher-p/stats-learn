@@ -14,8 +14,8 @@ from thesis.bayes import models as bayes_models
 from thesis.predictors import (ModelRegressor, BayesRegressor, plot_risk_eval_sim_compare, plot_predict_stats_compare,
                                risk_eval_sim_compare, plot_risk_eval_comp_compare, plot_risk_disc)
 from thesis.random import elements as rand_elements, models as rand_models
-from thesis.preprocessing import discretizer
-from thesis.util.base import all_equal
+from thesis.preprocessing import discretizer, prob_disc
+from thesis.util.base import vectorize_func
 from thesis.util.plotting import box_grid
 
 
@@ -23,25 +23,6 @@ from thesis.util.plotting import box_grid
 # plt.style.use(['science'])
 plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepackage{bm}")
-
-
-# x = np.random.default_rng().random(10)
-# print(x)
-#
-# vals = np.linspace(0, 1, 11, endpoint=True)
-# func_ = discretizer(vals)
-# x_d = func_(x)
-# print(x_d)
-#
-# x = np.random.default_rng().random((10, 2))
-# print(x)
-#
-# vals = box_grid([[0, 1], [0, 1]], 11, True).reshape(-1, 2)
-# func_ = discretizer(vals)
-# x_d = func_(x)
-# print(x_d)
-#
-# qq=1
 
 
 #%% Sim
@@ -76,8 +57,8 @@ w_model = [0, 0, 1]
 
 
 def nonlinear_model(x):
-    return 1 / (2 + np.sin(2*np.pi * x))
-    # return 1 / (1e-9 + 2 + np.sin(2*np.pi * x))
+    # return 1 / (2 + np.sin(2*np.pi * x))
+    return 1 / (2 + np.sin(2 * np.pi * x.mean()))
 
 
 # model = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, alpha_y_x_d, w_model),
@@ -85,12 +66,13 @@ def nonlinear_model(x):
 # model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model),
 #                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
-# model_x = rand_elements.Beta()
-model_x = rand_elements.Uniform([[0, 1], [0, 1]])
-model_x.space.x_plt = box_grid(model_x.lims, 100, endpoint=False)
+shape_x = (2,)
+model_x = rand_elements.Uniform(np.broadcast_to([0, 1], (*shape_x, 2)))
 
-model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
-# model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta)
+# model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
+model = rand_models.BetaLinear(weights=[1], basis_y_x=[vectorize_func(nonlinear_model, model_x.shape)],
+                               alpha_y_x=alpha_y_x_beta, model_x=model_x)
+# model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x)
 
 # model = rand_models.NormalLinear(weights=w_model, basis_y_x=None, cov_y_x=.05, model_x=rand_elements.Normal())
 
@@ -121,18 +103,14 @@ proc_funcs = []
 #                                                      supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
 
 
-# prior_mean_x = rand_elements.Beta()
-# prior_mean_x = rand_elements.Uniform([[0, 1], [0, 1]])
+# prior_mean_x = deepcopy(model_x)
 
 n_t = 4
-prior_mean_x = rand_elements.Finite(box_grid([[0, 1], [0, 1]], n_t, endpoint=True), p=None)
-proc_funcs.append(discretizer(prior_mean_x.supp.reshape(-1, 2)))
-
-# n_t = 4
-# _temp = np.full(n_t, 2)
-# _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
-# prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_t, endpoint=True), p=_temp / _temp.sum())
-# proc_funcs.append(discretizer(prior_mean_x.supp))
+supp_x = box_grid(model_x.lims, n_t, endpoint=True)
+# _temp = np.ones(model_x.size*(n_t,))
+_temp = prob_disc(model_x.size*(n_t,))
+prior_mean_x = rand_elements.Finite(supp_x, p=_temp / _temp.sum())
+proc_funcs.append(discretizer(supp_x.reshape(-1, *model_x.shape)))
 
 prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
 
@@ -201,11 +179,11 @@ norm_params = {'prior_cov': [.1]}
 
 # Plotting
 
-n_train = 400
+# n_train = 400
 # n_train = [0, 4, 40, 400]
 # n_train = [0, 800, 4000]
 # n_train = [0, 100, 200, 400, 800]
-# n_train = np.arange(0, 650, 50)
+n_train = np.arange(0, 650, 50)
 # n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
@@ -218,16 +196,16 @@ temp = [
     (opt_predictor, None),
     (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
-    # (norm_predictor, norm_params),
+    (norm_predictor, norm_params),
 ]
 predictors, params = list(zip(*temp))
 
 
-# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True, ax=None)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=50, verbose=True, ax=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
 
-plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=10, do_std=True,
-                           verbose=True, ax=None)
+# plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=10, do_std=True,
+#                            verbose=True, ax=None)
 
 # plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None)
 # plt.xscale('log', base=2)
