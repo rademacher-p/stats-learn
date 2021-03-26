@@ -916,10 +916,14 @@ class MixtureRVy(MixinRVy, Mixture):
     def mean_y_x(self, x):
         w = self._weights_y_x(x)
         w_sum = w.sum(axis=0)
-
         p_y_x = np.full(w.shape, np.nan)
-        idx = np.flatnonzero(w_sum)
-        p_y_x[:, idx] = w[:, idx] / w_sum[idx]
+
+        # idx = np.flatnonzero(w_sum)
+        # p_y_x[:, idx] = w[:, idx] / w_sum[idx]
+
+        idx = np.nonzero(w_sum)
+        for p_i, w_i in zip(p_y_x, w):
+            p_i[idx] = w_i[idx] / w_sum[idx]
 
         # p_y_x = temp / temp.sum(0)
 

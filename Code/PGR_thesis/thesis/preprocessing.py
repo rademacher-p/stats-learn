@@ -25,6 +25,16 @@ def discretizer(vals):  # TODO: use sklearn.preprocessing.KBinsDiscretizer?
     return func
 
 
+def prob_disc(shape):
+    p = np.ones(shape)
+    idx = np.nonzero(p)
+    n = np.zeros(p.size)
+    for i, size in zip(idx, shape):
+        n += np.all([i > 0, i < size-1], axis=0)
+    p[idx] = 2**n
+    return p
+
+
 def main():
     x = np.random.default_rng().random(10)
     print(x)
@@ -41,6 +51,8 @@ def main():
     func_ = discretizer(vals)
     x_d = func_(x)
     print(x_d)
+
+    print(prob_disc((4, 3)))
 
 
 if __name__ == '__main__':
