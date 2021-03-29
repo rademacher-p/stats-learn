@@ -21,3 +21,10 @@
 - Compare to classic algorithms (Normal regressor)
   - help reader relate
   - demonstrate Dirichlet consistency vs Normal loss
+
+
+## Real Data notes
+- How to select the prior mean?
+  - **Boost existing regressors?!?**
+- Cross-validation risk should be minimized when using the empirical distribution of the full data set
+- Take care to avoid validation bias when designing prior mean!

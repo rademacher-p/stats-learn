@@ -1,5 +1,4 @@
 from functools import wraps
-from itertools import groupby
 from numbers import Integral
 
 import numpy as np
@@ -185,7 +184,7 @@ def vectorize_func_dec(shape):  # TODO: use?
 #     return dist.reshape(supp_shape) / n
 
 
-def all_equal(iterable):
-    """Returns True if all the elements are equal to each other"""
-    g = groupby(iterable)
-    return next(g, True) and not next(g, False)
+# def all_equal(iterable):
+#     """Returns True if all the elements are equal to each other"""
+#     g = groupby(iterable)
+#     return next(g, True) and not next(g, False)

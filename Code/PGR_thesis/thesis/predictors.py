@@ -8,7 +8,7 @@ from itertools import product
 from numbers import Integral
 from typing import Union
 
-# from more_itertools import all_equal
+from more_itertools import all_equal
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -18,7 +18,7 @@ from thesis.bayes import models as bayes_models
 from thesis.loss_funcs import loss_se, loss_01
 from thesis.random import elements as rand_elements, models as rand_models
 from thesis.util import spaces
-from thesis.util.base import vectorize_func, check_data_shape, all_equal
+from thesis.util.base import vectorize_func, check_data_shape
 from thesis.util.spaces import check_spaces_x
 
 
