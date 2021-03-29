@@ -1,5 +1,6 @@
-import math
 from abc import ABC
+import math
+from numbers import Integral
 
 from more_itertools import all_equal
 
@@ -568,6 +569,9 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
 
 class Euclidean(Box):
     def __init__(self, shape):
+        # if isinstance(shape, (Integral, np.integer)):
+        #     shape = (shape,)
+
         lims = np.broadcast_to([-np.inf, np.inf], (*shape, 2))
         super().__init__(lims)
 

@@ -41,7 +41,7 @@ class Base(RandomGeneratorMixin):
 
     def _rvs(self, size, rng):
         model = self.random_model(rng)
-        return model._rvs(size)
+        return model.rvs(size)
 
     def fit(self, d=None, warm_start=False):
         if d is None:
@@ -57,8 +57,7 @@ class NormalLinear(Base):
     # tex_params = {'prior_mean': r'\mu_{\uptheta}', 'prior_cov': r'\Sigma_{\uptheta}'}
 
     def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
-                 model_x=rand_elements.Normal(),
-                 rng=None):
+                 model_x=rand_elements.Normal(), rng=None):
 
         # Prior
         prior = rand_elements.Normal(prior_mean, prior_cov)
@@ -67,9 +66,8 @@ class NormalLinear(Base):
             raise ValueError
 
         # Model
-
-        self._space['x'] = model_x.space
         self._model_x = model_x
+        self._space['x'] = model_x.space
 
         _temp = np.array(cov_y_x).shape
         self._space['y'] = spaces.Euclidean(_temp[:int(len(_temp) / 2)])
@@ -78,7 +76,7 @@ class NormalLinear(Base):
 
         if basis_y_x is None:
             def power_func(i):
-                return vectorize_func(lambda x: np.full(self.shape['y'], (x ** i).sum()), shape=self.shape['x'])
+                return vectorize_func(lambda x: np.full(self.shape['y'], (x ** i).mean()), shape=self.shape['x'])
 
             self._basis_y_x = tuple(power_func(i) for i in range(len(self.prior_mean)))
         else:
@@ -227,10 +225,10 @@ class NormalLinear(Base):
         self._prior_model_cov = self._make_posterior_model_cov(self.prior_cov)
 
 
-if __name__ == '__main__':
-    a = NormalLinear(prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
-                     model_x=rand_elements.Normal(), rng=None)
-    qq = None
+# if __name__ == '__main__':
+#     a = NormalLinear(prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
+#                      model_x=rand_elements.Normal(), rng=None)
+#     qq = None
 
 
 class Dirichlet(Base):  # TODO: DRY from random.elements?

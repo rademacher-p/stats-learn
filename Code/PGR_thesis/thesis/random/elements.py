@@ -1060,6 +1060,7 @@ class DataEmpirical(Base):
 
         self.n += n_new
 
+        # Increment existing value counts, flag new values
         idx_new = []
         for i, (value, count) in enumerate(zip(values, counts)):
             idx = self._get_idx(value)
@@ -1097,10 +1098,13 @@ class DataEmpirical(Base):
             # return self._p[idx]
 
             # FIXME: delta use needs to account for space dimensionality!?
+            # delta = DELTA if isinstance(self.space, spaces.Continuous) else 1.
+            if isinstance(self.space, spaces.Continuous):
+                raise NotImplementedError
+            else:
+                delta = 1.
 
-            delta = DELTA if isinstance(self.space, spaces.Continuous) else 1.
             return self._p[idx] * delta
-
         else:
             return 0.
 
