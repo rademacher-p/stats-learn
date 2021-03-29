@@ -10,7 +10,6 @@ from thesis.random import elements as rand_elements
 from thesis.util import spaces
 from thesis.util.base import RandomGeneratorMixin
 
-np.set_printoptions(precision=2)
 
 
 # TODO: rename `model` attributes to `element`?

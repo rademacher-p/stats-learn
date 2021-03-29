@@ -1,3 +1,7 @@
+from pathlib import Path
+import pickle
+from time import strftime
+
 import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
@@ -12,12 +16,18 @@ from thesis.util.plotting import box_grid
 from thesis.util import spaces
 
 
+np.set_printoptions(precision=3)
+pd.options.display.float_format = '{:,.3f}'.format
+
+
 #%%
 
-model = rand_models.Dataset.from_csv('data/CCPP/data_1.csv', 'PE')
+# TODO: data normalization for inverse stability, easy discretization?
+
+model = rand_models.DataSet.from_csv('data/CCPP/data_1.csv', 'PE', iter_mode='repeat', shuffle_mode='repeat')
 
 
-w_prior = [0.5]
+w_prior = np.zeros(3)
 model_x = rand_elements.Normal(model.data['x'].mean(0))
 # model_x = spaces.Euclidean(model.shape['x'])
 norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=100,
@@ -25,7 +35,7 @@ norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, pr
                                                           model_x=model_x), name=r'$\mathcal{N}$')
 
 
-n_train = np.arange(0, 110, 10)
+n_train = np.arange(10, 410, 10)
 
 
 temp = [
@@ -36,7 +46,20 @@ temp = [
 ]
 predictors, params = list(zip(*temp))
 
-plot_risk_eval_sim_compare(predictors, model, params, n_train, n_mc=50, verbose=True, ax=None)
+plot_risk_eval_sim_compare(predictors, model, params, n_train, n_test=1000, n_mc=50, verbose=True, ax=None)
+
+
+#%% Save image and Figure
+time_str = strftime('%Y-%m-%d_%H-%M-%S')
+image_path = Path('./images/temp/')
+
+fig = plt.gcf()
+fig.savefig(image_path.joinpath(f"{time_str}.png"))
+with open(image_path.joinpath(f"{time_str}.mpl"), 'wb') as fid:
+    pickle.dump(fig, fid)
+
+print('Done')
+
 
 #%%
 
