@@ -73,7 +73,7 @@ class Base(RandomGeneratorMixin):
         return np.array(list(zip(d_x, d_y)), dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
 
 
-class Dataset(Base):
+class DataSet(Base):
     def __init__(self, data, space=None, iter_mode='once', shuffle_mode='never', rng=None):
         super().__init__(rng)
 
@@ -94,6 +94,9 @@ class Dataset(Base):
 
         self.idx = None
         self.restart(shuffle=(self.shuffle_mode in {'once', 'repeat'}))
+
+    def __repr__(self):
+        return f"DataSet({len(self.data)})"
 
     @classmethod
     def from_xy(cls, x, y, space=None, iter_mode='once', shuffle_mode='never', rng=None):
@@ -121,7 +124,7 @@ class Dataset(Base):
     def _rvs(self, n, rng):
         if self.idx + n > len(self.data):
             if self.iter_mode == 'once':
-                raise ValueError("Dataset model is exhausted.")
+                raise ValueError("DataSet model is exhausted.")
             elif self.iter_mode == 'repeat':
                 self.restart(shuffle=(self.shuffle_mode == 'repeat'), rng=rng)
                 # TODO: use trailing samples?

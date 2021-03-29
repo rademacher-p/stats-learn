@@ -19,6 +19,8 @@ from thesis.util.base import vectorize_func
 from thesis.util.plotting import box_grid
 
 
+np.set_printoptions(precision=3)
+
 # plt.style.use('seaborn')
 # plt.style.use(['science'])
 plt.rc('text', usetex=True)
