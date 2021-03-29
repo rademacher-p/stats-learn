@@ -6,6 +6,7 @@ from copy import deepcopy
 from typing import Optional, Dict
 
 import numpy as np
+import pandas as pd
 
 from thesis.random import elements as rand_elements
 from thesis.util import spaces
@@ -70,6 +71,64 @@ class Base(RandomGeneratorMixin):
         d_y = np.array([self.model_y_x(x).rvs(rng=rng) for x in d_x])
 
         return np.array(list(zip(d_x, d_y)), dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
+
+
+class Dataset(Base):
+    def __init__(self, data, space=None, iter_mode='once', shuffle_mode='never', rng=None):
+        super().__init__(rng)
+
+        self.data = data
+
+        if space is not None:
+            self._space = space
+        else:
+            for c in 'xy':
+                dtype = data.dtype[c]
+                if np.issubdtype(dtype.base, np.number):
+                    self._space[c] = spaces.Euclidean(dtype.shape)
+                else:
+                    self._space[c] = spaces.FiniteGeneric(data[c], shape=dtype.shape)  # TODO: check...
+
+        self.iter_mode = iter_mode
+        self.shuffle_mode = shuffle_mode
+
+        self.idx = None
+        self.restart(shuffle=(self.shuffle_mode in {'once', 'repeat'}))
+
+    @classmethod
+    def from_xy(cls, x, y, space=None, iter_mode='once', shuffle_mode='never', rng=None):
+        data = np.array(list(zip(x, y)), dtype=[('x', x.dtype, x.shape[1:]), ('y', y.dtype, y.shape[1:])])
+
+        return cls(data, space, iter_mode, shuffle_mode, rng)
+
+    @classmethod
+    def from_csv(cls, path, y_name, space=None, iter_mode='once', shuffle_mode='never', rng=None):
+        df_x = pd.read_csv(path)
+        df_y = df_x.pop(y_name)
+        x, y = df_x.to_numpy(), df_y.to_numpy()
+
+        return cls.from_xy(x, y, space, iter_mode, shuffle_mode, rng)
+
+    def restart(self, shuffle=False, rng=None):
+        self.idx = 0
+        if shuffle:
+            self.shuffle(rng)
+
+    def shuffle(self, rng=None):
+        rng = self._get_rng(rng)
+        rng.shuffle(self.data)
+
+    def _rvs(self, n, rng):
+        if self.idx + n > len(self.data):
+            if self.iter_mode == 'once':
+                raise ValueError("Dataset model is exhausted.")
+            elif self.iter_mode == 'repeat':
+                self.restart(shuffle=(self.shuffle_mode == 'repeat'), rng=rng)
+                # TODO: use trailing samples?
+
+        out = self.data[self.idx:self.idx+n]
+        self.idx += n
+        return out
 
 
 class MixinRVx:
@@ -471,7 +530,6 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
     def __init__(self, weights=(0.,), basis_y_x=None, cov_y_x=1., model_x=rand_elements.Normal(), rng=None):
         super().__init__(rng)
 
-        self._space['x'] = model_x.space
         self.model_x = model_x
 
         self.weights = weights
@@ -502,6 +560,7 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
     @model_x.setter
     def model_x(self, model_x):
         self._model_x = model_x
+        self._space['x'] = model_x.space
 
         # self._mode_x = self._model_x.mode
         #
@@ -621,19 +680,20 @@ class DataEmpirical(Base):
         return np.array(list(zip(values['x'], values['y'], counts)),
                         dtype=[('x', self.dtype['x'], self.shape['x']),
                                ('y', self.dtype['y'], self.shape['y']),
-                               ('n', np.int,)])
+                               ('n', int,)])
 
     def add_data(self, d):
         self.add_values(*self._count_data(d))
 
     def add_values(self, values, counts):
         values, counts = map(np.array, (values, counts))
-        n_new = counts.sum(dtype=np.int)
+        n_new = counts.sum(dtype=int)
         if n_new == 0:
             return
 
         self.n += n_new
 
+        # Increment existing value counts, flag new values
         idx_new = []
         for i, (value, count) in enumerate(zip(values, counts)):
             idx = np.flatnonzero(value == self.data[['x', 'y']])

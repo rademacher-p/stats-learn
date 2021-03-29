@@ -123,9 +123,9 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10),
                                name=_name,
                                )
 
-# dir_params = None
+dir_params = None
 # dir_params = {'alpha_0': [10, 1000]}
-dir_params = {'alpha_0': [10]}
+# dir_params = {'alpha_0': [10]}
 # dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
@@ -168,7 +168,7 @@ if do_bayes:  # add true bayes model concentration
 
 
 # Normal learner
-norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=100 * np.eye(len(w_prior)),
+norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=100,
                                                           basis_y_x=None, cov_y_x=.1,
                                                           model_x=model.model_x), name=r'$\mathcal{N}$')
 
@@ -177,13 +177,14 @@ norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, pr
 norm_params = {'prior_cov': [.1]}
 # norm_params = {'prior_cov': [100, .01]}
 
+
 # Plotting
 
-# n_train = 400
+n_train = 40
 # n_train = [0, 4, 40, 400]
 # n_train = [0, 800, 4000]
 # n_train = [0, 100, 200, 400, 800]
-n_train = np.arange(0, 650, 50)
+# n_train = np.arange(0, 650, 50)
 # n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
@@ -204,8 +205,8 @@ predictors, params = list(zip(*temp))
 plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=50, verbose=True, ax=None)
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
 
-# plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=10, do_std=True,
-#                            verbose=True, ax=None)
+plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=10, do_std=True,
+                           verbose=True, ax=None)
 
 # plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None)
 # plt.xscale('log', base=2)
