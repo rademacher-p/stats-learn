@@ -1,4 +1,7 @@
 numpy
 scipy
 matplotlib
+PyQt5
 pandas
+more-itertools
+scikit-learn
