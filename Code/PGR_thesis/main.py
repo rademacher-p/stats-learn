@@ -24,6 +24,7 @@ np.set_printoptions(precision=3)
 
 # plt.style.use('seaborn')
 # plt.style.use(['science'])
+
 plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepackage{bm}")
 
@@ -56,8 +57,8 @@ alpha_y_x_beta = 1/var_y_x_const - 1
 # model = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
 
 
-# shape_x = ()
-shape_x = (2,)
+shape_x = ()
+# shape_x = (2,)
 
 # w_model = [.5]
 w_model = [0, 0, 1]
@@ -119,7 +120,10 @@ prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=a
 
 _name = r'$\mathrm{Dir}$'
 if len(proc_funcs) > 0:
-    _name += r', $|\mathcal{T}| = __card__$'.replace('__card__', str(prior_mean.space['x'].set_size))
+    _card = str(n_t)
+    if model_x.size > 1:
+        _card += f"^{model_x.size}"
+    _name += r', $|\mathcal{T}| = __card__$'.replace('__card__', _card)
 
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs, name=_name)
 
@@ -179,13 +183,13 @@ plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_tra
 
 
 # Save image and Figure
-time_str = strftime('%Y-%m-%d_%H-%M-%S')
-image_path = Path('./images/temp/')
-
-fig = plt.gcf()
-fig.savefig(image_path.joinpath(f"{time_str}.png"))
-with open(image_path.joinpath(f"{time_str}.mpl"), 'wb') as fid:
-    pickle.dump(fig, fid)
+# time_str = strftime('%Y-%m-%d_%H-%M-%S')
+# image_path = Path('./images/temp/')
+#
+# fig = plt.gcf()
+# fig.savefig(image_path.joinpath(f"{time_str}.png"))
+# with open(image_path.joinpath(f"{time_str}.mpl"), 'wb') as fid:
+#     pickle.dump(fig, fid)
 
 print('Done')
 

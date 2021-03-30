@@ -34,6 +34,13 @@ class Base(RandomGeneratorMixin):
 
     dtype = property(lambda self: {key: space.dtype for key, space in self._space.items()})
 
+    @staticmethod
+    def tex_params(key, val=None):
+        if val is None:
+            return r"${}$".format(key)
+        else:
+            return r"${} = {}$".format(key, val)
+
     def random_model(self, rng=None):
         raise NotImplementedError
 
@@ -91,27 +98,45 @@ class NormalLinear(Base):
         #                                                 **self._prior_model_kwargs)
 
     def tex_params(self, key, val=None):
-        val = np.array(val)
         if key == 'prior_mean':
-            if val is None:
-                return r"$\mu_{\uptheta}$"
-            else:
-                val_str = str(val)
-                if self.prior.shape != () and val.shape == ():
-                    val_str += r"\bm{1}"
+            key = r"\mu_{\uptheta}"
+            if val is not None:
+                val_np = np.array(val)
+                val = str(val)
+                if self.prior.shape != () and val_np.shape == ():
+                    val += r"\bm{1}"
 
-                return r"$\mu_{\uptheta} = " + val_str + "$"
         elif key == 'prior_cov':
-            if val is None:
-                return r"$\Sigma_{\uptheta}$"
-            else:
-                val_str = str(val)
-                if self.prior.shape != () and val.shape == ():
-                    val_str += r"\bm{I}"
+            key = r"\Sigma_{\uptheta}"
+            if val is not None:
+                val_np = np.array(val)
+                val = str(val)
+                if self.prior.shape != () and val_np.shape == ():
+                    val += r"\bm{I}"
 
-                return r"$\Sigma_{\uptheta} = " + val_str + "$"
-        else:
-            raise ValueError
+        return super(NormalLinear, NormalLinear).tex_params(key, val)
+
+        # val = np.array(val)
+        # if key == 'prior_mean':
+        #     if val is None:
+        #         return r"$\mu_{\uptheta}$"
+        #     else:
+        #         val_str = str(val)
+        #         if self.prior.shape != () and val.shape == ():
+        #             val_str += r"\bm{1}"
+        #
+        #         return r"$\mu_{\uptheta} = " + val_str + "$"
+        # elif key == 'prior_cov':
+        #     if val is None:
+        #         return r"$\Sigma_{\uptheta}$"
+        #     else:
+        #         val_str = str(val)
+        #         if self.prior.shape != () and val.shape == ():
+        #             val_str += r"\bm{I}"
+        #
+        #         return r"$\Sigma_{\uptheta} = " + val_str + "$"
+        # else:
+        #     raise ValueError
 
     # Methods
     def random_model(self, rng=None):
@@ -248,12 +273,8 @@ class Dirichlet(Base):  # TODO: DRY from random.elements?
     @staticmethod
     def tex_params(key, val=None):
         if key == 'alpha_0':
-            if val is None:
-                return r"$\alpha_0$"
-            else:
-                return r"$\alpha_0 = {}$".format(val)
-        else:
-            raise ValueError
+            key = r"\alpha_0"
+        return super(Dirichlet, Dirichlet).tex_params(key, val)
 
     def __setattr__(self, name, value):
         if name.startswith('prior_mean.'):
