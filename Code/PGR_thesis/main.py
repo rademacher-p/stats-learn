@@ -56,8 +56,8 @@ alpha_y_x_beta = 1/var_y_x_const - 1
 # model = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
 
 
-# shape_x = ()
-shape_x = (2,)
+shape_x = ()
+# shape_x = (2,)
 
 # w_model = [.5]
 w_model = [0, 0, 1]
@@ -120,10 +120,7 @@ _name = r'$\mathrm{Dir}$'
 if len(proc_funcs) > 0:
     _name += r', $|\mathcal{T}| = __card__$'.replace('__card__', str(prior_mean.space['x'].set_size))
 
-dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10),
-                               space=model.space, proc_funcs=proc_funcs,
-                               name=_name,
-                               )
+dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs, name=_name)
 
 # dir_params = None
 # dir_params = {'alpha_0': [10, 1000]}
@@ -142,7 +139,7 @@ if do_bayes:  # add true bayes model concentration
 # Normal learner
 norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=100,
                                                           basis_y_x=None, cov_y_x=.1,
-                                                          model_x=model.model_x), name=r'$\mathcal{N}$')
+                                                          model_x=model_x), name=r'$\mathcal{N}$')
 
 # norm_params = None
 # norm_params = {'prior_cov': [.1, .001]}
@@ -165,14 +162,16 @@ temp = [
     (opt_predictor, None),
     (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
-    # (norm_predictor, norm_params),
+    (norm_predictor, norm_params),
 ]
 predictors, params = list(zip(*temp))
 
 
 # plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=50, verbose=True, ax=None)
-plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=50, do_std=True,
+plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=5, do_std=True,
                            verbose=True, ax=None)
+
+# TODO: deprecate `x` arg for prediction, use space
 
 # plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None)
 # plt.xscale('log', base=2)
