@@ -91,8 +91,8 @@ class Base(ABC):
             raise NotImplementedError
 
         if len(set_shape) == 1 and self.shape == ():
-            fmt = '-'  # TODO: remove?
-            # fmt = '.' if isinstance(self, Discrete) else '-'
+            fmt = '-'
+            # fmt = '.-' if isinstance(self, Discrete) else '-'  # TODO: remove?
 
             plt_data = ax.plot(x, y, fmt, label=label)
             if y_std is not None:

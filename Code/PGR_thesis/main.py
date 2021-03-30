@@ -6,6 +6,7 @@ from pathlib import Path
 import pickle
 from time import strftime
 from copy import deepcopy
+from math import prod
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -27,7 +28,7 @@ plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepackage{bm}")
 
 
-#%% Sim
+#%% Model
 def poly_mean_to_models(n, alpha_0, weights):
     return func_mean_to_models(n, alpha_0, lambda x: sum(w * x ** i for i, w in enumerate(weights)))
 
@@ -51,8 +52,12 @@ alpha_y_x_beta = 1/var_y_x_const - 1
 
 # True model
 
-# model = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)],
-#                                                 supp_x=[0, .5], p_x=None)
+# model_x = rand_elements.Finite([0, .5], p=None)
+# model = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
+
+
+# shape_x = ()
+shape_x = (2,)
 
 # w_model = [.5]
 w_model = [0, 0, 1]
@@ -60,23 +65,21 @@ w_model = [0, 0, 1]
 
 def nonlinear_model(x):
     # return 1 / (2 + np.sin(2*np.pi * x))
-    return 1 / (2 + np.sin(2 * np.pi * x.mean()))
+    axis = tuple(range(-len(shape_x), 0))
+    return 1 / (2 + np.sin(2 * np.pi * x.mean(axis)))
 
 
-# model = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, alpha_y_x_d, w_model),
-#                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
-# model = rand_models.DataConditional.from_finite(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model),
-#                                                 supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
+# supp_x = box_grid(np.broadcast_to([0, 1], (*shape_x, 2)), n_x, endpoint=True)
+# _temp = np.ones(prod(shape_x)*(n_x,))
+# model_x = rand_elements.Finite(supp_x, p=_temp/_temp.sum())
+# # model = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_model), model_x)
+# model = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model), model_x)
 
-shape_x = (2,)
 model_x = rand_elements.Uniform(np.broadcast_to([0, 1], (*shape_x, 2)))
-
 # model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
-model = rand_models.BetaLinear(weights=[1], basis_y_x=[vectorize_func(nonlinear_model, model_x.shape)],
-                               alpha_y_x=alpha_y_x_beta, model_x=model_x)
-# model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x)
+model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x)
 
-# model = rand_models.NormalLinear(weights=w_model, basis_y_x=None, cov_y_x=.05, model_x=rand_elements.Normal())
+# model = rand_models.NormalLinear(weights=w_model, basis_y_x=None, cov_y_x=.1, model_x=rand_elements.Normal())
 
 
 do_bayes = False
@@ -89,7 +92,7 @@ else:
     opt_predictor = ModelRegressor(model_eval, name=r'$f_{\Theta}(\theta)$')
 
 
-# Bayesian learners
+#%% Bayesian learners
 
 w_prior = [.5, 0]
 # w_prior = [.5, 0, 0]
@@ -98,11 +101,8 @@ w_prior = [.5, 0]
 # Dirichlet learner
 proc_funcs = []
 
-# prior_mean = rand_models.DataConditional.from_finite([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.9, .9)],
-#                                                      supp_x=[0, .5], p_x=None)
-
-# prior_mean = rand_models.DataConditional.from_finite(poly_mean_to_models(n_x, alpha_y_x_d, w_prior),
-#                                                      supp_x=np.linspace(0, 1, n_x, endpoint=True), p_x=None)
+# prior_mean = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.9, .9)], model_x)
+# prior_mean = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_prior), model_x)
 
 
 # prior_mean_x = deepcopy(model_x)
@@ -111,7 +111,7 @@ n_t = 4
 supp_x = box_grid(model_x.lims, n_t, endpoint=True)
 # _temp = np.ones(model_x.size*(n_t,))
 _temp = prob_disc(model_x.size*(n_t,))
-prior_mean_x = rand_elements.Finite(supp_x, p=_temp / _temp.sum())
+prior_mean_x = rand_elements.Finite(supp_x, p=_temp/_temp.sum())
 proc_funcs.append(discretizer(supp_x.reshape(-1, *model_x.shape)))
 
 prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
@@ -125,20 +125,72 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10),
                                name=_name,
                                )
 
-dir_params = None
+# dir_params = None
 # dir_params = {'alpha_0': [10, 1000]}
-# dir_params = {'alpha_0': [10]}
+dir_params = {'alpha_0': [10]}
 # dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
 # dir_params = {'alpha_0': np.logspace(-0., 5., 60)}
 # dir_params = {'alpha_0': np.logspace(-3., 3., 100)}
 
-
 if do_bayes:  # add true bayes model concentration
     if model_eval.alpha_0 not in dir_params['alpha_0']:
         dir_params['alpha_0'] = np.sort(np.concatenate((dir_params['alpha_0'], [model_eval.alpha_0])))
 
+
+# Normal learner
+norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=100,
+                                                          basis_y_x=None, cov_y_x=.1,
+                                                          model_x=model.model_x), name=r'$\mathcal{N}$')
+
+# norm_params = None
+# norm_params = {'prior_cov': [.1, .001]}
+norm_params = {'prior_cov': [.1]}
+# norm_params = {'prior_cov': [100, .01]}
+
+
+#%% Results
+
+n_train = 400
+# n_train = [0, 4, 40, 400]
+# n_train = [0, 800, 4000]
+# n_train = [0, 100, 200, 400, 800]
+# n_train = np.arange(0, 650, 50)
+# n_train = np.arange(0, 4500, 500)
+# n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
+
+
+temp = [
+    (opt_predictor, None),
+    (dir_predictor, dir_params),
+    # *(zip(dir_predictors, dir_params_full)),
+    # (norm_predictor, norm_params),
+]
+predictors, params = list(zip(*temp))
+
+
+# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=50, verbose=True, ax=None)
+plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=50, do_std=True,
+                           verbose=True, ax=None)
+
+# plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None)
+# plt.xscale('log', base=2)
+
+
+# Save image and Figure
+time_str = strftime('%Y-%m-%d_%H-%M-%S')
+image_path = Path('./images/temp/')
+
+fig = plt.gcf()
+fig.savefig(image_path.joinpath(f"{time_str}.png"))
+with open(image_path.joinpath(f"{time_str}.mpl"), 'wb') as fid:
+    pickle.dump(fig, fid)
+
+print('Done')
+
+
+#%% Deprecated
 
 # ###
 # n_t_iter = [4, 128, 4096]
@@ -169,52 +221,7 @@ if do_bayes:  # add true bayes model concentration
 #         _params['alpha_0'] *= n_t
 
 
-# Normal learner
-norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=100,
-                                                          basis_y_x=None, cov_y_x=.1,
-                                                          model_x=model.model_x), name=r'$\mathcal{N}$')
-
-# norm_params = None
-# norm_params = {'prior_cov': [.1, .001]}
-norm_params = {'prior_cov': [.1]}
-# norm_params = {'prior_cov': [100, .01]}
-
-
-# Plotting
-
-n_train = 40
-# n_train = [0, 4, 40, 400]
-# n_train = [0, 800, 4000]
-# n_train = [0, 100, 200, 400, 800]
-# n_train = np.arange(0, 650, 50)
-# n_train = np.arange(0, 4500, 500)
-# n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
-
-
-# print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True))
-# dir_predictor.plot_risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True)
-
-
-temp = [
-    (opt_predictor, None),
-    (dir_predictor, dir_params),
-    # *(zip(dir_predictors, dir_params_full)),
-    (norm_predictor, norm_params),
-]
-predictors, params = list(zip(*temp))
-
-
-# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=50, verbose=True, ax=None)
-# plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
-
-plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=10, do_std=True,
-                           verbose=True, ax=None)
-
-# plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None)
-# plt.xscale('log', base=2)
-
-
-# # Find localization minimum
+# # Scale alpha axis, find localization minimum
 # do_argmin = False
 # # do_argmin = True
 # ax = plt.gca()
@@ -238,19 +245,11 @@ plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_tra
 #         ax.set_xlim((_vals.min(), _vals.max()))
 
 
-#%% Save image and Figure
-time_str = strftime('%Y-%m-%d_%H-%M-%S')
-image_path = Path('./images/temp/')
+# print(dir_predictor.risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True))
+# dir_predictor.plot_risk_eval_sim(model, dir_params, n_train, n_test=1, n_mc=5000, verbose=True)
 
-fig = plt.gcf()
-fig.savefig(image_path.joinpath(f"{time_str}.png"))
-with open(image_path.joinpath(f"{time_str}.mpl"), 'wb') as fid:
-    pickle.dump(fig, fid)
+# plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
 
-print('Done')
-
-
-#%%
 # print(f"\nAnalytical Risk = {opt_predictor.evaluate_comp(n_train=n_train)}")
 
 # if isinstance(model, rand_models.Base):

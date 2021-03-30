@@ -186,14 +186,6 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
                 if len(params) == 0:
                     y_mc = predictor.predict(x)
                     _update_stats(y_stats[i_n], y_mc)
-                    # if 'mean' in stats:
-                    #     _mean_prev = y_stats[i_n]['mean']
-                    #     y_stats[i_n]['mean'] += (y_mc - _mean_prev) / (i_mc + 1)
-                    #     if 'cov' in stats:
-                    #         _temp_1 = (y_mc - _mean_prev).reshape(math.prod(set_shape), size['y'])
-                    #         _temp_2 = (y_mc - y_stats[i_n]['mean']).reshape(math.prod(set_shape), size['y'])
-                    #         _temp = np.array([np.tensordot(t1, t2, 0) for t1, t2 in zip(_temp_1, _temp_2)])
-                    #         y_stats[i_n]['cov'] += _temp.reshape(set_shape + 2 * shape['y'])
                 else:
                     for i_v, param_vals in enumerate(list(product(*params.values()))):
                         predictor.set_params(**dict(zip(params.keys(), param_vals)))
@@ -201,14 +193,6 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
 
                         idx = (i_n, *np.unravel_index(i_v, params_shape))
                         _update_stats(y_stats[idx], y_mc)
-                        # if 'mean' in stats:
-                        #     _mean_prev = y_stats[idx]['mean']
-                        #     y_stats[idx]['mean'] += (y_mc - _mean_prev) / (i_mc + 1)
-                        #     if 'cov' in stats:
-                        #         _temp_1 = (y_mc - _mean_prev).reshape(math.prod(set_shape), size['y'])
-                        #         _temp_2 = (y_mc - y_stats[idx]['mean']).reshape(math.prod(set_shape), size['y'])
-                        #         _temp = np.array([np.tensordot(t1, t2, 0) for t1, t2 in zip(_temp_1, _temp_2)])
-                        #         y_stats[idx]['cov'] += _temp.reshape(set_shape + 2 * shape['y'])
 
     if 'cov' in stats:
         for y_stats in y_stats_full:
@@ -283,7 +267,7 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
 
     else:
         if len(n_train) == 1:
-            # TODO: enumerates and kwargs for errorbar predict. keep?
+            # TODO: enumerates and kwargs for errorbar predict. Remove??
             # lens = [1 if len(p) == 0 else len(list(p.values())[0]) for p in params_full]
             # n_lines = sum(lens)
 
