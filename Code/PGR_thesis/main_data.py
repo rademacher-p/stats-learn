@@ -22,7 +22,7 @@ pd.options.display.float_format = '{:,.3f}'.format
 
 #%%
 
-# TODO: data normalization for inverse stability, easy discretization?
+# TODO: data normalization for inverse stability, easy discretization? USE SKL!?
 
 model = rand_models.DataSet.from_csv('data/CCPP/data_1.csv', 'PE', iter_mode='repeat', shuffle_mode='repeat')
 
