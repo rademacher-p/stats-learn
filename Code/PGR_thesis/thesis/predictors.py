@@ -2,8 +2,8 @@
 Supervised learning functions.
 """
 
-import math
 from abc import ABC, abstractmethod
+import math
 from itertools import product
 from numbers import Integral
 from typing import Union
@@ -12,7 +12,7 @@ from typing import Union
 
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.stats import mode
+from sklearn import base as SKLbase
 
 from thesis.bayes import models as bayes_models
 from thesis.loss_funcs import loss_se, loss_01
@@ -588,12 +588,7 @@ class Base(ABC):
     shape = property(lambda self: {key: space.shape for key, space in self.space.items()})
     size = property(lambda self: {key: space.size for key, space in self.space.items()})
     ndim = property(lambda self: {key: space.ndim for key, space in self.space.items()})
-
     dtype = property(lambda self: {key: space.dtype for key, space in self.space.items()})
-
-    # shape = property(lambda self: self.model.shape)
-    # size = property(lambda self: self.model.size)
-    # ndim = property(lambda self: self.model.ndim)
 
     @property
     @abstractmethod
@@ -628,7 +623,7 @@ class Base(ABC):
         return self._fit(d, warm_start)
 
     @abstractmethod
-    def _fit(self, d=None, warm_start=False):
+    def _fit(self, d, warm_start):
         raise NotImplementedError
 
     def fit_from_model(self, model, n_train=0, rng=None, warm_start=False):
@@ -726,7 +721,7 @@ class Model(Base):
     def _model_obj(self):
         return self.model
 
-    def _fit(self, d=None, warm_start=False):
+    def _fit(self, d, warm_start):
         pass
 
     def fit_from_model(self, model, n_train=0, rng=None, warm_start=False):
@@ -788,7 +783,7 @@ class Bayes(Base):
     def _model_obj(self):
         return self.bayes_model
 
-    def _fit(self, d=None, warm_start=False):
+    def _fit(self, d, warm_start):
         self.bayes_model.fit(d, warm_start)
 
     def plot_param_dist(self, x=None, ax_prior=None):  # TODO: improve or remove?
@@ -873,3 +868,44 @@ class BayesRegressor(RegressorMixin, Bayes):
                     raise NotImplementedError
             else:
                 raise NotImplementedError
+
+
+class SKLWrapper(Base):
+
+    # FIXME: inheritance feels broken
+
+    def __init__(self, estimator, space, proc_funcs=(), name=None):
+        if isinstance(estimator, SKLbase.RegressorMixin):  # TODO: use _estimator_type attr?
+            loss_func = loss_se
+        else:
+            raise ValueError
+
+        super().__init__(loss_func, proc_funcs, name)
+        self.estimator = estimator
+        self._space = space
+
+    space = property(lambda self: self._space)
+
+    @property
+    def _model_obj(self):
+        raise NotImplementedError
+
+    def _fit(self, d, warm_start):
+        if hasattr(self.estimator, 'warm_start'):
+            self.estimator.warm_start = warm_start
+        else:
+            raise NotImplementedError
+
+        x, y = d['x'].reshape(-1, 1), d['y']
+        if len(x) == 0:
+            raise NotImplementedError
+
+        self.estimator.fit(x, y)
+
+    def _predict(self, x):
+        x = x.reshape(-1, 1)
+        return self.estimator.predict(x)
+
+    def evaluate(self, d):
+        loss = self.loss_func(self.predict(d['x']), d['y'], shape=self.shape['y'])
+        return loss.mean()
