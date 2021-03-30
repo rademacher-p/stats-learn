@@ -19,6 +19,9 @@ from thesis.util import spaces
 np.set_printoptions(precision=3)
 pd.options.display.float_format = '{:,.3f}'.format
 
+plt.rc('text', usetex=True)
+plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepackage{bm}")
+
 
 #%%
 
