@@ -16,3 +16,4 @@
   - Preserve `name` attribute?
   - Attr `space_x` used for predict plots
     - **Make it a func argument instead, deprecate `x`?!?**
+    - **Remove predictor `space` arg?**

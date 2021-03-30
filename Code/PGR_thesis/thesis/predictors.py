@@ -117,8 +117,9 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
 
     # uses Welford's online algorithm https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
 
-    space_x = check_spaces_x(predictors)
     if x is None:
+        # space_x = check_spaces_x(predictors)
+        space_x = model.space['x']
         x = space_x.x_plt
 
     if params is None:
@@ -206,7 +207,8 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
 
 def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, do_std=False, verbose=False,
                                ax=None):
-    space_x = check_spaces_x(predictors)
+    # space_x = check_spaces_x(predictors)
+    space_x = model.space['x']
     if x is None:
         x = space_x.x_plt
 
