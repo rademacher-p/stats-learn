@@ -56,7 +56,7 @@ class Base(RandomGeneratorMixin):
 
         self._fit(d, warm_start)
 
-    def _fit(self, d, warm_start=False):
+    def _fit(self, d, warm_start):
         raise NotImplementedError
 
 
@@ -148,7 +148,7 @@ class NormalLinear(Base):
 
         return rand_models.NormalLinear(**model_kwargs, **rand_kwargs)
 
-    def _fit(self, d, warm_start=False):
+    def _fit(self, d, warm_start):
         if not warm_start:  # reset learning attributes
             self._cov_data_inv = np.zeros(2 * self.prior.shape)
             self._mean_data_temp = np.zeros(self.prior.shape)
@@ -326,13 +326,13 @@ class Dirichlet(Base):  # TODO: DRY from random.elements?
 
         return _out
 
-    def _fit(self, d, warm_start=False):
+    def _fit(self, d, warm_start):
         if warm_start:
             emp_dist = self.emp_dist
         else:
             emp_dist = rand_models.DataEmpirical([], [], space=self.space)
         emp_dist.add_data(d)
-        self.emp_dist = emp_dist
+        self.emp_dist = emp_dist  # triggers setter
 
 
 if __name__ == '__main__':

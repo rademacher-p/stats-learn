@@ -2,6 +2,8 @@
 Loss functions.
 """
 
+# import numpy as np
+
 from thesis.util.base import check_data_shape
 
 
