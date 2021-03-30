@@ -19,7 +19,6 @@ from thesis.loss_funcs import loss_se, loss_01
 from thesis.random import elements as rand_elements, models as rand_models
 from thesis.util import spaces
 from thesis.util.base import vectorize_func, check_data_shape, all_equal
-from thesis.util.spaces import check_spaces_x
 
 
 # def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False):
@@ -569,10 +568,8 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
 
 # %%
 class Base(ABC):
-    def __init__(self, loss_func, space=None, proc_funcs=(), name=None):
+    def __init__(self, loss_func, proc_funcs=(), name=None):
         self.loss_func = loss_func
-
-        self._space = space
 
         self.proc_funcs = list(proc_funcs)
         self.name = name
@@ -584,9 +581,9 @@ class Base(ABC):
     #     if self._space is None:
     #         self._space = self._model_obj.space
     #     return self._space
-    space = property(lambda self: self._space)
+    # space = property(lambda self: self._space)
 
-    # space = property(lambda self: self._model_obj.space)
+    space = property(lambda self: self._model_obj.space)
 
     shape = property(lambda self: {key: space.shape for key, space in self.space.items()})
     size = property(lambda self: {key: space.size for key, space in self.space.items()})
@@ -718,10 +715,8 @@ class RegressorMixin:
 
 # %% Fixed model
 class Model(Base):
-    def __init__(self, model, loss_func, space=None, proc_funcs=(), name=None):
-        if space is None:
-            space = model.space
-        super().__init__(loss_func, space, proc_funcs, name)
+    def __init__(self, model, loss_func, proc_funcs=(), name=None):
+        super().__init__(loss_func, proc_funcs, name)
         self.model = model
 
     def __repr__(self):
@@ -739,13 +734,13 @@ class Model(Base):
 
 
 class ModelClassifier(ClassifierMixin, Model):
-    def __init__(self, model, space=None, proc_funcs=(), name=None):
-        super().__init__(model, loss_01, space, proc_funcs, name)
+    def __init__(self, model, proc_funcs=(), name=None):
+        super().__init__(model, loss_01, proc_funcs, name)
 
 
 class ModelRegressor(RegressorMixin, Model):
-    def __init__(self, model, space=None, proc_funcs=(), name=None):
-        super().__init__(model, loss_se, space, proc_funcs, name)
+    def __init__(self, model, proc_funcs=(), name=None):
+        super().__init__(model, loss_se, proc_funcs, name)
 
     def evaluate_comp(self, model=None, n_train=0, n_test=1):
         if model is None:
@@ -774,10 +769,8 @@ class ModelRegressor(RegressorMixin, Model):
 # %% Bayes model
 
 class Bayes(Base):
-    def __init__(self, bayes_model, loss_func, space=None, proc_funcs=(), name=None):
-        if space is None:
-            space = bayes_model.space
-        super().__init__(loss_func, space, proc_funcs, name=name)
+    def __init__(self, bayes_model, loss_func, proc_funcs=(), name=None):
+        super().__init__(loss_func, proc_funcs, name=name)
 
         self.bayes_model = bayes_model
 
@@ -810,13 +803,13 @@ class Bayes(Base):
 
 
 class BayesClassifier(ClassifierMixin, Bayes):
-    def __init__(self, bayes_model, space=None, proc_funcs=(), name=None):
-        super().__init__(bayes_model, loss_01, space, proc_funcs, name)
+    def __init__(self, bayes_model, proc_funcs=(), name=None):
+        super().__init__(bayes_model, loss_01, proc_funcs, name)
 
 
 class BayesRegressor(RegressorMixin, Bayes):
-    def __init__(self, bayes_model, space=None, proc_funcs=(), name=None):
-        super().__init__(bayes_model, loss_se, space, proc_funcs, name)
+    def __init__(self, bayes_model, proc_funcs=(), name=None):
+        super().__init__(bayes_model, loss_se, proc_funcs, name)
 
     def evaluate_comp(self, model=None, n_train=0, n_test=1):
         if model is None:
