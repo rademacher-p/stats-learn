@@ -56,8 +56,8 @@ alpha_y_x_beta = 1/var_y_x_const - 1
 # model = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
 
 
-shape_x = ()
-# shape_x = (2,)
+# shape_x = ()
+shape_x = (2,)
 
 # w_model = [.5]
 w_model = [0, 0, 1]
@@ -115,6 +115,7 @@ prior_mean_x = rand_elements.Finite(supp_x, p=_temp/_temp.sum())
 proc_funcs.append(discretizer(supp_x.reshape(-1, *model_x.shape)))
 
 prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
+
 
 _name = r'$\mathrm{Dir}$'
 if len(proc_funcs) > 0:
