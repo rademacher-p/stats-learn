@@ -3227,7 +3227,7 @@ Starting from the Dirichlet-based Bayesian predictive distribution \eqref{eq:P_y
 \begin{IEEEeqnarray}{rCl} \label{eq:P_y_xD_dir_disc}
 \prm_{\yrm | \xrm,\Drm} & = & \gammamd\big(T(\xrm); \Xrm \big) \alphac\big(T(\xrm)\big) + \Big(1 - \gammamd\big(T(\xrm); \Xrm \big)\Big) \Psicd\big(T(\xrm); \Drm\big) \;,
 \end{IEEEeqnarray}
-where the discretized weighting function $\gammamd(X): \Xcal^N \mapsto (0,1]^{\Tcal}$ is defined as 
+where the discretized weighting function $\gammamd: \Xcal^N \mapsto (0,1]^{\Tcal}$ is defined as 
 \begin{IEEEeqnarray}{rCl}
 \gammamd(t; X) & = & \left(1 + \frac{\sum_{n=1}^N \delta\big(t - T(X_n)\big)}{\alpha_0 \sum_{t' \in \Tcal} \alphamd(t') \delta(t - t')}\right)^{-1} \nonumber \\
 & = & \left(1 + \frac{\sum_{n=1}^N \delta\big[t, T(X_n)\big]}{\alpha_0 \sum_{t' \in \Tcal} \alphamd(t') \delta[t, t']}\right)^{-1} \nonumber \\
@@ -3304,7 +3304,7 @@ Using the equivalence $\prm_{\yrm | \xrm,\uppsimd,\uppsicd} = \prm_{\yrm | \trm,
 While similar in form to \eqref{eq:predictive_bias_dir}, observe that the bias includes an additional term that quantifies a ``discretization bias''. Since the discretized conditional empirical function $\uppsic(t)$ integrates all training samples falling in the subset $\Xcal'(t) \subset \Xcal$, its expected value integrates the true predictive distributions $\upthetac(x)$ in the same region.
 
 
-Following a procedure similar to that employed in Section \ref{sec:predictive_est_dir}, the covariance of the estimate in terms of the transform $\trm$ is
+Following a procedure similar to that employed in Section \ref{sec:predictive_est_dir}, the covariance of the estimate in terms of the transformed value $\trm$ is
 \begin{IEEEeqnarray}{L} \label{eq:predictive_cov_dir_disc}
 \Crm_{\uppsimd,\uppsicd | \upthetam,\upthetac} \big[\Prm_{\yrm | \trm,\uppsimd,\uppsicd} \big] \nonumber \\
 \quad = \Crm_{\uppsimd | \upthetamd}\big[ \gammamd(\trm; \uppsimd) \big] \big( \alphac(\trm) - \upthetacd(\trm) \big) \otimes \big( \alphac(\trm) - \upthetacd(\trm) \big) \nonumber \\
@@ -3402,7 +3402,7 @@ The effects of discretization on the squared-error will be analyzed next. Using 
 \qquad + \Erm_{\trm | \upthetam}\left[ \Erm_{\uppsimd | \upthetamd}\left[ \frac{\big(1 - \gammamd(\trm; \uppsimd)\big)^2}{N \uppsimd(\trm)} \right] \Erm_{\xrm | \trm, \upthetam}[\Sigma_{\yrm | \xrm,\upthetac}] \right] \nonumber \\
 \qquad + \Erm_{\trm | \upthetam}\left[ \left( 1 + \Erm_{\uppsimd | \upthetamd}\left[ \frac{\big(1 - \gammamd(\trm; \uppsimd)\big)^2}{N \uppsimd(\trm)} \right] \right) \Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \right] \;,
 \end{IEEEeqnarray}
-a weighted summation of three terms, each of which can be viewed as second-order in terms of $y$. Note that the expectations over the observations space are performed using the operator equivalence $\Erm_{\xrm | \upthetam} \equiv \Erm_{\trm | \upthetam} \Erm_{\xrm | \trm, \upthetam}$, allowing select terms in \eqref{eq:predictive_del_sq_dir_disc} to be evaluated strictly in terms of the transform $\trm$. The representation $\upthetacd(\trm) = \Erm_{\xrm | \trm, \upthetam}\big[ \upthetac(\xrm) \big] = \Erm_{\xrm | \trm, \upthetam}[\prm_{\yrm | \xrm,\upthetac}]$ is used throughout.
+a weighted summation of three terms, each of which can be viewed as second-order in terms of $y$. Note that the expectations over the observations space are performed using the operator equivalence $\Erm_{\xrm | \upthetam} \equiv \Erm_{\trm | \upthetam} \Erm_{\xrm | \trm, \upthetam}$, allowing select terms in \eqref{eq:predictive_del_sq_dir_disc} to be evaluated strictly in terms of the transformed observation $\trm$. The representation $\upthetacd(\trm) = \Erm_{\xrm | \trm, \upthetam}\big[ \upthetac(\xrm) \big] = \Erm_{\xrm | \trm, \upthetam}[\prm_{\yrm | \xrm,\upthetac}]$ is used throughout.
 
 Comparing with the discrete-domain excess squared-error \eqref{eq:risk_cond_SE_dir_ex}, there are both similar and new terms. The first two terms are directly comparable; instead of integrating over the observation space $\Xcal$, however, the expectation is evaluated using the transformed observation $\trm$. Additionally, note that the clairvoyant regressor \eqref{eq:f_clv_SE} and the its conditional variance $\Sigma_{\yrm | \xrm,\upthetac}$ are replaced by their expectations with respect to the conditional distribution $\prm_{\xrm | \trm, \upthetam}$. Note that $\Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$ represents the discretized clairvoyant regressor; the expected value of the Bayesian regressor tends to this function in the limit of training data volume. The additional term quantifies the discretization error via $\Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$, measuring the variation of the clairvoyant regressor within each discretization subset $\Xcal'(t)$. 
 
