@@ -1269,6 +1269,7 @@ class Mixture(Base):
             # dists_nonzero = [dist for (w, dist) in zip(self.weights, self.dists) if w > 0]
             dists_nonzero = [self.dists[i] for i in self._idx_nonzero]
 
+            # Update space plotting attributes
             if isinstance(self.space, spaces.Euclidean):
                 temp = np.stack(list(dist.space.lims_plot for dist in dists_nonzero))
                 self._space.lims_plot = [temp[:, 0].min(), temp[:, 1].max()]
