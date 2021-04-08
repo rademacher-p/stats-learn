@@ -1,11 +1,12 @@
 # 4.1.2
-- [ ] eq 4.1, lose geometric?
-- [ ] eq 4.3, lose geometric
+- [x] eq 4.1, eq 4.3: lose geometric?
+  - A: Made a note. Which form IS used? Does it hurt?
 - [ ] eq 4.6: divide by zero! **specify domain**
   - *Union of Xn*!?
   - Use PMF, finite subset of Ycal?
 
-- [ ] semicolon confusing? Use bold/case to distinguish?
+- [x] semicolon confusing? Use bold/case to distinguish?
+  - A: Keeping as is, or switch to serial brackets? Bold/case common for linear algebra, but not for analysis - may be confusing.
 - [ ] dirac vs kron, use diff. font!? partial delta?
 - [ ] CDF?
 
@@ -17,10 +18,15 @@
 - [ ] plot PDFS for sec 4.3
 
 # 5
-- [ ] "severe drawbacks"
-- [ ] *"cardinality reducing"*
-- [ ] contiguous vs continuous vs connected
-- [ ] discretization vs quantization
-- [ ] use projection terms
-
-- [ ] PDF tends in what sense?
+- [x] "severe drawbacks"
+  - A: Changed
+- [x] "cardinality reducing"
+  - A: Changed.
+- [x] contiguous vs continuous vs connected
+  - A: Switched to "connected spaces"
+- [x] discretization vs quantization
+  - A: Former is more common in ML terminology, code, etc.
+- [x] use projection terms
+  - A: Inappropriate, transform is non-linear
+- [x] PDF tends in what sense?
+  - A: Different types are for RV convergence, not function convergence?
