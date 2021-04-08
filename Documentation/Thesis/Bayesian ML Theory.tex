@@ -2553,7 +2553,7 @@ The training data is distributed as
 \end{IEEEeqnarray}
 where the operator $\prod$ is the geometric integral, the continuous analog of the discrete product operator.
 
-\todohigh{CITE for geometric integral!!}
+\todohigh{CITE for geometric integral!! Just remove if unused?}
 
 Note that the dependency on the training data is expressed via the empirical transform $\Psi : \Dcal \mapsto \Uppsi \subset \Uptheta$, redefined for continuous data as
 \begin{IEEEeqnarray}{rCl}
@@ -3214,9 +3214,9 @@ Next, consider the risk trends when the true model is fixed. The marginal distri
 
 \section{From the continuous DP}
 
-As seen in Chapter \ref{ch:dir_cont}, the flexibility of using a full-support prior, while effective for countable data spaces, has severe drawbacks when operating on observations drawn from continuous spaces. This section develops a new Bayesian predictive distribution using discretization that may be used to realize the benefits of Dirichlet process priors while avoiding the aforementioned limitation. 
+As seen in Chapter \ref{ch:dir_cont}, the flexibility of using a full-support prior, while effective for countable data spaces, has limited practical value when operating on observations drawn from continuous spaces. This section develops a new Bayesian predictive distribution using discretization that may be used to realize the benefits of Dirichlet process priors while avoiding the aforementioned limitation. 
 
-Define a discretizing data transformation $T: \Xcal \mapsto \Tcal$, where the range is a countable subset $\Tcal \subset \Xcal$, such that $|\Tcal| \leq \aleph_0$. This transform is applied to each of the training values $\Xrm_n$, as well as to the novel observation $\xrm$. Note that $T$ is effectively a dimensionality-reducing feature transformation. Use $T$ to define a partitioning $\{\ldots, \Xcal'(t), \ldots\}$ of the observation space $\Xcal$, where $\Xcal'(t) = \{x \in \Xcal: T(x) = t\}$. It is assumed that these subsets are contiguous; furthermore, assume that $t \in \Xcal'(t), \ \forall \ t \in \Tcal$, such that the transform maps $T(t) = t$.
+Define a discretizing data transformation $T: \Xcal \mapsto \Tcal$, where the range is a countable subset $\Tcal \subset \Xcal$, such that $|\Tcal| \leq \aleph_0$. This transform is applied to each of the training values $\Xrm_n$, as well as to the novel observation $\xrm$. Note that $T$ reduces the cardinality of the observation set; this is conceptually similar to the dimensionality reduction induced by feature transforms commonly used in machine learning and yields similar benefits. Use $T$ to define a partitioning $\{\ldots, \Xcal'(t), \ldots\}$ of the observation space $\Xcal$, where $\Xcal'(t) = \{x \in \Xcal: T(x) = t\}$. It is assumed that these subsets are all connected spaces; furthermore, assume that $t \in \Xcal'(t), \ \forall \ t \in \Tcal$, such that the transform maps $T(t) = t$.
 
 Having effectively changed the domain of the observations, the Dirichlet prior marginal mean is re-defined as $\alpham = \sum_{t \in \Tcal} \alphamd(t) \delta(\cdot - t)$, a mixture of delta functions at the discretized values, where $\alphamd \in \Pcal(\Tcal)$ is the discrete marginal function. 
 
