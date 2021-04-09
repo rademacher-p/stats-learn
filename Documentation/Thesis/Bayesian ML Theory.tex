@@ -1482,6 +1482,8 @@ This demonstrates the critical bias/variance trade-off that is controlled by sel
 
 \subsection{Example}
 
+\todohi{Non-singular example?}
+
 To exemplify how the model estimate $\Prm_{\yrm | \xrm,\uppsi}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 60$ and $|\Xcal| = 1$; the singular observation set enables visualization of the bias/variance trade-off. The prior mean $\alphac(x)$ and true model $\upthetac(x)$ are distributed as $\alphac(y;x) = \Bi(y/60; 60, 0.3)$ and $\thetac(y;x) = \Bi(y/60; 60, 0.7)$, respectively, and are shown in Figure \ref{fig:model_est/N_0} -- note the significant mismatch.
 \begin{figure}
 \centering
@@ -2877,7 +2879,7 @@ Thus for bounded $\upthetam(x)$, the expected number of samples $\delta(0)^{-1} 
 If instead $\upthetam$ includes a Dirac delta function at $x \in \Xcal$, the conditional prior concentration $\alpha_0 \alpham(x)$ can affect the bias and variance. If the marginal prior mean value $\alpham(x)$ is bounded, the empirical distribution is used for prediction whenever available and the weight $\Erm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big]$ assumes its minimal value $\big(1 - \delta(0)^{-1} \upthetam(x)\big)^N$, which is not necessarily equal to one. The estimate has minimal bias and maximal variance; the weighting values in \eqref{eq:predictive_del_sq_dir_cont} are analogous to those provided in Section \ref{sec:predictive_est_dir}. Conversely, if $\alpham$ also has a Dirac delta function at $x$, the bias weight behaves as for the discrete-domain case, depending on the relative values of $\delta(0)^{-1} \upthetam(x)$ and $\delta(0)^{-1} \alpham(x)$.
 
 
-\todohigh{example plots?}
+\todolo{Plot realizations (instead of stats) for meaningful viz?}
 
 
 
