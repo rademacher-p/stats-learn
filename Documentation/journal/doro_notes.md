@@ -1,7 +1,8 @@
 # 4.1.2
 - [x] eq 4.1, eq 4.3: lose geometric?
   - A: Made a note. Which form IS used? Does it hurt?
-- [ ] eq 4.6: divide by zero! **specify domain**
+- [x] eq 4.6: divide by zero! **specify domain**
+  - A: Added domain set dependent on data to avoid undefined case
   - *Union of Xn*!?
   - Use PMF, finite subset of Ycal?
 

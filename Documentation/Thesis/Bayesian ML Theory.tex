@@ -60,6 +60,8 @@
 \DeclareMathOperator{\Rbbgeq}{\mathbb{R}_{\geq 0}}
 \DeclareMathOperator{\Zbbgeq}{\mathbb{Z}_{\geq 0}}
 
+\DeclareMathOperator{\Xcals}{\Xcal_{\mathrm{s}}}
+
 \DeclareMathOperator{\Dir}{\mathrm{Dir}}
 \DeclareMathOperator{\DM}{\mathrm{DM}}
 \DeclareMathOperator{\Multi}{\mathrm{Multi}}
@@ -455,13 +457,13 @@ The conditional distribution of the values $\Yrm$ given the corresponding $\Xrm$
 \end{IEEEeqnarray}
 where the function $\Psic : \{\Ycal \times \Xcal\}^N \mapsto \Uppsic \subset \Pcal(\Ycal)^{\Xcal}$ is defined as
 \begin{equation}
-\Psic(x;Y,X) = \frac{\Psi(\cdot,x;Y,X)}{\Psim(x;X)} = \frac{\sum_{n=1}^N \delta\big[ \cdot,Y_n \big] \delta\big[ x,X_n \big]}{\sum_{n=1}^N \delta\big[ x,X_n \big]}
+\Psic(x;Y,X) = \frac{\Psi(\cdot,x;Y,X)}{\Psim(x;X)} = \frac{\sum_{n=1}^N \delta\big[ \cdot,Y_n \big] \delta\big[ x,X_n \big]}{\sum_{n=1}^N \delta\big[ x,X_n \big]} \;.
 \end{equation}
-and maps to the set
+Note that the conditional distribution is defined only for values $x \in \Xcals\big(\Psim(X)\big)$, where $\Xcals(\psim) = \{x \in \Xcal: \psim(x) > 0\}$. Observe that the range of the transform is 
 \begin{equation}
-\Uppsic = \bigcup_{\psim \in \Uppsim} \prod_{x \in \Xcal} \left\{ \frac{n}{N \psim(x)}: n \in {\Zbbgeq}^{\Ycal}, \ \sum_{y \in \Ycal} n(y) = N \psim(x) \right\} \;.
+\Uppsic = \bigcup_{\psim \in \Uppsim} \prod_{x \in \Xcals(\psim)} \left\{ \frac{n}{N \psim(x)}: n \in {\Zbbgeq}^{\Ycal}, \ \sum_{y \in \Ycal} n(y) = N \psim(x) \right\} \;.
 \end{equation}
-Note that the dependency of the conditional distribution on the model $\uptheta$ is expressed only through the conditional models $\upthetac(x)$. 
+and that the dependency of the conditional distribution on the model $\uptheta$ is expressed only through the conditional models $\upthetac(x)$. 
 
 
 
@@ -470,20 +472,18 @@ Analogous to the decomposition of the model $\uptheta$ into its marginal and con
 Also of interest is the conditional distribution of $\uppsic \in \Uppsic$, where $\uppsic(x) \equiv \uppsi(\cdot,x) / \uppsim(x)$. Using the Empirical process properties proven in Appendix \ref{app:emp}, it can be shown that when conditioned on $\uppsi$ and on the model $\uptheta$, the PMF of $\uppsic$ is
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\uppsic | \uppsim, \uptheta}(\psic | \psim , \theta) & \equiv & \Prm_{\uppsic | \uppsim, \upthetac}(\psic | \psim , \thetac) \\
-& = & \prod_{x \in \Xcal} \Bigg[ \Mcal\big( N \psim(x) \psic(x) \big) \left( \prod_{y \in \Ycal} \thetac(y;x)^{\psic(y;x)} \right)^{N \psim(x)} \Bigg] \nonumber \\
-& = & \prod_{x \in \Xcal} \Emp\Big( \psic(x) ; N \psim(x) , \thetac(x) \Big) \nonumber \;,
+& = & \prod_{x \in \Xcals(\psim)} \Bigg[ \Mcal\big( N \psim(x) \psic(x) \big) \left( \prod_{y \in \Ycal} \thetac(y;x)^{\psic(y;x)} \right)^{N \psim(x)} \Bigg] \nonumber \\
+& = & \prod_{x \in \Xcals(\psim)} \Emp\Big( \psic(x) ; N \psim(x) , \thetac(x) \Big) \nonumber \;,
 \end{IEEEeqnarray}
 \begin{IEEEeqnarray}{rCl}
-\Prm_{\uppsic | \uppsim, \uptheta} & \equiv & \bigotimes_{x \in \Xcal} \Prm_{\uppsic(x) | \uppsim(x), \upthetac(x)} \\
-& = & \bigotimes_{x \in \Xcal} \Emp\Big(N \uppsim(x), \upthetac(x) \Big) \nonumber \;,
+\Prm_{\uppsic | \uppsim, \uptheta} & \equiv & \bigotimes_{x \in \Xcals(\uppsim)} \Prm_{\uppsic(x) | \uppsim(x), \upthetac(x)} \\
+& = & \bigotimes_{x \in \Xcals(\uppsim)} \Emp\Big(N \uppsim(x), \upthetac(x) \Big) \nonumber \;,
 \end{IEEEeqnarray}
-over the domain $\prod_{x \in \Xcal} \left\{ \frac{n}{N \psim(x)}: n \in {\Zbbgeq}^{\Ycal}, \ \sum_{y \in \Ycal} n(y) = N \psim(x) \right\}$. Observe that conditioning on the marginal empirical process renders the conditional processes $\uppsic(x)$ independent of one another and that they are also Empirically distributed, such that $\uppsic(x) | \uppsim(x),\upthetac(x) \sim \Emp\big( N \uppsim(x),\upthetac(x) \big)$ for every $x \in \Xcal$. 
+over the domain $\prod_{x \in \Xcals(\psim)} \left\{ \frac{n}{N \psim(x)}: n \in {\Zbbgeq}^{\Ycal}, \ \sum_{y \in \Ycal} n(y) = N \psim(x) \right\}$. Observe that conditioning on the marginal empirical process renders the conditional processes $\uppsic(x)$ independent of one another and that they are also Empirically distributed, such that $\uppsic(x) | \uppsim(x),\upthetac(x) \sim \Emp\big( N \uppsim(x),\upthetac(x) \big)$ for every $x \in \Xcals(\uppsim)$. 
 
 \todohigh{otimes for all? ordered set? use sim notation?}
 
-%\begin{IEEEeqnarray}{L}
-%\prod_{x \in \Xcal : \psim(x) > 0} \left\{ \frac{n}{N \psim(x)}: n \in {\Zbbgeq}^{\Ycal}, \ \sum_{y \in \Ycal} n(y) = N \psim(x) \right\}
-%\end{IEEEeqnarray}
+
 
 
 
@@ -1244,9 +1244,7 @@ where the weight
 \begin{IEEEeqnarray}{L}
 \gamma = \left(1 + \frac{N}{\alpha_0}\right)^{-1} \in (0, 1]
 \end{IEEEeqnarray}
-is introduced.
-
-\todolo{Comment on N=0 case, psi not a valid PF?}
+is introduced. Note that when $N = 0$, the empirical transform $\Psi$ is undefined; however, since $1-\gamma = 0$, it is understood that $\mu_{\uptheta | \Drm} = \alpha$. This convention is used throughout for brevity wherever the empirical transform is needed.
 
 This posterior distribution is of specific interest in the machine learning literature. While Bayesian techniques are used here, often point estimates of the model $\uptheta$ are formed; perhaps the most common approach is to form the Maximum a posteriori estimate,
 \begin{IEEEeqnarray}{rCl}
@@ -2611,6 +2609,7 @@ depends only on the conditional models $\upthetac(x)$. The dependency on the dat
 \Psic(x;Y,X) & = & \frac{\Psi(\cdot,x;Y,X)}{\Psim(x;X)} \nonumber \\
 & = & \frac{\sum_{n=1}^N \delta(\cdot - Y_n) \delta(x-X_n)}{\sum_{n=1}^N \delta(x-X_n)} = \frac{\sum_{n=1}^N \delta(\cdot - Y_n) \delta[x,X_n]}{\sum_{n=1}^N \delta[x,X_n]} \;.
 \end{IEEEeqnarray}
+As in the discrete-domain case, the conditional empirical distribution is defined only for observations $x \in \Xcals\big(\Psim(X)\big) = \bigcup_{n=1}^N \{X_n\}$.
 
 
 The same bijection can be used to decompose the empirical process into marginal and conditional empirical processes. The ``marginalized'' random process $\uppsim \in \Uppsim \subset \Pcal(\Xcal)$ is now defined as $\uppsim \equiv \int_{\Ycal} \uppsi(y,\cdot) {\drm}y$. Using the aggregation property of empirical processes detailed in Appendix \ref{app:EP}, it can be shown that conditioned on the model $\uptheta$, the marginal model is also an Empirical process, $\uppsim | \upthetam \sim \EP(N,\upthetam)$. Note the conditional independence from $\upthetac$. 
