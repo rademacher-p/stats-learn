@@ -23,10 +23,10 @@
 - [x] "cardinality reducing"
   - A: Changed.
 - [x] contiguous vs continuous vs connected
-  - A: Switched to "connected spaces"
+  - A: Switched to "connected spaces"!
 - [x] discretization vs quantization
   - A: Former is more common in ML terminology, code, etc.
 - [x] use projection terms
-  - A: Inappropriate, transform is non-linear
+  - A: Inappropriate, transform is non-linear?!
 - [x] PDF tends in what sense?
   - A: Different types are for RV convergence, not function convergence?
