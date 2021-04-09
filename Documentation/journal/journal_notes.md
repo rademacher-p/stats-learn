@@ -23,7 +23,8 @@
   - demonstrate Dirichlet consistency vs Normal loss
 
 
-## Real Data notes
+---
+# Real Data notes
 - How to select the prior mean?
   - **Boost existing regressors?!?**
 - Cross-validation risk should be minimized when using the empirical distribution of the full data set
