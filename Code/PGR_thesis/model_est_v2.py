@@ -1,3 +1,7 @@
+from time import strftime
+from pathlib import Path
+import pickle
+
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -14,13 +18,13 @@ plt.rc('text.latex', preamble=r"\usepackage{amsmath}\usepackage{upgreek}")
 # Model and prior mean
 n_x = 60
 
-n = 1
+n = 500
 model = rand_elements.EmpiricalScalar(.7, n_x)
-p_x = 1
+p_x = .5
 
 alpha_0 = 10
 alpha = rand_elements.EmpiricalScalar(.3, n_x)
-alpha_x = .1
+alpha_x = .5
 
 #%% Make axes, plot model
 space = spaces.check_spaces([model, alpha])
@@ -80,3 +84,15 @@ ax.set_ylim(bottom=0.)
 # title = r'$\alpha_0 = {}$'.format(alpha_0)
 title = f'$N = {n}$'
 ax.set(xlabel='$y$', title=title)
+
+
+#%% Save image and Figure
+time_str = strftime('%Y-%m-%d_%H-%M-%S')
+image_path = Path('./images/temp/')
+
+fig = plt.gcf()
+fig.savefig(image_path.joinpath(f"{time_str}.png"))
+with open(image_path.joinpath(f"{time_str}.mpl"), 'wb') as fid:
+    pickle.dump(fig, fid)
+
+print('Done')

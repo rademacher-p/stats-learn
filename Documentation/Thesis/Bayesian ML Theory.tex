@@ -1480,40 +1480,69 @@ Note that the latter is equivalent to the first inverse moment of a positive bin
 This demonstrates the critical bias/variance trade-off that is controlled by selection of the Dirichlet concentration parameter. For common applications, both distribution estimate bias and variance contribute to the overall risk and an optimal value of $\alpha_0$ can be found to optimally balance these competing sources of error.
 
 
+
 \subsection{Example}
 
-\todohi{Non-singular example?}
-
-To exemplify how the model estimate $\Prm_{\yrm | \xrm,\uppsi}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 60$ and $|\Xcal| = 1$; the singular observation set enables visualization of the bias/variance trade-off. The prior mean $\alphac(x)$ and true model $\upthetac(x)$ are distributed as $\alphac(y;x) = \Bi(y/60; 60, 0.3)$ and $\thetac(y;x) = \Bi(y/60; 60, 0.7)$, respectively, and are shown in Figure \ref{fig:model_est/N_0} -- note the significant mismatch.
+To exemplify how the model estimate $\Prm_{\yrm | \xrm,\uppsi}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 60$; the visualization will be provided for an arbitrary observation value $x$. The true model $\upthetac(x)$ and prior mean $\alphac(x)$ are distributed as $\alphac(y;x) = \Bi(y/60; 60, 0.7)$ and $\thetac(y;x) = \Bi(y/60; 60, 0.3)$, respectively, and are shown in Figure \ref{fig:model_est/N_0} -- note the significant mismatch. The model and prior marginal values used are $\upthetam(x) = 0.5$ and $\alpham(x) = 0.5$.
 \begin{figure}
-\centering
-\includegraphics[width=0.8\linewidth]{model_est/N_0.png}
-\caption{Model $\uptheta$ estimate, $N=0$}
-\label{fig:model_est/N_0}
+	\centering
+	\includegraphics[width=0.8\linewidth]{model_est/N_0.png}
+	\caption{Model $\uptheta$ estimate, $N=0$}
+	\label{fig:model_est/N_0}
 \end{figure}
 
-\Cref{fig:model_est/N_1,fig:model_est/N_100,fig:model_est/N_10000} show how the bias and variance of the estimate changes with different values of $N$ and $\alpha_0$. The plot lines represent the mean of the estimator, $\Erm_{\uppsi | \uptheta}\big[ \Prm_{\yrm | \xrm,\uppsi} \big]$; the shaded regions represent the square-root of the expected variance $\Crm_{\uppsi | \uptheta}\big[ \Prm_{\yrm | \xrm,\uppsi} \big]$ above and below the conditional mean. 
+\Cref{fig:model_est/N_5,fig:model_est/N_500} show how the bias and variance of the estimate changes with different values of $N$ and $\alpha_0$. The plot lines represent the mean of the estimator, $\Erm_{\uppsi | \uptheta}\big[ \Prm_{\yrm | \xrm,\uppsi} \big]$; the shaded regions represent the square-root of the expected variance $\Crm_{\uppsi | \uptheta}\big[ \Prm_{\yrm | \xrm,\uppsi} \big]$ above and below the conditional mean. 
 \begin{figure}
-\centering
-\includegraphics[width=0.8\linewidth]{model_est/N_1.png}
-\caption{Model $\uptheta$ estimate, $N=1$}
-\label{fig:model_est/N_1}
+	\centering
+	\includegraphics[width=0.8\linewidth]{model_est/N_5.png}
+	\caption{Model $\uptheta$ estimate, $N=5$}
+	\label{fig:model_est/N_5}
 \end{figure}
 \begin{figure}
-\centering
-\includegraphics[width=0.8\linewidth]{model_est/N_100.png}
-\caption{Model $\uptheta$ estimate, $N=100$}
-\label{fig:model_est/N_100}
-\end{figure}
-\begin{figure}
-\centering
-\includegraphics[width=0.8\linewidth]{model_est/N_10000.png}
-\caption{Model $\uptheta$ estimate, $N=10000$}
-\label{fig:model_est/N_10000}
+	\centering
+	\includegraphics[width=0.8\linewidth]{model_est/N_500.png}
+	\caption{Model $\uptheta$ estimate, $N=500$}
+	\label{fig:model_est/N_500}
 \end{figure}
 
-Observe that for $N = 1$, the $\alpha_0 = 0.1$ estimate (favoring the empirical PMF) has negligible bias but massive variance where $\uptheta$ is highest; conversely, the $\alpha_0 = 10$ estimate has low variance but high bias, favoring the erroneous prior mean $\alpha$. The $N=100$ and $N=10000$ figures show that, given sufficient data, the $\alpha_0 = 0.1$ and $\alpha_0 = 10$ estimators will eliminate their high variance and high bias, respectively, leading to perfect estimation of the true model $\theta$. The consistency of this estimate is guaranteed due to the full support of the Dirichlet prior.
+Observe that for $N = 5$, the $\alpha_0 = 0.1$ estimate (favoring the empirical PMF) has negligible bias but massive variance where $\uptheta$ is highest; conversely, the $\alpha_0 = 10$ estimate has low variance but high bias, favoring the erroneous prior mean $\alpha$. The $N=500$ figure shows that, given sufficient data, the $\alpha_0 = 0.1$ and $\alpha_0 = 10$ estimators will eliminate their high variance and high bias, respectively, leading to perfect estimation of the true model $\theta$. The consistency of this estimate is guaranteed due to the full support of the Dirichlet prior.
 
+
+
+%\subsection{Example}
+%
+%\todohi{Non-singular example?}
+%
+%To exemplify how the model estimate $\Prm_{\yrm | \xrm,\uppsi}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 60$ and $|\Xcal| = 1$; the singular observation set enables visualization of the bias/variance trade-off. The prior mean $\alphac(x)$ and true model $\upthetac(x)$ are distributed as $\alphac(y;x) = \Bi(y/60; 60, 0.3)$ and $\thetac(y;x) = \Bi(y/60; 60, 0.7)$, respectively, and are shown in Figure \ref{fig:model_est/N_0} -- note the significant mismatch.
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.8\linewidth]{model_est/N_0.png}
+%\caption{Model $\uptheta$ estimate, $N=0$}
+%\label{fig:model_est/N_0}
+%\end{figure}
+%
+%\Cref{fig:model_est/N_1,fig:model_est/N_100,fig:model_est/N_10000} show how the bias and variance of the estimate changes with different values of $N$ and $\alpha_0$. The plot lines represent the mean of the estimator, $\Erm_{\uppsi | \uptheta}\big[ \Prm_{\yrm | \xrm,\uppsi} \big]$; the shaded regions represent the square-root of the expected variance $\Crm_{\uppsi | \uptheta}\big[ \Prm_{\yrm | \xrm,\uppsi} \big]$ above and below the conditional mean. 
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.8\linewidth]{model_est/N_1.png}
+%\caption{Model $\uptheta$ estimate, $N=1$}
+%\label{fig:model_est/N_1}
+%\end{figure}
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.8\linewidth]{model_est/N_100.png}
+%\caption{Model $\uptheta$ estimate, $N=100$}
+%\label{fig:model_est/N_100}
+%\end{figure}
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.8\linewidth]{model_est/N_10000.png}
+%\caption{Model $\uptheta$ estimate, $N=10000$}
+%\label{fig:model_est/N_10000}
+%\end{figure}
+%
+%Observe that for $N = 1$, the $\alpha_0 = 0.1$ estimate (favoring the empirical PMF) has negligible bias but massive variance where $\uptheta$ is highest; conversely, the $\alpha_0 = 10$ estimate has low variance but high bias, favoring the erroneous prior mean $\alpha$. The $N=100$ and $N=10000$ figures show that, given sufficient data, the $\alpha_0 = 0.1$ and $\alpha_0 = 10$ estimators will eliminate their high variance and high bias, respectively, leading to perfect estimation of the true model $\theta$. The consistency of this estimate is guaranteed due to the full support of the Dirichlet prior.
+%
 
 
 
