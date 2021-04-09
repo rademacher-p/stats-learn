@@ -11,13 +11,15 @@ plt.rc('text.latex', preamble=r"\usepackage{amsmath}\usepackage{upgreek}")
 # model = rand_elements.EmpiricalScalar(.75, n_x)
 # alpha = rand_elements.EmpiricalScalar(.25, n_x)
 
+# Model and prior mean
 n_x = 60
 model = rand_elements.EmpiricalScalar(.7, n_x)
 alpha = rand_elements.EmpiricalScalar(.3, n_x)
 
-n = 10000
+n = 1
 alpha_0 = 10
 
+#%% Make axes, plot model
 space = spaces.check_spaces([model, alpha])
 y = space.x_plt
 __, ax = plt.subplots()
@@ -25,12 +27,14 @@ __, ax = plt.subplots()
 model_pf = model.pf(y)
 space.plot_xy(y, model_pf, y_std=np.zeros(y.shape), ax=ax, label=r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \uptheta}$')
 
+#%% Plot learner bias/var
+
 # for n in [1, 100]:
 for alpha_0 in [.1, 10]:
 
     gamma = 1 / (1 + n / alpha_0)
     mean = gamma * alpha.pf(y) + (1 - gamma) * model_pf
-    cov = n / (alpha_0 + n) ** 2 * model_pf * (1 - model_pf)
+    cov = n / (alpha_0 + n)**2 * model_pf * (1 - model_pf)
     bias = mean - model_pf
 
     # cov_lo = cov_hi = cov
@@ -43,8 +47,7 @@ for alpha_0 in [.1, 10]:
             emp_pf = emp.pf(supp)
 
             idx = supp <= p
-            cov_lo[i] += ((supp[idx] - p) ** 2 * emp_pf[idx]).sum()
-            # cov_lo[i] += ((supp - p) ** 2 * emp_pf).sum()
+            cov_lo[i] = np.dot(emp_pf[idx], (supp[idx] - p)**2)
 
     cov_lo *= (1 - gamma) ** 2
     cov_hi = cov - cov_lo
