@@ -41,6 +41,9 @@ class Base(RandomGeneratorMixin):
     mode = property(lambda self: self._mode)
 
     def pf(self, x):  # TODO: perform input checks using `space.__contains__`?
+        # if x is None:
+        #     x = self.space.x_plt  # TODO: add default x_plt
+
         return vectorize_func(self._pf_single, self.shape)(x)  # TODO: decorator? better way?
 
     def _pf_single(self, x):
