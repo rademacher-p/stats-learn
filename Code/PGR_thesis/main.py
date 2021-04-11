@@ -11,6 +11,7 @@ from math import prod
 import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.linear_model import LinearRegression, SGDRegressor
+from sklearn.neural_network import MLPRegressor
 
 from thesis.bayes import models as bayes_models
 from thesis.predictors import (ModelRegressor, BayesRegressor, plot_risk_eval_sim_compare, plot_predict_stats_compare,
@@ -156,38 +157,41 @@ norm_params = {'prior_cov': [.1, .001]}
 
 
 #%% External learners
-skl_predictor = SKLWrapper(LinearRegression(), space=model.space, name='LR')
+# skl_predictor = SKLWrapper(LinearRegression(), space=model.space, name='LR')
 # skl_predictor = SKLWrapper(SGDRegressor(), space=model.space, name='SGD')
-skl_params = None
+skl_predictor = SKLWrapper(MLPRegressor(hidden_layer_sizes=(100, 100, 100, 100)), space=model.space, name='MLP')
 
 
 #%% Results
 
 # n_train = 400
-# n_train = [0, 4, 40, 400]
+n_train = [0, 4, 40, 400]
 # n_train = [0, 800, 4000]
 # n_train = [0, 100, 200, 400, 800]
-n_train = np.arange(0, 510, 10)
+# n_train = np.arange(0, 510, 10)
 # n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
 
 temp = [
-    (opt_predictor, None),
+    # (opt_predictor, None),
     # (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
-    (norm_predictor, norm_params),
-    (skl_predictor, skl_params),
+    # (norm_predictor, norm_params),
+    (skl_predictor, None),
 ]
 predictors, params = list(zip(*temp))
 
 
+# TODO: add logic based on which parameters can be changed while preserving learner state!!
 # TODO: add logic in MC funcs to handle predictors with no `warm_start` or `set_params` capability
-# TODO: add logic based on which parameters can be changed while preserving learner state
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=50, verbose=True, ax=None)
-# plot_predict_stats_compare(predictors, model_eval, params, x=None, n_train=n_train, n_mc=50, do_std=True,
-#                            verbose=True, ax=None)
+
+# FIXME: MLP warm_start error...
+
+
+# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True)
+plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=50, x=None, do_std=True, verbose=True)
 
 # plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None)
 # plt.xscale('log', base=2)

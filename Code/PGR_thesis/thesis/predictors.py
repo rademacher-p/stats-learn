@@ -13,6 +13,8 @@ from typing import Union
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import base as SKLbase
+from sklearn.exceptions import NotFittedError
+
 
 from thesis.bayes import models as bayes_models
 from thesis.loss_funcs import loss_se, loss_01
@@ -112,7 +114,7 @@ from thesis.util.base import vectorize_func, check_data_shape, all_equal
 #     return y_stats_full
 
 
-def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False):
+def predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=None, stats=('mode',), verbose=False):
 
     # uses Welford's online algorithm https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
 
@@ -204,7 +206,7 @@ def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_m
     return y_stats_full
 
 
-def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, do_std=False, verbose=False,
+def plot_predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=None, do_std=False, verbose=False,
                                ax=None):
     # space_x = check_spaces_x(predictors)
     space_x = model.space['x']
@@ -212,7 +214,7 @@ def plot_predict_stats_compare(predictors, model, params=None, x=None, n_train=0
         x = space_x.x_plt
 
     stats = ('mean', 'std') if do_std else ('mean',)  # TODO: generalize for mode, etc.
-    y_stats_full = predict_stats_compare(predictors, model, params, x, n_train, n_mc, stats, verbose)
+    y_stats_full = predict_stats_compare(predictors, model, params, n_train, n_mc, x, stats, verbose)
 
     if ax is None:
         ax = space_x.make_axes()
@@ -661,16 +663,16 @@ class Base(ABC):
         return self.space['x'].plot(self.predict, x, ax=ax, label=label)
 
     # Prediction statistics
-    def predict_stats(self, model=None, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False):
+    def predict_stats(self, model=None, params=None, n_train=0, n_mc=1, x=None, stats=('mode',), verbose=False):
         if model is None:
             model = self._model_obj
-        return predict_stats_compare([self], model, [params], x, n_train, n_mc, stats, verbose)[0]
+        return predict_stats_compare([self], model, [params], n_train, n_mc, x, stats, verbose)[0]
 
-    def plot_predict_stats(self, model=None, params=None, x=None, n_train=0, n_mc=1, do_std=False, verbose=False,
+    def plot_predict_stats(self, model=None, params=None, n_train=0, n_mc=1, x=None, do_std=False, verbose=False,
                            ax=None):
         if model is None:
             model = self._model_obj
-        return plot_predict_stats_compare([self], model, [params], x, n_train, n_mc, do_std, verbose, ax)
+        return plot_predict_stats_compare([self], model, [params], n_train, n_mc, x, do_std, verbose, ax)
 
     # Risk evaluation
     def risk_eval_sim(self, model=None, params=None, n_train=0, n_test=1, n_mc=1, verbose=False):
@@ -892,23 +894,20 @@ class SKLWrapper(Base):
 
     def _fit(self, d, warm_start):
 
-        if warm_start:
-            if hasattr(self.estimator, 'warm_start'):
-                self.estimator.warm_start = warm_start
-            else:
-                raise NotImplementedError
+        if hasattr(self.estimator, 'warm_start'):  # TODO: check unneeded if not warm_start
+            self.estimator.warm_start = warm_start
+        else:
+            raise NotImplementedError
 
-        x, y = d['x'].reshape(-1, 1), d['y']
-        if len(x) == 0:
-            raise NotImplementedError  # TODO: enable unfitted predict?
-            # return
-
-        self.estimator.fit(x, y)
+        if len(d) > 0:
+            x, y = d['x'].reshape(-1, 1), d['y']
+            self.estimator.fit(x, y)
+        # else:
+        #     raise NotImplementedError  # TODO: unfitted workaround
 
     def _predict(self, x):
-        x = x.reshape(-1, 1)
-        return self.estimator.predict(x)
-
-    # def evaluate(self, d):
-    #     loss = self.loss_func(self.predict(d['x']), d['y'], shape=self.shape['y'])
-    #     return loss.mean()
+        try:
+            x = x.reshape(-1, 1)
+            return self.estimator.predict(x)
+        except NotFittedError:
+            return np.full(x.shape[0], np.nan)
