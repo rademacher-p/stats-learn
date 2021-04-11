@@ -61,8 +61,6 @@ class Base(RandomGeneratorMixin):
 
 
 class NormalLinear(Base):
-    # tex_params = {'prior_mean': r'\mu_{\uptheta}', 'prior_cov': r'\Sigma_{\uptheta}'}
-
     def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
                  model_x=rand_elements.Normal(), rng=None):
 
@@ -257,8 +255,6 @@ class NormalLinear(Base):
 
 
 class Dirichlet(Base):  # TODO: DRY from random.elements?
-    # tex_params = {'prior_mean': r'\alpha', 'alpha_0': r'\alpha_0'}
-
     def __init__(self, prior_mean, alpha_0, rng=None):
         super().__init__(prior=None, rng=rng)
 
