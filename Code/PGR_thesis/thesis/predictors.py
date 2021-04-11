@@ -891,14 +891,17 @@ class SKLWrapper(Base):
         raise NotImplementedError
 
     def _fit(self, d, warm_start):
-        if hasattr(self.estimator, 'warm_start'):
-            self.estimator.warm_start = warm_start
-        else:
-            raise NotImplementedError
+
+        if warm_start:
+            if hasattr(self.estimator, 'warm_start'):
+                self.estimator.warm_start = warm_start
+            else:
+                raise NotImplementedError
 
         x, y = d['x'].reshape(-1, 1), d['y']
         if len(x) == 0:
-            raise NotImplementedError
+            raise NotImplementedError  # TODO: enable unfitted predict?
+            # return
 
         self.estimator.fit(x, y)
 
@@ -906,6 +909,6 @@ class SKLWrapper(Base):
         x = x.reshape(-1, 1)
         return self.estimator.predict(x)
 
-    def evaluate(self, d):
-        loss = self.loss_func(self.predict(d['x']), d['y'], shape=self.shape['y'])
-        return loss.mean()
+    # def evaluate(self, d):
+    #     loss = self.loss_func(self.predict(d['x']), d['y'], shape=self.shape['y'])
+    #     return loss.mean()
