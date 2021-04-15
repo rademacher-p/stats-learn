@@ -134,7 +134,6 @@ def predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=N
 
     shape, size, ndim = model.shape, model.size, model.ndim
     x, set_shape = check_data_shape(x, shape['x'])
-    # n_train_delta = np.diff(np.concatenate(([0], n_train)))
 
     # Initialize arrays
     params_shape_full = []
@@ -188,6 +187,7 @@ def predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=N
                 else:
                     slice_ = slice(n_train[i_n-1], n_train[i_n])
                     warm_start = True
+
                 predictor.fit(d[slice_], warm_start=warm_start)
 
                 if len(params) == 0:
@@ -344,37 +344,60 @@ def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n
 
     if isinstance(n_train, (Integral, np.integer)):
         n_train = [n_train]
-
-    n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
+    n_train = np.sort(n_train)
 
     loss_full = []
     for params in params_full:
         params_shape = tuple(len(vals) for _, vals in params.items())
         # loss = np.empty((n_mc, len(n_train_delta), *params_shape))
-        loss = np.zeros((len(n_train_delta), *params_shape))
+        loss = np.zeros((len(n_train), *params_shape))
         loss_full.append(loss)
 
     for i_mc in range(n_mc):
         if verbose:
-            print(f"Loss iteration: {i_mc + 1}/{n_mc}")
+            print(f"Loss iteration: {i_mc + 1}/{n_mc}", end='\r')
 
-        d = model.rvs(n_test + n_train_delta.sum())
-        d_test, _d_train = d[:n_test], d[n_test:]
-        d_train_iter = np.split(_d_train, np.cumsum(n_train_delta)[:-1])
+        d = model.rvs(n_test + n_train[-1])
+        d_test, d_train = d[:n_test], d[n_test:]
 
-        for i_n, d_train in enumerate(d_train_iter):
-            warm_start = i_n > 0  # resets learner for new iteration
-            for predictor, params, loss in zip(predictors, params_full, loss_full):
-                predictor.fit(d_train, warm_start=warm_start)
+        for predictor, params, loss in zip(predictors, params_full, loss_full):
+            fit_incremental = isinstance(predictor, Bayes)  # enable fitting with incremental data partitions
+            for i_n in range(len(n_train)):
+                if i_n == 0 or not fit_incremental:
+                    slice_ = slice(0, n_train[i_n])
+                    warm_start = False  # resets learner for new iteration
+                else:
+                    slice_ = slice(n_train[i_n-1], n_train[i_n])
+                    warm_start = True
+
+                predictor.fit(d_train[slice_], warm_start=warm_start)
 
                 if len(params) == 0:
-                    # loss[i_mc, i_n] = predictor.evaluate(d_test)
                     loss[i_n] += predictor.evaluate(d_test)
                 else:
                     for i_v, param_vals in enumerate(list(product(*params.values()))):
                         predictor.set_params(**dict(zip(params.keys(), param_vals)))
-                        # loss[i_mc, i_n][np.unravel_index(i_v, loss.shape[2:])] = predictor.evaluate(d_test)
-                        loss[i_n][np.unravel_index(i_v, loss.shape[1:])] += predictor.evaluate(d_test)
+                        idx = (i_n, *np.unravel_index(i_v, loss.shape[1:]))
+                        loss[idx] += predictor.evaluate(d_test)
+                        # loss[i_n][np.unravel_index(i_v, loss.shape[1:])] += predictor.evaluate(d_test)
+
+        # d = model.rvs(n_test + n_train[-1])
+        # d_test, _d_train = d[:n_test], d[n_test:]
+        # d_train_iter = np.split(_d_train, n_train[:-1])
+        #
+        # for i_n, d_train in enumerate(d_train_iter):
+        #     warm_start = i_n > 0  # resets learner for new iteration
+        #     for predictor, params, loss in zip(predictors, params_full, loss_full):
+        #         predictor.fit(d_train, warm_start=warm_start)
+        #
+        #         if len(params) == 0:
+        #             # loss[i_mc, i_n] = predictor.evaluate(d_test)
+        #             loss[i_n] += predictor.evaluate(d_test)
+        #         else:
+        #             for i_v, param_vals in enumerate(list(product(*params.values()))):
+        #                 predictor.set_params(**dict(zip(params.keys(), param_vals)))
+        #                 # loss[i_mc, i_n][np.unravel_index(i_v, loss.shape[2:])] = predictor.evaluate(d_test)
+        #                 loss[i_n][np.unravel_index(i_v, loss.shape[1:])] += predictor.evaluate(d_test)
 
     # loss_full = [loss.mean() for loss in loss_full]
     loss_full = [loss / n_mc for loss in loss_full]
