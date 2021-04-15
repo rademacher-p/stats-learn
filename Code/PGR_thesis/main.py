@@ -131,7 +131,7 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), p
 
 # dir_params = None
 # dir_params = {'alpha_0': [10, 1000]}
-dir_params = {'alpha_0': [10]}
+dir_params = {'alpha_0': [1000]}
 # dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
@@ -158,15 +158,16 @@ norm_params = {'prior_cov': [.1, .001]}
 
 #%% External learners
 # skl_predictor = SKLWrapper(LinearRegression(), space=model.space, name='LR')
-skl_predictor = SKLWrapper(SGDRegressor(), space=model.space, name='SGD')
-# skl_predictor = SKLWrapper(MLPRegressor(hidden_layer_sizes=(100, 100, 100, 100)), space=model.space, name='MLP')
+# skl_predictor = SKLWrapper(SGDRegressor(), space=model.space, name='SGD')
+skl_predictor = SKLWrapper(MLPRegressor(hidden_layer_sizes=(100, 100, 100, 100)), space=model.space, name='MLP')
 
 
 #%% Results
 
-n_train = 400
-# n_train = [0, 4, 40, 400]
-# n_train = [0, 800, 4000]
+# n_train = 2000
+# n_train = [1, 4, 40, 400]
+n_train = [0, 200, 400, 600]
+# n_train = [0, 400, 4000]
 # n_train = [0, 100, 200, 400, 800]
 # n_train = np.arange(0, 510, 10)
 # n_train = np.arange(0, 4500, 500)
@@ -185,9 +186,7 @@ predictors, params = list(zip(*temp))
 
 # TODO: add logic based on which parameters can be changed while preserving learner state!!
 # TODO: add logic in MC funcs to handle predictors with no `warm_start` or `set_params` capability
-
-
-# TODO: MLP warm_start error? Or just can't do incremental well?!
+# TODO: SGD/MLP incremental training not identical to full training!!
 
 
 # plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True)

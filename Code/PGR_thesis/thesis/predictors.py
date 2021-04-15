@@ -130,10 +130,11 @@ def predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=N
 
     if isinstance(n_train, (Integral, np.integer)):
         n_train = [n_train]
+    n_train = np.sort(n_train)
 
     shape, size, ndim = model.shape, model.size, model.ndim
     x, set_shape = check_data_shape(x, shape['x'])
-    n_train_delta = np.diff(np.concatenate(([0], list(n_train))))
+    # n_train_delta = np.diff(np.concatenate(([0], n_train)))
 
     # Initialize arrays
     params_shape_full = []
@@ -158,7 +159,7 @@ def predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=N
         _samp.append(np.zeros(stat_shape))
         dtype.append((stat, np.float64, stat_shape))  # TODO: dtype float? need model dtype attribute?!
 
-    y_stats_full = [np.tile(np.array(tuple(_samp), dtype=dtype), reps=(len(n_train_delta), *param_shape))
+    y_stats_full = [np.tile(np.array(tuple(_samp), dtype=dtype), reps=(len(n_train), *param_shape))
                     for param_shape in params_shape_full]
 
     def _update_stats(array, y):
@@ -174,16 +175,20 @@ def predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=N
     # Generate random data and make predictions
     for i_mc in range(n_mc):
         if verbose:
-            print(f"Stats iteration: {i_mc + 1}/{n_mc}")
+            print(f"Stats iteration: {i_mc + 1}/{n_mc}", end='\r')
 
-        d = model.rvs(n_train_delta.sum())
-        d_iter = np.split(d, np.cumsum(n_train_delta)[:-1])
-
-        for i_n, d in enumerate(d_iter):
-            warm_start = i_n > 0  # resets learner for new iteration
-            for predictor, params, params_shape, y_stats in zip(predictors, params_full, params_shape_full,
-                                                                y_stats_full):
-                predictor.fit(d, warm_start=warm_start)
+        d = model.rvs(n_train[-1])
+        for predictor, params, params_shape, y_stats in zip(predictors, params_full, params_shape_full, y_stats_full):
+            fit_incremental = isinstance(predictor, Bayes)  # enable fitting with incremental data partitions
+            # fit_incremental = True
+            for i_n in range(len(n_train)):
+                if i_n == 0 or not fit_incremental:
+                    slice_ = slice(0, n_train[i_n])
+                    warm_start = False  # resets learner for new iteration
+                else:
+                    slice_ = slice(n_train[i_n-1], n_train[i_n])
+                    warm_start = True
+                predictor.fit(d[slice_], warm_start=warm_start)
 
                 if len(params) == 0:
                     y_mc = predictor.predict(x)
@@ -195,6 +200,26 @@ def predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=N
 
                         idx = (i_n, *np.unravel_index(i_v, params_shape))
                         _update_stats(y_stats[idx], y_mc)
+
+        # d = model.rvs(n_train[-1])
+        # d_iter = np.split(d, n_train[:-1])
+        # for i_n, d_n in enumerate(d_iter):
+        #     warm_start = i_n > 0  # resets learner for new iteration
+        #     for predictor, params, params_shape, y_stats in zip(predictors, params_full, params_shape_full,
+        #                                                         y_stats_full):
+        #
+        #         predictor.fit(d_n, warm_start=warm_start)
+        #
+        #         if len(params) == 0:
+        #             y_mc = predictor.predict(x)
+        #             _update_stats(y_stats[i_n], y_mc)
+        #         else:
+        #             for i_v, param_vals in enumerate(list(product(*params.values()))):
+        #                 predictor.set_params(**dict(zip(params.keys(), param_vals)))
+        #                 y_mc = predictor.predict(x)
+        #
+        #                 idx = (i_n, *np.unravel_index(i_v, params_shape))
+        #                 _update_stats(y_stats[idx], y_mc)
 
     if 'cov' in stats:
         for y_stats in y_stats_full:
@@ -891,6 +916,10 @@ class SKLWrapper(Base):
     @property
     def _model_obj(self):
         raise NotImplementedError
+
+    def set_params(self, **kwargs):
+        for key, val in kwargs.items():
+            setattr(self.estimator, key, val)
 
     def _fit(self, d, warm_start):
 
