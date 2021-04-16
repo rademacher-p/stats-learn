@@ -29,3 +29,16 @@
   - **Boost existing regressors?!?**
 - Cross-validation risk should be minimized when using the empirical distribution of the full data set
 - Take care to avoid validation bias when designing prior mean!
+
+
+---
+# Pop Comparison notes
+- *Advantages*
+  - Full support prior = consistency = best performance for big Data
+  - Flexible parameterization = able to exploit strong prior knowledge
+- *Disadvantages*
+  - Weak utilization of limited data = outperformed by certain low-dim learners
+
+**Equate degrees-of-freedom for fair comparison?**
+*Show pop overfitting?* No?
+**Need harder funcs for pop learners**
