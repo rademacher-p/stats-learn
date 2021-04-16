@@ -24,6 +24,22 @@
 
 
 ---
+# CONCEPTS
+- Bayesian benefit = different optimization cost function
+  - Dirichlet = regularized empirical risk!
+  - Parametric learners effect a kind of extreme regularization
+- More DOF is fine, if cost is right! Avoid overfitting!
+- Quality of regularizer is model dependent
+
+- **DIRICHLET**
+  - Least restrictive regularizer
+    - Avoid worst case scenarios (esp. for large N)
+  - alpha_0 is regularizing term weight
+    - Combines to enable strong preference for any solution (good for small N)
+  - **Show results across multiple problems to emphasize robustness benefit!**
+
+
+---
 # Pop Comparison notes
 **ADD more advanced estimators to my Example for legitimacy**
 **Large N comparison table to show where Dirichlet is best**
@@ -31,7 +47,7 @@
 - *Advantages*
   - Full support prior = consistency = best performance for N >> 0
   - Flexible parameterization = able to exploit strong prior knowledge
-    - Show pop can't do priors = **Bayes benefit**!!!?
+    - Show pop don't do priors = **Bayes benefit**!!!?
 - *Disadvantages*
   - Weak utilization of limited data = outperformed by certain low-dim learners
 
