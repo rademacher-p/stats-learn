@@ -31,8 +31,8 @@ np.set_printoptions(precision=3)
 plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepackage{bm}")
 
-seed = None
-# seed = 123456789012
+# seed = None
+seed = 1234567890123
 
 
 #%% Model
@@ -161,10 +161,10 @@ norm_params = {'prior_cov': [.1]}
 # norm_params = {'prior_cov': np.logspace(-7., 3., 60)}
 
 
-#%% External learners
+#%% Popular 3rd party learners
 # skl_estimator, _name = LinearRegression(), 'LR'
-skl_estimator, _name = SGDRegressor(max_iter=1000, tol=None), 'SGD'
-# skl_estimator, _name = MLPRegressor(hidden_layer_sizes=(100, 100, 100, 100), max_iter=400), 'MLP'
+# skl_estimator, _name = SGDRegressor(max_iter=1000, tol=None), 'SGD'
+skl_estimator, _name = MLPRegressor(hidden_layer_sizes=(100, 100, 100, 100), max_iter=400, tol=1e-4), 'MLP'
 
 # skl_estimator = Pipeline([('scaler', StandardScaler()), ('regressor', skl_estimator)])
 skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
@@ -177,15 +177,15 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
 # n_train = [0, 100, 200, 400, 800]
-# n_train = np.arange(0, 1200, 200)
-n_train = np.arange(0, 32, 1)
+n_train = np.arange(0, 1200, 200)
+# n_train = np.arange(0, 32, 1)
 # n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
 
 temp = [
     (opt_predictor, None),
-    # (dir_predictor, dir_params),
+    (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
     (norm_predictor, norm_params),
     (skl_predictor, None),
@@ -194,10 +194,8 @@ predictors, params = list(zip(*temp))
 
 
 # TODO: add logic based on which parameters can be changed while preserving learner state!!
-# TODO: SGD/MLP incremental training better than full training?!
 
-
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=300, verbose=True)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=50, verbose=True)
 # plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=50, x=None, do_std=True, verbose=True)
 
 # plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None)
