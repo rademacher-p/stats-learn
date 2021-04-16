@@ -115,7 +115,7 @@ proc_funcs = []
 
 # prior_mean_x = deepcopy(model_x)
 
-n_t = 128
+n_t = 16
 supp_x = box_grid(model_x.lims, n_t, endpoint=True)
 # _temp = np.ones(model_x.size*(n_t,))
 _temp = prob_disc(model_x.size*(n_t,))
@@ -134,9 +134,9 @@ if len(proc_funcs) > 0:
 
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs, name=_name)
 
-# dir_params = None
+dir_params = None
 # dir_params = {'alpha_0': [10, 1000]}
-dir_params = {'alpha_0': [10]}
+# dir_params = {'alpha_0': [10]}
 # dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
@@ -150,13 +150,13 @@ if do_bayes:  # add true bayes model concentration
 
 # Normal learner
 w_prior = [.5, 0]
-norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=100,
+norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=.1,
                                                           basis_y_x=None, cov_y_x=.1,
                                                           model_x=model_x), name=r'$\mathcal{N}$')
 
-# norm_params = None
+norm_params = None
 # norm_params = {'prior_cov': [.1, .001]}
-norm_params = {'prior_cov': [.1]}
+# norm_params = {'prior_cov': [.1]}
 # norm_params = {'prior_cov': [100, .001]}
 # norm_params = {'prior_cov': np.logspace(-7., 3., 60)}
 
@@ -197,9 +197,6 @@ predictors, params = list(zip(*temp))
 
 plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=50, verbose=True)
 # plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=50, x=None, do_std=True, verbose=True)
-
-# plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None)
-# plt.xscale('log', base=2)
 
 
 # Save image and Figure
@@ -244,6 +241,8 @@ print('Done')
 #     if scale_alpha and _params is not None:
 #         _params['alpha_0'] *= n_t
 
+# plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None)
+# plt.xscale('log', base=2)
 
 # # Scale alpha axis, find localization minimum
 # do_argmin = False
