@@ -12,7 +12,10 @@ from typing import Union
 
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn import base as SKLbase
+import sklearn as skl
+from sklearn.linear_model import LinearRegression, SGDRegressor
+from sklearn.neural_network import MLPRegressor
+from sklearn.pipeline import Pipeline
 from sklearn.exceptions import NotFittedError
 
 
@@ -178,8 +181,8 @@ def predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=N
 
         d = model.rvs(n_train[-1])
         for predictor, params, params_shape, y_stats in zip(predictors, params_full, params_shape_full, y_stats_full):
-            fit_incremental = isinstance(predictor, Bayes)  # enable fitting with incremental data partitions
-            # fit_incremental = True
+            fit_incremental = True
+            # fit_incremental = isinstance(predictor, Bayes)  # enable fitting with incremental data partitions
             for i_n in range(len(n_train)):
                 if i_n == 0 or not fit_incremental:
                     slice_ = slice(0, n_train[i_n])
@@ -361,11 +364,13 @@ def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n
         d_test, d_train = d[:n_test], d[n_test:]
 
         for predictor, params, loss in zip(predictors, params_full, loss_full):
-            fit_incremental = isinstance(predictor, Bayes)  # enable fitting with incremental data partitions
+            # fit_incremental = True
+            fit_incremental = False
+            # fit_incremental = isinstance(predictor, Bayes)  # enable fitting with incremental data partitions
             for i_n in range(len(n_train)):
                 if i_n == 0 or not fit_incremental:
                     slice_ = slice(0, n_train[i_n])
-                    warm_start = False  # resets learner for new iteration
+                    warm_start = False  # resets learner
                 else:
                     slice_ = slice(n_train[i_n-1], n_train[i_n])
                     warm_start = True
@@ -379,7 +384,6 @@ def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n
                         predictor.set_params(**dict(zip(params.keys(), param_vals)))
                         idx = (i_n, *np.unravel_index(i_v, loss.shape[1:]))
                         loss[idx] += predictor.evaluate(d_test)
-                        # loss[i_n][np.unravel_index(i_v, loss.shape[1:])] += predictor.evaluate(d_test)
 
         # d = model.rvs(n_test + n_train[-1])
         # d_test, _d_train = d[:n_test], d[n_test:]
@@ -925,7 +929,8 @@ class SKLWrapper(Base):
     # FIXME: inheritance feels broken
 
     def __init__(self, estimator, space, proc_funcs=(), name=None):
-        if isinstance(estimator, SKLbase.RegressorMixin):  # TODO: use _estimator_type attr?
+        # if isinstance(estimator, skl.base.RegressorMixin):  # TODO: use _estimator_type attr?
+        if estimator._estimator_type == 'regressor':
             loss_func = loss_se
         else:
             raise ValueError
@@ -947,15 +952,20 @@ class SKLWrapper(Base):
     def _fit(self, d, warm_start):
 
         if hasattr(self.estimator, 'warm_start'):  # TODO: check unneeded if not warm_start
-            self.estimator.warm_start = warm_start
+            self.estimator.set_params(warm_start=warm_start)
+        elif isinstance(self.estimator, Pipeline):
+            self.estimator.set_params(regressor__warm_start=warm_start)
         else:
             raise NotImplementedError
+
+        if not warm_start:
+            self.estimator = skl.base.clone(self.estimator)
+            # self.estimator = SGDRegressor()
+            # self.estimator = MLPRegressor()
 
         if len(d) > 0:
             x, y = d['x'].reshape(-1, 1), d['y']
             self.estimator.fit(x, y)
-        # else:
-        #     raise NotImplementedError  # TODO: unfitted workaround
 
     def _predict(self, x):
         try:

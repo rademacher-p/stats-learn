@@ -12,13 +12,14 @@ import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.linear_model import LinearRegression, SGDRegressor
 from sklearn.neural_network import MLPRegressor
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
 from thesis.bayes import models as bayes_models
 from thesis.predictors import (ModelRegressor, BayesRegressor, plot_risk_eval_sim_compare, plot_predict_stats_compare,
                                risk_eval_sim_compare, plot_risk_eval_comp_compare, plot_risk_disc, SKLWrapper)
 from thesis.random import elements as rand_elements, models as rand_models
 from thesis.preprocessing import discretizer, prob_disc
-from thesis.util.base import vectorize_func
 from thesis.util.plotting import box_grid
 
 
@@ -29,6 +30,9 @@ np.set_printoptions(precision=3)
 
 plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepackage{bm}")
+
+seed = None
+# seed = 123456789012
 
 
 #%% Model
@@ -80,7 +84,8 @@ def nonlinear_model(x):
 
 model_x = rand_elements.Uniform(np.broadcast_to([0, 1], (*shape_x, 2)))
 # model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
-model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x)
+model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x,
+                               rng=seed)
 
 # model = rand_models.NormalLinear(weights=w_model, basis_y_x=None, cov_y_x=.1, model_x=rand_elements.Normal())
 
@@ -131,7 +136,7 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), p
 
 # dir_params = None
 # dir_params = {'alpha_0': [10, 1000]}
-dir_params = {'alpha_0': [1000]}
+dir_params = {'alpha_0': [10]}
 # dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
@@ -150,16 +155,19 @@ norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, pr
                                                           model_x=model_x), name=r'$\mathcal{N}$')
 
 # norm_params = None
-norm_params = {'prior_cov': [.1, .001]}
-# norm_params = {'prior_cov': [.1]}
+# norm_params = {'prior_cov': [.1, .001]}
+norm_params = {'prior_cov': [.1]}
 # norm_params = {'prior_cov': [100, .001]}
 # norm_params = {'prior_cov': np.logspace(-7., 3., 60)}
 
 
 #%% External learners
-# skl_predictor = SKLWrapper(LinearRegression(), space=model.space, name='LR')
-# skl_predictor = SKLWrapper(SGDRegressor(), space=model.space, name='SGD')
-skl_predictor = SKLWrapper(MLPRegressor(hidden_layer_sizes=(100, 100, 100, 100)), space=model.space, name='MLP')
+# skl_estimator, _name = LinearRegression(), 'LR'
+skl_estimator, _name = SGDRegressor(max_iter=1000, tol=None), 'SGD'
+# skl_estimator, _name = MLPRegressor(hidden_layer_sizes=(100, 100, 100, 100), max_iter=400), 'MLP'
+
+# skl_estimator = Pipeline([('scaler', StandardScaler()), ('regressor', skl_estimator)])
+skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 
 #%% Results
@@ -169,27 +177,27 @@ skl_predictor = SKLWrapper(MLPRegressor(hidden_layer_sizes=(100, 100, 100, 100))
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
 # n_train = [0, 100, 200, 400, 800]
-# n_train = np.arange(0, 510, 10)
-n_train = np.arange(0, 4500, 500)
+# n_train = np.arange(0, 1200, 200)
+n_train = np.arange(0, 32, 1)
+# n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
 
 temp = [
     (opt_predictor, None),
-    (dir_predictor, dir_params),
+    # (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
     (norm_predictor, norm_params),
-    # (skl_predictor, None),
+    (skl_predictor, None),
 ]
 predictors, params = list(zip(*temp))
 
 
 # TODO: add logic based on which parameters can be changed while preserving learner state!!
-# TODO: add logic in MC funcs to handle predictors with no `warm_start` or `set_params` capability
-# TODO: SGD/MLP incremental training not identical to full training!!
+# TODO: SGD/MLP incremental training better than full training?!
 
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=500, verbose=True)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=300, verbose=True)
 # plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=50, x=None, do_std=True, verbose=True)
 
 # plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None)
