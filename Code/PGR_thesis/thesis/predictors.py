@@ -928,11 +928,10 @@ class SKLWrapper(Base):
     # FIXME: inheritance feels broken
 
     def __init__(self, estimator, space, proc_funcs=(), name=None):
-        # if isinstance(estimator, skl.base.RegressorMixin):  # TODO: use _estimator_type attr?
-        if estimator._estimator_type == 'regressor':
+        if skl.base.is_regressor(estimator):
             loss_func = loss_se
         else:
-            raise ValueError
+            raise ValueError("Estimator must be regressor-type.")
 
         super().__init__(loss_func, proc_funcs, name)
         self.estimator = estimator
