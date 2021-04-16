@@ -24,21 +24,30 @@
 
 
 ---
-# Real Data notes
-- How to select the prior mean?
-  - **Boost existing regressors?!?**
-- Cross-validation risk should be minimized when using the empirical distribution of the full data set
-- Take care to avoid validation bias when designing prior mean!
-
-
----
 # Pop Comparison notes
+**ADD more advanced estimators to my Example for legitimacy**
+**Large N comparison table to show where Dirichlet is best**
+
 - *Advantages*
-  - Full support prior = consistency = best performance for big Data
+  - Full support prior = consistency = best performance for N >> 0
   - Flexible parameterization = able to exploit strong prior knowledge
+    - Show pop can't do priors = **Bayes benefit**!!!?
 - *Disadvantages*
   - Weak utilization of limited data = outperformed by certain low-dim learners
 
 **Equate degrees-of-freedom for fair comparison?**
-*Show pop overfitting?* No?
-**Need harder funcs for pop learners**
+**Need harder funcs for pop learners - research!**
+
+[0,1]^2^N
+(T x [0,1])^N
+R^p
+
+
+---
+# Real Data notes
+Try **SKL** and **UCI** datasets!
+
+- How to select the prior mean?
+  - **Boost existing regressors?!?**
+- Cross-validation risk should be minimized when using the empirical distribution of the full data set
+- Take care to avoid validation bias when designing prior mean!

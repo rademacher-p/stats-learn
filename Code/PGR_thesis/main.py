@@ -166,13 +166,15 @@ norm_params = None
 # skl_estimator, _name = SGDRegressor(max_iter=1000, tol=None), 'SGD'
 skl_estimator, _name = MLPRegressor(hidden_layer_sizes=(100, 100, 100, 100), max_iter=400, tol=1e-4), 'MLP'
 
+# TODO: try Adaboost, RandomForest, GP, BayesianRidge, KNeighbors, SVR
+
 # skl_estimator = Pipeline([('scaler', StandardScaler()), ('regressor', skl_estimator)])
 skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 
 #%% Results
 
-# n_train = 2000
+# n_train = 400
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
