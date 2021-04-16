@@ -954,18 +954,20 @@ class SKLWrapper(Base):
         if hasattr(self.estimator, 'warm_start'):  # TODO: check unneeded if not warm_start
             self.estimator.set_params(warm_start=warm_start)
         elif isinstance(self.estimator, Pipeline):
-            self.estimator.set_params(regressor__warm_start=warm_start)
+            self.estimator.set_params(regressor__warm_start=warm_start)  # assumes pipeline step called "regressor"
         else:
             raise NotImplementedError
 
-        if not warm_start:
-            self.estimator = skl.base.clone(self.estimator)
-            # self.estimator = SGDRegressor()
-            # self.estimator = MLPRegressor()
+        # if not warm_start:
+        #     self.estimator = skl.base.clone(self.estimator)
+        #     # self.estimator = SGDRegressor()
+        #     # self.estimator = MLPRegressor()
 
         if len(d) > 0:
             x, y = d['x'].reshape(-1, 1), d['y']
             self.estimator.fit(x, y)
+        elif not warm_start:
+            self.estimator = skl.base.clone(self.estimator)  # manually reset learner if `fit` is not called
 
     def _predict(self, x):
         try:
