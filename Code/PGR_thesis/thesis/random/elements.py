@@ -612,10 +612,6 @@ class DirichletEmpiricalScalar(BaseRV):
 
     # Attribute Updates
     @property
-    def mean(self):
-        return self._multi.mean[0]
-
-    @property
     def cov(self):
         return self._multi.cov[0, 0]
 
