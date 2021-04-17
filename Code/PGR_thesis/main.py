@@ -196,8 +196,11 @@ predictors, params = list(zip(*temp))
 
 
 # TODO: add logic based on which parameters can be changed while preserving learner state!!
+# TODO: train/test loss results?
 
-# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=5000, verbose=True)
+# FIXME: increase n_test!?!?!
+
+# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=1, n_mc=5000, verbose=True)
 plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=500, x=None, do_std=True, verbose=True)
 
 
