@@ -32,11 +32,14 @@
 - Quality of regularizer is model dependent
 
 - **DIRICHLET**
-  - Least restrictive regularizer
+  - Least restrictive regularizer (least subjective prior info)
     - Avoid worst case scenarios (esp. for large N)
   - alpha_0 is regularizing term weight
     - Combines to enable strong preference for any solution (good for small N)
   - **Show results across multiple problems to emphasize robustness benefit!**
+    - Bayes risk??
+    - Use large N for consistency effect
+    - Best flexibility when problem is not understood
 
 
 ---

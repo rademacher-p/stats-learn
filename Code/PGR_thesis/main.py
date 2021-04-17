@@ -115,7 +115,7 @@ proc_funcs = []
 
 # prior_mean_x = deepcopy(model_x)
 
-n_t = 16
+n_t = 128
 supp_x = box_grid(model_x.lims, n_t, endpoint=True)
 # _temp = np.ones(model_x.size*(n_t,))
 _temp = prob_disc(model_x.size*(n_t,))
@@ -174,12 +174,12 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 #%% Results
 
-# n_train = 400
+n_train = 4000
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
 # n_train = [0, 100, 200, 400, 800]
-n_train = np.arange(0, 1100, 100)
+# n_train = np.arange(0, 1100, 100)
 # n_train = np.arange(0, 32, 1)
 # n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
@@ -189,7 +189,7 @@ temp = [
     (opt_predictor, None),
     (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
-    (norm_predictor, norm_params),
+    # (norm_predictor, norm_params),
     (skl_predictor, None),
 ]
 predictors, params = list(zip(*temp))
@@ -197,8 +197,8 @@ predictors, params = list(zip(*temp))
 
 # TODO: add logic based on which parameters can be changed while preserving learner state!!
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=250, verbose=True)
-# plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=50, x=None, do_std=True, verbose=True)
+# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_mc=5000, verbose=True)
+plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=500, x=None, do_std=True, verbose=True)
 
 
 # Save image and Figure

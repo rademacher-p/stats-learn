@@ -497,7 +497,7 @@ over the domain $\prod_{x \in \Xcals(\psim)} \left\{ \frac{n}{N \psim(x)}: n \in
 
 \todomid{Continuous? Comment on PMF notation}
 
-The task in supervised machine learning is to design a learning function $f: \Dcal \mapsto \Hcal^{\Xcal}$ which produces a mapping from the space of the observed random elements to a decision space $\Hcal$. Define the function space $\Fcal = \left\{ {\Hcal^{\Xcal}} \right\}^{\Dcal}$, such that $f \in \Fcal$. The learning functions are non-parametric and there are no restrictions on the set of achievable functions $\Fcal$.
+The task in supervised machine learning is to design a learning function $f: \Dcal \mapsto \Hcal^{\Xcal}$ which produces a mapping from the space of the observed random elements to a decision space $\Hcal$. Define the function space $\Fcal = \left\{ {\Hcal^{\Xcal}} \right\}^{\Dcal}$, such that $f \in \Fcal$. The decision functions $f(D)$ are non-parametric and there are no restrictions on the set of achievable functions $\Hcal^{\Xcal}$.
 
 The metric guiding the design is a loss function $\Lcal: \Hcal \times \Ycal \mapsto \Rbbgeq$ which penalizes the decision $h \in \Hcal$ based on the value of $\yrm$. The objective is to minimize the expected loss, or ``risk'',
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond}
@@ -517,14 +517,18 @@ It is instructive to formulate the optimal decision function assuming the model 
 \begin{equation}
 f_{\Theta}(\uptheta) = \argmin_{f \in \Fcal} \Rcal_{\Theta}(f ; \uptheta) \;.
 \end{equation}
-For a given set of observations $\xrm$ and $\Drm$, the function $f_{\Theta}(\uptheta) \in \Fcal$ selects the decision $h = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big]$. Note the conditional independence of $\yrm$ from $\Drm$ in \eqref{eq:risk_cond} -- the knowledge of $\uptheta$ renders the training data $\Drm$ valueless. As such, the range of the clairvoyant function is recast as $f_{\Theta} : \Theta \mapsto \Hcal^{\Xcal}$ and the decisions are
+%For a given set of observations $\xrm$ and $\Drm$, the function $f_{\Theta}(\uptheta)$ selects the decision $h = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big]$. Note the conditional independence of $\yrm$ from $\Drm$ in \eqref{eq:risk_cond} -- the knowledge of $\uptheta$ renders the training data $\Drm$ valueless. As such, the range of the clairvoyant function is recast as $f_{\Theta} : \Theta \mapsto \Hcal^{\Xcal}$ and the decisions are
+%\begin{equation} \label{eq:f_clv_x}
+%f_{\Theta}(\xrm;\uptheta) = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \;.
+%\end{equation}
+For a given training set $\Drm$, the function $f_{\Theta}(\uptheta)$ selects the decision function $g = \argmin_{g \in \Hcal^{\Xcal}} \Erm_{\yrm,\xrm | \uptheta} \Big[ \Lcal\big(g(\xrm),\yrm\big) \Big]$. Note the conditional independence of $(\yrm,\xrm)$ from $\Drm$ in \eqref{eq:risk_cond} -- the knowledge of $\uptheta$ renders the training data $\Drm$ valueless. As such, the range of the clairvoyant function is recast as $f_{\Theta} : \Theta \mapsto \Hcal^{\Xcal}$ and the decisions are
 \begin{equation} \label{eq:f_clv_x}
-f_{\Theta}(\xrm;\uptheta) = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \;.
+	f_{\Theta}(\xrm;\uptheta) = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \;.
 \end{equation}
 The corresponding ``irreducible" risk for a given model $\uptheta$ is
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_clv}
 \Rcal_{\Theta}^*(\uptheta) & \equiv & \Rcal_{\Theta}\big( f_{\Theta}(\uptheta) ; \uptheta \big) \\
-& = & \min_{f \in \Fcal} \Rcal_{\Theta}(f ; \uptheta) \nonumber \\
+& = & \min_{g \in \Hcal^{\Xcal}} \Erm_{\yrm,\xrm | \uptheta}\Big[ \Lcal\big(g(\xrm),\yrm\big) \Big] \nonumber \\
 & = & \Erm_{\xrm | \uptheta} \left[ \min_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \right] \nonumber \;.
 \end{IEEEeqnarray}
 Additionally, define the excess risk $\Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta) \equiv \Rcal_{\Theta}(f ; \uptheta) - \Rcal_{\Theta}^*(\uptheta)$; minimization of the learning objective \eqref{eq:risk_cond} is equivalent to minimization of this function.
@@ -548,13 +552,15 @@ Define the PDF $\prm_{\uptheta} \in \Pcal(\Uptheta)$. Now the Bayes risk can be 
 \end{IEEEeqnarray}
 and $\yrm$, $\xrm$, and $\Drm$ are treated as jointly distributed random elements. 
 
-\todolow{Add formula for f(D)?}
-
 Finally, express the optimal learning function
 \begin{equation} 
-f^* = \argmin_{f \in \Fcal} \Rcal(f) \;.
+f^* = \argmin_{f \in \Fcal} \Rcal(f) \;,
 \end{equation}
-The decision expressed by the learning function $f^*$ given observed values of $\xrm$ and $\Drm$ is
+such that
+\begin{equation} \label{eq:f_opt_D}
+f^*(\Drm) = \argmin_{g \in \Hcal^{\Xcal}} \Erm_{\yrm,\xrm | \Drm} \Big[ \Lcal\big(g(\xrm),\yrm\big) \Big] \;.
+\end{equation}
+The decision expressed by the non-parametric learning function $f^*(\Drm)$ for a given novel observation $\xrm$ is
 \begin{IEEEeqnarray}{rCl} \label{eq:f_opt_xD}
 f^*(\xrm;\Drm) & = & \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm}\big[ \Lcal(h,\yrm) \big]
 %& = & \argmin_{h \in \Hcal} \Erm_{\uptheta | \xrm,\Drm}\bigg[ \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \bigg] \nonumber \;.
@@ -563,7 +569,7 @@ and the minimum Bayes risk is
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_min}
 \Rcal^* & \equiv & \Rcal(f^*) \\
  & = & \min_{f \in \Fcal} \Rcal(f) \nonumber \\
-& = & \Erm_{\xrm,\Drm} \left[ \min_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm}\big[ \Lcal(h,\yrm) \big] \right] \nonumber \\
+& = & \Erm_{\Drm} \left[ \min_{g \in \Hcal^{\Xcal}} \Erm_{\yrm,\xrm | \Drm}\Big[ \Lcal\big(g(\xrm),\yrm\big) \Big] \right] \nonumber \\
 & = & \Erm_{\Drm} \Bigg[ \Erm_{\xrm | \Drm} \bigg[ \min_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm}\big[ \Lcal(h,\yrm) \big] \bigg] \Bigg] \nonumber \;.
 \end{IEEEeqnarray}
 
@@ -1268,7 +1274,7 @@ Figure \ref{fig:P_theta_D} shows the influence of the training data on the model
 
 
 Recall that the joint PMF of $\yrm$ and $\xrm$ conditioned on the training data is equivalent to the posterior mean $\mu_{\uptheta | \Drm}$, such that \cite{murphy}
-\begin{IEEEeqnarray}{rCl}
+\begin{IEEEeqnarray}{rCl} \label{eq:P_yx_D_dir}
 \Prm_{\yrm,\xrm | \Drm} & = & \gamma \alpha + (1-\gamma) \Psi(\Drm) \;.
 \end{IEEEeqnarray}
 This is a mixture distribution of the prior mean $\mu_{\uptheta} = \alpha$ and the empirical distribution $\Psi(\Drm)$. The more informative the model prior (i.e., larger $\alpha_0$), the more the prior mean is favored; the more data, the more the empirical model is favored. The marginal distribution for $\xrm$ given $\Drm$ is
@@ -1606,15 +1612,25 @@ Observe that for $N = 5$, the $\alpha_0 = 0.1$ estimate (favoring the empirical 
 
 In this section, the Dirichlet prior is applied to the regression and classification applications. Optimal learners $f^*$ are found,  the corresponding minimum Bayes risk $\Rcal^*$ is assessed, and the risk $\Rcal_{\Theta}(f^*;\theta)$ is analyzed.
 
-PGR: add formula for $f(D)$??? EMPIRICAL RISK DISCUSS, REGULARIZING weight
+It is informative to substitute the Bayes distribution using the Dirichlet prior \eqref{eq:P_yx_D_dir} into \eqref{eq:f_opt_D}, expressing the decision function for a given training set $\Drm$ as
+\begin{IEEEeqnarray}{rCl} \label{eq:E_yx|D L}
+f^*(\Drm) & = & \argmin_{g \in \Hcal^{\Xcal}} \Erm_{\yrm,\xrm | \Drm} \Big[ \Lcal\big(g(\xrm),\yrm\big) \Big] \\
+& = & \argmin_{g \in \Hcal^{\Xcal}} \gamma \sum_{y,x} \alpha(y,x) \Lcal\big(g(x),y\big) + (1-\gamma) \sum_{y,x} \Psi(y,x;\Drm) \Lcal\big(g(x),y\big) \nonumber \\
+& = & \argmin_{g \in \Hcal^{\Xcal}} \gamma \Erm_{\yrm,\xrm}\Big[ \Lcal\big(g(\xrm), \yrm\big) \Big] + (1-\gamma) \frac{1}{N} \sum_{n=1}^N \Lcal\big(g(\Xrm_n), \Yrm_n \big) \nonumber \\
+& = & \argmin_{g \in \Hcal^{\Xcal}} \alpha_0 \Erm_{\yrm,\xrm}\Big[ \Lcal\big(g(\xrm), \yrm\big) \Big] + \sum_{n=1}^N \Lcal\big(g(\Xrm_n), \Yrm_n \big) \nonumber \;.
+\end{IEEEeqnarray}
+Observe that the objective function can be represented as a convex combination of two expected losses, one with respect to the Dirichlet prior mean $\alpha$, and one with respect to the empirical distribution $\Psi(D)$. As $N$ increases, $\gamma$ decreases and more emphasis is placed on the empirical loss. The final representation casts the learning optimization task as regularized empirical risk minimization. Note that the regularizing term is scaled using the Dirichlet localization $\alpha_0$ -- the stronger the prior knowledge, the more extreme the regularization. Importantly, the selection of the probability distribution $\alpha$ allows the designer to effect very different types of regularization from those typically used in the literature, such as the $\ell^2$ norm for parametric learners.
 
-It is useful to substitute the Bayes predictive distribution using the Dirichlet prior \eqref{eq:P_y_xD_dir} into Equation \eqref{eq:f_opt_xD}, expressing the decision for a given input $\xrm$ and training set $\Drm$ as
+\todohi{Regularized loss REFERENCE? See TheoML p.72}
+
+
+It is useful to substitute the Bayes predictive distribution using the Dirichlet prior \eqref{eq:P_y_xD_dir} into \eqref{eq:f_opt_xD}, expressing the decision for a given input $\xrm$ and training set $\Drm$ as
 \begin{IEEEeqnarray}{L} \label{eq:E_y|xD L}
 f^*(\xrm;\Drm) = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm} \big[ \Lcal(h,\yrm) \big] \\
 = \argmin_{h \in \Hcal} \frac{\alpha_0 \sum_{y \in \Ycal} \alpha(y,\xrm) \Lcal(h,y) + N \sum_{y \in \Ycal} \Psi(y,\xrm;\Drm) \Lcal(h,y)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)} \nonumber \\
 = \argmin_{h \in \Hcal} \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)}\right) \sum_{y \in \Ycal} \alphac(y;\xrm) \Lcal(h,y) + \left(\frac{N \Psim(\xrm;\Xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)}\right) \sum_{y \in \Ycal} \Psic(y;\xrm;\Drm) \Lcal(h,y) \nonumber \\
-= \argmin_{h \in \Hcal} \gammam(\xrm; \uppsim) \sum_{y \in \Ycal} \alphac(y;\xrm) \Lcal(h,y) + \big(1-\gammam(\xrm; \uppsim)\big) \sum_{y \in \Ycal} \Psic(y;\xrm;\Drm) \Lcal(h,y) \nonumber \\
-= \argmin_{h \in \Hcal} \gammam(\xrm; \uppsim) \Erm_{\yrm | \xrm}\big[ \Lcal(h,\yrm) \big] + \big(1-\gammam(\xrm; \uppsim)\big) \frac{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Lcal\big( h,\Yrm_n \big)}{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big]} \nonumber \;.
+= \argmin_{h \in \Hcal} \gammam(\xrm; \Xrm) \sum_{y \in \Ycal} \alphac(y;\xrm) \Lcal(h,y) + \big(1-\gammam(\xrm; \Xrm)\big) \sum_{y \in \Ycal} \Psic(y;\xrm;\Drm) \Lcal(h,y) \nonumber \\
+= \argmin_{h \in \Hcal} \gammam(\xrm; \Xrm) \Erm_{\yrm | \xrm}\big[ \Lcal(h,\yrm) \big] + \big(1-\gammam(\xrm; \Xrm)\big) \frac{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Lcal\big( h,\Yrm_n \big)}{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big]} \nonumber \;.
 \end{IEEEeqnarray}
 
 The metric to be minimized can be represented as a convex combination of two expected losses. The first expected loss is evaluated with respect to the conditional distribution $\Prm_{\yrm | \xrm} = \alphac(\xrm)$, which reflects the prior knowledge of the model parameter. The second term is the conditional empirical risk, or the average loss among samples $\Yrm_n$ whose corresponding values $\Xrm_n$ match the observed value $\xrm$. The convex weights are inherited from the conditional distribution $\Prm_{\yrm | \xrm,\Drm}$; thus, for a given observation $\xrm$, the model prior concentration $\alpha_0 \alpham(\xrm)$ and the number of matching training samples $N \Psim(\xrm;\Xrm)$ dictate which of the two expectations are emphasized.
