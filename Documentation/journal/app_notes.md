@@ -1,4 +1,3 @@
----
 # CONCEPTS
 - Bayesian benefit = different optimization cost function
   - Dirichlet = regularized empirical risk!
@@ -15,6 +14,8 @@
     - Bayes risk??
     - Use large N for consistency effect
     - Best flexibility when problem is not understood
+
+**Combine Dirichlet with Discretization transforms for more subjective prior knowledge?**
 
 
 ---
@@ -35,6 +36,7 @@
 
 [0,1]^2^N
 (T x [0,1])^N
+R^T
 R^p
 
 
