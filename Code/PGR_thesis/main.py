@@ -31,8 +31,8 @@ np.set_printoptions(precision=3)
 plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepackage{bm}")
 
-# seed = None
-seed = 1234567890123
+seed = None
+# seed = 1234567890123
 
 
 #%% Model
@@ -51,7 +51,7 @@ def func_mean_to_models(n, alpha_0, func):
 n_x = 128
 
 # var_y_x_const = 1 / (n_x-1)
-var_y_x_const = 1/5
+var_y_x_const = 1/50
 
 alpha_y_x_d = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_x-1))
 alpha_y_x_beta = 1/var_y_x_const - 1
@@ -67,7 +67,7 @@ shape_x = ()
 # shape_x = (2,)
 
 # w_model = [.5]
-w_model = [0, 0, 1]
+w_model = [0, 1]
 
 
 def nonlinear_model(x):
@@ -84,10 +84,9 @@ def nonlinear_model(x):
 
 model_x = rand_elements.Uniform(np.broadcast_to([0, 1], (*shape_x, 2)))
 # model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
-model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x,
-                               rng=seed)
+model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x)
 
-# model = rand_models.NormalLinear(weights=w_model, basis_y_x=None, cov_y_x=.1, model_x=rand_elements.Normal())
+# model = rand_models.NormalLinear(weights=w_model, basis_y_x=None, cov_y_x=.1, model_x=model_x)
 
 
 do_bayes = False
@@ -98,6 +97,8 @@ if do_bayes:
 else:
     model_eval = model
     opt_predictor = ModelRegressor(model_eval, name=r'$f_{\Theta}(\theta)$')
+
+model_eval.rng = seed
 
 
 #%% Bayesian learners
@@ -115,7 +116,7 @@ proc_funcs = []
 
 # prior_mean_x = deepcopy(model_x)
 
-n_t = 128
+n_t = 32
 supp_x = box_grid(model_x.lims, n_t, endpoint=True)
 # _temp = np.ones(model_x.size*(n_t,))
 _temp = prob_disc(model_x.size*(n_t,))
@@ -156,7 +157,7 @@ norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, pr
 
 norm_params = None
 # norm_params = {'prior_cov': [.1, .001]}
-# norm_params = {'prior_cov': [.1]}
+# norm_params = {'prior_cov': [100]}
 # norm_params = {'prior_cov': [100, .001]}
 # norm_params = {'prior_cov': np.logspace(-7., 3., 60)}
 
@@ -174,13 +175,13 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 #%% Results
 
-n_train = 4000
+# n_train = 100
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
 # n_train = [0, 100, 200, 400, 800]
-# n_train = np.arange(0, 1100, 100)
-# n_train = np.arange(0, 32, 1)
+n_train = np.arange(0, 520, 20)
+# n_train = np.arange(0, 110, 10)
 # n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
@@ -189,7 +190,7 @@ temp = [
     (opt_predictor, None),
     (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
-    # (norm_predictor, norm_params),
+    (norm_predictor, norm_params),
     (skl_predictor, None),
 ]
 predictors, params = list(zip(*temp))
@@ -198,10 +199,10 @@ predictors, params = list(zip(*temp))
 # TODO: add logic based on which parameters can be changed while preserving learner state!!
 # TODO: train/test loss results?
 
-# FIXME: increase n_test!?!?!
+# TODO: model variance effects?
 
-# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=1, n_mc=5000, verbose=True)
-plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=500, x=None, do_std=True, verbose=True)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=50, verbose=True)
+# plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=100, x=None, do_std=True, verbose=True)
 
 
 # Save image and Figure
