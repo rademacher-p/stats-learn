@@ -24,7 +24,7 @@
 **Large N comparison table to show where Dirichlet is best?**
 **Need harder funcs for pop learners - research!**
 **Equate degrees-of-freedom for fair comparison?**
-*Investigate where MLP fails due to overfitting (low N?)*
+*Investigate where MLP fails due to overfitting (low N?) MODEL VARIANCE?*
 
 - *Advantages*
   - Full support prior = consistency = best performance for N >> 0
