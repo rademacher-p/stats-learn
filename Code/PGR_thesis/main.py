@@ -32,7 +32,7 @@ plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepackage{bm}")
 
 seed = None
-# seed = 1234567890123
+# seed = 12345
 
 
 #%% Model
@@ -51,7 +51,7 @@ def func_mean_to_models(n, alpha_0, func):
 n_x = 128
 
 # var_y_x_const = 1 / (n_x-1)
-var_y_x_const = 1/50
+var_y_x_const = 1/5
 
 alpha_y_x_d = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_x-1))
 alpha_y_x_beta = 1/var_y_x_const - 1
@@ -83,8 +83,8 @@ def nonlinear_model(x):
 # model = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model), model_x)
 
 model_x = rand_elements.Uniform(np.broadcast_to([0, 1], (*shape_x, 2)))
-# model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
-model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x)
+model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
+# model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x)
 
 # model = rand_models.NormalLinear(weights=w_model, basis_y_x=None, cov_y_x=.1, model_x=model_x)
 
@@ -155,9 +155,9 @@ norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, pr
                                                           basis_y_x=None, cov_y_x=.1,
                                                           model_x=model_x), name=r'$\mathcal{N}$')
 
-norm_params = None
+# norm_params = None
 # norm_params = {'prior_cov': [.1, .001]}
-# norm_params = {'prior_cov': [100]}
+norm_params = {'prior_cov': [1000]}
 # norm_params = {'prior_cov': [100, .001]}
 # norm_params = {'prior_cov': np.logspace(-7., 3., 60)}
 
@@ -175,25 +175,25 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 #%% Results
 
-# n_train = 100
+n_train = 10
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
 # n_train = [0, 100, 200, 400, 800]
-n_train = np.arange(0, 520, 20)
-# n_train = np.arange(0, 110, 10)
+# n_train = np.arange(0, 320, 20)
+# n_train = np.arange(0, 55, 5)
 # n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
 
 temp = [
     (opt_predictor, None),
-    (dir_predictor, dir_params),
+    # (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
     (norm_predictor, norm_params),
     (skl_predictor, None),
 ]
-predictors, params = list(zip(*temp))
+predictors, params = zip(*temp)
 
 
 # TODO: add logic based on which parameters can be changed while preserving learner state!!
@@ -201,8 +201,8 @@ predictors, params = list(zip(*temp))
 
 # TODO: model variance effects?
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=50, verbose=True)
-# plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=100, x=None, do_std=True, verbose=True)
+# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=50, verbose=True)
+plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=100, x=None, do_std=True, verbose=True)
 
 
 # Save image and Figure
