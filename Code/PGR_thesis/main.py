@@ -70,10 +70,17 @@ shape_x = ()
 w_model = [0, 1]
 
 
+# def nonlinear_model(x):
+#     # return 1 / (2 + np.sin(2*np.pi * x))
+#     axis = tuple(range(-len(shape_x), 0))
+#     return 1 / (2 + np.sin(2 * np.pi * x.mean(axis)))
+
+
 def nonlinear_model(x):
-    # return 1 / (2 + np.sin(2*np.pi * x))
     axis = tuple(range(-len(shape_x), 0))
-    return 1 / (2 + np.sin(2 * np.pi * x.mean(axis)))
+    delta = 2e-1
+    return np.array(x.mean(axis) > .5, dtype=float) * (1-delta) + delta/2
+
 
 
 # supp_x = box_grid(np.broadcast_to([0, 1], (*shape_x, 2)), n_x, endpoint=True)
@@ -136,14 +143,14 @@ if len(proc_funcs) > 0:
 
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs, name=_name)
 
-dir_params = {}
+# dir_params = {}
 # dir_params = {'alpha_0': [10, 1000]}
-# dir_params = {'alpha_0': [10]}
+dir_params = {'alpha_0': [.001]}
 # dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
 # dir_params = {'alpha_0': np.logspace(-0., 5., 60)}
-# dir_params = {'alpha_0': np.logspace(-3., 3., 100)}
+# dir_params = {'alpha_0': np.logspace(-3., 3., 60)}
 
 if do_bayes:  # add true bayes model concentration
     if model_eval.alpha_0 not in dir_params['alpha_0']:
@@ -177,7 +184,7 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 #%% Results
 
-n_train = 10
+n_train = 40
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
