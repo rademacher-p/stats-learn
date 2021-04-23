@@ -11,8 +11,8 @@
     - Mean selection enables preference for any solution (good for low N)
   - Show results across multiple problems (Bayes?) to emphasize robustness?!
 
-Low N: avoid overfitting
-High N: consistency
+Low N: avoid overfitting (*Show L2 reg inferior?*)
+High N: consistency (*harder funcs?*)
 
 
 ---

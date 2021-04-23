@@ -176,13 +176,13 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 #%% Results
 
-# n_train = 10
+n_train = 10
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
-# n_train = [0, 100, 200, 400, 800]
+# n_train = [100, 200]
 # n_train = np.arange(0, 320, 20)
-n_train = np.arange(0, 55, 5)
+# n_train = np.arange(0, 55, 5)
 # n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
@@ -200,10 +200,8 @@ predictors, params = zip(*temp)
 # TODO: add logic based on which parameters can be changed while preserving learner state!!
 # TODO: train/test loss results?
 
-# TODO: model variance effects?
-
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=50, verbose=True)
-# plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=100, x=None, do_std=True, verbose=True)
+# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=50, verbose=True)
+plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=100, x=None, do_std=True, verbose=True)
 
 # d = model.rvs(10)
 # ax = model.space['x'].make_axes()
