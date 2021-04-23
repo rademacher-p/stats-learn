@@ -7,21 +7,16 @@
 
 - **DIRICHLET**
   - Least restrictive regularizer (least subjective prior info)
-    - Avoid worst case scenarios (esp. for large N)
-  - alpha_0 is regularizing term weight
-    - Combines to enable strong preference for any solution (good for small N)
-  - **Show results across multiple problems to emphasize robustness benefit!**
-    - Bayes risk??
-    - Use large N for consistency effect
-    - Best flexibility when problem is not understood
+    - Avoid worst case scenarios (via consistency)
+    - Mean selection enables preference for any solution (good for low N)
+  - Show results across multiple problems (Bayes?) to emphasize robustness?!
 
-**Combine Dirichlet with Discretization transforms for more subjective prior knowledge?**
+Low N: avoid overfitting
+High N: consistency
 
 
 ---
 # Pop Comparison notes
-**ADD more advanced estimators to my Example for legitimacy**
-**Large N comparison table to show where Dirichlet is best?**
 **Need harder funcs for pop learners - research!**
 **Equate degrees-of-freedom for fair comparison?**
 *Investigate where MLP fails due to overfitting (low N?) MODEL VARIANCE?*
@@ -33,11 +28,6 @@
 - *Disadvantages*
   - Weak utilization of limited data = outperformed by certain low-dim learners
 
-
-[0,1]^2^N
-(T x [0,1])^N
-R^T
-R^p
 
 
 ---
