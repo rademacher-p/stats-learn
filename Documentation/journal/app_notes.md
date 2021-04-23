@@ -3,7 +3,6 @@
   - Dirichlet = regularized empirical risk!
   - Parametric learners effect a kind of extreme regularization
 - More DOF is fine, if cost is right! Avoid overfitting!
-- Quality of regularizer is model dependent
 
 - **DIRICHLET**
   - Least restrictive regularizer (least subjective prior info)
@@ -14,12 +13,26 @@
 Low N: avoid overfitting (*Show L2 reg inferior?*)
 High N: consistency (*harder funcs?*)
 
+**MLP universal approx thoerem for CONTINUOUS functions. Discretized Dirichlet seems good for discontinuities! Fractals? RESEARCH!!**
+
+---
+# Results
+**Do discrete domain results to isolate Dirichlet properties?**
+
+- MODEL
+  - Original non-linearity
+- Dirichlet(T=16, alpha=10)
+  - Original mean; try others if needed!
+- MLP(layers=[100, 100, 100, 100], alpha=1e-4, iter=2000, tol=1e-8)
+  - *Note regularization*!
+  - Investigate # layers/weights
+- Best for low N due to MLP overfitting variance
+
 
 ---
 # Pop Comparison notes
 **Need harder funcs for pop learners - research!**
 **Equate degrees-of-freedom for fair comparison?**
-*Investigate where MLP fails due to overfitting (low N?) MODEL VARIANCE?*
 
 - *Advantages*
   - Full support prior = consistency = best performance for N >> 0
