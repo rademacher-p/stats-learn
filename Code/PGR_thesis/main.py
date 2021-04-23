@@ -165,7 +165,9 @@ norm_params = {'prior_cov': [1000]}
 #%% Popular 3rd party learners
 # skl_estimator, _name = LinearRegression(), 'LR'
 # skl_estimator, _name = SGDRegressor(max_iter=1000, tol=None), 'SGD'
-skl_estimator, _name = MLPRegressor(hidden_layer_sizes=(100, 100, 100, 100), max_iter=400, tol=1e-4), 'MLP'
+# skl_estimator, _name = MLPRegressor(hidden_layer_sizes=(100, 100, 100, 100), max_iter=4000, tol=1e-4), 'MLP'
+skl_estimator, _name = MLPRegressor(hidden_layer_sizes=(1000, 1000, 100, 100), max_iter=4000, tol=1e-4), 'MLP'
+
 
 # TODO: try Adaboost, RandomForest, GP, BayesianRidge, KNeighbors, SVR
 
