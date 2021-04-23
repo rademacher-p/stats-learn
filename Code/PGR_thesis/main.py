@@ -135,7 +135,7 @@ if len(proc_funcs) > 0:
 
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs, name=_name)
 
-dir_params = None
+dir_params = {}
 # dir_params = {'alpha_0': [10, 1000]}
 # dir_params = {'alpha_0': [10]}
 # dir_params = {'alpha_0': [.01, 100]}
@@ -154,7 +154,7 @@ norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, pr
                                                           basis_y_x=None, cov_y_x=.1,
                                                           model_x=model_x), name=r'$\mathcal{N}$')
 
-# norm_params = None
+# norm_params = {}
 # norm_params = {'prior_cov': [.1, .001]}
 norm_params = {'prior_cov': [1000000]}
 # norm_params = {'prior_cov': [100, .001]}
@@ -164,8 +164,8 @@ norm_params = {'prior_cov': [1000000]}
 #%% Popular 3rd party learners
 # skl_estimator, _name = LinearRegression(), 'LR'
 # skl_estimator, _name = SGDRegressor(max_iter=1000, tol=None), 'SGD'
-skl_estimator, _name = MLPRegressor(hidden_layer_sizes=[100 for _ in range(4)], solver='adam', max_iter=2000, tol=1e-8,
-                                    alpha=0, verbose=False), 'MLP'
+skl_estimator, _name = MLPRegressor(hidden_layer_sizes=[100 for _ in range(4)], solver='adam', alpha=1e-4,
+                                    max_iter=2000, tol=1e-8, verbose=False), 'MLP'
 
 
 # TODO: try Adaboost, RandomForest, GP, BayesianRidge, KNeighbors, SVR
@@ -176,13 +176,13 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 #%% Results
 
-n_train = 10
+# n_train = 10
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
 # n_train = [100, 200]
 # n_train = np.arange(0, 320, 20)
-# n_train = np.arange(0, 55, 5)
+n_train = np.arange(0, 55, 5)
 # n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
@@ -200,8 +200,8 @@ predictors, params = zip(*temp)
 # TODO: add logic based on which parameters can be changed while preserving learner state!!
 # TODO: train/test loss results?
 
-# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=50, verbose=True)
-plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=100, x=None, do_std=True, verbose=True)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=50, verbose=True)
+# plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=100, x=None, do_std=True, verbose=True)
 
 # d = model.rvs(10)
 # ax = model.space['x'].make_axes()
