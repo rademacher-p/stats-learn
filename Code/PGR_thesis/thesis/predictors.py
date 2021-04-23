@@ -713,6 +713,14 @@ class Base(ABC):
         """Plot prediction function."""
         return self.space['x'].plot(self.predict, x, ax=ax, label=label)
 
+    def plot_fit(self, d=None, warm_start=False, ax=None):
+        self.fit(d, warm_start)
+
+        if ax is None:
+            ax = self.space['x'].make_axes()
+        self.plot_predict(ax=ax)
+        ax.scatter(d['x'], d['y'])
+
     # Prediction statistics
     def predict_stats(self, model=None, params=None, n_train=0, n_mc=1, x=None, stats=('mode',), verbose=False):
         if model is None:
