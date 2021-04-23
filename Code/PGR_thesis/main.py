@@ -104,7 +104,7 @@ model_eval.rng = seed
 #%% Bayesian learners
 
 w_prior = [.5, 0]
-# w_prior = [.5, 0, 0]
+# w_prior = [.5, 0, 0, 0, 0, 0, 0]
 
 
 # Dirichlet learner
@@ -150,14 +150,13 @@ if do_bayes:  # add true bayes model concentration
 
 
 # Normal learner
-w_prior = [.5, 0]
 norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=.1,
                                                           basis_y_x=None, cov_y_x=.1,
                                                           model_x=model_x), name=r'$\mathcal{N}$')
 
 # norm_params = None
 # norm_params = {'prior_cov': [.1, .001]}
-norm_params = {'prior_cov': [1000]}
+norm_params = {'prior_cov': [1000000]}
 # norm_params = {'prior_cov': [100, .001]}
 # norm_params = {'prior_cov': np.logspace(-7., 3., 60)}
 
@@ -165,8 +164,8 @@ norm_params = {'prior_cov': [1000]}
 #%% Popular 3rd party learners
 # skl_estimator, _name = LinearRegression(), 'LR'
 # skl_estimator, _name = SGDRegressor(max_iter=1000, tol=None), 'SGD'
-# skl_estimator, _name = MLPRegressor(hidden_layer_sizes=(100, 100, 100, 100), max_iter=4000, tol=1e-4), 'MLP'
-skl_estimator, _name = MLPRegressor(hidden_layer_sizes=(1000, 1000, 100, 100), max_iter=4000, tol=1e-4), 'MLP'
+skl_estimator, _name = MLPRegressor(hidden_layer_sizes=[100 for _ in range(4)], solver='adam', max_iter=2000, tol=1e-8,
+                                    alpha=0, verbose=False), 'MLP'
 
 
 # TODO: try Adaboost, RandomForest, GP, BayesianRidge, KNeighbors, SVR
@@ -177,13 +176,13 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 #%% Results
 
-n_train = 10
+# n_train = 10
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
 # n_train = [0, 100, 200, 400, 800]
 # n_train = np.arange(0, 320, 20)
-# n_train = np.arange(0, 55, 5)
+n_train = np.arange(0, 55, 5)
 # n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
@@ -203,8 +202,14 @@ predictors, params = zip(*temp)
 
 # TODO: model variance effects?
 
-# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=50, verbose=True)
-plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=100, x=None, do_std=True, verbose=True)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=50, verbose=True)
+# plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=100, x=None, do_std=True, verbose=True)
+
+# d = model.rvs(10)
+# ax = model.space['x'].make_axes()
+# norm_predictor.plot_fit(d, ax=ax)
+# skl_predictor.plot_fit(d, ax=ax)
+# ax.set_ylim((0, 1))
 
 
 # Save image and Figure
