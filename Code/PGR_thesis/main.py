@@ -103,7 +103,8 @@ model_eval.rng = seed
 
 #%% Bayesian learners
 
-w_prior = [.5, 0]
+# w_prior = [.5, 0]
+w_prior = [0, 1]
 # w_prior = [.5, 0, 0, 0, 0, 0, 0]
 
 
@@ -116,7 +117,7 @@ proc_funcs = []
 
 # prior_mean_x = deepcopy(model_x)
 
-n_t = 32
+n_t = 16
 supp_x = box_grid(model_x.lims, n_t, endpoint=True)
 # _temp = np.ones(model_x.size*(n_t,))
 _temp = prob_disc(model_x.size*(n_t,))
@@ -161,7 +162,7 @@ norm_params = {}
 # norm_params = {'prior_cov': np.logspace(-7., 3., 60)}
 
 
-#%% Popular 3rd party learners
+#%% Scikit-Learn
 # skl_estimator, _name = LinearRegression(), 'LR'
 # skl_estimator, _name = SGDRegressor(max_iter=1000, tol=None), 'SGD'
 skl_estimator, _name = MLPRegressor(hidden_layer_sizes=[100 for _ in range(4)], solver='adam', alpha=1e-4,
@@ -176,13 +177,13 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 #%% Results
 
-n_train = 40
+# n_train = 40
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
 # n_train = [100, 200]
 # n_train = np.arange(0, 320, 20)
-# n_train = np.arange(0, 55, 5)
+n_train = np.arange(0, 55, 5)
 # n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
@@ -200,8 +201,8 @@ predictors, params = zip(*temp)
 # TODO: add logic based on which parameters can be changed while preserving learner state!!
 # TODO: train/test loss results?
 
-# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=50, verbose=True)
-plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=100, x=None, do_std=True, verbose=True)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=50, verbose=True)
+# plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=100, x=None, do_std=True, verbose=True)
 
 # d = model.rvs(10)
 # ax = model.space['x'].make_axes()
