@@ -176,7 +176,7 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 #%% Results
 
-n_train = 10
+n_train = 40
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
@@ -189,9 +189,9 @@ n_train = 10
 
 temp = [
     (opt_predictor, None),
-    # (dir_predictor, dir_params),
+    (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
-    (norm_predictor, norm_params),
+    # (norm_predictor, norm_params),
     (skl_predictor, None),
 ]
 predictors, params = zip(*temp)
