@@ -82,7 +82,6 @@ def nonlinear_model(x):
     return np.array(x.mean(axis) > .5, dtype=float) * (1-delta) + delta/2
 
 
-
 # supp_x = box_grid(np.broadcast_to([0, 1], (*shape_x, 2)), n_x, endpoint=True)
 # _temp = np.ones(prod(shape_x)*(n_x,))
 # model_x = rand_elements.Finite(supp_x, p=_temp/_temp.sum())
