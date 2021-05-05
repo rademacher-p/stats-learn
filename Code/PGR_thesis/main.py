@@ -48,7 +48,7 @@ def func_mean_to_models(n, alpha_0, func):
         return [rand_elements.DirichletEmpiricalScalar(func(_x), alpha_0, n-1) for _x in x_supp]
 
 
-n_x = 128
+n_x = 7
 
 # var_y_x_const = 1 / (n_x-1)
 var_y_x_const = 1/5
@@ -76,21 +76,26 @@ w_model = [0, 1]
 #     return 1 / (2 + np.sin(2 * np.pi * x.mean(axis)))
 
 
+_rand_func = dict(zip(np.linspace(0, 1, n_x, endpoint=True), np.random.default_rng(seed).random(n_x)))
 def nonlinear_model(x):
-    axis = tuple(range(-len(shape_x), 0))
-    delta = 2e-1
-    return np.array(x.mean(axis) > .5, dtype=float) * (1-delta) + delta/2
+    return _rand_func[x]
 
 
-# supp_x = box_grid(np.broadcast_to([0, 1], (*shape_x, 2)), n_x, endpoint=True)
-# _temp = np.ones(prod(shape_x)*(n_x,))
-# model_x = rand_elements.Finite(supp_x, p=_temp/_temp.sum())
-# # model = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_model), model_x)
-# model = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model), model_x)
+# def nonlinear_model(x):
+#     axis = tuple(range(-len(shape_x), 0))
+#     delta = 2e-1
+#     return np.array(x.mean(axis) > .5, dtype=float) * (1-delta) + delta/2
 
-model_x = rand_elements.Uniform(np.broadcast_to([0, 1], (*shape_x, 2)))
-# model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
-model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x)
+
+supp_x = box_grid(np.broadcast_to([0, 1], (*shape_x, 2)), n_x, endpoint=True)
+_temp = np.ones(prod(shape_x)*(n_x,))
+model_x = rand_elements.Finite(supp_x, p=_temp/_temp.sum())
+# model = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_model), model_x)
+model = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model), model_x)
+
+# model_x = rand_elements.Uniform(np.broadcast_to([0, 1], (*shape_x, 2)))
+# # model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
+# model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x)
 
 # model = rand_models.NormalLinear(weights=w_model, basis_y_x=None, cov_y_x=.1, model_x=model_x)
 
@@ -111,40 +116,40 @@ model_eval.rng = seed
 
 w_prior = [.5, 0]
 # w_prior = [0, 1]
-# w_prior = [.5, 0, 0, 0, 0, 0, 0]
 
 
 # Dirichlet learner
 proc_funcs = []
 
 # prior_mean = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.9, .9)], model_x)
-# prior_mean = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_prior), model_x)
+
+prior_mean = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_prior), model_x)
 
 
 # prior_mean_x = deepcopy(model_x)
-
-n_t = 16
-supp_x = box_grid(model_x.lims, n_t, endpoint=True)
-# _temp = np.ones(model_x.size*(n_t,))
-_temp = prob_disc(model_x.size*(n_t,))
-prior_mean_x = rand_elements.Finite(supp_x, p=_temp/_temp.sum())
-proc_funcs.append(discretizer(supp_x.reshape(-1, *model_x.shape)))
-
-prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
+#
+# n_t = 16
+# supp_x = box_grid(model_x.lims, n_t, endpoint=True)
+# # _temp = np.ones(model_x.size*(n_t,))
+# _temp = prob_disc(model_x.size*(n_t,))
+# prior_mean_x = rand_elements.Finite(supp_x, p=_temp/_temp.sum())
+# proc_funcs.append(discretizer(supp_x.reshape(-1, *model_x.shape)))
+#
+# prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
 
 
 _name = r'$\mathrm{Dir}$'
-if len(proc_funcs) > 0:
-    _card = str(n_t)
-    if model_x.size > 1:
-        _card += f"^{model_x.size}"
-    _name += r', $|\mathcal{T}| = __card__$'.replace('__card__', _card)
+# if len(proc_funcs) > 0:
+#     _card = str(n_t)
+#     if model_x.size > 1:
+#         _card += f"^{model_x.size}"
+#     _name += r', $|\mathcal{T}| = __card__$'.replace('__card__', _card)
 
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs, name=_name)
 
-# dir_params = {}
+dir_params = {}
 # dir_params = {'alpha_0': [10, 1000]}
-dir_params = {'alpha_0': [.001]}
+# dir_params = {'alpha_0': [.001]}
 # dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
@@ -157,13 +162,15 @@ if do_bayes:  # add true bayes model concentration
 
 
 # Normal learner
+w_prior = [.5, *(0 for __ in range(n_x-1))]
+
 norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=.1,
                                                           basis_y_x=None, cov_y_x=.1,
                                                           model_x=model_x), name=r'$\mathcal{N}$')
 
-norm_params = {}
+# norm_params = {}
 # norm_params = {'prior_cov': [.1, .001]}
-# norm_params = {'prior_cov': [1000000]}
+norm_params = {'prior_cov': [1000000]}
 # norm_params = {'prior_cov': [100, .001]}
 # norm_params = {'prior_cov': np.logspace(-7., 3., 60)}
 
@@ -183,13 +190,14 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 #%% Results
 
-n_train = 40
+# n_train = 400
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
 # n_train = [100, 200]
 # n_train = np.arange(0, 320, 20)
 # n_train = np.arange(0, 55, 5)
+n_train = np.arange(0, 420, 20)
 # n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
@@ -198,8 +206,8 @@ temp = [
     (opt_predictor, None),
     (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
-    # (norm_predictor, norm_params),
-    (skl_predictor, None),
+    (norm_predictor, norm_params),
+    # (skl_predictor, None),
 ]
 predictors, params = zip(*temp)
 
@@ -207,8 +215,8 @@ predictors, params = zip(*temp)
 # TODO: add logic based on which parameters can be changed while preserving learner state!!
 # TODO: train/test loss results?
 
-# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=50, verbose=True)
-plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=100, x=None, do_std=True, verbose=True)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=50, verbose=True)
+# plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=100, x=None, do_std=True, verbose=True)
 
 # d = model.rvs(10)
 # ax = model.space['x'].make_axes()
