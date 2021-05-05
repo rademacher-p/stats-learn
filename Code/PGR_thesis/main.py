@@ -76,9 +76,9 @@ w_model = [0, 1]
 #     return 1 / (2 + np.sin(2 * np.pi * x.mean(axis)))
 
 
-_rand_func = dict(zip(np.linspace(0, 1, n_x, endpoint=True), np.random.default_rng(seed).random(n_x)))
+_rand_vals = dict(zip(np.linspace(0, 1, n_x, endpoint=True), np.random.default_rng(seed).random(n_x)))
 def nonlinear_model(x):
-    return _rand_func[x]
+    return _rand_vals[x]
 
 
 # def nonlinear_model(x):
@@ -162,10 +162,21 @@ if do_bayes:  # add true bayes model concentration
 
 
 # Normal learner
-w_prior = [.5, *(0 for __ in range(n_x-1))]
+# w_prior_norm = w_prior
 
-norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=.1,
-                                                          basis_y_x=None, cov_y_x=.1,
+# w_prior_norm = [.5, *(0 for __ in range(n_x-1))]
+# basis_y_x = None
+
+vals = np.linspace(0, 1, n_x, endpoint=True)
+def make_square_func(val):
+    # return lambda x: 1. if abs(x-val) < _width/2 else 0.
+    return lambda x: np.where(abs(x-val) < 0.5/(len(vals)-1), 1, 0)
+
+w_prior_norm = [.5 for __ in range(len(vals))]
+basis_y_x = [make_square_func(val) for val in vals]
+
+norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior_norm, prior_cov=.1,
+                                                          basis_y_x=basis_y_x, cov_y_x=.1,
                                                           model_x=model_x), name=r'$\mathcal{N}$')
 
 # norm_params = {}
