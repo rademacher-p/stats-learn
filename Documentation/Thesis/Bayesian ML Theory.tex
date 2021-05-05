@@ -1615,7 +1615,7 @@ In this section, the Dirichlet prior is applied to the regression and classifica
 It is informative to substitute the Bayes distribution using the Dirichlet prior \eqref{eq:P_yx_D_dir} into \eqref{eq:f_opt_D}, expressing the decision function for a given training set $\Drm$ as
 \begin{IEEEeqnarray}{rCl} \label{eq:E_yx|D L}
 f^*(\Drm) & = & \argmin_{g \in \Hcal^{\Xcal}} \Erm_{\yrm,\xrm | \Drm} \Big[ \Lcal\big(g(\xrm),\yrm\big) \Big] \\
-& = & \argmin_{g \in \Hcal^{\Xcal}} \gamma \sum_{y,x} \alpha(y,x) \Lcal\big(g(x),y\big) + (1-\gamma) \sum_{y,x} \Psi(y,x;\Drm) \Lcal\big(g(x),y\big) \nonumber \\
+& = & \argmin_{g \in \Hcal^{\Xcal}} \gamma \sum_{y \in \Ycal} \sum_{x \in \Xcal} \alpha(y,x) \Lcal\big(g(x),y\big) + (1-\gamma) \sum_{y \in \Ycal} \sum_{x \in \Xcal} \Psi(y,x;\Drm) \Lcal\big(g(x),y\big) \nonumber \\
 & = & \argmin_{g \in \Hcal^{\Xcal}} \gamma \Erm_{\yrm,\xrm}\Big[ \Lcal\big(g(\xrm), \yrm\big) \Big] + (1-\gamma) \frac{1}{N} \sum_{n=1}^N \Lcal\big(g(\Xrm_n), \Yrm_n \big) \nonumber \\
 & = & \argmin_{g \in \Hcal^{\Xcal}} \alpha_0 \Erm_{\yrm,\xrm}\Big[ \Lcal\big(g(\xrm), \yrm\big) \Big] + \sum_{n=1}^N \Lcal\big(g(\Xrm_n), \Yrm_n \big) \nonumber \;.
 \end{IEEEeqnarray}
@@ -1628,9 +1628,11 @@ It is useful to substitute the Bayes predictive distribution using the Dirichlet
 \begin{IEEEeqnarray}{L} \label{eq:E_y|xD L}
 f^*(\xrm;\Drm) = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm} \big[ \Lcal(h,\yrm) \big] \\
 = \argmin_{h \in \Hcal} \frac{\alpha_0 \sum_{y \in \Ycal} \alpha(y,\xrm) \Lcal(h,y) + N \sum_{y \in \Ycal} \Psi(y,\xrm;\Drm) \Lcal(h,y)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)} \nonumber \\
-= \argmin_{h \in \Hcal} \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)}\right) \sum_{y \in \Ycal} \alphac(y;\xrm) \Lcal(h,y) + \left(\frac{N \Psim(\xrm;\Xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)}\right) \sum_{y \in \Ycal} \Psic(y;\xrm;\Drm) \Lcal(h,y) \nonumber \\
+= \argmin_{h \in \Hcal} \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)}\right) \sum_{y \in \Ycal} \alphac(y;\xrm) \Lcal(h,y) \nonumber \\
+\quad + \left(\frac{N \Psim(\xrm;\Xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)}\right) \sum_{y \in \Ycal} \Psic(y;\xrm;\Drm) \Lcal(h,y) \nonumber \\
 = \argmin_{h \in \Hcal} \gammam(\xrm; \Xrm) \sum_{y \in \Ycal} \alphac(y;\xrm) \Lcal(h,y) + \big(1-\gammam(\xrm; \Xrm)\big) \sum_{y \in \Ycal} \Psic(y;\xrm;\Drm) \Lcal(h,y) \nonumber \\
-= \argmin_{h \in \Hcal} \gammam(\xrm; \Xrm) \Erm_{\yrm | \xrm}\big[ \Lcal(h,\yrm) \big] + \big(1-\gammam(\xrm; \Xrm)\big) \frac{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Lcal\big( h,\Yrm_n \big)}{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big]} \nonumber \;.
+= \argmin_{h \in \Hcal} \gammam(\xrm; \Xrm) \Erm_{\yrm | \xrm}\big[ \Lcal(h,\yrm) \big] + \big(1-\gammam(\xrm; \Xrm)\big) \frac{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Lcal\big( h,\Yrm_n \big)}{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big]} \nonumber \\
+= \argmin_{h \in \Hcal} \alpha_0 \sum_{y \in \Ycal} \alpha(y,\xrm) \Lcal(h,y) + \sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Lcal\big( h,\Yrm_n \big) \nonumber \;.
 \end{IEEEeqnarray}
 
 The metric to be minimized can be represented as a convex combination of two expected losses. The first expected loss is evaluated with respect to the conditional distribution $\Prm_{\yrm | \xrm} = \alphac(\xrm)$, which reflects the prior knowledge of the model parameter. The second term is the conditional empirical risk, or the average loss among samples $\Yrm_n$ whose corresponding values $\Xrm_n$ match the observed value $\xrm$. The convex weights are inherited from the conditional distribution $\Prm_{\yrm | \xrm,\Drm}$; thus, for a given observation $\xrm$, the model prior concentration $\alpha_0 \alpham(\xrm)$ and the number of matching training samples $N \Psim(\xrm;\Xrm)$ dictate which of the two expectations are emphasized.
@@ -2596,7 +2598,7 @@ The training data is distributed as
 \begin{IEEEeqnarray}{rCl}
 \prm_{\Drm | \uptheta}\big( D | \theta \big) & = & \prod_{n=1}^N \prm_{\Drm_n | \uptheta}\big( D_n | \theta \big) = \prod_{n=1}^N \theta(D_n) \nonumber \\ 
 & = & \exp\left( \sum_{n=1}^N \ln\big(\theta(D_n)\big) \right) \nonumber \\
-& = & \exp\left( \int_{\Ycal \times \Xcal} N \Psi(y,x;D) \ln\big(\theta(y,x)\big) {\drm}y {\drm}x \right) \nonumber \\
+& = & \exp\left( \iint_{\Ycal \times \Xcal} N \Psi(y,x;D) \ln\big(\theta(y,x)\big) {\drm}y {\drm}x \right) \nonumber \\
 & \equiv & \prod_{\Ycal \times \Xcal} \left( \theta(y,x)^{N \Psi(y,x;D)} \right)^{{\drm}y {\drm}x} \;,
 \end{IEEEeqnarray}
 where the operator $\prod$ is the geometric integral, the continuous analog of the discrete product operator.
@@ -2942,6 +2944,13 @@ If instead $\upthetam$ includes a Dirac delta function at $x \in \Xcal$, the con
 
 PGR: COPIED, incomplete
 
+\begin{IEEEeqnarray}{rCl} \label{eq:E_yx|D L_cont}
+	f^*(\Drm) & = & \argmin_{g \in \Hcal^{\Xcal}} \Erm_{\yrm,\xrm | \Drm} \Big[ \Lcal\big(g(\xrm),\yrm\big) \Big] \\
+	& = & \argmin_{g \in \Hcal^{\Xcal}} \gamma \iint_{\Ycal \times \Xcal} \alpha(y,x) \Lcal\big(g(x),y\big) {\drm}y {\drm}x + (1-\gamma) \iint_{\Ycal \times \Xcal} \Psi(y,x;\Drm) \Lcal\big(g(x),y\big) {\drm}y {\drm}x \nonumber \\
+	& = & \argmin_{g \in \Hcal^{\Xcal}} \gamma \Erm_{\yrm,\xrm}\Big[ \Lcal\big(g(\xrm), \yrm\big) \Big] + (1-\gamma) \frac{1}{N} \sum_{n=1}^N \Lcal\big(g(\Xrm_n), \Yrm_n \big) \nonumber \\
+	& = & \argmin_{g \in \Hcal^{\Xcal}} \alpha_0 \Erm_{\yrm,\xrm}\Big[ \Lcal\big(g(\xrm), \yrm\big) \Big] + \sum_{n=1}^N \Lcal\big(g(\Xrm_n), \Yrm_n \big) \nonumber \;.
+\end{IEEEeqnarray}
+
 \begin{IEEEeqnarray}{rCl}
 \Erm_{\yrm | \xrm,\Drm} \big[ \Lcal(h,\yrm) \big] & = & \int_{\Ycal} \Lcal(h,y) \prm_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) {\drm}y \\
 & = & \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)}\right) \int_{\Ycal} \alphac(y;\xrm) \Lcal(h,y) {\drm}y \nonumber \\
@@ -3255,7 +3264,7 @@ Next, consider the risk trends when the true model is fixed. The marginal distri
 
 \todohi{Reconsider full thesis structure. Orig stats sec after problem statement!?}
 
-\todomid{Separate general feature theory from discretization}
+\todomid{Separate general feature theory from discretization. If Tcal not subset of Xcal!?}
 
 \todohi{Develop from low-dim prior! More SUBJECTIVE priors!!}
 
@@ -3317,7 +3326,7 @@ Consequently, when conditioned on the model, the marginal process $\uppsimd \equ
 \begin{IEEEeqnarray}{rCl}
 \upthetacd(t) & \equiv & \frac{\upthetad(\cdot,t)}{\upthetamd(t)} = \int_{\Xcal'(t)} \upthetac(x) \frac{\upthetam(x)}{\upthetamd(t)} {\drm}x \;,
 \end{IEEEeqnarray}
-convexly combining the true predictive distributions $\upthetac(x)$ for observations $x \in \Xcal'(t)$.The discretized conditional model can be simply represented as $\upthetacd(\trm) = \Erm_{\xrm | \trm, \upthetam}\big[\upthetac(\xrm)\big]$.
+convexly combining the true predictive distributions $\upthetac(x)$ for observations $x \in \Xcal'(t)$. The discretized conditional model can be simply represented as $\upthetacd(\trm) = \Erm_{\xrm | \trm, \upthetam}\big[\upthetac(\xrm)\big]$.
 
 
 
@@ -3398,7 +3407,7 @@ Evidently, the choice of how heavy a discretization to use effects its own trade
 
 \section{Applications to Common Loss Functions}
 
-\todohigh{New regularized risk form??}
+\todohigh{New regularized risk form?? Empirical loss now in feature space?!??}
 
 \begin{IEEEeqnarray}{rCl}
 \Erm_{\yrm | \xrm,\Drm} \big[ \Lcal(h,\yrm) \big] & = & \int_{\Ycal} \Lcal(h,y) \prm_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) {\drm}y \\
@@ -4256,7 +4265,7 @@ The likelihood function of the data $\Drm$ given the model $\uptheta$ is
 \begin{IEEEeqnarray}{rCl}
 \prm_{\Drm | \uptheta}\big( D | \theta \big) & = & \prod_{n=1}^N \prm_{\Drm_n | \uptheta}\big( D_n | \theta \big) = \prod_{n=1}^N \theta(D_n) \nonumber \\ 
 & = & \exp\left( \sum_{n=1}^N \ln\big(\theta(D_n)\big) \right) \nonumber \\
-& = & \exp\left( \int_{\Ycal \times \Xcal} N \Psi(y,x;D) \ln\big(\theta(y,x)\big) {\drm}y {\drm}x \right) \nonumber \\
+& = & \exp\left( \iint_{\Ycal \times \Xcal} N \Psi(y,x;D) \ln\big(\theta(y,x)\big) {\drm}y {\drm}x \right) \nonumber \\
 & \equiv & \prod_{\Ycal \times \Xcal} \left( \theta(y,x)^{N \Psi(y,x;D)} \right)^{{\drm}y {\drm}x} \;,
 \end{IEEEeqnarray}
 a function only dependent on the data through the empirical statistic $\Psi(\Drm)$. Also, as shown in \ref{app:EP}, the random process $\uppsi \equiv \Psi(\Drm)$ given $\uptheta$ is an Empirical process. 

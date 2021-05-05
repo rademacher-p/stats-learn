@@ -18,6 +18,7 @@ High N: consistency (*harder funcs?*)
 ---
 # Results
 **Do discrete domain results to isolate Dirichlet properties?**
+*Discretization of continuous domain loses consistency, but on discrete domain pop parametric learners can also be consistent?!*
 
 - MODEL
   - Original non-linearity
@@ -42,12 +43,11 @@ High N: consistency (*harder funcs?*)
   - Weak utilization of limited data = outperformed by certain low-dim learners
 
 
-
 ---
 # Real Data notes
 Try **SKL** and **UCI** datasets!
 
 - How to select the prior mean?
-  - **Boost existing regressors?!?**
-- Cross-validation risk should be minimized when using the empirical distribution of the full data set
-- Take care to avoid train/test leakage when designing prior mean!
+  - **Boost existing regressors?!?** Not really prior knowledge...
+- Note: cross-validation risk should be minimized when using the empirical distribution of the full data set
+  - Take care to avoid train/test leakage when designing prior mean!
