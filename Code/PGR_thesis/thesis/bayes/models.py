@@ -62,13 +62,15 @@ class Base(RandomGeneratorMixin):
 
 class NormalLinear(Base):
     def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
-                 model_x=rand_elements.Normal(), rng=None):
+                 model_x=rand_elements.Normal(), *, allow_singular=False, rng=None):
 
         # Prior
         prior = rand_elements.Normal(prior_mean, prior_cov)
         super().__init__(prior, rng)
         if self.prior.ndim > 1:
             raise ValueError
+
+        self.allow_singular = allow_singular
 
         # Model
         self._model_x = model_x
@@ -216,7 +218,7 @@ class NormalLinear(Base):
 
     def _set_cov_y_x(self, val):
         self._cov_y_x = np.array(val)
-        self._prec_U_y_x = _PSD(self._cov_y_x.reshape(2 * (self.size['y'],)), allow_singular=False).U
+        self._prec_U_y_x = _PSD(self._cov_y_x.reshape(2 * (self.size['y'],)), allow_singular=self.allow_singular).U
 
     @cov_y_x.setter
     def cov_y_x(self, val):
