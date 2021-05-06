@@ -853,12 +853,14 @@ class Uniform(BaseRV):
 
 
 class Normal(BaseRV):
-    def __init__(self, mean=0., cov=1., rng=None):
+    def __init__(self, mean=0., cov=1., *, allow_singular=False, rng=None):
         """
         Normal random variable.
 
         Parameters
         ----------
+        *
+        allow_singular
         mean : float or Iterable of float
             Mean
         cov : float or np.ndarray
@@ -869,6 +871,8 @@ class Normal(BaseRV):
         """
 
         super().__init__(rng)
+        self.allow_singular = allow_singular
+
         self._space = spaces.Euclidean(np.array(mean).shape)
 
         self.mean = mean
@@ -914,7 +918,7 @@ class Normal(BaseRV):
         self._cov_flat = self._cov.reshape(2 * (self.size,))
         # self._cov_flat = self._cov.reshape(2 * self.shape)
 
-        psd = _PSD(self._cov_flat, allow_singular=False)
+        psd = _PSD(self._cov_flat, allow_singular=self.allow_singular)
         self.prec_U = psd.U
         self._log_pf_coef = -0.5 * (psd.rank * np.log(2 * np.pi) + psd.log_pdet)
 
@@ -962,7 +966,7 @@ class NormalLinear(Normal):  # TODO: rework, only allow weights and cov to be se
         self._basis = np.array(basis)
 
         _mean_temp = np.empty(self._basis.shape[:-1])
-        super().__init__(_mean_temp, cov, rng)
+        super().__init__(_mean_temp, cov, rng=rng)
 
         self.weights = weights
 
