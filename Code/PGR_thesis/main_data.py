@@ -33,9 +33,9 @@ model = rand_models.DataSet.from_csv('data/CCPP/data_1.csv', 'PE', iter_mode='re
 w_prior = np.zeros(3)
 model_x = rand_elements.Normal(model.data['x'].mean(0))
 # model_x = spaces.Euclidean(model.shape['x'])
-norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=100,
-                                                          basis_y_x=None, cov_y_x=.1,
-                                                          model_x=model_x), name=r'$\mathcal{N}$')
+norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=100, basis_y_x=None,
+                                                          cov_y_x=.1, model_x=model_x),
+                                name=r'$\mathcal{N}$')
 
 
 n_train = np.arange(10, 410, 10)
