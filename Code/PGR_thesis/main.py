@@ -48,7 +48,7 @@ def func_mean_to_models(n, alpha_0, func):
         return [rand_elements.DirichletEmpiricalScalar(func(_x), alpha_0, n-1) for _x in x_supp]
 
 
-n_x = 7
+n_x = 51
 
 # var_y_x_const = 1 / (n_x-1)
 var_y_x_const = 1/5
@@ -147,9 +147,9 @@ _name = r'$\mathrm{Dir}$'
 
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs, name=_name)
 
-dir_params = {}
+# dir_params = {}
 # dir_params = {'alpha_0': [10, 1000]}
-# dir_params = {'alpha_0': [.001]}
+dir_params = {'alpha_0': [.001]}
 # dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
@@ -175,13 +175,13 @@ def make_square_func(val):
 w_prior_norm = [.5 for __ in range(len(vals))]
 basis_y_x = [make_square_func(val) for val in vals]
 
-norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior_norm, prior_cov=.1,
-                                                          basis_y_x=basis_y_x, cov_y_x=.1,
-                                                          model_x=model_x), name=r'$\mathcal{N}$')
+norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior_norm, prior_cov=.1, basis_y_x=basis_y_x,
+                                                          cov_y_x=.1, model_x=model_x, allow_singular=True),
+                                name=r'$\mathcal{N}$')
 
 # norm_params = {}
 # norm_params = {'prior_cov': [.1, .001]}
-norm_params = {'prior_cov': [1000000]}
+norm_params = {'prior_cov': [1e4]}
 # norm_params = {'prior_cov': [100, .001]}
 # norm_params = {'prior_cov': np.logspace(-7., 3., 60)}
 
@@ -201,21 +201,21 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 #%% Results
 
-# n_train = 400
+n_train = 2000
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
 # n_train = [100, 200]
 # n_train = np.arange(0, 320, 20)
 # n_train = np.arange(0, 55, 5)
-n_train = np.arange(0, 420, 20)
+# n_train = np.arange(0, 2050, 50)
 # n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
 
 temp = [
     (opt_predictor, None),
-    (dir_predictor, dir_params),
+    # (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
     (norm_predictor, norm_params),
     # (skl_predictor, None),
@@ -226,8 +226,8 @@ predictors, params = zip(*temp)
 # TODO: add logic based on which parameters can be changed while preserving learner state!!
 # TODO: train/test loss results?
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=50, verbose=True)
-# plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=100, x=None, do_std=True, verbose=True)
+# plot_risk_eval_sim_compare(pred/ictors, model_eval, params, n_train, n_test=100, n_mc=50, verbose=True)
+plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=50, x=None, do_std=True, verbose=True)
 
 # d = model.rvs(10)
 # ax = model.space['x'].make_axes()

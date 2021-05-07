@@ -64,13 +64,13 @@ class NormalLinear(Base):
     def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
                  model_x=rand_elements.Normal(), *, allow_singular=False, rng=None):
 
+        self.allow_singular = allow_singular
+
         # Prior
-        prior = rand_elements.Normal(prior_mean, prior_cov)
+        prior = rand_elements.Normal(prior_mean, prior_cov, allow_singular=self.allow_singular)
         super().__init__(prior, rng)
         if self.prior.ndim > 1:
             raise ValueError
-
-        self.allow_singular = allow_singular
 
         # Model
         self._model_x = model_x
@@ -92,7 +92,7 @@ class NormalLinear(Base):
         self._set_prior_persistent_attr()
 
         # Learning
-        self.posterior = rand_elements.Normal(self.prior_mean, self.prior_cov)
+        self.posterior = rand_elements.Normal(self.prior_mean, self.prior_cov, allow_singular=self.allow_singular)
         self.posterior_model = rand_models.NormalLinear(**self._prior_model_kwargs)
         # self.posterior_model = rand_models.NormalLinear(model_x=model_x, basis_y_x=basis_y_x,
         #                                                 **self._prior_model_kwargs)

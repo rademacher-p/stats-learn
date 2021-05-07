@@ -8,6 +8,7 @@
   - Least restrictive regularizer (least subjective prior info)
     - Avoid worst case scenarios (via consistency)
     - Mean selection enables preference for any solution (good for low N)
+    - *COMPARISON*: only Dir accounts for loss function, pop ignores parameter mapping
   - Show results across multiple problems (Bayes?) to emphasize robustness?!
 
 Low N: avoid overfitting (*Show L2 reg inferior?*)
@@ -37,6 +38,7 @@ High N: consistency (*harder funcs?*)
 
 - *Advantages*
   - Full support prior = consistency = best performance for N >> 0
+    - **Pop can be consistent on discrete domain with enough DOF!!**
   - Flexible parameterization = able to exploit strong prior knowledge
     - Show pop don't do priors = **Bayes benefit**!!!?
 - *Disadvantages*
