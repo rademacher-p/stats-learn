@@ -1,3 +1,10 @@
+# Discrete domain CONCEPTS
+*Discretization of continuous domain loses consistency, but on discrete domain pop parametric learners can also be consistent?!*
+- Pop parametric learners can also be consistent with enough DOF!!
+  - Bayesian LR demonstrates
+    - Dirichlet has less flexibility? NOT if you consider it as continuous domain case (infinite DOF in mean func)
+
+
 # CONCEPTS
 - Bayesian benefit = different optimization cost function
   - Dirichlet = regularized empirical risk!
@@ -14,12 +21,10 @@
 Low N: avoid overfitting (*Show L2 reg inferior?*)
 High N: consistency (*harder funcs?*)
 
-**MLP universal approx thoerem for CONTINUOUS functions. Discretized Dirichlet seems good for discontinuities! Fractals? RESEARCH!!**
+**MLP universal approx theorem for CONTINUOUS functions. Discretized Dirichlet seems good for discontinuities! Fractals? RESEARCH!!**
 
 ---
 # Results
-**Do discrete domain results to isolate Dirichlet properties?**
-*Discretization of continuous domain loses consistency, but on discrete domain pop parametric learners can also be consistent?!*
 
 - MODEL
   - Original non-linearity
