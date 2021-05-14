@@ -88,8 +88,7 @@ def nonlinear_model(x):
 
 
 supp_x = box_grid(np.broadcast_to([0, 1], (*shape_x, 2)), n_x, endpoint=True)
-_temp = np.ones(prod(shape_x)*(n_x,))
-model_x = rand_elements.Finite(supp_x, p=_temp/_temp.sum())
+model_x = rand_elements.Finite(supp_x, p=np.full(prod(shape_x)*(n_x,), n_x**-prod(shape_x)))
 # model = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_model), model_x)
 model = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model), model_x)
 
