@@ -21,7 +21,7 @@
 
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
-\newcommand{\inprob}{\overset{p}{\to}}
+%\newcommand{\inprob}{\overset{p}{\to}}
 
 
 \DeclareMathOperator{\Rbbgeq}{\mathbb{R}_{\geq 0}}
@@ -95,14 +95,11 @@ This work assumes that the observed and unobserved data elements are jointly cha
 After motivating the Bayesian perspective and using the Dirichlet prior to generate the predictive distribution, the results will be applied to the squared error loss function. The Bayes optimal estimator and the achieved risk will be presented. Results will demonstrate a bias/variance risk trade-off dependent on prior parameterization, exemplifying the balance between prior knowledge and data utilization. Comparison with a classical Bayesian regressor will be performed.
 
 
-
-
 \section{Objective}
 
 Consider an observable scalar random variable $\xrm \in \Xcal \subset \Rbb$ and unobservable scalar random variable $\yrm \in \Ycal \subset \Rbb$ which are jointly distributed according to an unknown probability mass function (PMF), $\theta \in \Pcal(\Ycal \times \Xcal) \equiv \Big\{ \theta \in {\Rbb_{\geq 0}}^{\Ycal \times \Xcal}: \sum_{y,x} \theta(y,x) = 1 \Big\}$, such that $\Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) = \theta(y,x)$. The space $\Pcal(\cdot)$ is the set of probability distributions over the argument set.
 
 Also observed is a random sequence of $N$ samples drawn from the model $\theta$, denoted $\Drm \in \Dcal = \{\Ycal \times \Xcal\}^N$. The $N$ data pairs are identically distributed as $\Prm_{\Drm_n | \uptheta}(y,x | \theta) = \theta(y,x)$ for $n = 1,\ldots,N$ and are conditionally independent from one another and from the novel pair $(\yrm,\xrm)$.
-
 
 The regression objective is to design a learning function $f: \Dcal \mapsto \Rbb^{\Xcal}$ which uses the training data to select an estimator from the set of functions $\Xcal \mapsto \Rbb$. The metric guiding the design is the squared error loss function $\Lcal: \Rbb \times \Ycal \mapsto \Rbb_{\geq 0}$, defined as $\Lcal(y',y) = (y'-y)^2$. The expected loss, or ``risk'', is defined as
 \begin{IEEEeqnarray}{L} \label{eq:risk_cond}
@@ -187,7 +184,7 @@ an empirical PMF. As $\uppsi | \uptheta$ is equivalent to a normalized multinomi
 \Sigma_{\uppsi | \uptheta}(y,x,y',x' | \theta) \\
 \qquad = \frac{1}{N} \theta(y,x) \big( \delta[y,y'] \delta[x,x'] - \theta(y',x') \big) \nonumber \;.
 \end{IEEEeqnarray}
-
+%Note that as $N \to \infty$, $\uppsi | \uptheta \to \uptheta$.
 
 
 
@@ -224,7 +221,7 @@ where $\gamma(x; \uppsim) = \left( 1 + \frac{N \uppsim(x)}{\alpha_0 \alpham(x)} 
 %&& \quad + \left( 1 + \frac{\alpha_0 \alpham(x)}{N \uppsim(x)} \right)^{-1} \uppsic(x) \nonumber \\
 %& \equiv & \Prm_{\yrm | \xrm,\uppsi}(x,\psi) \;.
 %\end{IEEEeqnarray}
-Note that as the prior localization increases relative to the training data volume, $\gamma(x; \uppsim) \inprob 1$ and the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior. Conversely, for increasingly large training sets, $\gamma(x; \uppsim) \inprob 0$ and the mean tends to $\uppsic(x)$. Also, as $N \uppsim(x) \inprob \infty$, the PDF $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$ and the model is positively identified. This results from the full support of the Dirichlet distribution and does not hold in general. The adaptation of the posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde} for $\alpha_0 \alpham(x) = 6$ and $N \psim(x) = 3$.
+Note that as the prior localization increases relative to the training data volume, $\gamma(x; \uppsim) \to 1$ and the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior. Conversely, for increasingly large training sets, $\gamma(x; \uppsim) \to 0$ and the mean tends to $\uppsic(x)$. Furthermore, as $N \uppsim(x) \to \infty$, the model posterior $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$; since $\uppsic | \upthetac \to \upthetac$, the model is positively identified. This results from the full support of the Dirichlet prior distribution and does not hold in general. The adaptation of the model posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde} for $\alpha_0 \alpham(x) = 6$ and $N \psim(x) = 3$.
 %Note that as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to 0$, the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior mean. Conversely, as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to \infty$, the mean tends to $\uppsic(x)$. Also, for larger training sets $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$ and the model is positively identified. This is a consequence of the full support of the Dirichlet distribution and does not hold in general. The adaptation of the posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde} for $\alpha_0 \alpham(x) = 6$ and $N \psim(x) = 3$.
 \begin{figure}
 \centering
@@ -248,7 +245,7 @@ Note that as the prior localization increases relative to the training data volu
 
 
 
-\section{Regression and the Squared-Error Loss}
+\section{Regression and the Squared Error Loss}
 
 
 
@@ -275,22 +272,23 @@ The weighting factors are inherited from $\Prm_{\yrm | \xrm,\uppsi}$; thus, larg
 
 
 
-\subsection{Squared-Error Risk}
+\subsection{Squared Error Risk}
 
 %PGR: risk eq steps? comp complexity?
 
 Substituting the Bayesian estimator \eqref{eq:f_opt_SE} into \eqref{eq:risk_cond}, transforming to the empirical statistic, and exploiting the properties from Section \ref{sec:P_psi-theta_mc}, the excess squared error risk is 
-\begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex}
-\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\uppsi | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\uppsi} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
-\; \equiv \Erm_{\xrm | \upthetam}\Big[ \lambda_{\text{Bias}}(\xrm) \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 + \lambda_{\text{Var}}(\xrm) \Sigma_{\yrm | \xrm,\upthetac} \Big] \nonumber \;,
+\begin{IEEEeqnarray}{rCl} \label{eq:risk_cond_SE_dir_ex}
+\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) & = & \Erm_{\xrm,\uppsi | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\uppsi} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
+& \equiv & \Erm_{\xrm | \upthetam}\Big[ \lambda_{\text{Bias}}(\xrm; \upthetam) \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \nonumber \\
+&& \quad + \lambda_{\text{Var}}(\xrm; \upthetam) \Sigma_{\yrm | \xrm,\upthetac} \Big] \nonumber \;,
 \end{IEEEeqnarray}
-a conditional expectation of two weighted functions, where
+a conditional expectation of two weighted functions, where 
 \begin{IEEEeqnarray}{rCl} \label{eq:bias}
-\lambda_{\text{Bias}}(x) & = & \Erm_{\uppsim | \upthetam}\left[ \gamma(x; \uppsim)^2 \right] 
+\lambda_{\text{Bias}}(x; \upthetam) & = & \Erm_{\uppsim | \upthetam}\left[ \gamma(x; \uppsim)^2 \right] 
 \end{IEEEeqnarray}
 and
 \begin{IEEEeqnarray}{rCl} \label{eq:var}
-\lambda_{\text{Var}}(x) & = & \Erm_{\uppsim | \upthetam}\left[ \frac{\big( 1 - \gamma(x; \uppsim) \big)^2}{N \uppsim(x)} \right] \;.
+\lambda_{\text{Var}}(x; \upthetam) & = & \Erm_{\uppsim | \upthetam}\left[ \frac{\big( 1 - \gamma(x; \uppsim) \big)^2}{N \uppsim(x)} \right] \;.
 \end{IEEEeqnarray}
 %\begin{IEEEeqnarray}{rCl}
 %lambda__{\text{Var}}(x) & = & \Erm_{\uppsim(x) | \upthetam(x)}\left[ \frac{N \uppsim(x)}{\big( \alpha_0 \alpham(x) + N \uppsim(x) \big)^2} \right]
@@ -302,7 +300,7 @@ and
 
 The first function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. The second function depends on $\Sigma_{\yrm | \xrm,\upthetac}$ and measures the estimator variance in excess of the minimum squared error $\Rcal_{\Theta}^*(\uptheta)$. Both functions are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam$ and $N$ via expectations with respect to $\Prm_{\uppsim | \upthetam}$. 
 %By the aggregation property of empirical distributions, $N \uppsim(x) | \upthetam(x) \sim \Bi\big(N,\upthetam(x)\big)$ is binomially distributed. 
-Closed-forms have not been found for the empirical process expectations in \eqref{eq:bias} and \eqref{eq:var}.
+%Closed forms have not been found for the empirical process expectations in \eqref{eq:bias} and \eqref{eq:var}.
 
 
 
@@ -316,7 +314,7 @@ Closed-forms have not been found for the empirical process expectations in \eqre
 \label{fig:Predict_SE_biased_hard}
 \end{figure}
 
-Consider the trends of the excess squared error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. As $N \to \infty$, the distribution $\Prm_{\uppsim | \upthetam}$ concentrates, such that $\uppsim \inprob \thetam$; thus, for $\thetam(x) > 0$, the weights $\lambda_{\text{Var}}(x)$ and $\lambda_{\text{Bias}}(x)$ both tend to zero and $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable result is a consequence of the full support of the Dirichlet prior, which ensures the convergence of $\upthetac(x) | \uppsim(x),\uppsic(x) \inprob \uppsic(x)$ as $N \to \infty$.
+Consider the trends of the excess squared error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. As $N \to \infty$, the distribution $\Prm_{\uppsim | \upthetam}$ concentrates, such that $\uppsim \to \upthetam$; thus, for $\upthetam(x) > 0$, the weights $\lambda_{\text{Var}}(x; \upthetam)$ and $\lambda_{\text{Bias}}(x; \upthetam)$ both tend to zero and $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable result is a consequence of the full support of the Dirichlet prior, which ensures the convergence of $\upthetac(x) | \uppsim(x),\uppsic(x) \to \uppsic(x)$ as $N \to \infty$.
 
 %An interesting point regarding the dependency of the excess risk on $N$ is that there may be a local maximum. To demonstrate, consider the case of $|\Xcal| = 1$; treating $N$ as a real number, there would be a maximum at 
 %\begin{equation}
@@ -332,9 +330,9 @@ Consider the trends of the excess squared error risk \eqref{eq:risk_cond_SE_dir_
 %\label{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased}
 %\end{figure}
 
-Next consider the effects of the conditional prior localizations $\alpha'(x) \equiv \alpha_0 \alpham(x)$, which control a bias/variance risk trade-off. For maximal localization $\alpha'(x) \to \infty$, $\lambda_{\text{Bias}}(x) \to 1$ and $\lambda_{\text{Var}}(x) \to 0$. This is intuitive given that the estimator tends toward the data-independent solution. Conversely, for $\alpha'(x) \to 0$, $\lambda_{\text{Bias}}(x) \to \big( 1 - \upthetam(x) \big)^N$ and $\lambda_{\text{Var}}(x) \to \Erm_{\uppsim | \upthetam}\left[ \big( N \uppsim(x) \big)^{-1} \right]$. Note that the variance weight is equivalent to the first inverse moment of a positive binomial random variable \cite{stephan}.
+Next consider the effects of the conditional prior localizations $\alpha'(x) \equiv \alpha_0 \alpham(x)$, which control a bias/variance risk trade-off. For maximal localization $\alpha'(x) \to \infty$, $\lambda_{\text{Bias}}(x; \upthetam) \to 1$ and $\lambda_{\text{Var}}(x; \upthetam) \to 0$. This is intuitive given that the estimator tends toward the data-independent solution. Conversely, for $\alpha'(x) \to 0$, $\lambda_{\text{Bias}}(x; \upthetam) \to \big( 1 - \upthetam(x) \big)^N$ and $\lambda_{\text{Var}}(x; \upthetam) \to \Erm_{\uppsim | \upthetam}\left[ \big( N \uppsim(x) \big)^{-1} \right]$. Note that the variance weight is equivalent to the first inverse moment of a positive binomial random variable \cite{stephan}.
 
-The values $\alpha'(x)$ that minimize the excess squared error for given prior conditional distributions $\alphac(x)$ are of interest. Calculating the first derivative, it can be shown that (for $N > 0$ and $\thetam(x) > 0$) only one stationary point exists, at 
+The values $\alpha'(x)$ that minimize the excess squared error for given prior conditional distributions $\alphac(x)$ are of interest. Calculating the first derivative, it can be shown that (for $N > 0$ and $\upthetam(x) > 0$) only one stationary point exists, at 
 \begin{equation} \label{eq:alpha_x_min_Rex}
 \alpha'(\xrm) = \frac{\Sigma_{\yrm | \xrm,\upthetac}}{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2} \;.
 \end{equation}
