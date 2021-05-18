@@ -19,7 +19,8 @@
 \addbibresource{../References/PhD_refs.bib}
 
 \usepackage{amsmath,amssymb,amsfonts}
-\usepackage{bm}
+%\usepackage{bm}
+%\usepackage{statmath}
 \usepackage{upgreek}
 \usepackage[retainorgcmds]{IEEEtrantools}
 
@@ -54,8 +55,10 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
 
-%\newcommand{\diag}{\mathop{\rm diag}}
-\DeclareMathOperator{\diag}{\mathrm{diag}}
+\DeclareMathOperator{\diag}{diag}
+
+\newcommand{\inprob}{\overset{p}{\to}}
+
 
 \DeclareMathOperator{\Rbbgeq}{\mathbb{R}_{\geq 0}}
 \DeclareMathOperator{\Zbbgeq}{\mathbb{Z}_{\geq 0}}
@@ -700,7 +703,7 @@ achieving
 \Rcal_{\Theta}(f ; \uptheta) & = & \Erm_{\xrm | \uptheta} \bigg[ \Erm_{\yrm | \xrm,\uptheta} \Big[ \Lcal\big( f(\xrm;\uptheta),\yrm \big) \Big] \bigg] \nonumber \\
 & = & \Rcal_{\Theta}^*(\uptheta) 
 \end{IEEEeqnarray}
-demonstrating consistency of the full support Bayesian learner.
+demonstrating consistency of the full-support Bayesian learner.
 
 \todohigh{FIXXXXXX lim}
 
@@ -752,12 +755,12 @@ over the domain $\Ycal \times \Ycal$.
 \todohi{marginal/conditional??? D or psi? Continuous?}
 
 
-In this section, loss functions typical for classification and regression applications, specifically the 0-1 loss function and the squared-error loss function, are adopted. The risk \eqref{eq:risk_cond} is assessed, clairvoyant decision functions \eqref{eq:f_clv_x} are found, and the irreducible risk \eqref{eq:risk_clv} is expressed.
+In this section, loss functions typical for classification and regression applications, specifically the 0-1 loss function and the squared error loss function, are adopted. The risk \eqref{eq:risk_cond} is assessed, clairvoyant decision functions \eqref{eq:f_clv_x} are found, and the irreducible risk \eqref{eq:risk_clv} is expressed.
 
 
 \subsection{Regression: the Squared-Error Loss}
 
-The squared-error (SE) loss function is arguably the most commonly used loss function for regression, or in fact for any estimation problem. This can be attributed to its quadratic form, which enables a closed-form expression of the minimizing estimation function.
+The squared error (SE) loss function is arguably the most commonly used loss function for regression, or in fact for any estimation problem. This can be attributed to its quadratic form, which enables a closed-form expression of the minimizing estimation function.
 
 It is assumed that the unobserved random element $\yrm$ is a scalar random variable; that is, $\Ycal \subseteq \Rbb$. Additionally, the estimator's output is allowed to assume real numbers; thus, $\Hcal = \Rbb \supseteq \Ycal$.
 
@@ -767,7 +770,7 @@ The loss function is defined as
 \begin{equation}
 \Lcal(h,y) = (h-y)^2 \;.
 \end{equation}
-Substituting the squared-error loss into \eqref{eq:risk_cond}, the squared-error risk is
+Substituting the squared error loss into \eqref{eq:risk_cond}, the squared error risk is
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond_SE}
 \Rcal_{\Theta}(f ; \uptheta) & = & \Erm_{\Drm | \uptheta} \bigg[ \Erm_{\yrm,\xrm | \uptheta} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \\
 & = & \Erm_{\xrm | \uptheta}\Bigg[ \Erm_{\yrm| \xrm,\uptheta}\bigg[ \Erm_{\Drm | \uptheta}\Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \Bigg] \nonumber \\
@@ -776,7 +779,7 @@ Substituting the squared-error loss into \eqref{eq:risk_cond}, the squared-error
 \end{IEEEeqnarray}
 a sum of two terms. The first term is the expected conditional variance of the true predictive distribution $\Prm_{\yrm | \xrm,\uptheta}$. The second term is the expected squared bias between the estimate and the true conditional mean $\mu_{\yrm | \xrm,\uptheta}$.
 
-Note that the risk can also be represented as $\Rcal_{\Theta}(f ; \uptheta) = \Rcal_{\Theta}^*(\uptheta) + \Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta)$, where the first term is the irreducible squared-error (as demonstrated in the next sub-section) and the second term is the excess squared-error,
+Note that the risk can also be represented as $\Rcal_{\Theta}(f ; \uptheta) = \Rcal_{\Theta}^*(\uptheta) + \Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta)$, where the first term is the irreducible squared error (as demonstrated in the next sub-section) and the second term is the excess squared error,
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond_ex_SE}
 \Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta) & = & \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( f(\xrm;\Drm) - f_{\Theta}(\xrm;\uptheta) \big)^2 \Big] \\
 & = & \Erm_{\xrm | \uptheta} \left[ \Big( \Erm_{\Drm | \uptheta}\big[ f(\xrm;\Drm) \big] - f_{\Theta}(\xrm;\uptheta) \Big)^2 + \Crm_{\Drm | \uptheta}\big[ f(\xrm;\Drm) \big] \right] \nonumber \;,
@@ -790,18 +793,18 @@ where $f_{\Theta}(\xrm;\uptheta)$ is the clairvoyant estimator. Observe that the
 
 \todolow{plots?}
 
-To find the clairvoyant estimator, the squared-error loss is substituted into \eqref{eq:f_clv_x}; note that the objective function is quadratic over the argument $h \in \Hcal = \Rbb$. It is easily shown that the function over $h$ is positive-definite; as such, the minimizing decision $h$ is the sole stationary point. Setting the first derivative of the function to zero, the clairvoyant estimate is the expected value of $\yrm$ given the model $\uptheta$ and the observed value $\xrm$, such that
+To find the clairvoyant estimator, the squared error loss is substituted into \eqref{eq:f_clv_x}; note that the objective function is quadratic over the argument $h \in \Hcal = \Rbb$. It is easily shown that the function over $h$ is positive-definite; as such, the minimizing decision $h$ is the sole stationary point. Setting the first derivative of the function to zero, the clairvoyant estimate is the expected value of $\yrm$ given the model $\uptheta$ and the observed value $\xrm$, such that
 \begin{IEEEeqnarray}{rCl} \label{eq:f_clv_SE}
 f_{\Theta}(\xrm;\uptheta) & = & \argmin_{h \in \Rbb} \Erm_{\yrm | \xrm,\uptheta} \left[ (h-\yrm)^2 \right] \\
 & = &  \mu_{\yrm | \xrm,\uptheta} \nonumber \;. %= \sum_{y \in \Ycal} y \upthetac(y;\xrm) 
 \end{IEEEeqnarray}
-Substituting the loss and clairvoyant function into \eqref{eq:risk_clv}, the irreducible squared-error is
+Substituting the loss and clairvoyant function into \eqref{eq:risk_clv}, the irreducible squared error is
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_clv_SE}
 \Rcal_{\Theta}^*(\uptheta) & = & \Erm_{\xrm | \uptheta} \Big[ \Erm_{\yrm | \xrm,\uptheta} \big[ (\yrm - \mu_{\yrm | \xrm,\uptheta})^2 \big] \Big] \\
 & = & \Erm_{\xrm | \uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right] \nonumber \;.
 \end{IEEEeqnarray}
 
-Observe that the general risk \eqref{eq:risk_cond_SE} can be represented as $\Rcal_{\Theta}(f ; \uptheta) = \Rcal_{\Theta}^*(\uptheta) + \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( f(\xrm;\Drm) - f_{\Theta}(\xrm;\uptheta) \big)^2 \Big]$. The first summand is equal to the irreducible squared-error; the second term is dependent on the difference between the general estimate and the clairvoyant estimate. 
+Observe that the general risk \eqref{eq:risk_cond_SE} can be represented as $\Rcal_{\Theta}(f ; \uptheta) = \Rcal_{\Theta}^*(\uptheta) + \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( f(\xrm;\Drm) - f_{\Theta}(\xrm;\uptheta) \big)^2 \Big]$. The first summand is equal to the irreducible squared error; the second term is dependent on the difference between the general estimate and the clairvoyant estimate. 
 
 
 Figure \ref{fig:Risk_clv_SE_tilde} displays the irreducible risk for predictive models $\thetac(x)$ independent of $x$. 
@@ -820,19 +823,19 @@ Figure \ref{fig:Risk_clv_SE_tilde} displays the irreducible risk for predictive 
 
 \paragraph{Optimal Estimate: the Posterior Mean}
 
-To find the optimal estimator, the squared-error loss is substituted into \eqref{eq:f_opt_xD}. Again, the function over $h$ is positive-definite; as such, the minimizing decision $h$ is the sole stationary point. Setting the first derivative of the function to zero, the optimal estimate is the expected value of $\yrm$ given the training data and the observed value $\xrm$, such that
+To find the optimal estimator, the squared error loss is substituted into \eqref{eq:f_opt_xD}. Again, the function over $h$ is positive-definite; as such, the minimizing decision $h$ is the sole stationary point. Setting the first derivative of the function to zero, the optimal estimate is the expected value of $\yrm$ given the training data and the observed value $\xrm$, such that
 \begin{IEEEeqnarray}{rCl} \label{eq:f_opt_SE}
 f^*(\xrm;\Drm) & = & \argmin_{h \in \Rbb} \Erm_{\yrm | \xrm,\Drm} \left[ (h-\yrm)^2 \right] \\
 & = & \mu_{\yrm | \xrm,\Drm} = \Erm_{\uptheta | \xrm,\Drm} \left[ \mu_{\yrm | \xrm,\uptheta} \right] \nonumber \;.
 \end{IEEEeqnarray}
 
-An interesting form for the optimal estimator is $f^*(\xrm;\Drm) = \Erm_{\uptheta | \xrm,\Drm} \big[ f_{\Theta}(\xrm;\uptheta) \big]$. Substituting the squared-error loss into the second line of \eqref{eq:f_opt_xD}, the optimal Bayes estimator is the conditional expected value of the clairvoyant estimate with respect to the model posterior distribution.
+An interesting form for the optimal estimator is $f^*(\xrm;\Drm) = \Erm_{\uptheta | \xrm,\Drm} \big[ f_{\Theta}(\xrm;\uptheta) \big]$. Substituting the squared error loss into the second line of \eqref{eq:f_opt_xD}, the optimal Bayes estimator is the conditional expected value of the clairvoyant estimate with respect to the model posterior distribution.
 
 
 
 \paragraph{Minimum Bayes Risk: the Expected Posterior Variance}
 
-The Bayes squared-error risk for a general learning function is
+The Bayes squared error risk for a general learning function is
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_SE}
 \Rcal(f) & = & \Erm_{\uptheta} \Bigg[ \Erm_{\Drm | \uptheta} \bigg[ \Erm_{\yrm,\xrm | \uptheta} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \Bigg] \\
 & = & \Erm_{\xrm,\Drm} \bigg[ \Erm_{\yrm | \xrm,\Drm} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \nonumber \\
@@ -854,7 +857,7 @@ The first term is the expected irreducible risk. The second term is the expected
 
 \todomid{Rename section}
 
-Substituting in the clairvoyant and Bayesian estimators, the excess squared-error \eqref{eq:risk_cond_ex_SE} can be represented as
+Substituting in the clairvoyant and Bayesian estimators, the excess squared error \eqref{eq:risk_cond_ex_SE} can be represented as
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond_ex_SE_bayes}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) & = & \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
 & \equiv & \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm,\Drm | \upthetam,\upthetac} \Big[ \Delta(y; \xrm; \Drm,\upthetac) \Delta(y'; \xrm; \Drm,\upthetac) \Big] \nonumber \\
@@ -1469,7 +1472,7 @@ where $\Bi$ is the binomial PMF. Closed-forms have not been found for the expect
 
 \todohi{binomial inverse moment review citations?}
 
-First consider the effects of the training data volume. Clearly, if $N=0$, $\gammam(\uppsim)$ is equal to one. Consequently, the prior mean $\alphac(\xrm)$ is used and the bias weight is maximal at unity; as this estimator is data-independent, the covariance is zero. As $N \to \infty$, the data PMF tends to $\Prm_{\uppsim | \upthetam} \to \delta[\cdot, \upthetam]$ and $\gammam(\uppsim) \to \left(1 + \frac{N \upthetam}{\alpha_0 \alpham}\right)^{-1}$. As a result, the bias scaling factor tends to zero for all values $x \in \Xcal$ satisfying $\upthetam(x) > 0$ and to one otherwise. Thus for observations falling in the support of the marginal model $\upthetam$, the empirical data distribution $\uppsic(x)$ is used and there is no bias. Similarly, the expectations affecting the covariance tend to zero. This demonstrates that the Dirichlet-based Bayesian estimate $\Prm_{\yrm | \xrm,\Drm}$ converges to the true predictive distribution $\Prm_{\yrm | \xrm,\upthetac}$ in the limit of training data volume; this is guaranteed due to the full-support of the prior.
+First consider the effects of the training data volume. Clearly, if $N=0$, $\gammam(\uppsim)$ is equal to one. Consequently, the prior mean $\alphac(\xrm)$ is used and the bias weight is maximal at unity; as this estimator is data-independent, the covariance is zero. As $N \to \infty$, the data PMF tends to $\Prm_{\uppsim | \upthetam} \to \delta[\cdot, \upthetam]$ and $\gammam(\uppsim) \to \left(1 + \frac{N \upthetam}{\alpha_0 \alpham}\right)^{-1}$. As a result, the bias scaling factor tends to zero for all values $x \in \Xcal$ satisfying $\upthetam(x) > 0$ and to one otherwise. Thus for observations falling in the support of the marginal model $\upthetam$, the empirical data distribution $\uppsic(x)$ is used and there is no bias. Similarly, the expectations affecting the covariance tend to zero. This demonstrates that the Dirichlet-based Bayesian estimate $\Prm_{\yrm | \xrm,\Drm}$ converges to the true predictive distribution $\Prm_{\yrm | \xrm,\upthetac}$ in the limit of training data volume; this is guaranteed due to the full support of the prior.
 
 Next consider the effects of the Dirichlet parameterization. As $\alpha_0 \to \infty$, $\gammam(\uppsim)$ is again equal to one, the bias is maximized and the covariance is zero. Conversely, as $\alpha_0 \to 0$, the empirical data distribution is emphasized and the bias scaling factor tends to its minimal value $\big(1 - \upthetam(x)\big)^{N}$; this value is equivalent to $\Prm_{\uppsim(x) | \upthetam}\big(0 | \thetam \big)$, the probability that no training samples satisfy $\Xrm_n = x$ and thus that $\uppsic(x)$ is undefined. Additionally, the expectations affecting the covariance tend to
 \begin{IEEEeqnarray}{L} 
@@ -1652,8 +1655,6 @@ The elements of the finite cardinality set $\Ycal$ are real numbers, such that $
 
 \paragraph{Optimal Estimate: the Posterior Mean}
 
-\todohi{add mean/var plots with true model, derived from model est. sec., similar to Theodoridis-ML!?}
-
 Substituting in the Bayes predictive distribution for a Dirichlet prior \eqref{eq:P_y_xD_dir} into \eqref{eq:f_opt_SE}, the optimal Bayesian estimate is
 \begin{IEEEeqnarray}{rCl} \label{eq:f_opt_SE_dir}
 f^*(\xrm;\Drm) & = & \mu_{\yrm | \xrm,\Drm} \\
@@ -1681,8 +1682,7 @@ Now, the model prior contribution to the weighting factors depends on the cardin
 
 \paragraph{Minimum Bayes Risk: the Expected Posterior Variance}
 
-
-The minimum Bayes squared-error is $\Rcal^* = \Erm_{\xrm,\Drm} \left[ \Sigma_{\yrm | \xrm,\Drm} \right]$. Using the sufficient statistic $\uppsi \equiv \Psi(\Drm)$, it can also be represented as $\Erm_{\xrm,\uppsi} \left[ \Sigma_{\yrm | \xrm,\uppsi} \right]$; as such, the expectations are performed over $\uppsi$. Decompose the conditional variance as
+The minimum Bayes squared error is $\Rcal^* = \Erm_{\xrm,\Drm} \left[ \Sigma_{\yrm | \xrm,\Drm} \right]$. Using the sufficient statistic $\uppsi \equiv \Psi(\Drm)$, it can also be represented as $\Erm_{\xrm,\uppsi} \left[ \Sigma_{\yrm | \xrm,\uppsi} \right]$; as such, the expectations are performed over $\uppsi$. Decompose the conditional variance as
 \begin{IEEEeqnarray}{rCl}
 \Sigma_{\yrm | \xrm,\uppsi} & = & \Erm_{\yrm | \xrm,\uppsi}[\yrm^2] - \mu_{\yrm | \xrm,\uppsi}^2 
 \end{IEEEeqnarray}
@@ -1742,13 +1742,13 @@ Finally, combine the two formulas to represent the mininum Bayes risk,
 = \Erm_{\xrm} \left[ \frac{\alpha_0 \big(\alpha_0 \alpham(\xrm) + N \alpham(\xrm) + 1 \big)}{\big( \alpha_0 \alpham(\xrm)+1 \big) (\alpha_0+N)} \Sigma_{\yrm | \xrm} \right] \nonumber \\
 = \Erm_{\xrm} \left[ \frac{\alpham(\xrm) + (\alpha_0+N)^{-1}}{\alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right] \nonumber \;.
 \end{IEEEeqnarray}
-The minimum Bayes squared-error is the expected value of the scaled conditional variance with respect to $\Prm_{\yrm | \xrm} = \alphac(\xrm)$. The expectation is taken with respect to the prior marginal distribution $\Prm_{\xrm} = \alpham$. 
+The minimum Bayes squared error is the expected value of the scaled conditional variance with respect to $\Prm_{\yrm | \xrm} = \alphac(\xrm)$. The expectation is taken with respect to the prior marginal distribution $\Prm_{\xrm} = \alpham$. 
 
 The scaling factor for each term $\Sigma_{\yrm | \xrm}$ depends on the marginal $\Prm_{\xrm}$, as well as on the prior concentration $\alpha_0$ and the number of training samples $N$. Observe that with no training data ($N = 0$), the scaling factor becomes unity and the risk is $\Rcal^* = \Erm_{\xrm} \left[ \Sigma_{\yrm | \xrm} \right]$. Conversely, as $N \to \infty$, the Bayes risk is $\Rcal^* \to \Erm_{\xrm} \left[ \frac{\alpham(\xrm)}{\alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right]$; note that this is equivalent to the expected irreducible risk  $\Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] = \Erm_{\xrm,\uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right]$. Also, as the model concentration parameter $\alpha_0 \to 0$, the risk tends to zero (for $N > 0$); as $\alpha_0 \to \infty$, the risk tends toward $\Erm_{\xrm} \left[ \Sigma_{\yrm | \xrm} \right]$.
 
 PGR: first/second derivatives of alpha0??
 
-To illustrate these trends, explicitly define the sets $\Ycal = \{ i/M_{\yrm} : i = 0,\ldots,M_{\yrm}-1 \}$ and $\Xcal = \{ i/M_{\xrm} : i = 0,\ldots,M_{\xrm}-1 \}$. Assume that the conditional variance $\Sigma_{\yrm | \xrm}$ is independent of $\xrm$; in this case, the squared-error becomes the conditional variance scaled by a factor dependent on the marginal distribution $\Prm_{\xrm}$, such that $\Rcal^* = \Sigma_{\yrm | \xrm} \Erm_{\xrm} \left[ \frac{\alpham(\xrm) + (\alpha_0+N)^{-1}}{\alpham(\xrm) + \alpha_0^{-1}} \right]$.  Figures \ref{fig:Risk_SE_Dir_IO_N_leg_a0} and \ref{fig:Risk_SE_Dir_IO_a0_leg_N} display how the risk changes with $N$ and $\alpha_0$ when $\alphac(\xrm)$ and $\alpham$ are fixed.
+To illustrate these trends, explicitly define the sets $\Ycal = \{ i/M_{\yrm} : i = 0,\ldots,M_{\yrm}-1 \}$ and $\Xcal = \{ i/M_{\xrm} : i = 0,\ldots,M_{\xrm}-1 \}$. Assume that the conditional variance $\Sigma_{\yrm | \xrm}$ is independent of $\xrm$; in this case, the squared error becomes the conditional variance scaled by a factor dependent on the marginal distribution $\Prm_{\xrm}$, such that $\Rcal^* = \Sigma_{\yrm | \xrm} \Erm_{\xrm} \left[ \frac{\alpham(\xrm) + (\alpha_0+N)^{-1}}{\alpham(\xrm) + \alpha_0^{-1}} \right]$.  Figures \ref{fig:Risk_SE_Dir_IO_N_leg_a0} and \ref{fig:Risk_SE_Dir_IO_a0_leg_N} display how the risk changes with $N$ and $\alpha_0$ when $\alphac(\xrm)$ and $\alpham$ are fixed.
 
 \begin{figure}
 \centering
@@ -1766,7 +1766,7 @@ To illustrate these trends, explicitly define the sets $\Ycal = \{ i/M_{\yrm} : 
 
 It may not seem intuitive for the risk to decrease when $\alpha_0$ is smaller -- the variance of the model $\uptheta$ increases and the prior knowledge is less definitive. This is a result of the Dirichlet PDF weight shifting towards the $|\Ycal||\Xcal|$ models which have $\ell_0$ norms satisfying $\| \theta \|_0 = 1$. Although these PMF's are maximally separated (and uncorrelated), they all have zero variance. The optimal learner \eqref{eq:f_opt_SE_dir} will simply use the empirical distribution supplied via the training data -- this allows exact identification of $\uptheta$ with a single training pair.
 
-It is also instructional to visualize how the minimum squared-error changes for fixed volume of training data $N$ and a fixed prior concentration $\alpha_0$. First, consider how the risk changes with the conditional PMF $\alphac(\xrm)$. Figure \ref{fig:Risk_SE_Dir_IO_Pyx} demonstrates how the squared-error tends towards zero for PMFs that have $\ell_0$-norm equal to one.
+It is also instructional to visualize how the minimum squared error changes for fixed volume of training data $N$ and a fixed prior concentration $\alpha_0$. First, consider how the risk changes with the conditional PMF $\alphac(\xrm)$. Figure \ref{fig:Risk_SE_Dir_IO_Pyx} demonstrates how the squared error tends towards zero for PMFs that have $\ell_0$-norm equal to one.
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_SE_Dir_IO_Pyx.pdf}
@@ -1819,9 +1819,9 @@ and the minimum Bayes risk is expressed as
 & = & \left(\frac{|\Ycal|}{N/|\Xcal| + |\Ycal|}\right) \frac{1 - |\Ycal|^{-2}}{12} + \left(\frac{N/|\Xcal|}{N/|\Xcal| + |\Ycal|}\right) \frac{1 - |\Ycal|^{-1}}{12} \nonumber \;.
 \end{IEEEeqnarray}
 
-Interestingly, the minimum squared-error for the uniform prior can be represented as a convex combination of two separate risk values with weighting factors dependent on $|\Ycal|$ and $N/|\Xcal|$. Thus for a uniform prior, the risk depends on the number of elements in $\Ycal$ and the number of training samples ``per element of $\Xcal$''. Note the relationship of these weighting factors to those of the conditional PMF $\Prm_{\yrm | \xrm,\Drm}$, which depend on $\alpha_0 \alpham(\xrm)$ and on $N \Psim(\xrm;\Xrm)$. For the uniform prior, $\alpha_0 \alpham(\xrm) = |\Ycal|$ and $N \Erm_{\Xrm}\big[ \Psim(\Xrm) \big] = N/|\Xcal|$.
+Interestingly, the minimum squared error for the uniform prior can be represented as a convex combination of two separate risk values with weighting factors dependent on $|\Ycal|$ and $N/|\Xcal|$. Thus for a uniform prior, the risk depends on the number of elements in $\Ycal$ and the number of training samples ``per element of $\Xcal$''. Note the relationship of these weighting factors to those of the conditional PMF $\Prm_{\yrm | \xrm,\Drm}$, which depend on $\alpha_0 \alpham(\xrm)$ and on $N \Psim(\xrm;\Xrm)$. For the uniform prior, $\alpha_0 \alpham(\xrm) = |\Ycal|$ and $N \Erm_{\Xrm}\big[ \Psim(\Xrm) \big] = N/|\Xcal|$.
 
-The first risk is the conditional variance $\Sigma_{\yrm|\xrm}$ -- this is intuitively satisfying as the corresponding weight becomes unity when $N=0$. The second risk is the squared-error with infinite training data. Note that the reduction of the risk between these two extreme cases is modest, and that the attenuating factor increases towards unity for applications with more possible outcomes. Figure \ref{fig:Risk_SE_uniform_N_lim} illustrates the difference between these cases.
+The first risk is the conditional variance $\Sigma_{\yrm|\xrm}$ -- this is intuitively satisfying as the corresponding weight becomes unity when $N=0$. The second risk is the squared error with infinite training data. Note that the reduction of the risk between these two extreme cases is modest, and that the attenuating factor increases towards unity for applications with more possible outcomes. Figure \ref{fig:Risk_SE_uniform_N_lim} illustrates the difference between these cases.
 
 \begin{figure}
 \centering
@@ -1854,9 +1854,9 @@ PGR: additional figures for uniform case?
 
 \subsubsection{Squared-Error Trends} 
 
-Having derived the optimal estimator based on a Dirichlet model prior, it is important to consider the risk $\Rcal_{\Theta}(f^* ; \uptheta)$ and analyze how different prior parameterizations $\alpha$ influence the squared-error for different models $\theta$.
+Having derived the optimal estimator based on a Dirichlet model prior, it is important to consider the risk $\Rcal_{\Theta}(f^* ; \uptheta)$ and analyze how different prior parameterizations $\alpha$ influence the squared error for different models $\theta$.
 
-Substituting the second moments of $\Delta(\xrm; \Drm,\upthetac)$ \eqref{eq:predictive_del_sq_dir} into \eqref{eq:risk_cond_ex_SE_bayes}, the excess squared-error can be represented as
+Substituting the second moments of $\Delta(\xrm; \Drm,\upthetac)$ \eqref{eq:predictive_del_sq_dir} into \eqref{eq:risk_cond_ex_SE_bayes}, the excess squared error can be represented as
 \begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm,\Drm | \upthetam,\upthetac} \Big[ \Delta(y; \xrm; \Drm,\upthetac) \Delta(y'; \xrm; \Drm,\upthetac) \Big] \nonumber \\
 \quad = \Erm_{\xrm | \upthetam}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \Erm_{\uppsim | \upthetam}\left[ \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right)^2 \right] \right] \nonumber \\
@@ -1881,10 +1881,10 @@ Substituting the second moments of $\Delta(\xrm; \Drm,\upthetac)$ \eqref{eq:pred
 %where the expectation of the function $\Ecal$ is defined in \eqref{eq:predictive_E_del_sq_dir}.
 
 
-The excess risk can thus be represented as the conditional expectation (with respect to $\Prm_{\xrm | \uptheta} = \upthetam$) of a sum of two functions of $\xrm$.  The first function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. This term alone is influenced by the data-independent Bayes predictive distribution $\Prm_{\yrm | \xrm} = \alphac(\xrm)$. The second function measures the additional variance beyond that of the clairvoyant estimator (i.e., the irreducible squared-error); like the irreducible squared-error, it depends on $\Sigma_{\yrm | \xrm,\upthetac}$, the conditional variance of the clairvoyant estimate for a given observation of $\xrm$. These two second-order terms (of $y$) are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam(x)$ and $N$ via conditional expectations with respect to $\uppsim(x)$.
+The excess risk can thus be represented as the conditional expectation (with respect to $\Prm_{\xrm | \uptheta} = \upthetam$) of a sum of two functions of $\xrm$.  The first function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. This term alone is influenced by the data-independent Bayes predictive distribution $\Prm_{\yrm | \xrm} = \alphac(\xrm)$. The second function measures the additional variance beyond that of the clairvoyant estimator (i.e., the irreducible squared error); like the irreducible squared error, it depends on $\Sigma_{\yrm | \xrm,\upthetac}$, the conditional variance of the clairvoyant estimate for a given observation of $\xrm$. These two second-order terms (of $y$) are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam(x)$ and $N$ via conditional expectations with respect to $\uppsim(x)$.
 
 
-It is instructional to consider the trends of the squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. As these weights depend on the bias and variance scaling factors introduced in Section \ref{sec:predictive_est_dir}, the analysis performed there is directly applicable.
+It is instructional to consider the trends of the squared error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. As these weights depend on the bias and variance scaling factors introduced in Section \ref{sec:predictive_est_dir}, the analysis performed there is directly applicable.
 
 
 First consider how the excess risk changes with the training volume $N$. For $N=0$, it is evident that the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$,  the expected squared bias between the clairvoyant and data-independent estimators. Recall that as $N \to \infty$, the bias and variance both vanish; as a result, $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable estimator property is a consequence of the full support of the Dirichlet prior, ensuring that the model posterior concentrates at the empirical PMF.
@@ -1894,7 +1894,7 @@ Another interesting point regarding the dependency of the excess risk on $N$ is 
 N = \alpha_0 \left( 1 - 2 \alpha_0 \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2}{\Sigma_{\yrm | \xrm,\upthetac}} \right) \;.
 \end{equation}
 \todohi{CHECK, consider x dependency + below}
-Note that as the squared-bias of the prior mean increases relative to the clairvoyant estimator variance, the maximizing value decreases (even below zero). Thus, the worse the prior estimate, the more likely the excess squared-error will decrease monotonically with $N$. Conversely, if the prior estimate is accurate, a local maximum may occur and additional training data may (temporarily) compromise the estimator performance. Also consider the effect of prior concentration; informative priors with sufficiently high $\alpha_0$ will not have the local maxima.
+Note that as the squared bias of the prior mean increases relative to the clairvoyant estimator variance, the maximizing value decreases (even below zero). Thus, the worse the prior estimate, the more likely the excess squared error will decrease monotonically with $N$. Conversely, if the prior estimate is accurate, a local maximum may occur and additional training data may (temporarily) compromise the estimator performance. Also consider the effect of prior concentration; informative priors with sufficiently high $\alpha_0$ will not have the local maxima.
 
 The excess risk at this potentially non-integral value would be 
 \begin{equation}
@@ -1904,7 +1904,7 @@ The excess risk at this potentially non-integral value would be
 PGR: better form above???
 
 
-\Cref{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased,fig:Risk_cond_SE_Dir_N_leg_a0_biased} exemplify the excess squared-error as a function of $N$ for estimators based on Dirichlet priors of varying concentration $\alpha_0$. The former shows local maxima for an unbiased estimator; note that higher concentration results in superior performance. The latter uses biased estimators and as such, learners based on low concentration achieve lower risk.
+\Cref{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased,fig:Risk_cond_SE_Dir_N_leg_a0_biased} exemplify the excess squared error as a function of $N$ for estimators based on Dirichlet priors of varying concentration $\alpha_0$. The former shows local maxima for an unbiased estimator; note that higher concentration results in superior performance. The latter uses biased estimators and as such, learners based on low concentration achieve lower risk.
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_cond_SE_Dir_N_leg_a0_unbiased.pdf}
@@ -1928,17 +1928,17 @@ First consider the conditional prior PMF's $\alphac(x)$; as shown, they manifest
 
 The concentrations $\bar{\alpha}_0(x)$ of the conditional distributions $\upthetac(x)$ control important bias/variance trade-offs via the two scaling factors in \eqref{eq:risk_cond_SE_dir_ex}. First, consider the asymptotic trends, again referencing the distribution estimation analysis in Section \ref{sec:predictive_est_dir}.
 
-Consider how the excess risk tends as the priors become maximally concentrated. Recall that as $\bar{\alpha}_0(x) \to \infty$, the estimate of $\upthetac$ is maximally biased and has no variance; thus, the excess risk tends to $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, the expected squared-error between the means of the Bayesian predictive PMF and the true predictive PMF. This is intuitive given that the estimator tends toward a data-independent solution; the estimator may be biased, but will have no variance due to the training data statistics.
+Consider how the excess risk tends as the priors become maximally concentrated. Recall that as $\bar{\alpha}_0(x) \to \infty$, the estimate of $\upthetac$ is maximally biased and has no variance; thus, the excess risk tends to $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, the expected squared error between the means of the Bayesian predictive PMF and the true predictive PMF. This is intuitive given that the estimator tends toward a data-independent solution; the estimator may be biased, but will have no variance due to the training data statistics.
 
 Conversely, if concentrations $\bar{\alpha}_0(x) \to 0$ are chosen, the Bayesian estimate tends to the empirical mean, independent of $\alphac$. Using the limits displayed in \ref{sec:predictive_est_dir}, it can be shown that the excess risk tends to
 \begin{IEEEeqnarray}{rCl}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) & \to & \Erm_{\xrm | \upthetam}\left[ \big( 1 - \upthetam(\xrm) \big)^N \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \right] \nonumber \\
 && \quad + \Erm_{\xrm | \upthetam}\left[ \left( \sum_{n=1}^N \binom{N}{n} \upthetam(\xrm)^n \big( 1 - \upthetam(\xrm) \big)^{N-n} \frac{1}{n} \right) \Sigma_{\yrm | \xrm,\upthetac} \right] \nonumber \;.
 \end{IEEEeqnarray}
-Observe that the squared-bias contributes to the sum for a given value $x$, proportionate to the probability that no training samples are observed matching this value.
+Observe that the squared bias contributes to the sum for a given value $x$, proportionate to the probability that no training samples are observed matching this value.
 
 
-Of further interest are the values $\bar{\alpha}_0(x)$ that minimize the excess squared-error for given prior conditional distributions $\alphac(x)$. With the asymptotic values of the excess risk known, all that remains is to determine any local minima. Since the $|\Xcal|$ summands of the excess risk depend only on the corresponding concentrations $\bar{\alpha}_0(x)$, each of these values can be optimized separately. 
+Of further interest are the values $\bar{\alpha}_0(x)$ that minimize the excess squared error for given prior conditional distributions $\alphac(x)$. With the asymptotic values of the excess risk known, all that remains is to determine any local minima. Since the $|\Xcal|$ summands of the excess risk depend only on the corresponding concentrations $\bar{\alpha}_0(x)$, each of these values can be optimized separately. 
 
 \todomid{add the derivative details below???}
 
@@ -1952,7 +1952,7 @@ Calculation of the second derivative confirms that this value is a local minimum
 \end{equation}
 which can be easily shown to be less than both the asymptotic values for $\bar{\alpha}_0(x) \to 0$ and $\bar{\alpha}_0(x) \to \infty$. Thus the concentration values \eqref{eq:alpha_x_min_Rex} can be used to find the optimal values of $\alpha_0$ and $\alpham(x)$, yielding the minimum excess risk for the given prior conditional distributions $\alphac(x)$.
 
-Note that the minimizing concentration values $\bar{\alpha}_0(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible; the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low concentrations are preferable when the conditional model has low variance. Such models can be accurately identified by learners that prioritize the empirical mean over the prior estimate, even with limited training data volume $N$; quick adaptation to the data is effective, with minimal risk due to overfitting. Additionally, note that these values $\bar{\alpha}_0(x)$ do not depend on the training volume $N$.
+Note that the minimizing concentration values $\bar{\alpha}_0(x)$ are inversely proportional to the squared bias of the prior conditional mean. This is sensible; the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low concentrations are preferable when the conditional model has low variance. Such models can be accurately identified by learners that prioritize the empirical mean over the prior estimate, even with limited training data volume $N$; quick adaptation to the data is effective, with minimal risk due to overfitting. Additionally, note that these values $\bar{\alpha}_0(x)$ do not depend on the training volume $N$.
 
 
 
@@ -1960,7 +1960,7 @@ Note that the minimizing concentration values $\bar{\alpha}_0(x)$ are inversely 
 %\qquad \qquad + \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \Erm_{\uppsim(\xrm) | \upthetam(\xrm)}\left[ \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right)^2 \right] \right] \nonumber
 
 
-\Cref{fig:Risk_cond_SE_Dir_a0_leg_N_unbiased,fig:Risk_cond_SE_Dir_a0_leg_N_biased} show how the excess squared-error trends as a function of the Dirichlet learner concentration. Note that the latter is based on a biased prior estimate and thus the optimal Dirichlet concentration value is lower.
+\Cref{fig:Risk_cond_SE_Dir_a0_leg_N_unbiased,fig:Risk_cond_SE_Dir_a0_leg_N_biased} show how the excess squared error trends as a function of the Dirichlet learner concentration. Note that the latter is based on a biased prior estimate and thus the optimal Dirichlet concentration value is lower.
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_cond_SE_Dir_a0_leg_N_unbiased.pdf}
@@ -1986,7 +1986,7 @@ PGR: plot captions, alpha zero or x???
 %
 %\todohi{Simulation details, reference? Github release??}
 %
-%\Cref{fig:SSP_2021/Risk_SE_N,fig:SSP_2021/Risk_SE_a0} display the Bayesian squared-error realized by the Dirichlet-based regressor. The model $\uptheta$ is randomly selected from a Dirichlet distribution with the same $\alpham$ and $\alphac$ used for the regressor design and with the localization fixed at $\alpha_0 = 100$. Observe that with increasing training data volume $N$, all the regressors tend towards the expected irreducible risk. Additionally, the regressor performs best when its localization matches $\alpha_0 = 100$, regardless of the value $N$, achieving the Bayesian squared-error \eqref{eq:Risk_min_SE_dir}.
+%\Cref{fig:SSP_2021/Risk_SE_N,fig:SSP_2021/Risk_SE_a0} display the Bayesian squared error realized by the Dirichlet-based regressor. The model $\uptheta$ is randomly selected from a Dirichlet distribution with the same $\alpham$ and $\alphac$ used for the regressor design and with the localization fixed at $\alpha_0 = 100$. Observe that with increasing training data volume $N$, all the regressors tend towards the expected irreducible risk. Additionally, the regressor performs best when its localization matches $\alpha_0 = 100$, regardless of the value $N$, achieving the Bayesian squared error \eqref{eq:Risk_min_SE_dir}.
 %\begin{figure}
 %\centering
 %\includegraphics[width=0.8\linewidth]{SSP_2021/Risk_SE_N.png}
@@ -2000,7 +2000,7 @@ PGR: plot captions, alpha zero or x???
 %\label{fig:SSP_2021/Risk_SE_a0}
 %\end{figure}
 %
-%Next, consider the risk trends when the true model is fixed. The PMF $\thetam = 1/128$ is uniform and $\thetac(y;x) = \Bi\Big(127y; 127, 1 / \big(2 + \sin(2\pi x)\big)\Big)$; note that the clairvoyant regressor is $\mu_{\yrm | \xrm,\uptheta} = 1 / \big(2 + \sin(2\pi \xrm)\big)$ and thus that the Dirichlet prior estimator $\mu_{\yrm | \xrm} = 0.5$ is biased. The true predictive variance is $\Sigma_{\yrm | \xrm, \uptheta} = \frac{1}{127} \mu_{\yrm | \xrm, \uptheta} (1 - \mu_{\yrm | \xrm, \uptheta})$ and thus the irreducible squared-error is relatively low. For comparison, a Bayesian linear regressor (Appendix \ref{app:norm_reg}) using $\Sigma_{\yrm}=0.1$, basis functions $\phi(x) = (1, x)$, and a Gaussian prior $\Ncal\big((0.5, 0), \Sigma_{\uptheta}\big)$ is evaluated, as well; different prior covariance functions $\Sigma_{\uptheta}$ will be used. Note that the linear regressor will also predict $\mu_{\yrm | \xrm, \Drm} = 0.5$ when $N=0$.
+%Next, consider the risk trends when the true model is fixed. The PMF $\thetam = 1/128$ is uniform and $\thetac(y;x) = \Bi\Big(127y; 127, 1 / \big(2 + \sin(2\pi x)\big)\Big)$; note that the clairvoyant regressor is $\mu_{\yrm | \xrm,\uptheta} = 1 / \big(2 + \sin(2\pi \xrm)\big)$ and thus that the Dirichlet prior estimator $\mu_{\yrm | \xrm} = 0.5$ is biased. The true predictive variance is $\Sigma_{\yrm | \xrm, \uptheta} = \frac{1}{127} \mu_{\yrm | \xrm, \uptheta} (1 - \mu_{\yrm | \xrm, \uptheta})$ and thus the irreducible squared error is relatively low. For comparison, a Bayesian linear regressor (Appendix \ref{app:norm_reg}) using $\Sigma_{\yrm}=0.1$, basis functions $\phi(x) = (1, x)$, and a Gaussian prior $\Ncal\big((0.5, 0), \Sigma_{\uptheta}\big)$ is evaluated, as well; different prior covariance functions $\Sigma_{\uptheta}$ will be used. Note that the linear regressor will also predict $\mu_{\yrm | \xrm, \Drm} = 0.5$ when $N=0$.
 %
 %\Cref{fig:SSP_2021/Predict_SE_biased_hard,fig:SSP_2021/Predict_SE_biased_hard_N} provide visualization of the statistics of the achieved regression functions. The lines represent $\Erm_{\Drm | \uptheta}\big[\mu_{\yrm | \xrm, \Drm}\big]$, the expectation of the Bayesian regressors with respect to the training data; the filled regions represent the square-root of $\Crm_{\Drm | \uptheta}\big[\mu_{\yrm | \xrm, \Drm}\big]$, the regressor variance. Observe that the Dirichlet-based estimator with $\alpha_0 = 0.01$ has lower prediction bias, but will incur additional error due to high variance. Conversely, the estimator using $\alpha_0 = 100$ is hindered by its confidence in the biased estimator $\mu_{\yrm | \xrm}$, but is less sensitive to variations in the observed training set. Also note that both the bias and variance of the estimator tend to zero in the limit $N \to \infty$, even when using the more concentrated $\alpha_0 = 100$ prior.
 %\begin{figure}
@@ -2016,9 +2016,9 @@ PGR: plot captions, alpha zero or x???
 %\label{fig:SSP_2021/Predict_SE_biased_hard_N}
 %\end{figure}
 %
-%The Bayesian linear regressor with the Normal prior is highly biased, as its set of achievable estimator functions is critically limited; it also has lower variance than the Dirichlet-based estimators. This is a consequence of the lower-dimensionality, limited-support prior -- there are fewer models $\theta \in \Pcal(\Ycal \times \Xcal)$ that are considered and thus fewer functions $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$ that can be realized. Contrasting, the Dirichlet estimator uses a full-support prior, which is necessary to ensure that any complex clairvoyant estimator can be learned.
+%The Bayesian linear regressor with the Normal prior is highly biased, as its set of achievable estimator functions is critically limited; it also has lower variance than the Dirichlet-based estimators. This is a consequence of the lower-dimensionality, limited support prior -- there are fewer models $\theta \in \Pcal(\Ycal \times \Xcal)$ that are considered and thus fewer functions $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$ that can be realized. Contrasting, the Dirichlet estimator uses a full support prior, which is necessary to ensure that any complex clairvoyant estimator can be learned.
 %
-%Figure \ref{fig:SSP_2021/Risk_cond_SE_N_biased_hard} shows the resultant expected squared-error as a function of $N$. Observe that the Dirichlet-based estimator trends toward the irreducible risk $\Rcal_{\Theta}^*(\theta)$, regardless of how much confidence in the data-independent regressor $\mu_{\yrm | \xrm}$ is indicated through the prior localization $\alpha_0$. Furthermore this trend holds no matter how severe the bias of $\alphac$ might be. This is a consequence of the Bayesian predictive distribution $\Prm_{\yrm | \xrm,\Drm}$ being a consistent estimator of the true predictive model $\thetac$, which is guaranteed by the Dirichlet prior's full support. In contrast, the Bayesian linear regressor will generally result in non-zero excess squared-error, no matter how much training data is available. 
+%Figure \ref{fig:SSP_2021/Risk_cond_SE_N_biased_hard} shows the resultant expected squared error as a function of $N$. Observe that the Dirichlet-based estimator trends toward the irreducible risk $\Rcal_{\Theta}^*(\theta)$, regardless of how much confidence in the data-independent regressor $\mu_{\yrm | \xrm}$ is indicated through the prior localization $\alpha_0$. Furthermore this trend holds no matter how severe the bias of $\alphac$ might be. This is a consequence of the Bayesian predictive distribution $\Prm_{\yrm | \xrm,\Drm}$ being a consistent estimator of the true predictive model $\thetac$, which is guaranteed by the Dirichlet prior's full support. In contrast, the Bayesian linear regressor will generally result in non-zero excess squared error, no matter how much training data is available. 
 %\begin{figure}
 %\centering
 %\includegraphics[width=0.8\linewidth]{SSP_2021/Risk_cond_SE_N_biased_hard.png}
@@ -2053,7 +2053,7 @@ To demonstrate the efficacy of Dirichlet-based regressors, consider a data model
 
 \todohi{Simulation details, reference? Github release??}
 
-\Cref{fig:Discrete/SE/risk_bayes_N_leg_a0,fig:Discrete/SE/risk_bayes_a0_leg_N} display the Bayesian squared-error realized by the Dirichlet-based regressor. The model $\uptheta$ is randomly selected from a Dirichlet distribution with the same $\alpham$ and $\alphac$ used for the regressor design and with the localization fixed at $\alpha_0 = 400$. Observe that with increasing training data volume $N$, all the regressors tend towards the expected irreducible risk $\Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] = \Erm_{\xrm,\uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right] \approx 0.038$. Additionally, the regressor performs best when its localization matches $\alpha_0 = 400$, regardless of the value $N$, achieving the Bayesian squared-error \eqref{eq:Risk_min_SE_dir}.
+\Cref{fig:Discrete/SE/risk_bayes_N_leg_a0,fig:Discrete/SE/risk_bayes_a0_leg_N} display the Bayesian squared error realized by the Dirichlet-based regressor. The model $\uptheta$ is randomly selected from a Dirichlet distribution with the same $\alpham$ and $\alphac$ used for the regressor design and with the localization fixed at $\alpha_0 = 400$. Observe that with increasing training data volume $N$, all the regressors tend towards the expected irreducible risk $\Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] = \Erm_{\xrm,\uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right] \approx 0.038$. Additionally, the regressor performs best when its localization matches $\alpha_0 = 400$, regardless of the value $N$, achieving the Bayesian squared error \eqref{eq:Risk_min_SE_dir}.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.8\linewidth]{Discrete/SE/risk_bayes_N_leg_a0.png}
@@ -2067,7 +2067,7 @@ To demonstrate the efficacy of Dirichlet-based regressors, consider a data model
 	\label{fig:Discrete/SE/risk_bayes_a0_leg_N}
 \end{figure}
 
-Next, consider the risk trends when the true model is fixed. The PMF $\thetam = 1/128$ is uniform and $\thetac(y;\xrm) = \DE\big((y, 1-y); 127, 4.164, (\mu_{\yrm | \xrm,\uptheta}, 1-\mu_{\yrm | \xrm,\uptheta})\big)$, where the clairvoyant regressor is $\mu_{\yrm | \xrm,\uptheta} = 1 / \big(2 + \sin(2\pi \xrm)\big)$. Note that the Dirichlet prior estimator $\mu_{\yrm | \xrm} = 0.5$ is significantly biased. The true predictive variance is $\Sigma_{\yrm | \xrm, \uptheta} = 0.2 \, \mu_{\yrm | \xrm, \uptheta} (1 - \mu_{\yrm | \xrm, \uptheta})$ and thus the irreducible squared-error is $\Rcal_{\Theta}^*(\uptheta) \approx 0.039 $. For comparison, a Bayesian linear regressor (Appendix \ref{app:norm_reg}) using $\Sigma_{\yrm}=0.1$, basis functions $\phi(x) = (1, x)$, and a Gaussian prior $\Ncal\big((0.5, 0), \Sigma_{\uptheta}\big)$ is evaluated, as well; different prior covariance functions $\Sigma_{\uptheta}$ will be used. Note that the linear regressor will also predict $\mu_{\yrm | \xrm, \Drm} = 0.5$ when $N=0$.
+Next, consider the risk trends when the true model is fixed. The PMF $\thetam = 1/128$ is uniform and $\thetac(y;\xrm) = \DE\big((y, 1-y); 127, 4.164, (\mu_{\yrm | \xrm,\uptheta}, 1-\mu_{\yrm | \xrm,\uptheta})\big)$, where the clairvoyant regressor is $\mu_{\yrm | \xrm,\uptheta} = 1 / \big(2 + \sin(2\pi \xrm)\big)$. Note that the Dirichlet prior estimator $\mu_{\yrm | \xrm} = 0.5$ is significantly biased. The true predictive variance is $\Sigma_{\yrm | \xrm, \uptheta} = 0.2 \, \mu_{\yrm | \xrm, \uptheta} (1 - \mu_{\yrm | \xrm, \uptheta})$ and thus the irreducible squared error is $\Rcal_{\Theta}^*(\uptheta) \approx 0.039 $. For comparison, a Bayesian linear regressor (Appendix \ref{app:norm_reg}) using $\Sigma_{\yrm}=0.1$, basis functions $\phi(x) = (1, x)$, and a Gaussian prior $\Ncal\big((0.5, 0), \Sigma_{\uptheta}\big)$ is evaluated, as well; different prior covariance functions $\Sigma_{\uptheta}$ will be used. Note that the linear regressor will also predict $\mu_{\yrm | \xrm, \Drm} = 0.5$ when $N=0$.
 
 \Cref{fig:Discrete/SE/predict_a0,fig:Discrete/SE/predict_N} provide visualization of the statistics of the achieved regression functions. The lines represent $\Erm_{\Drm | \uptheta}\big[\mu_{\yrm | \xrm, \Drm}\big]$, the expectation of the Bayesian regressors with respect to the training data; the filled regions represent the square-root of $\Crm_{\Drm | \uptheta}\big[\mu_{\yrm | \xrm, \Drm}\big]$, the regressor variance. Observe that the Dirichlet-based estimator with $\alpha_0 = 10$ has lower prediction bias, but will incur additional error due to high variance. Conversely, the estimator using $\alpha_0 = 1000$ is hindered by its confidence in the biased estimator $\mu_{\yrm | \xrm}$, but is less sensitive to variations in the observed training set. Also note that both the bias and variance of the estimator tend to zero in the limit $N \to \infty$, even when using the more concentrated $\alpha_0 = 1000$ prior.
 \begin{figure}
@@ -2085,7 +2085,7 @@ Next, consider the risk trends when the true model is fixed. The PMF $\thetam = 
 
 The Bayesian linear regressor with the Normal prior is highly biased, as its set of achievable estimator functions is critically limited; it also has lower variance than the Dirichlet-based estimators. This is a consequence of the lower-dimensionality, limited-support prior -- there are fewer models $\theta \in \Pcal(\Ycal \times \Xcal)$ that are considered and thus fewer functions $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$ that can be realized. Contrasting, the Dirichlet estimator uses a full-support prior, which is necessary to ensure that any complex clairvoyant estimator can be learned.
 
-Figure \ref{fig:Discrete/SE/risk_N_leg_a0} shows the resultant expected squared-error as a function of $N$. Observe that the Dirichlet-based estimator trends toward the irreducible risk $\Rcal_{\Theta}^*(\theta)$, regardless of how much confidence in the data-independent regressor $\mu_{\yrm | \xrm}$ is indicated through the prior localization $\alpha_0$. Furthermore this trend holds no matter how severe the bias of $\alphac$ might be. This is a consequence of the Bayesian predictive distribution $\Prm_{\yrm | \xrm,\Drm}$ being a consistent estimator of the true predictive model $\thetac$, which is guaranteed by the Dirichlet prior's full support. In contrast, the Bayesian linear regressor will generally result in non-zero excess squared-error, no matter how much training data is available. 
+Figure \ref{fig:Discrete/SE/risk_N_leg_a0} shows the resultant expected squared error as a function of $N$. Observe that the Dirichlet-based estimator trends toward the irreducible risk $\Rcal_{\Theta}^*(\theta)$, regardless of how much confidence in the data-independent regressor $\mu_{\yrm | \xrm}$ is indicated through the prior localization $\alpha_0$. Furthermore this trend holds no matter how severe the bias of $\alphac$ might be. This is a consequence of the Bayesian predictive distribution $\Prm_{\yrm | \xrm,\Drm}$ being a consistent estimator of the true predictive model $\thetac$, which is guaranteed by the Dirichlet prior's full support. In contrast, the Bayesian linear regressor will generally result in non-zero excess squared error, no matter how much training data is available. 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.8\linewidth]{Discrete/SE/risk_N_leg_a0.png}
@@ -2983,7 +2983,7 @@ As discussed in \ref{sec:dists_cont}, the weighting function $\gammam(D)$ will t
 
 \paragraph{Minimum Bayes Risk}
 
-To determine the minimum Bayes squared-error, $\Rcal^* = \Erm_{\xrm,\uppsi} \left[ \Sigma_{\yrm | \xrm,\uppsi} \right]$, a new evaluation of $\mu_{\yrm | \xrm,\uppsi}^2$ must be performed.
+To determine the minimum Bayes squared error, $\Rcal^* = \Erm_{\xrm,\uppsi} \left[ \Sigma_{\yrm | \xrm,\uppsi} \right]$, a new evaluation of $\mu_{\yrm | \xrm,\uppsi}^2$ must be performed.
 
 
 
@@ -3145,11 +3145,11 @@ Combining produces the risk,
 
 \todomid{Change form to have conditional prior concentration?}
 
-The minimum Bayesian squared-error equation is similar to the discrete-domain formula \eqref{eq:Risk_min_SE_dir}, with one difference -- the scaling factor for $\Sigma_{\yrm | \xrm}$ depends on the marginal prior mean through $\delta(0)^{-1} \alpham(\xrm)$. 
+The minimum Bayesian squared error equation is similar to the discrete-domain formula \eqref{eq:Risk_min_SE_dir}, with one difference -- the scaling factor for $\Sigma_{\yrm | \xrm}$ depends on the marginal prior mean through $\delta(0)^{-1} \alpham(\xrm)$. 
 
-Note that as $N \to \infty$, the Bayesian risk tends to $\Rcal^* \to \Erm_{\xrm} \left[ \frac{\delta(0)^{-1} \alpham(\xrm)}{\delta(0)^{-1} \alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right]$, which can readily be shown to be the expected irreducible risk, $\Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] = \Erm_{\xrm,\uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right]$. This result is dependent on the fact that models $\theta$ drawn from the prior $\prm_{\uptheta}$ will be Dirac delta mixtures with countable support, enabling effective learning of the clairvoyant regressor $f_{\Theta}(\theta)$; as shown in the following section, if the true model $\theta$ is bounded, then the excess risk will never vanish and the irreducible squared-error will not be achieved. 
+Note that as $N \to \infty$, the Bayesian risk tends to $\Rcal^* \to \Erm_{\xrm} \left[ \frac{\delta(0)^{-1} \alpham(\xrm)}{\delta(0)^{-1} \alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right]$, which can readily be shown to be the expected irreducible risk, $\Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] = \Erm_{\xrm,\uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right]$. This result is dependent on the fact that models $\theta$ drawn from the prior $\prm_{\uptheta}$ will be Dirac delta mixtures with countable support, enabling effective learning of the clairvoyant regressor $f_{\Theta}(\theta)$; as shown in the following section, if the true model $\theta$ is bounded, then the excess risk will never vanish and the irreducible squared error will not be achieved. 
 
-Other notable difference from the discrete set results occur if $\alpham$ is bounded; specifically, $\Rcal^* \approx (1 + N / \alpha_0)^{-1} \Erm_{\xrm}\big[ \Sigma_{\yrm | \xrm} \big]$. This is a consequence of the estimator preference for using the empirical data distribution when available; the scaling factor $(1 + N / \alpha_0)^{-1}$ is equal to the probability that the novel data pair $(\yrm, \xrm)$ is not represented in the training set and thus that the prior estimator is used. Additionally, as $N \to \infty$, the Bayes squared-error tends to zero. With continuous data, for any localization $\alpha_0$, the probability that two of the Dirac delta functions comprising the mixture $\prm_{\uptheta}$ are located at the same value $x$ is zero. As such, every predictive distribution $\upthetac(x)$ will be supported at a single value $y$, the conditional variance $\Sigma_{\yrm | \xrm,\upthetac}$ is zero, and the irreducible squared-error is zero. With sufficient data, the probability that the novel data pair $(\yrm, \xrm)$ is represented in the training set tends to one, and thus the empirical predictive distribution $\uppsic(\xrm)$ will precisely identify $\uptheta(\xrm)$. This is analogous to the $\alpha_0 \to 0$ case for discrete data, where the model $\uptheta$ will be concentrated at a single value $(y,x)$.
+Other notable difference from the discrete set results occur if $\alpham$ is bounded; specifically, $\Rcal^* \approx (1 + N / \alpha_0)^{-1} \Erm_{\xrm}\big[ \Sigma_{\yrm | \xrm} \big]$. This is a consequence of the estimator preference for using the empirical data distribution when available; the scaling factor $(1 + N / \alpha_0)^{-1}$ is equal to the probability that the novel data pair $(\yrm, \xrm)$ is not represented in the training set and thus that the prior estimator is used. Additionally, as $N \to \infty$, the Bayes squared error tends to zero. With continuous data, for any localization $\alpha_0$, the probability that two of the Dirac delta functions comprising the mixture $\prm_{\uptheta}$ are located at the same value $x$ is zero. As such, every predictive distribution $\upthetac(x)$ will be supported at a single value $y$, the conditional variance $\Sigma_{\yrm | \xrm,\upthetac}$ is zero, and the irreducible squared error is zero. With sufficient data, the probability that the novel data pair $(\yrm, \xrm)$ is represented in the training set tends to one, and thus the empirical predictive distribution $\uppsic(\xrm)$ will precisely identify $\uptheta(\xrm)$. This is analogous to the $\alpha_0 \to 0$ case for discrete data, where the model $\uptheta$ will be concentrated at a single value $(y,x)$.
 
 \todohigh{improve above discussion?? NEED DP CITATIONS!!!}
 
@@ -3199,7 +3199,7 @@ Other notable difference from the discrete set results occur if $\alpham$ is bou
 
 \subsubsection{Squared-Error Trends}
 
-Using the second moments of the random process $\Delta(\xrm; \Drm,\upthetac)$ formulated in \eqref{eq:predictive_del_sq_dir_cont}, the excess squared-error is redefined as
+Using the second moments of the random process $\Delta(\xrm; \Drm,\upthetac)$ formulated in \eqref{eq:predictive_del_sq_dir_cont}, the excess squared error is redefined as
 \begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex_cont}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
 \quad \equiv \int_{\Ycal} y \int_{\Ycal} y' \Erm_{\xrm,\Drm | \upthetam,\upthetac} \Big[ \Delta(y; \xrm; \Drm,\upthetac) \Delta(y'; \xrm; \Drm,\upthetac) \Big] {\drm}y {\drm}y' \nonumber \\
@@ -3208,7 +3208,7 @@ Using the second moments of the random process $\Delta(\xrm; \Drm,\upthetac)$ fo
 \end{IEEEeqnarray}
 
 
-It is instructional to consider the trends of the excess squared-error \eqref{eq:risk_cond_SE_dir_ex_cont} with training data volume $N$ and with Dirichlet prior parameterization. Referencing the predictive distribution estimation discussion in Section \ref{sec:predictive_est_dir_cont}, the bias/variance trends are used. Importantly, if the marginal model $\upthetam$ is upper-bounded, the biased, fixed prior estimator $\mu_{\yrm | \xrm}$ will  always be used (on average) and the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \approx \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, regardless of how large the training data volume $N$ may be. 
+It is instructional to consider the trends of the excess squared error \eqref{eq:risk_cond_SE_dir_ex_cont} with training data volume $N$ and with Dirichlet prior parameterization. Referencing the predictive distribution estimation discussion in Section \ref{sec:predictive_est_dir_cont}, the bias/variance trends are used. Importantly, if the marginal model $\upthetam$ is upper-bounded, the biased, fixed prior estimator $\mu_{\yrm | \xrm}$ will  always be used (on average) and the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \approx \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, regardless of how large the training data volume $N$ may be. 
 
 If instead $\upthetam$ includes Dirac delta functions, there are values $x \in \Xcal$ with non-zero probabilities of being observed. At these values, if $\alpham(x)$ is bounded, the weights tend to
 \begin{IEEEeqnarray}{L} 
@@ -3230,7 +3230,7 @@ representing the minimum bias and maximum variance incurred by the empirical est
 %
 %Consider a data model where $\Xcal = \Ycal = [0, 1]$, the closed unit interval. The Dirichlet estimator is parameterized by $\alpham = 1$ and $\alphac(x) = \Beta(63, 63)$, such that the prior estimator $\mu_{\yrm | \xrm} = 0.5$ is constant; various localizations $\alpha_0$ will be used. 
 %
-%\Cref{fig:SSP_2021/Risk_SE_N_cont} displays the Bayesian squared-error realized by the Dirichlet-based regressor. The model $\uptheta$ is randomly selected from a Dirichlet process with the same $\alpham$ and $\alphac$ used for the regressor design and with the localization fixed at $\alpha_0 = 100$. Since $\alpham$ is bounded, the Bayes risk is $\Rcal^* \approx (1 + N / \alpha_0)^{-1} \Erm_{\xrm}\big[ \Sigma_{\yrm | \xrm} \big]$. Observe that the risk is independent of the value $\alpha_0$ chosen for the estimator, since $\delta(0)^{-1} \alpha_0 \alpham(x) \to 0$ and thus the empirical estimate will always be used when available. Additionally, note that $\Rcal^* \to 0$ as $N \to \infty$.
+%\Cref{fig:SSP_2021/Risk_SE_N_cont} displays the Bayesian squared error realized by the Dirichlet-based regressor. The model $\uptheta$ is randomly selected from a Dirichlet process with the same $\alpham$ and $\alphac$ used for the regressor design and with the localization fixed at $\alpha_0 = 100$. Since $\alpham$ is bounded, the Bayes risk is $\Rcal^* \approx (1 + N / \alpha_0)^{-1} \Erm_{\xrm}\big[ \Sigma_{\yrm | \xrm} \big]$. Observe that the risk is independent of the value $\alpha_0$ chosen for the estimator, since $\delta(0)^{-1} \alpha_0 \alpham(x) \to 0$ and thus the empirical estimate will always be used when available. Additionally, note that $\Rcal^* \to 0$ as $N \to \infty$.
 %\begin{figure}
 %\centering
 %\includegraphics[width=0.8\linewidth]{SSP_2021/Risk_SE_N_cont.png}
@@ -3245,7 +3245,7 @@ representing the minimum bias and maximum variance incurred by the empirical est
 
 Consider a data model where $\Xcal = \Ycal = [0, 1]$, the closed unit interval. The Dirichlet estimator is parameterized by $\alpham = 1$ and $\alphac(x) = \Beta(2, 2)$, such that the prior estimator $\mu_{\yrm | \xrm} = 0.5$ is constant; various localizations $\alpha_0$ will be used. 
 
-\Cref{fig:Continuous/SE/risk_bayes_N_leg_a0} displays the Bayesian squared-error realized by the Dirichlet-based regressor. The model $\uptheta$ is randomly selected from a Dirichlet process with the same $\alpham$ and $\alphac$ used for the regressor design and with the localization fixed at $\alpha_0 = 400$. Since $\alpham$ is bounded, the Bayes risk is $\Rcal^* \approx (1 + N / \alpha_0)^{-1} \Erm_{\xrm}\big[ \Sigma_{\yrm | \xrm} \big]$. Observe that the risk is independent of the value $\alpha_0$ chosen for the estimator, since $\delta(0)^{-1} \alpha_0 \alpham(x) \to 0$ and thus the empirical estimate will always be used when available. Additionally, note that as $N \to \infty$, the regressors always tend to $\Rcal^* \to 0$, which is equivalent to the expected irreducible squared-error.
+\Cref{fig:Continuous/SE/risk_bayes_N_leg_a0} displays the Bayesian squared error realized by the Dirichlet-based regressor. The model $\uptheta$ is randomly selected from a Dirichlet process with the same $\alpham$ and $\alphac$ used for the regressor design and with the localization fixed at $\alpha_0 = 400$. Since $\alpham$ is bounded, the Bayes risk is $\Rcal^* \approx (1 + N / \alpha_0)^{-1} \Erm_{\xrm}\big[ \Sigma_{\yrm | \xrm} \big]$. Observe that the risk is independent of the value $\alpha_0$ chosen for the estimator, since $\delta(0)^{-1} \alpha_0 \alpham(x) \to 0$ and thus the empirical estimate will always be used when available. Additionally, note that as $N \to \infty$, the regressors always tend to $\Rcal^* \to 0$, which is equivalent to the expected irreducible squared error.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.8\linewidth]{Continuous/SE/risk_bayes_N_leg_a0.png}
@@ -3253,7 +3253,7 @@ Consider a data model where $\Xcal = \Ycal = [0, 1]$, the closed unit interval. 
 	\label{fig:Continuous/SE/risk_bayes_N_leg_a0}
 \end{figure}
 
-Next, consider the risk trends when the true model is fixed. The marginal distribution $\thetam = 1$ is uniform and $\thetac(\xrm) = \Beta\big(4 \, \mu_{\yrm | \xrm,\uptheta}, 4 \, (1- \mu_{\yrm | \xrm,\uptheta})\big)$, where the clairvoyant regressor is $\mu_{\yrm | \xrm,\uptheta} = 1 / \big(2 + \sin(2\pi \xrm)\big)$. Comparing with the discrete-space models used for demonstration in Section \ref{sec:SE_dir_example}, observe that the optimal regressor $\mu_{\yrm | \xrm, \uptheta}$ and true predictive variance $\Sigma_{\yrm | \xrm, \uptheta} = 0.2 \, \mu_{\yrm | \xrm, \uptheta} (1 - \mu_{\yrm | \xrm, \uptheta})$ are the same; the irreducible squared-error $\Rcal_{\Theta}^*(\theta) \approx 0.038$ is approximately equal as well. However, since $\thetam$ is bounded, no effective learning is possible, the Bayesian estimator tends to $\mu_{\yrm | \xrm, \Drm} \to \mu_{\yrm | \xrm}$, and the excess risk tends to the maximum bias value $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \approx \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right] \approx 0.058$ regardless of the data volume $N$.
+Next, consider the risk trends when the true model is fixed. The marginal distribution $\thetam = 1$ is uniform and $\thetac(\xrm) = \Beta\big(4 \, \mu_{\yrm | \xrm,\uptheta}, 4 \, (1- \mu_{\yrm | \xrm,\uptheta})\big)$, where the clairvoyant regressor is $\mu_{\yrm | \xrm,\uptheta} = 1 / \big(2 + \sin(2\pi \xrm)\big)$. Comparing with the discrete-space models used for demonstration in Section \ref{sec:SE_dir_example}, observe that the optimal regressor $\mu_{\yrm | \xrm, \uptheta}$ and true predictive variance $\Sigma_{\yrm | \xrm, \uptheta} = 0.2 \, \mu_{\yrm | \xrm, \uptheta} (1 - \mu_{\yrm | \xrm, \uptheta})$ are the same; the irreducible squared error $\Rcal_{\Theta}^*(\theta) \approx 0.038$ is approximately equal as well. However, since $\thetam$ is bounded, no effective learning is possible, the Bayesian estimator tends to $\mu_{\yrm | \xrm, \Drm} \to \mu_{\yrm | \xrm}$, and the excess risk tends to the maximum bias value $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \approx \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right] \approx 0.058$ regardless of the data volume $N$.
 
 
 
@@ -3451,7 +3451,7 @@ PGR
 
 \subsubsection{Squared-Error Trends}
 
-The effects of discretization on the squared-error will be analyzed next. Using the second moments of the random process $\Delta(\xrm; \Drm,\upthetac)$ formulated in \eqref{eq:predictive_del_sq_dir_disc}, the excess squared-error is formulated as
+The effects of discretization on the squared error will be analyzed next. Using the second moments of the random process $\Delta(\xrm; \Drm,\upthetac)$ formulated in \eqref{eq:predictive_del_sq_dir_disc}, the excess squared error is formulated as
 \begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex_disc}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \nonumber \\
 \quad \equiv \int_{\Ycal} y \int_{\Ycal} y' \Erm_{\xrm,\Drm | \upthetam,\upthetac} \Big[ \Delta(y; \xrm; \Drm,\upthetac) \Delta(y'; \xrm; \Drm,\upthetac) \Big] {\drm}y {\drm}y' \nonumber \\
@@ -3464,21 +3464,21 @@ The effects of discretization on the squared-error will be analyzed next. Using 
 \end{IEEEeqnarray}
 a weighted summation of three terms, each of which can be viewed as second-order in terms of $y$. Note that the expectations over the observations space are performed using the operator equivalence $\Erm_{\xrm | \upthetam} \equiv \Erm_{\trm | \upthetam} \Erm_{\xrm | \trm, \upthetam}$, allowing select terms in \eqref{eq:predictive_del_sq_dir_disc} to be evaluated strictly in terms of the transformed observation $\trm$. The representation $\upthetacd(\trm) = \Erm_{\xrm | \trm, \upthetam}\big[ \upthetac(\xrm) \big] = \Erm_{\xrm | \trm, \upthetam}[\prm_{\yrm | \xrm,\upthetac}]$ is used throughout.
 
-Comparing with the discrete-domain excess squared-error \eqref{eq:risk_cond_SE_dir_ex}, there are both similar and new terms. The first two terms are directly comparable; instead of integrating over the observation space $\Xcal$, however, the expectation is evaluated using the transformed observation $\trm$. Additionally, note that the clairvoyant regressor \eqref{eq:f_clv_SE} and the its conditional variance $\Sigma_{\yrm | \xrm,\upthetac}$ are replaced by their expectations with respect to the conditional distribution $\prm_{\xrm | \trm, \upthetam}$. Note that $\Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$ represents the discretized clairvoyant regressor; the expected value of the Bayesian regressor tends to this function in the limit of training data volume. The additional term quantifies the discretization error via $\Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$, measuring the variation of the clairvoyant regressor within each discretization subset $\Xcal'(t)$. 
+Comparing with the discrete-domain excess squared error \eqref{eq:risk_cond_SE_dir_ex}, there are both similar and new terms. The first two terms are directly comparable; instead of integrating over the observation space $\Xcal$, however, the expectation is evaluated using the transformed observation $\trm$. Additionally, note that the clairvoyant regressor \eqref{eq:f_clv_SE} and the its conditional variance $\Sigma_{\yrm | \xrm,\upthetac}$ are replaced by their expectations with respect to the conditional distribution $\prm_{\xrm | \trm, \upthetam}$. Note that $\Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$ represents the discretized clairvoyant regressor; the expected value of the Bayesian regressor tends to this function in the limit of training data volume. The additional term quantifies the discretization error via $\Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$, measuring the variation of the clairvoyant regressor within each discretization subset $\Xcal'(t)$. 
 
-Next, consider the trends of the excess squared-error \eqref{eq:risk_cond_SE_dir_ex_disc}; the trends will have similarities with those of the discrete-domain observation problem discussed in Section \ref{sec:SE_dir}, with the appropriate deviations detailed in Section \ref{sec:predictive_est_dir_disc}.
+Next, consider the trends of the excess squared error \eqref{eq:risk_cond_SE_dir_ex_disc}; the trends will have similarities with those of the discrete-domain observation problem discussed in Section \ref{sec:SE_dir}, with the appropriate deviations detailed in Section \ref{sec:predictive_est_dir_disc}.
 
-First, consider the trends with training data volume $N$. For $N = 0$, the three weighting factors equate to one, zero, and one, respectively; as such, the excess squared-error measures the deviation between the data-independent regressor $\mu_{\yrm|\xrm}(\trm)$ and the discretized clairvoyant regressor $\Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$, as well as the variance of the clairvoyant estimator within the discretization subsets. Combined the formula can also be represented as $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm | \upthetam}\bigg[ \Big( \mu_{\yrm | \xrm}\big(T(\xrm)\big) - \mu_{\yrm | \xrm,\upthetac} \Big)^2 \bigg]$, demonstrating error due to the maximal bias. Conversely, as $N \to \infty$, only the new discretization error remains, such that $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\trm | \upthetam}\big[ \Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \big]$, the total average variance of the clairvoyant estimate within the subsets $\Xcal'(t)$. Because of this unavoidable bias, the discretized regressor is unable to achieve the irreducible risk $\Rcal_{\Theta}^*(\theta)$, no matter how much data is available for training -- this is the fundamental drawback of using discretization.
+First, consider the trends with training data volume $N$. For $N = 0$, the three weighting factors equate to one, zero, and one, respectively; as such, the excess squared error measures the deviation between the data-independent regressor $\mu_{\yrm|\xrm}(\trm)$ and the discretized clairvoyant regressor $\Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$, as well as the variance of the clairvoyant estimator within the discretization subsets. Combined the formula can also be represented as $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm | \upthetam}\bigg[ \Big( \mu_{\yrm | \xrm}\big(T(\xrm)\big) - \mu_{\yrm | \xrm,\upthetac} \Big)^2 \bigg]$, demonstrating error due to the maximal bias. Conversely, as $N \to \infty$, only the new discretization error remains, such that $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\trm | \upthetam}\big[ \Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \big]$, the total average variance of the clairvoyant estimate within the subsets $\Xcal'(t)$. Because of this unavoidable bias, the discretized regressor is unable to achieve the irreducible risk $\Rcal_{\Theta}^*(\theta)$, no matter how much data is available for training -- this is the fundamental drawback of using discretization.
 
 Next, consider the trends with the user-defined parameters. Again, for $\alpha_0 \to \infty$, the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm | \upthetam}\bigg[ \Big( \mu_{\yrm | \xrm}\big(T(\xrm)\big) - \mu_{\yrm | \xrm,\upthetac} \Big)^2 \bigg]$ due to the maximally biased estimation. For $\alpha_0 \to 0$, the expectations with respect to $\uppsimd$ will be analogous to those provided in Section \ref{sec:SE_dir}. Also, the optimal conditional prior concentrations $\bar{\alpha}_0'(t) \equiv \alpha_0 \alphamd(t)$ can be shown to be 
 \begin{IEEEeqnarray}{rCl} \label{eq:SE_alpha_bar_disc_opt}
 \bar{\alpha}_0'(\trm) & = & \frac{\Erm_{\xrm | \trm, \upthetam}[\Sigma_{\yrm | \xrm,\upthetac}] + \Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]}{\big( \mu_{\yrm | \xrm}(\trm) - \Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \big)^2}
 \end{IEEEeqnarray}
-for a given model $\uptheta$ and conditional prior mean $\alphac$. As with the discrete-domain results, the optimal conditional concentrations are directly proportionate to the conditional model variance and inversely proportional to the squared-bias between the prior regressor and the optimal regressor. Note that the dependency is measured through the expectation of these values with respect to $\prm_{\xrm | \trm, \upthetam}$. Additionally, observe that the optimal concentrations $\bar{\alpha}_0'(\trm)$ are directly proportional to the clairvoyant regressor variations $\Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$; discretization adds this additional source of uncertainty in the target value $\yrm$, increasing the risk of overfitting and motivating decreased weight on the empirical mean.
+for a given model $\uptheta$ and conditional prior mean $\alphac$. As with the discrete-domain results, the optimal conditional concentrations are directly proportionate to the conditional model variance and inversely proportional to the squared bias between the prior regressor and the optimal regressor. Note that the dependency is measured through the expectation of these values with respect to $\prm_{\xrm | \trm, \upthetam}$. Additionally, observe that the optimal concentrations $\bar{\alpha}_0'(\trm)$ are directly proportional to the clairvoyant regressor variations $\Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$; discretization adds this additional source of uncertainty in the target value $\yrm$, increasing the risk of overfitting and motivating decreased weight on the empirical mean.
 
 Lastly, consider the excess risk trends with the selection of the discretization transform $T$. As discussed in Section \ref{sec:predictive_est_dir_disc}, with $|\Tcal| \to \infty$ and $\int_{\Xcal'(t)} {\drm}x \to 0$, the conditional distribution $\prm_{\xrm | \trm, \upthetam}$ concentrates and the discretized conditional model $\upthetacd$ tends to the true model $\upthetac$; as a result, $\Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \to 0$ and the discretization error is eliminated. However, with a decreasing expected volume of data $N \uppsimd(t)$ matching each transformed observation, the expected value of the regressor tends to $f^*(\xrm; \Drm) \to \mu_{\yrm | \xrm}\big(T(\xrm)\big) \approx \mu_{\yrm | \xrm}$ and the excess risk tends to the high bias, zero variance value, $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\trm | \upthetam}\Big[ \big( \mu_{\yrm | \xrm}(\trm) - \Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \big)^2 \Big] \approx \Erm_{\xrm | \upthetam}\Big[ \big( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \big)^2 \Big]$. Note that this is the same as the continuous-domain Dirichlet regressor error for bounded $\thetam$, as detailed in Section \ref{sec:SE_dir_cont}.
 
-Contrasting, if the transform set is singleton, the expectations of $\uppsimd$ used for weighting will be at their lowest values (given sufficient training data); see the discussion in Section \ref{sec:predictive_est_dir_disc}. However, the extremity of the averaging in $\Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$ and in the discretization variance term $\Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$ will generally cause the total excess error to be prohibitively high. In practice, the degree of discretization must balance these competing sources of squared-error risk.
+Contrasting, if the transform set is singleton, the expectations of $\uppsimd$ used for weighting will be at their lowest values (given sufficient training data); see the discussion in Section \ref{sec:predictive_est_dir_disc}. However, the extremity of the averaging in $\Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$ and in the discretization variance term $\Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]$ will generally cause the total excess error to be prohibitively high. In practice, the degree of discretization must balance these competing sources of squared error risk.
 
 \todohi{Optimal discretizer for fixed Dirichlet params? Aggregate continuous alpha...}
 
@@ -3518,7 +3518,7 @@ To underscore the limitation of predictors with coarse discretization, consider 
 	\label{fig:Discretization/SE/predict_N_T4_a0_high}
 \end{figure}
 
-Figure \ref{fig:Discretization/SE/risk_N_leg_T} displays the squared-error achieved by the Dirichlet-based regressors for varying data volumes $N$ and for different discretization set sizes $|\Tcal|$. Unlike the regressors derived from full support priors (see the discrete domain results in Section \ref{sec:SE_dir_example}), these regressors do not achieve the irreducible squared-error $\Rcal_{\Theta}^*(\theta)$ in the limit of training data volume $N$. The $|\Tcal| = 4$ regressor is extremely sensitive to $N$ and consequently outperforms the learners using finer discretization if $N$ is relatively small; however, it produces the highest discretization error, making the discretization excessive when the training set is more voluminous. The $|\Tcal| = 4096$ regressor uses such fine discretization that it it under-utilizes the data and it barely improves over the range of values $N$ shown. Nonetheless, it has the smallest discretization error; if enough data is collected, it will eventually outperform all the other regressors and tend to a loss even lower than that realized by the $|\Tcal| = 128$ regressor. Clearly, for more middling training data volumes, the $|\Tcal| = 128$ regressor strikes the best balance between the two sources of risk. Also note that the Bayesian linear regressors suffer from the worst excess squared-error due to their low-dimensionality priors and poorly-matched set of achievable prediction functions.
+Figure \ref{fig:Discretization/SE/risk_N_leg_T} displays the squared error achieved by the Dirichlet-based regressors for varying data volumes $N$ and for different discretization set sizes $|\Tcal|$. Unlike the regressors derived from full-support priors (see the discrete domain results in Section \ref{sec:SE_dir_example}), these regressors do not achieve the irreducible squared error $\Rcal_{\Theta}^*(\theta)$ in the limit of training data volume $N$. The $|\Tcal| = 4$ regressor is extremely sensitive to $N$ and consequently outperforms the learners using finer discretization if $N$ is relatively small; however, it produces the highest discretization error, making the discretization excessive when the training set is more voluminous. The $|\Tcal| = 4096$ regressor uses such fine discretization that it it under-utilizes the data and it barely improves over the range of values $N$ shown. Nonetheless, it has the smallest discretization error; if enough data is collected, it will eventually outperform all the other regressors and tend to a loss even lower than that realized by the $|\Tcal| = 128$ regressor. Clearly, for more middling training data volumes, the $|\Tcal| = 128$ regressor strikes the best balance between the two sources of risk. Also note that the Bayesian linear regressors suffer from the worst excess squared error due to their low-dimensionality priors and poorly-matched set of achievable prediction functions.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.8\linewidth]{Discretization/SE/risk_N_leg_T.png}
@@ -3534,7 +3534,7 @@ Figure \ref{fig:Discretization/SE/risk_N_leg_T} displays the squared-error achie
 	\label{fig:Discretization/SE/risk_a0norm_leg_T}
 \end{figure} 
 
-To further demonstrate the importance of the selection of the discretization function, \Cref{fig:Discretization/SE/risk_T_leg_N,fig:Discretization/SE/risk_T_leg_a0} demonstrate the error trends as a function of $|\Tcal|$ for different data volumes and prior concentrations, respectively. In the former, note that the transform set cardinality that minimizes the squared-error is directly proportionate to the training data volume $N$. Conforming with the previous results, more data allows finer discretizers to be used, reducing the discretization error without the severe consequences of lower data sensitivity.
+To further demonstrate the importance of the selection of the discretization function, \Cref{fig:Discretization/SE/risk_T_leg_N,fig:Discretization/SE/risk_T_leg_a0} demonstrate the error trends as a function of $|\Tcal|$ for different data volumes and prior concentrations, respectively. In the former, note that the transform set cardinality that minimizes the squared error is directly proportionate to the training data volume $N$. Conforming with the previous results, more data allows finer discretizers to be used, reducing the discretization error without the severe consequences of lower data sensitivity.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.8\linewidth]{Discretization/SE/risk_T_leg_N.png}
@@ -4292,7 +4292,7 @@ Additionally, note that $\upthetam | \{\Drm = D\} \sim \upthetam | \big\{ \uppsi
 
 For generalized linear regression, the space of data-generating models $\prm_{\yrm | \xrm, \uptheta}$ considered is restricted to a finite-dimensional space $\theta \in \Uptheta = \Rbb^K$. The observed data distribution $\prm_{\xrm | \uptheta} = \prm_{\xrm}$ is fixed. Note that the space of the data probability distributions considered is a strict subset of the entire function space. The conditional mean has the form $\mu_{\yrm | \xrm, \uptheta} = \phi(\xrm)^\intercal \uptheta$, where $\phi: \Xcal \mapsto \Ycal^K$ is a vector-valued basis function. Additionally, the conditional variance is fixed and independent of $\xrm$, such that $\Sigma_{\yrm | \xrm,\uptheta} \equiv \Sigma_{\yrm}$. 
 
-Note that the clairvoyant estimator \eqref{eq:f_clv_SE} is $f_{\Theta}(\xrm;\uptheta) = \phi(\xrm)^\intercal \uptheta$ and the irreducible squared-error \eqref{eq:risk_clv_SE} is $\Rcal_{\Theta}^*(\uptheta) = \Sigma_{\yrm}$, which is independent of the true weights. To determine the optimal Bayesian estimator \eqref{eq:f_opt_SE}, note that the weights are conditionally independent of the novel observation $\xrm$ given the data $\Drm$, resulting in $f^*(\xrm;\Drm) = \phi(\xrm)^\intercal \mu_{\uptheta | \Drm}$. Plugging into \eqref{eq:risk_min_SE}, the minimum Bayesian squared-error is 
+Note that the clairvoyant estimator \eqref{eq:f_clv_SE} is $f_{\Theta}(\xrm;\uptheta) = \phi(\xrm)^\intercal \uptheta$ and the irreducible squared error \eqref{eq:risk_clv_SE} is $\Rcal_{\Theta}^*(\uptheta) = \Sigma_{\yrm}$, which is independent of the true weights. To determine the optimal Bayesian estimator \eqref{eq:f_opt_SE}, note that the weights are conditionally independent of the novel observation $\xrm$ given the data $\Drm$, resulting in $f^*(\xrm;\Drm) = \phi(\xrm)^\intercal \mu_{\uptheta | \Drm}$. Plugging into \eqref{eq:risk_min_SE}, the minimum Bayesian squared error is 
 \begin{IEEEeqnarray}{rCl}
 \Rcal^* & = & \Erm_{\uptheta}\big[\Rcal_{\Theta}^*(\uptheta)\big] + \Erm_{\xrm,\Drm} \Big[ \Crm_{\uptheta | \xrm,\Drm} \big[ f_{\Theta}(\xrm;\uptheta) \big] \Big] \nonumber \\
 & = & \Sigma_{\yrm} + \Erm_{\xrm,\Drm} \Big[ \phi(\xrm)^\intercal \Sigma_{\uptheta | \Drm} \phi(\xrm) \Big] \nonumber \\

@@ -8,7 +8,8 @@
 \graphicspath{{../Figures/}}
 
 \usepackage{amsmath,amssymb,amsfonts}
-\usepackage{bm}
+%\usepackage{bm}
+%\usepackage{statmath}
 \usepackage{upgreek}
 \usepackage[retainorgcmds]{IEEEtrantools}
 
@@ -20,6 +21,8 @@
 
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
+\newcommand{\inprob}{\overset{p}{\to}}
+
 
 \DeclareMathOperator{\Rbbgeq}{\mathbb{R}_{\geq 0}}
 \DeclareMathOperator{\Zbbgeq}{\mathbb{Z}_{\geq 0}}
@@ -75,7 +78,7 @@
 
 
 \begin{abstract}
-When taking a Bayesian approach to machine learning applications, the performance of the learned function strongly depends on how well the prior distribution selected by the designer matches the true data-generating model. Dirichlet priors have a number of desirable properties -- they result in closed-form posterior distributions given independent training data, have full support over the space of data probability distributions, and can be maximally informative or non-informative depending on their localization parameter. This paper assumes a Dirichlet prior and details the predictive distributions that characterize unobservable random quantities given observed data. The results are then applied to the most common loss function for regression, the squared-error loss. The optimal Bayes estimator and the resultant risk trends are presented for different prior localizations, demonstrating a bias/variance trade-off. 
+When taking a Bayesian approach to machine learning applications, the performance of the learned function strongly depends on how well the prior distribution selected by the designer matches the true data-generating model. Dirichlet priors have a number of desirable properties -- they result in closed-form posterior distributions given independent training data, have full support over the space of data probability distributions, and can be maximally informative or non-informative depending on their localization parameter. This paper assumes a Dirichlet prior and details the predictive distributions that characterize unobservable random quantities given observed data. The results are then applied to the most common loss function for regression, the squared error loss. The optimal Bayes regressor and the resultant risk trends are presented for different prior localizations, demonstrating a bias/variance trade-off. 
 \end{abstract}
 
 \begin{keywords}
@@ -85,7 +88,7 @@ Bayesian learning, machine learning, regression, estimation, Dirichlet distribut
 
 \section{Introduction}
 
-The success or failure of Bayesian learning methods hinge on how well the prior knowledge imparted by the designer matches reality. The chosen prior distribution over the set of data-generating probability distributions reflects the users confidence that different models are responsible for generating the observed/unobserved random elements. If a highly localized, ``informative" prior is chosen that strongly weights the actual data model, low risk learning functions are possible even with limited training data; however, if the localized prior is poorly selected, a good solution may not be achieved. Conversely, a non-informative prior provides fast adaptation during training and can be suitable for a variety of problems; if data is limited, however, the learning function may not deliver satisfactory performance.
+The success or failure of Bayesian learning methods hinges on how well the prior knowledge imparted by the designer matches reality. The chosen prior distribution over the set of data-generating probability distributions reflects the user's confidence that different models are responsible for generating the observed/unobserved random elements. If a highly localized, ``informative" prior that strongly weights the actual data model is chosen, low risk learning functions are possible even with limited training data; however, if the localized prior is poorly selected, a good solution may not be achieved. Conversely, a non-informative prior provides fast adaptation during training and can be suitable for a variety of problems; if data is limited, however, the learning function may not deliver satisfactory performance.
 
 This work assumes that the observed and unobserved data elements are jointly characterized by a Dirichlet prior. The class of Dirichlet probability density functions (PDF) has the desirable property of full support, guaranteeing consistent estimation of the true data-generating distribution; it also leads to a closed-form posterior distribution for independently and identically distributed (i.i.d.) data \cite{ferguson}. Furthermore, control of the Dirichlet parameters enables both minimally and maximally informative priors, providing a wide range of learning solutions.
 
@@ -101,7 +104,7 @@ Consider an observable scalar random variable $\xrm \in \Xcal \subset \Rbb$ and 
 Also observed is a random sequence of $N$ samples drawn from the model $\theta$, denoted $\Drm \in \Dcal = \{\Ycal \times \Xcal\}^N$. The $N$ data pairs are identically distributed as $\Prm_{\Drm_n | \uptheta}(y,x | \theta) = \theta(y,x)$ for $n = 1,\ldots,N$ and are conditionally independent from one another and from the novel pair $(\yrm,\xrm)$.
 
 
-The regression objective is to design a learning function $f: \Dcal \mapsto \Rbb^{\Xcal}$ which uses the training data to select an estimator from the set of functions $\Xcal \mapsto \Rbb$. The metric guiding the design is the squared-error loss function $\Lcal: \Rbb \times \Ycal \mapsto \Rbb_{\geq 0}$, defined as $\Lcal(y',y) = (y'-y)^2$. The expected loss, or ``risk'', is defined as
+The regression objective is to design a learning function $f: \Dcal \mapsto \Rbb^{\Xcal}$ which uses the training data to select an estimator from the set of functions $\Xcal \mapsto \Rbb$. The metric guiding the design is the squared error loss function $\Lcal: \Rbb \times \Ycal \mapsto \Rbb_{\geq 0}$, defined as $\Lcal(y',y) = (y'-y)^2$. The expected loss, or ``risk'', is defined as
 \begin{IEEEeqnarray}{L} \label{eq:risk_cond}
 \Rcal_{\Theta}(f ; \uptheta) = \Erm_{\Drm | \uptheta} \bigg[ \Erm_{\yrm,\xrm | \uptheta} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] \bigg] \\
 \quad = \Erm_{\xrm | \uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right] + \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( f(\xrm;\Drm) - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \nonumber \;,
@@ -147,7 +150,7 @@ where $\beta$ is the multivariate beta function, and the user-selected localizat
 
 An alternative representation is implemented via the bijection $\uptheta \Leftrightarrow (\upthetam,\upthetac)$, where the marginal distribution $\upthetam \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) \in \Pcal(\Xcal)$ and the conditional distributions $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x) \in \Pcal(\Ycal)$ for all $x \in \Xcal$. 
 
-By the aggregation property \cite{ferguson}, $\upthetam \sim \Dir(\alpha_0,\alpham)$ is a Dirichlet random process parameterized by localization $\alpha_0$ and mean $\alpham \equiv \sum_{y \in \Ycal} \alpha(y,\cdot)$. Also, it can be shown that the predictive models $\upthetac(x) \sim \Dir(\alpha_0 \alpham(x),\alphac)$ are independent Dirichlet processes, where $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x)$; they are independent of $\upthetam$ as well. 
+By the aggregation property \cite{ferguson}, $\upthetam \sim \Dir(\alpha_0,\alpham)$ is a Dirichlet random process parameterized by localization $\alpha_0$ and mean $\alpham \equiv \sum_{y \in \Ycal} \alpha(y,\cdot)$. Also, it can be shown that the predictive models $\upthetac(x) \sim \Dir\big(\alpha_0 \alpham(x),\alphac(x)\big)$ are independent Dirichlet processes with mean functions $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x)$; they are each independent of $\upthetam$, as well. 
 
 
 
@@ -179,7 +182,7 @@ The conditional distribution of the transformed process is
 \Prm_{\uppsi | \uptheta}(\psi | \theta) & = & \Mcal(N \psi) \left( \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\psi(y,x)} \right)^N \nonumber \\
 & \equiv & \Emp\big( \psi;N,\theta \big) \;,
 \end{IEEEeqnarray}
-an empirical PMF given $\uptheta$. As $\uppsi | \uptheta$ is equivalent to a normalized multinomial random process \cite{minka-multi}, the mean and covariance functions are $\mu_{\uppsi | \uptheta} = \uptheta$ and
+an empirical PMF. As $\uppsi | \uptheta$ is equivalent to a normalized multinomial random process \cite{minka-multi}, the mean and covariance functions are $\mu_{\uppsi | \uptheta} = \uptheta$ and
 \begin{IEEEeqnarray}{L}
 \Sigma_{\uppsi | \uptheta}(y,x,y',x' | \theta) \\
 \qquad = \frac{1}{N} \theta(y,x) \big( \delta[y,y'] \delta[x,x'] - \theta(y',x') \big) \nonumber \;.
@@ -221,7 +224,7 @@ where $\gamma(x; \uppsim) = \left( 1 + \frac{N \uppsim(x)}{\alpha_0 \alpham(x)} 
 %&& \quad + \left( 1 + \frac{\alpha_0 \alpham(x)}{N \uppsim(x)} \right)^{-1} \uppsic(x) \nonumber \\
 %& \equiv & \Prm_{\yrm | \xrm,\uppsi}(x,\psi) \;.
 %\end{IEEEeqnarray}
-Note that as the prior localization increases relative to the training data volume, $\gamma(x; \uppsim) \to 1$ and the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior. Conversely, for large training sets, $\gamma(x; \uppsim) \to 0$ and the mean tends to $\uppsic(x)$. Also, as $N \uppsim(x) \to \infty$, the PDF $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$ and the model is positively identified. This is a consequence of the full support of the Dirichlet distribution and does not hold in general. The adaptation of the posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde} for $\alpha_0 \alpham(x) = 6$ and $N \psim(x) = 3$.
+Note that as the prior localization increases relative to the training data volume, $\gamma(x; \uppsim) \inprob 1$ and the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior. Conversely, for increasingly large training sets, $\gamma(x; \uppsim) \inprob 0$ and the mean tends to $\uppsic(x)$. Also, as $N \uppsim(x) \inprob \infty$, the PDF $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$ and the model is positively identified. This results from the full support of the Dirichlet distribution and does not hold in general. The adaptation of the posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde} for $\alpha_0 \alpham(x) = 6$ and $N \psim(x) = 3$.
 %Note that as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to 0$, the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior mean. Conversely, as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to \infty$, the mean tends to $\uppsic(x)$. Also, for larger training sets $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$ and the model is positively identified. This is a consequence of the full support of the Dirichlet distribution and does not hold in general. The adaptation of the posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde} for $\alpha_0 \alpham(x) = 6$ and $N \psim(x) = 3$.
 \begin{figure}
 \centering
@@ -266,7 +269,7 @@ f^*(x;\psi) & \equiv & \gamma(x; \psim) \sum_{y \in \Ycal} \alphac(y;x) \ y \\
 %\end{IEEEeqnarray}
 The optimal estimate is a convex combination of two mean values -- the first moment of the data-independent PMF $\Prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$, and the conditional empirical mean.
 
-The weighting factors are inherited from $\Prm_{\yrm | \xrm,\uppsi}$; thus, stronger prior information (larger $\alpha_0 \alpham(x)$) provides more emphasis on the data-independent estimate $\mu_{\yrm|\xrm}$ and higher data volume $N \uppsim(x)$ puts emphasis on the empirical mean.
+The weighting factors are inherited from $\Prm_{\yrm | \xrm,\uppsi}$; thus, larger $\alpha_0 \alpham(x)$ (i.e., stronger prior information) puts more emphasis on the data-independent estimate $\mu_{\yrm|\xrm}$, and higher data volume $N \uppsim(x)$ puts emphasis on the empirical mean.
 
 
 
@@ -276,7 +279,7 @@ The weighting factors are inherited from $\Prm_{\yrm | \xrm,\uppsi}$; thus, stro
 
 %PGR: risk eq steps? comp complexity?
 
-Substituting the Bayesian estimator \eqref{eq:f_opt_SE} into \eqref{eq:risk_cond}, transforming to the empirical statistic, and exploiting the properties from Section \ref{sec:P_psi-theta_mc}, the excess squared-error risk is 
+Substituting the Bayesian estimator \eqref{eq:f_opt_SE} into \eqref{eq:risk_cond}, transforming to the empirical statistic, and exploiting the properties from Section \ref{sec:P_psi-theta_mc}, the excess squared error risk is 
 \begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\uppsi | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\uppsi} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
 \; \equiv \Erm_{\xrm | \upthetam}\Big[ \lambda_{\text{Bias}}(\xrm) \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 + \lambda_{\text{Var}}(\xrm) \Sigma_{\yrm | \xrm,\upthetac} \Big] \nonumber \;,
@@ -297,7 +300,7 @@ and
 %lambda__{\text{Bias}}(x) & = & \Erm_{\uppsim(x) | \upthetam(x)}\left[ \left(\frac{\alpha_0 \alpham(x)}{\alpha_0 \alpham(x) + N \uppsim(x)}\right)^2 \right] \;.
 %\end{IEEEeqnarray}
 
-The first function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. The second function depends on $\Sigma_{\yrm | \xrm,\upthetac}$ and measures the estimator variance in excess of the minimum squared-error $\Rcal_{\Theta}^*(\uptheta)$. Both functions are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam$ and $N$ via expectations with respect to $\Prm_{\uppsim | \upthetam}$. 
+The first function is dependent on the squared bias between the clairvoyant estimate $\mu_{\yrm | \xrm,\upthetac}$ and the data-independent estimate $\mu_{\yrm | \xrm}$. The second function depends on $\Sigma_{\yrm | \xrm,\upthetac}$ and measures the estimator variance in excess of the minimum squared error $\Rcal_{\Theta}^*(\uptheta)$. Both functions are scaled by factors dependent on the conditional prior localizations $\alpha_0 \alpham(x)$ and on $\upthetam$ and $N$ via expectations with respect to $\Prm_{\uppsim | \upthetam}$. 
 %By the aggregation property of empirical distributions, $N \uppsim(x) | \upthetam(x) \sim \Bi\big(N,\upthetam(x)\big)$ is binomially distributed. 
 Closed-forms have not been found for the empirical process expectations in \eqref{eq:bias} and \eqref{eq:var}.
 
@@ -313,7 +316,7 @@ Closed-forms have not been found for the empirical process expectations in \eqre
 \label{fig:Predict_SE_biased_hard}
 \end{figure}
 
-Consider the trends of the excess squared-error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. As $N$ tends to infinity, the distribution $\Prm_{\uppsim | \upthetam}$ concentrates such that $\uppsim \to \thetam$; thus for $\thetam(x) > 0$, the weights $\lambda_{\text{Var}}(x)$ and $\lambda_{\text{Bias}}(x)$ both tend to zero and $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable result is a consequence of the full support of the Dirichlet prior, which ensures the convergence of $\upthetac(x) | \uppsim(x),\uppsic(x) \to \uppsic(x)$ as $N \to \infty$.
+Consider the trends of the excess squared error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. As $N \to \infty$, the distribution $\Prm_{\uppsim | \upthetam}$ concentrates, such that $\uppsim \inprob \thetam$; thus, for $\thetam(x) > 0$, the weights $\lambda_{\text{Var}}(x)$ and $\lambda_{\text{Bias}}(x)$ both tend to zero and $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable result is a consequence of the full support of the Dirichlet prior, which ensures the convergence of $\upthetac(x) | \uppsim(x),\uppsic(x) \inprob \uppsic(x)$ as $N \to \infty$.
 
 %An interesting point regarding the dependency of the excess risk on $N$ is that there may be a local maximum. To demonstrate, consider the case of $|\Xcal| = 1$; treating $N$ as a real number, there would be a maximum at 
 %\begin{equation}
@@ -321,7 +324,7 @@ Consider the trends of the excess squared-error risk \eqref{eq:risk_cond_SE_dir_
 %\end{equation}
 %If the prior estimate $\mu_{\yrm | \xrm}$ has low bias and yet the prior confidence $\alpha_0$ is small, a local maximum may occur and additional training data may (temporarily) compromise the estimator performance. 
 %
-%Figure \ref{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased} exemplifies the excess conditional squared-error as a function of $N$ for such estimators with varying localization $\alpha_0$. The variable $\yrm$ is a discretization of the unit interval, such that $\Ycal = \{i/256: i \in 0,\ldots,255\}$, with $\thetac(y;x) = 1/256$ and $\alphac(y;x) = \Bi(256y;255,0.5)$.
+%Figure \ref{fig:Risk_cond_SE_Dir_N_leg_a0_unbiased} exemplifies the excess conditional squared error as a function of $N$ for such estimators with varying localization $\alpha_0$. The variable $\yrm$ is a discretization of the unit interval, such that $\Ycal = \{i/256: i \in 0,\ldots,255\}$, with $\thetac(y;x) = 1/256$ and $\alphac(y;x) = \Bi(256y;255,0.5)$.
 %\begin{figure}
 %\centering
 %\includegraphics[width=1\linewidth]{SSP_2021/Risk_cond_SE_Dir_N_leg_a0_unbiased.pdf}
@@ -331,28 +334,28 @@ Consider the trends of the excess squared-error risk \eqref{eq:risk_cond_SE_dir_
 
 Next consider the effects of the conditional prior localizations $\alpha'(x) \equiv \alpha_0 \alpham(x)$, which control a bias/variance risk trade-off. For maximal localization $\alpha'(x) \to \infty$, $\lambda_{\text{Bias}}(x) \to 1$ and $\lambda_{\text{Var}}(x) \to 0$. This is intuitive given that the estimator tends toward the data-independent solution. Conversely, for $\alpha'(x) \to 0$, $\lambda_{\text{Bias}}(x) \to \big( 1 - \upthetam(x) \big)^N$ and $\lambda_{\text{Var}}(x) \to \Erm_{\uppsim | \upthetam}\left[ \big( N \uppsim(x) \big)^{-1} \right]$. Note that the variance weight is equivalent to the first inverse moment of a positive binomial random variable \cite{stephan}.
 
-The values $\alpha'(x)$ that minimize the excess squared-error for given prior conditional distributions $\alphac(x)$ are of interest. Calculating the first derivative, it can be shown that (for $N > 0$ and $\thetam(x) > 0$) only one stationary point exists, at 
+The values $\alpha'(x)$ that minimize the excess squared error for given prior conditional distributions $\alphac(x)$ are of interest. Calculating the first derivative, it can be shown that (for $N > 0$ and $\thetam(x) > 0$) only one stationary point exists, at 
 \begin{equation} \label{eq:alpha_x_min_Rex}
 \alpha'(\xrm) = \frac{\Sigma_{\yrm | \xrm,\upthetac}}{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2} \;.
 \end{equation}
 This can readily be shown to be the global minimum.
 %Evaluation of the second derivative confirms the local minimum and comparison of the local risk value to the $\alpha'(x) \to 0$ and $\alpha'(x) \to \infty$ values confirms the global minimum.
 
-Note that the minimizing localization values $\alpha'(x)$ are inversely proportional to the squared-bias of the prior conditional mean. This is sensible -- the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low localizations are preferable when the conditional models have low variance; these models can be accurately identified by learners that emphasize the empirical mean, even with limited training data. 
+Note that the minimizing localization values $\alpha'(x)$ are inversely proportional to the squared bias of the prior conditional mean. This is sensible -- the better the match between the true and prior predictive distributions, the more confidence should be expressed. Also, low localizations are preferable when the conditional models have low variance; these models can be accurately identified by learners that emphasize the empirical mean, even with limited training data. 
 
 
 \section{Examples}
-To demonstrate the efficacy of Dirichlet-based regressors, consider a data model where $\Xcal$ and $\Ycal$ are 128-point discretizations of the unit interval, $\thetam$ is uniform, and $\thetac(y; \xrm) = \Bi\big(127y; 127, \mu_{\yrm | \xrm,\upthetac}\big)$; the clairvoyant estimate is $\mu_{\yrm | \xrm,\upthetac} = 1 / \big(2 + \sin(2\pi \xrm\big)$. The Dirichlet estimator is parameterized by $\alpham = \thetam$ and $\alphac(y; \xrm) = \Bi(127y; 127, \mu_{\yrm | \xrm})$, with $\mu_{\yrm | \xrm} = 0.5$. For comparison, a Bayesian linear regressor \cite{theodoridis-ML} using $\Sigma_{\yrm}=0.1$ and a Gaussian prior $\Ncal\big((0.5, 0), \Sigma_{\uptheta}\big)$ is evaluated, as well. Results were generated by averaging 50,000 iterations of a Python learning simulation.
+To demonstrate the efficacy of Dirichlet-based regressors, consider a data model where $\Xcal$ and $\Ycal$ are 128-point discretizations of the unit interval, $\thetam$ is uniform, and $\thetac(y; \xrm) = \Bi\big(127y; 127, \mu_{\yrm | \xrm,\upthetac}\big)$; the clairvoyant estimate is $\mu_{\yrm | \xrm,\upthetac} = 1 / \big(2 + \sin(2\pi \xrm\big)$. The Dirichlet regressor is parameterized by $\alpham = \thetam$ and $\alphac(y; \xrm) = \Bi(127y; 127, \mu_{\yrm | \xrm})$, with $\mu_{\yrm | \xrm} = 0.5$. For comparison, a Bayesian linear regressor \cite{theodoridis-ML} using $\Sigma_{\yrm}=0.1$ and a Gaussian prior $\Ncal\big((0.5, 0), \Sigma_{\uptheta}\big)$ is evaluated, as well. Results are generated by averaging 50,000 iterations of a Python-based learning simulation.
 %To demonstrate the efficacy of Dirichlet-based regressors, consider a data model where $\Xcal$ and $\Ycal$ are 128-point discretizations of the unit interval. The PMF $\thetam$ is uniform and $\thetac(y;x) = \Bi\big(128y; 128, \mu_{\yrm | \xrm,\uptheta}(x)\big)$, where the clairvoyant regressor is $\mu_{\yrm | \xrm,\uptheta}(x) \equiv 1 / \big(2 + \sin(2\pi x)\big)$. The Dirichlet estimator is parameterized by $\alpham = \thetam$ and $\alphac(y;x) = \Bi(128y; 128, 0.5)$. For comparison, a Bayesian linear regressor \cite{theodoridis-ML} using $\Sigma_{\yrm}=0.1$ and a Gaussian prior $\Ncal\big([0, 0.5], \Sigma_{\uptheta}\big)$ is evaluated, as well. Results were generated by averaging 50,000 iterations of a novel Python learning simulation.
 
-Figure \ref{fig:Predict_SE_biased_hard} provides a statistical visualization (mean and standard deviation) of the achieved regression functions. Observe that lower prior localization decreases prediction bias, but leads to more severe variance. Unlike the Bayesian linear regressor, the Dirichlet estimator uses a prior that is sufficient for approximation of complex non-linear functions.
+Figure \ref{fig:Predict_SE_biased_hard} provides a statistical visualization (using mean and standard deviation) of the achieved regression functions. Observe that lower prior localization decreases prediction bias, but leads to more severe variance. Unlike the Bayesian linear regressor, the Dirichlet regressor uses a prior that is sufficient for approximation of complex non-linear functions.
 
 
-Figure \ref{fig:Risk_cond_SE_N_biased_hard} shows the resultant expected squared-error as a function of $N$. Note that only the Dirichlet estimator can achieve zero excess risk, by virtue of its full support prior. Furthermore, with sufficient data, its performance will approach that of the clairvoyant estimator regardless of how biased the prior conditional mean $\alphac$ is, or how much confidence in $\alphac$ is indicated through the prior localization $\alpha_0$.
+Figure \ref{fig:Risk_cond_SE_N_biased_hard} shows the resultant expected squared error as a function of $N$. Note that only the Dirichlet regressor can achieve zero excess risk, by virtue of its full-support prior. Furthermore, with sufficient data, its performance will approach that of the clairvoyant estimator regardless of how biased the prior conditional mean $\alphac$ is, or how much confidence in $\alphac$ is indicated through the prior localization $\alpha_0$.
 \begin{figure}
 \centering
 \includegraphics[width=1\linewidth]{SSP_2021/Risk_cond_SE_N_biased_hard.png}
-\caption{Squared-Error vs. training data volume $N$}
+\caption{Squared-error vs. training data volume $N$}
 \label{fig:Risk_cond_SE_N_biased_hard}
 \end{figure}
 
@@ -371,7 +374,7 @@ Figure \ref{fig:Risk_cond_SE_N_biased_hard} shows the resultant expected squared
 
 \section{Conclusions}
 
-This paper has assumed a Dirichlet prior for Bayesian learning and applied the resultant predictive distribution to squared-error regression. Closed-forms have been provided for the optimal estimator and the achieved risk. Analysis and graphical examples highlight risk trends as a function of training data volume and the Dirichlet prior localization, demonstrating a bias/variance risk trade-off.
+This paper has assumed a Dirichlet prior for Bayesian learning and applied the resultant predictive distribution to squared error regression. Closed-form expressions have been provided for the optimal regressor and the achieved risk. Analysis and graphical examples highlight risk trends as a function of training data volume and the Dirichlet prior localization, demonstrating a bias/variance risk trade-off.
 
 Future work will generalize these concepts for data drawn from continuous spaces using the continuous Dirichlet process \cite{gershman}. The inherent adaptability due to the full prior support will highlight the utility of these Bayesian estimators for a wide range of regression problems; for data-limited applications, however, additional analysis is required to determine when limited-support priors are a practical necessity.
 
