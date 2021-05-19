@@ -24,6 +24,11 @@
 \usepackage{upgreek}
 \usepackage[retainorgcmds]{IEEEtrantools}
 
+%\usepackage{tikz}
+%\usepackage{listings}
+%\usepackage{booktabs, multicol, multirow}
+%\usepackage{algorthmicx}
+
 \usepackage{hyperref}
 \usepackage{cleveref}
 
@@ -42,73 +47,9 @@
 \newcommand{\todohi}[1]{\todo[inline,color=orange!50,linecolor=red]{#1}}
 \newcommand{\todohigh}[1]{\todo[inline,color=red!50,linecolor=red]{#1}}
 
-%\usepackage{tikz}
-%\usepackage{listings}
-%\usepackage{booktabs, multicol, multirow}
-%\usepackage{algorthmicx}
 
-
-\usepackage{etoolbox}
-\undef{\Bbb}
 \usepackage{mathfont_shortcuts}
-
-\DeclareMathOperator*{\argmin}{arg\,min}
-\DeclareMathOperator*{\argmax}{arg\,max}
-
-\DeclareMathOperator{\diag}{diag}
-
-\newcommand{\inprob}{\overset{p}{\to}}
-
-
-\DeclareMathOperator{\Rbbgeq}{\mathbb{R}_{\geq 0}}
-\DeclareMathOperator{\Zbbgeq}{\mathbb{Z}_{\geq 0}}
-
-\DeclareMathOperator{\Xcals}{\Xcal_{\mathrm{s}}}
-
-\DeclareMathOperator{\Dir}{\mathrm{Dir}}
-\DeclareMathOperator{\DM}{\mathrm{DM}}
-\DeclareMathOperator{\Multi}{\mathrm{Multi}}
-\DeclareMathOperator{\Bi}{\mathrm{Bi}}
-\DeclareMathOperator{\Beta}{\mathrm{Beta}}
-\DeclareMathOperator{\DP}{\mathrm{DP}}
-\DeclareMathOperator{\DMP}{\mathrm{DMP}}
-\DeclareMathOperator{\Emp}{\mathrm{Emp}}
-\DeclareMathOperator{\DE}{\mathrm{DE}}
-\DeclareMathOperator{\EP}{\mathrm{EP}}
-\DeclareMathOperator{\DEP}{\mathrm{DEP}}
-
-\DeclareMathOperator{\thetam}{\theta_\mathrm{m}}
-\DeclareMathOperator{\upthetam}{\uptheta_\mathrm{m}}
-\DeclareMathOperator{\thetac}{\theta_\mathrm{c}}
-\DeclareMathOperator{\upthetac}{\uptheta_\mathrm{c}}
-
-\DeclareMathOperator{\psim}{\psi_\mathrm{m}}
-\DeclareMathOperator{\Psim}{\Psi_\mathrm{m}}
-\DeclareMathOperator{\uppsim}{\uppsi_\mathrm{m}}
-\DeclareMathOperator{\Uppsim}{\Uppsi_\mathrm{m}}
-\DeclareMathOperator{\psic}{\psi_\mathrm{c}}
-\DeclareMathOperator{\Psic}{\Psi_\mathrm{c}}
-\DeclareMathOperator{\uppsic}{\uppsi_\mathrm{c}}
-\DeclareMathOperator{\Uppsic}{\Uppsi_\mathrm{c}}
-
-\DeclareMathOperator{\alpham}{\alpha_\mathrm{m}}
-\DeclareMathOperator{\alphac}{\alpha_\mathrm{c}}
-
-\DeclareMathOperator{\gammam}{\gamma_\mathrm{m}}
-
-
-\DeclareMathOperator{\upthetad}{\uptheta^\prime}
-\DeclareMathOperator{\upthetamd}{\uptheta_\mathrm{m}^\prime}
-\DeclareMathOperator{\upthetacd}{\uptheta_\mathrm{c}^\prime}
-\DeclareMathOperator{\uppsid}{\uppsi^\prime}
-\DeclareMathOperator{\Psid}{\Psi^\prime}
-\DeclareMathOperator{\psimd}{\psi_\mathrm{m}^\prime}
-\DeclareMathOperator{\uppsimd}{\uppsi_\mathrm{m}^\prime}
-\DeclareMathOperator{\uppsicd}{\uppsi_\mathrm{c}^\prime}
-\DeclareMathOperator{\Psimd}{\Psi_\mathrm{m}^\prime}
-\DeclareMathOperator{\Psicd}{\Psi_\mathrm{c}^\prime}
-\DeclareMathOperator{\alphamd}{\alpha_\mathrm{m}^\prime}
-\DeclareMathOperator{\gammamd}{\gamma_\mathrm{m}^\prime}
+\usepackage{PhDmath}
 
 
 \title{Bayesian Learning using a Dirichlet Prior for Regression and Classification}
@@ -182,7 +123,7 @@ PGR: complete rework!!
 
 This report details a Bayesian perspective on statistical learning theory for when both the observations and unobserved quantities are jointly distributed according to an unknown probability distribution function. While the validity of Bayesian methods for statistical signal processing and machine learning has long been contended, the author believes it to be a justified approach that does not necessarily imply that the distribution model is `random'; rather, it simply reflects the desire of the user to formulate risk as a weighted sum of learner performance across the space of distributions. 
 
-The success or failure of Bayesian learning methods hinge on how well the prior knowledge imparted by the designer matches reality. The chosen prior distribution over the set of data-generating probability distributions reflects the users confidence that different distributions are responsible for generating the observed/unobserved random elements. If a highly informative prior \cite{box} is chosen that is concentrated around the actual data probability distribution, low risk learning functions are possible even with limited training data; however, if the informative prior is poorly designed, a good solution may not be achieved. Conversely, a non-informative prior that weights the different distributions without preference provides a more robust solution for all models, but may underperform relative to learners based on well-selected informative priors.
+The success or failure of Bayesian learning methods hinge on how well the prior knowledge imparted by the designer matches reality. The chosen prior distribution over the set of data-generating probability distributions reflects the users confidence that different distributions are responsible for generating the observed/unobserved random elements. If a highly informative prior \cite{box} is chosen that is concentrated around the actual data probability distribution, low risk learning functions are possible even with limited training data; however, if the informative prior is poorly designed, a good solution may not be achieved. Conversely, a non-informative prior that weights the different distributions without preference provides a more robust solution for all models, but may under-perform relative to learners based on well-selected informative priors.
 
 This work assumes that the prior distribution is Dirichlet. The class of Dirichlet probability density functions (PDF) and processes have the desirable properties of full support over the set of possible data-generating distributions and an analytic posterior distribution for independently and identically distributed data \cite{ferguson}. Furthermore, control of the Dirichlet parameters can enable both non-informative and informative prior knowledge. Special cases including the uniform prior will be given specific attention.
 
