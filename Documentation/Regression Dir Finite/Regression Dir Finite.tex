@@ -21,7 +21,7 @@
 
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
-%\newcommand{\inprob}{\overset{p}{\to}}
+\newcommand{\inprob}{\overset{p}{\to}}
 
 
 \DeclareMathOperator{\Rbbgeq}{\mathbb{R}_{\geq 0}}
@@ -139,7 +139,7 @@ The Dirichlet prior PDF for the model random process $\uptheta \in \Theta$ is \c
 \prm_{\uptheta}(\theta) & = & \beta(\alpha_0 \alpha)^{-1} \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\alpha_0 \alpha(y,x) - 1} \nonumber \\
 & \equiv & \Dir(\theta; \alpha_0,\alpha) \;,
 \end{IEEEeqnarray}
-where $\beta$ is the multivariate beta function, and the user-selected localization parameter $\alpha_0 \in \Rbb^+$ and mean $\alpha \in \Pcal(\Ycal \times \Xcal) \cap {\Rbb^+}^{\Ycal \times \Xcal}$ are introduced. Note that as $\alpha_0 \to \infty$, the PDF tends to a maximally informative prior $\prm_{\uptheta} \to \delta(\cdot - \alpha)$, where $\delta$ is the Dirac delta function over $\Pcal(\Ycal \times \Xcal)$.
+where $\beta$ is the multivariate beta function, and the localization parameter $\alpha_0 \in \Rbb^+$ and mean $\alpha \in \Pcal(\Ycal \times \Xcal) \cap {\Rbb^+}^{\Ycal \times \Xcal}$ are introduced. Note that as $\alpha_0 \to \infty$, $\uptheta \inprob \alpha$ and thus the PDF tends to a maximally informative prior $\prm_{\uptheta} \to \delta(\cdot - \alpha)$, where $\delta$ is the Dirac delta function over $\Pcal(\Ycal \times \Xcal)$.
 
 
 
@@ -184,7 +184,7 @@ an empirical PMF. As $\uppsi | \uptheta$ is equivalent to a normalized multinomi
 \Sigma_{\uppsi | \uptheta}(y,x,y',x' | \theta) \\
 \qquad = \frac{1}{N} \theta(y,x) \big( \delta[y,y'] \delta[x,x'] - \theta(y',x') \big) \nonumber \;.
 \end{IEEEeqnarray}
-%Note that as $N \to \infty$, $\uppsi | \uptheta \to \uptheta$.
+Note that as $N \to \infty$, the process converges to $\uppsi | \uptheta \inprob \uptheta$.
 
 
 
@@ -221,7 +221,7 @@ where $\gamma(x; \uppsim) = \left( 1 + \frac{N \uppsim(x)}{\alpha_0 \alpham(x)} 
 %&& \quad + \left( 1 + \frac{\alpha_0 \alpham(x)}{N \uppsim(x)} \right)^{-1} \uppsic(x) \nonumber \\
 %& \equiv & \Prm_{\yrm | \xrm,\uppsi}(x,\psi) \;.
 %\end{IEEEeqnarray}
-Note that as the prior localization increases relative to the training data volume, $\gamma(x; \uppsim) \to 1$ and the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior. Conversely, for increasingly large training sets, $\gamma(x; \uppsim) \to 0$ and the mean tends to $\uppsic(x)$. Furthermore, as $N \uppsim(x) \to \infty$, the model posterior $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$; since $\uppsic | \upthetac \to \upthetac$, the model is positively identified. This results from the full support of the Dirichlet prior distribution and does not hold in general. The adaptation of the model posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde} for $\alpha_0 \alpham(x) = 6$ and $N \psim(x) = 3$.
+Note that as the prior localization increases relative to the training data volume, $\gamma(x; \uppsim) \to 1$ and the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior. Conversely, for increasingly large training sets, $\gamma(x; \uppsim) \to 0$ and the mean tends to $\uppsic(x)$. Furthermore, as $N \uppsim(x) \to \infty$, the model posterior $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$; since $\uppsic | \upthetac \inprob \upthetac$, the model is positively identified. This results from the full support of the Dirichlet prior distribution and does not hold in general. The adaptation of the model posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde} for $\alpha_0 \alpham(x) = 6$ and $N \psim(x) = 3$.
 %Note that as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to 0$, the posterior mean tends to $\alphac(x)$, reflecting confidence in the prior mean. Conversely, as $\frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \to \infty$, the mean tends to $\uppsic(x)$. Also, for larger training sets $\prm_{\upthetac(x) | \uppsim(x),\uppsic(x)} \to \delta\big( \cdot - \uppsic(x) \big)$ and the model is positively identified. This is a consequence of the full support of the Dirichlet distribution and does not hold in general. The adaptation of the posterior is demonstrated in Figure \ref{fig:P_theta_post_tilde} for $\alpha_0 \alpham(x) = 6$ and $N \psim(x) = 3$.
 \begin{figure}
 \centering
@@ -314,7 +314,7 @@ The first function is dependent on the squared bias between the clairvoyant esti
 \label{fig:Predict_SE_biased_hard}
 \end{figure}
 
-Consider the trends of the excess squared error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. As $N \to \infty$, the distribution $\Prm_{\uppsim | \upthetam}$ concentrates, such that $\uppsim \to \upthetam$; thus, for $\upthetam(x) > 0$, the weights $\lambda_{\text{Var}}(x; \upthetam)$ and $\lambda_{\text{Bias}}(x; \upthetam)$ both tend to zero and $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable result is a consequence of the full support of the Dirichlet prior, which ensures the convergence of $\upthetac(x) | \uppsim(x),\uppsic(x) \to \uppsic(x)$ as $N \to \infty$.
+Consider the trends of the excess squared error risk \eqref{eq:risk_cond_SE_dir_ex} with training data volume $N$ and with Dirichlet prior parameterization. As $N \to \infty$, the distribution $\Prm_{\uppsim | \upthetam}$ concentrates, such that $\uppsim \inprob \upthetam$; thus, for $\upthetam(x) > 0$, the weights $\lambda_{\text{Var}}(x; \upthetam)$ and $\lambda_{\text{Bias}}(x; \upthetam)$ both tend to zero and $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$. This desirable result is a consequence of the full support of the Dirichlet prior, which ensures the convergence of $\upthetac(x) | \uppsim(x),\uppsic(x) \inprob \uppsic(x)$ as $N \to \infty$.
 
 %An interesting point regarding the dependency of the excess risk on $N$ is that there may be a local maximum. To demonstrate, consider the case of $|\Xcal| = 1$; treating $N$ as a real number, there would be a maximum at 
 %\begin{equation}
