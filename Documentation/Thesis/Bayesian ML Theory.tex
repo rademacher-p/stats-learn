@@ -129,8 +129,9 @@
 \todomid{Dirichlet localization or concentration?}
 \todomid{Is Dir and DP redundant?? DM and DMP?}
 \todomid{Ditch PMF/PDF case? roman?}
-\todomid{R, Rtheta to Rbayes, R??}
+\todomid{R, Rtheta to Rbayes, R?? For f, too.}
 
+\todolo{Use convergence in prob symbol}
 \todolow{equation numbers to final line!}
 \todolow{line break symbol format, before/after?}
 \todolow{DIM and PR and LIM operators from AMS?}
@@ -505,7 +506,7 @@ The task in supervised machine learning is to design a learning function $f: \Dc
 The metric guiding the design is a loss function $\Lcal: \Hcal \times \Ycal \mapsto \Rbbgeq$ which penalizes the decision $h \in \Hcal$ based on the value of $\yrm$. The objective is to minimize the expected loss, or ``risk'',
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond}
 \Rcal_{\Theta}(f ; \uptheta) & = &  \Erm_{\yrm,\xrm,\Drm | \uptheta} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \\
-& = & \Erm_{\xrm,\Drm | \uptheta} \bigg[ \Erm_{\yrm | \xrm,\uptheta} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \nonumber \\
+& = & \Erm_{\Drm | \uptheta} \bigg[ \Erm_{\yrm, \xrm| \uptheta} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \nonumber \\
 & = & \Erm_{\Drm | \uptheta}\Bigg[ \Erm_{\xrm | \uptheta}\bigg[ \Erm_{\yrm | \xrm,\uptheta}\Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \Bigg] \nonumber \;,
 \end{IEEEeqnarray}
 where the conditional independence of random element $\yrm$ from the training data $\Drm$ given the model $\uptheta$ is used. As the model $\uptheta$ is not observed, $\Rcal_{\Theta}: \Theta \mapsto {\Rbbgeq}^{\Fcal}$ is not a feasible objective function for optimization. This is the fundamental challenge of supervised learning -- the true risk objective cannot be evaluated and the designer can never be precisely sure how well any learning function performs. 
@@ -524,7 +525,11 @@ f_{\Theta}(\uptheta) = \argmin_{f \in \Fcal} \Rcal_{\Theta}(f ; \uptheta) \;.
 %\begin{equation} \label{eq:f_clv_x}
 %f_{\Theta}(\xrm;\uptheta) = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \;.
 %\end{equation}
-For a given training set $\Drm$, the function $f_{\Theta}(\uptheta)$ selects the decision function $g = \argmin_{g \in \Hcal^{\Xcal}} \Erm_{\yrm,\xrm | \uptheta} \Big[ \Lcal\big(g(\xrm),\yrm\big) \Big]$. Note the conditional independence of $(\yrm,\xrm)$ from $\Drm$ in \eqref{eq:risk_cond} -- the knowledge of $\uptheta$ renders the training data $\Drm$ valueless. As such, the range of the clairvoyant function is recast as $f_{\Theta} : \Theta \mapsto \Hcal^{\Xcal}$ and the decisions are
+For a given training set $\Drm$, the function $f_{\Theta}(\uptheta)$ selects the decision function $g \in \Hcal^{\Xcal}$ that minimizes $\Erm_{\yrm,\xrm | \uptheta} \Big[ \Lcal\big(g(\xrm),\yrm\big) \Big]$. Note the conditional independence of $(\yrm,\xrm)$ from $\Drm$ in \eqref{eq:risk_cond} -- the knowledge of $\uptheta$ renders the training data $\Drm$ valueless. As such, the range of the clairvoyant function is recast as $f_{\Theta} : \Theta \mapsto \Hcal^{\Xcal}$, and
+\begin{equation} \label{eq:f_clv}
+f_{\Theta}(\uptheta) = \argmin_{g \in \Hcal^{\Xcal}} \Erm_{\yrm,\xrm | \uptheta} \Big[ \Lcal\big(g(\xrm),\yrm\big) \Big] \;.
+\end{equation}
+For a given observation, the clairvoyant decision is
 \begin{equation} \label{eq:f_clv_x}
 	f_{\Theta}(\xrm;\uptheta) = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \;.
 \end{equation}
@@ -550,7 +555,7 @@ Define the PDF $\prm_{\uptheta} \in \Pcal(\Uptheta)$. Now the Bayes risk can be 
 \begin{IEEEeqnarray}{rCl} \label{eq:risk}
 \Rcal(f) & = & \Erm_{\uptheta}\big[ \Rcal_{\Theta}(f ; \uptheta) \big] \\
 & = & \Erm_{\yrm,\xrm,\Drm}\big[ \Lcal(f(\xrm;\Drm),\yrm) \big] \nonumber \\
-& = & \Erm_{\xrm,\Drm}\bigg[ \Erm_{\yrm | \xrm,\Drm} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \nonumber \\
+& = & \Erm_{\Drm}\bigg[ \Erm_{\yrm, \xrm| \Drm} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \nonumber \\
 & = & \Erm_{\Drm}\Bigg[ \Erm_{\xrm | \Drm}\bigg[ \Erm_{\yrm | \xrm,\Drm} \Big[ \Lcal\big( f(\xrm;\Drm),\yrm \big) \Big] \bigg] \Bigg] \nonumber
 \end{IEEEeqnarray}
 and $\yrm$, $\xrm$, and $\Drm$ are treated as jointly distributed random elements. 
@@ -627,9 +632,7 @@ where $\Prm_{\Yrm | \Xrm} = \Erm_{\upthetam | \Xrm} \Big[ \Erm_{\upthetac | \upt
 
 Additionally, since $\Psi(\Drm)$ is a sufficient statistic for the model $\uptheta$, the Bayesian distributions of interest $\Prm_{\Drm}$, $\Prm_{\xrm | \Drm}$, and $\Prm_{\yrm | \xrm,\Drm}$ will also depend on $\Drm$ only through $\Psi(\Drm)$; as such, the training data can be transformed into the empirical process $\uppsi$ for Bayesian prediction without incurring any additional risk. 
 
-For this approach, the distributions $\Prm_{\uppsi}$, $\Prm_{\xrm | \uppsi}$, and $\Prm_{\yrm | \xrm,\uppsi}$ are required. Note that $\Prm_{\Drm | \uptheta}(D | \theta) = \Mcal\big( N \Psi(D) \big)^{-1} \Prm_{\uppsi | \uptheta}\big( \Psi(D) | \theta \big)$. Also, observe that the relevant posterior distributions satisfy $\prm_{\upthetam | \Drm} = \prm_{\upthetam | \uppsi}\big( \Psi(\Drm) \big)$ and $\prm_{\upthetac(x) | \xrm,\Drm} = \prm_{\upthetac(x) | \xrm,\uppsi}\big( \xrm,\Psi(\Drm) \big)$, due to the sufficiency of the statistic $\Psi(\Drm)$ \cite{bernardo}; consequently, $\Prm_{\xrm | \Drm} = \Prm_{\xrm | \uppsi}\big( \Psi(\Drm) \big)$, and $\Prm_{\yrm | \xrm,\Drm} = \Prm_{\yrm | \xrm,\uppsi}\big( \xrm,\Psi(\Drm) \big)$.
-
-
+For this approach, the distributions $\Prm_{\uppsi}$, $\Prm_{\xrm | \uppsi}$, and $\Prm_{\yrm | \xrm,\uppsi}$ are required. Note that $\Prm_{\Drm | \uptheta}(D | \theta) = \Mcal\big( N \Psi(D) \big)^{-1} \Prm_{\uppsi | \uptheta}\big( \Psi(D) | \theta \big)$. Also, observe that the relevant posterior distributions satisfy $\prm_{\upthetam | \Drm} = \prm_{\upthetam | \uppsi}\big( \Psi(\Drm) \big)$ and $\prm_{\upthetac(x) | \xrm,\Drm} = \prm_{\upthetac(x) | \xrm,\uppsi}\big( \xrm,\Psi(\Drm) \big)$, due to the sufficiency of the statistic $\Psi(\Drm)$ \cite{bernardo}; consequently, $\Prm_{\xrm | \Drm} = \Prm_{\xrm | \uppsi}\big( \Psi(\Drm) \big)$, and $\Prm_{\yrm | \xrm,\Drm} = \Prm_{\yrm | \xrm,\uppsi}\big( \xrm,\Psi(\Drm) \big)$. Also, $\prm_{\uptheta | \Drm} = \prm_{\uptheta | \uppsi}\big( \Psi(\Drm) \big)$ and thus $\Prm_{\yrm, \xrm| \Drm} = \Prm_{\yrm, \xrm| \uppsi}\big( \Psi(\Drm) \big)$.
 
 The posteriors can be represented as
 \begin{IEEEeqnarray}{rCl}
@@ -683,33 +686,28 @@ where $\Prm_{\uppsic | \uppsim} = \Erm_{\upthetam | \uppsim} \Big[ \Erm_{\upthet
 
 \subsection{Risk trends}
 
-\todohigh{Location???}
+\todohi{Location???}
 
-\todohigh{Prior support?}
+\todohi{Prior support? Must be bounded??}
 
-The trends in Bayesian risk as $N \to \infty$ are of specific interest. Recall that $\Prm_{\uppsi | \uptheta}(\psi | \theta) \to \delta[\psi, \theta]$. For priors with full support, observe that as the number of training samples increases, the statistic PMF tends toward $\Prm_{\uppsi}(\psi) \approx N^{1-|\Ycal||\Xcal|}\prm_{\uptheta}(\psi)$; this can be proven using Gautschi's inequality \cite{wendel}. Thus,
+\todohigh{FIXXXXXX lim}
+
+The trends in risk as $N \to \infty$ are of specific interest. Recall that $\Prm_{\uppsi | \uptheta}(\psi | \theta) \to \delta[\psi, \theta]$. For priors with full support, observe that as the number of training samples increases, the statistic PMF tends toward $\Prm_{\uppsi}(\psi) \approx N^{1-|\Ycal||\Xcal|}\prm_{\uptheta}(\psi)$; this can be proven using Gautschi's inequality \cite{wendel}. Thus,
 \begin{IEEEeqnarray}{rCl}
 \prm_{\uptheta | \uppsi}(\theta | \psi) & = & \frac{\Prm_{\uppsi | \uptheta}(\psi | \theta)}{\Prm_{\uppsi}(\psi)} \prm_{\uptheta}(\theta) \nonumber \\
 & \to & \delta(\theta - \psi)
 \end{IEEEeqnarray}
-and 
-\begin{IEEEeqnarray}{rCl}
-f^*(\xrm; \uppsi) & = & \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\uppsi}\big[ \Lcal(h,\yrm) \big] \nonumber \\
-& \equiv & \argmin_{h \in \Hcal} \sum_{y \in \Ycal} \uppsic(y; x) \Lcal(h,y) \nonumber \\
-& \equiv & \argmin_{h \in \Hcal} \sum_{n=1}^N \Lcal\big( h,Y_n \big) \delta[\xrm, X_n]
-\end{IEEEeqnarray}
-achieving
+and $\Prm_{\yrm, \xrm| \uppsi} = \mu_{\uptheta| \uppsi} \to \uppsi$.
+
+Representing $\uppsi | \uptheta \inprob \uptheta$ as $\Prm_{\yrm, \xrm| \uppsi} | \uptheta \inprob \Prm_{\yrm, \xrm| \uptheta}$, it is clear that $f^*(\Drm) | \uptheta \inprob f_{\Theta}(\uptheta)$, such that the clairvoyant learner is precisely identified, achieving
 \begin{IEEEeqnarray}{rCl} 
-\Rcal_{\Theta}(f ; \uptheta) & = & \Erm_{\xrm | \uptheta} \bigg[ \Erm_{\yrm | \xrm,\uptheta} \Big[ \Lcal\big( f(\xrm;\uptheta),\yrm \big) \Big] \bigg] \nonumber \\
-& = & \Rcal_{\Theta}^*(\uptheta) 
+\Rcal_{\Theta}(f ; \uptheta) & = & \Erm_{\yrm, \xrm | \uptheta} \bigg[ \Erm_{\Drm | \uptheta} \Big[ \Lcal\big( f^*(\xrm; \Drm),\yrm \big) \Big] \bigg] \nonumber \\
+& = & \Erm_{\yrm, \xrm | \uptheta} \Big[ \Lcal\big( f_{\Theta}(\xrm; \uptheta),\yrm \big) \Big] \nonumber \\
+& = & \Rcal_{\Theta}^*(\uptheta) \;.
 \end{IEEEeqnarray}
-demonstrating consistency of the full-support Bayesian learner.
-
-\todohigh{FIXXXXXX lim}
+This demonstrates the consistency of the full-support Bayesian learner.
 
 
-
-\todohi{terminology?}
 
 The irreducible risk \eqref{eq:risk_clv} for a given model satisfies $\Rcal_{\Theta}^*(\theta) \leq \Rcal_{\Theta}(f;\theta) \quad \forall f \in \Fcal, \ \theta \in \Uptheta$. Consequently, the Bayes risk satisfies $\Erm_{\uptheta} \big[ \Rcal_{\Theta}^*(\uptheta) \big] \leq \Rcal(f) \quad \forall f \in \Fcal$. Note that this inequality holds for any number of training samples $N$ and that the lower bound does not depend on $N$. Thus, even with unlimited training data, no learning function can provide a Bayes risk lower than this value.
 
@@ -2016,7 +2014,7 @@ PGR: plot captions, alpha zero or x???
 %\label{fig:SSP_2021/Predict_SE_biased_hard_N}
 %\end{figure}
 %
-%The Bayesian linear regressor with the Normal prior is highly biased, as its set of achievable estimator functions is critically limited; it also has lower variance than the Dirichlet-based estimators. This is a consequence of the lower-dimensionality, limited support prior -- there are fewer models $\theta \in \Pcal(\Ycal \times \Xcal)$ that are considered and thus fewer functions $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$ that can be realized. Contrasting, the Dirichlet estimator uses a full support prior, which is necessary to ensure that any complex clairvoyant estimator can be learned.
+%The Bayesian linear regressor with the Normal prior is highly biased, as its set of achievable estimator functions is critically limited; it also has lower variance than the Dirichlet-based estimators. This is a consequence of the lower-dimensionality, limited-support prior -- there are fewer models $\theta \in \Pcal(\Ycal \times \Xcal)$ that are considered and thus fewer functions $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$ that can be realized. Contrasting, the Dirichlet estimator uses a full support prior, which is necessary to ensure that any complex clairvoyant estimator can be learned.
 %
 %Figure \ref{fig:SSP_2021/Risk_cond_SE_N_biased_hard} shows the resultant expected squared error as a function of $N$. Observe that the Dirichlet-based estimator trends toward the irreducible risk $\Rcal_{\Theta}^*(\theta)$, regardless of how much confidence in the data-independent regressor $\mu_{\yrm | \xrm}$ is indicated through the prior localization $\alpha_0$. Furthermore this trend holds no matter how severe the bias of $\alphac$ might be. This is a consequence of the Bayesian predictive distribution $\Prm_{\yrm | \xrm,\Drm}$ being a consistent estimator of the true predictive model $\thetac$, which is guaranteed by the Dirichlet prior's full support. In contrast, the Bayesian linear regressor will generally result in non-zero excess squared error, no matter how much training data is available. 
 %\begin{figure}
