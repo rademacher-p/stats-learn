@@ -205,6 +205,8 @@ will be used repeatedly.
 
 \subsection*{Random elements, variables, and processes}
 
+\todolo{Introduce convergence in probability, relate to delta PDF convergence?}
+
 Random elements are denoted with roman font (e.g., $\xrm$), while specific values are denoted with italics (e.g., $x$). Random elements that assume numerical scalars/functions are referred to as random variables/processes, respectively.
 
 Consider a random element $\xrm \in \Xcal$. If $\Xcal$ is countable, either finite with $|\Xcal| \in \Nbb$ or countably infinite with $|\Xcal| = \aleph_0$, then $\xrm$ is a discrete random element and is characterized by a probability mass function (PMF) \cite {papoulis}, denoted $\Prm_{\xrm} \in \Pcal(\Xcal)$. If $\Xcal$ is a Euclidean space and is thus uncountable with $|\Xcal| \geq \aleph_1$, then $\xrm$ is a continuous random variable/process characterized by a probability density function (PDF), denoted $\prm_{\xrm} \in \Pcal(\Xcal)$.
@@ -213,7 +215,7 @@ Consider a random element $\xrm \in \Xcal$. If $\Xcal$ is countable, either fini
 
 Consider $\xrm$ conditioned on another random element $\zrm \in \Zcal$. The conditional distribution is represented as $\Prm_{\xrm | \zrm} : \Zcal \mapsto \Pcal(\Xcal)$, such that $\Prm_{\xrm | \zrm}(z)$ is a PMF over $\Xcal$ and $\Prm_{\xrm | \zrm}(x|z)$ is a specific value of that PMF. Often, the dependency on the conditional variable $\zrm$ will not be expressed in terms of a specific value $z$, but will be left in terms of the random element itself; in this case, the more compact notation $\Prm_{\xrm | \zrm}$ is used to imply $\Prm_{\xrm | \zrm}(\zrm)$, a function of $\zrm$.
 
-\todohi{Ever need the full functional?}
+\todomid{Ever need the full functional?}
 
 Many distributions will be repeatedly used and thus special functions will be defined for the PDF's and PMF's of interest. For example, consider a random process $\xrm \in \Xcal$ characterized by a Multinomial distribution with parameters $N \in \Zbbgeq$ and $\theta \in \Uptheta$; the PDF will be notated as $\Multi : \Zbbgeq \times \Uptheta \mapsto \Pcal(\Xcal)$, where the range is the set of valid PDF's. More compactly, the notation $\xrm \sim \Multi(N, \theta)$ implies that $\Prm_{\xrm} = \Multi(N, \theta)$. Other distribution functions repeatedly used include $\Dir$, $\DE$, $\DP$, and $\DEP$, representing the Dirichlet distribution, the Dirichlet-Empirical distribution, the Dirichlet process, and the Dirichlet-Empirical process.
 
