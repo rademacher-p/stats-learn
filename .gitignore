@@ -4,6 +4,7 @@ Documentation/Thesis/*.pdf
 Documentation/Qualifying Exam/*.pdf
 Documentation/Density Est Dir/Density Est Dir.pdf
 Documentation/Classification Uni Finite/Classification Uni Finite.pdf
+Documentation/Classification Uni Finite/Classification Uni Finite - Presentation.pdf
 Documentation/Regression Dir Finite/Regression Dir Finite.pdf
 
 Documentation/Old/
@@ -291,6 +292,3 @@ TSWLatexianTemp*
 
 # Makeindex log files
 *.lpz
-
-
-
