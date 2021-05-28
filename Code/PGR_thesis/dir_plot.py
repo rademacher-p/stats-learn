@@ -1,74 +1,123 @@
+from warnings import warn
+
 # import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
 from thesis.random import elements as rand_elements
-from thesis.util import spaces
+from thesis.util import spaces, plotting
 
 plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{amsmath}")
 
-mean = np.array([.4, .3, .3])
-alpha_0 = 6
-dir_prior = rand_elements.Dirichlet(mean, alpha_0)
 
-psi = np.array([0, 1 / 3, 2 / 3])
-n = 3
+def plot_dirs(dirs, n_plot=None, titles=None, orient='h', same_cm=True, cm_hack=False):
 
-alpha_0_post = alpha_0 + n
-mean_post = (alpha_0 * mean + n * psi) / alpha_0_post
-dir_post = rand_elements.Dirichlet(mean_post, alpha_0_post)
+    n_dirs = len(dirs)
+    if titles is None:
+        titles = [None for __ in range(n_dirs)]
 
-dir_prior.space.n_plot = 150
-dir_post.space.n_plot = 150
+    if orient == 'h':
+        subplot_shape = (1, n_dirs)
+    else:
+        subplot_shape = (n_dirs, 1)
+    fig, axes = plt.subplots(*subplot_shape, subplot_kw={'projection': '3d'})
 
-mean = np.round(np.array(mean) * 100) / 100
-psi = np.round(np.array(psi) * 100) / 100
-titles = [r'$\mathrm{Prior}: \alpha_\mathrm{c}(x) = ' + f"{tuple(mean)}$",
-          r'$\mathrm{Posterior}: \psi_\mathrm{c}(x) = ' + f"{tuple(psi)}$"]
+    space = spaces.check_spaces(dirs)
 
-fig, axes = plt.subplots(1, 2, subplot_kw={'projection': '3d'})
+    if n_plot is None:
+        n_plot = space.n_plot
 
-space = spaces.check_spaces([dir_prior, dir_post])
-x = space.x_plt
-y = dir_prior.pf(x)
-y_post = dir_post.pf(x)
+    for dir_i in dirs:
+        dir_i.space.x_plt = plotting.simplex_grid(n_plot, dir_i.shape, hull_mask=(dir_i.mean < 1 / dir_i.alpha_0))
 
-y_max = np.concatenate((y, y_post)).max()
+    x_vec = [dir_i.space.x_plt for dir_i in dirs]
+    y_vec = [dir_i.pf(dir_i.space.x_plt) for dir_i in dirs]
+    for i in range(n_dirs):
+        i_sort = np.argsort(y_vec[i])
+        x_vec[i] = x_vec[i][i_sort]
+        y_vec[i] = y_vec[i][i_sort]
 
-c = [y / y_max, y_post / y_max]
-c = [plt.cm.viridis(i) for i in c]
+    if same_cm:
+        y_max = np.max(np.concatenate(y_vec))
+        c_maps = [plt.cm.viridis(y / y_max) for y in y_vec]
+    else:
+        c_maps = [plt.cm.viridis(y / np.max(y)) for y in y_vec]
 
-# for r, ax in zip([dir_prior], [axes]):
-for i, (r, ax, title) in enumerate(zip([dir_prior, dir_post], axes, titles)):
-    lims = (0, 1)
-    ax.set_xlim3d(*lims)
-    ax.set_ylim3d(*lims)
-    ax.set_zlim3d(*lims)
+        if cm_hack:
+            warn("CM hack!")
+            z = y_vec[0]
+            z /= np.max(z)
+            z *= 5
+            z = np.where(z <= 1, z, 1)
+            c_maps[0] = plt.cm.viridis(z)
 
-    ax.set_box_aspect((1, 1, 1))
+    for dir_i, x, ax, title, c in zip(dirs, x_vec, axes, titles, c_maps):
+        lims = (0, 1)
+        ax.set_xlim3d(*lims)
+        ax.set_ylim3d(*lims)
+        ax.set_zlim3d(*lims)
 
-    # ticks = []
-    ticks = [0, .5, 1]
-    ax.set_xticks(ticks)
-    ax.set_yticks(ticks)
-    ax.set_zticks(ticks)
+        ax.set_box_aspect((1, 1, 1))
 
-    pane_color = (1.0, 1.0, 1.0, 1.0)
-    ax.w_xaxis.set_pane_color(pane_color)
-    ax.w_yaxis.set_pane_color(pane_color)
-    ax.w_zaxis.set_pane_color(pane_color)
+        ticks = [0, .5, 1]
+        ax.set_xticks(ticks)
+        ax.set_yticks(ticks)
+        ax.set_zticks(ticks)
 
-    ax.view_init(45, 45)
+        # pane_color = (1.0, 1.0, 1.0, 1.0)
+        pane_color = (.5, .5, .5, 1.)
+        ax.w_xaxis.set_pane_color(pane_color)
+        ax.w_yaxis.set_pane_color(pane_color)
+        ax.w_zaxis.set_pane_color(pane_color)
 
-    ax.set_xlabel(r'$\theta_\mathrm{c}(\mathcal{Y}_1; x)$')
-    ax.set_ylabel(r'$\theta_\mathrm{c}(\mathcal{Y}_2; x)$')
-    ax.set_zlabel(r'$\theta_\mathrm{c}(\mathcal{Y}_3; x)$')
+        ax.view_init(45, 45)
 
-    # r.plot_pf(ax=ax)
-    space.plot(r.pf, x, ax=ax, c=c[i])
+        ax.set_xlabel(r'$\theta_\mathrm{c}(\mathcal{Y}_1; x)$')
+        ax.set_ylabel(r'$\theta_\mathrm{c}(\mathcal{Y}_2; x)$')
+        ax.set_zlabel(r'$\theta_\mathrm{c}(\mathcal{Y}_3; x)$')
 
-    ax.set_title(title)
+        space.plot(dir_i.pf, x, ax=ax, c=c, s=3)
+
+        ax.set_title(title)
+
+
+def prior_post():
+    mean = np.array([.4, .3, .3])
+    alpha_0 = 6
+    dir_prior = rand_elements.Dirichlet(mean, alpha_0)
+
+    psi = np.array([0, 1 / 3, 2 / 3])
+    n = 3
+
+    alpha_0_post = alpha_0 + n
+    mean_post = (alpha_0 * mean + n * psi) / alpha_0_post
+    dir_post = rand_elements.Dirichlet(mean_post, alpha_0_post)
+
+    dirs = [dir_prior, dir_post]
+
+    titles = [r'$\mathrm{Prior}: \alpha_\mathrm{c}(x) = ' + f'{tuple(np.round(np.array(mean) * 100) / 100)}$',
+              r'$\mathrm{Posterior}: \psi_\mathrm{c}(x) = ' + f'{tuple(np.round(np.array(psi) * 100) / 100)}$']
+
+    plot_dirs(dirs, n_plot=150, titles=titles, same_cm=True)
+
+
+def localization():
+    mean = np.array(np.ones(3) / 3)
+    alpha_0_vec = [1e-2, 1e2]
+    dirs = [rand_elements.Dirichlet(mean, alpha_0) for alpha_0 in alpha_0_vec]
+
+    titles = [r'$\alpha_0 \alpha_\mathrm{m}(x) \to 0$',
+              r'$\alpha_0 \alpha_\mathrm{m}(x) \to \infty$']
+    # titles = [r'$\alpha_0 \alpha_\mathrm{m}(x) = ' + f'{alpha_0}$' for alpha_0 in alpha_0_vec]
+
+    plot_dirs(dirs, n_plot=150, titles=titles, orient='v', same_cm=False, cm_hack=True)
+
+
+if __name__ == '__main__':
+    # prior_post()
+    localization()
+
 
 # ax[1].set_xlim(0, 1)
 # ax[1].set_ylim(0, 1)
