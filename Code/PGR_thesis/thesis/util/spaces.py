@@ -322,7 +322,7 @@ class Finite(Discrete):
 #
 #         elif set_ndim == 3 and self.shape == (3,):
 #             plt_data = ax.scatter(x[..., 0], x[..., 1], x[..., 2], s=15, c=y, label=label)
-#             c_bar = plt.colorbar(plt_data)
+#             c_bar = plt.colorbar(plt_data, ax=ax)
 #             c_bar.set_label('$f(x)$')
 #
 #             return plt_data
@@ -463,7 +463,7 @@ class FiniteGeneric(Finite):
         elif set_ndim == 3 and self.shape == (3,) and np.issubdtype(self.dtype, np.number):
             plt_data = ax.scatter(x[..., 0], x[..., 1], x[..., 2], s=15, c=y, label=label)
 
-            c_bar = plt.colorbar(plt_data)
+            c_bar = plt.colorbar(plt_data, ax=ax)
             c_bar.set_label('$f(x)$')
 
             return plt_data
@@ -683,8 +683,8 @@ class Simplex(Continuous):
         else:
             raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
-        c_bar = plt.colorbar(plt_data)
-        c_bar.set_label('$f(x)$')
+        # c_bar = plt.colorbar(plt_data, ax=ax)
+        # c_bar.set_label('$f(x)$')
 
         return plt_data
 
