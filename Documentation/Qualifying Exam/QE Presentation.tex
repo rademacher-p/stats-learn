@@ -7,17 +7,16 @@
 
 \setbeamerfont{footnote}{size=\tiny}
 
-\usefonttheme[onlymath]{serif} %%%%%%%%%
+\usefonttheme[onlymath]{serif}
 
 \colorlet{bumper}{NavyBlue}
 
 
 
-%\bibliography{{../References/phd_bib}}
+%\bibliography{{PhD_refs_QE_presentation}}
 
 \usepackage[style=authortitle-comp,maxnames=1]{biblatex} % PGR: backend=biber???
-\addbibresource{../References/PhD_refs_QE_presentation.bib}
-
+\addbibresource{PhD_refs_QE_presentation.bib}
 
 
 %%\addtobeamertemplate{footnote}{\vspace{-6pt}\advance\hsize-0.5cm}{\vspace{6pt}}
@@ -67,8 +66,6 @@
 
 
 
-
-
 \setlength{\fboxsep}{3pt}
 \setlength{\fboxrule}{2pt}
 
@@ -78,50 +75,10 @@
 \graphicspath{ {../Figures/} }
 
 
-\DeclareMathOperator*{\argmin}{arg\,min}
-\DeclareMathOperator*{\argmax}{arg\,max}
+\usepackage{mathfont_shortcuts}
+\usepackage{PhDmath}
 
-\DeclareMathOperator{\xrm}{\mathrm{x}}
-\DeclareMathOperator{\Xrm}{\mathrm{X}}
-\DeclareMathOperator{\yrm}{\mathrm{y}}
-\DeclareMathOperator{\Yrm}{\mathrm{Y}}
-\DeclareMathOperator{\Drm}{\mathrm{D}}
-\DeclareMathOperator{\nrm}{\mathrm{n}}
 \DeclareMathOperator{\nbarrm}{\bar{\mathrm{n}}}
-\DeclareMathOperator{\zrm}{\mathrm{z}}
-\DeclareMathOperator{\srm}{\mathrm{s}}
-\DeclareMathOperator{\trm}{\mathrm{t}}
-\DeclareMathOperator{\Trm}{\mathrm{T}}
-
-\DeclareMathOperator{\Prm}{\mathrm{P}}
-\DeclareMathOperator{\prm}{\mathrm{p}}
-\DeclareMathOperator{\Erm}{\mathrm{E}}
-\DeclareMathOperator{\Crm}{\mathrm{C}}
-
-\DeclareMathOperator{\Xcal}{\mathcal{X}}
-\DeclareMathOperator{\Ycal}{\mathcal{Y}}
-\DeclareMathOperator{\Dcal}{\mathcal{D}}
-\DeclareMathOperator{\Ncal}{\mathcal{N}}
-\DeclareMathOperator{\Zcal}{\mathcal{Z}}
-\DeclareMathOperator{\Hcal}{\mathcal{H}}
-\DeclareMathOperator{\Fcal}{\mathcal{F}}
-\DeclareMathOperator{\Rcal}{\mathcal{R}}
-\DeclareMathOperator{\Mcal}{\mathcal{M}}
-\DeclareMathOperator{\Scal}{\mathcal{S}}
-\DeclareMathOperator{\Pcal}{\mathcal{P}}
-\DeclareMathOperator{\Lcal}{\mathcal{L}}
-\DeclareMathOperator{\Tcal}{\mathcal{T}}
-
-\DeclareMathOperator{\Rbb}{\mathbb{R}}
-\DeclareMathOperator{\Nbb}{\mathbb{N}}
-\DeclareMathOperator{\Zbb}{\mathbb{Z}}
-
-\DeclareMathOperator{\Dir}{\mathrm{Dir}}
-\DeclareMathOperator{\DM}{\mathrm{DM}}
-\DeclareMathOperator{\Multi}{\mathrm{Multi}}
-\DeclareMathOperator{\Bi}{\mathrm{Bi}}
-\DeclareMathOperator{\DP}{\mathrm{DP}}
-\DeclareMathOperator{\DMP}{\mathrm{DMP}}
 
 
 %\newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}} % statistical independence symb
