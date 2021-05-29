@@ -99,7 +99,7 @@ def prior_post():
     titles = [r'$\mathrm{Prior}: \alpha_\mathrm{c}(x) = ' + f'{tuple(np.round(np.array(mean) * 100) / 100)}$',
               r'$\mathrm{Posterior}: \psi_\mathrm{c}(x) = ' + f'{tuple(np.round(np.array(psi) * 100) / 100)}$']
 
-    plot_dirs(dirs, n_plot=150, titles=titles, same_cm=True)
+    plot_dirs(dirs, n_plot=150, titles=titles, orient='h', same_cm=True)
 
 
 def localization():
@@ -115,8 +115,8 @@ def localization():
 
 
 if __name__ == '__main__':
-    # prior_post()
-    localization()
+    prior_post()
+    # localization()
 
 
 # ax[1].set_xlim(0, 1)
