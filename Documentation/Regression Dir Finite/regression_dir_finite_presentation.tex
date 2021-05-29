@@ -26,6 +26,7 @@
 
 \usepackage{bm}
 \usepackage{hhline}
+\usepackage{xcolor}
 
 
 \setlength{\fboxsep}{3pt}
@@ -39,6 +40,8 @@
 \DeclareMathOperator{\nbarrm}{\bar{\mathrm{n}}}
 
 
+\newcommand{\indep}{\perp \!\!\! \perp}
+%\DeclareMathOperator*{\indep}{\perp \!\!\! \perp}
 \newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
 \def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
 
@@ -163,7 +166,7 @@ Dirichlet prior distributions have a number of desirable properties:
 
 \vspace{0.5em}
 
-Independently, identically distributed according to an \underline{unknown} probability mass function (PMF) 
+Independently, identically distributed according to an \alert{unknown} probability mass function (PMF) 
 \begin{equation*}
 \uptheta \in \Theta = \left\{ \theta \in {\Rbb_{\geq 0}}^{\Ycal \times \Xcal}: \sum_{y \in \Ycal} \sum_{x \in \Xcal} \theta(y,x) = 1 \right\} \ ,
 \end{equation*}
@@ -174,8 +177,8 @@ such that $\Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) = \Prm_{\Drm_n | \uptheta}(
 \vspace{0.5em}
 \textit{Alternate Notation}: $\uptheta \Leftrightarrow \big( \upthetam,\upthetac \big)$
 \begin{itemize}
-\item Marginal model $\upthetam \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) = \Prm_{\xrm | \uptheta}$ over the set $\Xcal$ 
-\item Conditional models $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x) = \Prm_{\yrm | \xrm,\uptheta}$ over the set $\Ycal$
+\item Marginal model $\upthetam \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) = \Prm_{\xrm | \uptheta} \equiv \Prm_{\xrm | \upthetam}$
+\item Conditional models $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x) = \Prm_{\yrm | \xrm,\uptheta} \equiv \Prm_{\yrm | \xrm,\upthetac}$ 
 \end{itemize}
 
 \end{frame}
@@ -247,7 +250,7 @@ where data is represented using $\Psi : \Dcal \mapsto \Uppsi \subset \Theta$, de
 \end{itemize}
 \item As $N \to \infty$, the random process converges to $\uppsi | \uptheta \inprob \uptheta$
 \begin{itemize}
-\item [$\Rightarrow$] Enables \alert{consistent} estimation of model
+\item [$\Rightarrow$] Use enables \alert{consistent} estimation of model
 \end{itemize}
 
 \end{itemize}
@@ -270,7 +273,7 @@ where data is represented using $\Psi : \Dcal \mapsto \Uppsi \subset \Theta$, de
 By the aggregation property \footnotemark,
 \begin{itemize}
 \item $\uppsim | \upthetam \sim \Emp(N,\upthetam)$
-\item $\uppsic(x) | \uppsim(x),\upthetac(x) \sim \Emp\big( N \uppsim(x),\upthetac(x) \big)$ are independent
+\item $\uppsic(x) | \uppsim(x),\upthetac(x) \sim \Emp\big( N \uppsim(x),\upthetac(x) \big)$ are mutually independent
 \end{itemize}
 \end{column}
 
@@ -342,7 +345,8 @@ By the aggregation property \footnotemark,
 %\Rcal(f) & = & \Erm_{\uptheta}\big[ \Rcal_{\Theta}(f ; \uptheta) \big] = \Erm_{\yrm,\xrm,\uppsi} \Big[ \big( f(\xrm;\uppsi)-\yrm \big)^2 \Big] \nonumber
 %\end{IEEEeqnarray}
 
-\large
+\vspace{-3em}
+\huge
 \begin{equation*} 
 \Downarrow \quad \Downarrow \quad \Downarrow \quad \Downarrow 
 \end{equation*}
@@ -353,7 +357,24 @@ By the aggregation property \footnotemark,
 f^*(\xrm;\uppsi) & = & \argmin_{y' \in \Rbb} \Erm_{\yrm | \xrm,\uppsi}\big[ (y'-\yrm)^2 \big] = \mu_{\yrm | \xrm,\uppsi} \nonumber
 \end{IEEEeqnarray}
 
-Note: the Bayesian distribution $\Prm_{\yrm | \xrm,\uppsi} = \Erm_{\uptheta | \xrm,\uppsi}\big[ \Prm_{\yrm | \xrm,\uptheta} \big] \equiv \mu_{\upthetac(\xrm) | \xrm,\uppsi}$ is the posterior mean \footfullcite{murphy} of the true predictive model $\upthetac$
+\begin{itemize}
+\item[$*$] Observe that $\Prm_{\yrm | \xrm,\uppsi} = \Erm_{\uptheta | \xrm,\uppsi}\big[ \Prm_{\yrm | \xrm,\uptheta} \big] \equiv \mu_{\upthetac(\xrm) | \xrm,\uppsi}$
+\end{itemize}
+
+%\vspace{1em}
+
+\centering
+\fcolorbox{NRL_blue}{NRL_blue}{\color{white}
+\parbox{37em}{
+\centering
+\large
+\textbf{Bayesian distribution is the posterior mean \footfullcite{murphy} of the predictive model $\upthetac$}
+}
+}
+
+\vspace{1em}
+
+%Note: the Bayesian distribution $\Prm_{\yrm | \xrm,\uppsi} = \Erm_{\uptheta | \xrm,\uppsi}\big[ \Prm_{\yrm | \xrm,\uptheta} \big] \equiv \mu_{\upthetac(\xrm) | \xrm,\uppsi}$ is the posterior mean \footfullcite{murphy} of the true predictive model $\upthetac$
 
 %\begin{itemize}
 %\item Bayes optimal regressor = $\mu_{\yrm | \xrm,\uppsi}$
@@ -380,30 +401,36 @@ Note: the Bayesian distribution $\Prm_{\yrm | \xrm,\uppsi} = \Erm_{\uptheta | \x
 
 \begin{columns}[c]
 
-\begin{column}{.7\linewidth}
+\begin{column}{.8\linewidth}
 
-\begin{itemize}
-\item The probability density function (PDF) of the model $\uptheta \in \Theta$ is Dirichlet:
+The probability density function (PDF) of the model $\uptheta \in \Theta$ is Dirichlet:
 \begin{IEEEeqnarray*}{L}
-\prm_{\uptheta}(\theta) = \Dir\big( \theta ; \alpha \big) = \beta(\alpha)^{-1} \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\alpha(y,x) - 1}
+\prm_{\uptheta}(\theta) = \Dir(\theta; \alpha_0,\alpha) \equiv \beta(\alpha_0 \alpha)^{-1} \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\alpha_0 \alpha(y,x) - 1}
 \end{IEEEeqnarray*}
 
 %\footcitetext{bishop}
 
+\begin{itemize}
 \item Parameter $\alpha_0$ controls localization around mean $\alpha$
+\end{itemize}
 
-\item By the aggregation property\footnotemark, $\upthetam \sim \Dir(\alpha_0,\alpham)$, where $\alpham \equiv \sum_{y \in \Ycal} \alpha(y,\cdot)$, and $\upthetac(x) \sim \Dir\big(\alpha_0 \alpham(x),\alphac(x)\big)$, where $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x)$. Independent of $\upthetam$
+\vspace{1em}
 
+\textit{Alternate Notation}: 
+\begin{itemize}
+\item Marginal $\alpham \equiv \sum_{y \in \Ycal} \alpha(y,\cdot)$ and conditional $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x)$
+
+\item By the aggregation property\footnotemark, $\upthetam \sim \Dir(\alpha_0,\alpham)$ and $\upthetac(x) \sim \Dir\big(\alpha_0 \alpham(x),\alphac(x)\big)$, are \alert{independent} of one another and of $\upthetam$
 \end{itemize}
 
 \end{column}
 
 
-\begin{column}{.3\linewidth}
+\begin{column}{.2\linewidth}
 
 \begin{figure}
 \centering
-\includegraphics[width=0.65\linewidth]{SSP_2021/presentation/dir_loc.png}
+\includegraphics[width=1\linewidth]{SSP_2021/presentation/dir_loc.png}
 %\caption{}
 \end{figure}
 
@@ -417,86 +444,30 @@ Note: the Bayesian distribution $\Prm_{\yrm | \xrm,\uppsi} = \Erm_{\uptheta | \x
 \end{frame}
 
 
-%\begin{frame}
-%\frametitle{Dirichlet Prior}
-%
-%\begin{columns}[c]
-%
-%\begin{column}{.45\linewidth}
-%
-%The probability density function (PDF) of the model $\uptheta \in \Theta$ is Dirichlet:
-%\begin{IEEEeqnarray*}{L}
-%\prm_{\uptheta}(\theta) = \Dir\big( \theta ; \alpha \big) \\
-%\quad = \beta(\alpha)^{-1} \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\alpha(y,x) - 1}
-%\end{IEEEeqnarray*}
-%
-%\end{column}
-%
-%\hspace{2ex}
-%\huge
-%\begin{column}{.1\linewidth}
-%$\Rightarrow$ \\ $\Rightarrow$
-%\end{column}
-%\normalsize
-%\hspace{-3ex}
-%
-%\begin{column}{.45\linewidth}
-%
-%Conditional PDF of $\upthetac$ given $\upthetam$ is
-%\begin{IEEEeqnarray*}{L}
-%\prm_{\upthetac | \upthetam}\big( \thetac | \thetam \big) = \prm_{\upthetac}\big( \thetac \big) \\
-%\quad= \prod_{x \in \Xcal} \Dir\Big( \thetac(x) ; \alpha(\cdot,x) \Big) \Big|_{\alpha(\cdot,x) = 1} \\
-%\quad = \Big[ \big( |\Ycal|-1 \big)! \Big]^{|\Xcal|}
-%\end{IEEEeqnarray*}
-%
-%\end{column}
-%
-%\end{columns}
-%
-%\vspace{1em}
-%
-%\vspace{1em}
-%\centering
-%\fcolorbox{NRL_blue}{NRL_blue}{\color{white}
-%\parbox{37em}{
-%\centering
-%\large
-%\textbf{True predictive distribution $\upthetac$ is independent \\of the marginal model and inherits a uniform PDF}
-%}
-%}
-%\end{frame}
-
-
-
-
-
-
 
 
 \begin{frame}
-\frametitle{Model Posterior PDF}
+\frametitle{Predictive Model Posterior}
 \framesubtitle{Closed-Form}
 
-\begin{itemize}
-\item Independence of $\upthetac$ from $\upthetam$ implies conditional independence of $\upthetac$ from $\xrm$ given $\nbarrm$
-\item As the data PMF $\Prm_{\nbarrm | \uptheta}$ has exponential form, the Dirichlet PDF is a conjugate prior 
-
-\end{itemize}
-\vspace{0.5em}
-\begin{IEEEeqnarray*}{rCl}
-\prm_{\upthetac | \xrm,\nbarrm}\big( \thetac | x,\bar{n} \big) & = & \prm_{\upthetac | \nbarrm}\big( \thetac | \bar{n} \big) \\
-& = & \prod_{x' \in \Xcal} \Dir\Big( \thetac(x') ; \alpha(\cdot,x') \Big) \Big|_{\alpha(\cdot,x') = 1 + \bar{n}(\cdot,x')} \\
-%= \prod_{x' \in \Xcal} \left[ \left( \sum_{y \in \Ycal} \bar{n}(y,x') + |\Ycal|-1 \right)! \prod_{y \in \Ycal} \frac{\thetac(y,x')^{\bar{n}(y,x')}}{\big(\sum_{y \in \Ycal} \bar{n}(y,x')\big)!} \right] 
+Since $\indep_x \upthetac(x)$ and $\upthetac \indep \upthetam$, and since the Empirical process $\upthetac(x) | \uppsim(x),\uppsic(x)$ has exponential form, Dirichlet process $\upthetac(x)$ is conjugate \footfullcite{theodoridis-ML} and thus
+\begin{IEEEeqnarray*}{L}
+	\upthetac(x) | \uppsim(x),\uppsic(x) \sim \Dir\Big( \alpha_0 \alpham(x) + N \uppsim(x), \mu_{\upthetac(x) | \uppsim(x), \uppsic(x)} \Big) \;,
 \end{IEEEeqnarray*}
+with mean functions
+\begin{IEEEeqnarray*}{rCl} \label{eq:pred_Bayes_psi}
+	\mu_{\upthetac(x) | \uppsim(x), \uppsic(x)} & = & \gamma(x; \uppsim) \alphac(x) + \big(1 - \gamma(x; \uppsim)\big) \uppsic(x) \equiv \textcolor[rgb]{1,0,0}{\Prm_{\yrm | \xrm,\uppsi}} \;,
+\end{IEEEeqnarray*}
+where $\gamma(x; \uppsim) = \Big( 1 + N \uppsim(x) / \big(\alpha_0 \alpham(x)\big) \Big)^{-1} \in (0,1]$.
 
-\vspace{0.5em}
+\vspace{1em}
 
 \centering
 \fcolorbox{NRL_blue}{NRL_blue}{\color{white}
 \parbox{37em}{
 \centering
 \large
-\textbf{Posterior for model $\upthetac(x)$ is Dirichlet and dependent \\solely on the sufficient statistic elements $\nbarrm(\cdot,x)$}
+\textbf{Bayesian predictions mix prior mean $\alphac$ with empirical distribution $\uppsic$}
 }
 }
 
@@ -505,34 +476,30 @@ Note: the Bayesian distribution $\Prm_{\yrm | \xrm,\uppsi} = \Erm_{\uptheta | \x
 
 
 \begin{frame}
-\frametitle{Model Posterior PDF}
-\framesubtitle{Asymptotic Trend}
+\frametitle{Predictive Model Posterior}
+\framesubtitle{Trends}
 
-\begin{columns}[T]
+\begin{columns}[c]
 
-\begin{column}{.6\linewidth}
+\begin{column}{.5\linewidth}
 
 \begin{itemize}
-\item Covariance of Dirichlet $\prm_{\upthetac(x) | \nbarrm(\cdot,x)}$ decreases monotonically with concentration $\alpha'(x) \equiv \sum_{y \in \Ycal} \alpha(y,x)$
-\item Localized around $\mu_{\upthetac(x) | \nbarrm(\cdot,x)} = \alpha(\cdot,x)/\alpha'(x)$
+\item As localization $\alpha_0$ increases, $\Prm_{\yrm | \xrm,\uppsi} \to \alphac(\xrm)$ and the prior is emphasized
+\vspace{1em}
+\item As training volume $N$ increases, $\Prm_{\yrm | \xrm,\uppsi} \to \uppsic(\xrm)$ and data is emphasized
+\begin{itemize}
+\item[$*$] Since $\uppsic | \upthetac \inprob \upthetac$, the true predictive model is \alert{identified}
 \end{itemize}
-\Large
-\begin{equation*} 
-\Downarrow \quad \Downarrow
-\end{equation*}
-\normalsize
-As $n'(x) \equiv \sum_{y \in \Ycal} \bar{n}(y,x) \to \infty$, the posteriors converge to 
-\begin{IEEEeqnarray*}{L}
-\prm_{\upthetac(x) | \nbarrm(\cdot,x)}\Big(\thetac(x) | \bar{n}(\cdot,x) \Big) \to \delta\left( \thetac(x) - \frac{\bar{n}(\cdot,x)}{n'(x)} \right)
-\end{IEEEeqnarray*}
+\end{itemize}
+
 
 \end{column}
 
-\begin{column}{.4\linewidth}
+\begin{column}{.5\linewidth}
 
 \begin{figure}
 \centering
-\includegraphics[width=0.9\linewidth]{P_theta_post_uni_tilde.pdf}
+\includegraphics[width=1\linewidth]{SSP_2021/presentation/prior_post_h.png}
 %\caption{}
 \label{fig:P_theta_post_uni}
 \end{figure}
@@ -541,38 +508,6 @@ As $n'(x) \equiv \sum_{y \in \Ycal} \bar{n}(y,x) \to \infty$, the posteriors con
 
 \end{columns}
 
-\vspace{1em}
-
-\centering
-\fcolorbox{NRL_blue}{NRL_blue}{\color{white}
-\parbox{37em}{
-\centering
-\large
-\textbf{Asymptotically consistent estimation of $\upthetac$ due to full support of prior}
-}
-}
-
-\end{frame}
-
-
-
-
-\begin{frame}
-\frametitle{Bayesian Predictive PMF}
-
-\textit{The Bayesian predictive PMF is a convex combination of two conditional distributions}:
-\vspace{0.5em}
-\begin{IEEEeqnarray*}{rCl} \label{P_y_xD_uniform}
-\Prm_{\yrm | \xrm,\nbarrm}(\cdot | x,\bar{n}) & = & \mu_{\upthetac(x) | \nbarrm(\cdot,x)}\big( \bar{n}(\cdot,x) \big) \\
-& \equiv & \left( \frac{|\Ycal|}{n'(x) + |\Ycal|} \right) \frac{1}{|\Ycal|} + \left( \frac{n'(x)}{n'(x) + |\Ycal|} \right) \frac{\bar{n}(\cdot,x)}{n'(x)} 
-\end{IEEEeqnarray*}
-
-\vspace{0.5em}
-
-\begin{description}
-\item[Prior Mean] Uniform PMF $\mu_{\upthetac(x)} = |\Ycal|^{-1}$ dependent only on the Dirichlet parameterization
-\item[Conditional Empirical PMF] $\bar{n}(\cdot,x) / n'(x)$ dependent only on training data
-\end{description}
 
 \vspace{1em}
 
@@ -581,11 +516,14 @@ As $n'(x) \equiv \sum_{y \in \Ycal} \bar{n}(y,x) \to \infty$, the posteriors con
 \parbox{37em}{
 \centering
 \large
-\textbf{As the number of training data $n'(x)$ increases relative to the number of classes $|\Ycal|$, the predictive distribution tends toward the empirical PMF}
+\textbf{Full support prior ensures consistent estimation of model}
 }
 }
 
 \end{frame}
+
+
+
 
 
 
