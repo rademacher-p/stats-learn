@@ -19,11 +19,11 @@ from sklearn.pipeline import Pipeline
 from sklearn.exceptions import NotFittedError
 
 
-from thesis.bayes import models as bayes_models
-from thesis.loss_funcs import loss_se, loss_01
-from thesis.random import elements as rand_elements, models as rand_models
-from thesis.util import spaces
-from thesis.util.base import vectorize_func, check_data_shape, all_equal
+from stats_learn.bayes import models as bayes_models
+from stats_learn.loss_funcs import loss_se, loss_01
+from stats_learn.random import elements as rand_elements, models as rand_models
+from stats_learn.util import spaces
+from stats_learn.util.base import vectorize_func, check_data_shape, all_equal
 
 
 # def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False):

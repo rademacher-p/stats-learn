@@ -2,8 +2,8 @@ import math
 
 import numpy as np
 
-from thesis.util.base import check_data_shape
-from thesis.util.plotting import box_grid
+from stats_learn.util.base import check_data_shape
+from stats_learn.util.plotting import box_grid
 
 
 def discretizer(vals):  # TODO: use sklearn.preprocessing.KBinsDiscretizer?

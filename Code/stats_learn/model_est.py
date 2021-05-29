@@ -1,8 +1,8 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from thesis.random import elements as rand_elements
-from thesis.util import spaces
+from stats_learn.random import elements as rand_elements
+from stats_learn.util import spaces
 
 plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{amsmath}\usepackage{upgreek}")

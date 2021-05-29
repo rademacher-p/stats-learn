@@ -8,8 +8,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy import optimize, integrate
 
-from thesis.util.base import check_data_shape, all_equal
-from thesis.util.plotting import simplex_grid, box_grid, mesh_grid
+from stats_learn.util.base import check_data_shape, all_equal
+from stats_learn.util.plotting import simplex_grid, box_grid, mesh_grid
 
 
 # plt.style.use('seaborn')
