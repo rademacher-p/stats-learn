@@ -4,8 +4,8 @@ from warnings import warn
 import matplotlib.pyplot as plt
 import numpy as np
 
-from thesis.random import elements as rand_elements
-from thesis.util import spaces, plotting
+from stats_learn.random import elements as rand_elements
+from stats_learn.util import spaces, plotting
 
 plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{amsmath}")

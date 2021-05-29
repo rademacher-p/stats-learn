@@ -15,12 +15,12 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from thesis.bayes import models as bayes_models
-from thesis.predictors import (ModelRegressor, BayesRegressor, plot_risk_eval_sim_compare, plot_predict_stats_compare,
-                               risk_eval_sim_compare, plot_risk_eval_comp_compare, plot_risk_disc, SKLWrapper)
-from thesis.random import elements as rand_elements, models as rand_models
-from thesis.preprocessing import discretizer, prob_disc
-from thesis.util.plotting import box_grid
+from stats_learn.bayes import models as bayes_models
+from stats_learn.predictors import (ModelRegressor, BayesRegressor, plot_risk_eval_sim_compare, plot_predict_stats_compare,
+                                    risk_eval_sim_compare, plot_risk_eval_comp_compare, plot_risk_disc, SKLWrapper)
+from stats_learn.random import elements as rand_elements, models as rand_models
+from stats_learn.preprocessing import discretizer, prob_disc
+from stats_learn.util.plotting import box_grid
 
 
 np.set_printoptions(precision=3)

@@ -8,9 +8,9 @@ from typing import Optional, Dict
 import numpy as np
 import pandas as pd
 
-from thesis.random import elements as rand_elements
-from thesis.util import spaces
-from thesis.util.base import RandomGeneratorMixin, vectorize_func
+from stats_learn.random import elements as rand_elements
+from stats_learn.util import spaces
+from stats_learn.util.base import RandomGeneratorMixin, vectorize_func
 
 
 # TODO: add marginal/conditional pf methods

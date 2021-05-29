@@ -5,10 +5,10 @@ Bayesian SL models.
 import numpy as np
 from scipy.stats._multivariate import _PSD
 
-from thesis.random import elements as rand_elements
-from thesis.random import models as rand_models
-from thesis.util import spaces
-from thesis.util.base import RandomGeneratorMixin, vectorize_func
+from stats_learn.random import elements as rand_elements
+from stats_learn.random import models as rand_models
+from stats_learn.util import spaces
+from stats_learn.util.base import RandomGeneratorMixin, vectorize_func
 
 
 # %% Priors
