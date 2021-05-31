@@ -662,7 +662,7 @@ The irreducible risk \eqref{eq:risk_clv} for a given model satisfies $\Rcal_{\Th
 
 \section{Predictive Model Estimation} \label{sec:predictive_est}
 
-\todohigh{Bias/variance CITE??}
+\todohigh{bias-variance CITE??}
 
 It is instructive to treat the Bayesian predictive distribution $\Prm_{\yrm | \xrm,\Drm}$ as an estimator of the clairvoyant predictive distribution $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$ and investigate the effects of prior knowledge. Of specific interest are the mean $\Erm_{\Drm | \uptheta}\big[\Prm_{\yrm | \xrm, \Drm}\big]$ and covariance $\Crm_{\Drm | \uptheta}\big[\Prm_{\yrm | \xrm, \Drm}\big]$ with respect to the true model $\uptheta$.  
 
@@ -730,7 +730,7 @@ Note that the risk can also be represented as $\Rcal_{\Theta}(f ; \uptheta) = \R
 \end{IEEEeqnarray}
 where $f_{\Theta}(\xrm;\uptheta)$ is the clairvoyant estimator. Observe that the excess risk can be further decomposed as a sum of the estimator's expected bias and variance, respectively.
 
-\todohi{additional bias/variance trade-off discussion?}
+\todohi{additional bias-variance trade-off discussion?}
 
 
 \subsubsection{Clairvoyant Estimation}
@@ -1360,6 +1360,8 @@ The Bayes predictive PMF can thus be expressed as
 
 \section{Predictive Model Estimation} \label{sec:predictive_est_dir}
 
+\todolo{Use lambda weight notation from conf. papers? And table!}
+
 This section analyzes the bias and variance of the Dirichlet-based $\Prm_{\yrm | \xrm,\Drm}$ when used to estimate the clairvoyant predictive distribution $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$. To simplify the analysis, the training data $\Drm$ will be represented using the marginal and conditional sufficient statistics $(\uppsim, \uppsic)$, such that $\Erm_{\Drm | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\Drm} \big] = \Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big]$ and $\Crm_{\Drm | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\Drm} \big] = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big]$. 
 
 For a given $\xrm$, the expected value of the estimate conditioned on the true model is
@@ -1404,7 +1406,7 @@ Note that the bias is proportionate to the difference between the true condition
 
 \subsection{Trends}
 
-The trends of the bias and variance with the Dirichlet parameters and with the data volume $N$ are of interest. These values effect a bias/variance trade-off via expectations of functions of $\gammam(\uppsim)$ given the marginal model $\upthetam$ (and implicitly the marginal prior mean $\alpham$). Note that as a result of its aggregation property, the empirical process value $\uppsim(x)$ conditioned on the model $\upthetam(x)$ is distributed as
+The trends of the bias and variance with the Dirichlet parameters and with the data volume $N$ are of interest. These values effect a bias-variance trade-off via expectations of functions of $\gammam(\uppsim)$ given the marginal model $\upthetam$ (and implicitly the marginal prior mean $\alpham$). Note that as a result of its aggregation property, the empirical process value $\uppsim(x)$ conditioned on the model $\upthetam(x)$ is distributed as
 \begin{IEEEeqnarray}{rCl}
 \Prm_{\uppsim(x) | \upthetam(x)}\big(\psim(x) | \thetam(x) \big) & = & \Emp\Big( \big(\psim(x),1-\psim(x)\big); N, \big(\thetam(x),1-\thetam(x)\big) \Big) \nonumber \\
 & = & \Bi\big(N \psim(x); N, \thetam(x)\big) \;,
@@ -1430,7 +1432,7 @@ Note that the latter is equivalent to the first inverse moment of a positive bin
 
 \todolo{Intuitive explanation for empirical predictor variance?}
 
-This demonstrates the critical bias/variance trade-off that is controlled by selection of the Dirichlet concentration parameter. For common applications, both distribution estimate bias and variance contribute to the overall risk and an optimal value of $\alpha_0$ can be found to optimally balance these competing sources of error.
+This demonstrates the critical bias-variance trade-off that is controlled by selection of the Dirichlet concentration parameter. For common applications, both distribution estimate bias and variance contribute to the overall risk and an optimal value of $\alpha_0$ can be found to optimally balance these competing sources of error.
 
 
 
@@ -1466,7 +1468,7 @@ Observe that for $N = 5$, the $\alpha_0 = 0.1$ estimate (favoring the empirical 
 %
 %\todohi{Non-singular example?}
 %
-%To exemplify how the model estimate $\Prm_{\yrm | \xrm,\uppsi}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 60$ and $|\Xcal| = 1$; the singular observation set enables visualization of the bias/variance trade-off. The prior mean $\alphac(x)$ and true model $\upthetac(x)$ are distributed as $\alphac(y;x) = \Bi(y/60; 60, 0.3)$ and $\thetac(y;x) = \Bi(y/60; 60, 0.7)$, respectively, and are shown in \cref{fig:model_est/N_0} -- note the significant mismatch.
+%To exemplify how the model estimate $\Prm_{\yrm | \xrm,\uppsi}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 60$ and $|\Xcal| = 1$; the singular observation set enables visualization of the bias-variance trade-off. The prior mean $\alphac(x)$ and true model $\upthetac(x)$ are distributed as $\alphac(y;x) = \Bi(y/60; 60, 0.3)$ and $\thetac(y;x) = \Bi(y/60; 60, 0.7)$, respectively, and are shown in \cref{fig:model_est/N_0} -- note the significant mismatch.
 %\begin{figure}
 %\centering
 %\includegraphics[width=0.8\linewidth]{model_est/N_0.png}
@@ -1602,8 +1604,9 @@ The elements of the finite cardinality set $\Ycal$ are real numbers, such that $
 Substituting in the Bayes predictive distribution for a Dirichlet prior \eqref{eq:P_y_xD_dir} into \eqref{eq:f_opt_SE}, the optimal Bayesian estimate is
 \begin{IEEEeqnarray}{rCl} \label{eq:f_opt_SE_dir}
 f^*(\xrm;\Drm) & = & \mu_{\yrm | \xrm,\Drm} \\
-& = & \left( \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)} \right) \sum_{y \in \Ycal} y \alphac(y;\xrm) + \left( \frac{N \Psim(\xrm;\Xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)} \right) \sum_{y \in \Ycal} y \Psic(y;\xrm;\Drm) \nonumber \\
-& = & \gammam(\xrm; \uppsim) \mu_{\yrm | \xrm} + \big(1-\gammam(\xrm; \uppsim)\big) \frac{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Yrm_n}{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big]} \nonumber \;.
+& = & \left( \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)} \right) \sum_{y \in \Ycal} y \alphac(y;\xrm) \nonumber \\
+&& + \left( \frac{N \Psim(\xrm;\Xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)} \right) \sum_{y \in \Ycal} y \Psic(y;\xrm;\Drm) \nonumber \\
+& \equiv & \gammam(\xrm; \Xrm) \mu_{\yrm | \xrm} + \big(1-\gammam(\xrm; \Xrm)\big) \frac{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Yrm_n}{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big]} \nonumber \;.
 \end{IEEEeqnarray}
 
 The optimal estimate is interpreted as a convex combination of two separate estimates -- the expected value of $\yrm$ conditioned on the observed $\xrm$ and the mean of the training values $\Yrm_n$ which have a value $\Xrm_n$ matching the observed value $\xrm$. The weighting factors are the same as those of $\Prm_{\yrm | \xrm,\Drm}$; thus, stronger prior information (larger $\alpha_0 \alpham(\xrm)$) provides more weight to the estimate $\mu_{\yrm|\xrm}$ and more voluminous training data puts emphasis on the empirical conditional mean.
@@ -1870,7 +1873,7 @@ Next consider the effects of the Dirichlet prior parameters. The analysis will i
 
 First consider the conditional prior PMF's $\alphac(x)$; as shown, they manifest themselves in the risk through the squared estimator bias. It is clear that regardless of how the values $\alpha_0$ and $\alpham(x)$ are chosen, the best selections for these conditional priors must have first moments matching those of the corresponding true predictive distributions $\Prm_{\yrm | \xrm,\uptheta}$ for each $x \in \Xcal$. The resultant estimators $\mu_{\yrm | \xrm}$ are unbiased and the excess risk is equivalent to the first term in \eqref{eq:risk_cond_SE_dir_ex}, measuring additional variance due to model uncertainty.
 
-The concentrations $\bar{\alpha}_0(x)$ of the conditional distributions $\upthetac(x)$ control important bias/variance trade-offs via the two scaling factors in \eqref{eq:risk_cond_SE_dir_ex}. First, consider the asymptotic trends, again referencing the distribution estimation analysis in \cref{sec:predictive_est_dir}.
+The concentrations $\bar{\alpha}_0(x)$ of the conditional distributions $\upthetac(x)$ control important bias-variance trade-offs via the two scaling factors in \eqref{eq:risk_cond_SE_dir_ex}. First, consider the asymptotic trends, again referencing the distribution estimation analysis in \cref{sec:predictive_est_dir}.
 
 Consider how the excess risk tends as the priors become maximally concentrated. Recall that as $\bar{\alpha}_0(x) \to \infty$, the estimate of $\upthetac$ is maximally biased and has no variance; thus, the excess risk tends to $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, the expected squared error between the means of the Bayesian predictive PMF and the true predictive PMF. This is intuitive given that the estimator tends toward a data-independent solution; the estimator may be biased, but will have no variance due to the training data statistics.
 
@@ -1972,7 +1975,7 @@ PGR: plot captions, alpha zero or x???
 %
 %\todomid{Use my argmin marker plot!}
 %
-%Note that due to the high learner bias and low true predictive variance, both the Dirichlet-based estimator and Bayesian linear regressor perform better when projecting relatively low confidence in their data-independent prediction via high prior variance (low $\alpha_0$, high $\Sigma_{\uptheta}$). \cref{fig:SSP_2021/Risk_cond_SE_a0_biased_hard} demonstrates the error trends of the Dirichlet-based estimator for different prior localizations $\alpha_0$. \cref{fig:SSP_2021/Risk_cond_SE_a0_biased_hard_zoom} highlights the localization $\alpha_0$ that optimizes the bias/variance trade-off; this value is independent of the training volume $N$. Due to the bias and low true model variance, the corresponding optimal Dirichlet estimator is only marginally better than the empirical estimator used for $\alpha_0 \approx 0$.
+%Note that due to the high learner bias and low true predictive variance, both the Dirichlet-based estimator and Bayesian linear regressor perform better when projecting relatively low confidence in their data-independent prediction via high prior variance (low $\alpha_0$, high $\Sigma_{\uptheta}$). \cref{fig:SSP_2021/Risk_cond_SE_a0_biased_hard} demonstrates the error trends of the Dirichlet-based estimator for different prior localizations $\alpha_0$. \cref{fig:SSP_2021/Risk_cond_SE_a0_biased_hard_zoom} highlights the localization $\alpha_0$ that optimizes the bias-variance trade-off; this value is independent of the training volume $N$. Due to the bias and low true model variance, the corresponding optimal Dirichlet estimator is only marginally better than the empirical estimator used for $\alpha_0 \approx 0$.
 %\begin{figure}
 %\centering
 %\includegraphics[width=0.8\linewidth]{SSP_2021/Risk_cond_SE_a0_biased_hard.png}
@@ -2037,7 +2040,7 @@ The Bayesian linear regressor with the Normal prior is highly biased, as its set
 	\label{fig:Discrete/SE/risk_N_leg_a0}
 \end{figure}
 
-Note that due to their initial bias, both the Dirichlet-based estimator and Bayesian linear regressor perform better when projecting relatively low confidence in their data-independent prediction via high prior variance (low $\alpha_0$, high $\Sigma_{\uptheta}$). \cref{fig:Discrete/SE/risk_a0_leg_N} demonstrates the error trends of the Dirichlet-based estimator for different prior localizations $\alpha_0$; observe that the value of $\alpha_0$ that optimizes the bias/variance trade-off is independent of the training volume $N$. 
+Note that due to their initial bias, both the Dirichlet-based estimator and Bayesian linear regressor perform better when projecting relatively low confidence in their data-independent prediction via high prior variance (low $\alpha_0$, high $\Sigma_{\uptheta}$). \cref{fig:Discrete/SE/risk_a0_leg_N} demonstrates the error trends of the Dirichlet-based estimator for different prior localizations $\alpha_0$; observe that the value of $\alpha_0$ that optimizes the bias-variance trade-off is independent of the training volume $N$. 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.8\linewidth]{Discrete/SE/risk_a0_leg_N.png}
@@ -2856,7 +2859,7 @@ Note that the dependency on the marginal empirical model can be expressed throug
 
 \subsection{Trends}
 
-The bias/variance trade-off for continuous-domain data has notable differences from the discrete-domain results. Note that by the aggregation property of Empirical distributions, the empirical process value $\uppsim(x)$ conditioned on the model $\upthetam(x)$ is now distributed as
+The bias-variance trade-off for continuous-domain data has notable differences from the discrete-domain results. Note that by the aggregation property of Empirical distributions, the empirical process value $\uppsim(x)$ conditioned on the model $\upthetam(x)$ is now distributed as
 \begin{IEEEeqnarray}{rCl}
 \prm_{\uppsim(x) | \upthetam(x)}\big(\psim(x) | \thetam(x) \big) & = & \Emp\left( \left( \frac{\psim(x)}{\delta(0)},1 - \frac{\psim(x)}{\delta(0)} \right); N, \left( \frac{\thetam(x)}{\delta(0)}, 1 - \frac{\thetam(x)}{\delta(0)} \right) \right) \nonumber \\
 & = & \Bi\left(\frac{N \psim(x)}{\delta(0)}; N, \frac{\thetam(x)}{\delta(0)}\right) \;,
@@ -3152,7 +3155,7 @@ Using the second moments of the random process $\Delta(\xrm; \Drm,\upthetac)$ fo
 \end{IEEEeqnarray}
 
 
-It is instructional to consider the trends of the excess squared error \eqref{eq:risk_cond_SE_dir_ex_cont} with training data volume $N$ and with Dirichlet prior parameterization. Referencing the predictive distribution estimation discussion in \cref{sec:predictive_est_dir_cont}, the bias/variance trends are used. Importantly, if the marginal model $\upthetam$ is upper-bounded, the biased, fixed prior estimator $\mu_{\yrm | \xrm}$ will  always be used (on average) and the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \approx \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, regardless of how large the training data volume $N$ may be. 
+It is instructional to consider the trends of the excess squared error \eqref{eq:risk_cond_SE_dir_ex_cont} with training data volume $N$ and with Dirichlet prior parameterization. Referencing the predictive distribution estimation discussion in \cref{sec:predictive_est_dir_cont}, the bias-variance trends are used. Importantly, if the marginal model $\upthetam$ is upper-bounded, the biased, fixed prior estimator $\mu_{\yrm | \xrm}$ will  always be used (on average) and the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \approx \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, regardless of how large the training data volume $N$ may be. 
 
 If instead $\upthetam$ includes Dirac delta functions, there are values $x \in \Xcal$ with non-zero probabilities of being observed. At these values, if $\alpham(x)$ is bounded, the weights tend to
 \begin{IEEEeqnarray}{L} 
@@ -3162,7 +3165,7 @@ and
 \begin{IEEEeqnarray}{L} 
 \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(x; \uppsim)\big)^2}{\delta(0)^{-1} N \uppsim(x)} \right] \to \sum_{n=1}^N \binom{N}{n} \left(\frac{\upthetam(x)}{\delta(0)}\right)^n \left( 1 - \frac{\upthetam(x)}{\delta(0)} \right)^{N-n} \frac{1}{n} \;,
 \end{IEEEeqnarray}
-representing the minimum bias and maximum variance incurred by the empirical estimate. If $\alpham$ also has a Dirac delta function at $x$, the value $\gammam(x; \uppsim)$ may assume values between zero and one and the estimate may convexly combine the prior estimate with the empirical estimate; in this case, the bias/variance weights may take on the same full range of values as for regression using discrete-domain data.
+representing the minimum bias and maximum variance incurred by the empirical estimate. If $\alpham$ also has a Dirac delta function at $x$, the value $\gammam(x; \uppsim)$ may assume values between zero and one and the estimate may convexly combine the prior estimate with the empirical estimate; in this case, the bias-variance weights may take on the same full range of values as for regression using discrete-domain data.
 
 
 \todohi{comment on total risk with N - equal to prob thetam is continuous times sq bias?!}
@@ -3334,11 +3337,11 @@ Note that the first two terms are analogous to the two terms in  \eqref{eq:predi
 
 \subsection{Trends}
 
-The bias/variance trends for the discretized Dirichlet distribution estimate \eqref{eq:P_y_xD_dir_disc} have similarities with the trends of the discrete-domain Dirichlet distribution as detailed in \cref{sec:predictive_est_dir}. The bias and covariance formulae contain the same expectation forms as before, with $\upthetam$, $\upthetac$, $\uppsim$, and $\gammam$ being replaced by their new discretization variants; the earlier analysis is directly applicable with the appropriate substitutions. Note that $N \uppsimd(t) | \upthetamd(t) \sim \Bi\big(N, \upthetamd(t)\big)$; thus, the relevant expectations will implicitly depend on the selection of the discretization function $T$.
+The bias-variance trends for the discretized Dirichlet distribution estimate \eqref{eq:P_y_xD_dir_disc} have similarities with the trends of the discrete-domain Dirichlet distribution as detailed in \cref{sec:predictive_est_dir}. The bias and covariance formulae contain the same expectation forms as before, with $\upthetam$, $\upthetac$, $\uppsim$, and $\gammam$ being replaced by their new discretization variants; the earlier analysis is directly applicable with the appropriate substitutions. Note that $N \uppsimd(t) | \upthetamd(t) \sim \Bi\big(N, \upthetamd(t)\big)$; thus, the relevant expectations will implicitly depend on the selection of the discretization function $T$.
 
 There is one critical difference from the previous results: since the distribution estimate \eqref{eq:P_y_xD_dir_disc} mixes the discretized $\upthetacd$ instead of the true model $\upthetac$, the new bias formula \eqref{eq:predictive_bias_dir_disc} contains an additional discretization term. This term depends neither on the training data volume $N$ nor on the Dirichlet parameterization $(\alpha_0, \alpham, \alphac)$. Consider the effect of the training volume $N$ on the bias. For $N=0$, the data-independent distribution $\alphac\big(T(\xrm)\big)$ is again maximally biased and has zero variance; the bias $\mathrm{Bias}(\xrm; \upthetam,\upthetac) = \alphac\big(T(\xrm)\big) - \upthetac(\xrm)$ now depends on the conditional prior mean only at values $t \in \Tcal \subset \Xcal$. As $N \to \infty$, for values $x$ satisfying $\upthetam(x) > 0$, the expected value of the Bayesian predictive distribution tends to the discretized predictive model $\upthetacd\big(T(\xrm)\big)$. As a result, only the first term in the bias formula \eqref{eq:predictive_bias_dir_disc} vanishes; the residual $\mathrm{Bias}(\xrm; \upthetam,\upthetac) = \upthetacd\big(T(\xrm)\big) - \upthetac(\xrm)$ can not be reduced any further. It is clear that, unlike its discrete-domain relative \eqref{eq:P_y_xD_dir}, the distribution estimate \eqref{eq:P_y_xD_dir_disc} will \emph{not} necessarily converge to the true predictive distribution $\upthetac$ in the limit of training data volume. 
 
-Next, consider the effects of the user-selected parameters. The dependency of the bias/variance trade-off on the Dirichlet prior parameterization is conceptually identical to that of the discrete-domain scenario in \cref{sec:predictive_est_dir}. However, the design of the discretization transform $T$ also affects the bias and variance of the predictive distribution estimation. The extreme cases will be analyzed. 
+Next, consider the effects of the user-selected parameters. The dependency of the bias-variance trade-off on the Dirichlet prior parameterization is conceptually identical to that of the discrete-domain scenario in \cref{sec:predictive_est_dir}. However, the design of the discretization transform $T$ also affects the bias and variance of the predictive distribution estimation. The extreme cases will be analyzed. 
 
 First, consider the finest discretization, such that $|\Tcal| \to \infty$; assume that $\Xcal$ is bounded and the function $T$ is selected such that the volume of the sets $\Xcal'(t)$ tend to $\int_{\Xcal'(t)} {\drm}x \to 0$. Consequently, $\prm_{\xrm | \trm, \upthetam} \to \delta(\cdot - \trm)$ and thus $\upthetacd(t) \to \upthetac(t)$. Based on our assumptions regarding the transform, $T(x) \approx x$ and any smooth function $g$ over the domain $\Xcal$ will satisfy $g(x) \approx g(t), \ \forall x \in \Xcal'(t)$. Together, these properties dictate that the discretization bias $\Big\|\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big\| \to 0$. However, the overall bias may still be high. If the marginal model $\upthetam$ is bounded, the discretized model tends to $\upthetamd \to 0$ and thus $\uppsimd | \upthetamd \to 0$. As a result, $\gammamd(\uppsimd) \to 1$ and the first term in \eqref{eq:predictive_bias_dir_disc} is maximal. Also, observe that the covariance function \eqref{eq:predictive_cov_dir_disc} will tend to zero. Note that these trends are the same as those exhibited by the continuous-domain Dirichlet predictive distribution, as detailed in \cref{sec:predictive_est_dir_cont}; the higher the cardinality of the transformed observation set, the larger the training volume $N$ required to effectively learn the true model.
 
@@ -3452,7 +3455,7 @@ Note that the Bayesian linear regressor has prediction statistics similar to tho
 
 \todomid{Expand parameter space dimensionality discussion!?}
 
-This bias/variance trade-off is directly comparable to the trade-off effected by the selection of the prior concentration $\alpha_0$. Using lower $|\Tcal|$ imposes a more serious restriction on the regressors that can be realized by the learner. Similarly, using high $\alpha_0$ limits the sensitivity of the learning to the training data. Both parameterizations thus lead to higher prediction bias and lower variance. Conversely, finer discretization with high $|\Tcal|$ provides a similar effect to low $\alpha_0$; that is, the empirical distribution is emphasized for prediction. Refer to \cref{sec:SE_dir_example} for demonstration of the predictor statistics with different prior concentration. 
+This bias-variance trade-off is directly comparable to the trade-off effected by the selection of the prior concentration $\alpha_0$. Using lower $|\Tcal|$ imposes a more serious restriction on the regressors that can be realized by the learner. Similarly, using high $\alpha_0$ limits the sensitivity of the learning to the training data. Both parameterizations thus lead to higher prediction bias and lower variance. Conversely, finer discretization with high $|\Tcal|$ provides a similar effect to low $\alpha_0$; that is, the empirical distribution is emphasized for prediction. Refer to \cref{sec:SE_dir_example} for demonstration of the predictor statistics with different prior concentration. 
 
 To underscore the limitation of predictors with coarse discretization, consider \cref{fig:Discretization/SE/predict_N_T4_a0_high}. Unlike the predictors visualized in \cref{sec:SE_dir_example}, the discretized predictors converge to $\Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}]\big(T(x)\big)$ in the limit $N \to \infty$, not to the clairvoyant regressor $\mu_{\yrm | \xrm,\upthetac}$; this effects the independence of the discretization bias from the data volume $N$. As such, the quality of the match is dependent on the variation of the clairvoyant regressor and on the size of the subsets $\Xcal'(t)$. Note that the persistent discretization bias is inherently related to the performance of the discretized Bayesian predictive distribution \eqref{eq:P_y_xD_dir_disc} as an estimator of the true model $\thetac$; due to the discretization, consistent estimation is no longer guaranteed.
 \begin{figure}
@@ -3470,7 +3473,7 @@ To underscore the limitation of predictors with coarse discretization, consider 
 	\label{fig:Discretization/SE/risk_N_leg_T}
 \end{figure}
 
-\cref{fig:Discretization/SE/risk_a0norm_leg_T} demonstrates the error trends of different discretization learners for varying prior localizations $\alpha_0$. To aid visualization, the risk is plotted against $\alpha_0 / |\Tcal|$; this normalized concentration is equivalent to the average of the conditional prior concentrations \eqref{eq:SE_alpha_bar_disc_opt}. The optimal values of $\alpha_0$ optimize the bias/variance trade-off depending on the match between the true predictive model and the data-independent regressor $\mu_{\yrm | \xrm}$. Again, the optimal concentrations $\bar{\alpha}_0'(t)$ are independent of the data volume $N$; however, they are not independent of the selected discretization transform $T$. Observe that the optimal conditional concentrations are higher when the discretization is coarser -- the discretization causes the learner to perceive higher variation in the values $\Yrm_n$ satisfying $T(\Xrm_n) = t$, such that $\bar{\alpha}_0'(t)$ is increased to de-emphasize the empirical mean. 
+\cref{fig:Discretization/SE/risk_a0norm_leg_T} demonstrates the error trends of different discretization learners for varying prior localizations $\alpha_0$. To aid visualization, the risk is plotted against $\alpha_0 / |\Tcal|$; this normalized concentration is equivalent to the average of the conditional prior concentrations \eqref{eq:SE_alpha_bar_disc_opt}. The optimal values of $\alpha_0$ optimize the bias-variance trade-off depending on the match between the true predictive model and the data-independent regressor $\mu_{\yrm | \xrm}$. Again, the optimal concentrations $\bar{\alpha}_0'(t)$ are independent of the data volume $N$; however, they are not independent of the selected discretization transform $T$. Observe that the optimal conditional concentrations are higher when the discretization is coarser -- the discretization causes the learner to perceive higher variation in the values $\Yrm_n$ satisfying $T(\Xrm_n) = t$, such that $\bar{\alpha}_0'(t)$ is increased to de-emphasize the empirical mean. 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.8\linewidth]{Discretization/SE/risk_a0norm_leg_T.png}
