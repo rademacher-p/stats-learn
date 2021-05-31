@@ -11,7 +11,7 @@ plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{amsmath}")
 
 
-def plot_dirs(dirs, n_plot=None, titles=None, orient='h', same_cm=True, cm_hack=False):
+def plot_dirs(dirs, n_plot=None, titles=None, orient='h', same_cm=True, cm_hack=None):
 
     n_dirs = len(dirs)
     if titles is None:
@@ -44,13 +44,14 @@ def plot_dirs(dirs, n_plot=None, titles=None, orient='h', same_cm=True, cm_hack=
     else:
         c_maps = [plt.cm.viridis(y / np.max(y)) for y in y_vec]
 
-        if cm_hack:
+        if cm_hack is not None:
             warn("CM hack!")
-            z = y_vec[0]
-            z /= np.max(z)
-            z *= 5
-            z = np.where(z <= 1, z, 1)
-            c_maps[0] = plt.cm.viridis(z)
+            for idx in cm_hack:
+                z = y_vec[idx]
+                z /= np.max(z)
+                z *= 8
+                z = np.where(z <= 1, z, 1)
+                c_maps[idx] = plt.cm.viridis(z)
 
     for dir_i, x, ax, title, c in zip(dirs, x_vec, axes, titles, c_maps):
         lims = (0, 1)
@@ -104,19 +105,21 @@ def prior_post():
 
 def localization():
     mean = np.array(np.ones(3) / 3)
-    alpha_0_vec = [1e-2, 1e2]
+    alpha_0_vec = [1e2, 1e-2]
     dirs = [rand_elements.Dirichlet(mean, alpha_0) for alpha_0 in alpha_0_vec]
 
-    titles = [r'$\alpha_0 \alpha_\mathrm{m}(x) \to 0$',
-              r'$\alpha_0 \alpha_\mathrm{m}(x) \to \infty$']
+    # titles = [r'$\alpha_0 \alpha_\mathrm{m}(x) \to 0$',
+    #           r'$\alpha_0 \alpha_\mathrm{m}(x) \to \infty$']
+    titles = [r'$\alpha_0 \alpha_\mathrm{m}(x) \to \infty$',
+              r'$\alpha_0 \alpha_\mathrm{m}(x) \to 0$']
     # titles = [r'$\alpha_0 \alpha_\mathrm{m}(x) = ' + f'{alpha_0}$' for alpha_0 in alpha_0_vec]
 
-    plot_dirs(dirs, n_plot=150, titles=titles, orient='v', same_cm=False, cm_hack=True)
+    plot_dirs(dirs, n_plot=150, titles=titles, orient='v', same_cm=False, cm_hack=[1])
 
 
 if __name__ == '__main__':
-    prior_post()
-    # localization()
+    # prior_post()
+    localization()
 
 
 # ax[1].set_xlim(0, 1)

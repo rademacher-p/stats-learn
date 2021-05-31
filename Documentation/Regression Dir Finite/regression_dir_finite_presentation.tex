@@ -354,14 +354,15 @@ By the aggregation property \footnotemark,
 
 \textbf{Bayes optimal regressor:}
 \begin{IEEEeqnarray}{rCl} \label{eq:f_opt_xD}
-f^*(\xrm;\uppsi) & = & \argmin_{y' \in \Rbb} \Erm_{\yrm | \xrm,\uppsi}\big[ (y'-\yrm)^2 \big] = \mu_{\yrm | \xrm,\uppsi} \nonumber
+f^*(\xrm;\uppsi) & = & \argmin_{y' \in \Rbb} \Erm_{\yrm | \xrm,\uppsi}\big[ (y'-\yrm)^2 \big] = \textcolor[rgb]{1,0,0}{\mu_{\yrm | \xrm,\uppsi}} \nonumber
 \end{IEEEeqnarray}
 
+\vspace{-.5em}
 \begin{itemize}
 \item[$*$] Observe that $\Prm_{\yrm | \xrm,\uppsi} = \Erm_{\uptheta | \xrm,\uppsi}\big[ \Prm_{\yrm | \xrm,\uptheta} \big] \equiv \mu_{\upthetac(\xrm) | \xrm,\uppsi}$
 \end{itemize}
 
-%\vspace{1em}
+\vspace{1em}
 
 \centering
 \fcolorbox{NRL_blue}{NRL_blue}{\color{white}
@@ -393,7 +394,7 @@ f^*(\xrm;\uppsi) & = & \argmin_{y' \in \Rbb} \Erm_{\yrm | \xrm,\uppsi}\big[ (y'-
 
 
 
-\section{Distributions: Prior to Predictive}
+\section{Model Distributions: Prior to Predictive}
 
 
 \begin{frame}
@@ -484,9 +485,9 @@ where $\gamma(x; \uppsim) = \Big( 1 + N \uppsim(x) / \big(\alpha_0 \alpham(x)\bi
 \begin{column}{.5\linewidth}
 
 \begin{itemize}
-\item As localization $\alpha_0$ increases, $\Prm_{\yrm | \xrm,\uppsi} \to \alphac(\xrm)$ and the prior is emphasized
+\item As localization $\alpha_0$ increases, $\upthetac(x) | \uppsim(x),\uppsic(x) \inprob  \alphac(\xrm)$ and the prior is emphasized
 \vspace{1em}
-\item As training volume $N$ increases, $\Prm_{\yrm | \xrm,\uppsi} \to \uppsic(\xrm)$ and data is emphasized
+\item As training volume $N$ increases, $\upthetac(x) | \uppsim(x),\uppsic(x) \inprob \uppsic(x)$ and data is emphasized
 \begin{itemize}
 \item[$*$] Since $\uppsic | \upthetac \inprob \upthetac$, the true predictive model is \alert{identified}
 \end{itemize}
@@ -529,110 +530,106 @@ where $\gamma(x; \uppsim) = \Big( 1 + N \uppsim(x) / \big(\alpha_0 \alpham(x)\bi
 
 
 
-\section{Bayesian Classifier and Error Trends}
+\section{Bayesian Regressor and Results}
 
 
 \begin{frame}
-\frametitle{Bayesian Classifier and Risk}
+\frametitle{Bayesian Regressor and Risk}
 
-\textbf{Optimal Hypothesis}: the \emph{conditional majority decision}
-\begin{IEEEeqnarray}{rCl} 
-f^*(x;\bar{n}) & = & \argmax_{y \in \Ycal} \Prm_{\yrm | \xrm,\nbarrm}\big( y | x,\bar{n} \big) = \argmax_{y \in \Ycal} \bar{n}(y,x) \nonumber
-\end{IEEEeqnarray}
+\textbf{Bayes Optimal}: $f^*(\xrm;\uppsi) \equiv \gamma(\xrm; \uppsim) \mu_{\yrm | \xrm} + \big(1-\gamma(\xrm; \uppsim)\big) \sum_{y \in \Ycal} \uppsic(y;\xrm) \ y$
+\begin{itemize}
+\item[$*$] $\Prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$ 
+\item[$*$] Inherits trends from posterior distribution
+\end{itemize}
 
 \hrulefill
-\vspace{0.5em}
+\vspace{1.5em}
 
-\textbf{Minimum Expected Probability of Error}:
-\begin{IEEEeqnarray*}{L}
-\Rcal^* = 1 - \Erm_{\xrm,\Drm} \left[ \max_{y \in \Ycal} \Prm_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) \right] = 1 - \sum_{x \in \Xcal} \frac{\Erm_{\nbarrm} \big[ \max_{y \in \Ycal} \bar{\nrm}(y,x) \big] + 1}{|\Ycal||\Xcal| + N} \nonumber \\
-= 1 - \frac{\sum_{m=1}^{|\Ycal|} \binom{|\Ycal|}{m} (-1)^{m-1} \sum_{n=0}^{\big\lfloor\frac{N}{m}\big\rfloor} \prod_{l=1}^{|\Ycal||\Xcal|-1} \Big( 1-\frac{mn}{N+l} \Big)}{|\Ycal| + N/|\Xcal|} 
-\end{IEEEeqnarray*}
-\vspace{0.5em}
+\textbf{Excess SE}: $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \equiv \Erm_{\xrm | \upthetam}\Big[ \lambda_{\text{Bias}}(\xrm; \upthetam) \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 + \lambda_{\text{Var}}(\xrm; \upthetam) \Sigma_{\yrm | \xrm,\upthetac} \Big]$
 \begin{itemize}
-\item[$*$] \emph{Efficient formula derived using Inclusion-Exclusion principle}
+\item[$*$] \footnotesize $\lambda_{\text{Bias}}(x; \upthetam) = \Erm_{\uppsim | \upthetam}\left[ \gamma(x; \uppsim)^2 \right]$ and $\lambda_{\text{Var}}(x; \upthetam) = \Erm_{\uppsim | \upthetam}\left[ \frac{\big( 1 - \gamma(x; \uppsim) \big)^2}{N \uppsim(x)} \right]$ \normalsize
+\end{itemize}
+
+\begin{itemize}
+\item \alert{Bias}: proportionate to squared-difference between data-independent regressor $\mu_{\yrm | \xrm}$ and clairvoyant regressor
+\item \alert{Variance}: proportionate to the predictive variance, adding to the irreducible risk
 \end{itemize}
 
 \end{frame}
 
 
+
+
 \begin{frame}
-\frametitle{Probability of Error Trends}
-\framesubtitle{with Class/Data Set Sizes}
+\frametitle{Training Volume Trends}
 
 \begin{columns}[c]
 
 \begin{column}{.5\linewidth}
 
-\begin{figure}
-\centering
-\includegraphics[width=0.8\linewidth]{Risk_01_uni_N_leg_My.pdf}
-%\caption{Minimum 0--1 Risk for different numbers of classes}
-\label{fig:Risk_01_uni_N_leg_My}
-\end{figure}
+:)
 
 \end{column}
 
 \begin{column}{.5\linewidth}
 
 \begin{figure}
-\centering
-\includegraphics[width=0.8\linewidth]{Risk_01_uni_N_leg_Mx.pdf}
-%\caption{Minimum 0--1 Risk for different numbers of possible observations}
-\label{fig:Risk_01_uni_N_leg_Mx}
+	\centering
+	\includegraphics[width=1\linewidth]{Discrete/SE/risk_N_leg_a0.png}
+%	\caption{Squared-Error vs. training data volume $N$}
+	\label{fig:Discrete/SE/risk_N_leg_a0}
 \end{figure}
 
 \end{column}
 
 \end{columns}
 
-\begin{itemize}
-\item Larger class sets $\Ycal$ raise the lower bound on probability of error
-\item Larger observation set $\Xcal$ $\longrightarrow$ more data $N$ required to achieve the same level of performance
-\end{itemize}
-
 \end{frame}
 
 
 
-
 \begin{frame}
-\frametitle{Probability of Error Trends}
-\framesubtitle{with Training Data Volume}
+\frametitle{Optimal Localization}
 
 \begin{columns}[c]
 
 \begin{column}{.5\linewidth}
 
-\begin{itemize}
-\item For binary classification, infinite training data only reduces the expected probability of error from 0.5 to 0.25
-\item As $|\Ycal|$ increases, the probability of error tends to unity and any improvement due to training data becomes negligible
-\end{itemize}
-
+For a given conditional mean $\alphac$, localization $\alpha'(x) \equiv \alpha_0 \alpham(x)$ controls a \alert{Bias-Variance} trade-off:
+\vspace{-1em}
 \begin{table}
-\renewcommand{\arraystretch}{1.3}
-\begin{tabular}{| c | c |}
+\renewcommand{\arraystretch}{1.8}
+\scalebox{0.9}{
+\begin{tabular}{| c | c | c |}
 \hline 
-$N$ & $\Rcal^*$ \\
-\hhline{|=|=|}
-$0$ & $1 - |\Ycal|^{-1}$  \\ 
+$\alpha'(x)$ & $\lambda_{\text{Bias}}(x; \upthetam)$ & $\lambda_{\text{Var}}(x; \upthetam)$ \\
+\hhline{|=|=|=|}
+$\to \infty$ & $1$ & $0$ \\
 \hline
-$\to \infty$ & $1 - |\Ycal|^{-1} \sum_{m=1}^{|\Ycal|} m^{-1}$ \\
+$\to 0$ & $\big( 1 - \upthetam(x) \big)^N$ & $\Erm_{\uppsim | \upthetam}\left[ \big( N \uppsim(x) \big)^{-1} \right]$  \\ 
 \hline
 \end{tabular}
+}
 %\caption{}
 \end{table}
 
+\vspace{.5em}
+\textbf{Optimal}: 
+\vspace{-.5em}
+\begin{equation*} \label{eq:alpha_x_min_Rex}
+	\alpha'(\xrm) = \frac{\Sigma_{\yrm | \xrm,\upthetac}}{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2}
+\end{equation*}
+
 \end{column}
 
 \begin{column}{.5\linewidth}
 
 \begin{figure}
-\centering
-\includegraphics[width=1\linewidth]{Risk_01_uni_N_bounds.pdf}
-%\caption{Minimum 0--1 Risk for zero and infinite number of training data}
-\label{fig:Risk_01_uni_N_bounds}
-\end{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{Discrete/SE/risk_a0_leg_N.png}
+%	\caption{Squared-Error vs. prior localization $\alpha_0$}
+	\label{fig:Discrete/SE/risk_a0_leg_N}
+\end{figure} 
 
 \end{column}
 
@@ -640,100 +637,6 @@ $\to \infty$ & $1 - |\Ycal|^{-1} \sum_{m=1}^{|\Ycal|} m^{-1}$ \\
 
 \end{frame}
 
-
-\begin{frame}
-\frametitle{Comparison to Informative Classifiers}
-\framesubtitle{Bayes Risk}
-
-Classifiers derived from informative Dirichlet priors with $\alpha_f'(x) \gg |\Ycal||\Xcal|$ prioritize the prior mean $\mu_{\upthetac} = \alpha_f(\cdot,x) / \alpha_f'(x)$ for prediction
-
-\vspace{-0.5em}
-\begin{columns}[T]
-
-\begin{column}{.5\linewidth}
-
-\begin{figure}
-\centering
-\includegraphics[width=0.8\linewidth]{Risk_01_Dir_N_leg_f_a0.pdf}
-%\caption{}
-\label{fig:Risk_01_Dir_N_leg_f_a0}
-\end{figure}
-\vspace{-2.5em}
-\centering
-\footnotesize
-%Various $\alpha'(x)$
-
-\end{column}
-
-\begin{column}{.5\linewidth}
-
-\begin{figure}
-\centering
-\includegraphics[width=0.8\linewidth]{Risk_01_Dir_N_leg_f_mu.pdf}
-%\caption{}
-\label{fig:Risk_01_Dir_N_leg_f_mu}
-\end{figure}
-\vspace{-2.5em}
-\centering
-\footnotesize
-%Various $\mu_{\upthetac}$
-
-\end{column}
-
-\end{columns}
-
-\vspace{1.8em}
-\centering
-\fcolorbox{NRL_blue}{NRL_blue}{\color{white}
-\parbox{37em}{
-\centering
-\large
-\textbf{Slower adaptation $\Rightarrow$ Higher Bayes probability of error}
-}
-}
-
-\end{frame}
-
-
-
-\begin{frame}
-\frametitle{Comparison to Informative Classifiers}
-\framesubtitle{Excess Conditional Risk}
-
-\vspace{-1em}
-\begin{columns}[c]
-
-\begin{column}{.5\linewidth}
-
-\begin{figure}
-\centering
-\includegraphics[width=0.8\linewidth]{Risk_cond_ex_01_Dir_theta__uni_clim.pdf}
-%\caption{}
-\label{fig:Risk_cond_ex_01_Dir_theta__uni}
-\end{figure}
-
-\end{column}
-
-\begin{column}{.5\linewidth}
-
-\begin{figure}
-\centering
-\includegraphics[width=0.8\linewidth]{Risk_cond_ex_01_Dir_theta__subj_clim.pdf}
-%\caption{}
-\label{fig:Risk_cond_ex_01_Dir_theta__subj}
-\end{figure}
-
-\end{column}
-
-\end{columns}
-
-\vspace{-0.2em}
-\begin{block}{Trade-Off}
-\textbf{Uniform prior provides a robust classifier for all unknown models $\theta$, limiting the space of high error models. However, fewer models achieve the clairvoyant risk.}
-\end{block}
-
-
-\end{frame}
 
 
 
