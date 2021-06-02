@@ -525,21 +525,13 @@ where $\gamma(x; \uppsim) = \Big( 1 + N \uppsim(x) / \big(\alpha_0 \alpham(x)\bi
 
 
 
-
-
-
-
-
-\section{Bayesian Regressor and Results}
-
-
 \begin{frame}
-\frametitle{Bayesian Regressor and Risk}
+\frametitle{Bayes Optimal Regressor}
 
-\textbf{Bayes Optimal}: $f^*(\xrm;\uppsi) \equiv \gamma(\xrm; \uppsim) \mu_{\yrm | \xrm} + \big(1-\gamma(\xrm; \uppsim)\big) \sum_{y \in \Ycal} \uppsic(y;\xrm) \ y$
+\textbf{Regressor}: $f^*(\xrm;\uppsi) \equiv \gamma(\xrm; \uppsim) \mu_{\yrm | \xrm} + \big(1-\gamma(\xrm; \uppsim)\big) \sum_{y \in \Ycal} \uppsic(y;\xrm) \ y$
 \begin{itemize}
-\item[$*$] $\Prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$ 
-\item[$*$] Inherits trends from posterior distribution
+\item[$*$] $\Prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$
+\item[$*$] Inherits trends from posterior distribution. Max or min data dependency through localization $\alpha_0$.
 \end{itemize}
 
 \hrulefill
@@ -560,14 +552,82 @@ where $\gamma(x; \uppsim) = \Big( 1 + N \uppsim(x) / \big(\alpha_0 \alpham(x)\bi
 
 
 
+
+
+\section{Trends and Results}
+
+
 \begin{frame}
-\frametitle{Training Volume Trends}
+\frametitle{Example}
+
+\begin{columns}[T]
+
+\begin{column}{.5\linewidth}
+
+\textbf{Model}:
+\begin{itemize}
+\item $\Xcal = \Ycal = \{i/127: i = 0, \ldots, 127\}$
+%\item $\Xcal$ and $\Ycal$ are 128-point discretizations of $[0,1]$
+\item $\thetam = |\Xcal|^{-1}$
+%\item $\thetac(y;\xrm) = \DE\big((y, 1-y); 127, 4.164, (\mu_{\yrm | \xrm,\uptheta}, 1-\mu_{\yrm | \xrm,\uptheta})\big)$
+%\item $\thetac(y; \xrm) = \Bi\big(127y; 127, \mu_{\yrm | \xrm,\upthetac}\big)$
+\item \alert{Clairvoyant}: $\mu_{\yrm | \xrm,\upthetac} = 1 / \big(2 + \sin(2\pi \xrm\big)$
+\item $\Sigma_{\yrm | \xrm, \uptheta} = 0.2 \, \mu_{\yrm | \xrm, \uptheta} (1 - \mu_{\yrm | \xrm, \uptheta})$
+\end{itemize}
+
+
+\end{column}
+
+\begin{column}{.5\linewidth}
+
+\textbf{Learners}:
+\begin{itemize}
+\item Dirichlet:
+\begin{itemize}
+\item $\alpham = |\Xcal|^{-1}$ 
+%\item $\alphac(y;x) = \DE\big((y, 1-y); 127, 4.164, (0.5, 0.5)\big)$
+%\item $\alphac(y; \xrm) = \Bi(127y; 127, \mu_{\yrm | \xrm})$
+\item \alert{Prior} $\mu_{\yrm | \xrm} = 0.5$
+\end{itemize}
+
+\item Normal\footnotemark:
+\begin{itemize}
+\item $\yrm | \xrm, \uptheta \sim \Ncal\big([1, \xrm] \uptheta, 0.1 \big)$ 
+\item $\uptheta \sim \Ncal\big([0.5, 0], \Sigma_{\uptheta}\big)$
+\end{itemize}
+\end{itemize}
+
+
+\end{column}
+
+\end{columns}
+
+\vspace{1em}
+
+\begin{itemize}
+\item Vary prior confidence for Dirichlet and Normal learners using $\alpha_0$ and $\Sigma_{\uptheta}$
+\item Both learners effect highly \alert{biased} untrained regressor to approximate the non-linear clairvoyant regressor
+\end{itemize}
+
+
+\footcitetext{theodoridis-ML}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Prediction Statistics}
 
 \begin{columns}[c]
 
 \begin{column}{.5\linewidth}
 
-:)
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{Discrete/SE/predict_a0.png}
+%	\caption{Predictor mean/variance, comparative}
+	\label{fig:Discrete/SE/predict_a0}
+\end{figure}
 
 \end{column}
 
@@ -575,16 +635,23 @@ where $\gamma(x; \uppsim) = \Big( 1 + N \uppsim(x) / \big(\alpha_0 \alpham(x)\bi
 
 \begin{figure}
 	\centering
-	\includegraphics[width=1\linewidth]{Discrete/SE/risk_N_leg_a0.png}
-%	\caption{Squared-Error vs. training data volume $N$}
-	\label{fig:Discrete/SE/risk_N_leg_a0}
+	\includegraphics[width=1\linewidth]{Discrete/SE/predict_N.png}
+%	\caption{Dirichlet-based predictor mean/variance, varying $N$}
+	\label{fig:Discrete/SE/predict_N}
 \end{figure}
 
 \end{column}
 
 \end{columns}
 
+\vspace{-1em}
+\begin{itemize}
+\item Lines show bias $\Erm_{\uppsi | \uptheta}\big[\mu_{\yrm | \xrm, \uppsi}\big]$, fill shows variance $\Crm_{\uppsi | \uptheta}\big[\mu_{\yrm | \xrm, \uppsi}\big]$
+\item Python simulation results average 50,000 learning iterations
+\end{itemize}
+
 \end{frame}
+
 
 
 
@@ -630,6 +697,39 @@ $\to 0$ & $\big( 1 - \upthetam(x) \big)^N$ & $\Erm_{\uppsim | \upthetam}\left[ \
 %	\caption{Squared-Error vs. prior localization $\alpha_0$}
 	\label{fig:Discrete/SE/risk_a0_leg_N}
 \end{figure} 
+
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
+
+
+
+\begin{frame}
+\frametitle{Training Volume Trends}
+
+\begin{columns}[c]
+
+\begin{column}{.5\linewidth}
+
+\begin{itemize}
+\item As $N \to \infty$, both $\lambda_{\text{Bias}}(\xrm; \upthetam) \to 0$ and $\lambda_{\text{Var}}(\xrm; \upthetam) \to 0$, resulting in $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$ for \alert{any} model $\uptheta$ and \alert{any} prior parameterization
+\item Converges to the clairvoyant regressor regardless of how biased the prior conditional mean $\alphac$ is, or how much confidence in $\alphac$ is indicated through the prior localization $\alpha_0$
+\end{itemize}
+
+
+\end{column}
+
+\begin{column}{.5\linewidth}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{Discrete/SE/risk_N_leg_a0.png}
+%	\caption{Squared-Error vs. training data volume $N$}
+	\label{fig:Discrete/SE/risk_N_leg_a0}
+\end{figure}
 
 \end{column}
 
