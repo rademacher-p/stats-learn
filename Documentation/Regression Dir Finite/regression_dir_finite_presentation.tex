@@ -10,7 +10,8 @@
 
 
 \usepackage[style=authortitle-comp,maxnames=1]{biblatex} % PGR: backend=biber???
-\addbibresource{../References/PhD_refs.bib}
+%\addbibresource{../References/PhD_refs.bib}
+\addbibresource{references.bib}
 
 \usepackage{graphicx}
 \graphicspath{{../Figures/}}
@@ -22,6 +23,7 @@
 %\usepackage{hyperref}
 %\usepackage[capitalize]{cleveref}
 
+\usepackage{mathtools}
 \usepackage{relsize}
 
 \usepackage{bm}
@@ -35,9 +37,6 @@
 
 \usepackage{mathfont_shortcuts}
 \usepackage{PhDmath}
-
-
-\DeclareMathOperator{\nbarrm}{\bar{\mathrm{n}}}
 
 
 \newcommand{\indep}{\perp \!\!\! \perp}
@@ -258,6 +257,7 @@ where data is represented using $\Psi : \Dcal \mapsto \Uppsi \subset \Theta$, de
 
 
 \hrulefill
+\vspace{.5em}
 
 \begin{columns}[c]
 
@@ -273,7 +273,7 @@ where data is represented using $\Psi : \Dcal \mapsto \Uppsi \subset \Theta$, de
 By the aggregation property \footnotemark,
 \begin{itemize}
 \item $\uppsim | \upthetam \sim \Emp(N,\upthetam)$
-\item $\uppsic(x) | \uppsim(x),\upthetac(x) \sim \Emp\big( N \uppsim(x),\upthetac(x) \big)$ are mutually independent
+\item $\uppsic(x) | \uppsim(x),\upthetac(x) \sim \Emp\big( N \uppsim(x),\upthetac(x) \big)$ are mutually \alert{independent}
 \end{itemize}
 \end{column}
 
@@ -294,7 +294,7 @@ By the aggregation property \footnotemark,
 \Rcal_{\Theta}(f ; \uptheta) = \Erm_{\yrm,\xrm,\uppsi | \uptheta} \Big[ \big( f(\xrm;\uppsi)-\yrm \big)^2 \Big] & \equiv & \underbrace{\Erm_{\xrm | \upthetam} \left[ \Sigma_{\yrm | \xrm,\upthetac} \right]}_{\mathlarger{\Rcal_{\Theta}^*(\uptheta)}} + \underbrace{\Erm_{\xrm,\uppsi | \uptheta} \Big[ \big( f(\xrm;\uppsi) - \mu_{\yrm | \xrm,\upthetac} \big)^2 \Big]}_{\mathlarger{\Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta)}} \nonumber
 \end{IEEEeqnarray}
 
-\item Clairvoyant \footfullcite{kay-det} regressor $f_{\Theta}(\xrm;\upthetac) = \mu_{\yrm | \xrm,\upthetac}$ achieves irreducible squared-error $\Rcal_{\Theta}^*(\uptheta)$
+\item Clairvoyant \footfullcite{kay-det} regressor $f_{\Theta}(\xrm;\upthetac) = \mu_{\yrm | \xrm,\upthetac}$ achieves \emph{irreducible} squared-error $\Rcal_{\Theta}^*(\uptheta)$
 
 \item Excess squared-error can be decomposed into \alert{bias} and \alert{variance} terms:
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond_ex_SE}
@@ -304,26 +304,6 @@ By the aggregation property \footnotemark,
 \end{itemize}
 
 \end{frame}
-
-%\begin{frame}
-%\frametitle{Objective}
-%
-%\begin{itemize}
-%\item Design a regression function $f: \Uppsi \mapsto \Rbb^{\Xcal}$ to minimize the expected squared-error with respect to $\uptheta$:
-%\begin{IEEEeqnarray}{rCl} \label{eq:risk_cond_SE}
-%\Rcal_{\Theta}(f ; \uptheta) = \Erm_{\yrm,\xrm,\Drm | \uptheta} \Big[ \big( f(\xrm;\Drm)-\yrm \big)^2 \Big] & = & \underbrace{\Erm_{\xrm | \uptheta} \left[ \Sigma_{\yrm | \xrm,\uptheta} \right]}_{\mathlarger{\Rcal_{\Theta}^*(\uptheta)}} + \underbrace{\Erm_{\xrm,\Drm | \uptheta} \Big[ \big( f(\xrm;\Drm) - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big]}_{\mathlarger{\Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta)}} \nonumber
-%\end{IEEEeqnarray}
-%
-%\item Clairvoyant \footfullcite{kay-det} regressor $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$ achieves irreducible squared-error $\Rcal_{\Theta}^*(\uptheta)$
-%
-%\item Excess squared-error can be decomposed into \alert{bias} and \alert{variance} terms:
-%\begin{IEEEeqnarray}{rCl} \label{eq:risk_cond_ex_SE}
-%\Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta) & = & \Erm_{\xrm | \uptheta} \left[ \Big( \Erm_{\Drm | \uptheta}\big[ f(\xrm;\Drm) \big] - f_{\Theta}(\xrm;\uptheta) \Big)^2 + \Crm_{\Drm | \uptheta}\big[ f(\xrm;\Drm) \big] \right] \nonumber 
-%\end{IEEEeqnarray}
-%
-%\end{itemize}
-%
-%\end{frame}
 
 
 
@@ -394,7 +374,7 @@ f^*(\xrm;\uppsi) & = & \argmin_{y' \in \Rbb} \Erm_{\yrm | \xrm,\uppsi}\big[ (y'-
 
 
 
-\section{Model Distributions: Prior to Predictive}
+\section{Distributions: Prior to Predictive}
 
 
 \begin{frame}
@@ -404,13 +384,14 @@ f^*(\xrm;\uppsi) & = & \argmin_{y' \in \Rbb} \Erm_{\yrm | \xrm,\uppsi}\big[ (y'-
 
 \begin{column}{.8\linewidth}
 
-The probability density function (PDF) of the model $\uptheta \in \Theta$ is Dirichlet:
+The probability density function of the model $\uptheta \in \Theta$ is Dirichlet:
 \begin{IEEEeqnarray*}{L}
 \prm_{\uptheta}(\theta) = \Dir(\theta; \alpha_0,\alpha) \equiv \beta(\alpha_0 \alpha)^{-1} \prod_{y \in \Ycal} \prod_{x \in \Xcal} \theta(y,x)^{\alpha_0 \alpha(y,x) - 1}
 \end{IEEEeqnarray*}
 
 %\footcitetext{bishop}
 
+\vspace{-1em}
 \begin{itemize}
 \item Parameter $\alpha_0$ controls localization around mean $\alpha$
 \end{itemize}
@@ -419,10 +400,11 @@ The probability density function (PDF) of the model $\uptheta \in \Theta$ is Dir
 
 \textit{Alternate Notation}: 
 \begin{itemize}
-\item Marginal $\alpham \equiv \sum_{y \in \Ycal} \alpha(y,\cdot)$ and conditional $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x)$
-
-\item By the aggregation property\footnotemark, $\upthetam \sim \Dir(\alpha_0,\alpham)$ and $\upthetac(x) \sim \Dir\big(\alpha_0 \alpham(x),\alphac(x)\big)$, are \alert{independent} of one another and of $\upthetam$
+\item Marginal $\alpham \equiv \sum_{y \in \Ycal} \alpha(y,\cdot)$ 
+\item Conditional $\alphac(x) \equiv \alpha(\cdot,x) / \alpham(x)$
+\item[$*$] By the aggregation property\footnotemark, $\upthetam \sim \Dir(\alpha_0,\alpham)$ and $\upthetac(x) \sim \Dir\big(\alpha_0 \alpham(x),\alphac(x)\big)$ are mutually \alert{independent}
 \end{itemize}
+
 
 \end{column}
 
@@ -439,6 +421,7 @@ The probability density function (PDF) of the model $\uptheta \in \Theta$ is Dir
 
 \end{columns}
 
+\vspace{-.75em}
 \footcitetext{ferguson}
 
 
@@ -452,13 +435,18 @@ The probability density function (PDF) of the model $\uptheta \in \Theta$ is Dir
 \framesubtitle{Closed-Form}
 
 Since $\indep_x \upthetac(x)$ and $\upthetac \indep \upthetam$, and since the Empirical process $\upthetac(x) | \uppsim(x),\uppsic(x)$ has exponential form, Dirichlet process $\upthetac(x)$ is conjugate \footfullcite{theodoridis-ML} and thus
+%\vspace{-.5em}
 \begin{IEEEeqnarray*}{L}
 	\upthetac(x) | \uppsim(x),\uppsic(x) \sim \Dir\Big( \alpha_0 \alpham(x) + N \uppsim(x), \mu_{\upthetac(x) | \uppsim(x), \uppsic(x)} \Big) \;,
 \end{IEEEeqnarray*}
+%\vspace{-.5em}
 with mean functions
 \begin{IEEEeqnarray*}{rCl} \label{eq:pred_Bayes_psi}
 	\mu_{\upthetac(x) | \uppsim(x), \uppsic(x)} & = & \gamma(x; \uppsim) \alphac(x) + \big(1 - \gamma(x; \uppsim)\big) \uppsic(x) \equiv \textcolor[rgb]{1,0,0}{\Prm_{\yrm | \xrm,\uppsi}} \;,
 \end{IEEEeqnarray*}
+%\begin{IEEEeqnarray*}{rCl} \label{eq:pred_Bayes_psi}
+%	\mu_{\upthetac(x) | \uppsim(x), \uppsic(x)} & = & \gamma(x; \uppsim) \underbrace{\alphac(x)}_{\mathclap{= \mu_{\upthetac(\xrm)} = \Prm_{\yrm | \xrm}}} + \big(1 - \gamma(x; \uppsim)\big) \uppsic(x) \equiv \textcolor[rgb]{1,0,0}{\Prm_{\yrm | \xrm,\uppsi}} \;,
+%\end{IEEEeqnarray*}
 where $\gamma(x; \uppsim) = \Big( 1 + N \uppsim(x) / \big(\alpha_0 \alpham(x)\big) \Big)^{-1} \in (0,1]$.
 
 \vspace{1em}
@@ -529,9 +517,11 @@ where $\gamma(x; \uppsim) = \Big( 1 + N \uppsim(x) / \big(\alpha_0 \alpham(x)\bi
 \frametitle{Bayes Optimal Regressor}
 
 \textbf{Regressor}: $f^*(\xrm;\uppsi) \equiv \gamma(\xrm; \uppsim) \mu_{\yrm | \xrm} + \big(1-\gamma(\xrm; \uppsim)\big) \sum_{y \in \Ycal} \uppsic(y;\xrm) \ y$
+\vspace{.5em}
 \begin{itemize}
-\item[$*$] $\Prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$
-\item[$*$] Inherits trends from posterior distribution. Max or min data dependency through localization $\alpha_0$.
+%\item[$*$] $\Prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$
+\item[$*$] Convexly combines first moment of $\Prm_{\yrm | \xrm} = \mu_{\upthetac(\xrm)} = \alphac(\xrm)$ with empirical mean 
+\item[$*$] Inherits trends from posterior distribution, allowing maximal or minimal confidence in the prior
 \end{itemize}
 
 \hrulefill
@@ -564,7 +554,7 @@ where $\gamma(x; \uppsim) = \Big( 1 + N \uppsim(x) / \big(\alpha_0 \alpham(x)\bi
 
 \begin{column}{.5\linewidth}
 
-\textbf{Model}:
+\textbf{Data Model}:
 \begin{itemize}
 \item $\Xcal = \Ycal = \{i/127: i = 0, \ldots, 127\}$
 %\item $\Xcal$ and $\Ycal$ are 128-point discretizations of $[0,1]$
@@ -573,6 +563,9 @@ where $\gamma(x; \uppsim) = \Big( 1 + N \uppsim(x) / \big(\alpha_0 \alpham(x)\bi
 %\item $\thetac(y; \xrm) = \Bi\big(127y; 127, \mu_{\yrm | \xrm,\upthetac}\big)$
 \item \alert{Clairvoyant}: $\mu_{\yrm | \xrm,\upthetac} = 1 / \big(2 + \sin(2\pi \xrm\big)$
 \item $\Sigma_{\yrm | \xrm, \uptheta} = 0.2 \, \mu_{\yrm | \xrm, \uptheta} (1 - \mu_{\yrm | \xrm, \uptheta})$
+\begin{itemize}
+\item[$\Rightarrow$] $\Rcal_{\Theta}^*(\uptheta) \approx 0.039$
+\end{itemize}
 \end{itemize}
 
 
@@ -605,8 +598,9 @@ where $\gamma(x; \uppsim) = \Big( 1 + N \uppsim(x) / \big(\alpha_0 \alpham(x)\bi
 \vspace{1em}
 
 \begin{itemize}
-\item Vary prior confidence for Dirichlet and Normal learners using $\alpha_0$ and $\Sigma_{\uptheta}$
-\item Both learners effect highly \alert{biased} untrained regressor to approximate the non-linear clairvoyant regressor
+\item \emph{Prior confidence} of Dirichlet and Normal learners varied using $\alpha_0$ and $\Sigma_{\uptheta}$
+\vspace{.5em}
+\item Both learners effect the same \alert{biased} untrained regressor to approximate the non-linear clairvoyant regressor
 \end{itemize}
 
 
@@ -646,7 +640,7 @@ where $\gamma(x; \uppsim) = \Big( 1 + N \uppsim(x) / \big(\alpha_0 \alpham(x)\bi
 
 \vspace{-1em}
 \begin{itemize}
-\item Lines show bias $\Erm_{\uppsi | \uptheta}\big[\mu_{\yrm | \xrm, \uppsi}\big]$, fill shows variance $\Crm_{\uppsi | \uptheta}\big[\mu_{\yrm | \xrm, \uppsi}\big]$
+\item Lines show bias $\Erm_{\uppsi | \uptheta}\big[\mu_{\yrm | \xrm, \uppsi}\big]$, fill regions shows variance $\Crm_{\uppsi | \uptheta}\big[\mu_{\yrm | \xrm, \uppsi}\big]$
 \item Python simulation results average 50,000 learning iterations
 \end{itemize}
 
@@ -662,14 +656,14 @@ where $\gamma(x; \uppsim) = \Big( 1 + N \uppsim(x) / \big(\alpha_0 \alpham(x)\bi
 
 \begin{column}{.5\linewidth}
 
-For a given conditional mean $\alphac$, localization $\alpha'(x) \equiv \alpha_0 \alpham(x)$ controls a \alert{Bias-Variance} trade-off:
+For a given conditional mean $\alphac$, localization $\bar{\alpha}_0(x) \equiv \alpha_0 \alpham(x)$ controls a \alert{Bias-Variance} trade-off:
 \vspace{-1em}
 \begin{table}
 \renewcommand{\arraystretch}{1.8}
 \scalebox{0.9}{
 \begin{tabular}{| c | c | c |}
 \hline 
-$\alpha'(x)$ & $\lambda_{\text{Bias}}(x; \upthetam)$ & $\lambda_{\text{Var}}(x; \upthetam)$ \\
+$\bar{\alpha}_0(x)$ & $\lambda_{\text{Bias}}(x; \upthetam)$ & $\lambda_{\text{Var}}(x; \upthetam)$ \\
 \hhline{|=|=|=|}
 $\to \infty$ & $1$ & $0$ \\
 \hline
@@ -684,7 +678,7 @@ $\to 0$ & $\big( 1 - \upthetam(x) \big)^N$ & $\Erm_{\uppsim | \upthetam}\left[ \
 \textbf{Optimal}: 
 \vspace{-.5em}
 \begin{equation*} \label{eq:alpha_x_min_Rex}
-	\alpha'(\xrm) = \frac{\Sigma_{\yrm | \xrm,\upthetac}}{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2}
+	\bar{\alpha}_0(\xrm) = \frac{\Sigma_{\yrm | \xrm,\upthetac}}{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2}
 \end{equation*}
 
 \end{column}
@@ -715,8 +709,12 @@ $\to 0$ & $\big( 1 - \upthetam(x) \big)^N$ & $\Erm_{\uppsim | \upthetam}\left[ \
 \begin{column}{.5\linewidth}
 
 \begin{itemize}
-\item As $N \to \infty$, both $\lambda_{\text{Bias}}(\xrm; \upthetam) \to 0$ and $\lambda_{\text{Var}}(\xrm; \upthetam) \to 0$, resulting in $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$ for \alert{any} model $\uptheta$ and \alert{any} prior parameterization
-\item Converges to the clairvoyant regressor regardless of how biased the prior conditional mean $\alphac$ is, or how much confidence in $\alphac$ is indicated through the prior localization $\alpha_0$
+\item As $N \to \infty$, both $\lambda_{\text{Bias}}(\xrm; \upthetam) \to 0$ and $\lambda_{\text{Var}}(\xrm; \upthetam) \to 0$
+\begin{itemize}
+\item[$\Rightarrow$] $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$ for \alert{any} model $\uptheta$ 
+\end{itemize} 
+\vspace{.5em}
+\item Note that $f^*(\xrm;\uppsi)$ converges to the clairvoyant regressor \alert{regardless} of how biased the prior conditional mean $\alphac$ is, or how much confidence in $\alphac$ is indicated through the localization $\alpha_0$
 \end{itemize}
 
 
@@ -744,35 +742,23 @@ $\to 0$ & $\big( 1 - \upthetam(x) \big)^N$ & $\Erm_{\uppsim | \upthetam}\left[ \
 \begin{frame}
 \frametitle{Conclusions}
 
+\textbf{Summary}
+
+Full-support Bayesian learning with a Dirichlet prior enables:
 \begin{itemize}
-\item The majority decision classifier designed with a uniform Dirichlet prior minimizes the possibility of maximal error for applications where the data distribution can not be adequately modeled
-\item Full support of Dirichlet priors guarantees minimal risk in the limit of training data volume
-\item Efficient closed-form for Bayesian probability of error provides a lower-bound for general classifiers
+\item Asymptotically \alert{optimal} performance for data-rich applications 
+\item \alert{Maximal} prior knowledge required for data-limited applications
 \end{itemize}
 
-\begin{columns}[T]
-
-\begin{column}{.55\linewidth}
-
+\vspace{1em}
+\textbf{Future Work}
 \begin{itemize}
-\item Low localization Dirichlet priors result in the same classifier - these priors are sensible for recognition applications where humans perform with low-error
+\item Generalize these concepts for more general data models using the continuous Dirichlet process \footfullcite{gershman}
+\begin{itemize}
+\item Practical necessity motivates the use of \alert{discretization} to realize the demonstrated benefits
 \end{itemize}
-
-\end{column}
-
-\begin{column}{.4\linewidth}
-
-\vspace{-2em}
-\begin{figure}
-\centering
-\includegraphics[width=0.5\linewidth]{P_theta_highVar.pdf}
-%\caption{}
-\label{fig:P_theta_highVar}
-\end{figure}
-
-\end{column}
-
-\end{columns}
+\item Use the Dirichlet prior with different likelihood functions (e.g. mixture model) to effect limited-support priors that may be best suited for data-limited applications
+\end{itemize}
 
 
 \end{frame}
