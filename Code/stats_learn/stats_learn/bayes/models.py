@@ -258,7 +258,7 @@ class NormalLinear(Base):
 
 class Dirichlet(Base):  # TODO: DRY from random.elements?
     def __init__(self, prior_mean, alpha_0, rng=None):
-        super().__init__(prior=None, rng=rng)
+        super().__init__(prior=None, rng=rng)  # TODO: check prior??
 
         self._space = prior_mean.space
 

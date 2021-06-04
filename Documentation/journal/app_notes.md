@@ -21,7 +21,11 @@
 Low N: avoid overfitting (*Show L2 reg inferior?*)
 High N: consistency (*harder funcs?*)
 
+**Need harder funcs for pop learners - research!**
 **MLP universal approx theorem for CONTINUOUS functions. Discretized Dirichlet seems good for discontinuities! Fractals? RESEARCH!!**
+
+**Equate degrees-of-freedom for fair comparison? Prior or mean?**
+
 
 ---
 # Results
@@ -38,12 +42,9 @@ High N: consistency (*harder funcs?*)
 
 ---
 # Pop Comparison notes
-**Need harder funcs for pop learners - research!**
-**Equate degrees-of-freedom for fair comparison?**
-
 - *Advantages*
   - Full support prior = consistency = best performance for N >> 0
-    - **Pop can be consistent on discrete domain with enough DOF!!**
+    - **ERROR: Pop can be consistent on discrete domain with enough DOF!!**
   - Flexible parameterization = able to exploit strong prior knowledge
     - Show pop don't do priors = **Bayes benefit**!!!?
 - *Disadvantages*
