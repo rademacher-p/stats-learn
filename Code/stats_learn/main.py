@@ -48,7 +48,7 @@ def func_mean_to_models(n, alpha_0, func):
         return [rand_elements.DirichletEmpiricalScalar(func(_x), alpha_0, n-1) for _x in x_supp]
 
 
-n_x = 51
+n_x = 21
 
 # var_y_x_const = 1 / (n_x-1)
 var_y_x_const = 1/5
@@ -58,11 +58,6 @@ alpha_y_x_beta = 1/var_y_x_const - 1
 
 
 # True model
-
-# model_x = rand_elements.Finite([0, .5], p=None)
-# model = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
-
-
 shape_x = ()
 # shape_x = (2,)
 
@@ -70,15 +65,15 @@ shape_x = ()
 w_model = [0, 1]
 
 
-# def nonlinear_model(x):
-#     # return 1 / (2 + np.sin(2*np.pi * x))
-#     axis = tuple(range(-len(shape_x), 0))
-#     return 1 / (2 + np.sin(2 * np.pi * x.mean(axis)))
-
-
-_rand_vals = dict(zip(np.linspace(0, 1, n_x, endpoint=True), np.random.default_rng(seed).random(n_x)))
 def nonlinear_model(x):
-    return _rand_vals[x]
+    # return 1 / (2 + np.sin(2*np.pi * x))
+    axis = tuple(range(-len(shape_x), 0))
+    return 1 / (2 + np.sin(2 * np.pi * x.mean(axis)))
+
+
+# _rand_vals = dict(zip(np.linspace(0, 1, n_x, endpoint=True), np.random.default_rng(seed).random(n_x)))
+# def nonlinear_model(x):
+#     return _rand_vals[x]
 
 
 # def nonlinear_model(x):
@@ -87,14 +82,14 @@ def nonlinear_model(x):
 #     return np.array(x.mean(axis) > .5, dtype=float) * (1-delta) + delta/2
 
 
-supp_x = box_grid(np.broadcast_to([0, 1], (*shape_x, 2)), n_x, endpoint=True)
-model_x = rand_elements.Finite(supp_x, p=np.full(prod(shape_x)*(n_x,), n_x**-prod(shape_x)))
-# model = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_model), model_x)
-model = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model), model_x)
+# supp_x = box_grid(np.broadcast_to([0, 1], (*shape_x, 2)), n_x, endpoint=True)
+# model_x = rand_elements.Finite(supp_x, p=np.full(prod(shape_x)*(n_x,), n_x**-prod(shape_x)))
+# # model = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_model), model_x)
+# model = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model), model_x)
 
-# model_x = rand_elements.Uniform(np.broadcast_to([0, 1], (*shape_x, 2)))
-# # model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
-# model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x)
+model_x = rand_elements.Uniform(np.broadcast_to([0, 1], (*shape_x, 2)))
+# model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
+model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x)
 
 # model = rand_models.NormalLinear(weights=w_model, basis_y_x=None, cov_y_x=.1, model_x=model_x)
 
@@ -120,35 +115,27 @@ w_prior = [.5, 0]
 # Dirichlet learner
 proc_funcs = []
 
-# prior_mean = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.9, .9)], model_x)
-
-prior_mean = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_prior), model_x)
+# prior_mean = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_prior), model_x)
 
 
 # prior_mean_x = deepcopy(model_x)
-#
-# n_t = 16
-# supp_x = box_grid(model_x.lims, n_t, endpoint=True)
-# # _temp = np.ones(model_x.size*(n_t,))
+
+n_t = 16
+supp_t = box_grid(model_x.lims, n_t, endpoint=True)
+_temp = np.ones(model_x.size*(n_t,))
 # _temp = prob_disc(model_x.size*(n_t,))
-# prior_mean_x = rand_elements.Finite(supp_x, p=_temp/_temp.sum())
-# proc_funcs.append(discretizer(supp_x.reshape(-1, *model_x.shape)))
-#
-# prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
+prior_mean_x = rand_elements.Finite(supp_t, p=_temp/_temp.sum())
+proc_funcs.append(discretizer(supp_t.reshape(-1, *model_x.shape)))
+
+prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
 
 
-_name = r'$\mathrm{Dir}$'
-# if len(proc_funcs) > 0:
-#     _card = str(n_t)
-#     if model_x.size > 1:
-#         _card += f"^{model_x.size}"
-#     _name += r', $|\mathcal{T}| = __card__$'.replace('__card__', _card)
-
-dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs, name=_name)
+dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs, name=r'$\mathrm{Dir}$')
 
 # dir_params = {}
 # dir_params = {'alpha_0': [10, 1000]}
-dir_params = {'alpha_0': [.001]}
+# dir_params = {'alpha_0': [.001]}
+dir_params = {'alpha_0': [20]}
 # dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
@@ -166,13 +153,15 @@ if do_bayes:  # add true bayes model concentration
 # w_prior_norm = [.5, *(0 for __ in range(n_x-1))]
 # basis_y_x = None
 
-vals = np.linspace(0, 1, n_x, endpoint=True)
 def make_square_func(val):
-    # return lambda x: 1. if abs(x-val) < _width/2 else 0.
-    return lambda x: np.where(abs(x-val) < 0.5/(len(vals)-1), 1, 0)
+    # return lambda x: np.where(x == val, 1, 0)
+    # return lambda x: np.where(abs(x-val) < 0.5/(supp_t.size-1), 1, 0)
+    delta = 0.5 / (supp_t.size-1)
+    return lambda x: np.where((x >= val-delta) & (x < val+delta), 1, 0)
 
-w_prior_norm = [.5 for __ in range(len(vals))]
-basis_y_x = [make_square_func(val) for val in vals]
+
+w_prior_norm = [.5 for __ in supp_t]
+basis_y_x = [make_square_func(val) for val in supp_t]
 
 norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior_norm, prior_cov=.1, basis_y_x=basis_y_x,
                                                           cov_y_x=.1, model_x=model_x, allow_singular=True),
@@ -180,7 +169,9 @@ norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior_nor
 
 # norm_params = {}
 # norm_params = {'prior_cov': [.1, .001]}
-norm_params = {'prior_cov': [1e4]}
+# norm_params = {'prior_cov': [1e4]}
+# norm_params = {'prior_cov': [.1 / (20 / n_x)]}
+norm_params = {'prior_cov': [.1 / (20 / n_t)]}
 # norm_params = {'prior_cov': [100, .001]}
 # norm_params = {'prior_cov': np.logspace(-7., 3., 60)}
 
@@ -200,7 +191,7 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 #%% Results
 
-n_train = 2000
+n_train = 5
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
@@ -214,7 +205,7 @@ n_train = 2000
 
 temp = [
     (opt_predictor, None),
-    # (dir_predictor, dir_params),
+    (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
     (norm_predictor, norm_params),
     # (skl_predictor, None),
@@ -225,8 +216,8 @@ predictors, params = zip(*temp)
 # TODO: add logic based on which parameters can be changed while preserving learner state!!
 # TODO: train/test loss results?
 
-# plot_risk_eval_sim_compare(pred/ictors, model_eval, params, n_train, n_test=100, n_mc=50, verbose=True)
-plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=50, x=None, do_std=True, verbose=True)
+# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=50, verbose=True)
+plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=5, x=None, do_std=True, verbose=True)
 
 # d = model.rvs(10)
 # ax = model.space['x'].make_axes()
@@ -248,6 +239,19 @@ print('Done')
 
 
 #%% Deprecated
+
+# model_x = rand_elements.Finite([0, .5], p=None)
+# model = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
+# prior_mean = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.9, .9)], model_x)
+
+
+# _name = r'$\mathrm{Dir}$'
+# if len(proc_funcs) > 0:
+#     _card = str(n_t)
+#     if model_x.size > 1:
+#         _card += f"^{model_x.size}"
+#     _name += r', $|\mathcal{T}| = __card__$'.replace('__card__', _card)
+
 
 # ###
 # n_t_iter = [4, 128, 4096]
