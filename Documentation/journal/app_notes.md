@@ -24,7 +24,7 @@ High N: consistency (*harder funcs?*)
 **Need harder funcs for pop learners - research!**
 **MLP universal approx theorem for CONTINUOUS functions. Discretized Dirichlet seems good for discontinuities! Fractals? RESEARCH!!**
 
-**Equate degrees-of-freedom for fair comparison? Prior or mean?**
+**Equate degrees-of-freedom for fair comparison? For regression: prior or mean?**
 
 
 ---

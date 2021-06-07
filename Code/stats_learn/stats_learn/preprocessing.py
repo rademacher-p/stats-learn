@@ -9,8 +9,12 @@ from stats_learn.util.plotting import box_grid
 def discretizer(vals):  # TODO: use sklearn.preprocessing.KBinsDiscretizer?
     """Create a rounding discretizer."""
     vals = np.array(vals)
+
     shape = vals.shape[1:]
     size = math.prod(shape)
+
+    if shape == ():
+        vals = np.sort(vals)[::-1]  # trick to break ties towards higher values, for subsets closed on the lower end
     vals_flat = vals.reshape(-1, size)
 
     def func(x):

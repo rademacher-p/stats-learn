@@ -683,8 +683,8 @@ class Simplex(Continuous):
         else:
             raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
-        # c_bar = plt.colorbar(plt_data, ax=ax)
-        # c_bar.set_label('$f(x)$')
+        c_bar = plt.colorbar(plt_data, ax=ax)
+        c_bar.set_label('$f(x)$')
 
         return plt_data
 
