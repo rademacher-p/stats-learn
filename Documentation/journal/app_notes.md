@@ -1,30 +1,51 @@
-# Discrete domain CONCEPTS
-*Discretization of continuous domain loses consistency, but on discrete domain pop parametric learners can also be consistent?!*
-- Pop parametric learners can also be consistent with enough DOF!!
-  - Bayesian LR demonstrates
-    - Dirichlet has less flexibility? NOT if you consider it as continuous domain case (infinite DOF in mean func)
+# Discrete domain analysis
+- **BayesLR regressor superset of Dirichlet regressor set**
+- Dirichlet is a more flexible prior (continuous \alphac), but for regression, the *effective* parameterization is less flexible than that of BayesLR
+- Dirichlet, unlike BayesLR, can be applied to classification and other problems
 
 
-# CONCEPTS
-- Bayesian benefit = different optimization cost function
-  - Dirichlet = regularized empirical risk!
-  - Parametric learners effect a kind of extreme regularization
-- More DOF is fine, if cost is right! Avoid overfitting!
-
-- **DIRICHLET**
-  - Least restrictive regularizer (least subjective prior info)
-    - Avoid worst case scenarios (via consistency)
-    - Mean selection enables preference for any solution (good for low N)
-    - *COMPARISON*: only Dir accounts for loss function, pop ignores parameter mapping
-  - Show results across multiple problems (Bayes?) to emphasize robustness?!
-
-Low N: avoid overfitting (*Show L2 reg inferior?*)
-High N: consistency (*harder funcs?*)
-
-**Need harder funcs for pop learners - research!**
-**MLP universal approx theorem for CONTINUOUS functions. Discretized Dirichlet seems good for discontinuities! Fractals? RESEARCH!!**
+---
+- *Hard funcs for pop learners*
+  - Random discrete functions
+  - Discontinuous funcs vs MLP (UAT only for continuous). Fractals?
 
 **Equate degrees-of-freedom for fair comparison? For regression: prior or mean?**
+
+
+---
+# CONCEPTS
+*Preserve consistency while allowing richer regularization (via Bayes, vs L-norm) then most pop learners!?!*
+
+- **DIRICHLET** -> Regularized empirical mean
+  - Preserve consistency via full support prior
+    - Extreme "regularization" of parametric learners can be detrimental
+  - Better regularization via flexible parameterization
+    - Enables preference for any solution (good for low N)
+    - Avoid overfitting for high variance data models
+    - Only Dir accounts for loss function, pop *ignores* parameter mapping
+
+**Fast hyperparameter optimization of Dirichlet localization, no additional training computation!!**
+
+
+---
+# Pop Comparison notes
+- *Advantages*
+  - Full support prior = consistency = best performance for N >> 0
+    - **CRITICAL: BayesLR and NN (ref: Farago)**
+  - Flexible parameterization = able to exploit strong prior knowledge
+    - **CRITICAL: BayesLR**
+- *Disadvantages*
+  - Flex = minimal response to limited data = outperformed by certain low-dim learners
+
+
+---
+# Real Data notes
+Try **SKL** and **UCI** datasets!
+
+- How to select the prior mean?
+  - **Boost existing regressors?!?** Not really prior knowledge...
+  - Note: cross-validation risk should be minimized when using the empirical distribution of the full data set
+    - Take care to avoid train/test leakage when designing prior mean!
 
 
 ---
@@ -38,24 +59,3 @@ High N: consistency (*harder funcs?*)
   - *Note regularization*!
   - Investigate # layers/weights
 - Best for low N due to MLP overfitting variance
-
-
----
-# Pop Comparison notes
-- *Advantages*
-  - Full support prior = consistency = best performance for N >> 0
-    - **ERROR: Pop can be consistent on discrete domain with enough DOF!!**
-  - Flexible parameterization = able to exploit strong prior knowledge
-    - Show pop don't do priors = **Bayes benefit**!!!?
-- *Disadvantages*
-  - Weak utilization of limited data = outperformed by certain low-dim learners
-
-
----
-# Real Data notes
-Try **SKL** and **UCI** datasets!
-
-- How to select the prior mean?
-  - **Boost existing regressors?!?** Not really prior knowledge...
-- Note: cross-validation risk should be minimized when using the empirical distribution of the full data set
-  - Take care to avoid train/test leakage when designing prior mean!

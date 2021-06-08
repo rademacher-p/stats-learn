@@ -17,3 +17,5 @@
   - Trends with bias and model variance (OVERFITTING)
   - Optimal value independent of N
   - May not be able to use formula in practice, but next slide shows consistency
+- Training Volume Trends
+  - "Universal consistency"

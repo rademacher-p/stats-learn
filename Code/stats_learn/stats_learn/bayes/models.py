@@ -102,7 +102,7 @@ class NormalLinear(Base):
             key = r"\mu_{\uptheta}"
             if val is not None:
                 val_np = np.array(val)
-                val = str(val)
+                val = f"{val:.3f}"
                 if self.prior.shape != () and val_np.shape == ():
                     val += r"\bm{1}"
 
@@ -110,7 +110,7 @@ class NormalLinear(Base):
             key = r"\Sigma_{\uptheta}"
             if val is not None:
                 val_np = np.array(val)
-                val = str(val)
+                val = f"{val:.3f}"
                 if self.prior.shape != () and val_np.shape == ():
                     val += r"\bm{I}"
 
