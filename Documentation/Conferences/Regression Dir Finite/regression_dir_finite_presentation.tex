@@ -176,8 +176,8 @@ such that $\Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) = \Prm_{\Drm_n | \uptheta}(
 \vspace{0.5em}
 \textit{Alternate Notation}: $\uptheta \Leftrightarrow \big( \upthetam,\upthetac \big)$
 \begin{itemize}
-\item Marginal model $\upthetam \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) = \Prm_{\xrm | \uptheta} \equiv \Prm_{\xrm | \upthetam}$
-\item Conditional models $\upthetac(x) \equiv \uptheta(\cdot,x) / \upthetam(x) = \Prm_{\yrm | \xrm,\uptheta} \equiv \Prm_{\yrm | \xrm,\upthetac}$ 
+\item Marginal model $\upthetam \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) \equiv \Prm_{\xrm | \upthetam} \equiv \Prm_{\xrm | \uptheta} $
+\item Conditional models $\upthetac(\xrm) \equiv \uptheta(\cdot,\xrm) / \upthetam(\xrm) \equiv \Prm_{\yrm | \xrm,\upthetac} \equiv \Prm_{\yrm | \xrm,\uptheta} $ 
 \end{itemize}
 
 \end{frame}
@@ -473,7 +473,7 @@ where $\gamma(x; \uppsim) = \Big( 1 + N \uppsim(x) / \big(\alpha_0 \alpham(x)\bi
 \begin{column}{.5\linewidth}
 
 \begin{itemize}
-\item As localization $\alpha_0$ increases, $\upthetac(x) | \uppsim(x),\uppsic(x) \inprob  \alphac(\xrm)$ and the prior is emphasized
+\item As localization $\alpha_0$ increases, $\upthetac(x) | \uppsim(x),\uppsic(x) \inprob  \alphac(x)$ and the prior is emphasized
 \vspace{1em}
 \item As training volume $N$ increases, $\upthetac(x) | \uppsim(x),\uppsic(x) \inprob \uppsic(x)$ and data is emphasized
 \begin{itemize}
@@ -709,7 +709,7 @@ $\to 0$ & $\big( 1 - \upthetam(x) \big)^N$ & $\Erm_{\uppsim | \upthetam}\left[ \
 \begin{column}{.5\linewidth}
 
 \begin{itemize}
-\item As $N \to \infty$, both $\lambda_{\text{Bias}}(\xrm; \upthetam) \to 0$ and $\lambda_{\text{Var}}(\xrm; \upthetam) \to 0$
+\item As $N \to \infty$, both $\lambda_{\text{Bias}}(x; \upthetam) \to 0$ and $\lambda_{\text{Var}}(x; \upthetam) \to 0$
 \begin{itemize}
 \item[$\Rightarrow$] $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to 0$ for \alert{any} model $\uptheta$ 
 \end{itemize} 
