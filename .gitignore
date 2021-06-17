@@ -1,12 +1,12 @@
 ##### PGR additions
 
-Documentation/Thesis/*.pdf
+Documentation/Dissertation/*.pdf
 Documentation/Qualifying Exam/*.pdf
-Documentation/Density Est Dir/Density Est Dir.pdf
-Documentation/Classification Uni Finite/Classification Uni Finite.pdf
-Documentation/Classification Uni Finite/Classification Uni Finite - Presentation.pdf
-Documentation/Regression Dir Finite/Regression Dir Finite.pdf
-Documentation/Regression Dir Finite/regression_dir_finite_presentation.pdf
+Documentation/Conferences/Density Est Dir/Density Est Dir.pdf
+Documentation/Conferences/Classification Uni Finite/Classification Uni Finite.pdf
+Documentation/Conferences/Classification Uni Finite/Classification Uni Finite - Presentation.pdf
+Documentation/Conferences/Regression Dir Finite/Regression Dir Finite.pdf
+Documentation/Conferences/Regression Dir Finite/regression_dir_finite_presentation.pdf
 
 Documentation/Old/
 Code/Matlab/Old/
