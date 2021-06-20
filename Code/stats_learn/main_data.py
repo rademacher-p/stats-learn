@@ -1,6 +1,5 @@
 from pathlib import Path
 import pickle
-from time import strftime
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -11,7 +10,7 @@ from stats_learn.predictors import (ModelRegressor, BayesRegressor, plot_risk_ev
                                     risk_eval_sim_compare, plot_risk_eval_comp_compare, plot_risk_disc)
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.preprocessing import discretizer, prob_disc
-from stats_learn.util.base import vectorize_func
+from stats_learn.util.base import vectorize_func, NOW_STR
 from stats_learn.util.plotting import box_grid
 from stats_learn.util import spaces
 
@@ -53,12 +52,11 @@ plot_risk_eval_sim_compare(predictors, model, params, n_train, n_test=1000, n_mc
 
 
 #%% Save image and Figure
-time_str = strftime('%Y-%m-%d_%H-%M-%S')
 image_path = Path('./images/temp/')
 
 fig = plt.gcf()
-fig.savefig(image_path.joinpath(f"{time_str}.png"))
-with open(image_path.joinpath(f"{time_str}.mpl"), 'wb') as fid:
+fig.savefig(image_path.joinpath(f"{NOW_STR}.png"))
+with open(image_path.joinpath(f"{NOW_STR}.mpl"), 'wb') as fid:
     pickle.dump(fig, fid)
 
 print('Done')

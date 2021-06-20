@@ -4,7 +4,6 @@ Main.
 
 from pathlib import Path
 import pickle
-from time import strftime
 from copy import deepcopy
 from math import prod
 
@@ -17,10 +16,12 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 from stats_learn.bayes import models as bayes_models
-from stats_learn.predictors import (ModelRegressor, BayesRegressor, plot_risk_eval_sim_compare, plot_predict_stats_compare,
-                                    risk_eval_sim_compare, plot_risk_eval_comp_compare, plot_risk_disc, SKLWrapper)
+from stats_learn.predictors import (ModelRegressor, BayesRegressor, plot_risk_eval_sim_compare,
+                                    plot_predict_stats_compare, plot_fit_compare, risk_eval_sim_compare,
+                                    plot_risk_eval_comp_compare, plot_risk_disc, SKLWrapper)
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.preprocessing import discretizer, prob_disc
+from stats_learn.util.base import NOW_STR
 from stats_learn.util.plotting import box_grid
 
 
@@ -49,7 +50,7 @@ def func_mean_to_models(n, alpha_0, func):
         return [rand_elements.DirichletEmpiricalScalar(func(_x), alpha_0, n-1) for _x in x_supp]
 
 
-n_x = 21
+n_x = 128
 
 # var_y_x_const = 1 / (n_x-1)
 var_y_x_const = 1/5
@@ -66,15 +67,15 @@ shape_x = ()
 w_model = [0, 1]
 
 
-# def nonlinear_model(x):
-#     # return 1 / (2 + np.sin(2*np.pi * x))
-#     axis = tuple(range(-len(shape_x), 0))
-#     return 1 / (2 + np.sin(2 * np.pi * x.mean(axis)))
-
-
-_rand_vals = dict(zip(np.linspace(0, 1, n_x, endpoint=True), np.random.default_rng(seed).random(n_x)))
 def nonlinear_model(x):
-    return _rand_vals[x]
+    # return 1 / (2 + np.sin(2*np.pi * x))
+    axis = tuple(range(-len(shape_x), 0))
+    return 1 / (2 + np.sin(2 * np.pi * x.mean(axis)))
+
+
+# _rand_vals = dict(zip(np.linspace(0, 1, n_x, endpoint=True), np.random.default_rng(seed).random(n_x)))
+# def nonlinear_model(x):
+#     return _rand_vals[x]
 
 
 # def nonlinear_model(x):
@@ -133,8 +134,8 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), p
                                name=r'$\mathrm{Dir}$')
 
 # dir_params = {}
-# dir_params = {'alpha_0': [10, 1000]}
-dir_params = {'alpha_0': [.001]}
+dir_params = {'alpha_0': [10, 1000]}
+# dir_params = {'alpha_0': [.001]}
 # dir_params = {'alpha_0': [20]}
 # dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
@@ -148,15 +149,15 @@ if do_bayes:  # add true bayes model concentration
 
 
 # Normal learner
-# w_prior_norm = w_prior
 
+w_prior_norm = w_prior
 # w_prior_norm = [.5, *(0 for __ in range(n_x-1))]
-# basis_y_x = None
+basis_y_x = None
 
-def make_delta_func(val):
-    return lambda x: np.where(x == val, 1, 0)
-w_prior_norm = [.5 for __ in supp_x]
-basis_y_x = [make_delta_func(val) for val in supp_x]
+# def make_delta_func(val):
+#     return lambda x: np.where(x == val, 1, 0)
+# w_prior_norm = [.5 for __ in supp_x]
+# basis_y_x = [make_delta_func(val) for val in supp_x]
 
 # def make_square_func(val):
 #     delta = 0.5 / (supp_t.size-1)
@@ -169,9 +170,9 @@ norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior_nor
                                 name=r'$\mathcal{N}$')
 
 # norm_params = {}
-# norm_params = {'prior_cov': [.1, .001]}
+norm_params = {'prior_cov': [.1, .001]}
 # norm_params = {'prior_cov': [1e4]}
-norm_params = {'prior_cov': [.1 / (.001 / n_x)]}
+# norm_params = {'prior_cov': [.1 / (.001 / n_x)]}
 # norm_params = {'prior_cov': [.1 / (20 / n_t)]}
 # norm_params = {'prior_cov': [100, .001]}
 # norm_params = {'prior_cov': np.logspace(-7., 3., 60)}
@@ -181,8 +182,12 @@ norm_params = {'prior_cov': [.1 / (.001 / n_x)]}
 # skl_estimator, _name = LinearRegression(), 'LR'
 # skl_estimator, _name = SGDRegressor(max_iter=1000, tol=None), 'SGD'
 # skl_estimator, _name = GaussianProcessRegressor(), 'GP'
-skl_estimator, _name = MLPRegressor(hidden_layer_sizes=[300 for __ in range(1)], solver='adam', alpha=0,
-                                    max_iter=1000, tol=1e-8, n_iter_no_change=50, verbose=True), 'MLP'
+
+# _solver_kwargs = {'solver': 'sgd', 'learning_rate': 'adaptive', 'learning_rate_init': 1e-1, 'n_iter_no_change': 20}
+_solver_kwargs = {'solver': 'adam', 'learning_rate_init': 1e-3, 'n_iter_no_change': 20}
+# _solver_kwargs = {'solver': 'lbfgs', }
+skl_estimator, _name = MLPRegressor(hidden_layer_sizes=[1000], alpha=0, verbose=True,
+                                    max_iter=5000, tol=1e-8, **_solver_kwargs), 'MLP'
 
 
 # TODO: try Adaboost, RandomForest, GP, BayesianRidge, KNeighbors, SVR
@@ -193,7 +198,7 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 #%% Results
 
-n_train = 50000
+n_train = 20
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
@@ -209,7 +214,7 @@ temp = [
     (opt_predictor, None),
     (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
-    (norm_predictor, norm_params),
+    # (norm_predictor, norm_params),
     (skl_predictor, None),
 ]
 predictors, params = zip(*temp)
@@ -218,23 +223,22 @@ predictors, params = zip(*temp)
 # TODO: add logic based on which parameters can be changed while preserving learner state!!
 # TODO: train/test loss results?
 
-# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=50, verbose=True)
-plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=1, x=None, do_std=True, verbose=True)
+plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
+# plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=10, x=None, do_std=True, verbose=True)
 
-# d = model.rvs(10)
+
+# d = model.rvs(n_train)
 # ax = model.space['x'].make_axes()
-# norm_predictor.plot_fit(d, ax=ax)
-# skl_predictor.plot_fit(d, ax=ax)
+# plot_fit_compare(d, predictors, ax)
 # ax.set_ylim((0, 1))
 
 
 # Save image and Figure
-time_str = strftime('%Y-%m-%d_%H-%M-%S')
 image_path = Path('./images/temp/')
 
 fig = plt.gcf()
-fig.savefig(image_path.joinpath(f"{time_str}.png"))
-with open(image_path.joinpath(f"{time_str}.mpl"), 'wb') as fid:
+fig.savefig(image_path.joinpath(f"{NOW_STR}.png"))
+with open(image_path.joinpath(f"{NOW_STR}.mpl"), 'wb') as fid:
     pickle.dump(fig, fid)
 
 print('Done')
