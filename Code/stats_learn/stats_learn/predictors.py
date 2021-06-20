@@ -125,6 +125,8 @@ class Base(ABC):
 
         self.model = None
 
+        self.can_warm_start = False
+
     # @property
     # def space(self):
     #     if self._space is None:
@@ -330,6 +332,8 @@ class Bayes(Base):
         super().__init__(loss_func, proc_funcs, name=name)
 
         self.bayes_model = bayes_model
+
+        self.can_warm_start = self.bayes_model.can_warm_start
 
         self.prior = self.bayes_model.prior
         self.posterior = self.bayes_model.posterior

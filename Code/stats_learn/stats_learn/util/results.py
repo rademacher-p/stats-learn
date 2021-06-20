@@ -6,7 +6,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from stats_learn.bayes import models as bayes_models
-from stats_learn.predictors import Bayes
+# from stats_learn.predictors import Bayes
 from stats_learn.util.base import check_data_shape, all_equal
 
 
@@ -91,7 +91,8 @@ def predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=N
         d = model.rvs(n_train[-1])
         for predictor, params, params_shape, y_stats in zip(predictors, params_full, params_shape_full, y_stats_full):
             # fit_incremental = True
-            fit_incremental = isinstance(predictor, Bayes)  # enable fitting with incremental data partitions
+            fit_incremental = predictor.can_warm_start
+            # fit_incremental = isinstance(predictor, Bayes)  # enable fitting with incremental data partitions
             for i_n in range(len(n_train)):
                 if i_n == 0 or not fit_incremental:
                     slice_ = slice(0, n_train[i_n])
@@ -274,7 +275,8 @@ def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n
 
         for predictor, params, loss in zip(predictors, params_full, loss_full):
             # fit_incremental = True
-            fit_incremental = isinstance(predictor, Bayes)  # enable fitting with incremental data partitions
+            fit_incremental = predictor.can_warm_start
+            # fit_incremental = isinstance(predictor, Bayes)  # enable fitting with incremental data partitions
             for i_n in range(len(n_train)):
                 if i_n == 0 or not fit_incremental:
                     slice_ = slice(0, n_train[i_n])
