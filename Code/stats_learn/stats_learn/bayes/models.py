@@ -17,6 +17,8 @@ from stats_learn.util.base import RandomGeneratorMixin, vectorize_func
 
 
 class Base(RandomGeneratorMixin):
+    can_warm_start = False
+
     def __init__(self, prior=None, rng=None):
         super().__init__(rng)
 
@@ -51,6 +53,9 @@ class Base(RandomGeneratorMixin):
         return model.rvs(size)
 
     def fit(self, d=None, warm_start=False):
+        if warm_start and not self.can_warm_start:
+            raise ValueError("Bayes model does not support warm start fitting.")
+
         if d is None:
             d = np.array([], dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
 
@@ -61,6 +66,8 @@ class Base(RandomGeneratorMixin):
 
 
 class NormalLinear(Base):
+    can_warm_start = True
+
     def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
                  model_x=rand_elements.Normal(), *, allow_singular=False, rng=None):
 
@@ -257,6 +264,8 @@ class NormalLinear(Base):
 
 
 class Dirichlet(Base):  # TODO: DRY from random.elements?
+    can_warm_start = True
+
     def __init__(self, prior_mean, alpha_0, rng=None):
         super().__init__(prior=None, rng=rng)  # TODO: check prior??
 
