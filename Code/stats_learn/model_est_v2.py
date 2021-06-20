@@ -1,4 +1,3 @@
-from time import strftime
 from pathlib import Path
 import pickle
 
@@ -7,6 +6,7 @@ from matplotlib import pyplot as plt
 
 from stats_learn.random import elements as rand_elements
 from stats_learn.util import spaces
+from stats_learn.util.base import NOW_STR
 
 plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{amsmath}\usepackage{upgreek}")
@@ -87,12 +87,11 @@ ax.set(xlabel='$y$', title=title)
 
 
 #%% Save image and Figure
-time_str = strftime('%Y-%m-%d_%H-%M-%S')
 image_path = Path('./images/temp/')
 
 fig = plt.gcf()
-fig.savefig(image_path.joinpath(f"{time_str}.png"))
-with open(image_path.joinpath(f"{time_str}.mpl"), 'wb') as fid:
+fig.savefig(image_path.joinpath(f"{NOW_STR}.png"))
+with open(image_path.joinpath(f"{NOW_STR}.mpl"), 'wb') as fid:
     pickle.dump(fig, fid)
 
 print('Done')

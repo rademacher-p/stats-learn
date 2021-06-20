@@ -25,6 +25,23 @@ from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.util import spaces
 from stats_learn.util.base import vectorize_func, check_data_shape, all_equal
 
+# TODO: move all these result functions!?!
+
+
+def plot_fit_compare(d, predictors, ax=None):
+    if ax is None:
+        ax = predictors[0].space['x'].make_axes()
+        # ax = model.space['x'].make_axes()
+
+    ax.scatter(d['x'], d['y'], c='k', marker='.', label=None)
+    for predictor in predictors:
+        predictor.fit(d)
+        predictor.plot_predict(ax=ax, label=predictor.name)
+
+    if len(predictors) > 1:
+        ax.legend()
+    else:
+        ax.set(title=predictors[0].name)
 
 # def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False):
 #
@@ -713,13 +730,18 @@ class Base(ABC):
         """Plot prediction function."""
         return self.space['x'].plot(self.predict, x, ax=ax, label=label)
 
-    def plot_fit(self, d=None, warm_start=False, ax=None):
-        self.fit(d, warm_start)
-
+    def plot_fit(self, d, ax=None):
         if ax is None:
             ax = self.space['x'].make_axes()
-        self.plot_predict(ax=ax)
-        ax.scatter(d['x'], d['y'])
+        return plot_fit_compare(d, [self], ax)
+
+    # def plot_fit(self, d, ax=None):
+    #     if ax is None:
+    #         ax = self.space['x'].make_axes()
+    #     ax.scatter(d['x'], d['y'])
+    #
+    #     self.fit(d)
+    #     self.plot_predict(ax=ax)
 
     # Prediction statistics
     def predict_stats(self, model=None, params=None, n_train=0, n_mc=1, x=None, stats=('mode',), verbose=False):
