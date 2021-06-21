@@ -226,6 +226,7 @@ predictors, params = zip(*temp)
 plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
 # plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=10, x=None, do_std=True, verbose=True)
 
+# FIXME: add markdown print-out for `risk_eval_sim_compare` when appropriate!!!
 
 # d = model.rvs(n_train)
 # ax = model.space['x'].make_axes()
