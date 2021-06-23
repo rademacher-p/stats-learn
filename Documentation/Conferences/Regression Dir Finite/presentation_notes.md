@@ -10,6 +10,7 @@
 
 ---
 **Stop saying "of course" and "really"**
+**Pronounce "Dee-ree-shlay"**
 
 ---
 # Talking Points
