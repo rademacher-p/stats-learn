@@ -447,7 +447,8 @@ with mean functions
 %\begin{IEEEeqnarray*}{rCl} \label{eq:pred_Bayes_psi}
 %	\mu_{\upthetac(x) | \uppsim(x), \uppsic(x)} & = & \gamma(x; \uppsim) \underbrace{\alphac(x)}_{\mathclap{= \mu_{\upthetac(\xrm)} = \Prm_{\yrm | \xrm}}} + \big(1 - \gamma(x; \uppsim)\big) \uppsic(x) \equiv \textcolor[rgb]{1,0,0}{\Prm_{\yrm | \xrm,\uppsi}} \;,
 %\end{IEEEeqnarray*}
-where $\gamma(x; \uppsim) = \Big( 1 + N \uppsim(x) / \big(\alpha_0 \alpham(x)\big) \Big)^{-1} \in (0,1]$.
+%where $\gamma(x; \uppsim) = \Big( 1 + N \uppsim(x) / \big(\alpha_0 \alpham(x)\big) \Big)^{-1} \in (0,1]$.
+where $\gamma(x; \uppsim) = \Big( 1 + \frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \Big)^{-1} \in (0,1]$.
 
 \vspace{1em}
 
