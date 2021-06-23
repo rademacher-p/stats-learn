@@ -14,8 +14,12 @@
 ---
 # Talking Points
 - The Dirichlet prior
-  - *Universal* consistency
+  - *Universal* consistency; lower-dim parametric learners cannot guarantee!
+  - Closed-form = computationally tractable
   - Flexible and *interpretable* parameterization
+- Data Representation
+  - Note that sets are discrete
+  - Parameters are not limited, but the entire distribution!
 - Sufficient Statistics
   - *Likelihood function* shows dependency through `\psi`
   - Ensures we can use `\psi` without loss of information
@@ -24,7 +28,9 @@
 - Predictive Model Posterior - Trends
   - Not only does the mean tend, the entire distribution concentrates!
 - Bayes Optimal Regressor
-  - Regressor inherits trends from posterior dist.
+  - Predictive dist is mix of dists *->* estimate is mix of first moments
+- Example
+  - Simulated in my novel Python package
 - Prediction Statistics
   - Normal regressor is always biased due to lower-dim, limited-support prior
   - "A trade-off is shown, which is formalized next"
