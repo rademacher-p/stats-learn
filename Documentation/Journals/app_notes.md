@@ -13,8 +13,8 @@
 
 ---
 # Discrete domain analysis
-- **BayesLR regressors \superset Dirichlet regressors**
-- Dirichlet is a more flexible prior (continuous \alphac), but for regression, the *effective* parameterization is less flexible than that of BayesLR
+- **BayesLR regressors `\superset` Dirichlet regressors**
+- Dirichlet is a more flexible prior (continuous `\alphac`), but for regression, the *effective* parameterization is less flexible than that of BayesLR
 - Dirichlet, unlike BayesLR, can be applied to classification and other problems
 
 
