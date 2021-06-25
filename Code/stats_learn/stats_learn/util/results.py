@@ -4,20 +4,37 @@ from numbers import Integral
 
 import numpy as np
 from matplotlib import pyplot as plt
+import pandas as pd
 
 from stats_learn.bayes import models as bayes_models
 from stats_learn.util.base import check_data_shape, all_equal
 
 
-def plot_fit_compare(d, predictors, ax=None):
+def plot_fit_compare(predictors, d, params=None, ax=None):
+    if params is None:
+        params_full = [{} for _ in predictors]
+    else:
+        params_full = [item if item is not None else {} for item in params]
+
     if ax is None:
-        ax = predictors[0].space['x'].make_axes()
-        # ax = model.space['x'].make_axes()
+        ax = predictors[0].space['x'].make_axes()  # use first predictors space by default
 
     ax.scatter(d['x'], d['y'], c='k', marker='.', label=None)
-    for predictor in predictors:
+
+    for predictor, params in zip(predictors, params_full):
         predictor.fit(d)
-        predictor.plot_predict(ax=ax, label=predictor.name)
+        if len(params) == 0:
+            predictor.plot_predict(ax=ax, label=predictor.name)
+        elif len(params) == 1:
+            param_name, param_vals = list(params.items())[0]
+            labels = [f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals]
+            for param_val, label in zip(param_vals, labels):
+                predictor.set_params(**{param_name: param_val})
+                predictor.plot_predict(ax=ax, label=label)
+        else:
+            raise NotImplementedError("Only up to one varying parameter currently supported.")
+
+        # predictor.plot_predict(ax=ax, label=predictor.name)
 
     if len(predictors) > 1:
         ax.legend()
@@ -190,9 +207,9 @@ def plot_predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1
                 # title += f", ${param_name} = {param_vals[0]}$"
                 title += f", {predictor.tex_params(param_name, param_vals[0])}"
             else:
-                raise ValueError
+                raise NotImplementedError
         else:
-            raise ValueError
+            raise NotImplementedError("Only up to one varying parameter currently supported.")
 
         for y_stat, label in zip(y_stats, labels):
             y_mean = y_stat['mean']
@@ -244,6 +261,22 @@ def plot_predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1
     ax.set_title(title)
 
     return out
+
+
+def _print_risk(predictors, params, losses, file=None):
+    data = {}
+    for predictor, params, loss in zip(predictors, params, losses):
+        key = predictor.name
+        if len(params) == 0:
+            data[key] = loss[0]
+        else:
+            param_name, param_vals = list(params.items())[0]
+            for idx, val in enumerate(param_vals):
+                key_ = key + f", {predictor.tex_params(param_name, val)}"
+                data[key_] = loss[0, idx]
+
+    table = pd.Series(data, name='Loss').to_markdown(tablefmt='github', floatfmt='.3f')
+    print(table, file)
 
 
 def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False):
@@ -312,9 +345,9 @@ def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n
     # loss_full = [loss.mean() for loss in loss_full]
     loss_full = [loss / n_mc for loss in loss_full]
 
-    # if verbose and len(n_train) == 1:
-    #     for predictor, params in zip(predictors, params_full):
-    #         pass
+    # Print results as Markdown table
+    if verbose and len(n_train) == 1:
+        _print_risk(predictors, params_full, loss_full, file=None)
 
     return loss_full
 
@@ -347,6 +380,10 @@ def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, 
                 # loss[:, np.unravel_index(i_v, loss.shape[2:])] = predictor.evaluate_comp(model, n_train)
 
             loss_full.append(loss)
+
+    # Print results as Markdown table
+    if verbose and len(n_train) == 1:
+        _print_risk(predictors, params_full, loss_full, file=None)
 
     return loss_full
 

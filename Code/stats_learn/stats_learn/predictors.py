@@ -214,7 +214,7 @@ class Base(ABC):
     def plot_fit(self, d, ax=None):
         if ax is None:
             ax = self.space['x'].make_axes()
-        return plot_fit_compare(d, [self], ax)
+        return plot_fit_compare([self], d, ax)
 
     # def plot_fit(self, d, ax=None):
     #     if ax is None:
