@@ -3,20 +3,22 @@
   - No reg. = overfitting
   - With reg. = insufficiently flexible/intuitive?
 
-- *Hard funcs for pop learners*
+- Use smaller discrete spaces? Or use continuous space and **discretization**?
+- *Hard functions for pop learners to learn*
   - Random discrete functions
   - Discontinuous funcs vs MLP (UAT only for continuous). Fractals?
 
-**Equate degrees-of-freedom for fair comparison? For regression: prior or mean?**
+- Equate degrees-of-freedom for fair comparison? For regression: prior or mean?
+  - Related to computation -> not really in scope of my analysis
 
-**Fast hyperparameter optimization of Dirichlet localization, no additional training computation!!**
+*Fast hyperparameter optimization of Dirichlet localization, no additional training computation!!*
 
 ---
 # Discrete domain analysis
 - **BayesLR regressors `\superset` Dirichlet regressors**
   - LR, Ridge are subsets of BayesLR, but still used -> motivates use of Dirichlet
-- Dirichlet is a more flexible prior (continuous `\alphac`), but for regression, the *effective* parameterization is less flexible than that of BayesLR
-- Dirichlet, unlike BayesLR, can be applied to classification and other problems
+  - Dirichlet is a more flexible prior (continuous `\alphac`), but for regression, the *effective* parameterization is less flexible than that of BayesLR
+  - Dirichlet, unlike BayesLR, can be applied to classification and other problems
 
 
 ---
