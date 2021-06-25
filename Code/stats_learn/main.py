@@ -31,7 +31,7 @@ np.set_printoptions(precision=3)
 # plt.style.use(['science'])
 
 plt.rc('text', usetex=True)
-plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepackage{bm} \usepackage{PhDmath}")
+plt.rc('text.latex', preamble=r"\usepackage{PhDmath} \usepackage{bm}")
 
 seed = None
 # seed = 12345
@@ -167,7 +167,7 @@ basis_y_x = None
 
 norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior_norm, prior_cov=.1, basis_y_x=basis_y_x,
                                                           cov_y_x=.1, model_x=model_x, allow_singular=True),
-                                name=r'$\mathcal{N}$')
+                                name=r'$\Ncal$')
 
 # norm_params = {}
 norm_params = {'prior_cov': [.1, .001]}
@@ -223,7 +223,7 @@ predictors, params = zip(*temp)
 # TODO: add function that combines `plot_predict_stats_compare` with `risk_eval_sim`!
 # TODO: train/test loss results?
 
-# plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=10, x=None, do_std=True, verbose=True)
+plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=10, x=None, do_std=True, verbose=True)
 # plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
 
 # TODO: add verbosity arg for `predictor.fit`?
