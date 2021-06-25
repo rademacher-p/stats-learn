@@ -31,7 +31,7 @@ np.set_printoptions(precision=3)
 # plt.style.use(['science'])
 
 plt.rc('text', usetex=True)
-plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepackage{bm}")
+plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepackage{bm} \usepackage{PhDmath}")
 
 seed = None
 # seed = 12345
@@ -131,7 +131,7 @@ prior_mean = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w
 
 
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs,
-                               name=r'$\mathrm{Dir}$')
+                               name=r'$\Dir$')
 
 # dir_params = {}
 dir_params = {'alpha_0': [10, 1000]}
@@ -186,7 +186,7 @@ norm_params = {'prior_cov': [.1, .001]}
 # _solver_kwargs = {'solver': 'sgd', 'learning_rate': 'adaptive', 'learning_rate_init': 1e-1, 'n_iter_no_change': 20}
 _solver_kwargs = {'solver': 'adam', 'learning_rate_init': 1e-3, 'n_iter_no_change': 20}
 # _solver_kwargs = {'solver': 'lbfgs', }
-skl_estimator, _name = MLPRegressor(hidden_layer_sizes=[1000], alpha=0, verbose=True,
+skl_estimator, _name = MLPRegressor(hidden_layer_sizes=[1000], alpha=0, verbose=False,
                                     max_iter=5000, tol=1e-8, **_solver_kwargs), 'MLP'
 
 
@@ -220,17 +220,19 @@ temp = [
 predictors, params = zip(*temp)
 
 
-# TODO: add logic based on which parameters can be changed while preserving learner state!!
+# TODO: add function that combines `plot_predict_stats_compare` with `risk_eval_sim`!
 # TODO: train/test loss results?
 
-plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
 # plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=10, x=None, do_std=True, verbose=True)
+# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
 
-# FIXME: add markdown print-out for `risk_eval_sim_compare` when appropriate!!!
+# TODO: add verbosity arg for `predictor.fit`?
 
+# risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
+#
 # d = model.rvs(n_train)
 # ax = model.space['x'].make_axes()
-# plot_fit_compare(d, predictors, ax)
+# plot_fit_compare(predictors, d, params, ax)
 # ax.set_ylim((0, 1))
 
 
@@ -241,8 +243,6 @@ fig = plt.gcf()
 fig.savefig(image_path.joinpath(f"{NOW_STR}.png"))
 with open(image_path.joinpath(f"{NOW_STR}.mpl"), 'wb') as fid:
     pickle.dump(fig, fid)
-
-print('Done')
 
 
 #%% Deprecated
