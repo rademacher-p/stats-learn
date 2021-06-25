@@ -177,7 +177,7 @@ such that $\Prm_{\yrm,\xrm | \uptheta}(y,x | \theta) = \Prm_{\Drm_n | \uptheta}(
 \textit{Alternate Notation}: $\uptheta \Leftrightarrow \big( \upthetam,\upthetac \big)$
 \begin{itemize}
 \item Marginal model $\upthetam \equiv \sum_{y \in \Ycal} \uptheta(y,\cdot) \equiv \Prm_{\xrm | \upthetam} \equiv \Prm_{\xrm | \uptheta} $
-\item Conditional models $\upthetac(\xrm) \equiv \uptheta(\cdot,\xrm) / \upthetam(\xrm) \equiv \Prm_{\yrm | \xrm,\upthetac} \equiv \Prm_{\yrm | \xrm,\uptheta} $ 
+\item Conditional models $\upthetac(\xrm) \equiv \uptheta(\cdot,\xrm) / \upthetam(\xrm) \equiv \Prm_{\yrm | \xrm,\upthetac} \equiv \Prm_{\yrm | \xrm,\uptheta}$ 
 \end{itemize}
 
 \end{frame}
@@ -562,7 +562,8 @@ where $\gamma(x; \uppsim) = \Big( 1 + \frac{N \uppsim(x)}{\alpha_0 \alpham(x)} \
 \item $\thetam = |\Xcal|^{-1}$
 %\item $\thetac(y;\xrm) = \DE\big((y, 1-y); 127, 4.164, (\mu_{\yrm | \xrm,\uptheta}, 1-\mu_{\yrm | \xrm,\uptheta})\big)$
 %\item $\thetac(y; \xrm) = \Bi\big(127y; 127, \mu_{\yrm | \xrm,\upthetac}\big)$
-\item \alert{Clairvoyant}: $\mu_{\yrm | \xrm,\upthetac} = 1 / \big(2 + \sin(2\pi \xrm\big)$
+\item \alert{Clairvoyant}: $\mu_{\yrm | \xrm,\upthetac} = \big(2 + \sin(2\pi \xrm)\big)^{-1}$
+%\item \alert{Clairvoyant}: $\mu_{\yrm | \xrm,\upthetac} = \frac{1}{2 + \sin(2\pi \xrm)}$
 \item $\Sigma_{\yrm | \xrm, \uptheta} = 0.2 \, \mu_{\yrm | \xrm, \uptheta} (1 - \mu_{\yrm | \xrm, \uptheta})$
 \begin{itemize}
 \item[$\Rightarrow$] $\Rcal_{\Theta}^*(\uptheta) \approx 0.039$

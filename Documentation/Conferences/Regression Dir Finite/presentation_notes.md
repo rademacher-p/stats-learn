@@ -20,10 +20,12 @@
   - Flexible and *interpretable* parameterization
 - Data Representation
   - Note that sets are discrete
-  - Parameters are not limited, but the entire distribution!
+  - Parameters are *not limited*, but the entire distribution!
 - Sufficient Statistics
-  - *Likelihood function* shows dependency through `\psi`
-  - Ensures we can use `\psi` without loss of information
+  - Likelihood function shows dependency through `\psi`
+  - Ensures we can use `\psi` *without* loss of information
+- Objective
+  - Clairvoyant is used if you know true data model
 - Predictive Model Posterior - Closed-form
   - Localization control affects weights
 - Predictive Model Posterior - Trends
