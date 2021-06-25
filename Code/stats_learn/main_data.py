@@ -20,7 +20,7 @@ np.set_printoptions(precision=3)
 pd.options.display.float_format = '{:,.3f}'.format
 
 plt.rc('text', usetex=True)
-plt.rc('text.latex', preamble=r"\usepackage{PhDmath} \usepackage{bm}")
+plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
 
 
 #%%

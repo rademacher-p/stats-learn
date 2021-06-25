@@ -107,13 +107,11 @@ def predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=N
 
         d = model.rvs(n_train[-1])
         for predictor, params, params_shape, y_stats in zip(predictors, params_full, params_shape_full, y_stats_full):
-            # fit_incremental = True
-            fit_incremental = predictor.can_warm_start  # enable fitting with incremental data partitions
             for i_n in range(len(n_train)):
-                if i_n == 0 or not fit_incremental:
+                if i_n == 0 or not predictor.can_warm_start:
                     slice_ = slice(0, n_train[i_n])
                     warm_start = False  # resets learner for new iteration
-                else:
+                else:  # fit with incremental data partitions
                     slice_ = slice(n_train[i_n-1], n_train[i_n])
                     warm_start = True
 
@@ -266,39 +264,43 @@ def plot_predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1
 
 
 def _print_risk(predictors, params, n_train, losses, file=None):
-
-    # TODO: generalize
-
-    data = {}
-    if len(n_train) == 1:
-        for predictor, params, loss in zip(predictors, params, losses):
-            key = predictor.name
-            if len(params) == 0:
-                data[key] = loss[0]
-            else:
-                param_name, param_vals = list(params.items())[0]
-                for idx, val in enumerate(param_vals):
-                    key_ = key + f", {predictor.tex_params(param_name, val)}"
-                    data[key_] = loss[0, idx]
-
-        table = pd.Series(data, name='Loss').to_markdown(tablefmt='github', floatfmt='.3f')
-        print(f"N = {n_train[0]}\n{table}", file=file)
-
-    # elif len(predictors) == 1:
-    #     predictor, params, loss = predictors[0], params[0], losses[0]
-    #     if len(params) == 0:
-    #         for idx, n in enumerate(n_train):
-    #             data[n] = loss[idx]
-    #     else:
-    #         raise NotImplementedError
-    #
-    #     table = pd.Series(data, name='Loss').to_markdown(tablefmt='github', floatfmt='.3f')
-    #     print(f"N = {n_train[0]}\n{table}", file=file)
+    title = ''
+    index_n = pd.Index(n_train, name='N')
+    if len(predictors) == 1:
+        predictor, param, loss = predictors[0], params[0], losses[0]
+        if len(param) == 0:
+            df = pd.DataFrame(loss, index_n, columns=[predictor.name])
+            # df = pd.Series(loss, index_n, name=predictor.name)
+        elif len(param) == 1:
+            param_name, param_vals = list(param.items())[0]
+            index_param = param_vals
+            title = f"{predictor.name}, varying {param_name}"
+            # index_param = pd.Index(param_vals, name=param_name)
+            # title = predictor.name
+            df = pd.DataFrame(loss, index_n, columns=index_param)
+        else:
+            raise NotImplementedError("Only up to one varying parameter currently supported.")
     else:
-        raise NotImplementedError
+        data = []
+        columns = []
+        for predictor, param, loss in zip(predictors, params, losses):
+            if len(param) == 0:
+                data.append(loss[..., np.newaxis])
+                columns.append(predictor.name)
+            elif len(param) == 1:
+                data.append(loss)
+                param_name, param_vals = list(param.items())[0]
+                columns.extend([f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals])
+            else:
+                raise NotImplementedError("Only up to one varying parameter currently supported.")
 
-    # table = pd.Series(data, name='Loss').to_markdown(tablefmt='github', floatfmt='.3f')
-    # print(f"N = {n_train[0]}\n{table}", file=file)
+        data = np.concatenate(data, axis=1)
+        df = pd.DataFrame(data, index_n, columns)
+
+    df = df.transpose()
+
+    print(title)
+    print(df.to_markdown(tablefmt='github', floatfmt='.3f'), file=file)
 
 
 def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False):
@@ -326,13 +328,11 @@ def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n
         d_test, d_train = d[:n_test], d[n_test:]
 
         for predictor, params, loss in zip(predictors, params_full, loss_full):
-            # fit_incremental = True
-            fit_incremental = predictor.can_warm_start  # enable fitting with incremental data partitions
             for i_n in range(len(n_train)):
-                if i_n == 0 or not fit_incremental:
+                if i_n == 0 or not predictor.can_warm_start:
                     slice_ = slice(0, n_train[i_n])
                     warm_start = False  # resets learner
-                else:
+                else:  # fit with incremental data partitions
                     slice_ = slice(n_train[i_n-1], n_train[i_n])
                     warm_start = True
 
