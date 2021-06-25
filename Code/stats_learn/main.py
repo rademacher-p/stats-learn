@@ -31,7 +31,7 @@ np.set_printoptions(precision=3)
 # plt.style.use(['science'])
 
 plt.rc('text', usetex=True)
-plt.rc('text.latex', preamble=r"\usepackage{PhDmath} \usepackage{bm}")
+plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
 
 seed = None
 # seed = 12345
@@ -198,8 +198,8 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 #%% Results
 
-n_train = 20
-# n_train = [1, 4, 40, 400]
+# n_train = 20
+n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
 # n_train = [100, 200]
@@ -211,11 +211,11 @@ n_train = 20
 
 
 temp = [
-    (opt_predictor, None),
-    (dir_predictor, dir_params),
+    # (opt_predictor, None),
+    # (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
-    # (norm_predictor, norm_params),
-    (skl_predictor, None),
+    (norm_predictor, norm_params),
+    # (skl_predictor, None),
 ]
 predictors, params = zip(*temp)
 
@@ -223,13 +223,13 @@ predictors, params = zip(*temp)
 # TODO: add function that combines `plot_predict_stats_compare` with `risk_eval_sim`!
 # TODO: train/test loss results?
 
-plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=10, x=None, do_std=True, verbose=True)
+# plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=10, x=None, do_std=True, verbose=True)
 # plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
 
 # TODO: add verbosity arg for `predictor.fit`?
 
-# risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
-#
+risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
+
 # d = model.rvs(n_train)
 # ax = model.space['x'].make_axes()
 # plot_fit_compare(predictors, d, params, ax)
@@ -237,6 +237,7 @@ plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=10, x=N
 
 
 # Save image and Figure
+# TODO: move to plotting functions, make path arg
 image_path = Path('./images/temp/')
 
 fig = plt.gcf()

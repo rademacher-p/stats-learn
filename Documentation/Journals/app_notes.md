@@ -1,4 +1,3 @@
-
 - **Show overfitting example vs NN with differing degrees of regularization**
   - No reg. = overfitting
   - With reg. = insufficiently flexible/intuitive?
