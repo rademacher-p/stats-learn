@@ -20,7 +20,7 @@ np.set_printoptions(precision=3)
 pd.options.display.float_format = '{:,.3f}'.format
 
 plt.rc('text', usetex=True)
-plt.rc('text.latex', preamble=r"\usepackage{amsmath} \usepackage{upgreek} \usepackage{bm}")
+plt.rc('text.latex', preamble=r"\usepackage{PhDmath} \usepackage{bm}")
 
 
 #%%
@@ -35,7 +35,7 @@ model_x = rand_elements.Normal(model.data['x'].mean(0))
 # model_x = spaces.Euclidean(model.shape['x'])
 norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=100, basis_y_x=None,
                                                           cov_y_x=.1, model_x=model_x),
-                                name=r'$\mathcal{N}$')
+                                name=r'$\Ncal$')
 
 
 n_train = np.arange(10, 410, 10)

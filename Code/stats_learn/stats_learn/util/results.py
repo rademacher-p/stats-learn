@@ -422,9 +422,9 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
     if ax is None:
         _, ax = plt.subplots()
         if do_bayes:
-            ylabel = r'$\mathcal{R}(f)$'
+            ylabel = r'$\Rcal(f)$'
         else:
-            ylabel = r'$\mathcal{R}_{\Theta}(f;\theta)$'
+            ylabel = r'$\Rcal_{\Theta}(f;\theta)$'
         ax.set(ylabel=ylabel)
 
     out = []
@@ -540,9 +540,9 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
     if ax is None:
         _, ax = plt.subplots()
         if isinstance(model, bayes_models.Base):
-            ylabel = r'$\mathcal{R}(f)$'
+            ylabel = r'$\Rcal(f)$'
         else:
-            ylabel = r'$\mathcal{R}_{\Theta}(f;\theta)$'
+            ylabel = r'$\Rcal_{\Theta}(f;\theta)$'
         ax.set(ylabel=ylabel)
 
     loss = np.stack(losses, axis=-1)
@@ -550,7 +550,7 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
 
     x_plt = np.array([len(pr.model.space['x'].values) for pr in predictors])  # discretization set size
     # title = str(predictors[0].name)
-    title = r'$\mathrm{Dir}$'
+    title = r'$\Dir$'
 
     out = []
     if len(params) == 0:
@@ -584,7 +584,7 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
     if labels != [None]:
         ax.legend()
 
-    ax.set(xlabel=r'$|\mathcal{T}|$')
+    ax.set(xlabel=r'$|\Tcal|$')
     ax.set_title(title)
 
     return out
