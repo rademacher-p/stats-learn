@@ -9,6 +9,8 @@ import pandas as pd
 from stats_learn.bayes import models as bayes_models
 from stats_learn.util.base import check_data_shape, all_equal
 
+# TODO: LOTS of D.R.Y. fixes can be performed!!
+
 
 def plot_fit_compare(predictors, d, params=None, ax=None):
     if params is None:
@@ -263,20 +265,40 @@ def plot_predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1
     return out
 
 
-def _print_risk(predictors, params, losses, file=None):
-    data = {}
-    for predictor, params, loss in zip(predictors, params, losses):
-        key = predictor.name
-        if len(params) == 0:
-            data[key] = loss[0]
-        else:
-            param_name, param_vals = list(params.items())[0]
-            for idx, val in enumerate(param_vals):
-                key_ = key + f", {predictor.tex_params(param_name, val)}"
-                data[key_] = loss[0, idx]
+def _print_risk(predictors, params, n_train, losses, file=None):
 
-    table = pd.Series(data, name='Loss').to_markdown(tablefmt='github', floatfmt='.3f')
-    print(table, file)
+    # TODO: generalize
+
+    data = {}
+    if len(n_train) == 1:
+        for predictor, params, loss in zip(predictors, params, losses):
+            key = predictor.name
+            if len(params) == 0:
+                data[key] = loss[0]
+            else:
+                param_name, param_vals = list(params.items())[0]
+                for idx, val in enumerate(param_vals):
+                    key_ = key + f", {predictor.tex_params(param_name, val)}"
+                    data[key_] = loss[0, idx]
+
+        table = pd.Series(data, name='Loss').to_markdown(tablefmt='github', floatfmt='.3f')
+        print(f"N = {n_train[0]}\n{table}", file=file)
+
+    # elif len(predictors) == 1:
+    #     predictor, params, loss = predictors[0], params[0], losses[0]
+    #     if len(params) == 0:
+    #         for idx, n in enumerate(n_train):
+    #             data[n] = loss[idx]
+    #     else:
+    #         raise NotImplementedError
+    #
+    #     table = pd.Series(data, name='Loss').to_markdown(tablefmt='github', floatfmt='.3f')
+    #     print(f"N = {n_train[0]}\n{table}", file=file)
+    else:
+        raise NotImplementedError
+
+    # table = pd.Series(data, name='Loss').to_markdown(tablefmt='github', floatfmt='.3f')
+    # print(f"N = {n_train[0]}\n{table}", file=file)
 
 
 def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False):
@@ -346,8 +368,8 @@ def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n
     loss_full = [loss / n_mc for loss in loss_full]
 
     # Print results as Markdown table
-    if verbose and len(n_train) == 1:
-        _print_risk(predictors, params_full, loss_full, file=None)
+    if verbose:
+        _print_risk(predictors, params_full, n_train, loss_full, file=None)
 
     return loss_full
 
@@ -382,8 +404,8 @@ def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, 
             loss_full.append(loss)
 
     # Print results as Markdown table
-    if verbose and len(n_train) == 1:
-        _print_risk(predictors, params_full, loss_full, file=None)
+    if verbose:
+        _print_risk(predictors, params_full, n_train, loss_full, file=None)
 
     return loss_full
 
