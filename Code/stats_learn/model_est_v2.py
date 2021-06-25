@@ -9,7 +9,7 @@ from stats_learn.util import spaces
 from stats_learn.util.base import NOW_STR
 
 plt.rc('text', usetex=True)
-plt.rc('text.latex', preamble=r"\usepackage{amsmath}\usepackage{upgreek}")
+plt.rc('text.latex', preamble=r"\usepackage{PhDmath}")
 
 # n_x = 9
 # model = rand_elements.EmpiricalScalar(.75, n_x)
@@ -32,7 +32,7 @@ y = space.x_plt
 __, ax = plt.subplots()
 
 model_pf = model.pf(y)
-space.plot_xy(y, model_pf, y_std=np.zeros(y.shape), ax=ax, label=r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \uptheta}$')
+space.plot_xy(y, model_pf, y_std=np.zeros(y.shape), ax=ax, label=r'$\Prm_{\yrm | \xrm, \uptheta}$')
 
 #%% Plot learner bias/var
 
@@ -74,7 +74,7 @@ for alpha_0 in [.1, 10]:
 
     # label = r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \uppsi}$'
     # label = r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \uppsi}$, ' + f'$N={n}$'
-    label = r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \uppsi}$, ' + r'$\alpha_0={}$'.format(alpha_0)
+    label = r'$\Prm_{\yrm | \xrm, \uppsi}$, ' + r'$\alpha_0={}$'.format(alpha_0)
     space.plot_xy(y, mean, np.sqrt(cov_lo), np.sqrt(cov_hi), ax=ax, label=label)
 
 ax.legend(loc='upper left')

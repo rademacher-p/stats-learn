@@ -8,7 +8,7 @@ from stats_learn.random import elements as rand_elements
 from stats_learn.util import spaces, plotting
 
 plt.rc('text', usetex=True)
-plt.rc('text.latex', preamble=r"\usepackage{amsmath}")
+plt.rc('text.latex', preamble=r"\usepackage{PhDmath}")
 
 
 def plot_dirs(dirs, n_plot=None, titles=None, orient='h', same_cm=True, cm_hack=None):
@@ -74,9 +74,9 @@ def plot_dirs(dirs, n_plot=None, titles=None, orient='h', same_cm=True, cm_hack=
 
         ax.view_init(45, 45)
 
-        ax.set_xlabel(r'$\theta_\mathrm{c}(\mathcal{Y}_1; x)$')
-        ax.set_ylabel(r'$\theta_\mathrm{c}(\mathcal{Y}_2; x)$')
-        ax.set_zlabel(r'$\theta_\mathrm{c}(\mathcal{Y}_3; x)$')
+        ax.set_xlabel(r'$\thetac(\Ycal_1; x)$')
+        ax.set_ylabel(r'$\thetac(\Ycal_2; x)$')
+        ax.set_zlabel(r'$\thetac(\Ycal_3; x)$')
 
         space.plot(dir_i.pf, x, ax=ax, c=c, s=3)
 
@@ -97,8 +97,8 @@ def prior_post():
 
     dirs = [dir_prior, dir_post]
 
-    titles = [r'$\mathrm{Prior}: \alpha_\mathrm{c}(x) = ' + f'{tuple(np.round(np.array(mean) * 100) / 100)}$',
-              r'$\mathrm{Posterior}: \psi_\mathrm{c}(x) = ' + f'{tuple(np.round(np.array(psi) * 100) / 100)}$']
+    titles = [r'$\text{Prior}: \alphac(x) = ' + f'{tuple(np.round(np.array(mean) * 100) / 100)}$',
+              r'$\text{Posterior}: \psic(x) = ' + f'{tuple(np.round(np.array(psi) * 100) / 100)}$']
 
     plot_dirs(dirs, n_plot=150, titles=titles, orient='h', same_cm=True)
 
@@ -110,8 +110,8 @@ def localization():
 
     # titles = [r'$\alpha_0 \alpha_\mathrm{m}(x) \to 0$',
     #           r'$\alpha_0 \alpha_\mathrm{m}(x) \to \infty$']
-    titles = [r'$\alpha_0 \alpha_\mathrm{m}(x) \to \infty$',
-              r'$\alpha_0 \alpha_\mathrm{m}(x) \to 0$']
+    titles = [r'$\alpha_0 \alpham(x) \to \infty$',
+              r'$\alpha_0 \alpham(x) \to 0$']
     # titles = [r'$\alpha_0 \alpha_\mathrm{m}(x) = ' + f'{alpha_0}$' for alpha_0 in alpha_0_vec]
 
     plot_dirs(dirs, n_plot=150, titles=titles, orient='v', same_cm=False, cm_hack=[1])
