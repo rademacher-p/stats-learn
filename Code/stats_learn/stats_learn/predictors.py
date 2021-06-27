@@ -4,14 +4,18 @@ Supervised learning functions.
 
 from abc import ABC, abstractmethod
 from typing import Union
+from functools import partial
 
 # from more_itertools import all_equal
 
 import numpy as np
+
 import sklearn as skl
 from sklearn.pipeline import Pipeline
 from sklearn.exceptions import NotFittedError
 
+import torch
+from torch.utils.data import TensorDataset, DataLoader
 
 from stats_learn.bayes import models as bayes_models
 from stats_learn.loss_funcs import loss_se, loss_01
@@ -461,7 +465,6 @@ class SKLWrapper(Base):
             setattr(self.estimator, key, val)
 
     def _fit(self, d, warm_start):
-
         if hasattr(self.estimator, 'warm_start'):  # TODO: check unneeded if not warm_start
             self.estimator.set_params(warm_start=warm_start)
         elif isinstance(self.estimator, Pipeline):
@@ -481,3 +484,55 @@ class SKLWrapper(Base):
             return self.estimator.predict(x)
         except NotFittedError:
             return np.full(x.shape[0], np.nan)
+
+
+class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
+    def __init__(self, model, trainer, space, proc_funcs=(), name=None):
+        loss_func = loss_se  # TODO: hack. check?
+
+        super().__init__(loss_func, proc_funcs, name)
+        self.model = model
+        self.trainer = trainer
+        self._space = space
+
+    space = property(lambda self: self._space)
+
+    @property
+    def _model_obj(self):
+        raise NotImplementedError
+
+    def set_params(self, **kwargs):
+        for key, val in kwargs.items():
+            setattr(self.model, key, val)
+
+    def reset(self):  # TODO: add reset method to predictor base class?
+        def _reset_weights(model):
+            if hasattr(model, 'reset_parameters'):
+                model.reset_parameters()
+        self.model.apply(_reset_weights)
+
+    def _reshape_batches(self, *arrays):
+        shape_x = self.shape['x']
+        if shape_x == ():  # cast to non-scalar shape
+            shape_x = (1,)
+        return tuple(map(lambda x: x.reshape(-1, *shape_x), arrays))
+
+    def _fit(self, d, warm_start):
+        if not warm_start:
+            self.reset()
+
+        x, y = self._reshape_batches(d['x'], d['y'])
+        x, y = map(partial(torch.tensor, dtype=torch.float32), (x, y))
+        ds = TensorDataset(x, y)
+
+        batch_size = len(x)  # TODO: no mini-batching! Allow user specification.
+        dl = DataLoader(ds, batch_size, shuffle=True)
+
+        self.trainer.fit(self.model, dl)
+
+    def _predict(self, x):
+        x, = self._reshape_batches(x)
+        x = torch.tensor(x, requires_grad=False, dtype=torch.float32)
+        y_hat = self.model(x).detach().numpy()
+        y_hat = y_hat.reshape(-1, *self.shape['y'])
+        return y_hat

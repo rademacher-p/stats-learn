@@ -1,7 +1,7 @@
 """
 Main.
 """
-
+import math
 from pathlib import Path
 import pickle
 from copy import deepcopy
@@ -9,14 +9,20 @@ from math import prod
 
 import numpy as np
 from matplotlib import pyplot as plt
+
 from sklearn.linear_model import LinearRegression, SGDRegressor
 from sklearn.neural_network import MLPRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
+import torch
+from torch import nn
+from torch.nn import functional
+import pytorch_lightning as pl
+
 from stats_learn.bayes import models as bayes_models
-from stats_learn.predictors import (ModelRegressor, BayesRegressor, SKLWrapper)
+from stats_learn.predictors import ModelRegressor, BayesRegressor, SKLWrapper, LitWrapper
 from stats_learn.util.results import plot_fit_compare, plot_predict_stats_compare, risk_eval_sim_compare, \
     plot_risk_eval_sim_compare, plot_risk_eval_comp_compare, plot_risk_disc
 from stats_learn.random import elements as rand_elements, models as rand_models
@@ -51,6 +57,7 @@ def func_mean_to_models(n, alpha_0, func):
 
 
 n_x = 128
+# n_x = 32
 
 # var_y_x_const = 1 / (n_x-1)
 var_y_x_const = 1/5
@@ -118,6 +125,8 @@ w_prior = [.5, 0]
 proc_funcs = []
 
 prior_mean = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_prior), model_x)
+# _func = lambda x: .5*(1-np.sin(2*np.pi*x))
+# prior_mean = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, _func), model_x)
 
 
 # n_t = 16
@@ -184,11 +193,12 @@ norm_params = {'prior_cov': [.1, .001]}
 # skl_estimator, _name = GaussianProcessRegressor(), 'GP'
 
 # _solver_kwargs = {'solver': 'sgd', 'learning_rate': 'adaptive', 'learning_rate_init': 1e-1, 'n_iter_no_change': 20}
-_solver_kwargs = {'solver': 'adam', 'learning_rate_init': 1e-3, 'n_iter_no_change': 20}
+_solver_kwargs = {'solver': 'adam', 'learning_rate_init': 1e-3, 'n_iter_no_change': 200}
 # _solver_kwargs = {'solver': 'lbfgs', }
-skl_estimator, _name = MLPRegressor(hidden_layer_sizes=[1000], alpha=0, verbose=False,
+skl_estimator, _name = MLPRegressor(hidden_layer_sizes=[1000, 200, 100], alpha=0, verbose=True,
                                     max_iter=5000, tol=1e-8, **_solver_kwargs), 'MLP'
 
+# TODO: faster sklearn version in conda env?
 
 # TODO: try Adaboost, RandomForest, GP, BayesianRidge, KNeighbors, SVR
 
@@ -196,10 +206,53 @@ skl_estimator, _name = MLPRegressor(hidden_layer_sizes=[1000], alpha=0, verbose=
 skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 
+#%% PyTorch
+# TODO: regularization?
+
+class LitMLP(pl.LightningModule):
+    def __init__(self):
+        super().__init__()
+        self.model = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(math.prod(shape_x), 1000),
+            nn.ReLU(),
+            nn.Linear(1000, 100),
+            nn.ReLU(),
+            nn.Linear(100, 1)
+        )
+
+    def forward(self, x):
+        return self.model(x)
+
+    def training_step(self, batch, batch_idx):
+        x, y = batch
+        y_hat = self.model(x)
+        loss = functional.mse_loss(y_hat, y)
+        self.log('train_loss', loss)
+        return loss
+
+    def configure_optimizers(self):
+        # optimizer = torch.optim.SGD(self.parameters(), lr=1e-2)
+        optimizer = torch.optim.Adam(self.parameters(), lr=1e-2)
+        return optimizer
+
+
+lit_model = LitMLP()
+trainer = pl.Trainer(
+    max_epochs=1000,
+    callbacks=pl.callbacks.EarlyStopping('train_loss', min_delta=0., patience=20),
+    checkpoint_callback=False,
+    logger=False,
+    gpus=min(1, torch.cuda.device_count()),
+)
+
+lit_predictor = LitWrapper(lit_model, trainer, space=model.space, name='Lit MLP')
+
+
 #%% Results
 
-# n_train = 20
-n_train = [1, 4, 40, 400]
+n_train = 20
+# n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
 # n_train = [100, 200]
@@ -211,29 +264,28 @@ n_train = [1, 4, 40, 400]
 
 
 temp = [
-    # (opt_predictor, None),
-    # (dir_predictor, dir_params),
+    (opt_predictor, None),
+    (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
-    (norm_predictor, norm_params),
+    # (norm_predictor, norm_params),
     # (skl_predictor, None),
+    (lit_predictor, None),
 ]
 predictors, params = zip(*temp)
 
 
-# TODO: add function that combines `plot_predict_stats_compare` with `risk_eval_sim`!
+# TODO: add function that combines `plot_predict_stats_compare` with `risk_eval_sim_compare`! Use default `n_test=0`
 # TODO: train/test loss results?
 
 # plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=10, x=None, do_std=True, verbose=True)
 # plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
 
-# TODO: add verbosity arg for `predictor.fit`?
+# risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
 
-risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
-
-# d = model.rvs(n_train)
-# ax = model.space['x'].make_axes()
-# plot_fit_compare(predictors, d, params, ax)
-# ax.set_ylim((0, 1))
+d = model.rvs(n_train)
+ax = model.space['x'].make_axes()
+plot_fit_compare(predictors, d, params, ax)
+ax.set_ylim((0, 1))
 
 
 # Save image and Figure
