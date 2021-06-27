@@ -3,6 +3,9 @@
   - With reg. = insufficiently flexible/intuitive?
 
 - Use smaller discrete spaces? Or use continuous space and **discretization**?
+
+- Need better NN architectures to *ensure* overfitting!!
+
 - *Hard functions for pop learners to learn*
   - Random discrete functions
   - Discontinuous funcs vs MLP (UAT only for continuous). Fractals?
