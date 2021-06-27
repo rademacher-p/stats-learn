@@ -16,6 +16,7 @@ from sklearn.exceptions import NotFittedError
 
 import torch
 from torch.utils.data import TensorDataset, DataLoader
+import pytorch_lightning as pl
 
 from stats_learn.bayes import models as bayes_models
 from stats_learn.loss_funcs import loss_se, loss_01
@@ -510,6 +511,8 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
             if hasattr(model, 'reset_parameters'):
                 model.reset_parameters()
         self.model.apply(_reset_weights)
+
+        self.trainer.current_epoch = 0
 
     def _reshape_batches(self, *arrays):
         shape_x = self.shape['x']

@@ -1,7 +1,10 @@
 numpy
 scipy
 matplotlib
-PyQt5
 pandas
+tabulate
 more-itertools
 scikit-learn
+torch
+pytorch-lightning
+tensorboard
