@@ -61,6 +61,7 @@ n_x = 128
 
 # var_y_x_const = 1 / (n_x-1)
 var_y_x_const = 1/5
+# var_y_x_const = 1/50
 
 alpha_y_x_d = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_x-1))
 alpha_y_x_beta = 1/var_y_x_const - 1
@@ -214,11 +215,11 @@ class LitMLP(pl.LightningModule):
         super().__init__()
         self.model = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(math.prod(shape_x), 1000),
+            nn.Linear(math.prod(shape_x), 10000),
             nn.ReLU(),
-            nn.Linear(1000, 100),
-            nn.ReLU(),
-            nn.Linear(100, 1)
+            # nn.Linear(1000, 100),
+            # nn.ReLU(),
+            nn.Linear(10000, 1)
         )
 
     def forward(self, x):
@@ -240,7 +241,7 @@ class LitMLP(pl.LightningModule):
 lit_model = LitMLP()
 trainer = pl.Trainer(
     max_epochs=1000,
-    callbacks=pl.callbacks.EarlyStopping('train_loss', min_delta=0., patience=20),
+    # callbacks=pl.callbacks.EarlyStopping('train_loss', min_delta=0., patience=20),
     checkpoint_callback=False,
     logger=False,
     gpus=min(1, torch.cuda.device_count()),
@@ -264,8 +265,8 @@ n_train = 20
 
 
 temp = [
-    (opt_predictor, None),
-    (dir_predictor, dir_params),
+    # (opt_predictor, None),
+    # (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
     # (norm_predictor, norm_params),
     # (skl_predictor, None),
@@ -280,12 +281,12 @@ predictors, params = zip(*temp)
 # plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=10, x=None, do_std=True, verbose=True)
 # plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
 
-# risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
+risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
 
-d = model.rvs(n_train)
-ax = model.space['x'].make_axes()
-plot_fit_compare(predictors, d, params, ax)
-ax.set_ylim((0, 1))
+# d = model.rvs(n_train)
+# ax = model.space['x'].make_axes()
+# plot_fit_compare(predictors, d, params, ax)
+# ax.set_ylim((0, 1))
 
 
 # Save image and Figure
