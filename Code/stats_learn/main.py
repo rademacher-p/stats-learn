@@ -278,10 +278,13 @@ predictors, params = zip(*temp)
 # TODO: add function that combines `plot_predict_stats_compare` with `risk_eval_sim_compare`! Use default `n_test=0`
 # TODO: train/test loss results?
 
-# plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=10, x=None, do_std=True, verbose=True)
+plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=10, x=None, do_std=True, verbose=True)
 # plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
 
-risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
+
+# FIXME: PL trainer bug -> no variance in predict stats!?!
+
+# risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
 
 # d = model.rvs(n_train)
 # ax = model.space['x'].make_axes()
