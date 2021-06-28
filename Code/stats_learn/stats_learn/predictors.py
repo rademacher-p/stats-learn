@@ -531,6 +531,15 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
         batch_size = len(x)  # TODO: no mini-batching! Allow user specification.
         dl = DataLoader(ds, batch_size, shuffle=True)
 
+        # trainer = pl.Trainer(
+        #     max_epochs=1000,
+        #     # callbacks=pl.callbacks.EarlyStopping('train_loss', min_delta=0., patience=20),
+        #     checkpoint_callback=False,
+        #     logger=False,
+        #     gpus=min(1, torch.cuda.device_count()),
+        # )
+        # trainer.fit(self.model, dl)
+
         self.trainer.fit(self.model, dl)
 
     def _predict(self, x):
