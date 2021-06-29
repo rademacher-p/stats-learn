@@ -2,12 +2,14 @@ import math
 from itertools import product
 from numbers import Integral
 
+from more_itertools import all_equal
+
 import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
 
 from stats_learn.bayes import models as bayes_models
-from stats_learn.util.base import check_data_shape, all_equal
+from stats_learn.util.base import check_data_shape
 
 # TODO: LOTS of D.R.Y. fixes can be performed!!
 
