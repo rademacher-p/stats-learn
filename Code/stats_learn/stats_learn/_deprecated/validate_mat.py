@@ -81,7 +81,7 @@ from thesis.predictors import (ModelRegressor, BayesRegressor, ModelClassifier, 
 #     main()
 
 
-# %% Sim
+#%% Sim
 
 # True model
 model_x = rand_elements.FiniteRV([0, .5], p=None)

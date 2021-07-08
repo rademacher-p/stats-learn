@@ -15,7 +15,7 @@ from stats_learn.util.base import RandomGeneratorMixin
 # TODO: rename `model` attributes to `element`?
 
 
-# %% Priors
+#%% Priors
 
 class Base(RandomGeneratorMixin):
     def __init__(self, prior=None, rng=None):
