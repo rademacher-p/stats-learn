@@ -125,13 +125,13 @@ Add Theo-PR???
 
 PGR: complete rework!!
 
-This report details a Bayesian perspective on statistical learning theory for when both the observations and unobserved quantities are jointly distributed according to an unknown probability distribution function. While the validity of Bayesian methods for statistical signal processing and machine learning has long been contended, the author believes it to be a justified approach that does not necessarily imply that the distribution model is `random'; rather, it simply reflects the desire of the user to formulate risk as a weighted sum of learner performance across the space of distributions. 
+This report details a Bayesian perspective on statistical learning theory for cases in which both the observations and unobserved quantities are jointly distributed according to an unknown probability distribution function. While the validity of Bayesian methods for statistical signal processing and machine learning has long been contended, the author believes it to be a justified approach that does not necessarily imply the distribution model is `random'; rather, it simply reflects the desire of the user to formulate risk as a weighted sum of learner performance across the space of distributions. 
 
-The success or failure of Bayesian learning methods hinge on how well the prior knowledge imparted by the designer matches reality. The chosen prior distribution over the set of data-generating probability distributions reflects the users confidence that different distributions are responsible for generating the observed/unobserved random elements. If a highly informative prior \cite{box} is chosen that is concentrated around the actual data probability distribution, low risk learning functions are possible even with limited training data; however, if the informative prior is poorly designed, a good solution may not be achieved. Conversely, a non-informative prior that weights the different distributions without preference provides a more robust solution for all models, but may under-perform relative to learners based on well-selected informative priors.
+The success or failure of Bayesian learning methods hinges on how well the prior knowledge imparted by the designer matches reality. The chosen prior distribution over the set of data-generating probability distributions reflects the user's confidence that different distributions are responsible for generating the observed/unobserved random elements. If a highly informative prior \cite{box} that is concentrated around the actual data probability distribution is chosen, low-risk learning functions are possible even with limited training data; however, if the informative prior is poorly designed, a good solution may not be achieved. Conversely, a noninformative prior that weights the different distributions without preference provides a more robust solution for all models, but may underperform relative to learners based on well-selected informative priors.
 
-This work assumes that the prior distribution is Dirichlet. The class of Dirichlet probability density functions (PDF) and processes have the desirable properties of full support over the set of possible data-generating distributions and an analytic posterior distribution for independently and identically distributed data \cite{ferguson}. Furthermore, control of the Dirichlet parameters can enable both non-informative and informative prior knowledge. Special cases including the uniform prior will be given specific attention.
+This work assumes that the prior distribution is Dirichlet. The class of Dirichlet probability density functions (PDF) and processes have the desirable properties of full support over the set of possible data-generating distributions and an analytic posterior distribution for independently- and identically-distributed data \cite{ferguson}. Furthermore, control of the Dirichlet parameters can enable both noninformative and informative prior knowledge. Special cases including the uniform prior will be given specific attention.
 
-After introducing the problem and discussing the relevant data probability distributions, the Bayesian framework will be applied to two of the most common loss functions in machine learning: the squared error loss function (common for regression), and the 0-1 loss function \cite{berger} (common for classification). Optimal estimators/classifiers and their corresponding minimum risk will be presented for different Dirichlet prior distributions. Specific attention will be given to various asymptotic cases to show the differing performance for non-informative and informative Dirichlet priors.
+After introducing the problem and discussing the relevant data probability distributions, the Bayesian framework will be applied to two of the most common loss functions in machine learning: the squared-error loss function (common for regression), and the 0-1 loss function \cite{berger} (common for classification). Optimal estimators/classifiers and their corresponding minimum risk will be presented for different Dirichlet prior distributions. Specific attention will be given to various asymptotic cases to show the differing performance for noninformative and informative Dirichlet priors.
 
 
 
@@ -140,22 +140,22 @@ After introducing the problem and discussing the relevant data probability distr
 
 \todolo{Discuss arithmetic ops on functions? Upcasting?!}
 
-This section details the mathematical notation and typesetting conventions used throughout. Note that many variable scalars and functions including $x$, $y$, $g$, etc. are repeatedly redefined and reused to avoid introducing an excessive volume of symbols; unless explicitly stated, none of these variable definitions will hold in subsequent sections.
+This section details the mathematical notation and typesetting conventions used throughout. Note that many variable scalars and functions including $x$, $y$, $g$, etc. are repeatedly redefined and reused to avoid introducing an excess of symbols. Unless explicitly stated, none of these variable definitions will hold in subsequent sections.
 
 
 \subsection*{Sets and Function Arguments}
 
-Sets will typically be typeset with a calligraphic font, such as $\Xcal$. Exceptions include common number sets such as the real numbers, which are typeset using blackboard bold $\Rbb$. Function spaces such as the set of functions $\Xcal \mapsto \Ycal$ are compactly represented as $\Ycal^{\Xcal}$.
+Sets are typically typeset with a calligraphic font, such as $\Xcal$ with the exception of common number sets, such as the real numbers, which are typeset using blackboard bold $\Rbb$. Function spaces, such as the set of functions $\Xcal \mapsto \Ycal$, are compactly represented as $\Ycal^{\Xcal}$.
 
 \todolo{non-calligraphic for risk, loss, etc?}
 
-Various mappings will be defined for which the domain and/or the range \cite{rudin} are function spaces. The set of functions $\Xcal \mapsto \Ycal$ is denoted $\Ycal^{\Xcal}$. For a mapping $g : \Zcal \mapsto \Ycal^{\Xcal}$, the argument notation $g(z) \in \Ycal^{\Xcal}$ denotes a function, while $g(x;z) \in \Ycal$ is a specific value of that function. Semicolons are used to distinguish between the arguments referring to the domain and arguments that access the resulting function. The mapping $\{1,\ldots,N\} \mapsto \Ycal$ will be represented as $\Ycal^N$ for brevity. Spaces of indexed tuples will be notated as $g \in \Ycal^N$ and items of a tuple are accessed with subscripts rather than parentheses, such that $g_i \in \Ycal$.
+Various mappings are defined for which the domain and/or the range \cite{rudin} are function spaces. The set of functions $\Xcal \mapsto \Ycal$ is denoted $\Ycal^{\Xcal}$. For a mapping $g : \Zcal \mapsto \Ycal^{\Xcal}$, the argument notation $g(z) \in \Ycal^{\Xcal}$ denotes a function, while $g(x;z) \in \Ycal$ is a specific value of that function. Semicolons are used to distinguish between the arguments referring to the domain and arguments that access the resulting function. The mapping $\{1,\ldots,N\} \mapsto \Ycal$ is represented as $\Ycal^N$ for brevity. Spaces of indexed tuples are notated as $g \in \Ycal^N$ and items of a tuple are accessed with subscripts rather than parentheses, such that $g_i \in \Ycal$.
 
-The Cartesian product of sets will be frequently used, such that for $x \in \Xcal$ and $y \in \Ycal$, the pair $(x,y) \in \Xcal \times \Ycal$. For a general product of sets $\Scal_i$, the notation $\prod_i \Scal_i = \Scal_1 \times \Scal_2 \ldots$ is used.
+The Cartesian product of sets is frequently used, such that for $x \in \Xcal$ and $y \in \Ycal$, the pair $(x,y) \in \Xcal \times \Ycal$. For a general product of sets $\Scal_i$, the notation $\prod_i \Scal_i = \Scal_1 \times \Scal_2 \ldots$ is used.
 
-The convention adopted for natural numbers is $\Nbb = \{1,2,\ldots\}$; the set of non-negative integers is denoted $\Zbbgeq = \Nbb \cup \{0\}$. The set of positive real numbers $\Rbb^+$ excludes zero, while non-negative real numbers are represented as $\Rbbgeq = \Rbb^+ \cup \{0\}$. The cardinality of countably infinite sets, including the set of natural numbers, is denoted $\aleph_0 = |\Nbb|$; the cardinality of uncountable sets such as $\Rbb$ is at least $\aleph_1$.
+The convention adopted for natural numbers is $\Nbb = \{1,2,\ldots\}$; the set of nonnegative integers is denoted $\Zbbgeq = \Nbb \cup \{0\}$. The set of positive real numbers $\Rbb^+$ excludes zero, while nonnegative real numbers are represented as $\Rbbgeq = \Rbb^+ \cup \{0\}$. The cardinality of countably infinite sets, including the set of natural numbers, is denoted $\aleph_0 = |\Nbb|$; the cardinality of uncountable sets, such as $\Rbb$, is at least $\aleph_1$.
 
-Numerous probability distribution functions will be defined over different domains. As such, for a given set $\Xcal$, define a set function $\Pcal$ such that $\Pcal(\Xcal)$ is the set of distributions over $\Xcal$. If $\Xcal$ is countable, the set is defined as $\Pcal(\Xcal) = \left\{ p \in {\Rbbgeq}^{\Xcal}: \sum_{x \in \Xcal} p(x) = 1 \right\}$; if $\Xcal$ is a Euclidean space, the set is defined as $\Pcal(\Xcal) = \left\{ p \in {\Rbbgeq}^{\Xcal}: \int_{\Xcal} p(x) {\drm}x = 1 \right\}$.
+Numerous probability distribution functions are defined over different domains. As such, for a given set $\Xcal$, a set function $\Pcal$ is defined such that $\Pcal(\Xcal)$ is the set of distributions over $\Xcal$. If $\Xcal$ is countable, the set is defined as $\Pcal(\Xcal) = \left\{ p \in {\Rbbgeq}^{\Xcal}: \sum_{x \in \Xcal} p(x) = 1 \right\}$; if $\Xcal$ is a Euclidean space, the set is defined as $\Pcal(\Xcal) = \left\{ p \in {\Rbbgeq}^{\Xcal}: \int_{\Xcal} p(x) {\drm}x = 1 \right\}$.
 
 \todolo{aleph reference?}
 
@@ -163,12 +163,12 @@ Numerous probability distribution functions will be defined over different domai
 
 \subsection*{Special Operators and Functions}
 
-Various operators commonly used in linear algebra will be generalized for functions. Specifically, the outer product operator $\otimes$ is used on two real-valued functions $f \in \Rbb^{\Xcal}$ and $g \in \Rbb^{\Ycal}$, such that $\big(f \otimes g\big) \in \Rbb^{\Xcal \times \Ycal}$ with $\big(f \otimes g\big) (x,y) = f(x) g(y)$. A general outer product of functions is denoted $\bigotimes_i f_i = f_1 \otimes f_2 \ldots$ for $i = 1,\ldots$, where $\Big(\bigotimes_i f_i\Big)(x_1,x_2,\ldots) = f_1(x_1)f_x(x_2)\ldots$, is used as well. Also, the diagonal operator operates on a single real-valued function, such that $\diag(f) \in \Rbb^{\Xcal \times \Xcal}$. For countable sets $\Xrm$, the operator values are $\diag(f)(x,x') = f(x) \delta[x,x']$; for Euclidean sets, the operator values are $\diag(f)(x,x') = f(x) \delta(x-x')$.
+Various operators commonly used in linear algebra are generalized for functions. Specifically, the outer product operator $\otimes$ is used on two real-valued functions $f \in \Rbb^{\Xcal}$ and $g \in \Rbb^{\Ycal}$ such that $\big(f \otimes g\big) \in \Rbb^{\Xcal \times \Ycal}$ with $\big(f \otimes g\big) (x,y) = f(x) g(y)$. A general outer product of functions is denoted $\bigotimes_i f_i = f_1 \otimes f_2 \ldots$ for $i = 1,\ldots$, where $\Big(\bigotimes_i f_i\Big)(x_1,x_2,\ldots) = f_1(x_1)f_x(x_2)\ldots$, is used as well. Also, the diagonal operator operates on a single real-valued function such that $\diag(f) \in \Rbb^{\Xcal \times \Xcal}$. For countable sets $\Xrm$, the operator values are $\diag(f)(x,x') = f(x) \delta[x,x']$; for Euclidean sets, the operator values are $\diag(f)(x,x') = f(x) \delta(x-x')$.
 
 \todolow{tensor product?}
 
 
-A variety of special functions will be used throughout. Both the Dirac and Kronecker delta functions will frequently required. The Dirac delta function over a Euclidean domain $\Xcal$ is represented as $\delta(\cdot)$; it has support only at the point $x=0$ and satisfies
+A variety of special functions are used throughout. Both the Dirac and Kronecker delta functions are frequently required. The Dirac delta function over a Euclidean domain $\Xcal$ is represented as $\delta(\cdot)$; it has support only at the point $x=0$ and satisfies
 \begin{equation}
 	\int_{\Xcal} \delta(x) {\drm}x = 1 \;.
 \end{equation}
@@ -185,7 +185,7 @@ As both functions are denoted by the symbol $\delta$, they are distinguished by 
 \todomid{Add Dirac subscript to explictly define domain?}
 \todolo{reference Dirac/Kronecker}
 
-The multinomial coefficient and multivariate beta function, which typically operate on sequences, are defined more generally for function inputs. The multinomial operator $\Mcal$ is used for functions $g : \Xcal \mapsto \Zbbgeq$ that map to non-negative integers from an arbitrary countable domain $\Xcal$. The output of the operator is
+The multinomial coefficient and multivariate beta function, which typically operate on sequences, are defined more generally for function inputs. The multinomial operator $\Mcal$ is used for functions $g : \Xcal \mapsto \Zbbgeq$ that map to nonnegative integers from an arbitrary countable domain $\Xcal$. The output of the operator is
 \begin{equation}
 	\Mcal(g) = \frac{\big( \sum_{x \in \Xcal} g(x) \big)!}{\prod_{x \in \Xcal} g(x)!} \;.
 \end{equation}
@@ -208,13 +208,13 @@ will be used repeatedly.
 
 \todolo{Introduce convergence in probability, relate to delta PDF convergence?}
 
-Random elements are denoted with roman font (e.g., $\xrm$), while specific values are denoted with italics (e.g., $x$). Random elements that assume numerical scalars/functions are referred to as random variables/processes, respectively.
+Random elements are denoted with roman font (e.g., $\xrm$), while specific values are denoted with italics (e.g., $x$). Random elements that assume numerical scalars or functions are referred to as random variables or processes, respectively.
 
-Consider a random element $\xrm \in \Xcal$. If $\Xcal$ is countable, either finite with $|\Xcal| \in \Nbb$ or countably infinite with $|\Xcal| = \aleph_0$, then $\xrm$ is a discrete random element and is characterized by a probability mass function (PMF) \cite {papoulis}, denoted $\Prm_{\xrm} \in \Pcal(\Xcal)$. If $\Xcal$ is a Euclidean space and is thus uncountable with $|\Xcal| \geq \aleph_1$, then $\xrm$ is a continuous random variable/process characterized by a probability density function (PDF), denoted $\prm_{\xrm} \in \Pcal(\Xcal)$.
+Consider a random element $\xrm \in \Xcal$. If $\Xcal$ is countable, either finite with $|\Xcal| \in \Nbb$ or countably infinite with $|\Xcal| = \aleph_0$, then $\xrm$ is a discrete random element and is characterized by a probability mass function (PMF) \cite {papoulis} denoted $\Prm_{\xrm} \in \Pcal(\Xcal)$. If $\Xcal$ is a Euclidean space and is thus uncountable with $|\Xcal| \geq \aleph_1$, then $\xrm$ is a continuous random variable or process characterized by a probability density function (PDF) denoted $\prm_{\xrm} \in \Pcal(\Xcal)$.
 
 \todolo{explicit PMF/PDF formula with P of events?}
 
-Consider $\xrm$ conditioned on another random element $\zrm \in \Zcal$. The conditional distribution is represented as $\Prm_{\xrm | \zrm} : \Zcal \mapsto \Pcal(\Xcal)$, such that $\Prm_{\xrm | \zrm}(z)$ is a PMF over $\Xcal$ and $\Prm_{\xrm | \zrm}(x|z)$ is a specific value of that PMF. Often, the dependency on the conditional variable $\zrm$ will not be expressed in terms of a specific value $z$, but will be left in terms of the random element itself; in this case, the more compact notation $\Prm_{\xrm | \zrm}$ is used to imply $\Prm_{\xrm | \zrm}(\zrm)$, a function of $\zrm$.
+Consider $\xrm$ conditioned on another random element $\zrm \in \Zcal$. The conditional distribution is represented as $\Prm_{\xrm | \zrm} : \Zcal \mapsto \Pcal(\Xcal)$ such that $\Prm_{\xrm | \zrm}(z)$ is a PMF over $\Xcal$ and $\Prm_{\xrm | \zrm}(x|z)$ is a specific value of that PMF. Often, the dependency on the conditional variable $\zrm$ will not be expressed in terms of a specific value $z$, but will be left in terms of the random element itself; in this case, the more compact notation $\Prm_{\xrm | \zrm}$ is used to imply $\Prm_{\xrm | \zrm}(\zrm)$, a function of $\zrm$.
 
 \todomid{Ever need the full functional?}
 
