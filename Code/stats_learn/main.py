@@ -24,7 +24,7 @@ import pytorch_lightning as pl
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors import ModelRegressor, BayesRegressor, SKLWrapper, LitWrapper
 from stats_learn.util.results import plot_fit_compare, plot_predict_stats_compare, risk_eval_sim_compare, \
-    plot_risk_eval_sim_compare, plot_risk_eval_comp_compare, plot_risk_disc
+    plot_risk_eval_sim_compare, plot_risk_eval_comp_compare, plot_risk_disc, combined_compare
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.preprocessing import discretizer, prob_disc
 from stats_learn.util.base import NOW_STR
@@ -199,8 +199,6 @@ _solver_kwargs = {'solver': 'adam', 'learning_rate_init': 1e-3, 'n_iter_no_chang
 skl_estimator, _name = MLPRegressor(hidden_layer_sizes=[1000, 200, 100], alpha=0, verbose=True,
                                     max_iter=5000, tol=1e-8, **_solver_kwargs), 'MLP'
 
-# TODO: faster sklearn version in conda env?
-
 # TODO: try Adaboost, RandomForest, GP, BayesianRidge, KNeighbors, SVR
 
 # skl_estimator = Pipeline([('scaler', StandardScaler()), ('regressor', skl_estimator)])
@@ -252,7 +250,7 @@ lit_predictor = LitWrapper(lit_model, trainer, space=model.space, name='Lit MLP'
 
 #%% Results
 
-n_train = 20
+# n_train = 400
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
@@ -260,17 +258,17 @@ n_train = 20
 # n_train = np.arange(0, 320, 20)
 # n_train = np.arange(0, 55, 5)
 # n_train = np.arange(0, 2050, 50)
-# n_train = np.arange(0, 4500, 500)
+n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
 
 temp = [
-    # (opt_predictor, None),
-    # (dir_predictor, dir_params),
+    (opt_predictor, None),
+    (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
-    # (norm_predictor, norm_params),
+    (norm_predictor, norm_params),
     # (skl_predictor, None),
-    (lit_predictor, None),
+    # (lit_predictor, None),
 ]
 predictors, params = zip(*temp)
 
@@ -278,11 +276,13 @@ predictors, params = zip(*temp)
 # TODO: add function that combines `plot_predict_stats_compare` with `risk_eval_sim_compare`! Use default `n_test=0`
 # TODO: train/test loss results?
 
-plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=10, x=None, do_std=True, verbose=True)
-# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
+# plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=100, x=None, do_std=True, verbose=True)
+# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=100, verbose=True)
 
-
-# FIXME: PL trainer bug -> no variance in predict stats!?!
+# stats_ = None
+stats_ = ('mean', 'std')
+y_stats_full, loss_full = combined_compare(predictors, model_eval, params, n_train, n_test=10, n_mc=100, x=None,
+                                           stats=stats_, verbose=True)
 
 # risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True)
 
