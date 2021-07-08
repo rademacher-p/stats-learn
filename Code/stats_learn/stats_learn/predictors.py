@@ -118,7 +118,7 @@ from stats_learn.util.results import (plot_fit_compare, predict_stats_compare, p
 #     return y_stats_full
 
 
-# %%
+#%%
 class Base(ABC):
     def __init__(self, loss_func, proc_funcs=(), name=None):
         self.loss_func = loss_func
@@ -275,7 +275,7 @@ class RegressorMixin:
         return self.model.mean_y_x(x)
 
 
-# %% Fixed model
+#%% Fixed model
 class Model(Base):
     def __init__(self, model, loss_func, proc_funcs=(), name=None):
         super().__init__(loss_func, proc_funcs, name)
@@ -328,7 +328,7 @@ class ModelRegressor(RegressorMixin, Model):
             raise NotImplementedError
 
 
-# %% Bayes model
+#%% Bayes model
 
 class Bayes(Base):
     def __init__(self, bayes_model, loss_func, proc_funcs=(), name=None):
