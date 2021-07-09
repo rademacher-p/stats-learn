@@ -4,12 +4,14 @@
 
 - Use smaller discrete spaces? Or use continuous space and **discretization**?
 
-- Need better NN architectures to *ensure* overfitting!!
+- Need better NN architectures and optimizers to *ensure* overfitting!!
 
-- *Hard functions for pop learners to learn*
+- *Harder functions and data volumes for pop learners to learn*
   - Random discrete functions
   - Discontinuous funcs vs MLP (UAT only for continuous). Fractals?
 
+
+---
 - Equate degrees-of-freedom for fair comparison? For regression: prior or mean?
   - Related to computation -> not really in scope of my analysis
 

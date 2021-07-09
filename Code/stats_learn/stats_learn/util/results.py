@@ -1,6 +1,8 @@
 import math
 from itertools import product
 from numbers import Integral
+from pathlib import Path
+import pickle
 
 from more_itertools import all_equal
 
@@ -10,6 +12,8 @@ import pandas as pd
 
 from stats_learn.bayes import models as bayes_models
 from stats_learn.util.base import check_data_shape
+from stats_learn.util.base import NOW_STR
+
 
 # TODO: check for residual DRY fixes
 
@@ -47,10 +51,13 @@ def plot_fit_compare(predictors, d, params=None, ax=None):
 
 
 def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
-                      plot_stats=False, print_loss=False, plot_loss=False, ax=None):
+                      plot_stats=False, plot_loss=False, print_loss=False, img_path=Path.cwd(), file=None, ax=None):
     # uses Welford's online algorithm https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
 
     # TODO: add mode!!!
+
+    if plot_stats and plot_loss:
+        raise NotImplementedError("Cannot plot prediction statistics and losses at once.")
 
     if params is None:
         params_full = [{} for _ in predictors]
@@ -121,8 +128,8 @@ def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=
 
     for i_mc in range(n_mc):
         if verbose:
-            print(f"Stats/loss iteration: {i_mc + 1}/{n_mc}")
-            # print(f"Stats/loss iteration: {i_mc + 1}/{n_mc}", end='\r')
+            print(f"MC iteration: {i_mc + 1}/{n_mc}")
+            # print(f"MC iteration: {i_mc + 1}/{n_mc}", end='\r')
 
         d = model.rvs(n_test + n_train[-1])
         d_test, d_train = d[:n_test], d[n_test:]
@@ -168,18 +175,36 @@ def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=
     # loss_full = [loss.mean() for loss in loss_full]
     loss_full = [loss / n_mc for loss in loss_full]
 
-    # Plot stats
+    # Printing
+    if file is not None:
+        print(f"\n# {NOW_STR}", file=file)
+
+    if do_loss and print_loss:
+        _print_risk(predictors, params_full, n_train, loss_full, file=file)
+
+    # Plotting
     if do_stats and plot_stats:
         _plot_stats(y_stats_full, space_x, predictors, params_full, n_train, x, ax)
-
-    # Print results as Markdown table
-    if do_loss and print_loss:
-        _print_risk(predictors, params_full, n_train, loss_full, file=None)
-
-    # Plot loss
-    if do_loss and plot_loss:
+    elif do_loss and plot_loss:
         do_bayes = isinstance(model, bayes_models.Base)
         _plot_risk_eval_compare(loss_full, do_bayes, predictors, params_full, n_train, ax)
+
+    img_path = Path(img_path)
+    img_file = img_path.joinpath(f"{NOW_STR}.png")
+    mpl_file = img_file.parent / f"{img_file.stem}.mpl"
+
+    fig = plt.gcf()
+    fig.savefig(img_file)
+    # with open(img_path.joinpath(f"{NOW_STR}.mpl"), 'wb') as fid:
+    with open(mpl_file, 'wb') as fid:
+        pickle.dump(fig, fid)
+    if file is not None:
+        print(f"\n![]({img_file.absolute()})", file=file)
+
+    # # Plot loss
+    # if do_loss and plot_loss:
+    #     do_bayes = isinstance(model, bayes_models.Base)
+    #     _plot_risk_eval_compare(loss_full, do_bayes, predictors, params_full, n_train, ax)
 
     return y_stats_full, loss_full
 
@@ -340,8 +365,11 @@ def _print_risk(predictors, params, n_train, losses, file=None):
 
     df = df.transpose()
 
-    print(title)
-    print(df.to_markdown(tablefmt='github', floatfmt='.3f'), file=file)
+    str_table = df.to_markdown(tablefmt='github', floatfmt='.3f')
+    str_out = f"{title}\n{str_table}"
+    print(str_out)
+    if file is not None:
+        print(str_out, file=file)
 
 
 def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, print_loss=False):

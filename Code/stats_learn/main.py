@@ -232,7 +232,7 @@ class LitMLP(pl.LightningModule):
 
     def configure_optimizers(self):
         # optimizer = torch.optim.SGD(self.parameters(), lr=1e-2)
-        optimizer = torch.optim.Adam(self.parameters(), lr=1e-2)
+        optimizer = torch.optim.Adam(self.parameters(), lr=1e-2, weight_decay=0)
         return optimizer
 
 
@@ -275,15 +275,18 @@ predictors, params = zip(*temp)
 
 # TODO: train/test loss results?
 
-y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=100,
-                                            stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True)
-# y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=10, n_mc=10,
-#                                             verbose=True, print_loss=True)
+# file = None
+file = 'docs/temp/temp.md'
 
-# y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_mc=100, x=None,
-#                                             stats=('mean', 'std'), verbose=True, plot_stats=True)
-# y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=10, n_mc=100, x=None,
-#                                             verbose=True, plot_loss=True)
+if file is not None:
+    file = Path(file).open('a')
+
+y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10,
+                                            stats=('mean', 'std'), plot_stats=True, print_loss=True,
+                                            verbose=True, img_path='images/temp/', file=file)
+# y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=10, n_mc=10,
+#                                             plot_loss=True,
+#                                             verbose=True, img_path='images/temp/', file=file)
 
 
 # d = model.rvs(n_train)
@@ -292,14 +295,8 @@ y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_tr
 # ax.set_ylim((0, 1))
 
 
-# Save image and Figure
-# TODO: move to plotting functions, make path arg
-image_path = Path('./images/temp/')
-
-fig = plt.gcf()
-fig.savefig(image_path.joinpath(f"{NOW_STR}.png"))
-with open(image_path.joinpath(f"{NOW_STR}.mpl"), 'wb') as fid:
-    pickle.dump(fig, fid)
+if file is not None:
+    file.close()
 
 
 #%% Deprecated
@@ -308,6 +305,16 @@ with open(image_path.joinpath(f"{NOW_STR}.mpl"), 'wb') as fid:
 # plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=100, verbose=True)
 
 # risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True, print_loss=True)
+
+
+# # Save image and Figure
+# # TODO: move to plotting functions, make path arg
+# image_path = Path('./images/temp/')
+#
+# fig = plt.gcf()
+# fig.savefig(image_path.joinpath(f"{NOW_STR}.png"))
+# with open(image_path.joinpath(f"{NOW_STR}.mpl"), 'wb') as fid:
+#     pickle.dump(fig, fid)
 
 
 # model_x = rand_elements.Finite([0, .5], p=None)
