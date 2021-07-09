@@ -56,8 +56,8 @@ def func_mean_to_models(n, alpha_0, func):
         return [rand_elements.DirichletEmpiricalScalar(func(_x), alpha_0, n-1) for _x in x_supp]
 
 
-# n_x = 128
-n_x = 32
+n_x = 128
+# n_x = 32
 
 # var_y_x_const = 1 / (n_x-1)
 var_y_x_const = 1/5
@@ -92,14 +92,14 @@ def nonlinear_model(x):
 #     return np.array(x.mean(axis) > .5, dtype=float) * (1-delta) + delta/2
 
 
-supp_x = box_grid(np.broadcast_to([0, 1], (*shape_x, 2)), n_x, endpoint=True)
-model_x = rand_elements.Finite(supp_x, p=np.full(prod(shape_x)*(n_x,), n_x**-prod(shape_x)))
-# model = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_model), model_x)
-model = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model), model_x)
+# supp_x = box_grid(np.broadcast_to([0, 1], (*shape_x, 2)), n_x, endpoint=True)
+# model_x = rand_elements.Finite(supp_x, p=np.full(prod(shape_x)*(n_x,), n_x**-prod(shape_x)))
+# # model = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_model), model_x)
+# model = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model), model_x)
 
-# model_x = rand_elements.Uniform(np.broadcast_to([0, 1], (*shape_x, 2)))
-# # model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
-# model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x)
+model_x = rand_elements.Uniform(np.broadcast_to([0, 1], (*shape_x, 2)))
+# model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
+model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x)
 
 # model = rand_models.NormalLinear(weights=w_model, basis_y_x=None, cov_y_x=.1, model_x=model_x)
 
@@ -125,19 +125,19 @@ w_prior = [.5, 0]
 # Dirichlet learner
 proc_funcs = []
 
-prior_mean = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_prior), model_x)
-# _func = lambda x: .5*(1-np.sin(2*np.pi*x))
-# prior_mean = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, _func), model_x)
+# prior_mean = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_prior), model_x)
+# # _func = lambda x: .5*(1-np.sin(2*np.pi*x))
+# # prior_mean = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, _func), model_x)
 
 
-# n_t = 16
-# supp_t = box_grid(model_x.lims, n_t, endpoint=True)
-# _temp = np.ones(model_x.size*(n_t,))
-# # _temp = prob_disc(model_x.size*(n_t,))
-# prior_mean_x = rand_elements.Finite(supp_t, p=_temp/_temp.sum())
-# proc_funcs.append(discretizer(supp_t.reshape(-1, *model_x.shape)))
-#
-# prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
+n_t = 16
+supp_t = box_grid(model_x.lims, n_t, endpoint=True)
+_temp = np.ones(model_x.size*(n_t,))
+# _temp = prob_disc(model_x.size*(n_t,))
+prior_mean_x = rand_elements.Finite(supp_t, p=_temp/_temp.sum())
+proc_funcs.append(discretizer(supp_t.reshape(-1, *model_x.shape)))
+
+prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
 
 
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs,
@@ -275,7 +275,7 @@ predictors, params = zip(*temp)
 
 # TODO: train/test loss results?
 
-y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=10, n_mc=10,
+y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=50,
                                             stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True)
 # y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=10, n_mc=10,
 #                                             verbose=True, print_loss=True)
