@@ -87,7 +87,7 @@
 
 \todohigh{ALL figure notation: theta font + Ycal indexing. use R,f opt?}
 
-\todohigh{Generalize to semi-supervised joint decisions??? training/test!}
+\todohigh{Generalize to semisupervised joint decisions??? training/test!}
 \todohi{Investigate N lim for psi given theta, risks. Model support, bounded prior?}
 \todohi{priors = sparse conditionals; w/ sufficient statistics}
 
@@ -147,7 +147,7 @@ This section details the mathematical notation and typesetting conventions used 
 
 Sets are typically typeset with a calligraphic font, such as $\Xcal$ with the exception of common number sets, such as the real numbers, which are typeset using blackboard bold $\Rbb$. Function spaces, such as the set of functions $\Xcal \mapsto \Ycal$, are compactly represented as $\Ycal^{\Xcal}$.
 
-\todolo{non-calligraphic for risk, loss, etc?}
+\todolo{noncalligraphic for risk, loss, etc?}
 
 Various mappings are defined for which the domain and/or the range \cite{rudin} are function spaces. The set of functions $\Xcal \mapsto \Ycal$ is denoted $\Ycal^{\Xcal}$. For a mapping $g : \Zcal \mapsto \Ycal^{\Xcal}$, the argument notation $g(z) \in \Ycal^{\Xcal}$ denotes a function, while $g(x;z) \in \Ycal$ is a specific value of that function. Semicolons are used to distinguish between the arguments referring to the domain and arguments that access the resulting function. The mapping $\{1,\ldots,N\} \mapsto \Ycal$ is represented as $\Ycal^N$ for brevity. Spaces of indexed tuples are notated as $g \in \Ycal^N$ and items of a tuple are accessed with subscripts rather than parentheses, such that $g_i \in \Ycal$.
 
@@ -257,7 +257,7 @@ Similarly, the covariance function notation is modified and the output is a func
 \end{IEEEeqnarray}
 As before, the notation is simplified when the function $g$ is the identity operator. If $\xrm$ is a random process over a domain $\Ycal$, then the mean and covariance functions are defined over domains $\Ycal$ and $\Ycal \times \Ycal$ with values notated such as $\mu_{\xrm}(y)$ and $\Sigma_{\xrm}(y,y')$.
 
-If the expectations are evaluated with respect to a conditional distribution $\Prm_{\xrm | \zrm}$, the additional argument for the observed random element is added and the notation for the above operators is extended to $\Erm_{\xrm|\zrm}\big[ g(\xrm) \big](y|z)$ and $\Crm_{\xrm|\zrm}\big[g(\xrm)\big](y,y'|z)$ for non-scalar outputs. When $g$ is the identity operator, the notation $\mu_{\xrm|\zrm}(y|z)$ and $\Sigma_{\xrm|\zrm}(y,y'|z)$ is used. As for probability distributions, it is common for the conditional random element $\zrm$ to be left as a random quantity instead of being explicitly defined; in these cases, the dependency on $\zrm$ is implied.
+If the expectations are evaluated with respect to a conditional distribution $\Prm_{\xrm | \zrm}$, the additional argument for the observed random element is added and the notation for the above operators is extended to $\Erm_{\xrm|\zrm}\big[ g(\xrm) \big](y|z)$ and $\Crm_{\xrm|\zrm}\big[g(\xrm)\big](y,y'|z)$ for nonscalar outputs. When $g$ is the identity operator, the notation $\mu_{\xrm|\zrm}(y|z)$ and $\Sigma_{\xrm|\zrm}(y,y'|z)$ is used. As for probability distributions, it is common for the conditional random element $\zrm$ to be left as a random quantity instead of being explicitly defined; in these cases, the dependency on $\zrm$ is implied.
 
 
 \todohi{BELOW NOTATION CREATES AMBIGUITY!!!!!!! Check for residual uses...}
@@ -448,7 +448,7 @@ over the domain $\prod_{x \in \Xcals(\psim)} \left\{ \frac{n}{N \psim(x)}: n \in
 
 \todomid{Continuous? Comment on PMF notation}
 
-The task in supervised machine learning is to design a learning function $f: \Dcal \mapsto \Hcal^{\Xcal}$ which produces a mapping from the space of the observed random elements to a decision space $\Hcal$. Define the function space $\Fcal = \left\{ {\Hcal^{\Xcal}} \right\}^{\Dcal}$, such that $f \in \Fcal$. The decision functions $f(D)$ are non-parametric and there are no restrictions on the set of achievable functions $\Hcal^{\Xcal}$.
+The task in supervised machine learning is to design a learning function $f: \Dcal \mapsto \Hcal^{\Xcal}$ which produces a mapping from the space of the observed random elements to a decision space $\Hcal$. Define the function space $\Fcal = \left\{ {\Hcal^{\Xcal}} \right\}^{\Dcal}$, such that $f \in \Fcal$. The decision functions $f(D)$ are nonparametric and there are no restrictions on the set of achievable functions $\Hcal^{\Xcal}$.
 
 The metric guiding the design is a loss function $\Lcal: \Hcal \times \Ycal \mapsto \Rbbgeq$ which penalizes the decision $h \in \Hcal$ based on the value of $\yrm$. The objective is to minimize the expected loss, or ``risk'',
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond}
@@ -496,7 +496,7 @@ Note that using the marginal/conditional model representations introduced previo
 
 \subsection{Bayes Decision}
 
-To design an optimal learning function $f \in \Fcal$, an operator must be chosen to remove the dependency of the risk $\Rcal_{\Theta}$ on $\uptheta$ and form an objective function $\Fcal \mapsto \Rbbgeq$. One choice is to integrate over $\Uptheta$; to ensure a non-negative objective value, the weighting function should be non-negative. Also, as scaling the objective function will not change its minimizing argument, the weighting function can be constrained to integrate to one. These are the requirements for a valid probability density function (PDF); as such, the model $\uptheta$ is treated as a random process and a Bayesian approach can be adopted. 
+To design an optimal learning function $f \in \Fcal$, an operator must be chosen to remove the dependency of the risk $\Rcal_{\Theta}$ on $\uptheta$ and form an objective function $\Fcal \mapsto \Rbbgeq$. One choice is to integrate over $\Uptheta$; to ensure a nonnegative objective value, the weighting function should be nonnegative. Also, as scaling the objective function will not change its minimizing argument, the weighting function can be constrained to integrate to one. These are the requirements for a valid probability density function (PDF); as such, the model $\uptheta$ is treated as a random process and a Bayesian approach can be adopted. 
 
 Define the PDF $\prm_{\uptheta} \in \Pcal(\Uptheta)$. Now the Bayes risk can be formulated as
 \begin{IEEEeqnarray}{rCl} \label{eq:risk}
@@ -515,7 +515,7 @@ such that
 \begin{equation} \label{eq:f_opt_D}
 f^*(\Drm) = \argmin_{g \in \Hcal^{\Xcal}} \Erm_{\yrm,\xrm | \Drm} \Big[ \Lcal\big(g(\xrm),\yrm\big) \Big] \;.
 \end{equation}
-The decision expressed by the non-parametric learning function $f^*(\Drm)$ for a given novel observation $\xrm$ is
+The decision expressed by the nonparametric learning function $f^*(\Drm)$ for a given novel observation $\xrm$ is
 \begin{IEEEeqnarray}{rCl} \label{eq:f_opt_xD}
 f^*(\xrm;\Drm) & = & \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm}\big[ \Lcal(h,\yrm) \big]
 %& = & \argmin_{h \in \Hcal} \Erm_{\uptheta | \xrm,\Drm}\bigg[ \Erm_{\yrm | \xrm,\uptheta}\big[ \Lcal(h,\yrm) \big] \bigg] \nonumber \;.
@@ -723,7 +723,7 @@ Substituting the squared error loss into \eqref{eq:risk_cond}, the squared error
 \end{IEEEeqnarray}
 a sum of two terms. The first term is the expected conditional variance of the true predictive distribution $\Prm_{\yrm | \xrm,\uptheta}$. The second term is the expected squared bias between the estimate and the true conditional mean $\mu_{\yrm | \xrm,\uptheta}$.
 
-Note that the risk can also be represented as $\Rcal_{\Theta}(f ; \uptheta) = \Rcal_{\Theta}^*(\uptheta) + \Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta)$, where the first term is the irreducible squared error (as demonstrated in the next sub-section) and the second term is the excess squared error,
+Note that the risk can also be represented as $\Rcal_{\Theta}(f ; \uptheta) = \Rcal_{\Theta}^*(\uptheta) + \Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta)$, where the first term is the irreducible squared error (as demonstrated in the next subsection) and the second term is the excess squared error,
 \begin{IEEEeqnarray}{rCl} \label{eq:risk_cond_ex_SE}
 \Rcal_{\Theta, \mathrm{ex}}(f ; \uptheta) & = & \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( f(\xrm;\Drm) - f_{\Theta}(\xrm;\uptheta) \big)^2 \Big] \\
 & = & \Erm_{\xrm | \uptheta} \left[ \Big( \Erm_{\Drm | \uptheta}\big[ f(\xrm;\Drm) \big] - f_{\Theta}(\xrm;\uptheta) \Big)^2 + \Crm_{\Drm | \uptheta}\big[ f(\xrm;\Drm) \big] \right] \nonumber \;,
@@ -909,7 +909,7 @@ Substituting the optimal learning function \eqref{eq:f_opt_01} into the general 
 
 \todohigh{Figs BROKEN from alpha changes}
 
-\todohigh{Uncoupled m/c alphas = non-Dir Ptheta??}
+\todohigh{Uncoupled m/c alphas = nonDir Ptheta??}
 
 This chapter determines the optimal learning functions when the sets $\Ycal$ and $\Xcal$ have a finite number of elements and the model $\uptheta$ is characterized by a Dirichlet distribution.
 
@@ -1466,7 +1466,7 @@ Observe that for $N = 5$, the $\alpha_0 = 0.1$ estimate (favoring the empirical 
 
 %\subsection{Example}
 %
-%\todohi{Non-singular example?}
+%\todohi{Nonsingular example?}
 %
 %To exemplify how the model estimate $\Prm_{\yrm | \xrm,\uppsi}$ approximates $\Prm_{\yrm | \xrm,\uptheta}$, consider a scenario with $|\Ycal| = 60$ and $|\Xcal| = 1$; the singular observation set enables visualization of the bias-variance trade-off. The prior mean $\alphac(x)$ and true model $\upthetac(x)$ are distributed as $\alphac(y;x) = \Bi(y/60; 60, 0.3)$ and $\thetac(y;x) = \Bi(y/60; 60, 0.7)$, respectively, and are shown in \cref{fig:model_est/N_0} -- note the significant mismatch.
 %\begin{figure}
@@ -1843,7 +1843,7 @@ N = \alpha_0 \left( 1 - 2 \alpha_0 \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | 
 \todohi{CHECK, consider x dependency + below}
 Note that as the squared bias of the prior mean increases relative to the clairvoyant estimator variance, the maximizing value decreases (even below zero). Thus, the worse the prior estimate, the more likely the excess squared error will decrease monotonically with $N$. Conversely, if the prior estimate is accurate, a local maximum may occur and additional training data may (temporarily) compromise the estimator performance. Also consider the effect of prior concentration; informative priors with sufficiently high $\alpha_0$ will not have the local maxima.
 
-The excess risk at this potentially non-integral value would be 
+The excess risk at this potentially nonintegral value would be 
 \begin{equation}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \to \frac{\Sigma_{\yrm | \xrm,\uptheta}}{4 \alpha_0 \left( 1 - \alpha_0 \frac{\left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2}{\Sigma_{\yrm | \xrm,\uptheta}} \right)} \;.
 \end{equation}
@@ -1965,7 +1965,7 @@ PGR: plot captions, alpha zero or x???
 %
 %The Bayesian linear regressor with the Normal prior is highly biased, as its set of achievable estimator functions is critically limited; it also has lower variance than the Dirichlet-based estimators. This is a consequence of the lower-dimensionality, limited-support prior -- there are fewer models $\theta \in \Pcal(\Ycal \times \Xcal)$ that are considered and thus fewer functions $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$ that can be realized. Contrasting, the Dirichlet estimator uses a full support prior, which is necessary to ensure that any complex clairvoyant estimator can be learned.
 %
-%\cref{fig:SSP_2021/Risk_cond_SE_N_biased_hard} shows the resultant expected squared error as a function of $N$. Observe that the Dirichlet-based estimator trends toward the irreducible risk $\Rcal_{\Theta}^*(\theta)$, regardless of how much confidence in the data-independent regressor $\mu_{\yrm | \xrm}$ is indicated through the prior localization $\alpha_0$. Furthermore this trend holds no matter how severe the bias of $\alphac$ might be. This is a consequence of the Bayesian predictive distribution $\Prm_{\yrm | \xrm,\Drm}$ being a consistent estimator of the true predictive model $\thetac$, which is guaranteed by the Dirichlet prior's full support. In contrast, the Bayesian linear regressor will generally result in non-zero excess squared error, no matter how much training data is available. 
+%\cref{fig:SSP_2021/Risk_cond_SE_N_biased_hard} shows the resultant expected squared error as a function of $N$. Observe that the Dirichlet-based estimator trends toward the irreducible risk $\Rcal_{\Theta}^*(\theta)$, regardless of how much confidence in the data-independent regressor $\mu_{\yrm | \xrm}$ is indicated through the prior localization $\alpha_0$. Furthermore this trend holds no matter how severe the bias of $\alphac$ might be. This is a consequence of the Bayesian predictive distribution $\Prm_{\yrm | \xrm,\Drm}$ being a consistent estimator of the true predictive model $\thetac$, which is guaranteed by the Dirichlet prior's full support. In contrast, the Bayesian linear regressor will generally result in nonzero excess squared error, no matter how much training data is available. 
 %\begin{figure}
 %\centering
 %\includegraphics[width=0.8\linewidth]{SSP_2021/Risk_cond_SE_N_biased_hard.png}
@@ -1993,7 +1993,7 @@ PGR: plot captions, alpha zero or x???
 
 \subsubsection{Example} \label{sec:SE_dir_example}
 
-\todohi{Use harder non-linearity that fails even for higher-order poly??}
+\todohi{Use harder nonlinearity that fails even for higher-order poly??}
 \todolo{use markers for predict plots?!?}
 
 To demonstrate the efficacy of Dirichlet-based regressors, consider a data model where $\Xcal$ and $\Ycal$ are 128-point discretizations of the unit interval $[0, 1]$, inclusive, such that $\Xcal = \Ycal = \{i/127: i = 0, \ldots, 127\}$. The Dirichlet estimator is parameterized by $\alpham = 1 / 128$ and $\alphac(y;x) = \DE\big((y, 1-y); 127, 4.164, (0.5, 0.5)\big)$, such that the prior estimator $\mu_{\yrm | \xrm} = 0.5$ is constant; various localizations $\alpha_0$ will be used. Results were generated by averaging 50,000 iterations of a novel Python learning simulation.
@@ -2032,7 +2032,7 @@ Next, consider the risk trends when the true model is fixed. The PMF $\thetam = 
 
 The Bayesian linear regressor with the Normal prior is highly biased, as its set of achievable estimator functions is critically limited; it also has lower variance than the Dirichlet-based estimators. This is a consequence of the lower-dimensionality, limited-support prior -- there are fewer models $\theta \in \Pcal(\Ycal \times \Xcal)$ that are considered and thus fewer functions $f_{\Theta}(\xrm;\uptheta) = \mu_{\yrm | \xrm,\uptheta}$ that can be realized. Contrasting, the Dirichlet estimator uses a full-support prior, which is necessary to ensure that any complex clairvoyant estimator can be learned.
 
-\cref{fig:Discrete/SE/risk_N_leg_a0} shows the resultant expected squared error as a function of $N$. Observe that the Dirichlet-based estimator trends toward the irreducible risk $\Rcal_{\Theta}^*(\theta)$, regardless of how much confidence in the data-independent regressor $\mu_{\yrm | \xrm}$ is indicated through the prior localization $\alpha_0$. Furthermore this trend holds no matter how severe the bias of $\alphac$ might be. This is a consequence of the Bayesian predictive distribution $\Prm_{\yrm | \xrm,\Drm}$ being a consistent estimator of the true predictive model $\thetac$, which is guaranteed by the Dirichlet prior's full support. In contrast, the Bayesian linear regressor will generally result in non-zero excess squared error, no matter how much training data is available. 
+\cref{fig:Discrete/SE/risk_N_leg_a0} shows the resultant expected squared error as a function of $N$. Observe that the Dirichlet-based estimator trends toward the irreducible risk $\Rcal_{\Theta}^*(\theta)$, regardless of how much confidence in the data-independent regressor $\mu_{\yrm | \xrm}$ is indicated through the prior localization $\alpha_0$. Furthermore this trend holds no matter how severe the bias of $\alphac$ might be. This is a consequence of the Bayesian predictive distribution $\Prm_{\yrm | \xrm,\Drm}$ being a consistent estimator of the true predictive model $\thetac$, which is guaranteed by the Dirichlet prior's full support. In contrast, the Bayesian linear regressor will generally result in nonzero excess squared error, no matter how much training data is available. 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.8\linewidth]{Discrete/SE/risk_N_leg_a0.png}
@@ -2278,7 +2278,7 @@ providing a lower bound for the achievable 0-1 Bayes risk. The above formulation
 \label{fig:Risk_01_uni_N_leg_Mx}
 \end{figure}
 
-Further insight into how $|\Xcal|$ affects the risk can be acquired by plotting the risk as a function of $N/|\Xcal|$. In \cref{fig:Risk_01_uni_N-Mx}, it is shown that the minimal risk can be approximated by a function dependent only on $N/|\Xcal|$; of the series plotted, only the series for $|\Xcal| = 1$ shows notable non-negligible from the others.
+Further insight into how $|\Xcal|$ affects the risk can be acquired by plotting the risk as a function of $N/|\Xcal|$. In \cref{fig:Risk_01_uni_N-Mx}, it is shown that the minimal risk can be approximated by a function dependent only on $N/|\Xcal|$; of the series plotted, only the series for $|\Xcal| = 1$ shows notable nonnegligible from the others.
 
 \begin{figure}
 \centering
@@ -2333,7 +2333,7 @@ Substituting the optimal Dirichlet-based classifier into the formula for the pro
 \label{fig:Risk_cond_01_Dir_N_leg_a0__subj_bad}
 \end{figure}
 
-Also, it is important to consider how a given classifier performs for varying models $\thetac(x)$. \cref{fig:Risk_cond_ex_01_Dir_theta__uni,fig:Risk_cond_ex_01_Dir_theta__subj}  demonstrate the excess probability of error achieved by the conditional majority decision (based on a non-informative Dirichlet prior) and by a classifier derived from an informative Dirichlet prior, respectively. Note that while the former has fewer models for which the error is critically high, the latter has more models for which the irreducible risk $\Rcal_{\Theta}^*(\theta)$ is achieved. This a fundamental trade-off between Bayesian learners based on non-informative versus informative priors.
+Also, it is important to consider how a given classifier performs for varying models $\thetac(x)$. \cref{fig:Risk_cond_ex_01_Dir_theta__uni,fig:Risk_cond_ex_01_Dir_theta__subj}  demonstrate the excess probability of error achieved by the conditional majority decision (based on a noninformative Dirichlet prior) and by a classifier derived from an informative Dirichlet prior, respectively. Note that while the former has fewer models for which the error is critically high, the latter has more models for which the irreducible risk $\Rcal_{\Theta}^*(\theta)$ is achieved. This a fundamental trade-off between Bayesian learners based on noninformative versus informative priors.
 \begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{Risk_cond_ex_01_Dir_theta__uni.pdf}
@@ -2825,7 +2825,7 @@ The marginalized data can also be represented using the empirical transform. As 
 %& = & \left(1 + \frac{\alpha_0}{N}\right) \Sigma_{\uptheta} \nonumber \;.
 %\end{IEEEeqnarray}
 
-Observe that by the aggregation principle, $\uppsim \sim \DEP(N,\alpha_0,\alpham)$ is a DEP over the set $\Xcal$. Additionally, the 1-dimensional subsets conditioned on the marginalized DEP are characterized as
+Observe that by the aggregation principle, $\uppsim \sim \DEP(N,\alpha_0,\alpham)$ is a DEP over the set $\Xcal$. Additionally, the one-dimensional subsets conditioned on the marginalized DEP are characterized as
 \begin{equation}
 \uppsic(x) \big| \uppsim(x) \sim \DEP\left( \frac{N \uppsim(x)}{\delta(0)}, \frac{\alpha_0 \alpham(x)}{\delta(0)}, \alphac(x) \right) \;.
 \end{equation}
@@ -3157,7 +3157,7 @@ Using the second moments of the random process $\Delta(\xrm; \Drm,\upthetac)$ fo
 
 It is instructional to consider the trends of the excess squared error \eqref{eq:risk_cond_SE_dir_ex_cont} with training data volume $N$ and with Dirichlet prior parameterization. Referencing the predictive distribution estimation discussion in \cref{sec:predictive_est_dir_cont}, the bias-variance trends are used. Importantly, if the marginal model $\upthetam$ is upper-bounded, the biased, fixed prior estimator $\mu_{\yrm | \xrm}$ will  always be used (on average) and the excess risk is $\Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) \approx \Erm_{\xrm | \uptheta}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\uptheta} \right)^2 \right]$, regardless of how large the training data volume $N$ may be. 
 
-If instead $\upthetam$ includes Dirac delta functions, there are values $x \in \Xcal$ with non-zero probabilities of being observed. At these values, if $\alpham(x)$ is bounded, the weights tend to
+If instead $\upthetam$ includes Dirac delta functions, there are values $x \in \Xcal$ with nonzero probabilities of being observed. At these values, if $\alpham(x)$ is bounded, the weights tend to
 \begin{IEEEeqnarray}{L} 
 \Erm_{\uppsim | \upthetam}\big[ \gammam(x; \uppsim)^2 \big] \to \left(1 - \frac{\upthetam(x)}{\delta(0)}\right)^{N} 
 \end{IEEEeqnarray}
@@ -3224,7 +3224,7 @@ As seen in \cref{ch:dir_cont}, the flexibility of using a full-support prior, wh
 
 Define a discretizing data transformation $T: \Xcal \mapsto \Tcal$, where the range is a countable subset $\Tcal \subset \Xcal$, such that $|\Tcal| \leq \aleph_0$. This transform is applied to each of the training values $\Xrm_n$, as well as to the novel observation $\xrm$. Note that $T$ reduces the cardinality of the observation set; this is conceptually similar to the dimensionality reduction induced by feature transforms commonly used in machine learning and yields similar benefits. Use $T$ to define a partitioning $\{\ldots, \Xcal'(t), \ldots\}$ of the observation space $\Xcal$, where $\Xcal'(t) = \{x \in \Xcal: T(x) = t\}$. It is assumed that these subsets are all connected spaces; furthermore, assume that $t \in \Xcal'(t), \ \forall \ t \in \Tcal$, such that the transform maps $T(t) = t$.
 
-Having effectively changed the domain of the observations, the Dirichlet prior marginal mean is re-defined as $\alpham = \sum_{t \in \Tcal} \alphamd(t) \delta(\cdot - t)$, a mixture of delta functions at the discretized values, where $\alphamd \in \Pcal(\Tcal)$ is the discrete marginal function. 
+Having effectively changed the domain of the observations, the Dirichlet prior marginal mean is redefined as $\alpham = \sum_{t \in \Tcal} \alphamd(t) \delta(\cdot - t)$, a mixture of delta functions at the discretized values, where $\alphamd \in \Pcal(\Tcal)$ is the discrete marginal function. 
 
 %Additionally, the conditional prior mean is $\alphac(x) = \sum_{t \in \Tcal} \alphac'(t) \delta\big[t, T(x)\big]$
 \todohi{discretized conditional alpha?? generic marginal alpha to start?}
@@ -3433,7 +3433,7 @@ Contrasting, if the transform set is singleton, the expectations of $\uppsimd$ u
 
 \subsubsection{Example} 
 
-To demonstrate the efficacy of the discretized Dirichlet regressor, the scenario detailed in \cref{sec:SE_dir_cont_example} will be again used; $\Xcal$ and $\Ycal$ are the closed unit interval and the true model dictates a non-linear clairvoyant regressor. The Bayesian linear regressor detailed in \cref{sec:SE_dir_example} will be used for comparison; note that it can operate on the continuous data without any modification.
+To demonstrate the efficacy of the discretized Dirichlet regressor, the scenario detailed in \cref{sec:SE_dir_cont_example} will be again used; $\Xcal$ and $\Ycal$ are the closed unit interval and the true model dictates a nonlinear clairvoyant regressor. The Bayesian linear regressor detailed in \cref{sec:SE_dir_example} will be used for comparison; note that it can operate on the continuous data without any modification.
 
 The set of discretized observations is defined as 
 \begin{IEEEeqnarray}{L}
@@ -3451,7 +3451,7 @@ Recall that the continuous-domain Dirichlet learner previously used was paramete
 	\label{fig:Discretization/SE/predict_T}
 \end{figure}
 
-Note that the Bayesian linear regressor has prediction statistics similar to those of the coarsest discretization regressors -- it has high bias and low variance. This is intuitive, as it compresses the training data into a 2-dimensional parameter space, and thus has fewer degrees-of-freedom than even the $|\Tcal| = 4$ Dirichlet-based regressor.
+Note that the Bayesian linear regressor has prediction statistics similar to those of the coarsest discretization regressors -- it has high bias and low variance. This is intuitive, as it compresses the training data into a two-dimensional parameter space, and thus has fewer degrees-of-freedom than even the $|\Tcal| = 4$ Dirichlet-based regressor.
 
 \todomid{Expand parameter space dimensionality discussion!?}
 
@@ -3465,7 +3465,7 @@ To underscore the limitation of predictors with coarse discretization, consider 
 	\label{fig:Discretization/SE/predict_N_T4_a0_high}
 \end{figure}
 
-\cref{fig:Discretization/SE/risk_N_leg_T} displays the squared error achieved by the Dirichlet-based regressors for varying data volumes $N$ and for different discretization set sizes $|\Tcal|$. Unlike the regressors derived from full-support priors (see the discrete domain results in \cref{sec:SE_dir_example}), these regressors do not achieve the irreducible squared error $\Rcal_{\Theta}^*(\theta)$ in the limit of training data volume $N$. The $|\Tcal| = 4$ regressor is extremely sensitive to $N$ and consequently outperforms the learners using finer discretization if $N$ is relatively small; however, it produces the highest discretization error, making the discretization excessive when the training set is more voluminous. The $|\Tcal| = 4096$ regressor uses such fine discretization that it it under-utilizes the data and it barely improves over the range of values $N$ shown. Nonetheless, it has the smallest discretization error; if enough data is collected, it will eventually outperform all the other regressors and tend to a loss even lower than that realized by the $|\Tcal| = 128$ regressor. Clearly, for more middling training data volumes, the $|\Tcal| = 128$ regressor strikes the best balance between the two sources of risk. Also note that the Bayesian linear regressors suffer from the worst excess squared error due to their low-dimensionality priors and poorly-matched set of achievable prediction functions.
+\cref{fig:Discretization/SE/risk_N_leg_T} displays the squared error achieved by the Dirichlet-based regressors for varying data volumes $N$ and for different discretization set sizes $|\Tcal|$. Unlike the regressors derived from full-support priors (see the discrete domain results in \cref{sec:SE_dir_example}), these regressors do not achieve the irreducible squared error $\Rcal_{\Theta}^*(\theta)$ in the limit of training data volume $N$. The $|\Tcal| = 4$ regressor is extremely sensitive to $N$ and consequently outperforms the learners using finer discretization if $N$ is relatively small; however, it produces the highest discretization error, making the discretization excessive when the training set is more voluminous. The $|\Tcal| = 4096$ regressor uses such fine discretization that it it underutilizes the data and it barely improves over the range of values $N$ shown. Nonetheless, it has the smallest discretization error; if enough data is collected, it will eventually outperform all the other regressors and tend to a loss even lower than that realized by the $|\Tcal| = 128$ regressor. Clearly, for more middling training data volumes, the $|\Tcal| = 128$ regressor strikes the best balance between the two sources of risk. Also note that the Bayesian linear regressors suffer from the worst excess squared error due to their low-dimensionality priors and poorly-matched set of achievable prediction functions.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.8\linewidth]{Discretization/SE/risk_N_leg_T.png}
@@ -4354,7 +4354,7 @@ It can be further shown that the Bayesian predictive distribution is also Normal
 %
 %where we have used the identity $\sum_{m=0}^M \binom{M}{m} (-1)^{M-m}  P_{M-1}(m) = 0$, in which $P_{M-1}(m)$ is a polynomial of degree $M-1$ \cite{graham}.
 %
-%Next, we assess the second term in equation ???. We seek to re-use the previous identity. To this effect, we expand the final term,
+%Next, we assess the second term in equation ???. We seek to reuse the previous identity. To this effect, we expand the final term,
 %
 %\begin{IEEEeqnarray}{rCl}
 %m^{-1} (m-1)^M & = & \sum_{k=0}^M \binom{M}{k} m^{k-1} (-1)^{M-k} \\
