@@ -275,7 +275,7 @@ predictors, params = zip(*temp)
 
 # TODO: train/test loss results?
 
-y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=50,
+y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=100,
                                             stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True)
 # y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=10, n_mc=10,
 #                                             verbose=True, print_loss=True)

@@ -121,7 +121,8 @@ def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=
 
     for i_mc in range(n_mc):
         if verbose:
-            print(f"Stats/loss iteration: {i_mc + 1}/{n_mc}", end='\r')
+            print(f"Stats/loss iteration: {i_mc + 1}/{n_mc}")
+            # print(f"Stats/loss iteration: {i_mc + 1}/{n_mc}", end='\r')
 
         d = model.rvs(n_test + n_train[-1])
         d_test, d_train = d[:n_test], d[n_test:]
