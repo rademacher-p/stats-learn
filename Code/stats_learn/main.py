@@ -56,8 +56,8 @@ def func_mean_to_models(n, alpha_0, func):
         return [rand_elements.DirichletEmpiricalScalar(func(_x), alpha_0, n-1) for _x in x_supp]
 
 
-n_x = 128
-# n_x = 32
+# n_x = 128
+n_x = 32
 
 # var_y_x_const = 1 / (n_x-1)
 var_y_x_const = 1/5
@@ -238,7 +238,7 @@ class LitMLP(pl.LightningModule):
 
 lit_model = LitMLP()
 trainer = pl.Trainer(
-    max_epochs=1000,
+    max_epochs=5000,
     # callbacks=pl.callbacks.EarlyStopping('train_loss', min_delta=0., patience=20),
     checkpoint_callback=False,
     logger=False,
@@ -250,7 +250,7 @@ lit_predictor = LitWrapper(lit_model, trainer, space=model.space, name='Lit MLP'
 
 #%% Results
 
-n_train = 400
+n_train = 20
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
@@ -266,28 +266,25 @@ temp = [
     (opt_predictor, None),
     (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
-    (norm_predictor, norm_params),
+    # (norm_predictor, norm_params),
     # (skl_predictor, None),
-    # (lit_predictor, None),
+    (lit_predictor, None),
 ]
 predictors, params = zip(*temp)
 
 
-# TODO: add function that combines `plot_predict_stats_compare` with `risk_eval_sim_compare`! Use default `n_test=0`
 # TODO: train/test loss results?
 
-y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=10, n_mc=100, x=None,
+y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=10, n_mc=10,
                                             stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True)
+# y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=10, n_mc=10,
+#                                             verbose=True, print_loss=True)
+
 # y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_mc=100, x=None,
 #                                             stats=('mean', 'std'), verbose=True, plot_stats=True)
 # y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=10, n_mc=100, x=None,
 #                                             verbose=True, plot_loss=True)
 
-
-# plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=100, x=None, do_std=True, verbose=True)
-# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=100, verbose=True)
-
-# risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True, print_loss=True)
 
 # d = model.rvs(n_train)
 # ax = model.space['x'].make_axes()
@@ -306,6 +303,12 @@ with open(image_path.joinpath(f"{NOW_STR}.mpl"), 'wb') as fid:
 
 
 #%% Deprecated
+
+# plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=100, x=None, do_std=True, verbose=True)
+# plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=100, verbose=True)
+
+# risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10, verbose=True, print_loss=True)
+
 
 # model_x = rand_elements.Finite([0, .5], p=None)
 # model = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
