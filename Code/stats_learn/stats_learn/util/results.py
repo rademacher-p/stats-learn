@@ -3,6 +3,8 @@ from itertools import product
 from numbers import Integral
 from pathlib import Path
 import pickle
+from collections import Iterable
+from typing import Union
 
 from more_itertools import all_equal
 
@@ -52,9 +54,53 @@ def plot_fit_compare(predictors, d, params=None, ax=None):
 
 def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
                       plot_stats=False, plot_loss=False, print_loss=False, img_path=Path.cwd(), file=None, ax=None):
-    # uses Welford's online algorithm https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
+    """
+
+    Parameters
+    ----------
+    predictors : iterable of stats_learn.predictors.Base
+    model : stats_learn.random.models.Base
+        Data-generating model.
+    params : iterable of dict, optional
+        Predictor parameters to evaluate. Each element corresponds to an element of `predictors` and contains an
+        optional dictionary mapping parameter names to various values. Outer product of each parameter array is
+        assessed.
+    n_train : int or iterable, optional
+        Training data volume.
+    n_test : int, optional
+        Test data volume.
+    n_mc : int, optional
+        Number of Monte Carlo simulation iterations.
+    x : iterable, optional
+        Values of observed element to use for assessment of prediction statistics.
+    stats : iterable of str, optional
+        Names of the statistics to generate, e.g. 'mean', 'std', 'cov', 'mode', etc.
+    verbose : bool, optional
+        Enables iteration print-out.
+    plot_stats : bool, optional
+        Enables plotting of prediction statistics.
+    plot_loss : bool, optional
+        Enables plotting of average loss.
+    print_loss : bool, optional
+        Enables print-out of average loss table.
+    img_path : os.PathLike or str, optional
+        Directory for saving generated images.
+    file : file-like, optional
+        File for saving printed loss table and image path in Markdown format.
+    ax : matplotlib.axes.Axes, optional
+        Axes onto which stats/losses are plotted.
+
+    Returns
+    -------
+
+    Notes
+    -----
+    Uses Welford's online algorithm https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
+
+    """
 
     # TODO: add mode!!!
+    # TODO: train/test loss results?
 
     if plot_stats and plot_loss:
         raise NotImplementedError("Cannot plot prediction statistics and losses at once.")
@@ -81,9 +127,9 @@ def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=
     do_loss = n_test > 0
 
     if do_stats:
+        # space_x = check_spaces_x(predictors)
+        space_x = model.space['x']
         if x is None:
-            # space_x = check_spaces_x(predictors)
-            space_x = model.space['x']
             x = space_x.x_plt
 
         shape, size, ndim = model.shape, model.size, model.ndim
@@ -216,7 +262,7 @@ def predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=N
     return y_stats_full
 
 
-def _plot_stats(y_stats_full, space_x, predictors, params, n_train=0, x=None, ax=None):
+def _plot_stats(y_stats_full, space_x, predictors, params, n_train: Union[int, Iterable] = 0, x=None, ax=None):
     if x is None:
         x = space_x.x_plt
 
@@ -415,7 +461,7 @@ def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, 
     return loss_full
 
 
-def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0, ax=None):
+def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train: Union[int, Iterable] = 0, ax=None):
     if params is None:
         params_full = [{} for _ in predictors]
     else:

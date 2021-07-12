@@ -206,7 +206,13 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 
 #%% PyTorch
-# TODO: regularization?
+
+opt_params = {
+    'lr': 1e-2,
+    'weight_decay': 0.,
+    # 'weight_decay': 0.001,
+}
+
 
 class LitMLP(pl.LightningModule):
     def __init__(self):
@@ -231,8 +237,8 @@ class LitMLP(pl.LightningModule):
         return loss
 
     def configure_optimizers(self):
-        # optimizer = torch.optim.SGD(self.parameters(), lr=1e-2)
-        optimizer = torch.optim.Adam(self.parameters(), lr=1e-2, weight_decay=0)
+        # optimizer = torch.optim.SGD(self.parameters(), **opt_params)
+        optimizer = torch.optim.Adam(self.parameters(), **opt_params)
         return optimizer
 
 
@@ -245,7 +251,10 @@ trainer = pl.Trainer(
     gpus=min(1, torch.cuda.device_count()),
 )
 
-lit_predictor = LitWrapper(lit_model, trainer, space=model.space, name='Lit MLP')
+# _name = 'Lit MLP'
+_name = f"Lit MLP, {opt_params['weight_decay']} reg."
+# _name = f"Lit MLP, {trainer.max_epochs} ep., {opt_params['weight_decay']} reg."
+lit_predictor = LitWrapper(lit_model, trainer, space=model.space, name=_name)
 
 
 #%% Results
@@ -273,15 +282,13 @@ temp = [
 predictors, params = zip(*temp)
 
 
-# TODO: train/test loss results?
-
 # file = None
 file = 'docs/temp/temp.md'
 
 if file is not None:
     file = Path(file).open('a')
 
-y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10,
+y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=2,
                                             stats=('mean', 'std'), plot_stats=True, print_loss=True,
                                             verbose=True, img_path='images/temp/', file=file)
 # y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=10, n_mc=10,
