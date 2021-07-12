@@ -213,6 +213,14 @@ opt_params = {
     # 'weight_decay': 0.001,
 }
 
+trainer_params = {
+    'max_epochs': 5000,
+    # 'callbacks': pl.callbacks.EarlyStopping('train_loss', min_delta=0., patience=20),
+    'checkpoint_callback': False,
+    'logger': False,
+    'gpus': min(1, torch.cuda.device_count()),
+}
+
 
 class LitMLP(pl.LightningModule):
     def __init__(self):
@@ -243,13 +251,14 @@ class LitMLP(pl.LightningModule):
 
 
 lit_model = LitMLP()
-trainer = pl.Trainer(
-    max_epochs=5000,
-    # callbacks=pl.callbacks.EarlyStopping('train_loss', min_delta=0., patience=20),
-    checkpoint_callback=False,
-    logger=False,
-    gpus=min(1, torch.cuda.device_count()),
-)
+trainer = pl.Trainer(**trainer_params)
+# trainer = pl.Trainer(
+#     max_epochs=5000,
+#     # callbacks=pl.callbacks.EarlyStopping('train_loss', min_delta=0., patience=20),
+#     checkpoint_callback=False,
+#     logger=False,
+#     gpus=min(1, torch.cuda.device_count()),
+# )
 
 # _name = 'Lit MLP'
 _name = f"Lit MLP, {opt_params['weight_decay']} reg."
@@ -288,7 +297,7 @@ file = 'docs/temp/temp.md'
 if file is not None:
     file = Path(file).open('a')
 
-y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=2,
+y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10,
                                             stats=('mean', 'std'), plot_stats=True, print_loss=True,
                                             verbose=True, img_path='images/temp/', file=file)
 # y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=10, n_mc=10,
