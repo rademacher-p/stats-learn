@@ -1,6 +1,7 @@
 images/temp/
 data/temp/
 docs/temp/
+logs/
 
 ##### IntelliJ project files
 .idea

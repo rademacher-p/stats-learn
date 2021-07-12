@@ -20,6 +20,7 @@ import torch
 from torch import nn
 from torch.nn import functional
 import pytorch_lightning as pl
+import pytorch_lightning.loggers as pl_loggers
 
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors import ModelRegressor, BayesRegressor, SKLWrapper, LitWrapper
@@ -39,8 +40,8 @@ np.set_printoptions(precision=3)
 plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
 
-seed = None
-# seed = 12345
+# seed = None
+seed = 12345
 
 
 #%% Model
@@ -207,32 +208,43 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 #%% PyTorch
 
+# opt_class = torch.optim.SGD
+opt_class = torch.optim.Adam
+
 opt_params = {
     'lr': 1e-2,
     'weight_decay': 0.,
     # 'weight_decay': 0.001,
 }
 
+# logger = False
+logger = pl_loggers.TensorBoardLogger('logs/', name='Lit_MLP')
+
 trainer_params = {
-    'max_epochs': 5000,
-    # 'callbacks': pl.callbacks.EarlyStopping('train_loss', min_delta=0., patience=20),
+    'max_epochs': 20000,
+    # 'callbacks': pl.callbacks.EarlyStopping('train_loss', min_delta=0.1, patience=1),  # TODO: only works for val?
     'checkpoint_callback': False,
-    'logger': False,
+    'logger': logger,
     'gpus': min(1, torch.cuda.device_count()),
 }
+
+layer_sizes = [10000]
+# layer_sizes = [5000, 1000]
+
+
+def _build_torch_net(sizes):
+    layers = [nn.Flatten()]
+    for in_out in zip([math.prod(shape_x), *sizes[:-1]], sizes):
+        layers.append(nn.Linear(*in_out))
+        layers.append(nn.ReLU())
+    layers.append(nn.Linear(sizes[-1], 1))
+    return nn.Sequential(*layers)
 
 
 class LitMLP(pl.LightningModule):
     def __init__(self):
         super().__init__()
-        self.model = nn.Sequential(
-            nn.Flatten(),
-            nn.Linear(math.prod(shape_x), 10000),
-            nn.ReLU(),
-            # nn.Linear(1000, 100),
-            # nn.ReLU(),
-            nn.Linear(10000, 1)
-        )
+        self.model = _build_torch_net(layer_sizes)
 
     def forward(self, x):
         return self.model(x)
@@ -245,24 +257,15 @@ class LitMLP(pl.LightningModule):
         return loss
 
     def configure_optimizers(self):
-        # optimizer = torch.optim.SGD(self.parameters(), **opt_params)
-        optimizer = torch.optim.Adam(self.parameters(), **opt_params)
+        optimizer = opt_class(self.parameters(), **opt_params)
         return optimizer
 
 
 lit_model = LitMLP()
 trainer = pl.Trainer(**trainer_params)
-# trainer = pl.Trainer(
-#     max_epochs=5000,
-#     # callbacks=pl.callbacks.EarlyStopping('train_loss', min_delta=0., patience=20),
-#     checkpoint_callback=False,
-#     logger=False,
-#     gpus=min(1, torch.cuda.device_count()),
-# )
 
 # _name = 'Lit MLP'
 _name = f"Lit MLP, {opt_params['weight_decay']} reg."
-# _name = f"Lit MLP, {trainer.max_epochs} ep., {opt_params['weight_decay']} reg."
 lit_predictor = LitWrapper(lit_model, trainer, space=model.space, name=_name)
 
 
@@ -297,7 +300,7 @@ file = 'docs/temp/temp.md'
 if file is not None:
     file = Path(file).open('a')
 
-y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=10,
+y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=1,
                                             stats=('mean', 'std'), plot_stats=True, print_loss=True,
                                             verbose=True, img_path='images/temp/', file=file)
 # y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=10, n_mc=10,

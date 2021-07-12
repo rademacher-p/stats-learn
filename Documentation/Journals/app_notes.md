@@ -4,7 +4,7 @@
 
 - Use smaller discrete spaces? Or use continuous space and **discretization**?
 
-- Need better NN architectures and optimizers to *ensure* overfitting!!
+- Need better NN architectures and optimizers to *maximize* overfitting!!
 
 - *Harder functions and data volumes for pop learners to learn*
   - Random discrete functions
