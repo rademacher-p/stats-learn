@@ -482,10 +482,10 @@ class Continuous(Base):
         return {'x0': np.zeros(self.shape), 'bounds': None, 'constraints': ()}
 
     def _minimize(self, f):  # TODO: add `brute` method option?
-        kwargs = self.optimize_kwargs.copy()
-        x0 = kwargs.pop('x0')
 
         # FIXME: add stepsize dependence on lims
+        kwargs = self.optimize_kwargs.copy()
+        x0 = kwargs.pop('x0')
         return optimize.basinhopping(f, x0, niter=100, T=1., stepsize=4., minimizer_kwargs=kwargs).x.reshape(self.shape)
 
         # if self.ndim == 0:
