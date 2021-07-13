@@ -560,8 +560,8 @@ The relevant posteriors can be represented as
 and
 \begin{IEEEeqnarray}{rCl}
 \prm_{\upthetac | \Yrm,\Xrm,\xrm}(\thetac | Y,X,x) & = &  
-\frac{\Erm_{\upthetam | \upthetac}\left[ \Prm_{\Xrm,\xrm | \upthetam}(X,x | \upthetam) \right](\thetac)}{\Prm_{\Xrm,\xrm}(X,x)} \frac{\Prm_{\Yrm | \Xrm,\upthetac}(Y | X,\thetac)}{\Prm_{\Yrm | \Xrm,\xrm}(Y | X,x)} \prm_{\upthetac}(\thetac) 
-\end{IEEEeqnarray}
+\frac{\Erm_{\upthetam | \upthetac}\left[ \Prm_{\Xrm,\xrm | \upthetam}(X,x | \upthetam) \right](\thetac)}{\Prm_{\Xrm,\xrm}(X,x)} \frac{\Prm_{\Yrm | \Xrm,\upthetac}(Y | X,\thetac)}{\Prm_{\Yrm | \Xrm,\xrm}(Y | X,x)} \prm_{\upthetac}(\thetac)\nonumber\\
+\end{IEEEeqnarray} 
 %\begin{IEEEeqnarray}{rCl}
 %\prm_{\upthetac,\upthetam | \Yrm,\Xrm,\xrm}(\thetac,\thetam | Y,X,x) & = & \frac{\Prm_{\Yrm | \Xrm,\upthetac}(Y | X,\thetac)}{\Prm_{\Yrm | \Xrm,\xrm}(Y | X,x)} 
 %\frac{\Prm_{\Xrm,\xrm | \upthetam}(X,x | \thetam)}{\Prm_{\Xrm,\xrm}(X,x)} \prm_{\upthetac,\upthetam}(\thetac,\thetam) \\
@@ -601,7 +601,7 @@ and
 %\prm_{\upthetac,\upthetam | \uppsic,\uppsim,\xrm}(\thetac,\thetam | \psic,\psim,x) & = & \frac{\Prm_{\uppsic | \uppsim,\upthetac}\big( \psic | \psim,\thetac \big)}{\Prm_{\uppsic | \uppsim,\xrm}\big( \psic | \psim,x \big)} 
 %\frac{\Prm_{\uppsim,\xrm | \upthetam}\big( \psim,x | \thetam \big)}{\Prm_{\uppsim,\xrm}\big( \psim,x \big)} \prm_{\upthetac,\upthetam}(\thetac,\thetam) \nonumber \\
 %& = & \prm_{\upthetac | \uppsic,\uppsim}\Big( \thetac | \psic,\psim \Big) \prm_{\upthetam | \uppsim,\xrm}\Big( \thetam | \psim,x \Big) \nonumber \\
-%&& \quad \frac{\Prm_{\uppsic | \uppsim}\big( \psic | \psim \big)}{\Prm_{\uppsic | \uppsim,\xrm}\big( \psic | \psim,x \big)} \frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \uppsim}\big( \thetac | \psim \big)} 
+%&& \qquad \frac{\Prm_{\uppsic | \uppsim}\big( \psic | \psim \big)}{\Prm_{\uppsic | \uppsim,\xrm}\big( \psic | \psim,x \big)} \frac{\prm_{\upthetac | \upthetam}(\thetac | \thetam)}{\prm_{\upthetac | \uppsim}\big( \thetac | \psim \big)} 
 %\end{IEEEeqnarray}
 where $\Prm_{\uppsic | \uppsim} = \Erm_{\upthetam | \uppsim} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\uppsic | \uppsim,\upthetac} \big] \Big]$ and $\Prm_{\uppsic | \uppsim,\xrm} = \Erm_{\upthetam | \uppsim,\xrm} \Big[ \Erm_{\upthetac | \upthetam} \big[ \Prm_{\uppsic | \uppsim,\upthetac} \big] \Big]$.
 
@@ -1368,7 +1368,7 @@ For a given $\xrm$, the expected value of the estimate conditioned on the true m
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_dist_avg_dir}
 \Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] 
 & = & \Erm_{\uppsim | \upthetam} \big[\gammam(\xrm; \uppsim)\big] \alphac(\xrm) \nonumber \\
-&& \quad + \Erm_{\uppsim | \upthetam} \big[1 - \gammam(\xrm; \uppsim)\big] \upthetac(\xrm) \;,
+&& + \Erm_{\uppsim | \upthetam} \big[1 - \gammam(\xrm; \uppsim)\big] \upthetac(\xrm) \;,
 \end{IEEEeqnarray}
 where the properties of an Empirical distribution (\cref{app:emp}) conditioned on its aggregation have been used. The result is a convex combination of the conditional data-independent distribution $\alphac(\xrm)$ and the true conditional distribution $\upthetac(\xrm)$. Substituting into \eqref{eq:predictive_bias}, the expected bias is
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias_dir}
@@ -1880,7 +1880,7 @@ Consider how the excess risk tends as the priors become maximally concentrated. 
 Conversely, if concentrations $\bar{\alpha}_0(x) \to 0$ are chosen, the Bayesian estimate tends to the empirical mean, independent of $\alphac$. Using the limits displayed in \cref{sec:predictive_est_dir}, it can be shown that the excess risk tends to
 \begin{IEEEeqnarray}{rCl}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) & \to & \Erm_{\xrm | \upthetam}\left[ \big( 1 - \upthetam(\xrm) \big)^N \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \right] \nonumber \\
-&& \quad + \Erm_{\xrm | \upthetam}\left[ \left( \sum_{n=1}^N \binom{N}{n} \upthetam(\xrm)^n \big( 1 - \upthetam(\xrm) \big)^{N-n} \frac{1}{n} \right) \Sigma_{\yrm | \xrm,\upthetac} \right] \nonumber \;.
+&&+ \Erm_{\xrm | \upthetam}\left[ \left( \sum_{n=1}^N \binom{N}{n} \upthetam(\xrm)^n \big( 1 - \upthetam(\xrm) \big)^{N-n} \frac{1}{n} \right) \Sigma_{\yrm | \xrm,\upthetac} \right] \nonumber \;.
 \end{IEEEeqnarray}
 Observe that the squared bias contributes to the sum for a given value $x$, proportionate to the probability that no training samples are observed matching this value.
 
@@ -2750,9 +2750,9 @@ Note that the marginal PDF's are $\prm_{\Xrm_n} = \prm_{\xrm} = \mu_{\upthetam} 
 %The PDF for $\Xrm$ is
 %\begin{IEEEeqnarray}{rCl}
 %\prm(X) & = & \int_{Y(1)} {\drm}Y(1) \ldots \int_{Y(N)} {\drm}Y(N) \frac{\alpha(Y(1),X(1))}{\alpha_0} \\
-%&& \quad \prod_{n=2}^N \frac{\alpha(Y_n,X_n) + \sum_{i=1}^{n-1} \delta(Y_n-Y(i)) \delta(X_n-X(i))}{\alpha_0+n-1} \\
+%&& \prod_{n=2}^N \frac{\alpha(Y_n,X_n) + \sum_{i=1}^{n-1} \delta(Y_n-Y(i)) \delta(X_n-X(i))}{\alpha_0+n-1} \\
 %& = & \int_{Y(1)} {\drm}Y(1) \ldots \int_{Y(N-1)} {\drm}Y(N-1) \frac{\alpha(Y(1),X(1))}{\alpha_0} \\
-%&& \quad \prod_{n=2}^{N-1} \frac{\alpha(Y_n,X_n) + \sum_{i=1}^{n-1} \delta(Y_n-Y(i)) \delta(X_n-X(i))}{\alpha_0+n-1} \\
+%&& \prod_{n=2}^{N-1} \frac{\alpha(Y_n,X_n) + \sum_{i=1}^{n-1} \delta(Y_n-Y(i)) \delta(X_n-X(i))}{\alpha_0+n-1} \\
 %&& \qquad \frac{\alpha'(X(N)) + \sum_{i=1}^{N-1} \delta(X(N)-X(i))}{\alpha_0+N-1} \\
 %& = & \ldots \\
 %& = & \frac{\alpha'(X(1))}{\alpha_0} \prod_{n=2}^N \frac{\alpha'(X_n) + \sum_{i=1}^{n-1} \delta(X_n-X(i))}{\alpha_0+n-1}
@@ -2763,7 +2763,7 @@ Note that the marginal PDF's are $\prm_{\Xrm_n} = \prm_{\xrm} = \mu_{\upthetam} 
 Using Bayes theorem,
 \begin{IEEEeqnarray}{rCl}
 \prm_{\Yrm | \Xrm}(Y | X) & = & \Erm_{\upthetac}\left[ \prod_{n=1}^N \upthetac\big( Y_n;X_n \big) \right] \\
-& = & \alphac\big( Y_1;X_1 \big) \prod_{n=2}^N \frac{\alpha_0 \alpham(X_n) \alphac\big( Y_n;X_n \big) + \sum_{i=1}^{n-1} \delta\big( Y_n-Y_i \big) \delta\big( X_n-X_i \big)}{\alpha_0 \alpham\big( X_n \big) + \sum_{i=1}^{n-1} \delta\big( X_n-X_i \big)} 
+& = & \alphac\big( Y_1;X_1 \big) \prod_{n=2}^N \frac{\alpha_0 \alpham(X_n) \alphac\big( Y_n;X_n \big) + \sum_{i=1}^{n-1} \delta\big( Y_n-Y_i \big) \delta\big( X_n-X_i \big)}{\alpha_0 \alpham\big( X_n \big) + \sum_{i=1}^{n-1} \delta\big( X_n-X_i \big)} \nonumber
 \end{IEEEeqnarray}
 
 
@@ -2794,7 +2794,7 @@ To determine the second order conditional distributions, first note that for $\X
 Combining, the second order distribution formula is
 \begin{IEEEeqnarray}{rCl}
 \prm_{\Yrm_n,\Yrm_{n'} | \Xrm_n,\Xrm_{n'}} & = & \frac{\delta(\Xrm_n-\Xrm_{n'})}{\alpha_0 \alpham(\Xrm_n) + \delta(\Xrm_n-\Xrm_{n'})} \diag\big(\alphac(\Xrm_n)\big) \nonumber \\
-&& \quad + \frac{\alpha_0 \alpham(\Xrm_n)}{\alpha_0 \alpham(\Xrm_n) + \delta(\Xrm_n-\Xrm_{n'})} \alphac(\Xrm_n) \otimes \alpha(\Xrm_{n'}) 
+&& + \frac{\alpha_0 \alpham(\Xrm_n)}{\alpha_0 \alpham(\Xrm_n) + \delta(\Xrm_n-\Xrm_{n'})} \alphac(\Xrm_n) \otimes \alpha(\Xrm_{n'}) 
 \end{IEEEeqnarray}
 %\begin{IEEEeqnarray}{L}
 %\Prm_{\Yrm_n,\Yrm_{n'} | \Xrm_n,\Xrm_{n'}} (y,y' | x,x') \\
@@ -2817,7 +2817,7 @@ The marginalized data can also be represented using the empirical transform. As 
 %and
 %\begin{IEEEeqnarray}{rCl}
 %\Erm_{\uppsi}\big[ \uppsi(y,x) \uppsi(y',x') \big] & = & \frac{\alpha_0^{-1} + N^{-1}}{1 + \alpha_0^{-1}} \alpha(y,x) \delta(y-y') \delta(x-x') \nonumber \\
-%&& \quad + \frac{1 - N^{-1}}{1 + \alpha_0^{-1}} \alpha(y,x) \alpha(y',x')
+%&& + \frac{1 - N^{-1}}{1 + \alpha_0^{-1}} \alpha(y,x) \alpha(y',x')
 %\end{IEEEeqnarray}
 %and covariance function
 %\begin{IEEEeqnarray}{rCl}
@@ -2901,7 +2901,7 @@ PGR: COPIED, incomplete
 \begin{IEEEeqnarray}{rCl}
 \Erm_{\yrm | \xrm,\Drm} \big[ \Lcal(h,\yrm) \big] & = & \int_{\Ycal} \Lcal(h,y) \prm_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) {\drm}y \\
 & = & \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)}\right) \int_{\Ycal} \alphac(y;\xrm) \Lcal(h,y) {\drm}y \nonumber \\
-&& \quad + \left(\frac{N \Psim(\xrm;\Xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)}\right) \int_{\Ycal} \Psic(y;\xrm;\Drm) \Lcal(h,y) {\drm}y \nonumber \\
+&& + \left(\frac{N \Psim(\xrm;\Xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)}\right) \int_{\Ycal} \Psic(y;\xrm;\Drm) \Lcal(h,y) {\drm}y \nonumber \\
 & = & \gammam(\xrm; \Xrm) \Erm_{\yrm | \xrm}\big[ \Lcal(h,\yrm) \big] + \big(1 - \gammam(\xrm; \Xrm)\big) \frac{\sum_{n=1}^N \delta\big[\xrm, \Xrm_n\big] \Lcal\big( h,\Yrm_n \big)}{\sum_{n=1}^N \delta\big[\xrm, \Xrm_n\big]} \nonumber \;.
 \end{IEEEeqnarray}
 
@@ -2920,7 +2920,7 @@ The optimal function is the expected value of the output conditional PDF,
 \begin{IEEEeqnarray}{rCl}
 f^*(\xrm;\Drm) & = & \mu_{\yrm | \xrm,\Drm}  = \Erm_{\uptheta | \xrm,\Drm} \left[ \mu_{\yrm | \xrm,\uptheta} \right] \\
 & = & \left( \frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)} \right) \int_{\Ycal} y \alphac(y;\xrm) {\drm}y \nonumber \\
-&& \quad + \left( \frac{N \Psim(\xrm;\Xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)} \right) \int_{\Ycal} y \Psic(y;\xrm;\Drm) {\drm}y \nonumber \\
+&& + \left( \frac{N \Psim(\xrm;\Xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)} \right) \int_{\Ycal} y \Psic(y;\xrm;\Drm) {\drm}y \nonumber \\
 & = & \gammam(\xrm; \Xrm) \mu_{\yrm | \xrm} + \big(1 - \gammam(\xrm; \Xrm)\big) \frac{\sum_{n=1}^N \delta\big[\xrm, \Xrm_n\big] \Yrm_n}{\sum_{n=1}^N \delta\big[\xrm, \Xrm_n\big]} \nonumber \;.
 \end{IEEEeqnarray}
 
@@ -3298,14 +3298,14 @@ In terms of the transformed observation $\trm$, the expected value of the estima
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_dist_avg_dir_disc}
 \Erm_{\uppsimd,\uppsicd | \upthetam,\upthetac}\big[ \prm_{\yrm | \trm,\uppsimd,\uppsicd} \big] 
 & = & \Erm_{\uppsimd | \upthetamd}\big[\gammamd(\trm; \uppsimd)\big] \alphac(\trm) \\
-&& \quad + \Big(1 - \Erm_{\uppsimd | \upthetamd} \big[\gammamd(\trm; \uppsimd)\big]\Big) \upthetacd(\trm) \nonumber \;.
+&& + \Big(1 - \Erm_{\uppsimd | \upthetamd} \big[\gammamd(\trm; \uppsimd)\big]\Big) \upthetacd(\trm) \nonumber \;.
 \end{IEEEeqnarray}
 Comparing to \eqref{eq:predictive_dist_avg_dir}, observe that the mixture distribution no longer includes the true predictive distribution $\upthetac$, but rather the discretized $\upthetacd$. 
 
 Using the equivalence $\prm_{\yrm | \xrm,\uppsimd,\uppsicd} = \prm_{\yrm | \trm, \uppsimd, \uppsicd}\big(T(\xrm), \uppsimd,\uppsicd \big)$ and substituting into \eqref{eq:predictive_bias}, the expected bias is
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias_dir_disc}	
 \mathrm{Bias}(\xrm; \upthetam,\upthetac) & = & \Erm_{\uppsimd | \upthetamd} \Big[\gammamd\big(T(\xrm); \uppsimd\big)\Big] \Big( \alphac\big(T(\xrm)\big) - \upthetacd\big(T(\xrm)\big) \Big) \nonumber \\
-&& \quad + \Big(\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big) \;.
+&& + \Big(\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big) \;.
 \end{IEEEeqnarray}
 While similar in form to \eqref{eq:predictive_bias_dir}, observe that the bias includes an additional term that quantifies a ``discretization bias''. Since the discretized conditional empirical function $\uppsic(t)$ integrates all training samples falling in the subset $\Xcal'(t) \subset \Xcal$, its expected value integrates the true predictive distributions $\upthetac(x)$ in the same region.
 
@@ -3359,9 +3359,9 @@ Evidently, the choice of how heavy a discretization to use effects its own trade
 \begin{IEEEeqnarray}{rCl}
 \Erm_{\yrm | \xrm,\Drm} \big[ \Lcal(h,\yrm) \big] & = & \int_{\Ycal} \Lcal(h,y) \prm_{\yrm | \xrm,\Drm}(y | \xrm,\Drm) {\drm}y \\
 & = & \gammamd\big(T(\xrm); \Xrm\big) \int_{\Ycal} \alphac\big(y; T(\xrm)\big) \Lcal(h,y) {\drm}y \nonumber \\
-&& \quad + \Big(1 - \gammamd\big(T(\xrm); \Xrm\big)\Big) \int_{\Ycal} \Psicd\big(y; T(\xrm); \Drm\big) \Lcal(h,y) {\drm}y \nonumber \\
+&& + \Big(1 - \gammamd\big(T(\xrm); \Xrm\big)\Big) \int_{\Ycal} \Psicd\big(y; T(\xrm); \Drm\big) \Lcal(h,y) {\drm}y \nonumber \\
 & = & \gammamd\big(T(\xrm); \Xrm\big) \Erm_{\yrm | \xrm}\big[ \Lcal(h, \yrm) \big] \nonumber \\
-&& \quad + \Big(1 - \gammamd\big(T(\xrm); \Xrm\big)\Big) \frac{\sum_{n=1}^N \delta\big[T(\xrm), T(\Xrm_n)\big] \Lcal\big(h, \Yrm_n \big)}{\sum_{n=1}^N \delta\big[T(\xrm), T(\Xrm_n)\big]} \nonumber \;.
+&& + \Big(1 - \gammamd\big(T(\xrm); \Xrm\big)\Big) \frac{\sum_{n=1}^N \delta\big[T(\xrm), T(\Xrm_n)\big] \Lcal\big(h, \Yrm_n \big)}{\sum_{n=1}^N \delta\big[T(\xrm), T(\Xrm_n)\big]} \nonumber \;.
 \end{IEEEeqnarray}
 
 \todomid{Above requires low-dim prior definition}
@@ -3401,13 +3401,13 @@ PGR
 The effects of discretization on the squared error will be analyzed next. Using the second moments of the random process $\Delta(\xrm; \Drm,\upthetac)$ formulated in \eqref{eq:predictive_del_sq_dir_disc}, the excess squared error is formulated as
 \begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex_disc}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \nonumber \\
-\quad \equiv \int_{\Ycal} y \int_{\Ycal} y' \Erm_{\xrm,\Drm | \upthetam,\upthetac} \Big[ \Delta(y; \xrm; \Drm,\upthetac) \Delta(y'; \xrm; \Drm,\upthetac) \Big] {\drm}y {\drm}y' \nonumber \\
-\quad \equiv \Erm_{\trm | \upthetam}\Big[ \Erm_{\uppsimd | \upthetamd}\big[ \gammamd(\trm; \uppsimd)^2 \big] \big( \mu_{\yrm | \xrm}(\trm) - \Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \big)^2 \Big] \nonumber \\
-\qquad + \Erm_{\trm | \upthetam}\left[ \Erm_{\uppsimd | \upthetamd}\left[ \frac{\big(1 - \gammamd(\trm; \uppsimd)\big)^2}{N \uppsimd(\trm)} \right] \big( \Erm_{\xrm | \trm, \upthetam}[\Sigma_{\yrm | \xrm,\upthetac}] + \Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \big) \right] \nonumber \\
-\qquad + \Erm_{\trm | \upthetam}\big[ \Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \big] \nonumber \\
-\quad \equiv \Erm_{\trm | \upthetam}\Big[ \Erm_{\uppsimd | \upthetamd}\big[ \gammamd(\trm; \uppsimd)^2 \big] \big( \mu_{\yrm | \xrm}(\trm) - \Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \big)^2 \Big] \nonumber \\
-\qquad + \Erm_{\trm | \upthetam}\left[ \Erm_{\uppsimd | \upthetamd}\left[ \frac{\big(1 - \gammamd(\trm; \uppsimd)\big)^2}{N \uppsimd(\trm)} \right] \Erm_{\xrm | \trm, \upthetam}[\Sigma_{\yrm | \xrm,\upthetac}] \right] \nonumber \\
-\qquad + \Erm_{\trm | \upthetam}\left[ \left( 1 + \Erm_{\uppsimd | \upthetamd}\left[ \frac{\big(1 - \gammamd(\trm; \uppsimd)\big)^2}{N \uppsimd(\trm)} \right] \right) \Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \right] \;,
+\qquad \equiv \int_{\Ycal} y \int_{\Ycal} y' \Erm_{\xrm,\Drm | \upthetam,\upthetac} \Big[ \Delta(y; \xrm; \Drm,\upthetac) \Delta(y'; \xrm; \Drm,\upthetac) \Big] {\drm}y {\drm}y' \nonumber \\
+\qquad \equiv \Erm_{\trm | \upthetam}\Big[ \Erm_{\uppsimd | \upthetamd}\big[ \gammamd(\trm; \uppsimd)^2 \big] \big( \mu_{\yrm | \xrm}(\trm) - \Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \big)^2 \Big] \nonumber \\
+\qquad \quad + \Erm_{\trm | \upthetam}\left[ \Erm_{\uppsimd | \upthetamd}\left[ \frac{\big(1 - \gammamd(\trm; \uppsimd)\big)^2}{N \uppsimd(\trm)} \right] \big( \Erm_{\xrm | \trm, \upthetam}[\Sigma_{\yrm | \xrm,\upthetac}] + \Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \big) \right] \nonumber \\
+\qquad \quad + \Erm_{\trm | \upthetam}\big[ \Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \big] \nonumber \\
+\qquad \equiv \Erm_{\trm | \upthetam}\Big[ \Erm_{\uppsimd | \upthetamd}\big[ \gammamd(\trm; \uppsimd)^2 \big] \big( \mu_{\yrm | \xrm}(\trm) - \Erm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \big)^2 \Big] \nonumber \\
+\qquad \quad + \Erm_{\trm | \upthetam}\left[ \Erm_{\uppsimd | \upthetamd}\left[ \frac{\big(1 - \gammamd(\trm; \uppsimd)\big)^2}{N \uppsimd(\trm)} \right] \Erm_{\xrm | \trm, \upthetam}[\Sigma_{\yrm | \xrm,\upthetac}] \right] \nonumber \\
+\qquad \quad + \Erm_{\trm | \upthetam}\left[ \left( 1 + \Erm_{\uppsimd | \upthetamd}\left[ \frac{\big(1 - \gammamd(\trm; \uppsimd)\big)^2}{N \uppsimd(\trm)} \right] \right) \Crm_{\xrm | \trm, \upthetam}[\mu_{\yrm | \xrm,\upthetac}] \right] \;,
 \end{IEEEeqnarray}
 a weighted summation of three terms, each of which can be viewed as second-order in terms of $y$. Note that the expectations over the observations space are performed using the operator equivalence $\Erm_{\xrm | \upthetam} \equiv \Erm_{\trm | \upthetam} \Erm_{\xrm | \trm, \upthetam}$, allowing select terms in \eqref{eq:predictive_del_sq_dir_disc} to be evaluated strictly in terms of the transformed observation $\trm$. The representation $\upthetacd(\trm) = \Erm_{\xrm | \trm, \upthetam}\big[ \upthetac(\xrm) \big] = \Erm_{\xrm | \trm, \upthetam}[\prm_{\yrm | \xrm,\upthetac}]$ is used throughout.
 
@@ -3772,7 +3772,7 @@ Thus, when conditioned on the aggregation $\uppsim$, the individual functions $\
 %%\Prm(\uppsi | \uppsim) & = & \frac{\Prm(\uppsi)}{\Prm(\uppsim)} \Prm(\uppsim | \uppsi) \\ 
 %%& = & \frac{\Mcal(\uppsi) \beta(\alpha_0 \alpha)^{-1} \beta(\alpha+\uppsi)}{\Mcal(\uppsim) \beta(\alpha_0 \alpham)^{-1} \beta(\alpha'+\uppsim)} \prod_{z \in \Zcal} \delta\left[ \uppsim(z),\sum_{y \in \Scal_z} \uppsi(y) \right] \nonumber \\
 %%& = & \left( \prod_{z \in \Zcal} \frac{\Gamma\big( \alpham(z)+\uppsim(z) \big)}{\uppsim(z)! \ \Gamma\big( \alpham(z) \big)} \right)^{-1} \left( \prod_{y \in \Ycal} \frac{\Gamma\big( \alpha(y)+\uppsi(y) \big)}{\uppsi(y)! \ \Gamma\big( \alpha_0 \alpha(y) \big)} \right) \nonumber \\
-%%&& \quad \prod_{z \in \Zcal} \delta\left[ \uppsim(z),\sum_{y \in \Scal_z} \uppsi(y) \right] \nonumber \\
+%%&& \prod_{z \in \Zcal} \delta\left[ \uppsim(z),\sum_{y \in \Scal_z} \uppsi(y) \right] \nonumber \\
 %%& = & \prod_{z \in \Zcal} \left[ \delta\left[ \uppsim(z),\sum_{y \in \Scal_z} \uppsi(y) \right] \frac{\uppsim(z)! \ \Gamma\big( \alpham(z) \big)}{\Gamma\big( \alpham(z)+\uppsim(z) \big)} \prod_{y \in \Scal_z} \frac{\Gamma\big( \alpha(y)+\uppsi(y) \big)}{\uppsi(y)! \ \Gamma\big( \alpha_0 \alpha(y) \big)} \right] \nonumber \\
 %%& = & \prod_{z \in \Zcal} \DM\Big( \big\{ \uppsi(y) : y \in \Scal_z \big\} ; \uppsim(z), \big\{ \alpha(y) : y \in \Scal_z \big\} \Big) \nonumber \;,
 %%\end{IEEEeqnarray}
@@ -3821,9 +3821,9 @@ Additionally, when further conditioned on the aggregation $\uppsim$, the normali
 %\begin{IEEEeqnarray}{rCl}
 %\Erm_{\uppsi | \uptheta}\big[ \uppsi(y) \uppsi(y') \big] & = & N^{-2} \sum_{n=1}^N \sum_{n'=1}^N \Erm_{\Drm | \uptheta}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_{n'} \big) \Big] \nonumber \\
 %& = & N^{-2} \sum_n \Erm_{\Drm_n | \uptheta}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_n \big) \Big] \nonumber \\
-%&& \quad + N^{-2} \sum_{n \neq n'} \Erm_{\Drm_n | \uptheta}\Big[ \delta\big( y-\Drm_n \big) \Big] \Erm_{\Drm_{n'} | \uptheta}\Big[ \delta\big( y'-\Drm_{n'} \big) \Big] \nonumber \\
+%&& + N^{-2} \sum_{n \neq n'} \Erm_{\Drm_n | \uptheta}\Big[ \delta\big( y-\Drm_n \big) \Big] \Erm_{\Drm_{n'} | \uptheta}\Big[ \delta\big( y'-\Drm_{n'} \big) \Big] \nonumber \\
 %& = & N^{-2} \sum_n \int_{\Ycal} \uptheta(\tilde{y}) \delta(y-\tilde{y}) \delta(y'-\tilde{y}) {\drm}\tilde{y}  \nonumber \\
-%&& \quad + N^{-2} \sum_{n \neq n'} \int_{\Ycal} \uptheta(\tilde{y}) \delta(y-\tilde{y}) {\drm}\tilde{y} \int_{\Ycal} \uptheta(\tilde{y}') \delta(y'-\tilde{y}') {\drm}\tilde{y}' \nonumber \\
+%&& + N^{-2} \sum_{n \neq n'} \int_{\Ycal} \uptheta(\tilde{y}) \delta(y-\tilde{y}) {\drm}\tilde{y} \int_{\Ycal} \uptheta(\tilde{y}') \delta(y'-\tilde{y}') {\drm}\tilde{y}' \nonumber \\
 %& = & \frac{1}{N} \uptheta(y) \delta(y-y') + \left(1-\frac{1}{N}\right) \uptheta(y) \uptheta(y') \;.
 %\end{IEEEeqnarray}
 
@@ -3999,9 +3999,9 @@ Also, when conditioned on the aggregation $\uppsim$, the normalized functions $\
 %%\begin{IEEEeqnarray}{rCl}
 %%\Erm_{\uppsi}\big[ \uppsi(y) \uppsi(y') \big] & = & N^{-2} \sum_{n=1}^N \sum_{n'=1}^N \Erm_{\Drm_n,\Drm_{n'}}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_{n'} \big) \Big] \nonumber \\
 %%& = & N^{-2} \sum_n \Erm_{\Drm_n}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_n \big) \Big] \nonumber \\
-%%&& \quad + N^{-2} \sum_{n \neq n'} \Erm_{\Drm_n,\Drm_{n'}}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_{n'} \big) \Big] \nonumber \\
+%%&& + N^{-2} \sum_{n \neq n'} \Erm_{\Drm_n,\Drm_{n'}}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_{n'} \big) \Big] \nonumber \\
 %%& = & N^{-2} \sum_n \int_{\Ycal} \frac{\alpha(\tilde{y})}{\alpha_0} \delta(y-\tilde{y}) \delta(y'-\tilde{y}) \nonumber \\
-%%&& \quad + N^{-2} \sum_{n \neq n'} \int_{\Ycal} \int_{\Ycal} \frac{\alpha(\tilde{y}) \alpha(\tilde{y}') + \alpha(\tilde{y}) \delta(\tilde{y}-\tilde{y}')}{\alpha_0 (\alpha_0+1)} \delta(y-\tilde{y}) \delta(y-\tilde{y}') \nonumber \\
+%%&& + N^{-2} \sum_{n \neq n'} \int_{\Ycal} \int_{\Ycal} \frac{\alpha(\tilde{y}) \alpha(\tilde{y}') + \alpha(\tilde{y}) \delta(\tilde{y}-\tilde{y}')}{\alpha_0 (\alpha_0+1)} \delta(y-\tilde{y}) \delta(y-\tilde{y}') \nonumber \\
 %%& = & N \frac{\alpha(y)}{\alpha_0} \delta(y-y') + N(N-1) \frac{\alpha(y) \alpha(y') + \alpha(y) \delta(y-y')}{\alpha_0 (\alpha_0+1)} \nonumber \\
 %%& = & \frac{N}{\alpha_0 (\alpha_0+1)} \big[ (N-1)\alpha(y) \alpha(y') + (\alpha_0+N) \alpha(y) \delta(y-y') \big] \nonumber \;.
 %%\end{IEEEeqnarray}
@@ -4110,9 +4110,9 @@ Additionally, when conditioned on the aggregation $\uppsim$, the normalized func
 %\Erm_{\uppsi}\big[ \uppsi(y) \uppsi(y') \big] & = & \sum_{n=1}^N \Erm_{\Drm_n}\Big[\delta\big( y-\Drm_n \big) \Big] \\
 %& = & \sum_{n=1}^N \sum_{n'=1}^N \Erm_{\Drm_n,\Drm_{n'}}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y-\Drm_{n'} \big) \Big] \nonumber \\
 %& = & \sum_n \Erm_{\Drm_n}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_n \big) \Big] + \nonumber \\
-%&& \quad \sum_{n \neq n'} \Erm_{\Drm_n,\Drm_{n'}}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_{n'} \big) \Big] \nonumber \\
+%&& \sum_{n \neq n'} \Erm_{\Drm_n,\Drm_{n'}}\Big[ \delta\big( y-\Drm_n \big) \delta\big( y'-\Drm_{n'} \big) \Big] \nonumber \\
 %& = & \sum_n \int_{\Ycal} \frac{\alpha(\tilde{y})}{\alpha_0} \delta(y-\tilde{y}) \delta(y'-\tilde{y}) + \nonumber \\
-%&& \quad \sum_{n \neq n'} \int_{\Ycal} \int_{\Ycal} \frac{\alpha(\tilde{y}) \alpha(\tilde{y}') + \alpha(\tilde{y}) \delta(\tilde{y}-\tilde{y}')}{\alpha_0 (\alpha_0+1)} \delta(y-\tilde{y}) \delta(y-\tilde{y}') \nonumber \\
+%&& \sum_{n \neq n'} \int_{\Ycal} \int_{\Ycal} \frac{\alpha(\tilde{y}) \alpha(\tilde{y}') + \alpha(\tilde{y}) \delta(\tilde{y}-\tilde{y}')}{\alpha_0 (\alpha_0+1)} \delta(y-\tilde{y}) \delta(y-\tilde{y}') \nonumber \\
 %& = & N \frac{\alpha(y)}{\alpha_0} \delta(y-y') + N(N-1) \frac{\alpha(y) \alpha(y') + \alpha(y) \delta(y-y')}{\alpha_0 (\alpha_0+1)} \nonumber \\
 %& = & \frac{N}{\alpha_0 (\alpha_0+1)} \big[ (N-1)\alpha(y) \alpha(y') + (\alpha_0+N) \alpha(y) \delta(y-y') \big] \nonumber \;.
 %\end{IEEEeqnarray}
@@ -4290,7 +4290,7 @@ It can be further shown that the Bayesian predictive distribution is also Normal
 %\begin{IEEEeqnarray}{rCl}
 %F_{\uppsi_{\mathrm{max}}}(n) & = & \Prm\left( \uppsi_{\mathrm{max}} \leq n \right) \\
 %& = & \binom{N+M-1}{M-1}^{-1} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} \\
-%&& \quad \binom{m(n+1)-N-1}{M-1} U\left(n+1-\frac{N+M}{m}\right) \;,
+%&& \binom{m(n+1)-N-1}{M-1} U\left(n+1-\frac{N+M}{m}\right) \;,
 %\end{IEEEeqnarray}
 %
 %has been found via simulation. Although an exhaustive demonstration of conformity between the provided expression and the numerically determined CMF values has not been performed, the CMF has been confirmed for a variety of values $N$ and $M$.
@@ -4307,9 +4307,9 @@ It can be further shown that the Bayesian predictive distribution is also Normal
 %
 %\begin{IEEEeqnarray}{rCl}
 %\lim_{N \to \infty} F_{\uppsi_{\mathrm{max}}}(n) & = & \lim_{N \to \infty} \binom{N+M-1}{M-1}^{-1} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} \\
-%&& \quad \binom{m(n+1)-N-1}{M-1} U\left(n+1-\frac{N+M}{m}\right) \\
+%&& \binom{m(n+1)-N-1}{M-1} U\left(n+1-\frac{N+M}{m}\right) \\
 %& = & \lim_{N \to \infty} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} U\left(\frac{n}{N}+\frac{1}{N}-\frac{1}{m}-\frac{M}{Nm}\right) \\
-%&& \quad \prod_{k=1}^M \frac{m(n+1)-N-k}{N+M-k} \\
+%&& \prod_{k=1}^M \frac{m(n+1)-N-k}{N+M-k} \\
 %& = & \lim_{N \to \infty} \sum_{m=1}^M \binom{M}{m} (-1)^{M-m} U\left( \frac{n}{N}-\frac{1}{m} \right) \left( \frac{mn}{N} - 1 \right)^{M-1} \\
 %\end{IEEEeqnarray}
 %
