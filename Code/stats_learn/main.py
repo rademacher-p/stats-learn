@@ -205,8 +205,8 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 #%% PyTorch
 
-# layer_sizes = [500]
-layer_sizes = [500, 500]
+layer_sizes = [500]
+# layer_sizes = [500, 500]
 
 # opt_class = torch.optim.SGD
 opt_class = torch.optim.Adam
@@ -281,7 +281,7 @@ n_train = 20
 # n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
-n_test = 1000
+n_test = 100
 
 n_mc = 100
 
@@ -313,7 +313,7 @@ if file is not None:
 
 d_train, d_test = model.rvs(n_train), model.rvs(n_test)
 ax = model.space['x'].make_axes()
-plot_fit_compare(predictors, d_train, d_test, params, ax)
+plot_fit_compare(predictors, d_train, d_test, params, img_path='images/temp/', file=file, ax=ax)
 ax.set_ylim((0, 1))
 
 
