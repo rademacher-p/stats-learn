@@ -17,7 +17,7 @@ from stats_learn.util.base import check_data_shape
 from stats_learn.util.base import NOW_STR
 
 
-def plot_fit_compare(predictors, d_train, d_test=(), params=None, ax=None):
+def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None, file=None,  ax=None):
     if params is None:
         params_full = [{} for _ in predictors]
     else:
@@ -67,12 +67,26 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, ax=None):
     else:
         ax.set(title=predictors[0].name)
 
+    # if do_loss:
+    #     _print_risk(predictors, params_full, [n_train], loss_full, file=None)
+
+    if file is not None:
+        print(f"\n# {NOW_STR}", file=file)
+
     if do_loss:
-        _print_risk(predictors, params_full, [n_train], loss_full, file=None)
+        _print_risk(predictors, params_full, [n_train], loss_full, file=file)
+
+    if img_path is not None:
+        img_path = Path(img_path)
+        img_file = img_path.joinpath(f"{NOW_STR}.png")
+        _save_current_fig(img_file)
+
+        if file is not None:
+            print(f"\n![]({img_file.absolute()})", file=file)
 
 
 def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
-                      plot_stats=False, plot_loss=False, print_loss=False, img_path=Path.cwd(), file=None, ax=None):
+                      plot_stats=False, plot_loss=False, print_loss=False, img_path=None, file=None, ax=None):
     """
 
     Parameters
@@ -254,19 +268,32 @@ def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=
         do_bayes = isinstance(model, bayes_models.Base)
         _plot_risk_eval_compare(loss_full, do_bayes, predictors, params_full, n_train, ax)
 
-    img_path = Path(img_path)
-    img_file = img_path.joinpath(f"{NOW_STR}.png")
+    if img_path is not None:
+        img_path = Path(img_path)
+        img_file = img_path.joinpath(f"{NOW_STR}.png")
+
+        _save_current_fig(img_file)
+        # mpl_file = img_file.parent / f"{img_file.stem}.mpl"
+        #
+        # fig = plt.gcf()
+        # fig.savefig(img_file)
+        # # with open(img_path.joinpath(f"{NOW_STR}.mpl"), 'wb') as fid:
+        # with open(mpl_file, 'wb') as fid:
+        #     pickle.dump(fig, fid)
+
+        if file is not None:
+            print(f"\n![]({img_file.absolute()})", file=file)
+
+    return y_stats_full, loss_full
+
+
+def _save_current_fig(img_file):
     mpl_file = img_file.parent / f"{img_file.stem}.mpl"
 
     fig = plt.gcf()
     fig.savefig(img_file)
-    # with open(img_path.joinpath(f"{NOW_STR}.mpl"), 'wb') as fid:
     with open(mpl_file, 'wb') as fid:
         pickle.dump(fig, fid)
-    if file is not None:
-        print(f"\n![]({img_file.absolute()})", file=file)
-
-    return y_stats_full, loss_full
 
 
 def predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=None, stats=('mode',), verbose=False):
