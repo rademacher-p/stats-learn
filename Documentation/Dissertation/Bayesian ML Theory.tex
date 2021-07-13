@@ -682,7 +682,7 @@ Defining the covariance of the Bayesian predictive distribution as
 the conditional second moments of $\Delta(\xrm; \Drm,\upthetac)$ can be readily shown to be
 \begin{IEEEeqnarray}{L} \label{eq:predictive_del_sq}
 \Erm_{\Drm | \upthetam,\upthetac} \Big[ \Delta(\xrm; \Drm,\upthetac) \otimes \Delta(\xrm; \Drm,\upthetac) \Big] \nonumber \\
-\quad = \mathrm{Bias}(\xrm; \upthetam,\upthetac) \otimes \mathrm{Bias}(\xrm; \upthetam,\upthetac) + \mathrm{Cov}(\xrm; \upthetam,\upthetac)
+\qquad = \mathrm{Bias}(\xrm; \upthetam,\upthetac) \otimes \mathrm{Bias}(\xrm; \upthetam,\upthetac) + \mathrm{Cov}(\xrm; \upthetam,\upthetac)
 \end{IEEEeqnarray}
 over the domain $\Ycal \times \Ycal$.
 
@@ -1377,22 +1377,22 @@ where the properties of an Empirical distribution (\cref{app:emp}) conditioned o
 and noting that
 \begin{IEEEeqnarray}{L}
 \Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \nonumber \\
-\quad = \Big( \gammam(\xrm; \uppsim) - \Erm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \Big) \big(\alphac(\xrm) - \upthetac(\xrm)\big) \nonumber \\
-\qquad + \big(1 - \gammam(\xrm; \uppsim)\big) \big(\uppsic(\xrm) - \upthetac(\xrm)\big) \;,
+\qquad = \Big( \gammam(\xrm; \uppsim) - \Erm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \Big) \big(\alphac(\xrm) - \upthetac(\xrm)\big) \nonumber \\
+\qquad \quad+ \big(1 - \gammam(\xrm; \uppsim)\big) \big(\uppsic(\xrm) - \upthetac(\xrm)\big) \;,
 \end{IEEEeqnarray}
 the covariance \eqref{eq:predictive_cov} of the estimate can be represented as
 \begin{IEEEeqnarray}{L} \label{eq:predictive_cov_dir}
 \mathrm{Cov}(\xrm;\upthetam,\upthetac) = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
-\quad = \Crm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
-\qquad + \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \nonumber \;.
+\qquad = \Crm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
+\qquad \quad+ \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \nonumber \;.
 \end{IEEEeqnarray}
 
 
 Substituting the estimator bias and variance into \eqref{eq:predictive_del_sq}, the conditional second moments of $\Delta(\xrm; \Drm,\upthetac)$ are
 \begin{IEEEeqnarray}{L} \label{eq:predictive_del_sq_dir}
 \Erm_{\Drm | \upthetam,\upthetac} \big[ \Delta(\xrm; \Drm,\upthetac) \otimes \Delta(\xrm; \Drm,\upthetac) \big] \\
-\quad \equiv \Erm_{\uppsim | \upthetam}\left[ \gammam(\xrm; \uppsim)^2 \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
-\qquad + \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \nonumber \;.
+\qquad \equiv \Erm_{\uppsim | \upthetam}\left[ \gammam(\xrm; \uppsim)^2 \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
+\qquad \quad+ \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \nonumber \;.
 \end{IEEEeqnarray}
 Note that the bias is proportionate to the difference between the true conditional model and the data-independent estimate, while the covariance also depends on $\Sigma_{\uppsic(x) | \uppsim(x), \upthetac(x)}$. 
 
@@ -1684,10 +1684,10 @@ The above formulation exploits the statistical characterization of the aggregati
 PGR: move to appendix???
 
 Finally, combine the two formulas to represent the mininum Bayes risk,
-\begin{IEEEeqnarray}{L} \label{eq:Risk_min_SE_dir}
-\Rcal^* = \Erm_{\xrm,\uppsi} \left[ \Erm_{\yrm | \xrm,\uppsi}[\yrm^2] - \mu_{\yrm | \xrm,\uppsi}^2 \right] \\
-= \Erm_{\xrm} \left[ \frac{\alpha_0 \big(\alpha_0 \alpham(\xrm) + N \alpham(\xrm) + 1 \big)}{\big( \alpha_0 \alpham(\xrm)+1 \big) (\alpha_0+N)} \Sigma_{\yrm | \xrm} \right] \nonumber \\
-= \Erm_{\xrm} \left[ \frac{\alpham(\xrm) + (\alpha_0+N)^{-1}}{\alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right] \nonumber \;.
+\begin{IEEEeqnarray}{rCl} \label{eq:Risk_min_SE_dir}
+\Rcal^*  & = & \Erm_{\xrm,\uppsi} \left[ \Erm_{\yrm | \xrm,\uppsi}[\yrm^2] - \mu_{\yrm | \xrm,\uppsi}^2 \right] \\
+& = & \Erm_{\xrm} \left[ \frac{\alpha_0 \big(\alpha_0 \alpham(\xrm) + N \alpham(\xrm) + 1 \big)}{\big( \alpha_0 \alpham(\xrm)+1 \big) (\alpha_0+N)} \Sigma_{\yrm | \xrm} \right] \nonumber \\
+& = & \Erm_{\xrm} \left[ \frac{\alpham(\xrm) + (\alpha_0+N)^{-1}}{\alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right] \nonumber \;.
 \end{IEEEeqnarray}
 The minimum Bayes squared error is the expected value of the scaled conditional variance with respect to $\Prm_{\yrm | \xrm} = \alphac(\xrm)$. The expectation is taken with respect to the prior marginal distribution $\Prm_{\xrm} = \alpham$. 
 
@@ -1806,9 +1806,9 @@ Having derived the optimal estimator based on a Dirichlet model prior, it is imp
 Substituting the second moments of $\Delta(\xrm; \Drm,\upthetac)$ \eqref{eq:predictive_del_sq_dir} into \eqref{eq:risk_cond_ex_SE_bayes}, the excess squared error can be represented as
 \begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \sum_{y \in \Ycal} y \sum_{y' \in \Ycal} y' \Erm_{\xrm,\Drm | \upthetam,\upthetac} \Big[ \Delta(y; \xrm; \Drm,\upthetac) \Delta(y'; \xrm; \Drm,\upthetac) \Big] \nonumber \\
-\quad = \Erm_{\xrm | \upthetam}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \Erm_{\uppsim | \upthetam}\left[ \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right)^2 \right] \right] \nonumber \\
+\qquad = \Erm_{\xrm | \upthetam}\left[ \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \Erm_{\uppsim | \upthetam}\left[ \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \uppsim(\xrm)}\right)^2 \right] \right] \nonumber \\
 \qquad \quad + \Erm_{\xrm | \upthetam}\left[ \Sigma_{\yrm | \xrm,\upthetac} \Erm_{\uppsim | \upthetam}\left[ \frac{N \uppsim(\xrm)}{\big( \alpha_0 \alpham(\xrm) + N \uppsim(\xrm) \big)^2} \right] \right] \nonumber \\
-\quad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim | \upthetam}\left[ \gammam(\xrm; \uppsim)^2 \right] \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \right] \nonumber \\
+\qquad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim | \upthetam}\left[ \gammam(\xrm; \uppsim)^2 \right] \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \right] \nonumber \\
 \qquad \quad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim\big)^2}{N \uppsim(\xrm)} \right]  \Sigma_{\yrm | \xrm,\upthetac} \right] \;.
 \end{IEEEeqnarray}
 
@@ -2213,7 +2213,7 @@ For $0 \leq n < N$, the cardinality is an alternating binomial summation where t
 The probability of interest can thus be expressed as
 \begin{IEEEeqnarray}{L}
 \Prm\big( \uppsi_{\max}(x) \geq n/N \big) = \binom{N+|\Ycal||\Xcal|-1}{|\Ycal||\Xcal|-1}^{-1} \big| \cup_{y \in \Ycal} \{ \psi : \psi(y,x) \geq n/N \} \big| \\
-\quad = \begin{cases} 1 & \mathrm{if} \ n < 0, \\ \sum_{m=1}^{|\Ycal|} \binom{|\Ycal|}{m} (-1)^{m-1} \prod_{l=1}^{|\Ycal||\Xcal|-1} \Big( 1-\frac{mn}{N+l} \Big) H\Big( \big\lfloor\frac{N}{m}\big\rfloor - n \Big) & \mathrm{if} \ 0 \leq n \leq N, \\ 0 & \mathrm{if} \ n > N. \end{cases} \nonumber
+\qquad = \begin{cases} 1 & \mathrm{if} \ n < 0, \\ \sum_{m=1}^{|\Ycal|} \binom{|\Ycal|}{m} (-1)^{m-1} \prod_{l=1}^{|\Ycal||\Xcal|-1} \Big( 1-\frac{mn}{N+l} \Big) H\Big( \big\lfloor\frac{N}{m}\big\rfloor - n \Big) & \mathrm{if} \ 0 \leq n \leq N, \\ 0 & \mathrm{if} \ n > N. \end{cases} \nonumber
 \end{IEEEeqnarray}
 
 
@@ -2788,8 +2788,8 @@ The first and second order conditional distributions are of specific interest. T
 To determine the second order conditional distributions, first note that for $\Xrm_n \neq \Xrm_{n'}$, $\prm_{\Yrm_n,\Yrm_{n'} | \Xrm_n,\Xrm_{n'}} = \mu_{\upthetac}(\Xrm_n) \otimes \mu_{\upthetac}(\Xrm_{n'}) = \alphac(\Xrm_n) \otimes \alphac(\Xrm_{n'})$. Conversely, if $\Xrm_n = \Xrm_{n'}$, then
 \begin{IEEEeqnarray}{L}
 \prm_{\Yrm_n,\Yrm_{n'} | \Xrm_n,\Xrm_{n'}} = \Erm_{\upthetac} \big[\upthetac(\Xrm_n) \otimes \upthetac(\Xrm_n)\big]  \\
-\quad = \frac{\diag\big(\alphac(\Xrm_n)\big) + \delta(0)^{-1} \alpha_0 \alpham(\Xrm_n) \alphac(\Xrm_n) \otimes \alpha(\Xrm_n)}{\delta(0)^{-1} \alpha_0 \alpham(\Xrm_n) + 1} \nonumber \\
-\quad = \frac{\delta(0)}{\alpha_0 \alpham(\Xrm_n) + \delta(0)} \diag\big(\alphac(\Xrm_n)\big) + \frac{\alpha_0 \alpham(\Xrm_n)}{\alpha_0 \alpham(\Xrm_n) + \delta(0)} \alphac(\Xrm_n) \otimes  \alpha(\Xrm_n) \nonumber \;.
+\qquad = \frac{\diag\big(\alphac(\Xrm_n)\big) + \delta(0)^{-1} \alpha_0 \alpham(\Xrm_n) \alphac(\Xrm_n) \otimes \alpha(\Xrm_n)}{\delta(0)^{-1} \alpha_0 \alpham(\Xrm_n) + 1} \nonumber \\
+\qquad = \frac{\delta(0)}{\alpha_0 \alpham(\Xrm_n) + \delta(0)} \diag\big(\alphac(\Xrm_n)\big) + \frac{\alpha_0 \alpham(\Xrm_n)}{\alpha_0 \alpham(\Xrm_n) + \delta(0)} \alphac(\Xrm_n) \otimes  \alpha(\Xrm_n) \nonumber \;.
 \end{IEEEeqnarray}
 Combining, the second order distribution formula is
 \begin{IEEEeqnarray}{rCl}
@@ -2843,16 +2843,16 @@ Observe that by the aggregation principle, $\uppsim \sim \DEP(N,\alpha_0,\alpham
 \section{Predictive Model Estimation} \label{sec:predictive_est_dir_cont}
 
 For continuous data spaces, the analysis of the Bayesian predictive distribution as an estimate of the true predictive distribution has some unique differences from the analysis put forth in \cref{sec:predictive_est_dir} for discrete sets. Redefine the difference function $\Delta(\xrm; \Drm,\upthetac) \equiv \prm_{\yrm | \xrm,\Drm} - \prm_{\yrm | \xrm,\upthetac} \in \Rbb^{\Ycal}$. Using the properties of the continuous-domain empirical process conditioned on its aggregation, the covariance function takes on the new form
-\begin{IEEEeqnarray}{L} \label{eq:predictive_cov_cont}
-\mathrm{Cov}(\xrm;\upthetam,\upthetac) = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
-\quad = \Crm_{\uppsim | \upthetam}\big[\gammam(\xrm; \uppsim)\big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
-\qquad + \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{\delta(0)^{-1} N \uppsim(\xrm)} \right] \big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \big) \nonumber
+\begin{IEEEeqnarray}{rCl} \label{eq:predictive_cov_cont}
+\mathrm{Cov}(\xrm;\upthetam,\upthetac) & = & \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \\
+& = & \Crm_{\uppsim | \upthetam}\big[\gammam(\xrm; \uppsim)\big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
+&& + \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{\delta(0)^{-1} N \uppsim(\xrm)} \right] \big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \big) \nonumber
 \end{IEEEeqnarray}
 and the expectation of the second moments of the difference function is thus
 \begin{IEEEeqnarray}{L} \label{eq:predictive_del_sq_dir_cont}
 \Erm_{\Drm | \upthetam,\upthetac} \Big[ \Delta(\xrm; \Drm,\upthetac) \otimes \Delta(\xrm; \Drm,\upthetac) \Big] \\
-\quad \equiv \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim)^2 \big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big)  \right] \nonumber \\
-\qquad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{\delta(0)^{-1} N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \right] \nonumber \;.
+\qquad \equiv \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim)^2 \big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big)  \right] \nonumber \\
+\qquad \quad+ \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{\delta(0)^{-1} N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \right] \nonumber \;.
 \end{IEEEeqnarray}
 Note that the dependency on the marginal empirical model can be expressed through the conditional number of samples $\delta(0)^{-1} N \uppsim(\xrm)$.
 
@@ -2939,7 +2939,7 @@ PGR: D PERSPECTIVE
 To evaluate the expectation directly using training samples $\Yrm$ and $\Xrm$, first note that  $\mu_{\Yrm_n | \Xrm} = \mu_{\yrm|\xrm}\big( \Xrm_n \big)$ and $\Erm_{\Yrm_n | \Xrm}\big[ \Yrm_n^2 \big] = \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \big( \Xrm_n \big)$, and that
 \begin{IEEEeqnarray}{L}
 \Erm_{\Yrm_n,\Yrm_{n'} | \Xrm}\big[ \Yrm_n \Yrm_{n'} \big] \\
-\quad = \frac{\alpha_0 \alpham\big( \Xrm_n \big) \mu_{\yrm|\xrm}\big( \Xrm_n ) \mu_{\yrm|\xrm}\big (\Xrm_{n'} \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \big( \Xrm_n \big) \delta\big( \Xrm_n - \Xrm_{n'} \big)}{\alpha_0 \alpham\big( \Xrm_n \big) + \delta\big( \Xrm_n - \Xrm_{n'} \big)} \nonumber \;.
+\qquad = \frac{\alpha_0 \alpham\big( \Xrm_n \big) \mu_{\yrm|\xrm}\big( \Xrm_n ) \mu_{\yrm|\xrm}\big (\Xrm_{n'} \big) + \Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \big( \Xrm_n \big) \delta\big( \Xrm_n - \Xrm_{n'} \big)}{\alpha_0 \alpham\big( \Xrm_n \big) + \delta\big( \Xrm_n - \Xrm_{n'} \big)} \nonumber \;.
 \end{IEEEeqnarray}
 
 Solving,
@@ -2987,14 +2987,14 @@ Evaluating the expectation over $\Xrm$,
 Plugging,
 \begin{IEEEeqnarray}{L}
 \Erm_{\xrm,\Drm} \Big[ \mu_{\yrm | \xrm,\Drm}^2 \Big] \\
-\quad = \Erm_{\xrm} \left[ \frac{\Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N + \mu_{\yrm | \xrm}^2 \alpha_0 \big( \alpha_0 \alpham(\xrm) + \delta(0) + N \alpham(\xrm) \big)}{ \big( \alpha_0 \alpham(\xrm) + \delta(0) \big) (\alpha_0+N)} \right] \nonumber \;.
+\qquad = \Erm_{\xrm} \left[ \frac{\Erm_{\yrm|\xrm}\big[ \yrm^2 \big] \delta(0) N + \mu_{\yrm | \xrm}^2 \alpha_0 \big( \alpha_0 \alpham(\xrm) + \delta(0) + N \alpham(\xrm) \big)}{ \big( \alpha_0 \alpham(\xrm) + \delta(0) \big) (\alpha_0+N)} \right] \nonumber \;.
 \end{IEEEeqnarray}
 
 Combining with the second moment produces the risk,
-\begin{IEEEeqnarray}{L}
-\Rcal^* = \Erm_{\xrm,\Drm} \Big[ \Erm_{\yrm | \xrm,\Drm}\big[ \yrm^2 \big] - \mu_{\yrm | \xrm,\Drm}^2 \Big] \\
-= \Erm_{\xrm} \left[ \frac{\alpha_0 \big( \alpha_0 \alpham(\xrm) + \delta(0) + N \alpham(\xrm) \big)}{(\alpha_0+N) \big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \Sigma_{\yrm | \xrm} \right] \nonumber \\
-= \Erm_{\xrm} \left[ \frac{\delta(0)^{-1} \alpham(\xrm) + (\alpha_0+N)^{-1}}{\delta(0)^{-1} \alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right] \nonumber \;.
+\begin{IEEEeqnarray}{rCl}
+\Rcal^* & = & \Erm_{\xrm,\Drm} \Big[ \Erm_{\yrm | \xrm,\Drm}\big[ \yrm^2 \big] - \mu_{\yrm | \xrm,\Drm}^2 \Big] \\
+& = & \Erm_{\xrm} \left[ \frac{\alpha_0 \big( \alpha_0 \alpham(\xrm) + \delta(0) + N \alpham(\xrm) \big)}{(\alpha_0+N) \big( \alpha_0 \alpham(\xrm)+\delta(0) \big)} \Sigma_{\yrm | \xrm} \right] \nonumber \\
+& = & \Erm_{\xrm} \left[ \frac{\delta(0)^{-1} \alpham(\xrm) + (\alpha_0+N)^{-1}}{\delta(0)^{-1} \alpham(\xrm) + \alpha_0^{-1}} \Sigma_{\yrm | \xrm} \right] \nonumber \;.
 \end{IEEEeqnarray}
 
 %\begin{IEEEeqnarray}{L}
@@ -3149,8 +3149,8 @@ Other notable difference from the discrete set results occur if $\alpham$ is bou
 Using the second moments of the random process $\Delta(\xrm; \Drm,\upthetac)$ formulated in \eqref{eq:predictive_del_sq_dir_cont}, the excess squared error is redefined as
 \begin{IEEEeqnarray}{L} \label{eq:risk_cond_SE_dir_ex_cont}
 \Rcal_{\Theta, \mathrm{ex}}(f^* ; \uptheta) = \Erm_{\xrm,\Drm | \uptheta} \Big[ \big( \mu_{\yrm | \xrm,\Drm} - \mu_{\yrm | \xrm,\uptheta} \big)^2 \Big] \\
-\quad \equiv \int_{\Ycal} y \int_{\Ycal} y' \Erm_{\xrm,\Drm | \upthetam,\upthetac} \Big[ \Delta(y; \xrm; \Drm,\upthetac) \Delta(y'; \xrm; \Drm,\upthetac) \Big] {\drm}y {\drm}y' \nonumber \\
-\quad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim)^2 \big] \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \right] \nonumber \\
+\qquad \equiv \int_{\Ycal} y \int_{\Ycal} y' \Erm_{\xrm,\Drm | \upthetam,\upthetac} \Big[ \Delta(y; \xrm; \Drm,\upthetac) \Delta(y'; \xrm; \Drm,\upthetac) \Big] {\drm}y {\drm}y' \nonumber \\
+\qquad = \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim)^2 \big] \left( \mu_{\yrm | \xrm} - \mu_{\yrm | \xrm,\upthetac} \right)^2 \right] \nonumber \\
 \qquad \quad + \Erm_{\xrm | \upthetam}\left[ \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{\delta(0)^{-1} N \uppsim(\xrm)} \right] \Sigma_{\yrm | \xrm,\upthetac} \right] \nonumber \;.
 \end{IEEEeqnarray}
 
@@ -3313,8 +3313,8 @@ While similar in form to \eqref{eq:predictive_bias_dir}, observe that the bias i
 Following a procedure similar to that employed in \cref{sec:predictive_est_dir}, the covariance of the estimate in terms of the transformed value $\trm$ is
 \begin{IEEEeqnarray}{L} \label{eq:predictive_cov_dir_disc}
 \Crm_{\uppsimd,\uppsicd | \upthetam,\upthetac} \big[\Prm_{\yrm | \trm,\uppsimd,\uppsicd} \big] \nonumber \\
-\quad = \Crm_{\uppsimd | \upthetamd}\big[ \gammamd(\trm; \uppsimd) \big] \big( \alphac(\trm) - \upthetacd(\trm) \big) \otimes \big( \alphac(\trm) - \upthetacd(\trm) \big) \nonumber \\
-\qquad + \Erm_{\uppsimd | \upthetamd}\left[ \frac{\big(1 - \gammamd(\trm; \uppsimd)\big)^2}{N \uppsimd(\trm)} \right] \Big( \diag\big(\upthetacd(\trm)\big) - \upthetacd(\trm) \otimes \upthetacd(\trm) \Big) 
+\qquad = \Crm_{\uppsimd | \upthetamd}\big[ \gammamd(\trm; \uppsimd) \big] \big( \alphac(\trm) - \upthetacd(\trm) \big) \otimes \big( \alphac(\trm) - \upthetacd(\trm) \big) \nonumber \\
+\qquad \quad + \Erm_{\uppsimd | \upthetamd}\left[ \frac{\big(1 - \gammamd(\trm; \uppsimd)\big)^2}{N \uppsimd(\trm)} \right] \Big( \diag\big(\upthetacd(\trm)\big) - \upthetacd(\trm) \otimes \upthetacd(\trm) \Big) 
 \end{IEEEeqnarray}
 and thus the covariance \eqref{eq:predictive_cov} can be represented as 
 \begin{IEEEeqnarray}{L} \label{eq:predictive_cov_dir_disc}
@@ -3324,11 +3324,11 @@ and thus the covariance \eqref{eq:predictive_cov} can be represented as
 Substituting the estimator bias and variance into \eqref{eq:predictive_del_sq}, the conditional second moments of $\Delta(\xrm; \Drm,\upthetac)$ are
 \begin{IEEEeqnarray}{L} \label{eq:predictive_del_sq_dir_disc}
 \Erm_{\Drm | \upthetam,\upthetac} \big[ \Delta(\xrm; \Drm,\upthetac) \otimes \Delta(\xrm; \Drm,\upthetac) \big] \nonumber \\
-\quad \equiv \Erm_{\uppsimd | \upthetamd}\Big[ \gammamd\big(T(\xrm); \uppsimd\big)^2 \Big] \Big( \alphac\big(T(\xrm)\big) - \upthetacd\big(T(\xrm)\big) \Big) \otimes \Big( \alphac\big(T(\xrm)\big) - \upthetacd\big(T(\xrm)\big) \Big) \nonumber \\
-\qquad + \Erm_{\uppsimd | \upthetamd}\left[ \frac{\Big(1 - \gammamd\big(T(\xrm); \uppsimd\big)\Big)^2}{N \uppsimd\big(T(\xrm)\big)} \right] \bigg( \diag\Big( \upthetacd\big(T(\xrm)\big) \Big) - \upthetacd\big(T(\xrm)\big) \otimes \upthetacd\big(T(\xrm)\big) \bigg) \nonumber \\
-\qquad + \Erm_{\uppsimd | \upthetamd}\Big[\gammamd\big(T(\xrm); \uppsimd\big)\Big] \Big( \alphac\big(T(\xrm)\big) - \upthetacd\big(T(\xrm)\big) \Big) \otimes \Big(\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big) \nonumber \\
-\qquad + \Erm_{\uppsimd | \upthetamd}\Big[\gammamd\big(T(\xrm); \uppsimd\big)\Big] \Big(\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big) \otimes \Big( \alphac\big(T(\xrm)\big) - \upthetacd\big(T(\xrm)\big) \Big) \nonumber \\
-\qquad + \Big(\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big) \otimes \Big(\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big) \;.
+\qquad \equiv \Erm_{\uppsimd | \upthetamd}\Big[ \gammamd\big(T(\xrm); \uppsimd\big)^2 \Big] \Big( \alphac\big(T(\xrm)\big) - \upthetacd\big(T(\xrm)\big) \Big) \otimes \Big( \alphac\big(T(\xrm)\big) - \upthetacd\big(T(\xrm)\big) \Big) \nonumber \\
+\qquad \quad+ \Erm_{\uppsimd | \upthetamd}\left[ \frac{\Big(1 - \gammamd\big(T(\xrm); \uppsimd\big)\Big)^2}{N \uppsimd\big(T(\xrm)\big)} \right] \bigg( \diag\Big( \upthetacd\big(T(\xrm)\big) \Big) - \upthetacd\big(T(\xrm)\big) \otimes \upthetacd\big(T(\xrm)\big) \bigg) \nonumber \\
+\qquad \quad+ \Erm_{\uppsimd | \upthetamd}\Big[\gammamd\big(T(\xrm); \uppsimd\big)\Big] \Big( \alphac\big(T(\xrm)\big) - \upthetacd\big(T(\xrm)\big) \Big) \otimes \Big(\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big) \nonumber \\
+\qquad \quad+ \Erm_{\uppsimd | \upthetamd}\Big[\gammamd\big(T(\xrm); \uppsimd\big)\Big] \Big(\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big) \otimes \Big( \alphac\big(T(\xrm)\big) - \upthetacd\big(T(\xrm)\big) \Big) \nonumber \\
+\qquad \quad + \Big(\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big) \otimes \Big(\upthetacd\big(T(\xrm)\big) - \upthetac(\xrm) \Big) \;.
 \end{IEEEeqnarray}
 Note that the first two terms are analogous to the two terms in  \eqref{eq:predictive_del_sq_dir}, with $T(\xrm)$ in place of $\xrm$ and the appropriate substitutions for the discretized functions; the remaining terms quantify additional deviation due to the discretization bias.
 
@@ -3861,7 +3861,7 @@ g(t_1,t_2) = \frac{1}{N} \left( \int_{-\infty}^{\min(y_1,y_2)} \theta(t_1) {\drm
 and, finally,
 \begin{IEEEeqnarray}{L}
 \Erm_{\uppsi}\big[ \uppsi(y_1)\uppsi(y_2) \big] = \frac{{\drm}^2}{{\drm}t_1 {\drm}t_2} g(t_1,t_2) \\
-\quad = \frac{{\drm}}{{\drm}t_2} \left[ \frac{1}{N} u(t_2-t_1) \theta\big( \min(t_1,t_2) \big) + \left(1-\frac{1}{N}\right) \theta(y_1) \left( \int_{-\infty}^{y_2} \theta(t_2) {\drm}t_2 \right) \right] \nonumber \\
+\qquad = \frac{{\drm}}{{\drm}t_2} \left[ \frac{1}{N} u(t_2-t_1) \theta\big( \min(t_1,t_2) \big) + \left(1-\frac{1}{N}\right) \theta(y_1) \left( \int_{-\infty}^{y_2} \theta(t_2) {\drm}t_2 \right) \right] \nonumber \\
 \quad = \frac{1}{N} \theta(y_1)\delta(y_1-y_2) + \left(1-\frac{1}{N}\right) \theta(y_1)\theta(y_2) \nonumber \;.
 \end{IEEEeqnarray}
 
@@ -3929,9 +3929,9 @@ First, assume $y_2 \geq y_1$ and define a new partition of $\Ycal$, $\big\{ (-\i
 Define the function
 \begin{IEEEeqnarray}{L}
 g(t_1,t_2) = \Erm_{\uptheta}\left[ \int_{-\infty}^{y_1} \uptheta(t_1) {\drm}t_1 \int_{-\infty}^{y_2} \uptheta(t_2) {\drm}t_2 \right] \\
-\quad = \Erm_{\uptheta}\left[ \left( \int_{-\infty}^{y_1} \uptheta(t_1) {\drm}t_1 \right)^2 + \left( \int_{-\infty}^{y_1} \uptheta(t_1) {\drm}t_1 \right) \left( \int_{y_1}^{y_2} \uptheta(t_2) {\drm}t_2 \right) \right] \nonumber \\
-\quad = \frac{\left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) \left( 1 + \alpha_0\int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) + \alpha_0 \left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) \left( \int_{y_1}^{y_2} \alpha(t_2) {\drm}t_2 \right)}{\alpha_0+1} \nonumber \\
-\quad = \frac{\left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) + \alpha_0 \left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) \left( \int_{-\infty}^{y_2} \alpha(t_2) {\drm}t_2 \right)}{\alpha_0+1} \quad \forall \ y_2 \geq y_1 \nonumber \;.
+\qquad = \Erm_{\uptheta}\left[ \left( \int_{-\infty}^{y_1} \uptheta(t_1) {\drm}t_1 \right)^2 + \left( \int_{-\infty}^{y_1} \uptheta(t_1) {\drm}t_1 \right) \left( \int_{y_1}^{y_2} \uptheta(t_2) {\drm}t_2 \right) \right] \nonumber \\
+\qquad = \frac{\left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) \left( 1 + \alpha_0\int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) + \alpha_0 \left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) \left( \int_{y_1}^{y_2} \alpha(t_2) {\drm}t_2 \right)}{\alpha_0+1} \nonumber \\
+\qquad = \frac{\left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) + \alpha_0 \left( \int_{-\infty}^{y_1} \alpha(t_1) {\drm}t_1 \right) \left( \int_{-\infty}^{y_2} \alpha(t_2) {\drm}t_2 \right)}{\alpha_0+1} \quad \forall \ y_2 \geq y_1 \nonumber \;.
 \end{IEEEeqnarray}
 Following the same steps provides the values of $g$ for $t_2 \leq t_1$; the combined formula can be given as
 \begin{IEEEeqnarray}{L}
@@ -3940,8 +3940,8 @@ g(t_1,t_2) = \frac{\left( \int_{-\infty}^{\min(y_1,y_2)} \alpha(t_1) {\drm}t_1 \
 Finally,
 \begin{IEEEeqnarray}{L}
 \Erm_{\uptheta}\big[ \uptheta(y_1)\uptheta(y_2) \big] = \frac{{\drm}^2}{{\drm}t_1 {\drm}t_2} g(t_1,t_2) \\
-\quad = \frac{\frac{{\drm}}{{\drm}t_2} \left[ u(t_2-t_1) \alpha\big( \min(t_1,t_2) \big) + \alpha_0 \alpha(y_1) \left( \int_{-\infty}^{y_2} \alpha(t_2) {\drm}t_2 \right) \right]}{\alpha_0+1} \nonumber \\
-\quad = \frac{\alpha(y_1)\delta(y_1-y_2) + \alpha_0 \alpha(y_1)\alpha(y_2)}{\alpha_0+1} \nonumber \;.
+\qquad = \frac{\frac{{\drm}}{{\drm}t_2} \left[ u(t_2-t_1) \alpha\big( \min(t_1,t_2) \big) + \alpha_0 \alpha(y_1) \left( \int_{-\infty}^{y_2} \alpha(t_2) {\drm}t_2 \right) \right]}{\alpha_0+1} \nonumber \\
+\qquad = \frac{\alpha(y_1)\delta(y_1-y_2) + \alpha_0 \alpha(y_1)\alpha(y_2)}{\alpha_0+1} \nonumber \;.
 \end{IEEEeqnarray}
 
 
@@ -4042,8 +4042,8 @@ g(t_1,t_2) \quad = \frac{(\alpha_0^{-1} + N^{-1}) \left( \int_{-\infty}^{\min(y_
 Finally,
 \begin{IEEEeqnarray}{L}
 \Erm_{\uppsi}\big[ \uppsi(y_1)\uppsi(y_2) \big] = \frac{{\drm}^2}{{\drm}t_1 {\drm}t_2} g(t_1,t_2) \\
-\quad = \frac{\frac{{\drm}}{{\drm}t_2} \left[ (\alpha_0^{-1} + N^{-1}) \Big( u(t_2-t_1) \alpha\big( \min(t_1,t_2) \big) \Big) + \left(1-N^{-1}\right) \alpha(y_1) \left( \int_{-\infty}^{y_2} \alpha(t_2) {\drm}t_2 \right) \right]}{1 + \alpha_0^{-1}} \nonumber \\
-\quad = \frac{(\alpha_0^{-1} + N^{-1}) \alpha(y_1) \delta(y_1-y_2) + (1 - N^{-1}) \alpha(y_1) \alpha(y_2)}{1 + \alpha_0^{-1}} \nonumber \;.
+\qquad = \frac{\frac{{\drm}}{{\drm}t_2} \left[ (\alpha_0^{-1} + N^{-1}) \Big( u(t_2-t_1) \alpha\big( \min(t_1,t_2) \big) \Big) + \left(1-N^{-1}\right) \alpha(y_1) \left( \int_{-\infty}^{y_2} \alpha(t_2) {\drm}t_2 \right) \right]}{1 + \alpha_0^{-1}} \nonumber \\
+\qquad = \frac{(\alpha_0^{-1} + N^{-1}) \alpha(y_1) \delta(y_1-y_2) + (1 - N^{-1}) \alpha(y_1) \alpha(y_2)}{1 + \alpha_0^{-1}} \nonumber \;.
 \end{IEEEeqnarray}
 
 
