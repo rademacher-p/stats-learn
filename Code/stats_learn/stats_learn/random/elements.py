@@ -1103,7 +1103,8 @@ class DataEmpirical(Base):
             # FIXME: delta use needs to account for space dimensionality!?
             # delta = DELTA if isinstance(self.space, spaces.Continuous) else 1.
             if isinstance(self.space, spaces.Continuous):
-                raise NotImplementedError
+                # raise NotImplementedError
+                delta = DELTA
             else:
                 delta = 1.
 

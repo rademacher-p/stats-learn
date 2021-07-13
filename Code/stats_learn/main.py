@@ -3,9 +3,7 @@ Main.
 """
 import math
 from pathlib import Path
-import pickle
 from copy import deepcopy
-from math import prod
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -24,11 +22,9 @@ import pytorch_lightning.loggers as pl_loggers
 
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors import ModelRegressor, BayesRegressor, SKLWrapper, LitWrapper
-from stats_learn.util.results import plot_fit_compare, plot_predict_stats_compare, risk_eval_sim_compare, \
-    plot_risk_eval_sim_compare, plot_risk_eval_comp_compare, plot_risk_disc, predictor_compare
+from stats_learn.util.results import plot_fit_compare, plot_risk_disc, predictor_compare
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.preprocessing import discretizer, prob_disc
-from stats_learn.util.base import NOW_STR
 from stats_learn.util.plotting import box_grid
 
 
@@ -133,9 +129,10 @@ proc_funcs = []
 
 n_t = 16
 supp_t = box_grid(model_x.lims, n_t, endpoint=True)
-_temp = np.ones(model_x.size*(n_t,))
-# _temp = prob_disc(model_x.size*(n_t,))
-prior_mean_x = rand_elements.Finite(supp_t, p=_temp/_temp.sum())
+# _temp = np.ones(model_x.size*(n_t,))
+_temp = prob_disc(model_x.size*(n_t,))
+# prior_mean_x = rand_elements.Finite(supp_t, p=_temp/_temp.sum())
+prior_mean_x = rand_elements.DataEmpirical(supp_t, counts=_temp, space=model_x.space)
 proc_funcs.append(discretizer(supp_t.reshape(-1, *model_x.shape)))
 
 prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
@@ -145,10 +142,10 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), p
                                name=r'$\Dir$')
 
 # dir_params = {}
-dir_params = {'alpha_0': [10, 1000]}
+# dir_params = {'alpha_0': [10, 1000]}
 # dir_params = {'alpha_0': [.001]}
 # dir_params = {'alpha_0': [20]}
-# dir_params = {'alpha_0': [.01, 100]}
+dir_params = {'alpha_0': [.01, 100]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
 # dir_params = {'alpha_0': np.logspace(-0., 5., 60)}
@@ -208,6 +205,9 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
 
 #%% PyTorch
 
+# layer_sizes = [500]
+layer_sizes = [500, 500]
+
 # opt_class = torch.optim.SGD
 opt_class = torch.optim.Adam
 
@@ -217,8 +217,12 @@ opt_params = {
     # 'weight_decay': 0.001,
 }
 
+# _name = 'Lit MLP'
+# _name = f"Lit MLP, {opt_params['weight_decay']} reg."
+_name = f"Lit MLP, {'-'.join(map(str, layer_sizes))}, {opt_params['lr']} lr"
+
 # logger = False
-logger = pl_loggers.TensorBoardLogger('logs/', name='Lit_MLP')
+logger = pl_loggers.TensorBoardLogger('logs/', name=_name)
 
 trainer_params = {
     'max_epochs': 20000,
@@ -227,9 +231,6 @@ trainer_params = {
     'logger': logger,
     'gpus': min(1, torch.cuda.device_count()),
 }
-
-layer_sizes = [10000]
-# layer_sizes = [5000, 1000]
 
 
 def _build_torch_net(sizes):
@@ -264,8 +265,6 @@ class LitMLP(pl.LightningModule):
 lit_model = LitMLP()
 trainer = pl.Trainer(**trainer_params)
 
-# _name = 'Lit MLP'
-_name = f"Lit MLP, {opt_params['weight_decay']} reg."
 lit_predictor = LitWrapper(lit_model, trainer, space=model.space, name=_name)
 
 
@@ -281,6 +280,10 @@ n_train = 20
 # n_train = np.arange(0, 2050, 50)
 # n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
+
+n_test = 1000
+
+n_mc = 100
 
 
 temp = [
@@ -300,18 +303,18 @@ file = 'docs/temp/temp.md'
 if file is not None:
     file = Path(file).open('a')
 
-y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=1,
-                                            stats=('mean', 'std'), plot_stats=True, print_loss=True,
-                                            verbose=True, img_path='images/temp/', file=file)
-# y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test=10, n_mc=10,
+# y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+#                                             stats=('mean', 'std'), plot_stats=True, print_loss=True,
+#                                             verbose=True, img_path='images/temp/', file=file)
+# y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
 #                                             plot_loss=True,
 #                                             verbose=True, img_path='images/temp/', file=file)
 
 
-# d = model.rvs(n_train)
-# ax = model.space['x'].make_axes()
-# plot_fit_compare(predictors, d, params, ax)
-# ax.set_ylim((0, 1))
+d_train, d_test = model.rvs(n_train), model.rvs(n_test)
+ax = model.space['x'].make_axes()
+plot_fit_compare(predictors, d_train, d_test, params, ax)
+ax.set_ylim((0, 1))
 
 
 if file is not None:

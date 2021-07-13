@@ -17,39 +17,58 @@ from stats_learn.util.base import check_data_shape
 from stats_learn.util.base import NOW_STR
 
 
-# TODO: check for residual DRY fixes
-
-
-def plot_fit_compare(predictors, d, params=None, ax=None):
+def plot_fit_compare(predictors, d_train, d_test=(), params=None, ax=None):
     if params is None:
         params_full = [{} for _ in predictors]
     else:
         params_full = [item if item is not None else {} for item in params]
 
+    n_train, n_test = map(len, (d_train, d_test))
+    do_loss = n_test > 0
+
+    loss_full = []
+    for params in params_full:
+        params_shape = tuple(len(vals) for _, vals in params.items())
+        # loss = np.empty((n_mc, len(n_train_delta), *params_shape))
+        if do_loss:
+            loss = np.zeros((1, *params_shape))
+        else:
+            loss = np.full((1, *params_shape), np.nan)
+        loss_full.append(loss)
+
     if ax is None:
         ax = predictors[0].space['x'].make_axes()  # use first predictors space by default
 
-    ax.scatter(d['x'], d['y'], c='k', marker='.', label=None)
+    ax.scatter(d_train['x'], d_train['y'], c='k', marker='.', label=None)
 
-    for predictor, params in zip(predictors, params_full):
-        predictor.fit(d)
+    for predictor, params, loss in zip(predictors, params_full, loss_full):
+        predictor.fit(d_train)
         if len(params) == 0:
             predictor.plot_predict(ax=ax, label=predictor.name)
+
+            if do_loss:
+                loss[0] += predictor.evaluate(d_test)
+
         elif len(params) == 1:
             param_name, param_vals = list(params.items())[0]
             labels = [f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals]
-            for param_val, label in zip(param_vals, labels):
+            for i_v, (param_val, label) in enumerate(zip(param_vals, labels)):
                 predictor.set_params(**{param_name: param_val})
                 predictor.plot_predict(ax=ax, label=label)
+
+                if do_loss:
+                    idx = (0, *np.unravel_index(i_v, loss.shape[1:]))
+                    loss[idx] += predictor.evaluate(d_test)
         else:
             raise NotImplementedError("Only up to one varying parameter currently supported.")
-
-        # predictor.plot_predict(ax=ax, label=predictor.name)
 
     if len(predictors) > 1:
         ax.legend()
     else:
         ax.set(title=predictors[0].name)
+
+    if do_loss:
+        _print_risk(predictors, params_full, [n_train], loss_full, file=None)
 
 
 def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
@@ -177,8 +196,8 @@ def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=
             print(f"MC iteration: {i_mc + 1}/{n_mc}")
             # print(f"MC iteration: {i_mc + 1}/{n_mc}", end='\r')
 
-        d = model.rvs(n_test + n_train[-1])
-        d_test, d_train = d[:n_test], d[n_test:]
+        d = model.rvs(n_train[-1] + n_test)
+        d_train, d_test = d[:n_train[-1]], d[n_train[-1]:]
 
         for predictor, params, y_stats, loss in zip(predictors, params_full, y_stats_full, loss_full):
             for i_n in range(len(n_train)):
@@ -246,11 +265,6 @@ def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=
         pickle.dump(fig, fid)
     if file is not None:
         print(f"\n![]({img_file.absolute()})", file=file)
-
-    # # Plot loss
-    # if do_loss and plot_loss:
-    #     do_bayes = isinstance(model, bayes_models.Base)
-    #     _plot_risk_eval_compare(loss_full, do_bayes, predictors, params_full, n_train, ax)
 
     return y_stats_full, loss_full
 
