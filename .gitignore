@@ -11,6 +11,7 @@ Documentation/Conferences/Regression Dir Finite/regression_dir_finite_presentati
 Documentation/Old/
 Code/Matlab/Old/
 
+*.mp4
 *.asv
 
 
