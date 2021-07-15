@@ -3,12 +3,14 @@
   - With reg. = insufficiently flexible/intuitive?
 
 - Use smaller discrete spaces? Or use continuous space and **discretization**?
+  - Discretization makes the *restricted* function space a major regularizer!
+  - **DISCRETE** enables better consistency/overfitting trade demo!!!
 
 - Need better NN architectures and optimizers to *maximize* overfitting!!
 
 - *Harder functions and data volumes for pop learners to learn*
   - Random discrete functions
-  - Discontinuous funcs vs MLP (UAT only for continuous). Fractals?
+  - Discontinuous funcs vs MLP (UAT only holds for continuous). Fractals?
 
 
 ---
