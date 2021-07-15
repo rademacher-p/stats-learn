@@ -19,6 +19,7 @@ from torch import nn
 from torch.nn import functional
 import pytorch_lightning as pl
 import pytorch_lightning.loggers as pl_loggers
+from pytorch_lightning.utilities.seed import seed_everything
 
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors import ModelRegressor, BayesRegressor, SKLWrapper, LitWrapper
@@ -38,6 +39,8 @@ plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
 
 # seed = None
 seed = 12345
+
+seed_everything(seed)  # PyTorch Lightning seeding
 
 
 #%% Model
@@ -206,7 +209,8 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 #%% PyTorch
 
 # layer_sizes = [500]
-layer_sizes = [1000, 500, 200]
+# layer_sizes = [1000, 500, 200]
+layer_sizes = [500, 500, 500]
 
 # opt_class = torch.optim.SGD
 opt_class = torch.optim.Adam
@@ -214,8 +218,8 @@ opt_class = torch.optim.Adam
 opt_params = {
     'lr': 1e-3,
     # 'lr': 1e-4,
-    # 'weight_decay': 0.,
-    'weight_decay': 0.001,
+    'weight_decay': 0.,
+    # 'weight_decay': 0.001,
 }
 
 # lit_name = 'Lit MLP'
@@ -223,7 +227,7 @@ opt_params = {
 lit_name = f"Lit MLP {'-'.join(map(str, layer_sizes))}, {opt_params['lr']} lr, {opt_params['weight_decay']} reg."
 
 trainer_params = {
-    'max_epochs': 5000,
+    'max_epochs': 10000,
     # 'callbacks': pl.callbacks.EarlyStopping('train_loss', min_delta=0.1, patience=1),  # TODO: only works for val?
     'checkpoint_callback': False,
     'logger': pl_loggers.TensorBoardLogger('logs/', name=lit_name),
@@ -301,17 +305,16 @@ file = 'docs/temp/temp.md'
 if file is not None:
     file = Path(file).open('a')
 
+
 y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
                                             stats=('mean', 'std'), plot_stats=True, print_loss=True,
                                             verbose=True, img_path='images/temp/', file=file)
+
 # y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
 #                                             plot_loss=True,
 #                                             verbose=True, img_path='images/temp/', file=file)
 
-
-# ax = model.space['x'].make_axes()
-# ax.set(ylim=(0, 1))
-# plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params, img_path='images/temp/', file=file, ax=ax)
+# plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params, img_path='images/temp/', file=file)
 
 
 if file is not None:
