@@ -72,15 +72,15 @@ shape_x = ()
 w_model = [0, 1]
 
 
-def nonlinear_model(x):
-    # return 1 / (2 + np.sin(2*np.pi * x))
-    axis = tuple(range(-len(shape_x), 0))
-    return 1 / (2 + np.sin(2 * np.pi * x.mean(axis)))
-
-
-# _rand_vals = dict(zip(np.linspace(0, 1, n_x, endpoint=True), np.random.default_rng(seed).random(n_x)))
 # def nonlinear_model(x):
-#     return _rand_vals[x]
+#     # return 1 / (2 + np.sin(2*np.pi * x))
+#     axis = tuple(range(-len(shape_x), 0))
+#     return 1 / (2 + np.sin(2 * np.pi * x.mean(axis)))
+
+
+_rand_vals = dict(zip(np.linspace(0, 1, n_x, endpoint=True), np.random.default_rng(seed).random(n_x)))
+def nonlinear_model(x):
+    return _rand_vals[x]
 
 
 # def nonlinear_model(x):
@@ -89,14 +89,14 @@ def nonlinear_model(x):
 #     return np.array(x.mean(axis) > .5, dtype=float) * (1-delta) + delta/2
 
 
-# supp_x = box_grid(np.broadcast_to([0, 1], (*shape_x, 2)), n_x, endpoint=True)
-# model_x = rand_elements.Finite(supp_x, p=np.full(prod(shape_x)*(n_x,), n_x**-prod(shape_x)))
-# # model = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_model), model_x)
-# model = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model), model_x)
+supp_x = box_grid(np.broadcast_to([0, 1], (*shape_x, 2)), n_x, endpoint=True)
+model_x = rand_elements.Finite(supp_x, p=np.full(math.prod(shape_x)*(n_x,), n_x**-math.prod(shape_x)))
+# model = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_model), model_x)
+model = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model), model_x)
 
-model_x = rand_elements.Uniform(np.broadcast_to([0, 1], (*shape_x, 2)))
-# model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
-model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x)
+# model_x = rand_elements.Uniform(np.broadcast_to([0, 1], (*shape_x, 2)))
+# # model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
+# model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x)
 
 # model = rand_models.NormalLinear(weights=w_model, basis_y_x=None, cov_y_x=.1, model_x=model_x)
 
@@ -122,20 +122,20 @@ w_prior = [.5, 0]
 # Dirichlet learner
 proc_funcs = []
 
-# prior_mean = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_prior), model_x)
-# # _func = lambda x: .5*(1-np.sin(2*np.pi*x))
-# # prior_mean = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, _func), model_x)
+prior_mean = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_prior), model_x)
+# _func = lambda x: .5*(1-np.sin(2*np.pi*x))
+# prior_mean = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, _func), model_x)
 
 
-n_t = 16
-supp_t = box_grid(model_x.lims, n_t, endpoint=True)
-# _temp = np.ones(model_x.size*(n_t,))
-_temp = prob_disc(model_x.size*(n_t,))
-# prior_mean_x = rand_elements.Finite(supp_t, p=_temp/_temp.sum())
-prior_mean_x = rand_elements.DataEmpirical(supp_t, counts=_temp, space=model_x.space)
-proc_funcs.append(discretizer(supp_t.reshape(-1, *model_x.shape)))
-
-prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
+# n_t = 16
+# supp_t = box_grid(model_x.lims, n_t, endpoint=True)
+# # _temp = np.ones(model_x.size*(n_t,))
+# _temp = prob_disc(model_x.size*(n_t,))
+# # prior_mean_x = rand_elements.Finite(supp_t, p=_temp/_temp.sum())
+# prior_mean_x = rand_elements.DataEmpirical(supp_t, counts=_temp, space=model_x.space)
+# proc_funcs.append(discretizer(supp_t.reshape(-1, *model_x.shape)))
+#
+# prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
 
 
 dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs,
@@ -194,41 +194,39 @@ norm_params = {'prior_cov': [.1, .001]}
 # _solver_kwargs = {'solver': 'sgd', 'learning_rate': 'adaptive', 'learning_rate_init': 1e-1, 'n_iter_no_change': 20}
 _solver_kwargs = {'solver': 'adam', 'learning_rate_init': 1e-3, 'n_iter_no_change': 200}
 # _solver_kwargs = {'solver': 'lbfgs', }
-skl_estimator, _name = MLPRegressor(hidden_layer_sizes=[1000, 200, 100], alpha=0, verbose=True,
+skl_estimator, skl_name = MLPRegressor(hidden_layer_sizes=[1000, 200, 100], alpha=0, verbose=True,
                                     max_iter=5000, tol=1e-8, **_solver_kwargs), 'MLP'
 
 # TODO: try Adaboost, RandomForest, GP, BayesianRidge, KNeighbors, SVR
 
 # skl_estimator = Pipeline([('scaler', StandardScaler()), ('regressor', skl_estimator)])
-skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=_name)
+skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 
 
 #%% PyTorch
 
-layer_sizes = [500]
-# layer_sizes = [500, 500]
+# layer_sizes = [500]
+layer_sizes = [1000, 500, 200]
 
 # opt_class = torch.optim.SGD
 opt_class = torch.optim.Adam
 
 opt_params = {
-    'lr': 1e-2,
-    'weight_decay': 0.,
-    # 'weight_decay': 0.001,
+    'lr': 1e-3,
+    # 'lr': 1e-4,
+    # 'weight_decay': 0.,
+    'weight_decay': 0.001,
 }
 
-# _name = 'Lit MLP'
-# _name = f"Lit MLP, {opt_params['weight_decay']} reg."
-_name = f"Lit MLP, {'-'.join(map(str, layer_sizes))}, {opt_params['lr']} lr"
-
-# logger = False
-logger = pl_loggers.TensorBoardLogger('logs/', name=_name)
+# lit_name = 'Lit MLP'
+# lit_name = f"Lit MLP, {opt_params['weight_decay']} reg."
+lit_name = f"Lit MLP {'-'.join(map(str, layer_sizes))}, {opt_params['lr']} lr, {opt_params['weight_decay']} reg."
 
 trainer_params = {
-    'max_epochs': 20000,
+    'max_epochs': 5000,
     # 'callbacks': pl.callbacks.EarlyStopping('train_loss', min_delta=0.1, patience=1),  # TODO: only works for val?
     'checkpoint_callback': False,
-    'logger': logger,
+    'logger': pl_loggers.TensorBoardLogger('logs/', name=lit_name),
     'gpus': min(1, torch.cuda.device_count()),
 }
 
@@ -265,7 +263,7 @@ class LitMLP(pl.LightningModule):
 lit_model = LitMLP()
 trainer = pl.Trainer(**trainer_params)
 
-lit_predictor = LitWrapper(lit_model, trainer, space=model.space, name=_name)
+lit_predictor = LitWrapper(lit_model, trainer, space=model.space, name=lit_name)
 
 
 #%% Results
@@ -281,9 +279,9 @@ n_train = 20
 # n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
-n_test = 100
+n_test = 1000
 
-n_mc = 100
+n_mc = 10
 
 
 temp = [
@@ -303,18 +301,17 @@ file = 'docs/temp/temp.md'
 if file is not None:
     file = Path(file).open('a')
 
-# y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-#                                             stats=('mean', 'std'), plot_stats=True, print_loss=True,
-#                                             verbose=True, img_path='images/temp/', file=file)
+y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+                                            stats=('mean', 'std'), plot_stats=True, print_loss=True,
+                                            verbose=True, img_path='images/temp/', file=file)
 # y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
 #                                             plot_loss=True,
 #                                             verbose=True, img_path='images/temp/', file=file)
 
 
-d_train, d_test = model.rvs(n_train), model.rvs(n_test)
-ax = model.space['x'].make_axes()
-plot_fit_compare(predictors, d_train, d_test, params, img_path='images/temp/', file=file, ax=ax)
-ax.set_ylim((0, 1))
+# ax = model.space['x'].make_axes()
+# ax.set(ylim=(0, 1))
+# plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params, img_path='images/temp/', file=file, ax=ax)
 
 
 if file is not None:
