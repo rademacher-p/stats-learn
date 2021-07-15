@@ -40,6 +40,8 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None,
         ax = predictors[0].space['x'].make_axes()  # use first predictors space by default
 
     ax.scatter(d_train['x'], d_train['y'], c='k', marker='o', label=None)
+    # if do_loss:
+    #     ax.scatter(d_test['x'], d_test['y'], c='k', marker='D', label=None)
 
     for predictor, params, loss in zip(predictors, params_full, loss_full):
         predictor.fit(d_train)
