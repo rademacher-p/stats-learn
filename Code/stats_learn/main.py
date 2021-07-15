@@ -75,22 +75,24 @@ shape_x = ()
 w_model = [0, 1]
 
 
-# def nonlinear_model(x):
-#     # return 1 / (2 + np.sin(2*np.pi * x))
-#     axis = tuple(range(-len(shape_x), 0))
-#     return 1 / (2 + np.sin(2 * np.pi * x.mean(axis)))
+def make_sin_orig(shape):
+    def sin_orig(x):
+        axis = tuple(range(-len(shape), 0))
+        return 1 / (2 + np.sin(2 * np.pi * x.mean(axis)))
+    return sin_orig
 
 
-_rand_vals = dict(zip(np.linspace(0, 1, n_x, endpoint=True), np.random.default_rng(seed).random(n_x)))
-def nonlinear_model(x):
-    return _rand_vals[x]
+def make_rand_discrete(n, rng):
+    rng = np.random.default_rng(rng)
+    _rand_vals = dict(zip(np.linspace(0, 1, n, endpoint=True), rng.random(n)))
+
+    def rand_discrete(x):
+        return _rand_vals[x]
+    return rand_discrete
 
 
-# def nonlinear_model(x):
-#     axis = tuple(range(-len(shape_x), 0))
-#     delta = 2e-1
-#     return np.array(x.mean(axis) > .5, dtype=float) * (1-delta) + delta/2
-
+# nonlinear_model = make_sin_orig(shape_x)
+nonlinear_model = make_rand_discrete(n_x, seed)
 
 supp_x = box_grid(np.broadcast_to([0, 1], (*shape_x, 2)), n_x, endpoint=True)
 model_x = rand_elements.Finite(supp_x, p=np.full(math.prod(shape_x)*(n_x,), n_x**-math.prod(shape_x)))
@@ -148,7 +150,8 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), p
 # dir_params = {'alpha_0': [10, 1000]}
 # dir_params = {'alpha_0': [.001]}
 # dir_params = {'alpha_0': [20]}
-dir_params = {'alpha_0': [.01, 100]}
+# dir_params = {'alpha_0': [.01, 100]}
+dir_params = {'alpha_0': [.001, 1000]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
 # dir_params = {'alpha_0': np.logspace(-0., 5., 60)}
@@ -209,7 +212,6 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 #%% PyTorch
 
 # layer_sizes = [500]
-# layer_sizes = [1000, 500, 200]
 layer_sizes = [500, 500, 500]
 
 # opt_class = torch.optim.SGD
@@ -218,8 +220,8 @@ opt_class = torch.optim.Adam
 opt_params = {
     'lr': 1e-3,
     # 'lr': 1e-4,
-    'weight_decay': 0.,
-    # 'weight_decay': 0.001,
+    # 'weight_decay': 0.,
+    'weight_decay': 0.001,
 }
 
 # lit_name = 'Lit MLP'
