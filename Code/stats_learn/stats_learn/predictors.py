@@ -393,6 +393,11 @@ class SKLWrapper(Base):
             return np.full(x.shape[0], np.nan)
 
 
+def reset_weights(model):
+    if hasattr(model, 'reset_parameters'):
+        model.reset_parameters()
+
+
 class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
     def __init__(self, model, trainer, space, proc_funcs=(), name=None):
         loss_func = loss_se  # TODO: Generalize!
@@ -400,7 +405,7 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
         super().__init__(loss_func, proc_funcs, name)
         self.model = model
         self.trainer = trainer
-        self._trainer_init = deepcopy(trainer)
+        self._trainer_init = deepcopy(self.trainer)
         self._space = space
 
     space = property(lambda self: self._space)
@@ -414,10 +419,7 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
             setattr(self.model, key, val)
 
     def reset(self):  # TODO: add reset method to predictor base class?
-        def _reset_weights(model):
-            if hasattr(model, 'reset_parameters'):
-                model.reset_parameters()
-        self.model.apply(_reset_weights)
+        self.model.apply(reset_weights)
 
         # self.trainer.current_epoch = 0
         self.trainer = deepcopy(self._trainer_init)
