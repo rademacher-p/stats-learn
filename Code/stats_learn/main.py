@@ -267,9 +267,9 @@ class LitMLP(pl.LightningModule):
 
 
 lit_model = LitMLP()
-trainer = pl.Trainer(**trainer_params)
+# trainer = pl.Trainer(**trainer_params)
 
-lit_predictor = LitWrapper(lit_model, trainer, space=model.space, name=lit_name)
+lit_predictor = LitWrapper(lit_model, model.space, trainer_params, name=lit_name)
 
 
 #%% Results

@@ -8,6 +8,7 @@ from functools import partial
 from copy import deepcopy
 
 import numpy as np
+import pytorch_lightning as pl
 
 import sklearn as skl
 from sklearn.pipeline import Pipeline
@@ -399,14 +400,16 @@ def reset_weights(model):
 
 
 class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
-    def __init__(self, model, trainer, space, proc_funcs=(), name=None):
+    def __init__(self, model, space, trainer_params=None, proc_funcs=(), name=None):
         loss_func = loss_se  # TODO: Generalize!
 
         super().__init__(loss_func, proc_funcs, name)
         self.model = model
-        self.trainer = trainer
-        self._trainer_init = deepcopy(self.trainer)
         self._space = space
+        # self.trainer = trainer
+        # self._trainer_init = deepcopy(self.trainer)
+        self.trainer_params = trainer_params
+        self._reset_trainer()
 
     space = property(lambda self: self._space)
 
@@ -420,9 +423,11 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
 
     def reset(self):  # TODO: add reset method to predictor base class?
         self.model.apply(reset_weights)
+        # self.trainer = deepcopy(self._trainer_init)
+        self._reset_trainer()
 
-        # self.trainer.current_epoch = 0
-        self.trainer = deepcopy(self._trainer_init)
+    def _reset_trainer(self):
+        self.trainer = pl.Trainer(**self.trainer_params)
 
     def _reshape_batches(self, *arrays):
         shape_x = self.shape['x']
