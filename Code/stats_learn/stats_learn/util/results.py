@@ -1,6 +1,6 @@
 import math
 from itertools import product
-from numbers import Integral
+# from numbers import Integral
 from pathlib import Path
 import pickle
 from collections import Iterable
@@ -145,8 +145,9 @@ def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=
     else:
         params_full = [item if item is not None else {} for item in params]
 
-    if isinstance(n_train, (Integral, np.integer)):
-        n_train = [n_train]
+    # if isinstance(n_train, (Integral, np.integer)):
+    #     n_train = [n_train]
+    n_train = np.array(n_train).reshape(-1)
     n_train = np.sort(n_train)
 
     if stats is None:
@@ -317,8 +318,9 @@ def _plot_stats(y_stats_full, space_x, predictors, params, n_train: Union[int, I
     else:
         params_full = [item if item is not None else {} for item in params]
 
-    if isinstance(n_train, (Integral, np.integer)):
-        n_train = [n_train]
+    # if isinstance(n_train, (Integral, np.integer)):
+    #     n_train = [n_train]
+    n_train = np.array(n_train).reshape(-1)
 
     names = y_stats_full[0].dtype.names
     if 'mean' not in names:
@@ -474,8 +476,9 @@ def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, 
     else:
         params_full = [item if item is not None else {} for item in params]
 
-    if isinstance(n_train, (Integral, np.integer)):
-        n_train = [n_train]
+    # if isinstance(n_train, (Integral, np.integer)):
+    #     n_train = [n_train]
+    n_train = np.array(n_train).reshape(-1)
 
     loss_full = []
     for predictor, params in zip(predictors, params_full):
@@ -510,8 +513,9 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train: 
     else:
         params_full = [item if item is not None else {} for item in params]
 
-    if isinstance(n_train, (Integral, np.integer)):
-        n_train = [n_train]
+    # if isinstance(n_train, (Integral, np.integer)):
+    #     n_train = [n_train]
+    n_train = np.array(n_train).reshape(-1)
 
     if ax is None:
         _, ax = plt.subplots()
@@ -624,8 +628,9 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
 
     losses = risk_eval_sim_compare(predictors, model, params, n_train, n_test, n_mc, verbose)
 
-    if isinstance(n_train, (Integral, np.integer)):
-        n_train = [n_train]
+    # if isinstance(n_train, (Integral, np.integer)):
+    #     n_train = [n_train]
+    n_train = np.array(n_train).reshape(-1)
 
     if ax is None:
         _, ax = plt.subplots()

@@ -92,7 +92,7 @@ def make_rand_discrete(n, rng):
 
 
 # nonlinear_model = make_sin_orig(shape_x)
-nonlinear_model = make_rand_discrete(n_x, seed)
+nonlinear_model = make_rand_discrete(n_x, rng=seed)
 
 supp_x = box_grid(np.broadcast_to([0, 1], (*shape_x, 2)), n_x, endpoint=True)
 model_x = rand_elements.Finite(supp_x, p=np.full(math.prod(shape_x)*(n_x,), n_x**-math.prod(shape_x)))
@@ -151,11 +151,11 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), p
 # dir_params = {'alpha_0': [.001]}
 # dir_params = {'alpha_0': [20]}
 # dir_params = {'alpha_0': [.01, 100]}
-dir_params = {'alpha_0': [.001, 1000]}
+# dir_params = {'alpha_0': [.000001, 100000]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
 # dir_params = {'alpha_0': np.logspace(-0., 5., 60)}
-# dir_params = {'alpha_0': np.logspace(-3., 3., 60)}
+dir_params = {'alpha_0': np.logspace(-3., 3., 60)}
 
 if do_bayes:  # add true bayes model concentration
     if model_eval.alpha_0 not in dir_params['alpha_0']:
@@ -214,10 +214,10 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 # layer_sizes = [500]
 layer_sizes = [500, 500, 500]
 
-# opt_class = torch.optim.SGD
-opt_class = torch.optim.Adam
+# optim_class = torch.optim.SGD
+optim_class = torch.optim.Adam
 
-opt_params = {
+optim_params = {
     'lr': 1e-3,
     # 'lr': 1e-4,
     # 'weight_decay': 0.,
@@ -225,8 +225,8 @@ opt_params = {
 }
 
 # lit_name = 'Lit MLP'
-# lit_name = f"Lit MLP, {opt_params['weight_decay']} reg."
-lit_name = f"Lit MLP {'-'.join(map(str, layer_sizes))}, {opt_params['lr']} lr, {opt_params['weight_decay']} reg."
+lit_name = f"Lit MLP {'-'.join(map(str, layer_sizes))}, {optim_params['weight_decay']} reg."
+# lit_name = f"Lit MLP {'-'.join(map(str, layer_sizes))}, {optim_params['lr']} lr, {optim_params['weight_decay']} reg."
 
 trainer_params = {
     'max_epochs': 10000,
@@ -262,7 +262,7 @@ class LitMLP(pl.LightningModule):
         return loss
 
     def configure_optimizers(self):
-        optimizer = opt_class(self.parameters(), **opt_params)
+        optimizer = optim_class(self.parameters(), **optim_params)
         return optimizer
 
 
@@ -274,7 +274,8 @@ lit_predictor = LitWrapper(lit_model, model.space, trainer_params, name=lit_name
 
 #%% Results
 
-n_train = 20
+# n_train = 400
+n_train = [10, 20, 50, 100, 200]
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
@@ -291,12 +292,12 @@ n_mc = 10
 
 
 temp = [
-    (opt_predictor, None),
+    # (opt_predictor, None),
     (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
     # (norm_predictor, norm_params),
     # (skl_predictor, None),
-    (lit_predictor, None),
+    # (lit_predictor, None),
 ]
 predictors, params = zip(*temp)
 
@@ -308,16 +309,17 @@ if file is not None:
     file = Path(file).open('a')
 
 
-y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-                                            stats=('mean', 'std'), plot_stats=True, print_loss=True,
-                                            verbose=True, img_path='images/temp/', file=file)
-
 # y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-#                                             plot_loss=True,
+#                                             stats=('mean', 'std'), plot_stats=True, print_loss=True,
 #                                             verbose=True, img_path='images/temp/', file=file)
+
+y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+                                            plot_loss=True,
+                                            verbose=True, img_path='images/temp/', file=file)
 
 # plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params, img_path='images/temp/', file=file)
 
+# TODO: include `plot_fit_compare` figs in dissertation!?
 
 if file is not None:
     file.close()
