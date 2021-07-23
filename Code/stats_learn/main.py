@@ -11,8 +11,6 @@ from matplotlib import pyplot as plt
 from sklearn.neural_network import MLPRegressor
 
 import torch
-from torch import nn
-from torch.nn import functional
 import pytorch_lightning as pl
 import pytorch_lightning.loggers as pl_loggers
 from pytorch_lightning.utilities.seed import seed_everything
@@ -20,11 +18,10 @@ from pytorch_lightning.utilities.seed import seed_everything
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors import ModelRegressor, BayesRegressor, SKLWrapper, LitWrapper
 from stats_learn.util import funcs
-# from stats_learn.util.results import predictor_compare, plot_fit_compare
 from stats_learn.util import results
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.util.plotting import box_grid
-
+from stats_learn.util.torch import LitMLP
 
 np.set_printoptions(precision=3)
 
@@ -71,8 +68,8 @@ shape_x = ()
 # w_model = [.5]
 w_model = [0, 1]
 
-nonlinear_model = funcs.make_sin_orig(shape_x)
-# nonlinear_model = funcs.make_rand_discrete(n_x, rng=seed)
+# nonlinear_model = funcs.make_sin_orig(shape_x)
+nonlinear_model = funcs.make_rand_discrete(n_x, rng=seed)
 
 supp_x = box_grid(np.broadcast_to([0, 1], (*shape_x, 2)), n_x, endpoint=True)
 model_x = rand_elements.Finite(supp_x, p=np.full(math.prod(shape_x)*(n_x,), n_x**-math.prod(shape_x)))
@@ -190,88 +187,35 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 
 
 #%% PyTorch
-
-# layer_sizes = [500]
-# layer_sizes = [500, 500, 500]
-
-# optim_class = torch.optim.SGD
-# optim_class = torch.optim.Adam
-
-# optim_params = {
-#     'lr': 1e-3,
-#     # 'lr': 1e-4,
-#     # 'weight_decay': 0.,
-#     'weight_decay': 0.001,
-# }
-
-
-def _build_torch_net(sizes):
-    layers = [nn.Flatten()]
-    for in_out in zip([math.prod(shape_x), *sizes[:-1]], sizes):
-        layers.append(nn.Linear(*in_out))
-        layers.append(nn.ReLU())
-    layers.append(nn.Linear(sizes[-1], 1))
-    return nn.Sequential(*layers)
-
-
-class LitMLP(pl.LightningModule):
-    def __init__(self, layer_sizes, optim_class=torch.optim.Adam, optim_params=None):
-        super().__init__()
-        self.layer_sizes = layer_sizes
-        self.optim_class = optim_class
-        if optim_params is None:
-            optim_params = {}
-        self.optim_params = optim_params
-        self.model = _build_torch_net(self.layer_sizes)
-
-    def forward(self, x):
-        return self.model(x)
-
-    def training_step(self, batch, batch_idx):
-        x, y = batch
-        y_hat = self.model(x)
-        loss = functional.mse_loss(y_hat, y)
-        self.log('train_loss', loss)
-        return loss
-
-    def configure_optimizers(self):
-        optimizer = self.optim_class(self.parameters(), **self.optim_params)
-        return optimizer
-
-
-# optim_params_ = {
-#     'lr': 1e-3,
-#     # 'lr': 1e-4,
-#     # 'weight_decay': 0.,
-#     'weight_decay': 0.001,
-# }
-
-# weight_decays = [0.]
-weight_decays = [0., 0.001]
+weight_decays = [0.]
+# weight_decays = [0.001]
+# weight_decays = [0., 0.001]
 
 lit_predictors = []
 for weight_decay in weight_decays:
-    # lit_model = LitMLP([500, 500, 500], optim_params=optim_params_)
-    lit_model = LitMLP([500, 500, 500], optim_params={'lr': 1e-3, 'weight_decay': weight_decay})
+    layer_sizes = [500, 500, 500]
+    optim_params = {'lr': 1e-3, 'weight_decay': weight_decay}
 
     # lit_name = 'Lit MLP'
-    lit_name = f"Lit MLP {'-'.join(map(str, lit_model.layer_sizes))}, {lit_model.optim_params['weight_decay']} reg."
+    lit_name = f"Lit MLP {'-'.join(map(str, layer_sizes))}, {optim_params['weight_decay']} reg."
 
     trainer_params = {
         'max_epochs': 10000,
-        # 'callbacks': pl.callbacks.EarlyStopping('train_loss', min_delta=0.1, patience=1),  # TODO: only works for val?
+        'callbacks': pl.callbacks.EarlyStopping('train_loss', min_delta=1e-4, patience=200,
+                                                check_on_train_epoch_end=True),
         'checkpoint_callback': False,
         'logger': pl_loggers.TensorBoardLogger('logs/', name=lit_name),
         'gpus': min(1, torch.cuda.device_count()),
     }
 
+    lit_model = LitMLP([math.prod(shape_x), *layer_sizes], optim_params=optim_params)
     lit_predictor = LitWrapper(lit_model, model.space, trainer_params, name=lit_name)
     lit_predictors.append(lit_predictor)
 
 
 #%% Results
 
-n_train = 20
+n_train = 400
 # n_train = [10, 20, 50, 100, 200]
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
@@ -312,10 +256,11 @@ if file is not None:
 #                                                     verbose=True, img_path='images/temp/', file=file)
 
 # y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-#                                                     plot_loss=True,
+#                                                     plot_loss=True, print_loss=True,
 #                                                     verbose=True, img_path='images/temp/', file=file)
 
-results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params, img_path='images/temp/', file=file)
+results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
+                         img_path='images/temp/', file=file)
 
 # TODO: include `plot_fit_compare` figs in dissertation!?
 
