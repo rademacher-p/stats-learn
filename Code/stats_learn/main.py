@@ -19,8 +19,9 @@ from pytorch_lightning.utilities.seed import seed_everything
 
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors import ModelRegressor, BayesRegressor, SKLWrapper, LitWrapper
-from stats_learn.util.funcs import make_sin_orig, make_rand_discrete
-from stats_learn.util.results import predictor_compare, plot_fit_compare
+from stats_learn.util import funcs
+# from stats_learn.util.results import predictor_compare, plot_fit_compare
+from stats_learn.util import results
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.util.plotting import box_grid
 
@@ -70,8 +71,8 @@ shape_x = ()
 # w_model = [.5]
 w_model = [0, 1]
 
-nonlinear_model = make_sin_orig(shape_x)
-# nonlinear_model = make_rand_discrete(n_x, rng=seed)
+nonlinear_model = funcs.make_sin_orig(shape_x)
+# nonlinear_model = funcs.make_rand_discrete(n_x, rng=seed)
 
 supp_x = box_grid(np.broadcast_to([0, 1], (*shape_x, 2)), n_x, endpoint=True)
 model_x = rand_elements.Finite(supp_x, p=np.full(math.prod(shape_x)*(n_x,), n_x**-math.prod(shape_x)))
@@ -180,7 +181,7 @@ norm_params = {'prior_cov': [.1, .001]}
 _solver_kwargs = {'solver': 'adam', 'learning_rate_init': 1e-3, 'n_iter_no_change': 200}
 # _solver_kwargs = {'solver': 'lbfgs', }
 skl_estimator, skl_name = MLPRegressor(hidden_layer_sizes=[1000, 200, 100], alpha=0, verbose=True,
-                                    max_iter=5000, tol=1e-8, **_solver_kwargs), 'MLP'
+                                       max_iter=5000, tol=1e-8, **_solver_kwargs), 'MLP'
 
 # TODO: try Adaboost, RandomForest, GP, BayesianRidge, KNeighbors, SVR
 
@@ -191,29 +192,17 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 #%% PyTorch
 
 # layer_sizes = [500]
-layer_sizes = [500, 500, 500]
+# layer_sizes = [500, 500, 500]
 
 # optim_class = torch.optim.SGD
-optim_class = torch.optim.Adam
+# optim_class = torch.optim.Adam
 
-optim_params = {
-    'lr': 1e-3,
-    # 'lr': 1e-4,
-    # 'weight_decay': 0.,
-    'weight_decay': 0.001,
-}
-
-# lit_name = 'Lit MLP'
-lit_name = f"Lit MLP {'-'.join(map(str, layer_sizes))}, {optim_params['weight_decay']} reg."
-# lit_name = f"Lit MLP {'-'.join(map(str, layer_sizes))}, {optim_params['lr']} lr, {optim_params['weight_decay']} reg."
-
-trainer_params = {
-    'max_epochs': 10000,
-    # 'callbacks': pl.callbacks.EarlyStopping('train_loss', min_delta=0.1, patience=1),  # TODO: only works for val?
-    'checkpoint_callback': False,
-    'logger': pl_loggers.TensorBoardLogger('logs/', name=lit_name),
-    'gpus': min(1, torch.cuda.device_count()),
-}
+# optim_params = {
+#     'lr': 1e-3,
+#     # 'lr': 1e-4,
+#     # 'weight_decay': 0.,
+#     'weight_decay': 0.001,
+# }
 
 
 def _build_torch_net(sizes):
@@ -226,9 +215,14 @@ def _build_torch_net(sizes):
 
 
 class LitMLP(pl.LightningModule):
-    def __init__(self):
+    def __init__(self, layer_sizes, optim_class=torch.optim.Adam, optim_params=None):
         super().__init__()
-        self.model = _build_torch_net(layer_sizes)
+        self.layer_sizes = layer_sizes
+        self.optim_class = optim_class
+        if optim_params is None:
+            optim_params = {}
+        self.optim_params = optim_params
+        self.model = _build_torch_net(self.layer_sizes)
 
     def forward(self, x):
         return self.model(x)
@@ -241,19 +235,43 @@ class LitMLP(pl.LightningModule):
         return loss
 
     def configure_optimizers(self):
-        optimizer = optim_class(self.parameters(), **optim_params)
+        optimizer = self.optim_class(self.parameters(), **self.optim_params)
         return optimizer
 
 
-lit_model = LitMLP()
-# trainer = pl.Trainer(**trainer_params)
+# optim_params_ = {
+#     'lr': 1e-3,
+#     # 'lr': 1e-4,
+#     # 'weight_decay': 0.,
+#     'weight_decay': 0.001,
+# }
 
-lit_predictor = LitWrapper(lit_model, model.space, trainer_params, name=lit_name)
+# weight_decays = [0.]
+weight_decays = [0., 0.001]
+
+lit_predictors = []
+for weight_decay in weight_decays:
+    # lit_model = LitMLP([500, 500, 500], optim_params=optim_params_)
+    lit_model = LitMLP([500, 500, 500], optim_params={'lr': 1e-3, 'weight_decay': weight_decay})
+
+    # lit_name = 'Lit MLP'
+    lit_name = f"Lit MLP {'-'.join(map(str, lit_model.layer_sizes))}, {lit_model.optim_params['weight_decay']} reg."
+
+    trainer_params = {
+        'max_epochs': 10000,
+        # 'callbacks': pl.callbacks.EarlyStopping('train_loss', min_delta=0.1, patience=1),  # TODO: only works for val?
+        'checkpoint_callback': False,
+        'logger': pl_loggers.TensorBoardLogger('logs/', name=lit_name),
+        'gpus': min(1, torch.cuda.device_count()),
+    }
+
+    lit_predictor = LitWrapper(lit_model, model.space, trainer_params, name=lit_name)
+    lit_predictors.append(lit_predictor)
 
 
 #%% Results
 
-n_train = 400
+n_train = 20
 # n_train = [10, 20, 50, 100, 200]
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
@@ -276,7 +294,8 @@ temp = [
     # *(zip(dir_predictors, dir_params_full)),
     # (norm_predictor, norm_params),
     # (skl_predictor, None),
-    (lit_predictor, None),
+    # (lit_predictor, None),
+    *((predictor, None) for predictor in lit_predictors),
 ]
 predictors, params = zip(*temp)
 
@@ -288,15 +307,15 @@ if file is not None:
     file = Path(file).open('a')
 
 
-# y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-#                                             stats=('mean', 'std'), plot_stats=True, print_loss=True,
-#                                             verbose=True, img_path='images/temp/', file=file)
+# y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+#                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
+#                                                     verbose=True, img_path='images/temp/', file=file)
 
-# y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-#                                             plot_loss=True,
-#                                             verbose=True, img_path='images/temp/', file=file)
+# y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+#                                                     plot_loss=True,
+#                                                     verbose=True, img_path='images/temp/', file=file)
 
-plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params, img_path='images/temp/', file=file)
+results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params, img_path='images/temp/', file=file)
 
 # TODO: include `plot_fit_compare` figs in dissertation!?
 
@@ -353,7 +372,8 @@ if file is not None:
 #     _temp = np.full(n_t, 2)
 #     _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
 #     prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_t, endpoint=True), p=_temp / _temp.sum())
-#     prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
+#     prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta,
+#                                         model_x=prior_mean_x)
 #
 #     dir_predictors.append(BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=0.01),
 #                                          space=model.space, proc_funcs=[discretizer(prior_mean_x.supp)],

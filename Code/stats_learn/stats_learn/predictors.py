@@ -405,8 +405,6 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
         super().__init__(loss_func, proc_funcs, name)
         self.model = model
         self._space = space
-        # self.trainer = trainer
-        # self._trainer_init = deepcopy(self.trainer)
         self.trainer_params = trainer_params
         self.trainer = pl.Trainer(**self.trainer_params)
 
@@ -422,7 +420,6 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
 
     def reset(self):  # TODO: add reset method to predictor base class?
         self.model.apply(reset_weights)
-        # self.trainer = deepcopy(self._trainer_init)
         self.trainer = pl.Trainer(**self.trainer_params)
 
     def _reshape_batches(self, *arrays):
