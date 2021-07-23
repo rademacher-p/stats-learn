@@ -117,3 +117,7 @@ def prob_disc(shape):
         n += np.all([i > 0, i < size-1], axis=0)
     p[idx] = 2**n
     return p
+
+
+def main():
+    print(prob_disc((4, 3)))

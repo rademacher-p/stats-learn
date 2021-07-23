@@ -30,7 +30,11 @@ class Base(ABC):
 
         self._space = space
 
-        self.proc_funcs = list(proc_funcs)
+        # self.proc_funcs = list(proc_funcs)
+        if isinstance(proc_funcs, dict):
+            self.proc_funcs = proc_funcs
+        else:
+            self.proc_funcs = {'pre': list(proc_funcs), 'post': []}
         self.name = name
 
         self.model = None
@@ -66,13 +70,21 @@ class Base(ABC):
     # def get_params(self, *args):
     #     return {arg: getattr(self._model_obj, arg) for arg in args}
 
-    def _proc_predictors(self, x):
-        for func in self.proc_funcs:
+    def _proc_x(self, x):
+        # for func in self.proc_funcs:
+        for func in self.proc_funcs['pre']:
             x = func(x)
         return x
 
+    def _proc_y(self, y):
+        # for func in self.proc_funcs:
+        for func in self.proc_funcs['post']:
+            y = func(y)
+        return y
+
     def _proc_data(self, d):
-        x, y = self._proc_predictors(d['x']), d['y']
+        # x, y = self._proc_x(d['x']), d['y']
+        x, y = self._proc_x(d['x']), self._proc_y(d['y'])
         # dtype = [('x', d.dtype['x'].base, x.shape[1:]), ('y', d.dtype['y'].base, d.dtype['y'].shape)]
         dtype = [('x', d.dtype['x'].base, x.shape[1:]), ('y', d.dtype['y'].base, y.shape[1:])]
         return np.array(list(zip(x, y)), dtype=dtype)
@@ -93,8 +105,10 @@ class Base(ABC):
         self.fit(d, warm_start)  # train learner
 
     def predict(self, x):
-        x = self._proc_predictors(x)
-        return self._predict(x)
+        x = self._proc_x(x)
+        y = self._predict(x)
+        y = self._proc_y(y)
+        return y
 
     def _predict(self, x):
         return vectorize_func(self._predict_single, shape=self.shape['x'])(x)
