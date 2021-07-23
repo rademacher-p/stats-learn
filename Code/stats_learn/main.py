@@ -31,8 +31,8 @@ np.set_printoptions(precision=3)
 plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
 
-# seed = None
-seed = 12345
+seed = None
+# seed = 12345
 
 seed_everything(seed)  # PyTorch Lightning seeding
 
@@ -141,8 +141,9 @@ if do_bayes:  # add true bayes model concentration
 
 # Normal learner
 
-w_prior_norm = w_prior
+# w_prior_norm = w_prior
 # w_prior_norm = [.5, *(0 for __ in range(n_x-1))]
+w_prior_norm = [.5, *(0 for __ in range(4))]
 basis_y_x = None
 
 # def make_delta_func(val):
@@ -161,8 +162,8 @@ norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior_nor
                                 name=r'$\Ncal$')
 
 # norm_params = {}
-norm_params = {'prior_cov': [.1, .001]}
-# norm_params = {'prior_cov': [1e4]}
+# norm_params = {'prior_cov': [.1, .001]}
+norm_params = {'prior_cov': [1e6]}
 # norm_params = {'prior_cov': [.1 / (.001 / n_x)]}
 # norm_params = {'prior_cov': [.1 / (20 / n_t)]}
 # norm_params = {'prior_cov': [100, .001]}
@@ -187,8 +188,8 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 
 
 #%% PyTorch
-# weight_decays = [0.]
-weight_decays = [0.001]
+weight_decays = [0.]
+# weight_decays = [0.001]
 # weight_decays = [0., 0.001]
 
 lit_predictors = []
@@ -215,10 +216,10 @@ for weight_decay in weight_decays:
 
 #%% Results
 
-# n_train = 400
+n_train = 5
 # n_train = [1, 4, 40, 400]
 # n_train = [20, 40, 200, 400, 2000]
-n_train = 2**np.arange(11)
+# n_train = 2**np.arange(11)
 # n_train = [0, 400, 4000]
 # n_train = np.arange(0, 55, 5)
 # n_train = np.arange(0, 4500, 500)
@@ -233,7 +234,7 @@ temp = [
     (opt_predictor, None),
     (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
-    # (norm_predictor, norm_params),
+    (norm_predictor, norm_params),
     # (skl_predictor, None),
     # (lit_predictor, None),
     *((predictor, None) for predictor in lit_predictors),
@@ -242,22 +243,24 @@ predictors, params = zip(*temp)
 
 
 # file = None
-file = 'docs/temp/temp.md'
+file = 'docs/temp/results.md'
 
 if file is not None:
     file = Path(file).open('a')
 
 
-y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-                                                    stats=('mean', 'std'), plot_stats=True, print_loss=True,
-                                                    verbose=True, img_path='images/temp/', file=file)
+# FIXME: need clipping to Box space for fair comparison?? Clipping to Finite is nonsensical?
+
+# y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+#                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
+#                                                     verbose=True, img_path='images/temp/', file=file)
 
 # y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
 #                                                     plot_loss=True, print_loss=True,
 #                                                     verbose=True, img_path='images/temp/', file=file)
 
-# results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
-#                          img_path='images/temp/', file=file)
+results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
+                         img_path='images/temp/', file=file)
 
 # TODO: include `plot_fit_compare` figs in dissertation!?
 
