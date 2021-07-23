@@ -120,8 +120,8 @@ prior_mean = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w
 # prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
 
 
-dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), proc_funcs=proc_funcs,
-                               name=r'$\Dir$')
+dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10),
+                               space=model.space, proc_funcs=proc_funcs, name=r'$\Dir$')
 
 # dir_params = {}
 # dir_params = {'alpha_0': [10, 1000]}
@@ -159,7 +159,7 @@ basis_y_x = None
 
 norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior_norm, prior_cov=.1, basis_y_x=basis_y_x,
                                                           cov_y_x=.1, model_x=model_x, allow_singular=True),
-                                name=r'$\Ncal$')
+                                space=model.space, name=r'$\Ncal$')
 
 # norm_params = {}
 # norm_params = {'prior_cov': [.1, .001]}
@@ -227,7 +227,7 @@ n_train = 5
 
 n_test = 1000
 
-n_mc = 1
+n_mc = 5
 
 
 temp = [
@@ -236,7 +236,6 @@ temp = [
     # *(zip(dir_predictors, dir_params_full)),
     (norm_predictor, norm_params),
     # (skl_predictor, None),
-    # (lit_predictor, None),
     *((predictor, None) for predictor in lit_predictors),
 ]
 predictors, params = zip(*temp)
