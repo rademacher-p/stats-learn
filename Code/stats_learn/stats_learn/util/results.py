@@ -29,7 +29,6 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None,
     loss_full = []
     for params in params_full:
         params_shape = tuple(len(vals) for _, vals in params.items())
-        # loss = np.empty((n_mc, len(n_train_delta), *params_shape))
         if do_loss:
             loss = np.zeros((1, *params_shape))
         else:
@@ -64,13 +63,10 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None,
         else:
             raise NotImplementedError("Only up to one varying parameter currently supported.")
 
-    if len(predictors) > 1:
-        ax.legend()
-    else:
+    if len(predictors) == 1 and len(params_full[0]) == 0:
         ax.set(title=predictors[0].name)
-
-    # if do_loss:
-    #     _print_risk(predictors, params_full, [n_train], loss_full, file=None)
+    else:
+        ax.legend()
 
     if file is not None:
         print(f"\n# {NOW_STR}", file=file)
