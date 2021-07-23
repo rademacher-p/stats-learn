@@ -70,9 +70,10 @@ class Base(ABC):
         return x
 
     def _proc_data(self, d):
-        x = self._proc_predictors(d['x'])
-        dtype = [('x', d.dtype['x'].base, x.shape[1:]), ('y', d.dtype['y'].base, d.dtype['y'].shape)]
-        return np.array(list(zip(x, d['y'])), dtype=dtype)
+        x, y = self._proc_predictors(d['x']), d['y']
+        # dtype = [('x', d.dtype['x'].base, x.shape[1:]), ('y', d.dtype['y'].base, d.dtype['y'].shape)]
+        dtype = [('x', d.dtype['x'].base, x.shape[1:]), ('y', d.dtype['y'].base, y.shape[1:])]
+        return np.array(list(zip(x, y)), dtype=dtype)
 
     def fit(self, d=None, warm_start=False):
         if d is None:
