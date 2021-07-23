@@ -5,6 +5,7 @@ Supervised learning functions.
 from abc import ABC, abstractmethod
 from typing import Union
 from functools import partial
+from copy import deepcopy
 
 import numpy as np
 import pytorch_lightning as pl
@@ -406,7 +407,7 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
         self.model = model
         self._space = space
         self.trainer_params = trainer_params
-        self.trainer = pl.Trainer(**self.trainer_params)
+        self._reset_trainer()
 
     space = property(lambda self: self._space)
 
@@ -418,9 +419,12 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
         for key, val in kwargs.items():
             setattr(self.model, key, val)
 
+    def _reset_trainer(self):
+        self.trainer = pl.Trainer(**deepcopy(self.trainer_params))
+
     def reset(self):  # TODO: add reset method to predictor base class?
         self.model.apply(reset_weights)
-        self.trainer = pl.Trainer(**self.trainer_params)
+        self._reset_trainer()
 
     def _reshape_batches(self, *arrays):
         shape_x = self.shape['x']

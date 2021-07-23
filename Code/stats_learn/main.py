@@ -128,7 +128,7 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), p
 # dir_params = {'alpha_0': [.001]}
 # dir_params = {'alpha_0': [20]}
 # dir_params = {'alpha_0': [.01, 100]}
-dir_params = {'alpha_0': [.000001, 100000]}
+dir_params = {'alpha_0': [1e-6, 1e6]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
 # dir_params = {'alpha_0': np.logspace(-0., 5., 60)}
@@ -187,21 +187,20 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 
 
 #%% PyTorch
-weight_decays = [0.]
+# weight_decays = [0.]
 # weight_decays = [0.001]
-# weight_decays = [0., 0.001]
+weight_decays = [0., 0.001]
 
 lit_predictors = []
 for weight_decay in weight_decays:
     layer_sizes = [500, 500, 500]
     optim_params = {'lr': 1e-3, 'weight_decay': weight_decay}
 
-    # lit_name = 'Lit MLP'
     lit_name = f"Lit MLP {'-'.join(map(str, layer_sizes))}, {optim_params['weight_decay']} reg."
 
     trainer_params = {
         'max_epochs': 10000,
-        'callbacks': pl.callbacks.EarlyStopping('train_loss', min_delta=1e-4, patience=200,
+        'callbacks': pl.callbacks.EarlyStopping('train_loss', min_delta=1e-4, patience=500,
                                                 check_on_train_epoch_end=True),
         'checkpoint_callback': False,
         'logger': pl_loggers.TensorBoardLogger('logs/', name=lit_name),
@@ -215,10 +214,10 @@ for weight_decay in weight_decays:
 
 #%% Results
 
-n_train = 400
+# n_train = 400
 # n_train = [10, 20, 50, 100, 200]
 # n_train = [1, 4, 40, 400]
-# n_train = [0, 200, 400, 600]
+n_train = [20, 40, 200, 400, 2000]
 # n_train = [0, 400, 4000]
 # n_train = [100, 200]
 # n_train = np.arange(0, 320, 20)
@@ -229,7 +228,7 @@ n_train = 400
 
 n_test = 1000
 
-n_mc = 10
+n_mc = 5
 
 
 temp = [
@@ -239,7 +238,7 @@ temp = [
     # (norm_predictor, norm_params),
     # (skl_predictor, None),
     # (lit_predictor, None),
-    *((predictor, None) for predictor in lit_predictors),
+    # *((predictor, None) for predictor in lit_predictors),
 ]
 predictors, params = zip(*temp)
 
@@ -255,12 +254,12 @@ if file is not None:
 #                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
 #                                                     verbose=True, img_path='images/temp/', file=file)
 
-# y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-#                                                     plot_loss=True, print_loss=True,
-#                                                     verbose=True, img_path='images/temp/', file=file)
+y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+                                                    plot_loss=True, print_loss=True,
+                                                    verbose=True, img_path='images/temp/', file=file)
 
-results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
-                         img_path='images/temp/', file=file)
+# results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
+#                          img_path='images/temp/', file=file)
 
 # TODO: include `plot_fit_compare` figs in dissertation!?
 
