@@ -19,10 +19,9 @@ from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors import ModelRegressor, BayesRegressor, SKLWrapper
 from stats_learn.util import funcs
 from stats_learn.util import results
+from stats_learn.util.data_processing import make_discretizer, make_clipper
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.util.plotting import box_grid
-from stats_learn.data_processing import discretizer
-from stats_learn.util.math import prob_disc
 from stats_learn.util.torch import LitMLP, LitWrapper
 
 np.set_printoptions(precision=3)
@@ -118,7 +117,7 @@ prior_mean = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w
 # _temp = prob_disc(model_x.size*(n_t,))
 # # prior_mean_x = rand_elements.Finite(supp_t, p=_temp/_temp.sum())
 # prior_mean_x = rand_elements.DataEmpirical(supp_t, counts=_temp, space=model_x.space)
-# proc_funcs.append(discretizer(supp_t.reshape(-1, *model_x.shape)))
+# proc_funcs.append(make_discretizer(supp_t.reshape(-1, *model_x.shape)))
 #
 # prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
 
@@ -160,9 +159,12 @@ basis_y_x = None
 # w_prior_norm = [.5 for __ in supp_t]
 # basis_y_x = [make_square_func(val) for val in supp_t]
 
+# proc_funcs = []
+proc_funcs = {'pre': [], 'post': [make_clipper((0, 1))]}
+
 norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior_norm, prior_cov=.1, basis_y_x=basis_y_x,
                                                           cov_y_x=.1, model_x=model_x, allow_singular=True),
-                                space=model.space, name=r'$\Ncal$')
+                                space=model.space, proc_funcs=proc_funcs, name=r'$\Ncal$')
 
 # norm_params = {}
 # norm_params = {'prior_cov': [.1, .001]}
@@ -195,6 +197,9 @@ weight_decays = [0.]
 # weight_decays = [0.001]
 # weight_decays = [0., 0.001]
 
+# proc_funcs = []
+proc_funcs = {'pre': [], 'post': [make_clipper((0, 1))]}
+
 lit_predictors = []
 for weight_decay in weight_decays:
     layer_sizes = [500, 500, 500]
@@ -213,7 +218,7 @@ for weight_decay in weight_decays:
     }
 
     lit_model = LitMLP([math.prod(shape_x), *layer_sizes], optim_params=optim_params)
-    lit_predictor = LitWrapper(lit_model, model.space, trainer_params, name=lit_name)
+    lit_predictor = LitWrapper(lit_model, model.space, trainer_params, proc_funcs, name=lit_name)
     lit_predictors.append(lit_predictor)
 
 
@@ -323,7 +328,7 @@ if file is not None:
 #                                         model_x=prior_mean_x)
 #
 #     dir_predictors.append(BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=0.01),
-#                                          space=model.space, proc_funcs=[discretizer(prior_mean_x.supp)],
+#                                          space=model.space, proc_funcs=[make_discretizer(prior_mean_x.supp)],
 #                                          name=r'$\mathrm{Dir}$, $|\mathcal{T}| = card$'.replace('card', str(n_t)),
 #                                          ))
 #
