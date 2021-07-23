@@ -21,6 +21,8 @@ from stats_learn.util import funcs
 from stats_learn.util import results
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.util.plotting import box_grid
+from stats_learn.data_processing import discretizer
+from stats_learn.util.math import prob_disc
 from stats_learn.util.torch import LitMLP, LitWrapper
 
 np.set_printoptions(precision=3)
@@ -34,7 +36,8 @@ plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
 seed = None
 # seed = 12345
 
-seed_everything(seed)  # PyTorch Lightning seeding
+if seed is not None:
+    seed_everything(seed)  # PyTorch Lightning seeding
 
 
 #%% Model

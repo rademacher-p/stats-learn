@@ -105,3 +105,15 @@ def simplex_round(x):
             break
 
     return out.reshape(x.shape)
+
+
+def prob_disc(shape):
+    """Create (unnormalized) probability array for a discretization grid. Lower edge/corner probabilities."""
+
+    p = np.ones(shape)
+    idx = np.nonzero(p)
+    n = np.zeros(p.size)
+    for i, size in zip(idx, shape):
+        n += np.all([i > 0, i < size-1], axis=0)
+    p[idx] = 2**n
+    return p
