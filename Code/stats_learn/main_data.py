@@ -10,7 +10,6 @@ from stats_learn.predictors import (ModelRegressor, BayesRegressor)
 from stats_learn.util.results import plot_predict_stats_compare, risk_eval_sim_compare, plot_risk_eval_sim_compare, \
     plot_risk_eval_comp_compare, plot_risk_disc
 from stats_learn.random import elements as rand_elements, models as rand_models
-from stats_learn.preprocessing import discretizer, prob_disc
 from stats_learn.util.base import vectorize_func, NOW_STR
 from stats_learn.util.plotting import box_grid
 from stats_learn.util import spaces

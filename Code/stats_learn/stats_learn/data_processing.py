@@ -3,6 +3,7 @@ import math
 import numpy as np
 
 from stats_learn.util.base import check_data_shape
+from stats_learn.util.math import prob_disc
 from stats_learn.util.plotting import box_grid
 
 
@@ -27,18 +28,6 @@ def discretizer(vals):  # TODO: use sklearn.preprocessing.KBinsDiscretizer?
         return vals[idx].reshape(set_shape + shape)
 
     return func
-
-
-def prob_disc(shape):
-    """Create (unnormalized) probability array for a discretization grid. Lower edge/corner probabilities."""
-
-    p = np.ones(shape)
-    idx = np.nonzero(p)
-    n = np.zeros(p.size)
-    for i, size in zip(idx, shape):
-        n += np.all([i > 0, i < size-1], axis=0)
-    p[idx] = 2**n
-    return p
 
 
 def main():
