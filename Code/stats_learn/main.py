@@ -16,12 +16,12 @@ import pytorch_lightning.loggers as pl_loggers
 from pytorch_lightning.utilities.seed import seed_everything
 
 from stats_learn.bayes import models as bayes_models
-from stats_learn.predictors import ModelRegressor, BayesRegressor, SKLWrapper, LitWrapper
+from stats_learn.predictors import ModelRegressor, BayesRegressor, SKLWrapper
 from stats_learn.util import funcs
 from stats_learn.util import results
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.util.plotting import box_grid
-from stats_learn.util.torch import LitMLP
+from stats_learn.util.torch import LitMLP, LitWrapper
 
 np.set_printoptions(precision=3)
 
@@ -188,8 +188,8 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 
 #%% PyTorch
 # weight_decays = [0.]
-# weight_decays = [0.001]
-weight_decays = [0., 0.001]
+weight_decays = [0.001]
+# weight_decays = [0., 0.001]
 
 lit_predictors = []
 for weight_decay in weight_decays:
@@ -204,7 +204,8 @@ for weight_decay in weight_decays:
                                                 check_on_train_epoch_end=True),
         'checkpoint_callback': False,
         'logger': pl_loggers.TensorBoardLogger('logs/', name=lit_name),
-        'gpus': min(1, torch.cuda.device_count()),
+        'weights_summary': None,
+        'gpus': torch.cuda.device_count(),
     }
 
     lit_model = LitMLP([math.prod(shape_x), *layer_sizes], optim_params=optim_params)
@@ -215,20 +216,17 @@ for weight_decay in weight_decays:
 #%% Results
 
 # n_train = 400
-# n_train = [10, 20, 50, 100, 200]
 # n_train = [1, 4, 40, 400]
-n_train = [20, 40, 200, 400, 2000]
+# n_train = [20, 40, 200, 400, 2000]
+n_train = 2**np.arange(11)
 # n_train = [0, 400, 4000]
-# n_train = [100, 200]
-# n_train = np.arange(0, 320, 20)
 # n_train = np.arange(0, 55, 5)
-# n_train = np.arange(0, 2050, 50)
 # n_train = np.arange(0, 4500, 500)
 # n_train = np.concatenate((np.arange(0, 250, 50), np.arange(200, 4050, 50)))
 
 n_test = 1000
 
-n_mc = 5
+n_mc = 1
 
 
 temp = [
@@ -238,7 +236,7 @@ temp = [
     # (norm_predictor, norm_params),
     # (skl_predictor, None),
     # (lit_predictor, None),
-    # *((predictor, None) for predictor in lit_predictors),
+    *((predictor, None) for predictor in lit_predictors),
 ]
 predictors, params = zip(*temp)
 
@@ -250,13 +248,13 @@ if file is not None:
     file = Path(file).open('a')
 
 
-# y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-#                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
-#                                                     verbose=True, img_path='images/temp/', file=file)
-
 y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-                                                    plot_loss=True, print_loss=True,
+                                                    stats=('mean', 'std'), plot_stats=True, print_loss=True,
                                                     verbose=True, img_path='images/temp/', file=file)
+
+# y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+#                                                     plot_loss=True, print_loss=True,
+#                                                     verbose=True, img_path='images/temp/', file=file)
 
 # results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
 #                          img_path='images/temp/', file=file)

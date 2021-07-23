@@ -4,18 +4,12 @@ Supervised learning functions.
 
 from abc import ABC, abstractmethod
 from typing import Union
-from functools import partial
-from copy import deepcopy
 
 import numpy as np
-import pytorch_lightning as pl
 
 import sklearn as skl
 from sklearn.pipeline import Pipeline
 from sklearn.exceptions import NotFittedError
-
-import torch
-from torch.utils.data import TensorDataset, DataLoader
 
 from stats_learn.bayes import models as bayes_models
 from stats_learn.loss_funcs import loss_se, loss_01
@@ -26,6 +20,8 @@ from stats_learn.util.base import vectorize_func
 from stats_learn.util.results import (plot_fit_compare, predict_stats_compare, plot_predict_stats_compare,
                                       risk_eval_sim_compare, risk_eval_comp_compare, plot_risk_eval_sim_compare,
                                       plot_risk_eval_comp_compare)
+
+# TODO: refactor into subpackages?
 
 
 class Base(ABC):
@@ -392,62 +388,3 @@ class SKLWrapper(Base):
             return self.estimator.predict(x)
         except NotFittedError:
             return np.full(x.shape[0], np.nan)
-
-
-def reset_weights(model):
-    if hasattr(model, 'reset_parameters'):
-        model.reset_parameters()
-
-
-class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
-    def __init__(self, model, space, trainer_params=None, proc_funcs=(), name=None):
-        loss_func = loss_se  # TODO: Generalize!
-
-        super().__init__(loss_func, proc_funcs, name)
-        self.model = model
-        self._space = space
-        self.trainer_params = trainer_params
-        self._reset_trainer()
-
-    space = property(lambda self: self._space)
-
-    @property
-    def _model_obj(self):
-        raise NotImplementedError
-
-    def set_params(self, **kwargs):
-        for key, val in kwargs.items():
-            setattr(self.model, key, val)
-
-    def _reset_trainer(self):
-        self.trainer = pl.Trainer(**deepcopy(self.trainer_params))
-
-    def reset(self):  # TODO: add reset method to predictor base class?
-        self.model.apply(reset_weights)
-        self._reset_trainer()
-
-    def _reshape_batches(self, *arrays):
-        shape_x = self.shape['x']
-        if shape_x == ():  # cast to non-scalar shape
-            shape_x = (1,)
-        return tuple(map(lambda x: x.reshape(-1, *shape_x), arrays))
-
-    def _fit(self, d, warm_start):
-        if not warm_start:
-            self.reset()
-
-        x, y = self._reshape_batches(d['x'], d['y'])
-        x, y = map(partial(torch.tensor, dtype=torch.float32), (x, y))
-        ds = TensorDataset(x, y)
-
-        batch_size = len(x)  # TODO: no mini-batching! Allow user specification.
-        dl = DataLoader(ds, batch_size, shuffle=True)
-
-        self.trainer.fit(self.model, dl)
-
-    def _predict(self, x):
-        x, = self._reshape_batches(x)
-        x = torch.tensor(x, requires_grad=False, dtype=torch.float32)
-        y_hat = self.model(x).detach().numpy()
-        y_hat = y_hat.reshape(-1, *self.shape['y'])
-        return y_hat
