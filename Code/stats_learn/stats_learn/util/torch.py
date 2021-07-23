@@ -62,13 +62,13 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
     def __init__(self, model, space, trainer_params=None, proc_funcs=(), name=None):
         loss_func = loss_se  # TODO: Generalize!
 
-        super().__init__(loss_func, proc_funcs, name)
+        super().__init__(loss_func, space, proc_funcs, name)
         self.model = model
-        self._space = space
+        # self._space = space
         self.trainer_params = trainer_params
         self._reset_trainer()
 
-    space = property(lambda self: self._space)
+    # space = property(lambda self: self._space)
 
     @property
     def _model_obj(self):
