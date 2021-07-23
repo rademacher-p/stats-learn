@@ -217,6 +217,9 @@ def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=
         d_train, d_test = d[:n_train[-1]], d[n_train[-1]:]
 
         for predictor, params, y_stats, loss in zip(predictors, params_full, y_stats_full, loss_full):
+            if verbose:
+                print(f"  Predictor: {predictor.name}", end='\r')
+
             for i_n in range(len(n_train)):
                 if i_n == 0 or not predictor.can_warm_start:
                     slice_ = slice(0, n_train[i_n])
