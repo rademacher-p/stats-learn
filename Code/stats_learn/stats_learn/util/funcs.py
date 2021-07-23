@@ -1,0 +1,17 @@
+import numpy as np
+
+
+def make_sin_orig(shape):
+    def sin_orig(x):
+        axis = tuple(range(-len(shape), 0))
+        return 1 / (2 + np.sin(2 * np.pi * x.mean(axis)))
+    return sin_orig
+
+
+def make_rand_discrete(n, rng):
+    rng = np.random.default_rng(rng)
+    _rand_vals = dict(zip(np.linspace(0, 1, n, endpoint=True), rng.random(n)))
+
+    def rand_discrete(x):
+        return _rand_vals[x]
+    return rand_discrete

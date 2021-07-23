@@ -8,11 +8,7 @@ from copy import deepcopy
 import numpy as np
 from matplotlib import pyplot as plt
 
-from sklearn.linear_model import LinearRegression, SGDRegressor
 from sklearn.neural_network import MLPRegressor
-from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
 
 import torch
 from torch import nn
@@ -23,9 +19,9 @@ from pytorch_lightning.utilities.seed import seed_everything
 
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors import ModelRegressor, BayesRegressor, SKLWrapper, LitWrapper
-from stats_learn.util.results import plot_fit_compare, plot_risk_disc, predictor_compare
+from stats_learn.util.funcs import make_sin_orig, make_rand_discrete
+from stats_learn.util.results import predictor_compare, plot_fit_compare
 from stats_learn.random import elements as rand_elements, models as rand_models
-from stats_learn.preprocessing import discretizer, prob_disc
 from stats_learn.util.plotting import box_grid
 
 
@@ -74,25 +70,8 @@ shape_x = ()
 # w_model = [.5]
 w_model = [0, 1]
 
-
-def make_sin_orig(shape):
-    def sin_orig(x):
-        axis = tuple(range(-len(shape), 0))
-        return 1 / (2 + np.sin(2 * np.pi * x.mean(axis)))
-    return sin_orig
-
-
-def make_rand_discrete(n, rng):
-    rng = np.random.default_rng(rng)
-    _rand_vals = dict(zip(np.linspace(0, 1, n, endpoint=True), rng.random(n)))
-
-    def rand_discrete(x):
-        return _rand_vals[x]
-    return rand_discrete
-
-
-# nonlinear_model = make_sin_orig(shape_x)
-nonlinear_model = make_rand_discrete(n_x, rng=seed)
+nonlinear_model = make_sin_orig(shape_x)
+# nonlinear_model = make_rand_discrete(n_x, rng=seed)
 
 supp_x = box_grid(np.broadcast_to([0, 1], (*shape_x, 2)), n_x, endpoint=True)
 model_x = rand_elements.Finite(supp_x, p=np.full(math.prod(shape_x)*(n_x,), n_x**-math.prod(shape_x)))
@@ -151,11 +130,11 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10), p
 # dir_params = {'alpha_0': [.001]}
 # dir_params = {'alpha_0': [20]}
 # dir_params = {'alpha_0': [.01, 100]}
-# dir_params = {'alpha_0': [.000001, 100000]}
+dir_params = {'alpha_0': [.000001, 100000]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
 # dir_params = {'alpha_0': np.logspace(-0., 5., 60)}
-dir_params = {'alpha_0': np.logspace(-3., 3., 60)}
+# dir_params = {'alpha_0': np.logspace(-3., 3., 60)}
 
 if do_bayes:  # add true bayes model concentration
     if model_eval.alpha_0 not in dir_params['alpha_0']:
@@ -274,8 +253,8 @@ lit_predictor = LitWrapper(lit_model, model.space, trainer_params, name=lit_name
 
 #%% Results
 
-# n_train = 400
-n_train = [10, 20, 50, 100, 200]
+n_train = 400
+# n_train = [10, 20, 50, 100, 200]
 # n_train = [1, 4, 40, 400]
 # n_train = [0, 200, 400, 600]
 # n_train = [0, 400, 4000]
@@ -292,12 +271,12 @@ n_mc = 10
 
 
 temp = [
-    # (opt_predictor, None),
+    (opt_predictor, None),
     (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
     # (norm_predictor, norm_params),
     # (skl_predictor, None),
-    # (lit_predictor, None),
+    (lit_predictor, None),
 ]
 predictors, params = zip(*temp)
 
@@ -313,11 +292,11 @@ if file is not None:
 #                                             stats=('mean', 'std'), plot_stats=True, print_loss=True,
 #                                             verbose=True, img_path='images/temp/', file=file)
 
-y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-                                            plot_loss=True,
-                                            verbose=True, img_path='images/temp/', file=file)
+# y_stats_full, loss_full = predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+#                                             plot_loss=True,
+#                                             verbose=True, img_path='images/temp/', file=file)
 
-# plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params, img_path='images/temp/', file=file)
+plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params, img_path='images/temp/', file=file)
 
 # TODO: include `plot_fit_compare` figs in dissertation!?
 

@@ -2,15 +2,25 @@
   - No reg. = overfitting
   - With reg. = insufficiently flexible/intuitive?
 
+- **Show underfitting example vs NN due to inherent regularization?!**
+
+- Clairvoyant regressors
+  - Random func is *hard for NN*, but makes it difficult to use meaningful prior mean
+    - High variation makes regularization *worse* for both Dir and NN!!
+      - Dirichlet **benefit** = purest empirical learner for high variance data?!
+  - Discontinuous funcs (NN UAT only holds for continuous)?
+
+- Results best case: Dirichlet empirical is worst (*high N*) via MAX overfitting, then empirical NN (inherent reg.), then L2 reg. NN, then informative Dirichlet for MAX reg.
+
+- If |X| >> N, the prior mean will tend to be used with high probability and the effects of alpha_0 will be negligible. Bad for demonstrating empirical Dirichlet.
+  - Should use *higher* N to contrast localization effects!?
+
+
 - Use smaller discrete spaces? Or use continuous space and **discretization**?
   - Discretization makes the *restricted* function space a major regularizer!
   - **DISCRETE** enables better consistency/overfitting trade demo!!!
 
 - Need better NN architectures and optimizers to *maximize* overfitting!!
-
-- *Harder functions and data volumes for pop learners to learn*
-  - Random discrete functions
-  - Discontinuous funcs vs MLP (UAT only holds for continuous). Fractals?
 
 
 ---
