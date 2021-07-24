@@ -260,6 +260,8 @@ def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=
     if file is not None:
         print(f"\n# {NOW_STR}", file=file)
 
+    print(f"n_mc = {n_mc}", file=file)
+
     if do_loss and print_loss:
         _print_risk(predictors, params_full, n_train, loss_full, file=file)
 
