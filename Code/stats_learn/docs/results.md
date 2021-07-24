@@ -9,7 +9,7 @@ n_mc = 10
 | Lit MLP 500-500-500, 0.0 reg.   | 0.244 | 0.266 | 0.262 | 0.243 | 0.204 | 0.171 | 0.150 | 0.119 | 0.088 | 0.072 |  0.066 |
 | Lit MLP 500-500-500, 0.001 reg. | 0.247 | 0.268 | 0.258 | 0.224 | 0.186 | 0.160 | 0.132 | 0.122 | 0.116 | 0.116 |  0.116 |
 
-![](C:\Users\rademacherp\Documents\PhD\Research\Code\stats_learn\images\temp\2021-07-24T08_41_07.png)
+![](..\images\underfit_new.png)
 
 # 2021-07-24T10_34_31
 n_mc = 10
@@ -22,4 +22,4 @@ n_mc = 10
 | Lit MLP 500-500-500, 0.0 reg.   | 0.247 | 0.267 | 0.264 | 0.248 | 0.206 | 0.176 | 0.149 | 0.117 | 0.089 | 0.070 |  0.067 |
 | Lit MLP 500-500-500, 0.001 reg. | 0.240 | 0.254 | 0.260 | 0.235 | 0.187 | 0.159 | 0.131 | 0.121 | 0.116 | 0.115 |  0.116 |
 
-![](C:\Users\rademacherp\Documents\PhD\Research\Code\stats_learn\images\temp\2021-07-24T10_34_31.png)
+![](..\images\underfit_no_stopping.png)
