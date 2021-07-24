@@ -32,8 +32,8 @@ np.set_printoptions(precision=3)
 plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
 
-seed = None
-# seed = 12345
+# seed = None
+seed = 12345
 
 if seed is not None:
     seed_everything(seed)  # PyTorch Lightning seeding
@@ -224,7 +224,7 @@ for weight_decay in weight_decays:
 
 #%% Results
 
-n_train = 5
+n_train = 400
 # n_train = [1, 4, 40, 400]
 # n_train = [20, 40, 200, 400, 2000]
 # n_train = 2**np.arange(11)
@@ -235,14 +235,14 @@ n_train = 5
 
 n_test = 1000
 
-n_mc = 5
+n_mc = 2
 
 
 temp = [
     (opt_predictor, None),
     (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
-    (norm_predictor, norm_params),
+    # (norm_predictor, norm_params),
     # (skl_predictor, None),
     *((predictor, None) for predictor in lit_predictors),
 ]
@@ -250,7 +250,8 @@ predictors, params = zip(*temp)
 
 
 # file = None
-file = 'docs/temp/results.md'
+file = 'docs/temp/temp.md'
+# file = 'docs/results.md'
 
 if file is not None:
     file = Path(file).open('a')
@@ -258,16 +259,18 @@ if file is not None:
 
 # FIXME: need clipping to Box space for fair comparison?? Clipping to Finite is nonsensical?
 
-# y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-#                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
-#                                                     verbose=True, img_path='images/temp/', file=file)
+y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+                                                    stats=('mean', 'std'), plot_stats=True, print_loss=True,
+                                                    verbose=True, img_path='images/temp/', file=file)
 
 # y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
 #                                                     plot_loss=True, print_loss=True,
 #                                                     verbose=True, img_path='images/temp/', file=file)
 
-results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
-                         img_path='images/temp/', file=file)
+# TODO: save arrays!?
+
+# results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
+#                          img_path='images/temp/', file=file)
 
 # TODO: include `plot_fit_compare` figs in dissertation!?
 

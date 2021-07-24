@@ -24,6 +24,7 @@
   - **DISCRETE** enables better consistency/overfitting trade demo!!!
 
 - Need better NN architectures and optimizers to *maximize* overfitting!!
+  - **Comment** on excessive DOF and train time for DNN!
 
 
 ---
