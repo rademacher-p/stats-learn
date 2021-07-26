@@ -6,7 +6,7 @@
 - **Show underfitting example vs NN due to inherent regularization?!**
   - NN w/o reg. = mild underfitting
   - NN w/ reg. = severe underfitting
-  - *Use lower variance model??*
+  - **Use lower variance model??**
 
 - Clairvoyant regressors
   - Random func is *hard for NN*, but makes it difficult to use meaningful prior mean
@@ -14,6 +14,9 @@
       - Dirichlet **benefit** = purest empirical learner for high variance data?!
   - Discontinuous funcs? (NN UAT only holds for continuous)
 
+
+- Need better NN architectures and optimizers to *maximize* overfitting!!
+  - Comment on **excessive** DOF and train time for DNN!
 
 
 - If |X| >> N, the prior mean will tend to be used with high probability and the effects of alpha_0 will be negligible. Bad for demonstrating empirical Dirichlet.
@@ -23,8 +26,6 @@
   - Discretization makes the *restricted* function space a major regularizer!
   - **DISCRETE** enables better consistency/overfitting trade demo!!!
 
-- Need better NN architectures and optimizers to *maximize* overfitting!!
-  - **Comment** on excessive DOF and train time for DNN!
 
 
 ---

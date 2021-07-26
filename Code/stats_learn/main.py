@@ -193,24 +193,25 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 
 
 #%% PyTorch
-weight_decays = [0.]
+# weight_decays = [0.]
 # weight_decays = [0.001]
-# weight_decays = [0., 0.001]
+weight_decays = [0., 0.001]
 
 # proc_funcs = []
 proc_funcs = {'pre': [], 'post': [make_clipper((0, 1))]}
 
 lit_predictors = []
 for weight_decay in weight_decays:
-    layer_sizes = [500, 500, 500]
+    # layer_sizes = [500, 500, 500]
+    layer_sizes = [500, 500, 500, 500]
     optim_params = {'lr': 1e-3, 'weight_decay': weight_decay}
 
     lit_name = f"Lit MLP {'-'.join(map(str, layer_sizes))}, {optim_params['weight_decay']} reg."
 
     trainer_params = {
-        'max_epochs': 10000,
-        'callbacks': pl.callbacks.EarlyStopping('train_loss', min_delta=1e-4, patience=500,
-                                                check_on_train_epoch_end=True),
+        'max_epochs': 50000,
+        # 'callbacks': pl.callbacks.EarlyStopping('train_loss', min_delta=1e-4, patience=2000,
+        #                                         check_on_train_epoch_end=True),
         'checkpoint_callback': False,
         'logger': pl_loggers.TensorBoardLogger('logs/', name=lit_name),
         'weights_summary': None,
@@ -224,7 +225,7 @@ for weight_decay in weight_decays:
 
 #%% Results
 
-n_train = 400
+n_train = 128
 # n_train = [1, 4, 40, 400]
 # n_train = [20, 40, 200, 400, 2000]
 # n_train = 2**np.arange(11)
@@ -235,7 +236,7 @@ n_train = 400
 
 n_test = 1000
 
-n_mc = 2
+n_mc = 5
 
 
 temp = [
