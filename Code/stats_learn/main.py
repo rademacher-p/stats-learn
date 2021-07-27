@@ -258,7 +258,9 @@ if file is not None:
     file = Path(file).open('a')
 
 
-# FIXME: need clipping to Box space for fair comparison?? Clipping to Finite is nonsensical?
+# TODO: refactor user scripts outside `stats_learn` package?!?
+
+# TODO: Note clipping in results!
 
 y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
