@@ -1,4 +1,4 @@
-##### PGR additions
+### Project files
 
 Documentation/Dissertation/*.pdf
 Documentation/Qualifying Exam/*.pdf
@@ -15,8 +15,7 @@ Code/Matlab/Old/
 *.asv
 
 
-
-##### github/gitignore Tex
+### github/gitignore/TeX.gitignore
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
@@ -140,6 +139,7 @@ acs-*.bib
 
 # gregoriotex
 *.gaux
+*.glog
 *.gtex
 
 # htlatex
@@ -155,8 +155,8 @@ acs-*.bib
 
 # knitr
 *-concordance.tex
-# TODO Comment the next line if you want to keep your tikz graphics files
-*.tikz
+# TODO Uncomment the next line if you use knitr and want to ignore its generated tikz files
+# *.tikz
 *-tikzDictionary
 
 # listings
@@ -185,6 +185,9 @@ _minted*
 
 # morewrites
 *.mw
+
+# newpax
+*.newpax
 
 # nomencl
 *.nlg
@@ -294,3 +297,12 @@ TSWLatexianTemp*
 
 # Makeindex log files
 *.lpz
+
+# xwatermark package
+*.xwm
+
+# REVTeX puts footnotes in the bibliography by default, unless the nofootinbib
+# option is specified. Footnotes are the stored in a file with suffix Notes.bib.
+# Uncomment the next line to have this generated file ignored.
+#*Notes.bib
+

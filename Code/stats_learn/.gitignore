@@ -1,16 +1,16 @@
+### Project files
 images/temp/
 data/temp/
-docs/temp/
-logs/
-
-##### IntelliJ project files
-.idea
-*.iml
-out
-gen
+logs/temp/
+logs/learn/
 
 
-##### github/gitignore Python
+### JetBrains
+# TODO: use github/gitignore/Global/PyCharm.gitignore ?
+.idea/
+
+
+##### github/gitignore/Python.gitignore
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -34,7 +34,6 @@ parts/
 sdist/
 var/
 wheels/
-pip-wheel-metadata/
 share/python-wheels/
 *.egg-info/
 .installed.cfg
@@ -151,7 +150,3 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-
-# static files generated from Django application using `collectstatic`
-media
-static

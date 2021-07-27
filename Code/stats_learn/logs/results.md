@@ -64,7 +64,6 @@ n_mc = 10
 | $\Dir$, $\alpha_0 = 1000000.0$    | 0.114 |
 | Lit MLP 500-500-500-500, 0.0 reg. | 0.110 |
 
-[comment]: <> (![]&#40;C:\Users\paulg\Documents\PhD\Research\Code\stats_learn\images\temp\2021-07-25T14_35_53.png&#41;)
 ![](..\images\ex_underfitting\predict_full.png)
 
 
