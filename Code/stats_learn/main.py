@@ -213,7 +213,7 @@ for weight_decay in weight_decays:
         # 'callbacks': pl.callbacks.EarlyStopping('train_loss', min_delta=1e-4, patience=2000,
         #                                         check_on_train_epoch_end=True),
         'checkpoint_callback': False,
-        'logger': pl_loggers.TensorBoardLogger('logs/', name=lit_name),
+        'logger': pl_loggers.TensorBoardLogger('logs/learn/', name=lit_name),
         'weights_summary': None,
         'gpus': torch.cuda.device_count(),
     }
@@ -251,8 +251,8 @@ predictors, params = zip(*temp)
 
 
 # file = None
-file = 'docs/temp/temp.md'
-# file = 'docs/results.md'
+file = 'logs/temp/temp.md'
+# file = 'logs/results.md'
 
 if file is not None:
     file = Path(file).open('a')
