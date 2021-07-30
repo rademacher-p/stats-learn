@@ -4,6 +4,7 @@ Main.
 import math
 from pathlib import Path
 from copy import deepcopy
+import pickle
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -11,16 +12,16 @@ from matplotlib import pyplot as plt
 from sklearn.neural_network import MLPRegressor
 
 import torch
-import pytorch_lightning as pl
+from pytorch_lightning.callbacks import EarlyStopping
 import pytorch_lightning.loggers as pl_loggers
 from pytorch_lightning.utilities.seed import seed_everything
 
+from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors import ModelRegressor, BayesRegressor, SKLWrapper
-from stats_learn.util import funcs
-from stats_learn.util import results
+from stats_learn.util import funcs, results
+from stats_learn.util.base import NOW_STR
 from stats_learn.util.data_processing import make_discretizer, make_clipper
-from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.util.plotting import box_grid
 from stats_learn.util.torch import LitMLP, LitWrapper
 
@@ -53,7 +54,6 @@ def func_mean_to_models(n, alpha_0, func):
 
 
 n_x = 128
-# n_x = 32
 
 # var_y_x_const = 1 / (n_x-1)
 var_y_x_const = 1/5
@@ -67,18 +67,22 @@ alpha_y_x_beta = 1/var_y_x_const - 1
 shape_x = ()
 # shape_x = (2,)
 
+size_x = math.prod(shape_x)
+lims_x = np.broadcast_to([0, 1], (*shape_x, 2))
+
 # w_model = [.5]
 w_model = [0, 1]
 
 # nonlinear_model = funcs.make_sin_orig(shape_x)
 nonlinear_model = funcs.make_rand_discrete(n_x, rng=seed)
 
-supp_x = box_grid(np.broadcast_to([0, 1], (*shape_x, 2)), n_x, endpoint=True)
-model_x = rand_elements.Finite(supp_x, p=np.full(math.prod(shape_x)*(n_x,), n_x**-math.prod(shape_x)))
+
+supp_x = box_grid(lims_x, n_x, endpoint=True)
+model_x = rand_elements.Finite(supp_x, p=np.full(size_x*(n_x,), n_x**-size_x))
 # model = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_model), model_x)
 model = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model), model_x)
 
-# model_x = rand_elements.Uniform(np.broadcast_to([0, 1], (*shape_x, 2)))
+# model_x = rand_elements.Uniform(lims_x)
 # # model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
 # model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x)
 
@@ -130,7 +134,8 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10),
 # dir_params = {'alpha_0': [.001]}
 # dir_params = {'alpha_0': [20]}
 # dir_params = {'alpha_0': [.01, 100]}
-dir_params = {'alpha_0': [1e-6, 1e6]}
+dir_params = {'alpha_0': [1e-5, 1e5]}
+# dir_params = {'alpha_0': [1e-6, 1e6]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
 # dir_params = {'alpha_0': np.logspace(-0., 5., 60)}
@@ -160,7 +165,7 @@ basis_y_x = None
 # basis_y_x = [make_square_func(val) for val in supp_t]
 
 # proc_funcs = []
-proc_funcs = {'pre': [], 'post': [make_clipper((0, 1))]}
+proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
 
 norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior_norm, prior_cov=.1, basis_y_x=basis_y_x,
                                                           cov_y_x=.1, model_x=model_x, allow_singular=True),
@@ -200,11 +205,10 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 weight_decays = [0., 0.001]
 
 # proc_funcs = []
-proc_funcs = {'pre': [], 'post': [make_clipper((0, 1))]}
+proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
 
 lit_predictors = []
 for weight_decay in weight_decays:
-    # layer_sizes = [500, 500, 500]
     layer_sizes = [500, 500, 500, 500]
     optim_params = {'lr': 1e-3, 'weight_decay': weight_decay}
 
@@ -214,26 +218,25 @@ for weight_decay in weight_decays:
     lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {optim_params['weight_decay']}$"
 
     trainer_params = {
-        'max_epochs': 5000,
-        # 'callbacks': pl.callbacks.EarlyStopping('train_loss', min_delta=1e-4, patience=2000,
-        #                                         check_on_train_epoch_end=True),
+        'max_epochs': 50000,
+        # 'callbacks': EarlyStopping('train_loss', min_delta=1e-4, patience=2000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
         'logger': pl_loggers.TensorBoardLogger('logs/learn/', name=logger_name),
         'weights_summary': None,
         'gpus': torch.cuda.device_count(),
     }
 
-    lit_model = LitMLP([math.prod(shape_x), *layer_sizes], optim_params=optim_params)
+    lit_model = LitMLP([size_x, *layer_sizes], optim_params=optim_params)
     lit_predictor = LitWrapper(lit_model, model.space, trainer_params, proc_funcs, name=lit_name)
     lit_predictors.append(lit_predictor)
 
 
 #%% Results
 
-n_train = 128
+# n_train = 128
 # n_train = [1, 4, 40, 400]
 # n_train = [20, 40, 200, 400, 2000]
-# n_train = 2**np.arange(11)
+n_train = 2**np.arange(11)
 # n_train = [0, 400, 4000]
 # n_train = np.arange(0, 55, 5)
 # n_train = np.arange(0, 4500, 500)
@@ -241,7 +244,7 @@ n_train = 128
 
 n_test = 1000
 
-n_mc = 2
+n_mc = 10
 
 
 temp = [
@@ -250,7 +253,7 @@ temp = [
     # *(zip(dir_predictors, dir_params_full)),
     # (norm_predictor, norm_params),
     # (skl_predictor, None),
-    *((predictor, None) for predictor in lit_predictors),
+    # *((predictor, None) for predictor in lit_predictors),
 ]
 predictors, params = zip(*temp)
 
@@ -263,24 +266,23 @@ if file is not None:
     file = Path(file).open('a')
 
 
-# TODO: refactor user scripts outside `stats_learn` package?!?
-
-# TODO: Note clipping in results!
-
-y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-                                                    stats=('mean', 'std'), plot_stats=True, print_loss=True,
-                                                    verbose=True, img_path='images/temp/', file=file)
+# FIXME: NOTE clipping in results!
 
 # y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-#                                                     plot_loss=True, print_loss=True,
+#                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
 #                                                     verbose=True, img_path='images/temp/', file=file)
 
-# TODO: save arrays!?
+y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+                                                    plot_loss=True, print_loss=True,
+                                                    verbose=True, img_path='images/temp/', file=file)
 
 # results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
 #                          img_path='images/temp/', file=file)
 
 # TODO: include `plot_fit_compare` figs in dissertation!?
+
+# with open(f'data/temp/{NOW_STR}.pkl', 'wb') as fid:
+#     pickle.dump(dict(y_stats=y_stats_full, losses=loss_full), fid)
 
 if file is not None:
     file.close()
