@@ -94,3 +94,37 @@ n_mc = 10
 
 # Low Variance Results
 
+### 2021-07-30T15_29_12
+- MC iterations: 5
+
+|                                   |   128 |
+|-----------------------------------|-------|
+| $f_{\Theta}(\theta)$              | 0.001 |
+| $\Dir$, $\alpha_0 = 1e-05$        | 0.027 |
+| $\Dir$, $\alpha_0 = 100000.0$     | 0.075 |
+| $\mathrm{MLP}$, $\lambda = 0.0$   | 0.055 |
+| $\mathrm{MLP}$, $\lambda = 0.001$ | 0.069 |
+
+![](C:\Users\paulg\Documents\PhD\Research\Code\stats_learn\images\temp\2021-07-30T15_29_12.png)
+
+### 2021-07-30T15_28_15
+- MC iterations: 5
+
+|                               |   128 |
+|-------------------------------|-------|
+| $f_{\Theta}(\theta)$          | 0.001 |
+| $\Dir$, $\alpha_0 = 1e-05$    | 0.027 |
+| $\Dir$, $\alpha_0 = 100000.0$ | 0.075 |
+
+![](C:\Users\paulg\Documents\PhD\Research\Code\stats_learn\images\temp\2021-07-30T15_28_15.png)
+
+### 2021-07-30T15_46_06
+- MC iterations: 5
+
+|                                   |   128 |
+|-----------------------------------|-------|
+| $f_{\Theta}(\theta)$              | 0.001 |
+| $\mathrm{MLP}$, $\lambda = 0.0$   | 0.055 |
+| $\mathrm{MLP}$, $\lambda = 0.001$ | 0.069 |
+
+![](C:\Users\paulg\Documents\PhD\Research\Code\stats_learn\images\temp\2021-07-30T15_46_06.png)
