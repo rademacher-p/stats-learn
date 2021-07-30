@@ -56,8 +56,8 @@ def func_mean_to_models(n, alpha_0, func):
 n_x = 128
 
 # var_y_x_const = 1 / (n_x-1)
-var_y_x_const = 1/5
-# var_y_x_const = 1/125
+# var_y_x_const = 1/5
+var_y_x_const = 1/125
 
 alpha_y_x_d = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_x-1))
 alpha_y_x_beta = 1/var_y_x_const - 1
@@ -219,7 +219,7 @@ for weight_decay in weight_decays:
 
     trainer_params = {
         'max_epochs': 50000,
-        # 'callbacks': EarlyStopping('train_loss', min_delta=1e-4, patience=2000, check_on_train_epoch_end=True),
+        'callbacks': EarlyStopping('train_loss', min_delta=1e-4, patience=2000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
         'logger': pl_loggers.TensorBoardLogger('logs/learn/', name=logger_name),
         'weights_summary': None,

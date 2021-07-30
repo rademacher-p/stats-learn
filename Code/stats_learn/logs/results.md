@@ -40,7 +40,7 @@ n_mc = 10
 
 # BEST RESULTS:
 
-# 2021-07-25T11_13_28
+### 2021-07-25T11_13_28
 - MC iterations: 5
 
 |                                     |     1 |     2 |     4 |     8 |    16 |    32 |    64 |   128 |   256 |   512 |   1024 |
@@ -89,3 +89,8 @@ n_mc = 10
 | Lit MLP 500-500-500-500, 0.001 reg. | 0.111 |
 
 ![](..\images\ex_underfitting\predict_nn.png)
+
+
+
+# Low Variance Results
+
