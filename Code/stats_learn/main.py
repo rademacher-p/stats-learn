@@ -4,7 +4,7 @@ Main.
 import math
 from pathlib import Path
 from copy import deepcopy
-import pickle
+# import pickle
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -20,7 +20,7 @@ from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors import ModelRegressor, BayesRegressor, SKLWrapper
 from stats_learn.util import funcs, results
-from stats_learn.util.base import NOW_STR
+# from stats_learn.util.base import NOW_STR
 from stats_learn.util.data_processing import make_discretizer, make_clipper
 from stats_learn.util.plotting import box_grid
 from stats_learn.util.torch import LitMLP, LitWrapper
@@ -34,7 +34,7 @@ plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
 
 # seed = None
-seed = 12345
+seed = 123450
 
 if seed is not None:
     seed_everything(seed)  # PyTorch Lightning seeding
@@ -57,7 +57,7 @@ n_x = 128
 
 # var_y_x_const = 1 / (n_x-1)
 var_y_x_const = 1/5
-# var_y_x_const = 1/50
+# var_y_x_const = 1/125
 
 alpha_y_x_d = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_x-1))
 alpha_y_x_beta = 1/var_y_x_const - 1
@@ -73,7 +73,7 @@ lims_x = np.broadcast_to([0, 1], (*shape_x, 2))
 # w_model = [.5]
 w_model = [0, 1]
 
-# nonlinear_model = funcs.make_sin_orig(shape_x)
+# nonlinear_model = funcs.make_inv_trig(shape_x)
 nonlinear_model = funcs.make_rand_discrete(n_x, rng=seed)
 
 
@@ -200,9 +200,9 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 #%% PyTorch
 # TODO: add citations to dissertation. PyTorch, Adam weight decay, etc.
 
-# weight_decays = [0.]
+weight_decays = [0.]
 # weight_decays = [0.001]
-weight_decays = [0., 0.001]
+# weight_decays = [0., 0.001]
 
 # proc_funcs = []
 proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
@@ -233,10 +233,10 @@ for weight_decay in weight_decays:
 
 #%% Results
 
-# n_train = 128
+n_train = 128
 # n_train = [1, 4, 40, 400]
 # n_train = [20, 40, 200, 400, 2000]
-n_train = 2**np.arange(11)
+# n_train = 2**np.arange(11)
 # n_train = [0, 400, 4000]
 # n_train = np.arange(0, 55, 5)
 # n_train = np.arange(0, 4500, 500)
@@ -244,7 +244,7 @@ n_train = 2**np.arange(11)
 
 n_test = 1000
 
-n_mc = 10
+n_mc = 5
 
 
 temp = [
@@ -253,7 +253,7 @@ temp = [
     # *(zip(dir_predictors, dir_params_full)),
     # (norm_predictor, norm_params),
     # (skl_predictor, None),
-    # *((predictor, None) for predictor in lit_predictors),
+    *((predictor, None) for predictor in lit_predictors),
 ]
 predictors, params = zip(*temp)
 
@@ -268,13 +268,13 @@ if file is not None:
 
 # FIXME: NOTE clipping in results!
 
-# y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-#                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
-#                                                     verbose=True, img_path='images/temp/', file=file)
-
 y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-                                                    plot_loss=True, print_loss=True,
+                                                    stats=('mean', 'std'), plot_stats=True, print_loss=True,
                                                     verbose=True, img_path='images/temp/', file=file)
+
+# y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+#                                                     plot_loss=True, print_loss=True,
+#                                                     verbose=True, img_path='images/temp/', file=file)
 
 # results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
 #                          img_path='images/temp/', file=file)
