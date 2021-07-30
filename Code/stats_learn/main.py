@@ -193,6 +193,8 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 
 
 #%% PyTorch
+# TODO: add citations to dissertation. PyTorch, Adam weight decay, etc.
+
 # weight_decays = [0.]
 # weight_decays = [0.001]
 weight_decays = [0., 0.001]
@@ -206,14 +208,17 @@ for weight_decay in weight_decays:
     layer_sizes = [500, 500, 500, 500]
     optim_params = {'lr': 1e-3, 'weight_decay': weight_decay}
 
-    lit_name = f"Lit MLP {'-'.join(map(str, layer_sizes))}, {optim_params['weight_decay']} reg."
+    logger_name = f"MLP {'-'.join(map(str, layer_sizes))}, lambda {optim_params['weight_decay']}"
+    # lit_name = r"$\text{{MLP}} {}$, $\lambda = {}$".format('-'.join(map(str, layer_sizes)),
+    #                                                      optim_params['weight_decay'])
+    lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {optim_params['weight_decay']}$"
 
     trainer_params = {
-        'max_epochs': 50000,
+        'max_epochs': 5000,
         # 'callbacks': pl.callbacks.EarlyStopping('train_loss', min_delta=1e-4, patience=2000,
         #                                         check_on_train_epoch_end=True),
         'checkpoint_callback': False,
-        'logger': pl_loggers.TensorBoardLogger('logs/learn/', name=lit_name),
+        'logger': pl_loggers.TensorBoardLogger('logs/learn/', name=logger_name),
         'weights_summary': None,
         'gpus': torch.cuda.device_count(),
     }
@@ -236,7 +241,7 @@ n_train = 128
 
 n_test = 1000
 
-n_mc = 5
+n_mc = 2
 
 
 temp = [
