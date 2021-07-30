@@ -258,7 +258,7 @@ def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=
 
     # Printing
     if file is not None:
-        print(f"\n# {NOW_STR}", file=file)
+        print(f"\n### {NOW_STR}", file=file)
 
     print(f"- MC iterations: {n_mc}", file=file)
 
