@@ -249,11 +249,11 @@ If the range of $g$ is a Hilbert space, such that $g(\xrm)$ is itself a function
 \Erm_{\xrm}\big[ g(\xrm) \big](y) = \sum_{x} \Prm_{\xrm}(x) g(y;x) \;.
 \end{equation}
 Similarly, the covariance function notation is modified and the output is a function over $\Ycal \times \Ycal$, 
-\begin{IEEEeqnarray}{L}
-\Crm_{\xrm}\big[g(\xrm)\big](y,y') = \Erm_{\xrm} \bigg[ \Big( g(y;\xrm) - \Erm_{\xrm}\big[g(y;\xrm)\big] \Big) \Big( g(y';\xrm) - \Erm_{\xrm}\big[g(y';\xrm)\big] \Big) \bigg] \;.
+\begin{IEEEeqnarray}{rCl}
+\Crm_{\xrm}\big[g(\xrm)\big](y,y') & = & \Erm_{\xrm} \bigg[ \Big( g(y;\xrm) - \Erm_{\xrm}\big[g(y;\xrm)\big] \Big) \Big( g(y';\xrm) - \Erm_{\xrm}\big[g(y';\xrm)\big] \Big) \bigg] \;.
 \end{IEEEeqnarray}
-\begin{IEEEeqnarray}{L}
-\Crm_{\xrm}\big[g(\xrm)\big] = \Erm_{\xrm} \bigg[ \Big( g(\xrm) - \Erm_{\xrm}\big[g(\xrm)\big] \Big) \otimes \Big( g(\xrm) - \Erm_{\xrm}\big[g(\xrm)\big] \Big) \bigg] \;.
+\begin{IEEEeqnarray}{rCl}
+\Crm_{\xrm}\big[g(\xrm)\big] & = & \Erm_{\xrm} \bigg[ \Big( g(\xrm) - \Erm_{\xrm}\big[g(\xrm)\big] \Big) \otimes \Big( g(\xrm) - \Erm_{\xrm}\big[g(\xrm)\big] \Big) \bigg] \;.
 \end{IEEEeqnarray}
 As before, the notation is simplified when the function $g$ is the identity operator. If $\xrm$ is a random process over a domain $\Ycal$, then the mean and covariance functions are defined over domains $\Ycal$ and $\Ycal \times \Ycal$ with values notated such as $\mu_{\xrm}(y)$ and $\Sigma_{\xrm}(y,y')$.
 
@@ -346,8 +346,8 @@ The first and second joint moments of this Empirical distribution (derived from 
 \mu_{\uppsi | \uptheta} & = & \uptheta
 \end{IEEEeqnarray}
 and
-\begin{IEEEeqnarray}{L}
-\Erm_{\uppsi | \uptheta}\big[ \uppsi \otimes \uppsi \big] = \frac{1}{N} \diag(\uptheta)  + \left(1 - \frac{1}{N}\right) \uptheta \otimes \uptheta 
+\begin{IEEEeqnarray}{rCl}
+\Erm_{\uppsi | \uptheta}\big[ \uppsi \otimes \uppsi \big] & = & \frac{1}{N} \diag(\uptheta)  + \left(1 - \frac{1}{N}\right) \uptheta \otimes \uptheta 
 \end{IEEEeqnarray}
 %\begin{IEEEeqnarray}{L}
 %\Erm_{\uppsi | \uptheta}\big[ \uppsi(y,x) \uppsi(y',x') \big] = \frac{1}{N} \uptheta(y,x) \delta[y,y'] \delta[x,x'] + \left(1 - \frac{1}{N}\right) \uptheta(y,x) \uptheta(y',x') 
@@ -684,6 +684,11 @@ the conditional second moments of $\Delta(\xrm; \Drm,\upthetac)$ can be readily 
 \Erm_{\Drm | \upthetam,\upthetac} \Big[ \Delta(\xrm; \Drm,\upthetac) \otimes \Delta(\xrm; \Drm,\upthetac) \Big] \nonumber \\
 \qquad = \mathrm{Bias}(\xrm; \upthetam,\upthetac) \otimes \mathrm{Bias}(\xrm; \upthetam,\upthetac) + \mathrm{Cov}(\xrm; \upthetam,\upthetac)
 \end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{rCl} 
+%\IEEEeqnarraymulticol{3}{l}{\Erm_{\Drm | \upthetam,\upthetac} \Big[ \Delta(\xrm; \Drm,\upthetac) \otimes \Delta(\xrm; \Drm,\upthetac) \Big]} \nonumber \\
+%\qquad & = & \mathrm{Bias}(\xrm; \upthetam,\upthetac) \otimes \mathrm{Bias}(\xrm; \upthetam,\upthetac) + \mathrm{Cov}(\xrm; \upthetam,\upthetac)
+%\label{eq:predictive_del_sq}
+%\end{IEEEeqnarray}
 over the domain $\Ycal \times \Ycal$.
 
 
@@ -1365,35 +1370,50 @@ The Bayes predictive PMF can thus be expressed as
 This section analyzes the bias and variance of the Dirichlet-based $\Prm_{\yrm | \xrm,\Drm}$ when used to estimate the clairvoyant predictive distribution $\Prm_{\yrm | \xrm,\uptheta} \equiv \upthetac(\xrm)$. To simplify the analysis, the training data $\Drm$ will be represented using the marginal and conditional sufficient statistics $(\uppsim, \uppsic)$, such that $\Erm_{\Drm | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\Drm} \big] = \Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big]$ and $\Crm_{\Drm | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\Drm} \big] = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big]$. 
 
 For a given $\xrm$, the expected value of the estimate conditioned on the true model is
-\begin{IEEEeqnarray}{rCl} \label{eq:predictive_dist_avg_dir}
-\Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] 
-& = & \Erm_{\uppsim | \upthetam} \big[\gammam(\xrm; \uppsim)\big] \alphac(\xrm) \nonumber \\
-&& + \Erm_{\uppsim | \upthetam} \big[1 - \gammam(\xrm; \uppsim)\big] \upthetac(\xrm) \;,
+\begin{IEEEeqnarray}{L} \label{eq:predictive_dist_avg_dir}
+\Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \nonumber \\
+\qquad = \Erm_{\uppsim | \upthetam} \big[\gammam(\xrm; \uppsim)\big] \alphac(\xrm) + \Erm_{\uppsim | \upthetam} \big[1 - \gammam(\xrm; \uppsim)\big] \upthetac(\xrm) \;,
 \end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{rCl} \label{eq:predictive_dist_avg_dir}
+%\Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] 
+%& = & \Erm_{\uppsim | \upthetam} \big[\gammam(\xrm; \uppsim)\big] \alphac(\xrm) \nonumber \\
+%&& + \Erm_{\uppsim | \upthetam} \big[1 - \gammam(\xrm; \uppsim)\big] \upthetac(\xrm) \;,
+%\end{IEEEeqnarray}
 where the properties of an Empirical distribution (\cref{app:emp}) conditioned on its aggregation have been used. The result is a convex combination of the conditional data-independent distribution $\alphac(\xrm)$ and the true conditional distribution $\upthetac(\xrm)$. Substituting into \eqref{eq:predictive_bias}, the expected bias is
 \begin{IEEEeqnarray}{rCl} \label{eq:predictive_bias_dir}
 \mathrm{Bias}(\xrm;\upthetam,\upthetac) & = & \Erm_{\uppsim | \upthetam}\big[\gammam(\xrm; \uppsim)\big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \;
 \end{IEEEeqnarray}
 and, noting that
-\begin{IEEEeqnarray}{L}
-\Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \nonumber \\
-\qquad = \Big( \gammam(\xrm; \uppsim) - \Erm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \Big) \big(\alphac(\xrm) - \upthetac(\xrm)\big) \nonumber \\
-\qquad \quad+ \big(1 - \gammam(\xrm; \uppsim)\big) \big(\uppsic(\xrm) - \upthetac(\xrm)\big) \;,
+\begin{IEEEeqnarray}{rCl}
+\IEEEeqnarraymulticol{3}{l}{\Prm_{\yrm | \xrm,\uppsim,\uppsic} - \Erm_{\uppsim,\uppsic | \upthetam,\upthetac}\big[ \Prm_{\yrm | \xrm,\uppsim,\uppsic} \big]} \nonumber \\
+\qquad & = & \Big( \gammam(\xrm; \uppsim) - \Erm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \Big) \big(\alphac(\xrm) - \upthetac(\xrm)\big) \nonumber \\
+&& + \big(1 - \gammam(\xrm; \uppsim)\big) \big(\uppsic(\xrm) - \upthetac(\xrm)\big) \;,
 \end{IEEEeqnarray}
 the covariance \eqref{eq:predictive_cov} of the estimate can be represented as
-\begin{IEEEeqnarray}{L} \label{eq:predictive_cov_dir}
-\mathrm{Cov}(\xrm;\upthetam,\upthetac) = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \nonumber \\
-\qquad = \Crm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
-\qquad \quad+ \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \;.
+\begin{IEEEeqnarray}{rCl} \label{eq:predictive_cov_dir}
+\mathrm{Cov}(\xrm;\upthetam,\upthetac) & = & \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \nonumber \\
+& = & \Crm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
+&& + \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \; . \nonumber \\
 \end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{L} \label{eq:predictive_cov_dir}
+%\mathrm{Cov}(\xrm;\upthetam,\upthetac) = \Crm_{\uppsim,\uppsic | \upthetam,\upthetac} \big[\Prm_{\yrm | \xrm,\uppsim,\uppsic} \big] \nonumber \\
+%\qquad = \Crm_{\uppsim | \upthetam}\big[ \gammam(\xrm; \uppsim) \big] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
+%\qquad \quad+ \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \;.
+%\end{IEEEeqnarray}
 
 
 Substituting the estimator bias and variance into \eqref{eq:predictive_del_sq}, the conditional second moments of $\Delta(\xrm; \Drm,\upthetac)$ are
-\begin{IEEEeqnarray}{L} \label{eq:predictive_del_sq_dir}
-\Erm_{\Drm | \upthetam,\upthetac} \big[ \Delta(\xrm; \Drm,\upthetac) \otimes \Delta(\xrm; \Drm,\upthetac) \big] \nonumber \\
-\qquad \equiv \Erm_{\uppsim | \upthetam}\left[ \gammam(\xrm; \uppsim)^2 \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
-\qquad \quad+ \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \;.
+\begin{IEEEeqnarray}{rCl} 
+\IEEEeqnarraymulticol{3}{l}{\Erm_{\Drm | \upthetam,\upthetac} \big[ \Delta(\xrm; \Drm,\upthetac) \otimes \Delta(\xrm; \Drm,\upthetac) \big]} \nonumber \\
+\qquad & \equiv & \Erm_{\uppsim | \upthetam}\left[ \gammam(\xrm; \uppsim)^2 \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
+&& + \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \;.
+\label{eq:predictive_del_sq_dir}
 \end{IEEEeqnarray}
+%\begin{IEEEeqnarray}{L} \label{eq:predictive_del_sq_dir}
+%\Erm_{\Drm | \upthetam,\upthetac} \big[ \Delta(\xrm; \Drm,\upthetac) \otimes \Delta(\xrm; \Drm,\upthetac) \big] \nonumber \\
+%\qquad \equiv \Erm_{\uppsim | \upthetam}\left[ \gammam(\xrm; \uppsim)^2 \right] \big( \alphac(\xrm) - \upthetac(\xrm) \big) \otimes \big( \alphac(\xrm) - \upthetac(\xrm) \big) \nonumber \\
+%\qquad \quad+ \Erm_{\uppsim | \upthetam}\left[ \frac{\big(1 - \gammam(\xrm; \uppsim)\big)^2}{N \uppsim(\xrm)} \right] \Big( \diag\big(\upthetac(\xrm)\big) - \upthetac(\xrm) \otimes \upthetac(\xrm) \Big) \;.
+%\end{IEEEeqnarray}
 Note that the bias is proportionate to the difference between the true conditional model and the data-independent estimate, while the covariance also depends on $\Sigma_{\uppsic(x) | \uppsim(x), \upthetac(x)}$. 
 
 %The conditional expectation over $\xrm$ is
@@ -1574,14 +1594,14 @@ Observe that the objective function can be represented as a convex combination o
 
 
 It is useful to substitute the Bayes predictive distribution using the Dirichlet prior \eqref{eq:P_y_xD_dir} into \eqref{eq:f_opt_xD}, expressing the decision for a given input $\xrm$ and training set $\Drm$ as
-\begin{IEEEeqnarray}{L} \label{eq:E_y|xD L}
-f^*(\xrm;\Drm) = \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm} \big[ \Lcal(h,\yrm) \big] \nonumber \\
-= \argmin_{h \in \Hcal} \frac{\alpha_0 \sum_{y \in \Ycal} \alpha(y,\xrm) \Lcal(h,y) + N \sum_{y \in \Ycal} \Psi(y,\xrm;\Drm) \Lcal(h,y)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)} \nonumber \\
-= \argmin_{h \in \Hcal} \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)}\right) \sum_{y \in \Ycal} \alphac(y;\xrm) \Lcal(h,y) \nonumber \\
-\quad + \left(\frac{N \Psim(\xrm;\Xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)}\right) \sum_{y \in \Ycal} \Psic(y;\xrm;\Drm) \Lcal(h,y) \nonumber \\
-= \argmin_{h \in \Hcal} \gammam(\xrm; \Xrm) \sum_{y \in \Ycal} \alphac(y;\xrm) \Lcal(h,y) + \big(1-\gammam(\xrm; \Xrm)\big) \sum_{y \in \Ycal} \Psic(y;\xrm;\Drm) \Lcal(h,y) \nonumber \\
-= \argmin_{h \in \Hcal} \gammam(\xrm; \Xrm) \Erm_{\yrm | \xrm}\big[ \Lcal(h,\yrm) \big] + \big(1-\gammam(\xrm; \Xrm)\big) \frac{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Lcal\big( h,\Yrm_n \big)}{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big]} \nonumber \\
-= \argmin_{h \in \Hcal} \alpha_0 \sum_{y \in \Ycal} \alpha(y,\xrm) \Lcal(h,y) + \sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Lcal\big( h,\Yrm_n \big) \;.
+\begin{IEEEeqnarray}{rCl} \label{eq:E_y|xD L}
+f^*(\xrm;\Drm) & = & \argmin_{h \in \Hcal} \Erm_{\yrm | \xrm,\Drm} \big[ \Lcal(h,\yrm) \big] \nonumber \\
+& = & \argmin_{h \in \Hcal} \frac{\alpha_0 \sum_{y \in \Ycal} \alpha(y,\xrm) \Lcal(h,y) + N \sum_{y \in \Ycal} \Psi(y,\xrm;\Drm) \Lcal(h,y)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)} \nonumber \\
+& = & \argmin_{h \in \Hcal} \left(\frac{\alpha_0 \alpham(\xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)}\right) \sum_{y \in \Ycal} \alphac(y;\xrm) \Lcal(h,y) \nonumber \\
+&& + \left(\frac{N \Psim(\xrm;\Xrm)}{\alpha_0 \alpham(\xrm) + N \Psim(\xrm;\Xrm)}\right) \sum_{y \in \Ycal} \Psic(y;\xrm;\Drm) \Lcal(h,y) \nonumber \\
+& = & \argmin_{h \in \Hcal} \gammam(\xrm; \Xrm) \sum_{y \in \Ycal} \alphac(y;\xrm) \Lcal(h,y) + \big(1-\gammam(\xrm; \Xrm)\big) \sum_{y \in \Ycal} \Psic(y;\xrm;\Drm) \Lcal(h,y) \nonumber \\
+& = & \argmin_{h \in \Hcal} \gammam(\xrm; \Xrm) \Erm_{\yrm | \xrm}\big[ \Lcal(h,\yrm) \big] + \big(1-\gammam(\xrm; \Xrm)\big) \frac{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Lcal\big( h,\Yrm_n \big)}{\sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big]} \nonumber \\
+& = & \argmin_{h \in \Hcal} \alpha_0 \sum_{y \in \Ycal} \alpha(y,\xrm) \Lcal(h,y) + \sum_{n=1}^N \delta\big[ \xrm,\Xrm_n \big] \Lcal\big( h,\Yrm_n \big) \;.
 \end{IEEEeqnarray}
 
 The metric to be minimized can be represented as a convex combination of two expected losses. The first expected loss is evaluated with respect to the conditional distribution $\Prm_{\yrm | \xrm} = \alphac(\xrm)$, which reflects the prior knowledge of the model parameter. The second term is the conditional empirical risk, or the average loss among samples $\Yrm_n$ whose corresponding values $\Xrm_n$ match the observed value $\xrm$. The convex weights are inherited from the conditional distribution $\Prm_{\yrm | \xrm,\Drm}$; thus, for a given observation $\xrm$, the model prior concentration $\alpha_0 \alpham(\xrm)$ and the number of matching training samples $N \Psim(\xrm;\Xrm)$ dictate which of the two expectations are emphasized.
@@ -3361,7 +3381,7 @@ Evidently, the choice of how heavy a discretization to use effects its own trade
 & = & \gammamd\big(T(\xrm); \Xrm\big) \int_{\Ycal} \alphac\big(y; T(\xrm)\big) \Lcal(h,y) {\drm}y \nonumber \\
 && + \Big(1 - \gammamd\big(T(\xrm); \Xrm\big)\Big) \int_{\Ycal} \Psicd\big(y; T(\xrm); \Drm\big) \Lcal(h,y) {\drm}y \nonumber \\
 & = & \gammamd\big(T(\xrm); \Xrm\big) \Erm_{\yrm | \xrm}\big[ \Lcal(h, \yrm) \big] \nonumber \\
-&& + \Big(1 - \gammamd\big(T(\xrm); \Xrm\big)\Big) \frac{\sum_{n=1}^N \delta\big[T(\xrm), T(\Xrm_n)\big] \Lcal\big(h, \Yrm_n \big)}{\sum_{n=1}^N \delta\big[T(\xrm), T(\Xrm_n)\big]} \;.
+&& + \Big(1 - \gammamd\big(T(\xrm); \Xrm\big)\Big) \frac{\sum_{n=1}^N \delta\big[T(\xrm), T(\Xrm_n)\big] \Lcal\big(h, \Yrm_n \big)}{\sum_{n=1}^N \delta\big[T(\xrm), T(\Xrm_n)\big]} \; . \IEEEeqnarraynumspace
 \end{IEEEeqnarray}
 
 \todomid{Above requires low-dim prior definition}
@@ -3378,7 +3398,7 @@ Evidently, the choice of how heavy a discretization to use effects its own trade
 The optimal function is the expected value of the output conditional PDF,
 \begin{IEEEeqnarray}{rCl}
 f^*(\xrm;\Drm) & = & \mu_{\yrm | \xrm,\Drm} \nonumber \\
-& = & \gammamd\big(T(\xrm); \Xrm\big) \mu_{\yrm | \xrm}\big(T(\xrm)\big) + \Big(1 - \gammamd\big(T(\xrm); \Xrm\big)\Big) \frac{\sum_{n=1}^N \delta\big[T(\xrm), T(\Xrm_n)\big] \Yrm_n}{\sum_{n=1}^N \delta\big[T(\xrm), T(\Xrm_n)\big]} \;.
+& = & \gammamd\big(T(\xrm); \Xrm\big) \mu_{\yrm | \xrm}\big(T(\xrm)\big) + \Big(1 - \gammamd\big(T(\xrm); \Xrm\big)\Big) \frac{\sum_{n=1}^N \delta\big[T(\xrm), T(\Xrm_n)\big] \Yrm_n}{\sum_{n=1}^N \delta\big[T(\xrm), T(\Xrm_n)\big]} \; . \nonumber \\
 \end{IEEEeqnarray}
 
 Inheriting the properties of the discretized predictive distribution \eqref{eq:P_y_xD_dir_disc}, the empirical mean for a given observation $\xrm$ averages all values $\Yrm_n$ whose corresponding observation satisfy $\Xrm_n \in \Xcal'\big(T(\xrm)\big)$.
