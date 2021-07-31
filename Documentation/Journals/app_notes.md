@@ -6,7 +6,7 @@
 - **Show underfitting example vs NN due to inherent regularization?!**
   - NN w/o reg. = mild underfitting
   - NN w/ reg. = severe underfitting
-  - **Use lower variance model??**
+  - **Use lower variance model! Difficulty via func XOR variance!**
 
 - Clairvoyant regressors
   - Random func is *hard for NN*, but makes it difficult to use meaningful prior mean
