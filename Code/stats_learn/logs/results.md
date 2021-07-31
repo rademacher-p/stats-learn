@@ -105,7 +105,7 @@ n_mc = 10
 | $\mathrm{MLP}$, $\lambda = 0.0$   | 0.055 |
 | $\mathrm{MLP}$, $\lambda = 0.001$ | 0.069 |
 
-![](C:\Users\paulg\Documents\PhD\Research\Code\stats_learn\images\temp\2021-07-30T15_29_12.png)
+![](..\images\ex_underfitting\low_var\predict_full.png)
 
 ### 2021-07-30T15_28_15
 - MC iterations: 5
@@ -116,7 +116,7 @@ n_mc = 10
 | $\Dir$, $\alpha_0 = 1e-05$    | 0.027 |
 | $\Dir$, $\alpha_0 = 100000.0$ | 0.075 |
 
-![](C:\Users\paulg\Documents\PhD\Research\Code\stats_learn\images\temp\2021-07-30T15_28_15.png)
+![](..\images\ex_underfitting\low_var\predict_dir.png)
 
 ### 2021-07-30T15_46_06
 - MC iterations: 5
@@ -127,7 +127,7 @@ n_mc = 10
 | $\mathrm{MLP}$, $\lambda = 0.0$   | 0.055 |
 | $\mathrm{MLP}$, $\lambda = 0.001$ | 0.069 |
 
-![](C:\Users\paulg\Documents\PhD\Research\Code\stats_learn\images\temp\2021-07-30T15_46_06.png)
+![](..\images\ex_underfitting\low_var\predict_mlp.png)
 
 ### 2021-07-30T16_04_23
 - MC iterations: 5
@@ -140,4 +140,4 @@ n_mc = 10
 | $\mathrm{MLP}$, $\lambda = 0.0$   | 0.140 | 0.157 | 0.150 | 0.147 | 0.139 | 0.111 | 0.093 | 0.056 | 0.033 | 0.007 |  0.005 |
 | $\mathrm{MLP}$, $\lambda = 0.001$ | 0.135 | 0.156 | 0.137 | 0.135 | 0.123 | 0.096 | 0.079 | 0.066 | 0.065 | 0.067 |  0.065 |
 
-![](C:\Users\rademacherp\Documents\PhD\Research\Code\stats_learn\images\temp\2021-07-30T16_04_23.png)
+![](..\images\ex_underfitting\low_var\risk_N.png)
