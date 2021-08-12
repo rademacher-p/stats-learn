@@ -7,6 +7,8 @@
   - NN w/o reg. = mild underfitting
   - NN w/ reg. = severe underfitting
   - **Use lower variance model! Difficulty via func XOR variance!**
+  - **Results AFFECTED by Dir regularization effects!**
+    - Different prior mean demonstrates. Unavoidable reg. perspective?
 
 - Clairvoyant regressors
   - Random func is *hard for NN*, but makes it difficult to use meaningful prior mean
@@ -17,7 +19,6 @@
 
 - Need better NN architectures and optimizers to *maximize* overfitting!!
   - Comment on **excessive** DOF and train time for DNN!
-
 
 - If |X| >> N, the prior mean will tend to be used with high probability and the effects of alpha_0 will be negligible. Bad for demonstrating empirical Dirichlet.
   - Should use *higher* N to contrast localization effects!?
