@@ -34,7 +34,7 @@ plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
 
 # seed = None
-seed = 123450
+seed = 12345
 
 if seed is not None:
     seed_everything(seed)  # PyTorch Lightning seeding
@@ -103,7 +103,8 @@ model_eval.rng = seed
 
 #%% Bayesian learners
 
-w_prior = [.5, 0]
+# w_prior = [.5, 0]
+w_prior = [1, 0]
 # w_prior = [0, 1]
 
 
@@ -200,9 +201,9 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 #%% PyTorch
 # TODO: add citations to dissertation. PyTorch, Adam weight decay, etc.
 
-weight_decays = [0.]
+# weight_decays = [0.]
 # weight_decays = [0.001]
-# weight_decays = [0., 0.001]
+weight_decays = [0., 0.001]
 
 # proc_funcs = []
 proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
@@ -219,7 +220,8 @@ for weight_decay in weight_decays:
 
     trainer_params = {
         'max_epochs': 50000,
-        'callbacks': EarlyStopping('train_loss', min_delta=1e-4, patience=2000, check_on_train_epoch_end=True),
+        # 'callbacks': EarlyStopping('train_loss', min_delta=1e-4, patience=2000, check_on_train_epoch_end=True),
+        'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=3000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
         'logger': pl_loggers.TensorBoardLogger('logs/learn/', name=logger_name),
         'weights_summary': None,
@@ -233,7 +235,7 @@ for weight_decay in weight_decays:
 
 #%% Results
 
-n_train = 128
+n_train = 400
 # n_train = [1, 4, 40, 400]
 # n_train = [20, 40, 200, 400, 2000]
 # n_train = 2**np.arange(11)
@@ -244,7 +246,7 @@ n_train = 128
 
 n_test = 1000
 
-n_mc = 5
+n_mc = 50
 
 
 temp = [
@@ -253,7 +255,7 @@ temp = [
     # *(zip(dir_predictors, dir_params_full)),
     # (norm_predictor, norm_params),
     # (skl_predictor, None),
-    *((predictor, None) for predictor in lit_predictors),
+    # *((predictor, None) for predictor in lit_predictors),
 ]
 predictors, params = zip(*temp)
 
@@ -267,6 +269,8 @@ if file is not None:
 
 
 # FIXME: NOTE clipping in results!
+
+# TODO: result checkpointing!?!
 
 y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
