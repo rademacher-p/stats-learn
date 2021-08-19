@@ -103,8 +103,8 @@ model_eval.rng = seed
 
 #%% Bayesian learners
 
-# w_prior = [.5, 0]
-w_prior = [1, 0]
+w_prior = [.5, 0]
+# w_prior = [1, 0]
 # w_prior = [0, 1]
 
 
@@ -135,8 +135,9 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10),
 # dir_params = {'alpha_0': [.001]}
 # dir_params = {'alpha_0': [20]}
 # dir_params = {'alpha_0': [.01, 100]}
-dir_params = {'alpha_0': [1e-5, 1e5]}
-# dir_params = {'alpha_0': [1e-6, 1e6]}
+# dir_params = {'alpha_0': [1e-5, 1e5]}
+dir_params = {'alpha_0': [1e-6, 1e6]}
+# dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
 # dir_params = {'alpha_0': np.logspace(-0., 5., 60)}
@@ -201,9 +202,9 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 #%% PyTorch
 # TODO: add citations to dissertation. PyTorch, Adam weight decay, etc.
 
-weight_decays = [0.]
+# weight_decays = [0.]
 # weight_decays = [0.001]
-# weight_decays = [0., 0.001]
+weight_decays = [0., 0.001]
 
 # proc_funcs = []
 proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
@@ -219,9 +220,9 @@ for weight_decay in weight_decays:
     lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {optim_params['weight_decay']}$"
 
     trainer_params = {
-        # 'max_epochs': 50000,
-        'max_epochs': 0,
+        'max_epochs': 50000,
         # 'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=3000, check_on_train_epoch_end=True),
+        'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=5000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
         'logger': pl_loggers.TensorBoardLogger('logs/learn/', name=logger_name),
         'weights_summary': None,
@@ -230,26 +231,24 @@ for weight_decay in weight_decays:
 
     lit_model = LitMLP([size_x, *layer_sizes], optim_params=optim_params)
 
-    # FIXME
-    for p in lit_model.model.parameters():
-        # print(p)
-        p.data = torch.zeros_like(p)
+
+    # FIXME: this initializes net to prior mean!
+    # for p in lit_model.model.parameters():
+    #     p.data = torch.zeros_like(p)
     lit_model.model[-1].bias = torch.nn.Parameter(torch.tensor([.5]))
 
+
     lit_predictor = LitWrapper(lit_model, model.space, trainer_params, proc_funcs, name=lit_name)
-    lit_predictor.plot_predict()
-    plt.gca().set(ylim=[0, 1])
-    plt.show()
 
     lit_predictors.append(lit_predictor)
 
 
 #%% Results
 
-n_train = 128
+# n_train = 128
 # n_train = [1, 4, 40, 400]
 # n_train = [20, 40, 200, 400, 2000]
-# n_train = 2**np.arange(11)
+n_train = 2**np.arange(11)
 # n_train = [0, 400, 4000]
 # n_train = np.arange(0, 55, 5)
 # n_train = np.arange(0, 4500, 500)
@@ -257,7 +256,7 @@ n_train = 128
 
 n_test = 1000
 
-n_mc = 2
+n_mc = 5
 
 
 temp = [
@@ -278,14 +277,15 @@ file = 'logs/temp/temp.md'
 if file is not None:
     file = Path(file).open('a')
 
-
-y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-                                                    stats=('mean', 'std'), plot_stats=True, print_loss=True,
-                                                    verbose=True, img_path='images/temp/', file=file)
+# TODO: comment on clipping in dissertation
 
 # y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-#                                                     plot_loss=True, print_loss=True,
+#                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
 #                                                     verbose=True, img_path='images/temp/', file=file)
+
+y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+                                                    plot_loss=True, print_loss=True,
+                                                    verbose=True, img_path='images/temp/', file=file)
 
 # results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
 #                          img_path='images/temp/', file=file)
