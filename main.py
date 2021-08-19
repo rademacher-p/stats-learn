@@ -270,7 +270,7 @@ if file is not None:
 
 # FIXME: NOTE clipping in results!
 
-# TODO: result checkpointing!?!
+# TODO: result checkpointing!?
 
 y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
