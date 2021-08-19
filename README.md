@@ -1,4 +1,1 @@
-# Dissertation
-Ph.D @ GWU
-
-Master.
+# Statistical Learning with a Bayesian focus
