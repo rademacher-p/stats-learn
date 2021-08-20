@@ -233,22 +233,32 @@ for weight_decay in weight_decays:
 
 
     # FIXME: this initializes net to prior mean!
-    # for p in lit_model.model.parameters():
-    #     p.data = torch.zeros_like(p)
-    lit_model.model[-1].bias = torch.nn.Parameter(torch.tensor([.5]))
+    # with torch.no_grad():
+    #     for p in lit_model.model.parameters():
+    #         p.data.fill_(0.)
+    #     lit_model.model[-1].bias.fill_(.5)
 
 
-    lit_predictor = LitWrapper(lit_model, model.space, trainer_params, proc_funcs, name=lit_name)
+    # reset_func = None
+    def reset_func(model_):
+        with torch.no_grad():
+            for p in model_.parameters():
+                p.data.fill_(0.)
+                # p.data = torch.zeros_like(p.data)
+            model_.model[-1].bias.fill_(.5)
+            # model_.model[-1].bias.data = torch.tensor([.5])
+
+    lit_predictor = LitWrapper(lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name)
 
     lit_predictors.append(lit_predictor)
 
 
 #%% Results
 
-# n_train = 128
+n_train = 0
 # n_train = [1, 4, 40, 400]
 # n_train = [20, 40, 200, 400, 2000]
-n_train = 2**np.arange(11)
+# n_train = np.concatenate(([0], 2**np.arange(11)))
 # n_train = [0, 400, 4000]
 # n_train = np.arange(0, 55, 5)
 # n_train = np.arange(0, 4500, 500)
@@ -256,12 +266,12 @@ n_train = 2**np.arange(11)
 
 n_test = 1000
 
-n_mc = 5
+n_mc = 1
 
 
 temp = [
     (opt_predictor, None),
-    (dir_predictor, dir_params),
+    # (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
     # (norm_predictor, norm_params),
     # (skl_predictor, None),
@@ -279,13 +289,13 @@ if file is not None:
 
 # TODO: comment on clipping in dissertation
 
-# y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-#                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
-#                                                     verbose=True, img_path='images/temp/', file=file)
-
 y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-                                                    plot_loss=True, print_loss=True,
+                                                    stats=('mean', 'std'), plot_stats=True, print_loss=True,
                                                     verbose=True, img_path='images/temp/', file=file)
+
+# y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+#                                                     plot_loss=True, print_loss=True,
+#                                                     verbose=True, img_path='images/temp/', file=file)
 
 # results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
 #                          img_path='images/temp/', file=file)
