@@ -33,8 +33,8 @@ np.set_printoptions(precision=3)
 plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
 
-seed = None
-# seed = 12345
+# seed = None
+seed = 12345
 
 if seed is not None:
     seed_everything(seed)  # PyTorch Lightning seeding
@@ -233,9 +233,14 @@ for weight_decay in weight_decays:
 
     def reset_func(model_):
         with torch.no_grad():
-            # for p in model_.parameters():
+            # for p in model_.parameters():  # DO NOT USE: breaks gradient descent!
             #     p.data.fill_(0.)
-            model_.model[-1].bias.fill_(.5)
+            #     raise Exception
+            for layer in reversed(model_.model):  # initialize the scalar output Linear layer bias
+                if isinstance(layer, torch.nn.Linear):
+                    layer.bias.fill_(.5)
+                    break
+            # model_.model[-1].bias.fill_(.5)
 
     lit_predictor = LitWrapper(lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name)
 
@@ -243,11 +248,13 @@ for weight_decay in weight_decays:
 
 
 #%% Results
+# TODO: comment on clipping in dissertation
+# TODO: include `plot_fit_compare` figs in dissertation!?
 
-# n_train = 128
+n_train = 128
 # n_train = [1, 4, 40, 400]
 # n_train = [20, 40, 200, 400, 2000]
-n_train = np.concatenate(([0], 2**np.arange(11)))
+# n_train = np.concatenate(([0], 2**np.arange(11)))
 # n_train = [0, 400, 4000]
 # n_train = np.arange(0, 55, 5)
 # n_train = np.arange(0, 4500, 500)
@@ -276,25 +283,24 @@ file = 'logs/temp/temp.md'
 if file is not None:
     file = Path(file).open('a')
 
-# TODO: comment on clipping in dissertation
-
-# y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-#                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
-#                                                     verbose=True, img_path='images/temp/', file=file)
 
 y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-                                                    plot_loss=True, print_loss=True,
+                                                    stats=('mean', 'std'), plot_stats=True, print_loss=True,
                                                     verbose=True, img_path='images/temp/', file=file)
+
+# y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+#                                                     plot_loss=True, print_loss=True,
+#                                                     verbose=True, img_path='images/temp/', file=file)
 
 # results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
 #                          img_path='images/temp/', file=file)
 
-# TODO: include `plot_fit_compare` figs in dissertation!?
 
 # with open(f'data/temp/{NOW_STR}.pkl', 'wb') as fid:
 #     pickle.dump(dict(y_stats=y_stats_full, losses=loss_full), fid)
 
 if file is not None:
+    print(f"\nSeed = {seed}", file=file)
     file.close()
 
 

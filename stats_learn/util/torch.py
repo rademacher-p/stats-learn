@@ -9,6 +9,7 @@ from torch.utils.data import TensorDataset, DataLoader
 
 from stats_learn.loss_funcs import loss_se
 from stats_learn.predictors import Base
+from stats_learn.util.data_processing import make_clipper
 
 num_workers = 0
 # num_workers = os.cpu_count()
@@ -39,10 +40,14 @@ class LitMLP(pl.LightningModule):
 
     def forward(self, x):
         return self.model(x)
+        # clipper = make_clipper([0, 1])
+        # y = self.model(x)
+        # return clipper(y)
 
     def training_step(self, batch, batch_idx):
         x, y = batch
         y_hat = self.model(x)
+        # y_hat = self(x)
         loss = functional.mse_loss(y_hat, y)
         self.log('train_loss', loss)
         return loss

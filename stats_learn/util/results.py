@@ -286,7 +286,7 @@ def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=
         #     pickle.dump(fig, fid)
 
         if file is not None:
-            print(f"\n![]({img_file.absolute()})", file=file)
+            print(f"\n![]({img_file.absolute().as_posix()})", file=file)
 
     return y_stats_full, loss_full
 
