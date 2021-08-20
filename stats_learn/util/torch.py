@@ -69,7 +69,6 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
         super().__init__(loss_func, space, proc_funcs, name)
         self.model = model
         self.trainer_params = trainer_params
-        # self._reset_trainer()
 
         if reset_func is None:
             self.reset_func = lambda model_: model_.apply(reset_weights)
@@ -92,7 +91,6 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
         self.trainer = pl.Trainer(**deepcopy(self.trainer_params))
 
     def reset(self):  # TODO: add reset method to predictor base class?
-        # self.model.apply(self.reset_func)
         self.reset_func(self.model)
         self._reset_trainer()
 

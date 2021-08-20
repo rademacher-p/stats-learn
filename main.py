@@ -23,7 +23,7 @@ from stats_learn.util import funcs, results
 # from stats_learn.util.base import NOW_STR
 from stats_learn.util.data_processing import make_discretizer, make_clipper
 from stats_learn.util.plotting import box_grid
-from stats_learn.util.torch import LitMLP, LitWrapper
+from stats_learn.util.torch import LitMLP, LitWrapper, reset_weights
 
 np.set_printoptions(precision=3)
 
@@ -231,15 +231,18 @@ for weight_decay in weight_decays:
 
 
     def reset_func(model_):
+        model_.apply(reset_weights)
+
         with torch.no_grad():
             # for p in model_.parameters():  # DO NOT USE: breaks gradient descent!
             #     p.data.fill_(0.)
             #     raise Exception
-            for layer in reversed(model_.model):  # initialize the scalar output Linear layer bias
-                if isinstance(layer, torch.nn.Linear):
-                    layer.bias.fill_(.5)
-                    break
-            # model_.model[-1].bias.fill_(.5)
+
+            # for layer in reversed(model_.model):  # initialize the scalar output Linear layer bias
+            #     if isinstance(layer, torch.nn.Linear):
+            #         layer.bias.fill_(.5)
+            #         break
+            model_.model[-1].bias.fill_(.5)
 
     lit_predictor = LitWrapper(lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name)
 
@@ -266,7 +269,7 @@ n_mc = 5
 
 temp = [
     (opt_predictor, None),
-    # (dir_predictor, dir_params),
+    (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
     # (norm_predictor, norm_params),
     # (skl_predictor, None),
