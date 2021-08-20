@@ -7,7 +7,7 @@ from stats_learn.util.plotting import box_grid
 
 
 def make_discretizer(vals):  # TODO: use sklearn.preprocessing.KBinsDiscretizer?
-    """Create a rounding make_discretizer."""
+    """Create a rounding discretization function."""
     vals = np.array(vals)
 
     shape = vals.shape[1:]
@@ -30,6 +30,7 @@ def make_discretizer(vals):  # TODO: use sklearn.preprocessing.KBinsDiscretizer?
 
 
 def make_clipper(lims):
+    """Create a function that clips inputs into a closed box space."""
     lims = np.array(lims)
 
     low, high = lims[..., 0], lims[..., 1]
