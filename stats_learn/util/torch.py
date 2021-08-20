@@ -64,7 +64,7 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
         super().__init__(loss_func, space, proc_funcs, name)
         self.model = model
         self.trainer_params = trainer_params
-        self._reset_trainer()
+        # self._reset_trainer()
 
         if reset_func is None:
             self.reset_func = lambda model_: model_.apply(reset_weights)
@@ -72,6 +72,8 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
             self.reset_func = reset_func
         else:
             raise TypeError("Reset function must be a callable for application to `nn.Module.apply`.")
+
+        self.reset()
 
     @property
     def _model_obj(self):
