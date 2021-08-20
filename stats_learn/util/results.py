@@ -253,7 +253,6 @@ def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=
         for y_stats in y_stats_full:
             y_stats['std'] = np.sqrt(y_stats['cov'])
 
-    # loss_full = [loss.mean() for loss in loss_full]
     loss_full = [loss / n_mc for loss in loss_full]
 
     # Printing
