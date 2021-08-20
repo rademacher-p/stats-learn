@@ -135,8 +135,8 @@ dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10),
 # dir_params = {'alpha_0': [.001]}
 # dir_params = {'alpha_0': [20]}
 # dir_params = {'alpha_0': [.01, 100]}
-# dir_params = {'alpha_0': [1e-5, 1e5]}
-dir_params = {'alpha_0': [1e-6, 1e6]}
+dir_params = {'alpha_0': [1e-5, 1e5]}
+# dir_params = {'alpha_0': [1e-6, 1e6]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
@@ -203,8 +203,8 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 # TODO: add citations to dissertation. PyTorch, Adam weight decay, etc.
 
 # weight_decays = [0.]
-# weight_decays = [0.001]
-weight_decays = [0., 0.001]
+# weight_decays = [1e-3]
+weight_decays = [0., 1e-3]
 
 # proc_funcs = []
 proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
@@ -221,8 +221,7 @@ for weight_decay in weight_decays:
 
     trainer_params = {
         'max_epochs': 50000,
-        # 'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=3000, check_on_train_epoch_end=True),
-        'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=5000, check_on_train_epoch_end=True),
+        'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=10000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
         'logger': pl_loggers.TensorBoardLogger('logs/learn/', name=logger_name),
         'weights_summary': None,
@@ -232,21 +231,11 @@ for weight_decay in weight_decays:
     lit_model = LitMLP([size_x, *layer_sizes], optim_params=optim_params)
 
 
-    # FIXME: this initializes net to prior mean!
-    # with torch.no_grad():
-    #     for p in lit_model.model.parameters():
-    #         p.data.fill_(0.)
-    #     lit_model.model[-1].bias.fill_(.5)
-
-
-    # reset_func = None
     def reset_func(model_):
         with torch.no_grad():
-            for p in model_.parameters():
-                p.data.fill_(0.)
-                # p.data = torch.zeros_like(p.data)
+            # for p in model_.parameters():
+            #     p.data.fill_(0.)
             model_.model[-1].bias.fill_(.5)
-            # model_.model[-1].bias.data = torch.tensor([.5])
 
     lit_predictor = LitWrapper(lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name)
 
@@ -255,10 +244,10 @@ for weight_decay in weight_decays:
 
 #%% Results
 
-n_train = 0
+# n_train = 128
 # n_train = [1, 4, 40, 400]
 # n_train = [20, 40, 200, 400, 2000]
-# n_train = np.concatenate(([0], 2**np.arange(11)))
+n_train = np.concatenate(([0], 2**np.arange(11)))
 # n_train = [0, 400, 4000]
 # n_train = np.arange(0, 55, 5)
 # n_train = np.arange(0, 4500, 500)
@@ -266,12 +255,12 @@ n_train = 0
 
 n_test = 1000
 
-n_mc = 1
+n_mc = 5
 
 
 temp = [
     (opt_predictor, None),
-    # (dir_predictor, dir_params),
+    (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
     # (norm_predictor, norm_params),
     # (skl_predictor, None),
@@ -289,13 +278,13 @@ if file is not None:
 
 # TODO: comment on clipping in dissertation
 
-y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-                                                    stats=('mean', 'std'), plot_stats=True, print_loss=True,
-                                                    verbose=True, img_path='images/temp/', file=file)
-
 # y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-#                                                     plot_loss=True, print_loss=True,
+#                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
 #                                                     verbose=True, img_path='images/temp/', file=file)
+
+y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+                                                    plot_loss=True, print_loss=True,
+                                                    verbose=True, img_path='images/temp/', file=file)
 
 # results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
 #                          img_path='images/temp/', file=file)
