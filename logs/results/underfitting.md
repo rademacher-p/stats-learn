@@ -168,5 +168,7 @@ n_mc = 10
 | $\mathrm{MLP}$, $\lambda = 0.001$ | 0.069 |
 
 ![](../../images/ex_underfitting/nn_init/predict_full.png)
+![](../../images/ex_underfitting/nn_init/predict_dir.png)
+![](../../images/ex_underfitting/nn_init/predict_nn.png)
 
 Seed = 12345
