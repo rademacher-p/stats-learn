@@ -58,16 +58,20 @@ def reset_weights(model):
 
 
 class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
-    def __init__(self, model, space, trainer_params=None, proc_funcs=(), name=None):
+    def __init__(self, model, space, trainer_params=None, reset_func=None, proc_funcs=(), name=None):
         loss_func = loss_se  # TODO: Generalize!
 
         super().__init__(loss_func, space, proc_funcs, name)
         self.model = model
-        # self._space = space
         self.trainer_params = trainer_params
         self._reset_trainer()
 
-    # space = property(lambda self: self._space)
+        if reset_func is None:
+            self.reset_func = lambda model_: model_.apply(reset_weights)
+        elif callable(reset_func):
+            self.reset_func = reset_func
+        else:
+            raise TypeError("Reset function must be a callable for application to `nn.Module.apply`.")
 
     @property
     def _model_obj(self):
@@ -81,7 +85,8 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
         self.trainer = pl.Trainer(**deepcopy(self.trainer_params))
 
     def reset(self):  # TODO: add reset method to predictor base class?
-        self.model.apply(reset_weights)
+        # self.model.apply(self.reset_func)
+        self.reset_func(self.model)
         self._reset_trainer()
 
     def _reshape_batches(self, *arrays):
@@ -94,11 +99,15 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
         if not warm_start:
             self.reset()
 
+        if len(d) == 0:
+            return
+
         x, y = self._reshape_batches(d['x'], d['y'])
         x, y = map(partial(torch.tensor, dtype=torch.float32), (x, y))
         ds = TensorDataset(x, y)
 
         batch_size = len(x)  # TODO: no mini-batching! Allow user specification.
+
         dl = DataLoader(ds, batch_size, shuffle=True, pin_memory=pin_memory, num_workers=num_workers)
 
         self.trainer.fit(self.model, dl)
