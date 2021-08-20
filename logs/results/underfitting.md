@@ -154,17 +154,19 @@ n_mc = 10
 ![](../../images/ex_underfitting/low_var/risk_N_v2.png)
 
 
-# Low Variance + NN init control
+# Low Variance + NN bias init
 
-### 2021-08-20T11_20_13
+### 2021-08-20T12_10_00
 - MC iterations: 5
 
 |                                   |   128 |
 |-----------------------------------|-------|
 | $f_{\Theta}(\theta)$              | 0.001 |
-| $\Dir$, $\alpha_0 = 1e-05$        | 0.028 |
-| $\Dir$, $\alpha_0 = 100000.0$     | 0.081 |
-| $\mathrm{MLP}$, $\lambda = 0.0$   | 0.062 |
-| $\mathrm{MLP}$, $\lambda = 0.001$ | 0.080 |
+| $\Dir$, $\alpha_0 = 1e-05$        | 0.030 |
+| $\Dir$, $\alpha_0 = 100000.0$     | 0.079 |
+| $\mathrm{MLP}$, $\lambda = 0.0$   | 0.054 |
+| $\mathrm{MLP}$, $\lambda = 0.001$ | 0.069 |
 
 ![](../../images/ex_underfitting/nn_init/predict_full.png)
+
+Seed = 12345
