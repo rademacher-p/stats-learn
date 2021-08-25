@@ -250,8 +250,6 @@ for weight_decay in weight_decays:
 
 
 #%% Results
-# TODO: comment on clipping in dissertation
-# TODO: include `plot_fit_compare` figs in dissertation!?
 
 n_train = 128
 # n_train = [1, 4, 40, 400]
