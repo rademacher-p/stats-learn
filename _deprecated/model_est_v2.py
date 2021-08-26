@@ -87,7 +87,7 @@ ax.set(xlabel='$y$', title=title)
 
 
 #%% Save image and Figure
-image_path = Path('./images/temp/')
+image_path = Path('../images/temp/')
 
 fig = plt.gcf()
 fig.savefig(image_path.joinpath(f"{NOW_STR}.png"))
