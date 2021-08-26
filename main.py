@@ -201,9 +201,9 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 #%% PyTorch
 # TODO: add citations to dissertation. PyTorch, Adam weight decay, etc.
 
-# weight_decays = [0.]
+weight_decays = [0.]
 # weight_decays = [0.001]
-weight_decays = [0., 0.001]
+# weight_decays = [0., 0.001]
 
 # proc_funcs = []
 proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
@@ -235,10 +235,10 @@ for weight_decay in weight_decays:
 
 #%% Results
 
-n_train = 400
+# n_train = 400
 # n_train = [1, 4, 40, 400]
 # n_train = [20, 40, 200, 400, 2000]
-# n_train = 2**np.arange(11)
+n_train = 2**np.arange(11)
 # n_train = [0, 400, 4000]
 # n_train = np.arange(0, 55, 5)
 # n_train = np.arange(0, 4500, 500)
@@ -246,7 +246,7 @@ n_train = 400
 
 n_test = 1000
 
-n_mc = 50
+n_mc = 5
 
 
 temp = [
@@ -255,30 +255,26 @@ temp = [
     # *(zip(dir_predictors, dir_params_full)),
     # (norm_predictor, norm_params),
     # (skl_predictor, None),
-    # *((predictor, None) for predictor in lit_predictors),
+    *((predictor, None) for predictor in lit_predictors),
 ]
 predictors, params = zip(*temp)
 
 
 # file = None
 file = 'logs/temp/temp.md'
-# file = 'logs/results.md'
+# file = 'logs/results/underfitting.md'
 
 if file is not None:
     file = Path(file).open('a')
 
 
-# FIXME: NOTE clipping in results!
-
-# TODO: result checkpointing!?
+# y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+#                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
+#                                                     verbose=True, img_path='images/temp/', file=file)
 
 y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-                                                    stats=('mean', 'std'), plot_stats=True, print_loss=True,
+                                                    plot_loss=True, print_loss=True,
                                                     verbose=True, img_path='images/temp/', file=file)
-
-# y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-#                                                     plot_loss=True, print_loss=True,
-#                                                     verbose=True, img_path='images/temp/', file=file)
 
 # results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
 #                          img_path='images/temp/', file=file)
