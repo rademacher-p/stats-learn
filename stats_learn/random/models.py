@@ -297,6 +297,20 @@ class DataConditional(Base):
 
         # self._update_attr()
 
+    @classmethod
+    def from_func_mean(cls, n, alpha_0, func, model_x, rng=None):
+        if np.isinf(alpha_0):
+            dists = [rand_elements.EmpiricalScalar(func(_x), n - 1) for _x in model_x.supp]
+        else:
+            dists = [rand_elements.DirichletEmpiricalScalar(func(_x), alpha_0, n - 1) for _x in model_x.supp]
+        return cls(dists, model_x, rng)
+
+    @classmethod
+    def from_poly_mean(cls, n, alpha_0, weights, model_x, rng=None):
+        def poly_func(x):
+            return sum(w * x ** i for i, w in enumerate(weights))
+        return cls.from_func_mean(n, alpha_0, poly_func, model_x, rng)
+
     def __eq__(self, other):
         if isinstance(other, DataConditional):
             return (self.model_x == other.model_x

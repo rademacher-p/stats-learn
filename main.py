@@ -41,16 +41,16 @@ if seed is not None:
 
 
 #%% Model
-def poly_mean_to_models(n, alpha_0, weights):
-    return func_mean_to_models(n, alpha_0, lambda x: sum(w * x ** i for i, w in enumerate(weights)))
-
-
-def func_mean_to_models(n, alpha_0, func):
-    x_supp = np.linspace(0, 1, n, endpoint=True)
-    if np.isinf(alpha_0):
-        return [rand_elements.EmpiricalScalar(func(_x), n-1) for _x in x_supp]
-    else:
-        return [rand_elements.DirichletEmpiricalScalar(func(_x), alpha_0, n-1) for _x in x_supp]
+# def poly_mean_to_models(n, alpha_0, weights):
+#     return func_mean_to_models(n, alpha_0, lambda x: sum(w * x ** i for i, w in enumerate(weights)))
+#
+#
+# def func_mean_to_models(n, alpha_0, func):
+#     x_supp = np.linspace(0, 1, n, endpoint=True)
+#     if np.isinf(alpha_0):
+#         return [rand_elements.EmpiricalScalar(func(_x), n-1) for _x in x_supp]
+#     else:
+#         return [rand_elements.DirichletEmpiricalScalar(func(_x), alpha_0, n-1) for _x in x_supp]
 
 
 n_x = 128
@@ -79,8 +79,8 @@ nonlinear_model = funcs.make_rand_discrete(n_x, rng=seed)
 
 supp_x = box_grid(lims_x, n_x, endpoint=True)
 model_x = rand_elements.Finite(supp_x, p=np.full(size_x*(n_x,), n_x**-size_x))
-# model = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_model), model_x)
-model = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, nonlinear_model), model_x)
+model = rand_models.DataConditional.from_poly_mean(n_x, alpha_y_x_d, w_model, model_x)
+model = rand_models.DataConditional.from_func_mean(n_x, alpha_y_x_d, nonlinear_model, model_x)
 
 # model_x = rand_elements.Uniform(lims_x)
 # # model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
@@ -111,9 +111,9 @@ w_prior = [.5, 0]
 # Dirichlet learner
 proc_funcs = []
 
-prior_mean = rand_models.DataConditional(poly_mean_to_models(n_x, alpha_y_x_d, w_prior), model_x)
+prior_mean = rand_models.DataConditional.from_poly_mean(n_x, alpha_y_x_d, w_prior, model_x)
 # _func = lambda x: .5*(1-np.sin(2*np.pi*x))
-# prior_mean = rand_models.DataConditional(func_mean_to_models(n_x, alpha_y_x_d, _func), model_x)
+# prior_mean = rand_models.DataConditional.from_func_mean(n_x, alpha_y_x_d, _func, model_x)
 
 
 # n_t = 16
@@ -251,10 +251,10 @@ for weight_decay in weight_decays:
 
 #%% Results
 
-n_train = 128
+# n_train = 128
 # n_train = [1, 4, 40, 400]
 # n_train = [20, 40, 200, 400, 2000]
-# n_train = np.concatenate(([0], 2**np.arange(11)))
+n_train = np.concatenate(([0], 2**np.arange(11)))
 # n_train = [0, 400, 4000]
 # n_train = np.arange(0, 55, 5)
 # n_train = np.arange(0, 4500, 500)
@@ -282,15 +282,16 @@ file = 'logs/temp/temp.md'
 
 if file is not None:
     file = Path(file).open('a')
+    print(f"\nSeed = {seed}", file=file)
 
-
-y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-                                                    stats=('mean', 'std'), plot_stats=True, print_loss=True,
-                                                    verbose=True, img_path='images/temp/', file=file)
 
 # y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-#                                                     plot_loss=True, print_loss=True,
+#                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
 #                                                     verbose=True, img_path='images/temp/', file=file)
+
+y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+                                                    plot_loss=True, print_loss=True,
+                                                    verbose=True, img_path='images/temp/', file=file)
 
 # results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
 #                          img_path='images/temp/', file=file)
@@ -300,7 +301,6 @@ y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, para
 #     pickle.dump(dict(y_stats=y_stats_full, losses=loss_full), fid)
 
 if file is not None:
-    print(f"\nSeed = {seed}", file=file)
     file.close()
 
 
