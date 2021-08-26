@@ -1,6 +1,3 @@
-"""
-Main.
-"""
 import math
 from pathlib import Path
 from copy import deepcopy
@@ -26,12 +23,9 @@ from stats_learn.util.plotting import box_grid
 from stats_learn.util.torch import LitMLP, LitWrapper, reset_weights
 
 np.set_printoptions(precision=3)
-
-# plt.style.use('seaborn')
-# plt.style.use(['science'])
-
 plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
+# plt.style.use('seaborn')
 
 # seed = None
 seed = 12345
@@ -40,19 +34,7 @@ if seed is not None:
     seed_everything(seed)  # PyTorch Lightning seeding
 
 
-#%% Model
-# def poly_mean_to_models(n, alpha_0, weights):
-#     return func_mean_to_models(n, alpha_0, lambda x: sum(w * x ** i for i, w in enumerate(weights)))
-#
-#
-# def func_mean_to_models(n, alpha_0, func):
-#     x_supp = np.linspace(0, 1, n, endpoint=True)
-#     if np.isinf(alpha_0):
-#         return [rand_elements.EmpiricalScalar(func(_x), n-1) for _x in x_supp]
-#     else:
-#         return [rand_elements.DirichletEmpiricalScalar(func(_x), alpha_0, n-1) for _x in x_supp]
-
-
+#%% Model and optimal predictor
 n_x = 128
 
 # var_y_x_const = 1 / (n_x-1)
@@ -79,7 +61,7 @@ nonlinear_model = funcs.make_rand_discrete(n_x, rng=seed)
 
 supp_x = box_grid(lims_x, n_x, endpoint=True)
 model_x = rand_elements.Finite(supp_x, p=np.full(size_x*(n_x,), n_x**-size_x))
-model = rand_models.DataConditional.from_poly_mean(n_x, alpha_y_x_d, w_model, model_x)
+# model = rand_models.DataConditional.from_poly_mean(n_x, alpha_y_x_d, w_model, model_x)
 model = rand_models.DataConditional.from_func_mean(n_x, alpha_y_x_d, nonlinear_model, model_x)
 
 # model_x = rand_elements.Uniform(lims_x)
@@ -127,8 +109,8 @@ prior_mean = rand_models.DataConditional.from_poly_mean(n_x, alpha_y_x_d, w_prio
 # prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
 
 
-dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=10),
-                               space=model.space, proc_funcs=proc_funcs, name=r'$\Dir$')
+dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
+dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=proc_funcs, name=r'$\Dir$')
 
 # dir_params = {}
 # dir_params = {'alpha_0': [10, 1000]}
@@ -168,9 +150,9 @@ basis_y_x = None
 # proc_funcs = []
 proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
 
-norm_predictor = BayesRegressor(bayes_models.NormalLinear(prior_mean=w_prior_norm, prior_cov=.1, basis_y_x=basis_y_x,
-                                                          cov_y_x=.1, model_x=model_x, allow_singular=True),
-                                space=model.space, proc_funcs=proc_funcs, name=r'$\Ncal$')
+norm_model = bayes_models.NormalLinear(prior_mean=w_prior_norm, prior_cov=.1, basis_y_x=basis_y_x, cov_y_x=.1,
+                                       model_x=model_x, allow_singular=True)
+norm_predictor = BayesRegressor(norm_model, space=model.space, proc_funcs=proc_funcs, name=r'$\Ncal$')
 
 # norm_params = {}
 # norm_params = {'prior_cov': [.1, .001]}
@@ -213,10 +195,10 @@ for weight_decay in weight_decays:
     layer_sizes = [500, 500, 500, 500]
     optim_params = {'lr': 1e-3, 'weight_decay': weight_decay}
 
-    logger_name = f"MLP {'-'.join(map(str, layer_sizes))}, lambda {optim_params['weight_decay']}"
+    logger_name = f"MLP {'-'.join(map(str, layer_sizes))}, lambda {weight_decay}"
     # lit_name = r"$\text{{MLP}} {}$, $\lambda = {}$".format('-'.join(map(str, layer_sizes)),
     #                                                      optim_params['weight_decay'])
-    lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {optim_params['weight_decay']}$"
+    lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {weight_decay}$"
 
     trainer_params = {
         'max_epochs': 50000,
@@ -251,10 +233,10 @@ for weight_decay in weight_decays:
 
 #%% Results
 
-# n_train = 128
+n_train = 128
 # n_train = [1, 4, 40, 400]
 # n_train = [20, 40, 200, 400, 2000]
-n_train = np.concatenate(([0], 2**np.arange(11)))
+# n_train = np.concatenate(([0], 2**np.arange(11)))
 # n_train = [0, 400, 4000]
 # n_train = np.arange(0, 55, 5)
 # n_train = np.arange(0, 4500, 500)
@@ -285,13 +267,13 @@ if file is not None:
     print(f"\nSeed = {seed}", file=file)
 
 
-# y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-#                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
-#                                                     verbose=True, img_path='images/temp/', file=file)
-
 y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-                                                    plot_loss=True, print_loss=True,
+                                                    stats=('mean', 'std'), plot_stats=True, print_loss=True,
                                                     verbose=True, img_path='images/temp/', file=file)
+
+# y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+#                                                     plot_loss=True, print_loss=True,
+#                                                     verbose=True, img_path='images/temp/', file=file)
 
 # results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
 #                          img_path='images/temp/', file=file)

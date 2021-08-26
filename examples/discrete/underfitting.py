@@ -15,8 +15,6 @@ from stats_learn.util.data_processing import make_clipper
 from stats_learn.util.plotting import box_grid
 from stats_learn.util.torch import LitMLP, LitWrapper, reset_weights
 
-np.set_printoptions(precision=3)
-
 plt.rc('text', usetex=True)
 
 seed = 12345
@@ -37,16 +35,14 @@ model_x = rand_elements.Finite(supp_x, p=np.full(size_x*(n_x,), n_x**-size_x))
 nonlinear_model = funcs.make_rand_discrete(n_x, rng=seed)
 var_y_x_const = 1/125
 
-alpha_y_x_d = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_x-1))
-model = rand_models.DataConditional.from_func_mean(n_x, alpha_y_x_d, nonlinear_model, model_x, rng=seed)
+alpha_y_x = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_x-1))
+model = rand_models.DataConditional.from_func_mean(n_x, alpha_y_x, nonlinear_model, model_x, rng=seed)
 
 opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 
 
 #%% Dirichlet learner
-w_prior = [.5, 0]
-
-prior_mean = rand_models.DataConditional.from_poly_mean(n_x, alpha_y_x_d, w_prior, model_x)
+prior_mean = rand_models.DataConditional.from_func_mean(n_x, alpha_y_x, lambda x: .5, model_x)
 dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
 
 dir_predictor = BayesRegressor(dir_model, space=model.space, name=r'$\mathrm{Dir}$')
@@ -63,8 +59,8 @@ for weight_decay in weight_decays:
     layer_sizes = [500, 500, 500, 500]
     optim_params = {'lr': 1e-3, 'weight_decay': weight_decay}
 
-    logger_name = f"MLP {'-'.join(map(str, layer_sizes))}, lambda {optim_params['weight_decay']}"
-    lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {optim_params['weight_decay']}$"
+    logger_name = f"MLP {'-'.join(map(str, layer_sizes))}, lambda {weight_decay}"
+    lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {weight_decay}$"
 
     trainer_params = {
         'max_epochs': 50000,
@@ -100,7 +96,7 @@ predictors, params = zip(*temp)
 
 # y_stats_full, loss_full = results.predictor_compare(predictors, model, params, n_train, n_test, n_mc,
 #                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
-#                                                     verbose=True, img_path='images/temp/', file=file)
+#                                                     verbose=True)
 
 y_stats_full, loss_full = results.predictor_compare(predictors, model, params, n_train, n_test, n_mc,
                                                     plot_loss=True, print_loss=True, verbose=True)
