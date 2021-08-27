@@ -156,6 +156,8 @@ n_mc = 10
 
 # Low Variance + NN bias init
 
+NOTE: 1000 test samples!
+
 ### 2021-08-20T17_47_26
 - MC iterations: 5
 
