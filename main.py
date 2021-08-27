@@ -1,5 +1,4 @@
 import math
-import sys
 from pathlib import Path
 from copy import deepcopy
 # import pickle
@@ -12,14 +11,14 @@ from sklearn.neural_network import MLPRegressor
 import torch
 from pytorch_lightning.callbacks import EarlyStopping
 import pytorch_lightning.loggers as pl_loggers
-from pytorch_lightning.utilities.seed import seed_everything
 
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors import ModelRegressor, BayesRegressor, SKLWrapper
-from stats_learn.util import funcs, results
+from stats_learn.util import funcs
+from stats_learn import results
 # from stats_learn.util.base import NOW_STR
-from stats_learn.util.data_processing import make_discretizer, make_clipper
+from stats_learn.util.data_processing import make_clipper
 from stats_learn.util.plotting import box_grid
 from stats_learn.util.torch import LitMLP, LitWrapper, reset_weights
 
@@ -31,8 +30,8 @@ plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
 # seed = None
 seed = 12345
 
-if seed is not None:
-    seed_everything(seed)  # PyTorch Lightning seeding
+# if seed is not None:
+#     seed_everything(seed)  # PyTorch Lightning seeding
 
 
 #%% Model and optimal predictor
@@ -81,7 +80,7 @@ else:
     model_eval = model
     opt_predictor = ModelRegressor(model_eval, name=r'$f_{\Theta}(\theta)$')
 
-model_eval.rng = seed
+# model_eval.rng = seed  # TODO
 
 
 #%% Bayesian learners
@@ -216,16 +215,10 @@ for weight_decay in weight_decays:
 
     def reset_func(model_):
         model_.apply(reset_weights)
-
         with torch.no_grad():
             # for p in model_.parameters():  # DO NOT USE: breaks gradient descent!
             #     p.data.fill_(0.)
             #     raise Exception
-
-            # for layer in reversed(model_.model):  # initialize the scalar output Linear layer bias
-            #     if isinstance(layer, torch.nn.Linear):
-            #         layer.bias.fill_(.5)
-            #         break
             model_.model[-1].bias.fill_(.5)
 
     lit_predictor = LitWrapper(lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name)
@@ -273,7 +266,7 @@ if file is not None:
 
 y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
                                                  stats=('mean', 'std'), plot_stats=True, print_loss=True,
-                                                 verbose=True, img_path='images/temp/', file=file)
+                                                 verbose=True, img_path='images/temp/', file=file, rng=seed)
 
 # y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
 #                                                     plot_loss=True, print_loss=True,

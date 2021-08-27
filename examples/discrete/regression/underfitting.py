@@ -10,7 +10,8 @@ from pytorch_lightning.utilities.seed import seed_everything
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors import ModelRegressor, BayesRegressor
-from stats_learn.util import funcs, results
+from stats_learn.util import funcs
+from stats_learn import results
 from stats_learn.util.data_processing import make_clipper
 from stats_learn.util.plotting import box_grid
 from stats_learn.util.torch import LitMLP, LitWrapper, reset_weights

@@ -1,20 +1,20 @@
 import math
 from itertools import product
-# from numbers import Integral
 from pathlib import Path
 import pickle
 from collections import Iterable
 from typing import Union
+from warnings import warn
 
 from more_itertools import all_equal
-
 import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
+from pytorch_lightning.utilities.seed import seed_everything
 
 from stats_learn.bayes import models as bayes_models
-from stats_learn.util.base import check_data_shape
-from stats_learn.util.base import NOW_STR
+from stats_learn.util.base import check_data_shape, NOW_STR, RandomGeneratorMixin as RNGMix
+from stats_learn.util.torch import LitWrapper
 
 
 def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None, file=None,  ax=None):
@@ -84,7 +84,7 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None,
 
 
 def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
-                   plot_stats=False, plot_loss=False, print_loss=False, img_path=None, file=None, ax=None):
+                   plot_stats=False, plot_loss=False, print_loss=False, img_path=None, file=None, ax=None, rng=None):
     """
 
     Parameters
@@ -136,13 +136,20 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
     if plot_stats and plot_loss:
         raise NotImplementedError("Cannot plot prediction statistics and losses at once.")
 
+    if rng is not None and any(isinstance(predictor, LitWrapper) for predictor in predictors):
+        if isinstance(rng, int):
+            seed_everything(rng)
+        else:
+            warn("Can only seed PyTorch-Lightning with an `int` rng.")
+
+    rng = RNGMix.make_rng(rng)
+    model.rng = rng
+
     if params is None:
         params_full = [{} for _ in predictors]
     else:
         params_full = [item if item is not None else {} for item in params]
 
-    # if isinstance(n_train, (Integral, np.integer)):
-    #     n_train = [n_train]
     n_train = np.array(n_train).reshape(-1)
     n_train = np.sort(n_train)
 
@@ -206,8 +213,8 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
 
     for i_mc in range(n_mc):
         if verbose:
-            print(f"MC iteration: {i_mc + 1}/{n_mc}")
-            # print(f"MC iteration: {i_mc + 1}/{n_mc}", end='\r')
+            # print(f"MC iteration: {i_mc + 1}/{n_mc}")
+            print(f"MC iteration: {i_mc + 1}/{n_mc}", end='\r')
 
         d = model.rvs(n_train[-1] + n_test)
         d_train, d_test = d[:n_train[-1]], d[n_train[-1]:]
@@ -318,8 +325,6 @@ def _plot_stats(y_stats_full, space_x, predictors, params, n_train: Union[int, I
     else:
         params_full = [item if item is not None else {} for item in params]
 
-    # if isinstance(n_train, (Integral, np.integer)):
-    #     n_train = [n_train]
     n_train = np.array(n_train).reshape(-1)
 
     names = y_stats_full[0].dtype.names
