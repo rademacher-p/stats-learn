@@ -9,7 +9,7 @@ n_mc = 10
 | Lit MLP 500-500-500, 0.0 reg.   | 0.244 | 0.266 | 0.262 | 0.243 | 0.204 | 0.171 | 0.150 | 0.119 | 0.088 | 0.072 |  0.066 |
 | Lit MLP 500-500-500, 0.001 reg. | 0.247 | 0.268 | 0.258 | 0.224 | 0.186 | 0.160 | 0.132 | 0.122 | 0.116 | 0.116 |  0.116 |
 
-![](../../images/discrete/regression/underfitting/new.png)
+![](../../../../images/discrete/regression/underfitting/new.png)
 
 # 2021-07-24T10_34_31
 n_mc = 10
@@ -22,7 +22,7 @@ n_mc = 10
 | Lit MLP 500-500-500, 0.0 reg.   | 0.247 | 0.267 | 0.264 | 0.248 | 0.206 | 0.176 | 0.149 | 0.117 | 0.089 | 0.070 |  0.067 |
 | Lit MLP 500-500-500, 0.001 reg. | 0.240 | 0.254 | 0.260 | 0.235 | 0.187 | 0.159 | 0.131 | 0.121 | 0.116 | 0.115 |  0.116 |
 
-![](../../images/discrete/regression/underfitting/no_stopping.png)
+![](../../../../images/discrete/regression/underfitting/no_stopping.png)
 
 # 2021-07-24T17_22_50
 - MC iterations: 5
@@ -35,7 +35,7 @@ n_mc = 10
 | Lit MLP 500-500-500, 0.0 reg.   | 0.193 | 0.264 | 0.188 | 0.199 | 0.198 | 0.172 | 0.139 | 0.112 | 0.072 | 0.054 |  0.045 |
 | Lit MLP 500-500-500, 0.001 reg. | 0.211 | 0.250 | 0.181 | 0.187 | 0.172 | 0.142 | 0.114 | 0.107 | 0.102 | 0.101 |  0.101 |
 
-![](../../images/discrete/regression/underfitting/long_train.png)
+![](../../../../images/discrete/regression/underfitting/long_train.png)
 
 # BEST RESULTS:
 
@@ -50,7 +50,7 @@ n_mc = 10
 | Lit MLP 500-500-500-500, 0.0 reg.   | 0.196 | 0.245 | 0.184 | 0.209 | 0.203 | 0.177 | 0.138 | 0.114 | 0.075 | 0.053 |  0.043 |
 | Lit MLP 500-500-500-500, 0.001 reg. | 0.211 | 0.250 | 0.185 | 0.185 | 0.166 | 0.156 | 0.119 | 0.108 | 0.102 | 0.100 |  0.100 |
 
-![](../../images/discrete/regression/underfitting/big_net.png)
+![](../../../../images/discrete/regression/underfitting/big_net.png)
 
 # 2021-07-25T14_35_53
 - MC iterations: 5
@@ -62,7 +62,7 @@ n_mc = 10
 | $\Dir$, $\alpha_0 = 1000000.0$    | 0.114 |
 | Lit MLP 500-500-500-500, 0.0 reg. | 0.110 |
 
-![](../../images/discrete/regression/underfitting/predict_full.png)
+![](../../../../images/discrete/regression/underfitting/predict_full.png)
 
 
 # 2021-07-25T18_43_28
@@ -74,7 +74,7 @@ n_mc = 10
 | $\Dir$, $\alpha_0 = 1e-06$     | 0.080 |
 | $\Dir$, $\alpha_0 = 1000000.0$ | 0.114 |
 
-![](../../images/discrete/regression/underfitting/predict_dir.png)
+![](../../../../images/discrete/regression/underfitting/predict_dir.png)
 
 
 # 2021-07-25T18_44_02
@@ -86,7 +86,7 @@ n_mc = 10
 | Lit MLP 500-500-500-500, 0.0 reg.   | 0.111 |
 | Lit MLP 500-500-500-500, 0.001 reg. | 0.111 |
 
-![](../../images/discrete/regression/underfitting/predict_nn.png)
+![](../../../../images/discrete/regression/underfitting/predict_nn.png)
 
 
 
@@ -103,7 +103,7 @@ n_mc = 10
 | $\mathrm{MLP}$, $\lambda = 0.0$   | 0.055 |
 | $\mathrm{MLP}$, $\lambda = 0.001$ | 0.069 |
 
-![](../../images/discrete/regression/underfitting/low_var/predict_full.png)
+![](../../../../images/discrete/regression/underfitting/low_var/predict_full.png)
 
 ### 2021-07-30T15_28_15
 - MC iterations: 5
@@ -114,7 +114,7 @@ n_mc = 10
 | $\Dir$, $\alpha_0 = 1e-05$    | 0.027 |
 | $\Dir$, $\alpha_0 = 100000.0$ | 0.075 |
 
-![](../../images/discrete/regression/underfitting/low_var/predict_dir.png)
+![](../../../../images/discrete/regression/underfitting/low_var/predict_dir.png)
 
 ### 2021-07-30T15_46_06
 - MC iterations: 5
@@ -125,7 +125,7 @@ n_mc = 10
 | $\mathrm{MLP}$, $\lambda = 0.0$   | 0.055 |
 | $\mathrm{MLP}$, $\lambda = 0.001$ | 0.069 |
 
-![](../../images/discrete/regression/underfitting/low_var/predict_mlp.png)
+![](../../../../images/discrete/regression/underfitting/low_var/predict_mlp.png)
 
 ### 2021-07-30T16_04_23
 - MC iterations: 5
@@ -138,7 +138,7 @@ n_mc = 10
 | $\mathrm{MLP}$, $\lambda = 0.0$   | 0.140 | 0.157 | 0.150 | 0.147 | 0.139 | 0.111 | 0.093 | 0.056 | 0.033 | 0.007 |  0.005 |
 | $\mathrm{MLP}$, $\lambda = 0.001$ | 0.135 | 0.156 | 0.137 | 0.135 | 0.123 | 0.096 | 0.079 | 0.066 | 0.065 | 0.067 |  0.065 |
 
-![](../../images/discrete/regression/underfitting/low_var/risk_N.png)
+![](../../../../images/discrete/regression/underfitting/low_var/risk_N.png)
 
 ### 2021-07-30T22_07_58
 - MC iterations: 5
@@ -151,7 +151,7 @@ n_mc = 10
 | $\mathrm{MLP}$, $\lambda = 0.0$   | 0.129 | 0.142 | 0.116 | 0.085 | 0.079 | 0.069 | 0.059 | 0.049 | 0.048 | 0.042 | 0.038 | 0.036 | 0.030 | 0.026 | 0.027 | 0.023 | 0.025 | 0.023 | 0.020 | 0.017 | 0.020 | 0.015 | 0.012 | 0.015 | 0.015 | 0.014 | 0.013 | 0.011 | 0.013 | 0.009 | 0.008 | 0.008 | 0.016 | 0.008 | 0.014 | 0.013 | 0.012 | 0.011 | 0.005 | 0.016 | 0.012 |
 | $\mathrm{MLP}$, $\lambda = 0.001$ | 0.147 | 0.124 | 0.091 | 0.082 | 0.077 | 0.072 | 0.070 | 0.069 | 0.069 | 0.068 | 0.067 | 0.067 | 0.067 | 0.067 | 0.067 | 0.066 | 0.067 | 0.066 | 0.067 | 0.066 | 0.066 | 0.067 | 0.066 | 0.066 | 0.066 | 0.066 | 0.066 | 0.066 | 0.066 | 0.066 | 0.068 | 0.067 | 0.067 | 0.067 | 0.066 | 0.066 | 0.066 | 0.068 | 0.067 | 0.066 | 0.066 |
 
-![](../../images/discrete/regression/underfitting/low_var/risk_N_v2.png)
+![](../../../../images/discrete/regression/underfitting/low_var/risk_N_v2.png)
 
 
 # Low Variance + NN bias init
@@ -169,9 +169,9 @@ NOTE: 1000 test samples!
 | $\mathrm{MLP}$, $\lambda = 0.0$   | 0.056 |
 | $\mathrm{MLP}$, $\lambda = 0.001$ | 0.069 |
 
-![](../../images/discrete/regression/underfitting/nn_init/predict_full.png)
-![](../../images/discrete/regression/underfitting/nn_init/predict_dir.png)
-![](../../images/discrete/regression/underfitting/nn_init/predict_nn.png)
+![](../../../../images/discrete/regression/underfitting/nn_init/predict_full.png)
+![](../../../../images/discrete/regression/underfitting/nn_init/predict_dir.png)
+![](../../../../images/discrete/regression/underfitting/nn_init/predict_nn.png)
 
 Seed = 12345
 
@@ -186,6 +186,6 @@ Seed = 12345
 | $\mathrm{MLP}$, $\lambda = 0.0$   | 0.081 | 0.167 | 0.204 | 0.164 | 0.164 | 0.120 | 0.117 | 0.097 | 0.059 | 0.025 | 0.007 |  0.003 |
 | $\mathrm{MLP}$, $\lambda = 0.001$ | 0.080 | 0.172 | 0.195 | 0.169 | 0.140 | 0.114 | 0.099 | 0.080 | 0.070 | 0.068 | 0.068 |  0.068 |
 
-![](../../images/discrete/regression/underfitting/nn_init/risk_N.png)
+![](../../../../images/discrete/regression/underfitting/nn_init/risk_N.png)
 
 Seed = 12345
