@@ -9,6 +9,7 @@ from operator import itemgetter
 import numpy as np
 
 import sklearn as skl
+from sklearn.base import BaseEstimator
 from sklearn.pipeline import Pipeline
 from sklearn.exceptions import NotFittedError
 
@@ -90,15 +91,35 @@ class Base(ABC):
         dtype = [('x', d.dtype['x'].base, x.shape[1:]), ('y', d.dtype['y'].base, y.shape[1:])]
         return np.array(list(zip(x, y)), dtype=dtype)
 
-    def fit(self, d=None, warm_start=False):
-        if d is None:
-            d = np.array([], dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
+    def fit(self, d=(), warm_start=False):
+        if not warm_start:
+            self.reset()
+        elif not self.can_warm_start:
+            raise ValueError("Predictor does not support warm start fitting.")
 
-        d = self._proc_data(d)
-        return self._fit(d, warm_start)
+        if len(d) > 0:
+            d = self._proc_data(d)
+            self._fit(d)
+
+        # if d is None:
+        #     d = np.array([], dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
+        # d = self._proc_data(d)
+        #
+        # return self._fit(d)
+
+    # def fit(self, d=None, warm_start=False):
+    #     if d is None:
+    #         d = np.array([], dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
+    #
+    #     d = self._proc_data(d)
+    #     return self._fit(d, warm_start)
 
     @abstractmethod
-    def _fit(self, d, warm_start):
+    def _fit(self, d):
+        raise NotImplementedError
+
+    @abstractmethod
+    def reset(self):
         raise NotImplementedError
 
     def fit_from_model(self, model, n_train=0, rng=None, warm_start=False):
@@ -220,7 +241,10 @@ class Model(Base):
     def _model_obj(self):
         return self.model
 
-    def _fit(self, d, warm_start):
+    def _fit(self, d):
+        pass
+
+    def reset(self):
         pass
 
     def fit_from_model(self, model, n_train=0, rng=None, warm_start=False):
@@ -284,8 +308,11 @@ class Bayes(Base):
     def _model_obj(self):
         return self.bayes_model
 
-    def _fit(self, d, warm_start):
-        self.bayes_model.fit(d, warm_start)
+    def _fit(self, d):
+        self.bayes_model.fit(d, warm_start=True)
+
+    def reset(self):
+        self.bayes_model.reset()
 
     def plot_param_dist(self, x=None, ax_prior=None):  # TODO: improve or remove?
         if x is None:
@@ -371,7 +398,7 @@ class BayesRegressor(RegressorMixin, Bayes):
                 raise NotImplementedError
 
 
-class SKLWrapper(Base):
+class SKLWrapper(Base):  # TODO: rework for new reset/fit functionality
 
     # FIXME: inheritance feels broken
 
@@ -385,6 +412,8 @@ class SKLWrapper(Base):
         self.estimator = estimator
         # self._space = space
 
+        self.can_warm_start = hasattr(self.estimator, 'warm_start')  # TODO: bugged if estimator is `Pipeline`?
+
     # space = property(lambda self: self._space)
 
     @property
@@ -395,19 +424,26 @@ class SKLWrapper(Base):
         for key, val in kwargs.items():
             setattr(self.estimator, key, val)
 
-    def _fit(self, d, warm_start):
-        if hasattr(self.estimator, 'warm_start'):  # TODO: check unneeded if not warm_start
-            self.estimator.set_params(warm_start=warm_start)
-        elif isinstance(self.estimator, Pipeline):
-            self.estimator.set_params(regressor__warm_start=warm_start)  # assumes pipeline step called "regressor"
-        else:
-            raise NotImplementedError
+    def reset(self):
+        self.estimator = skl.base.clone(self.estimator)  # manually reset learner if `fit` is not called
 
-        if len(d) > 0:
-            x, y = d['x'].reshape(-1, 1), d['y']
-            self.estimator.fit(x, y)
-        elif not warm_start:
-            self.estimator = skl.base.clone(self.estimator)  # manually reset learner if `fit` is not called
+    def _fit(self, d):
+        x, y = d['x'].reshape(-1, 1), d['y']
+        self.estimator.fit(x, y)
+
+    # def _fit(self, d, warm_start):
+    #     if hasattr(self.estimator, 'warm_start'):  # TODO: check unneeded if not warm_start
+    #         self.estimator.set_params(warm_start=warm_start)
+    #     elif isinstance(self.estimator, Pipeline):
+    #         self.estimator.set_params(regressor__warm_start=warm_start)  # assumes pipeline step called "regressor"
+    #     else:
+    #         raise NotImplementedError
+    #
+    #     if len(d) > 0:
+    #         x, y = d['x'].reshape(-1, 1), d['y']
+    #         self.estimator.fit(x, y)
+    #     elif not warm_start:
+    #         self.estimator = skl.base.clone(self.estimator)  # manually reset learner if `fit` is not called
 
     def _predict(self, x):
         try:

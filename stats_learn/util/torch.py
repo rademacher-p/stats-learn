@@ -77,6 +77,8 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
         else:
             raise TypeError("Reset function must be a callable for application to `nn.Module.apply`.")
 
+        self.can_warm_start = True
+
         self.reset()
 
     @property
@@ -90,7 +92,7 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
     def _reset_trainer(self):
         self.trainer = pl.Trainer(**deepcopy(self.trainer_params))
 
-    def reset(self):  # TODO: add reset method to predictor base class?
+    def reset(self):
         self.reset_func(self.model)
         self._reset_trainer()
 
@@ -100,13 +102,7 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
             shape_x = (1,)
         return tuple(map(lambda x: x.reshape(-1, *shape_x), arrays))
 
-    def _fit(self, d, warm_start):
-        if not warm_start:
-            self.reset()
-
-        if len(d) == 0:
-            return
-
+    def _fit(self, d):
         x, y = self._reshape_batches(d['x'], d['y'])
         x, y = map(partial(torch.tensor, dtype=torch.float32), (x, y))
         ds = TensorDataset(x, y)

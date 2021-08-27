@@ -2,6 +2,8 @@
 Bayesian SL models.
 """
 
+from abc import abstractmethod, ABC
+
 import numpy as np
 from scipy.stats._multivariate import _PSD
 
@@ -16,7 +18,7 @@ from stats_learn.util.base import RandomGeneratorMixin, vectorize_func
 # TODO: Add deterministic DEP to effect a DP realization and sample!!
 
 
-class Base(RandomGeneratorMixin):
+class Base(RandomGeneratorMixin, ABC):
     can_warm_start = False
 
     def __init__(self, prior=None, rng=None):
@@ -52,17 +54,39 @@ class Base(RandomGeneratorMixin):
         model = self.random_model(rng)
         return model.rvs(size)
 
-    def fit(self, d=None, warm_start=False):
-        if warm_start and not self.can_warm_start:
+    def fit(self, d=(), warm_start=False):
+        if not warm_start:
+            self.reset()
+        elif not self.can_warm_start:
             raise ValueError("Bayes model does not support warm start fitting.")
 
-        if d is None:
-            d = np.array([], dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
+        if len(d) > 0:
+            self._fit(d)
 
-        self._fit(d, warm_start)
+        # if d is None:
+        #     d = np.array([], dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
+        #
+        # self._fit(d)
 
-    def _fit(self, d, warm_start):
+    @abstractmethod
+    def _fit(self, d):
         raise NotImplementedError
+
+    @abstractmethod
+    def reset(self):
+        raise NotImplementedError
+
+    # def fit(self, d=None, warm_start=False):
+    #     if warm_start and not self.can_warm_start:
+    #         raise ValueError("Bayes model does not support warm start fitting.")
+    #
+    #     if d is None:
+    #         d = np.array([], dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
+    #
+    #     self._fit(d, warm_start)
+    #
+    # def _fit(self, d, warm_start):
+    #     raise NotImplementedError
 
 
 class NormalLinear(Base):
@@ -99,6 +123,9 @@ class NormalLinear(Base):
         self._set_prior_persistent_attr()
 
         # Learning
+        self._cov_data_inv = np.zeros(2 * self.prior.shape)
+        self._mean_data_temp = np.zeros(self.prior.shape)
+
         self.posterior = rand_elements.Normal(self.prior_mean, self.prior_cov, allow_singular=self.allow_singular)
         self.posterior_model = rand_models.NormalLinear(**self._prior_model_kwargs)
         # self.posterior_model = rand_models.NormalLinear(model_x=model_x, basis_y_x=basis_y_x,
@@ -155,22 +182,39 @@ class NormalLinear(Base):
 
         return rand_models.NormalLinear(**model_kwargs, **rand_kwargs)
 
-    def _fit(self, d, warm_start):
-        if not warm_start:  # reset learning attributes
-            self._cov_data_inv = np.zeros(2 * self.prior.shape)
-            self._mean_data_temp = np.zeros(self.prior.shape)
+    def reset(self):
+        self._cov_data_inv = np.zeros(2 * self.prior.shape)
+        self._mean_data_temp = np.zeros(self.prior.shape)
+        self._reset_posterior()
 
-        n = len(d)
-        if n > 0:  # update data-dependent attributes
-            psi = np.array([np.array([func(x_i) for func in self.basis_y_x])
-                            for x_i in d['x']]).reshape((n, self.prior.size, self.size['y']))
-            psi_white = np.dot(psi, self._prec_U_y_x)
-            self._cov_data_inv += sum(psi_i @ psi_i.T for psi_i in psi_white)
+    def _fit(self, d):
+        # update data-dependent attributes
+        psi = np.array([np.array([func(x_i) for func in self.basis_y_x])
+                        for x_i in d['x']]).reshape((len(d), self.prior.size, self.size['y']))
+        psi_white = np.dot(psi, self._prec_U_y_x)
+        self._cov_data_inv += sum(psi_i @ psi_i.T for psi_i in psi_white)
 
-            y_white = np.dot(d['y'].reshape(n, self.size['y']), self._prec_U_y_x)
-            self._mean_data_temp += sum(psi_i @ y_i for psi_i, y_i in zip(psi_white, y_white))
+        y_white = np.dot(d['y'].reshape(len(d), self.size['y']), self._prec_U_y_x)
+        self._mean_data_temp += sum(psi_i @ y_i for psi_i, y_i in zip(psi_white, y_white))
 
         self._update_posterior()
+
+    # def _fit(self, d, warm_start):
+    #     if not warm_start:  # reset learning attributes
+    #         self._cov_data_inv = np.zeros(2 * self.prior.shape)
+    #         self._mean_data_temp = np.zeros(self.prior.shape)
+    #
+    #     n = len(d)
+    #     if n > 0:  # update data-dependent attributes
+    #         psi = np.array([np.array([func(x_i) for func in self.basis_y_x])
+    #                         for x_i in d['x']]).reshape((n, self.prior.size, self.size['y']))
+    #         psi_white = np.dot(psi, self._prec_U_y_x)
+    #         self._cov_data_inv += sum(psi_i @ psi_i.T for psi_i in psi_white)
+    #
+    #         y_white = np.dot(d['y'].reshape(n, self.size['y']), self._prec_U_y_x)
+    #         self._mean_data_temp += sum(psi_i @ y_i for psi_i, y_i in zip(psi_white, y_white))
+    #
+    #     self._update_posterior()
 
     def _reset_posterior(self):
         self.posterior.mean = self.prior_mean
@@ -333,13 +377,22 @@ class Dirichlet(Base):  # TODO: DRY from random.elements?
 
         return _out
 
-    def _fit(self, d, warm_start):
-        if warm_start:
-            emp_dist = self.emp_dist
-        else:
-            emp_dist = rand_models.DataEmpirical([], [], space=self.space)
+    def reset(self):
+        self.emp_dist = rand_models.DataEmpirical([], [], space=self.space)
+
+    def _fit(self, d):
+        emp_dist = self.emp_dist
         emp_dist.add_data(d)
         self.emp_dist = emp_dist  # triggers setter
+        self.emp_dist = emp_dist  # triggers setter
+
+    # def _fit(self, d, warm_start):
+    #     if warm_start:
+    #         emp_dist = self.emp_dist
+    #     else:
+    #         emp_dist = rand_models.DataEmpirical([], [], space=self.space)
+    #     emp_dist.add_data(d)
+    #     self.emp_dist = emp_dist  # triggers setter
 
 
 if __name__ == '__main__':
