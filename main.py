@@ -1,4 +1,5 @@
 import math
+import sys
 from pathlib import Path
 from copy import deepcopy
 # import pickle
@@ -11,16 +12,18 @@ from sklearn.neural_network import MLPRegressor
 import torch
 from pytorch_lightning.callbacks import EarlyStopping
 import pytorch_lightning.loggers as pl_loggers
+from pytorch_lightning.utilities.seed import seed_everything
 
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
-from stats_learn.predictors import ModelRegressor, BayesRegressor, SKLWrapper
+from stats_learn.predictors.base import ModelRegressor, BayesRegressor
+from stats_learn.predictors.sklearn import SKLWrapper
 from stats_learn.util import funcs
 from stats_learn import results
 # from stats_learn.util.base import NOW_STR
 from stats_learn.util.data_processing import make_clipper
 from stats_learn.util.plotting import box_grid
-from stats_learn.util.torch import LitMLP, LitWrapper, reset_weights
+from stats_learn.predictors.torch import LitMLP, LitWrapper, reset_weights
 
 np.set_printoptions(precision=3)
 
@@ -30,8 +33,8 @@ plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
 # seed = None
 seed = 12345
 
-# if seed is not None:
-#     seed_everything(seed)  # PyTorch Lightning seeding
+if seed is not None:
+    seed_everything(seed)  # PyTorch Lightning seeding
 
 
 #%% Model and optimal predictor
@@ -248,25 +251,18 @@ temp = [
     # *(zip(dir_predictors, dir_params_full)),
     # (norm_predictor, norm_params),
     # (skl_predictor, None),
-    *((predictor, None) for predictor in lit_predictors),
+    # *((predictor, None) for predictor in lit_predictors),
 ]
 predictors, params = zip(*temp)
 
 
-# file = None
-# file = sys.stdout
-file = 'logs/temp/temp.md'
-# file = 'logs/results/underfitting.md'
-
-if file is not None:
-    file = Path(file).open('a')
-    print(f"\nSeed = {seed}", file=file)
-# print(f"\nSeed = {seed}", file=file)
+file = sys.stdout
+# file = 'logs/temp/temp.md'
 
 
 y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-                                                 stats=('mean', 'std'), plot_stats=True, print_loss=True,
-                                                 verbose=True, img_path='images/temp/', file=file, rng=seed)
+                                                 stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
+                                                 img_dir='images/temp/', file=file, rng=seed)
 
 # y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
 #                                                     plot_loss=True, print_loss=True,
@@ -278,9 +274,6 @@ y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params,
 
 # with open(f'data/temp/{NOW_STR}.pkl', 'wb') as fid:
 #     pickle.dump(dict(y_stats=y_stats_full, losses=loss_full), fid)
-
-if file is not None:
-    file.close()
 
 
 #%% Deprecated

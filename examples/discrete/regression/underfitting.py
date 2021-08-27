@@ -9,12 +9,12 @@ from pytorch_lightning.utilities.seed import seed_everything
 
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
-from stats_learn.predictors import ModelRegressor, BayesRegressor
+from stats_learn.predictors.base import ModelRegressor, BayesRegressor
 from stats_learn.util import funcs
 from stats_learn import results
 from stats_learn.util.data_processing import make_clipper
 from stats_learn.util.plotting import box_grid
-from stats_learn.util.torch import LitMLP, LitWrapper, reset_weights
+from stats_learn.predictors.torch import LitMLP, LitWrapper, reset_weights
 
 plt.style.use('../../../style.mplstyle')
 
@@ -106,7 +106,7 @@ n_mc = 5
 #                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
 #                                                     verbose=True)
 
-y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
-                                                 plot_loss=True, print_loss=True, verbose=True)
+y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
+                                                 plot_loss=True, print_loss=True)
 
 
