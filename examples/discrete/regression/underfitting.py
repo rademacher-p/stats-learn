@@ -15,7 +15,7 @@ from stats_learn.util.data_processing import make_clipper
 from stats_learn.util.plotting import box_grid
 from stats_learn.util.torch import LitMLP, LitWrapper, reset_weights
 
-plt.rc('text', usetex=True)
+plt.style.use('../../../style.mplstyle')
 
 seed = 12345
 
@@ -50,7 +50,7 @@ dir_params = {'alpha_0': [1e-5, 1e5]}
 
 
 #%% PyTorch
-weight_decays = [0., 1e-3]
+weight_decays = [0., 1e-3]  # controls L2 regularization
 
 proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
 
@@ -90,7 +90,7 @@ n_mc = 1
 temp = [
     (opt_predictor, None),
     (dir_predictor, dir_params),
-    # *((predictor, None) for predictor in lit_predictors),
+    *((predictor, None) for predictor in lit_predictors),
 ]
 predictors, params = zip(*temp)
 

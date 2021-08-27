@@ -4,8 +4,8 @@ from matplotlib import pyplot as plt
 from stats_learn.random import elements as rand_elements
 from stats_learn.util import spaces
 
-plt.rc('text', usetex=True)
-plt.rc('text.latex', preamble=r"\usepackage{upgreek}")
+plt.style.use('../../style.mplstyle')
+
 
 str_p_opt = r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \uptheta}$'
 str_p_bayes = r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \uppsi}$'
