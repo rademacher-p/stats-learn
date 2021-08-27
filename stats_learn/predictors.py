@@ -4,6 +4,7 @@ Supervised learning functions.
 
 from abc import ABC, abstractmethod
 from typing import Union
+from operator import itemgetter
 
 import numpy as np
 
@@ -19,7 +20,7 @@ from stats_learn.util.base import vectorize_func
 
 from stats_learn.util.results import (plot_fit_compare, predict_stats_compare, plot_predict_stats_compare,
                                       risk_eval_sim_compare, risk_eval_comp_compare, plot_risk_eval_sim_compare,
-                                      plot_risk_eval_comp_compare)
+                                      plot_risk_eval_comp_compare, assess_compare)
 
 # TODO: refactor into subpackages?
 
@@ -148,6 +149,15 @@ class Base(ABC):
     #
     #     self.fit(d)
     #     self.plot_predict(ax=ax)
+
+    # Assess
+    def assess(self, model=None, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
+               plot_stats=False, plot_loss=False, print_loss=False, img_path=None, file=None, ax=None):
+        if model is None:
+            model = self._model_obj
+        out = assess_compare([self], model, [params], n_train, n_test, n_mc, x, stats, verbose, plot_stats, plot_loss,
+                             print_loss, img_path, file, ax)
+        return map(itemgetter(0), out)
 
     # Prediction statistics
     def predict_stats(self, model=None, params=None, n_train=0, n_mc=1, x=None, stats=('mode',), verbose=False):
