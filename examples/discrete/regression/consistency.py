@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
-from stats_learn.predictors import ModelRegressor, BayesRegressor
+from stats_learn.predictors.base import ModelRegressor, BayesRegressor
 from stats_learn.util import funcs
 from stats_learn import results
 from stats_learn.util.plotting import box_grid
@@ -89,23 +89,22 @@ n_mc = 10
 # Predictor mean/variance, comparative
 n_train = 400
 y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
-                                                 stats=('mean', 'std'), plot_stats=True, print_loss=True,
-                                                 verbose=True)
+                                                 stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True)
 
 # Dirichlet-based predictor mean/variance, varying N
 n_train = [0, 800, 4000]
-y_stats_full, loss_full = dir_predictor.assess(model, {'alpha_0': [1000]}, n_train, n_test, n_mc,
-                                               stats=('mean', 'std'), plot_stats=True, print_loss=True, verbose=True)
+y_stats_full, loss_full = dir_predictor.assess(model, {'alpha_0': [1000]}, n_train, n_test, n_mc, stats=('mean', 'std'),
+                                               verbose=True, plot_stats=True, print_loss=True)
 
 # Squared-Error vs. training data volume N
 n_train = np.arange(0, 4050, 50)
-y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
-                                                 plot_loss=True, verbose=True)
+y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
+                                                 plot_loss=True)
 
 # Squared-Error vs. prior localization alpha_0
 n_train = [0, 100, 200, 400, 800]
 y_stats_full, loss_full = dir_predictor.assess(model, {'alpha_0': np.logspace(0., 5., 100)}, n_train, n_test, n_mc,
-                                               plot_loss=True, verbose=True)
+                                               verbose=True, plot_loss=True)
 
 
 # results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,

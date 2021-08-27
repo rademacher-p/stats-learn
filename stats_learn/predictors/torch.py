@@ -8,7 +8,7 @@ import pytorch_lightning as pl
 from torch.utils.data import TensorDataset, DataLoader
 
 from stats_learn.loss_funcs import loss_se
-from stats_learn.predictors import Base
+from stats_learn.predictors.base import Base
 
 num_workers = 0
 # num_workers = os.cpu_count()

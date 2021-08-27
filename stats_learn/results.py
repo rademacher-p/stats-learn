@@ -1,20 +1,21 @@
 import math
+import sys
 from itertools import product
 from pathlib import Path
 import pickle
 from collections import Iterable
 from typing import Union
-from warnings import warn
+# from warnings import warn
 
 from more_itertools import all_equal
 import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
-from pytorch_lightning.utilities.seed import seed_everything
+# from pytorch_lightning.utilities.seed import seed_everything
 
 from stats_learn.bayes import models as bayes_models
 from stats_learn.util.base import check_data_shape, NOW_STR, RandomGeneratorMixin as RNGMix
-from stats_learn.util.torch import LitWrapper
+# from stats_learn.predictors.torch import LitWrapper
 
 
 def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None, file=None,  ax=None):
@@ -68,7 +69,7 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None,
     else:
         ax.legend()
 
-    if file is not None:
+    if file != sys.stdout:
         print(f"\n# {NOW_STR}", file=file)
 
     if do_loss:
@@ -79,12 +80,13 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None,
         img_file = img_path.joinpath(f"{NOW_STR}.png")
         _save_current_fig(img_file)
 
-        if file is not None:
+        if file != sys.stdout:
             print(f"\n![]({img_file.absolute()})", file=file)
 
 
 def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
-                   plot_stats=False, plot_loss=False, print_loss=False, img_path=None, file=None, ax=None, rng=None):
+                   plot_stats=False, plot_loss=False, print_loss=False, img_dir=None, file=sys.stdout, ax=None,
+                   rng=None):
     """
 
     Parameters
@@ -114,15 +116,20 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
         Enables plotting of average loss.
     print_loss : bool, optional
         Enables print-out of average loss table.
-    img_path : os.PathLike or str, optional
+    img_dir : os.PathLike or str, optional
         Directory for saving generated images.
     file : file-like, optional
         File for saving printed loss table and image path in Markdown format.
     ax : matplotlib.axes.Axes, optional
         Axes onto which stats/losses are plotted.
+    rng : int or RandomState or Generator, optional
+            Random number generator seed or object.
 
     Returns
     -------
+    tuple of list of ndarray
+        Length 2 tuple of lists, each list has length `len(predictors)`. First element contains prediction
+        statistics, second element contains empirical risk values.
 
     Notes
     -----
@@ -136,14 +143,13 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
     if plot_stats and plot_loss:
         raise NotImplementedError("Cannot plot prediction statistics and losses at once.")
 
-    if rng is not None and any(isinstance(predictor, LitWrapper) for predictor in predictors):
-        if isinstance(rng, int):
-            seed_everything(rng)
-        else:
-            warn("Can only seed PyTorch-Lightning with an `int` rng.")
+    # if rng is not None and any(isinstance(predictor, LitWrapper) for predictor in predictors):  # FIXME
+    #     if isinstance(rng, int):
+    #         seed_everything(rng)
+    #     else:
+    #         warn("Can only seed PyTorch-Lightning with an `int` rng.")
 
-    rng = RNGMix.make_rng(rng)
-    model.rng = rng
+    model.rng = RNGMix.make_rng(rng)
 
     if params is None:
         params_full = [{} for _ in predictors]
@@ -263,10 +269,18 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
     loss_full = [loss / n_mc for loss in loss_full]
 
     # Printing
-    if file is not None:
-        print(f"\n### {NOW_STR}", file=file)
+    if not hasattr(file, 'write'):
+        file = open(file, 'a')
 
-    print(f"- Test samples: {n_test}\n- MC iterations: {n_mc}", file=file)
+    print(f"- Seed = {rng}")
+    print(f"- Test samples: {n_test}")
+    print(f"- MC iterations: {n_mc}")
+
+    if file != sys.stdout:
+        print(f"### {NOW_STR}", file=file)
+        print(f"- Seed = {rng}", file=file)
+        print(f"- Test samples: {n_test}", file=file)
+        print(f"- MC iterations: {n_mc}", file=file)
 
     if do_loss and print_loss:
         _print_risk(predictors, params_full, n_train, loss_full, file=file)
@@ -278,21 +292,21 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
         do_bayes = isinstance(model, bayes_models.Base)
         _plot_risk_eval_compare(loss_full, do_bayes, predictors, params_full, n_train, ax)
 
-    if img_path is not None and (plot_stats or plot_loss):
-        img_path = Path(img_path)
-        img_file = img_path.joinpath(f"{NOW_STR}.png")
-
+    if img_dir is not None and (plot_stats or plot_loss):
+        img_file = Path(img_dir).joinpath(f"{NOW_STR}.png")
         _save_current_fig(img_file)
-        # mpl_file = img_file.parent / f"{img_file.stem}.mpl"
-        #
-        # fig = plt.gcf()
-        # fig.savefig(img_file)
-        # # with open(img_path.joinpath(f"{NOW_STR}.mpl"), 'wb') as fid:
-        # with open(mpl_file, 'wb') as fid:
-        #     pickle.dump(fig, fid)
 
-        if file is not None:
+        if file != sys.stdout:
             print(f"\n![]({img_file.absolute().as_posix()})", file=file)
+
+        print('\n', file=file)
+
+    if hasattr(file, 'write') and file != sys.stdout:
+        file.close()
+        # try:
+        #     file.close()
+        # except ValueError:
+        #     pass
 
     return y_stats_full, loss_full
 
@@ -308,8 +322,7 @@ def _save_current_fig(img_file):
 
 def predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=None, stats=('mode',), verbose=False):
 
-    y_stats_full, __ = assess_compare(predictors, model, params, n_train, n_mc=n_mc, x=x, stats=stats,
-                                      verbose=verbose)
+    y_stats_full, __ = assess_compare(predictors, model, params, n_train, n_mc=n_mc, x=x, stats=stats, verbose=verbose)
     return y_stats_full
 
 
@@ -463,8 +476,8 @@ def _print_risk(predictors, params, n_train, losses, file=None):
 
     str_table = df.to_markdown(tablefmt='github', floatfmt='.3f')
     str_out = title + str_table
-    print(str_out)
-    if file is not None:
+    print(str_out)  # print to `stdout` in addition to file
+    if file != sys.stdout:
         print(str_out, file=file)
 
 

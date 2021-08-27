@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 import pandas as pd
 
 from stats_learn.bayes import models as bayes_models
-from stats_learn.predictors import (BayesRegressor)
+from stats_learn.predictors.base import (BayesRegressor)
 from stats_learn.results import plot_risk_eval_sim_compare
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.util.base import NOW_STR
