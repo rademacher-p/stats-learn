@@ -46,10 +46,10 @@ opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 # model_eval.rng = seed
 
 
-#%% Bayesian learners
+#%% Learners
 w_prior = [.5, 0]
 
-# Dirichlet learner
+# Dirichlet
 prior_mean = rand_models.DataConditional.from_poly_mean(n_x, alpha_y_x, w_prior, model_x)
 dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
 
@@ -62,8 +62,9 @@ dir_params = {'alpha_0': [10, 1000]}
 #         dir_params['alpha_0'] = np.sort(np.concatenate((dir_params['alpha_0'], [model_eval.alpha_0])))
 
 
-# Normal learner
-proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
+# Normal-prior LR
+proc_funcs = []
+# proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
 
 norm_model = bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=.1, cov_y_x=.1, model_x=model_x,
                                        allow_singular=True)
@@ -72,12 +73,7 @@ norm_predictor = BayesRegressor(norm_model, space=model.space, proc_funcs=proc_f
 norm_params = {'prior_cov': [.1, .001]}
 
 
-#%% Results
-n_train = 400
-n_test = 10
-n_mc = 50
-
-
+#
 temp = [
     (opt_predictor, None),
     (dir_predictor, dir_params),
@@ -86,13 +82,31 @@ temp = [
 predictors, params = zip(*temp)
 
 
-y_stats_full, loss_full = results.predictor_compare(predictors, model, params, n_train, n_test, n_mc,
-                                                    stats=('mean', 'std'), plot_stats=True, print_loss=True,
-                                                    verbose=True)
+#%% Results
+n_test = 10
+n_mc = 10
 
-# y_stats_full, loss_full = results.predictor_compare(predictors, model, params, n_train, n_test, n_mc,
-#                                                     plot_loss=True, print_loss=True,
-#                                                     verbose=True)
+# Predictor mean/variance, comparative
+n_train = 400
+y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
+                                                 stats=('mean', 'std'), plot_stats=True, print_loss=True,
+                                                 verbose=True)
+
+# Dirichlet-based predictor mean/variance, varying N
+n_train = [0, 800, 4000]
+y_stats_full, loss_full = dir_predictor.assess(model, {'alpha_0': [1000]}, n_train, n_test, n_mc,
+                                               stats=('mean', 'std'), plot_stats=True, print_loss=True, verbose=True)
+
+# Squared-Error vs. training data volume N
+n_train = np.arange(0, 4050, 50)
+y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
+                                                 plot_loss=True, verbose=True)
+
+# Squared-Error vs. prior localization alpha_0
+n_train = [0, 100, 200, 400, 800]
+y_stats_full, loss_full = dir_predictor.assess(model, {'alpha_0': np.logspace(0., 5., 100)}, n_train, n_test, n_mc,
+                                               plot_loss=True, verbose=True)
+
 
 # results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
 #                          img_path='images/temp/', file=file)

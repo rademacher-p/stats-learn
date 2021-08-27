@@ -1,4 +1,5 @@
 import math
+import sys
 from pathlib import Path
 from copy import deepcopy
 # import pickle
@@ -23,9 +24,9 @@ from stats_learn.util.plotting import box_grid
 from stats_learn.util.torch import LitMLP, LitWrapper, reset_weights
 
 np.set_printoptions(precision=3)
-plt.rc('text', usetex=True)
+
+plt.style.use('style.mplstyle')
 plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
-# plt.style.use('seaborn')
 
 # seed = None
 seed = 12345
@@ -38,8 +39,8 @@ if seed is not None:
 n_x = 128
 
 # var_y_x_const = 1 / (n_x-1)
-# var_y_x_const = 1/5
-var_y_x_const = 1/125
+var_y_x_const = 1/5
+# var_y_x_const = 1/125
 
 alpha_y_x_d = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_x-1))
 alpha_y_x_beta = 1/var_y_x_const - 1
@@ -55,8 +56,8 @@ lims_x = np.broadcast_to([0, 1], (*shape_x, 2))
 # w_model = [.5]
 w_model = [0, 1]
 
-# nonlinear_model = funcs.make_inv_trig(shape_x)
-nonlinear_model = funcs.make_rand_discrete(n_x, rng=seed)
+nonlinear_model = funcs.make_inv_trig(shape_x)
+# nonlinear_model = funcs.make_rand_discrete(n_x, rng=seed)
 
 
 supp_x = box_grid(lims_x, n_x, endpoint=True)
@@ -183,9 +184,9 @@ skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 #%% PyTorch
 # TODO: add citations to dissertation. PyTorch, Adam weight decay, etc.
 
-# weight_decays = [0.]
-# weight_decays = [1e-3]
-weight_decays = [0., 1e-3]
+# weight_decays = [0.]  # controls L2 regularization
+weight_decays = [1e-3]
+# weight_decays = [0., 1e-3]
 
 # proc_funcs = []
 proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
@@ -201,7 +202,8 @@ for weight_decay in weight_decays:
     lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {weight_decay}$"
 
     trainer_params = {
-        'max_epochs': 50000,
+        # 'max_epochs': 50000,
+        'max_epochs': 1,
         'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=10000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
         'logger': pl_loggers.TensorBoardLogger('logs/learn/', name=logger_name),
@@ -244,7 +246,7 @@ n_train = 128
 
 n_test = 1000
 
-n_mc = 5
+n_mc = 1
 
 
 temp = [
@@ -259,19 +261,21 @@ predictors, params = zip(*temp)
 
 
 # file = None
+# file = sys.stdout
 file = 'logs/temp/temp.md'
 # file = 'logs/results/underfitting.md'
 
 if file is not None:
     file = Path(file).open('a')
     print(f"\nSeed = {seed}", file=file)
+# print(f"\nSeed = {seed}", file=file)
 
 
-y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-                                                    stats=('mean', 'std'), plot_stats=True, print_loss=True,
-                                                    verbose=True, img_path='images/temp/', file=file)
+y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+                                                 stats=('mean', 'std'), plot_stats=True, print_loss=True,
+                                                 verbose=True, img_path='images/temp/', file=file)
 
-# y_stats_full, loss_full = results.predictor_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+# y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
 #                                                     plot_loss=True, print_loss=True,
 #                                                     verbose=True, img_path='images/temp/', file=file)
 

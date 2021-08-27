@@ -41,7 +41,9 @@ model = rand_models.DataConditional.from_func_mean(n_x, alpha_y_x, nonlinear_mod
 opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 
 
-#%% Dirichlet learner
+#%% Learners
+
+# Dirichlet
 prior_mean = rand_models.DataConditional.from_func_mean(n_x, alpha_y_x, lambda x: .5, model_x)
 dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
 
@@ -49,9 +51,10 @@ dir_predictor = BayesRegressor(dir_model, space=model.space, name=r'$\mathrm{Dir
 dir_params = {'alpha_0': [1e-5, 1e5]}
 
 
-#%% PyTorch
+# PyTorch
 weight_decays = [0., 1e-3]  # controls L2 regularization
 
+# proc_funcs = []
 proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
 
 lit_predictors = []
@@ -82,11 +85,7 @@ for weight_decay in weight_decays:
     lit_predictors.append(lit_predictor)
 
 
-#%% Results
-n_train = np.concatenate(([0], 2**np.arange(11)))
-n_test = 1000
-n_mc = 1
-
+#
 temp = [
     (opt_predictor, None),
     (dir_predictor, dir_params),
@@ -94,11 +93,19 @@ temp = [
 ]
 predictors, params = zip(*temp)
 
-# y_stats_full, loss_full = results.predictor_compare(predictors, model, params, n_train, n_test, n_mc,
+
+#%% Results
+n_train = 128
+# n_train = np.concatenate(([0], 2**np.arange(11)))
+
+n_test = 1000
+n_mc = 5
+
+# y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
 #                                                     stats=('mean', 'std'), plot_stats=True, print_loss=True,
 #                                                     verbose=True)
 
-y_stats_full, loss_full = results.predictor_compare(predictors, model, params, n_train, n_test, n_mc,
-                                                    plot_loss=True, print_loss=True, verbose=True)
+y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
+                                                 plot_loss=True, print_loss=True, verbose=True)
 
 
