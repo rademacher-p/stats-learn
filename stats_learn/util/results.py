@@ -83,8 +83,8 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None,
             print(f"\n![]({img_file.absolute()})", file=file)
 
 
-def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
-                      plot_stats=False, plot_loss=False, print_loss=False, img_path=None, file=None, ax=None):
+def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
+                   plot_stats=False, plot_loss=False, print_loss=False, img_path=None, file=None, ax=None):
     """
 
     Parameters
@@ -259,7 +259,7 @@ def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=
     if file is not None:
         print(f"\n### {NOW_STR}", file=file)
 
-    print(f"- MC iterations: {n_mc}", file=file)
+    print(f"- Test samples: {n_test}\n- MC iterations: {n_mc}", file=file)
 
     if do_loss and print_loss:
         _print_risk(predictors, params_full, n_train, loss_full, file=file)
@@ -271,7 +271,7 @@ def predictor_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=
         do_bayes = isinstance(model, bayes_models.Base)
         _plot_risk_eval_compare(loss_full, do_bayes, predictors, params_full, n_train, ax)
 
-    if img_path is not None:
+    if img_path is not None and (plot_stats or plot_loss):
         img_path = Path(img_path)
         img_file = img_path.joinpath(f"{NOW_STR}.png")
 
@@ -301,8 +301,8 @@ def _save_current_fig(img_file):
 
 def predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=None, stats=('mode',), verbose=False):
 
-    y_stats_full, __ = predictor_compare(predictors, model, params, n_train, n_test=0, n_mc=n_mc, x=x, stats=stats,
-                                         verbose=verbose)
+    y_stats_full, __ = assess_compare(predictors, model, params, n_train, n_mc=n_mc, x=x, stats=stats,
+                                      verbose=verbose)
     return y_stats_full
 
 
@@ -416,12 +416,12 @@ def plot_predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1
     stats = ['mean']
     if do_std:
         stats.append('std')
-    return predictor_compare(predictors, model, params, n_train, n_mc=n_mc, x=x, stats=stats, verbose=verbose,
-                             plot_stats=True, ax=ax)
+    return assess_compare(predictors, model, params, n_train, n_mc=n_mc, x=x, stats=stats, verbose=verbose,
+                          plot_stats=True, ax=ax)
 
 
 def _print_risk(predictors, params, n_train, losses, file=None):
-    title = ''
+    title = '\n'
     index_n = pd.Index(n_train, name='N')
     if len(predictors) == 1:
         predictor, param, loss = predictors[0], params[0], losses[0]
@@ -431,7 +431,7 @@ def _print_risk(predictors, params, n_train, losses, file=None):
         elif len(param) == 1:
             param_name, param_vals = list(param.items())[0]
             index_param = param_vals
-            title = f"{predictor.name}, varying {param_name}"
+            title += f"{predictor.name}, varying {param_name}\n"
             # index_param = pd.Index(param_vals, name=param_name)
             # title = predictor.name
             df = pd.DataFrame(loss, index_n, columns=index_param)
@@ -457,15 +457,15 @@ def _print_risk(predictors, params, n_train, losses, file=None):
     df = df.transpose()
 
     str_table = df.to_markdown(tablefmt='github', floatfmt='.3f')
-    str_out = f"{title}\n{str_table}"
+    str_out = title + str_table
     print(str_out)
     if file is not None:
         print(str_out, file=file)
 
 
 def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, print_loss=False):
-    __, loss_full = predictor_compare(predictors, model, params, n_train, n_test, n_mc, verbose=verbose,
-                                      print_loss=print_loss)
+    __, loss_full = assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=verbose,
+                                   print_loss=print_loss)
     return loss_full
 
 
@@ -609,11 +609,11 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train: 
 
 
 def plot_risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None):
-    return predictor_compare(predictors, model, params, n_train, n_test, n_mc, verbose=verbose, plot_loss=True, ax=ax)
+    return assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=verbose, plot_loss=True, ax=ax)
 
 
 def plot_risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, verbose=False, ax=None):
-    return predictor_compare(predictors, model, params, n_train, n_test, verbose=verbose, plot_loss=True, ax=ax)
+    return assess_compare(predictors, model, params, n_train, n_test, verbose=verbose, plot_loss=True, ax=ax)
 
 
 def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500, verbose=True, ax=None):
