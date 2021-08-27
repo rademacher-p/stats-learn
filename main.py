@@ -33,7 +33,7 @@ plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
 seed = 12345
 
 if seed is not None:
-    seed_everything(seed)  # PyTorch Lightning seeding
+    seed_everything(seed)  # PyTorch-Lightning seeding
 
 
 #%% Model and optimal predictor
@@ -233,7 +233,7 @@ for weight_decay in weight_decays:
 n_train = 128
 # n_train = [1, 4, 40, 400]
 # n_train = [20, 40, 200, 400, 2000]
-# n_train = np.concatenate(([0], 2**np.arange(11)))
+# n_train = np.insert(2**np.arange(11), 0, 0)
 # n_train = [0, 400, 4000]
 # n_train = np.arange(0, 55, 5)
 # n_train = np.arange(0, 4500, 500)

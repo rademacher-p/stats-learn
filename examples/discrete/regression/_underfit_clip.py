@@ -53,18 +53,17 @@ dir_params = {'alpha_0': [1e-5, 1e5]}
 
 
 # PyTorch
-weight_decays = [0., 1e-3]  # controls L2 regularization
+weight_decay = 0.
 
-# proc_funcs = []
-proc_funcs = {'pre': [], 'post': [make_clipper([np.min(supp_x), np.max(supp_x)])]}
+proc_funcss = [[], {'pre': [], 'post': [make_clipper([np.min(supp_x), np.max(supp_x)])]}]
 
 lit_predictors = []
-for weight_decay in weight_decays:
+for proc_funcs in proc_funcss:
     layer_sizes = [500, 500, 500, 500]
     optim_params = {'lr': 1e-3, 'weight_decay': weight_decay}
 
-    logger_name = f"MLP {'-'.join(map(str, layer_sizes))}, lambda {weight_decay}"
-    lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {weight_decay}$"
+    logger_name = f"MLP {'-'.join(map(str, layer_sizes))}, lambda {weight_decay}, clip{len(proc_funcs)}"
+    lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {weight_decay}, clip{len(proc_funcs)}$"
 
     trainer_params = {
         'max_epochs': 50000,
@@ -99,21 +98,9 @@ predictors, params = zip(*temp)
 n_test = 1000
 n_mc = 5
 
-# Sample regressor realizations
-n_train = 20
-
-d = model.rvs(n_train + n_test, rng=seed)
-d_train, d_test = np.split(d, [n_train])
-loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, img_dir=img_dir, file=file)
-
 # Prediction mean/variance, comparative
 n_train = 128
 y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
                                                  img_dir=img_dir, file=file, rng=seed)
 
-# Squared-Error vs. training data volume N
-n_train = np.insert(2**np.arange(11), 0, 0)
-y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
-                                                 plot_loss=True, print_loss=True,
-                                                 img_dir=img_dir, file=file, rng=seed)

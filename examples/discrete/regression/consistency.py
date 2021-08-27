@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
+# from stats_learn.util.data_processing import make_clipper
 from stats_learn.util import funcs
 from stats_learn import results
 
@@ -22,6 +23,17 @@ img_dir = '../../../images/temp/'
 
 #%% Model and optimal predictor
 n_x = n_y = 128
+nonlinear_model = funcs.make_inv_trig()
+var_y_x_const = 1/5
+
+supp_x = np.linspace(0, 1, n_x, endpoint=True)
+model_x = rand_elements.Finite(supp_x, p=None)
+
+alpha_y_x = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_y-1))
+model = rand_models.DataConditional.from_func_mean(n_y, alpha_y_x, nonlinear_model, model_x)
+
+opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
+
 
 # shape_x = ()
 # size_x = math.prod(shape_x)
@@ -36,18 +48,6 @@ n_x = n_y = 128
 # model = rand_models.DataConditional.from_func_mean(n_y, alpha_y_x, nonlinear_model, model_x)
 #
 # opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
-
-supp_x = np.linspace(0, 1, n_x, endpoint=True)
-model_x = rand_elements.Finite(supp_x, p=None)
-
-nonlinear_model = funcs.make_inv_trig()
-
-var_y_x_const = 1/5
-
-alpha_y_x = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_y-1))
-model = rand_models.DataConditional.from_func_mean(n_y, alpha_y_x, nonlinear_model, model_x)
-
-opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 
 
 # do_bayes = False
@@ -78,7 +78,9 @@ dir_params = {'alpha_0': [10, 1000]}
 
 # Normal-prior LR
 proc_funcs = []
-# proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
+# proc_funcs = {'pre': [], 'post': [make_clipper([np.min(supp_x), np.max(supp_x)])]}
+# proc_funcs = {'pre': [], 'post': [make_clipper([0, 1)]}
+
 
 norm_model = bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=.1, cov_y_x=.1, model_x=model_x,
                                        allow_singular=True)
@@ -97,37 +99,36 @@ predictors, params = zip(*temp)
 
 
 #%% Results
-n_test = 10
-n_mc = 10
+n_test = 1000
+n_mc = 5
 
-# Sample fit, comparative
+# Sample regressor realizations
 n_train = 30
 
 d = model.rvs(n_train + n_test, rng=seed)
 d_train, d_test = np.split(d, [n_train])
 loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, img_dir=img_dir, file=file)
 
-
-# Predictor mean/variance, comparative
+# Prediction mean/variance, comparative
 n_train = 400
 y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
                                                  img_dir=img_dir, file=file, rng=seed)
 
-
-# Dirichlet-based predictor mean/variance, varying N
+# Dirichlet-based prediction mean/variance, varying N
 n_train = [0, 800, 4000]
 y_stats_full, loss_full = dir_predictor.assess(model, {'alpha_0': [1000]}, n_train, n_test, n_mc, stats=('mean', 'std'),
-                                               verbose=True, plot_stats=True, print_loss=True, img_dir=img_dir,
-                                               file=file, rng=seed)
+                                               verbose=True, plot_stats=True, print_loss=True,
+                                               img_dir=img_dir, file=file, rng=seed)
 
 # Squared-Error vs. training data volume N
 n_train = np.arange(0, 4050, 50)
 y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
-                                                 plot_loss=True, img_dir=img_dir, file=file, rng=seed)
-
+                                                 plot_loss=True, print_loss=True,
+                                                 img_dir=img_dir, file=file, rng=seed)
 
 # Squared-Error vs. prior localization alpha_0
 n_train = [0, 100, 200, 400, 800]
 y_stats_full, loss_full = dir_predictor.assess(model, {'alpha_0': np.logspace(0., 5., 100)}, n_train, n_test, n_mc,
-                                               verbose=True, plot_loss=True, img_dir=img_dir, file=file, rng=seed)
+                                               verbose=True, plot_loss=True, print_loss=True,
+                                               img_dir=img_dir, file=file, rng=seed)
