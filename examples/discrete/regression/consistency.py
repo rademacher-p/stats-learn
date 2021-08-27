@@ -10,8 +10,7 @@ from stats_learn.util import funcs, results
 from stats_learn.util.data_processing import make_clipper
 from stats_learn.util.plotting import box_grid
 
-plt.rc('text', usetex=True)
-plt.rc('text.latex', preamble=r"\usepackage{bm,upgreek}")
+plt.style.use('../../../style.mplstyle')
 
 # seed = None
 seed = 12345
@@ -75,8 +74,8 @@ norm_params = {'prior_cov': [.1, .001]}
 
 #%% Results
 n_train = 400
-n_test = 1000
-n_mc = 5
+n_test = 10
+n_mc = 50
 
 
 temp = [
@@ -94,3 +93,6 @@ y_stats_full, loss_full = results.predictor_compare(predictors, model, params, n
 # y_stats_full, loss_full = results.predictor_compare(predictors, model, params, n_train, n_test, n_mc,
 #                                                     plot_loss=True, print_loss=True,
 #                                                     verbose=True)
+
+# results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
+#                          img_path='images/temp/', file=file)
