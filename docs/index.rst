@@ -1,15 +1,21 @@
-.. stats_learn documentation master file, created by
-   sphinx-quickstart on Tue Jul 27 15:50:26 2021.
+.. stats-learn documentation master file, created by
+   sphinx-quickstart on Fri Aug 27 06:43:17 2021.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to stats_learn's documentation!
+Welcome to stats-learn's documentation!
 =======================================
 
+This package provides a framework to explore statistical learning with a Bayesian focus.
+
+.. note::
+   This project is under active development @ https://github.com/rademacher-p/stats-learn
+
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
+   source/modules
 
 
 Indices and tables
