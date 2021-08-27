@@ -65,8 +65,8 @@ def reset_weights(model):
 class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
     def __init__(self, model, space, trainer_params=None, reset_func=None, proc_funcs=(), name=None):
         loss_func = loss_se  # TODO: Generalize!
-
         super().__init__(loss_func, space, proc_funcs, name)
+
         self.model = model
         self.trainer_params = trainer_params
 
@@ -77,7 +77,7 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
         else:
             raise TypeError("Reset function must be a callable for application to `nn.Module.apply`.")
 
-        self.can_warm_start = True
+        self.can_warm_start = False  # TODO: actually can, but `assess` results are better with full datasets!
 
         self.reset()
 
