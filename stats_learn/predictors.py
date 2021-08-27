@@ -9,8 +9,6 @@ from operator import itemgetter
 import numpy as np
 
 import sklearn as skl
-from sklearn.base import BaseEstimator
-from sklearn.pipeline import Pipeline
 from sklearn.exceptions import NotFittedError
 
 from stats_learn.bayes import models as bayes_models
@@ -19,9 +17,9 @@ from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.util import spaces
 from stats_learn.util.base import vectorize_func
 
-from stats_learn.util.results import (plot_fit_compare, predict_stats_compare, plot_predict_stats_compare,
-                                      risk_eval_sim_compare, risk_eval_comp_compare, plot_risk_eval_sim_compare,
-                                      plot_risk_eval_comp_compare, assess_compare)
+from stats_learn.results import (plot_fit_compare, predict_stats_compare, plot_predict_stats_compare,
+                                 risk_eval_sim_compare, risk_eval_comp_compare, plot_risk_eval_sim_compare,
+                                 plot_risk_eval_comp_compare, assess_compare)
 
 # TODO: refactor into subpackages?
 
