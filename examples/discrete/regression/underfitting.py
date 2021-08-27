@@ -20,12 +20,19 @@ plt.style.use('../../../style.mplstyle')
 
 seed = 12345
 
+# file = sys.stdout
+file = '../../../logs/temp/temp.md'
+
+# img_dir = None
+img_dir = '../../../images/temp/'
+
+
 if seed is not None:
     seed_everything(seed)  # PyTorch Lightning seeding
 
 
 #%% Model and optimal predictor
-n_x = 128
+n_x = n_y = 128
 
 shape_x = ()
 size_x = math.prod(shape_x)
@@ -36,8 +43,8 @@ model_x = rand_elements.Finite(supp_x, p=np.full(size_x*(n_x,), n_x**-size_x))
 nonlinear_model = funcs.make_rand_discrete(n_x, rng=seed)
 var_y_x_const = 1/125
 
-alpha_y_x = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_x-1))
-model = rand_models.DataConditional.from_func_mean(n_x, alpha_y_x, nonlinear_model, model_x, rng=seed)
+alpha_y_x = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_y-1))
+model = rand_models.DataConditional.from_func_mean(n_y, alpha_y_x, nonlinear_model, model_x, rng=seed)
 
 opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 
@@ -45,7 +52,7 @@ opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 #%% Learners
 
 # Dirichlet
-prior_mean = rand_models.DataConditional.from_func_mean(n_x, alpha_y_x, lambda x: .5, model_x)
+prior_mean = rand_models.DataConditional.from_func_mean(n_y, alpha_y_x, lambda x: .5, model_x)
 dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
 
 dir_predictor = BayesRegressor(dir_model, space=model.space, name=r'$\mathrm{Dir}$')

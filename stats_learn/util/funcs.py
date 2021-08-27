@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def make_inv_trig(shape):
+def make_inv_trig(shape=()):
     def sin_orig(x):
         axis = tuple(range(-len(shape), 0))
         return 1 / (2 + np.sin(2 * np.pi * x.mean(axis)))

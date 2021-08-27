@@ -300,9 +300,9 @@ class DataConditional(Base):
     @classmethod
     def from_func_mean(cls, n, alpha_0, func, model_x, rng=None):
         if np.isinf(alpha_0):
-            dists = [rand_elements.EmpiricalScalar(func(_x), n - 1) for _x in model_x.supp]
+            dists = [rand_elements.EmpiricalScalar(func(x), n - 1) for x in model_x.supp]
         else:
-            dists = [rand_elements.DirichletEmpiricalScalar(func(_x), alpha_0, n - 1) for _x in model_x.supp]
+            dists = [rand_elements.DirichletEmpiricalScalar(func(x), alpha_0, n - 1) for x in model_x.supp]
         return cls(dists, model_x, rng)
 
     @classmethod

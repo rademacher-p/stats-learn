@@ -154,26 +154,16 @@ class Base(ABC):
         """Plot prediction function."""
         return self.space['x'].plot(self.predict, x, ax=ax, label=label)
 
-    def plot_fit(self, d, ax=None):
-        if ax is None:
-            ax = self.space['x'].make_axes()
-        return plot_fit_compare([self], d, ax)
-
-    # def plot_fit(self, d, ax=None):
-    #     if ax is None:
-    #         ax = self.space['x'].make_axes()
-    #     ax.scatter(d['x'], d['y'])
-    #
-    #     self.fit(d)
-    #     self.plot_predict(ax=ax)
+    def plot_fit(self, d_train, d_test=(), params=None, img_dir=None, file=None, ax=None):
+        return plot_fit_compare([self], d_train, d_test, [params], img_dir, file, ax)
 
     # Assess
     def assess(self, model=None, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
-               plot_stats=False, plot_loss=False, print_loss=False, img_path=None, file=sys.stdout, ax=None):
+               plot_stats=False, plot_loss=False, print_loss=False, img_dir=None, file=sys.stdout, ax=None, rng=None):
         if model is None:
             model = self._model_obj
         out = assess_compare([self], model, [params], n_train, n_test, n_mc, x, stats, verbose, plot_stats, plot_loss,
-                             print_loss, img_path, file, ax)
+                             print_loss, img_dir, file, ax, rng)
         return map(itemgetter(0), out)
 
     # Prediction statistics

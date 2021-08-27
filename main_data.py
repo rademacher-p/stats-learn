@@ -9,7 +9,6 @@ from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import (BayesRegressor)
 from stats_learn.results import plot_risk_eval_sim_compare
 from stats_learn.random import elements as rand_elements, models as rand_models
-from stats_learn.util.base import NOW_STR
 
 np.set_printoptions(precision=3)
 pd.options.display.float_format = '{:,.3f}'.format
@@ -47,15 +46,15 @@ predictors, params = list(zip(*temp))
 plot_risk_eval_sim_compare(predictors, model, params, n_train, n_test=1000, n_mc=50, verbose=True, ax=None)
 
 
-#%% Save image and Figure
-image_path = Path('./images/temp/')
-
-fig = plt.gcf()
-fig.savefig(image_path.joinpath(f"{NOW_STR}.png"))
-with open(image_path.joinpath(f"{NOW_STR}.mpl"), 'wb') as fid:
-    pickle.dump(fig, fid)
-
-print('Done')
+# #%% Save image and Figure
+# image_path = Path('./images/temp/')
+#
+# fig = plt.gcf()
+# fig.savefig(image_path.joinpath(f"{NOW_STR}.png"))
+# with open(image_path.joinpath(f"{NOW_STR}.mpl"), 'wb') as fid:
+#     pickle.dump(fig, fid)
+#
+# print('Done')
 
 
 #%%

@@ -14,11 +14,11 @@ import pandas as pd
 # from pytorch_lightning.utilities.seed import seed_everything
 
 from stats_learn.bayes import models as bayes_models
-from stats_learn.util.base import check_data_shape, NOW_STR, RandomGeneratorMixin as RNGMix
+from stats_learn.util.base import check_data_shape, get_now, RandomGeneratorMixin as RNGMix
 # from stats_learn.predictors.torch import LitWrapper
 
 
-def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None, file=None,  ax=None):
+def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_dir=None, file=None, ax=None):
     if params is None:
         params_full = [{} for _ in predictors]
     else:
@@ -39,14 +39,16 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None,
     if ax is None:
         ax = predictors[0].space['x'].make_axes()  # use first predictors space by default
 
-    ax.scatter(d_train['x'], d_train['y'], c='k', marker='o', label=None)
+    h_data = ax.scatter(d_train['x'], d_train['y'], c='k', marker='o', label='$D$')
     # if do_loss:
     #     ax.scatter(d_test['x'], d_test['y'], c='k', marker='D', label=None)
 
+    h_predictors = []
     for predictor, params, loss in zip(predictors, params_full, loss_full):
         predictor.fit(d_train)
         if len(params) == 0:
-            predictor.plot_predict(ax=ax, label=predictor.name)
+            h = predictor.plot_predict(ax=ax, label=predictor.name)
+            h_predictors.extend(h)
 
             if do_loss:
                 loss[0] += predictor.evaluate(d_test)
@@ -56,7 +58,8 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None,
             labels = [f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals]
             for i_v, (param_val, label) in enumerate(zip(param_vals, labels)):
                 predictor.set_params(**{param_name: param_val})
-                predictor.plot_predict(ax=ax, label=label)
+                h = predictor.plot_predict(ax=ax, label=label)
+                h_predictors.extend(h)
 
                 if do_loss:
                     idx = (0, *np.unravel_index(i_v, loss.shape[1:]))
@@ -64,24 +67,40 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None,
         else:
             raise NotImplementedError("Only up to one varying parameter currently supported.")
 
+    title = f"$N = {n_train}$"
     if len(predictors) == 1 and len(params_full[0]) == 0:
-        ax.set(title=predictors[0].name)
+        title = f"{predictors[0].name}, " + title
     else:
-        ax.legend()
+        ax.legend(handles=[h_data, *h_predictors])
+    ax.set(title=title)
 
+    now = get_now()
+    if not hasattr(file, 'write'):
+        file = open(file, 'a')
+
+    # Printing
+    print('\n')
+    print(f"- Test samples: {n_test}")
     if file != sys.stdout:
-        print(f"\n# {NOW_STR}", file=file)
+        print(f"### {now}", file=file)
+        print(f"- Test samples: {n_test}", file=file)
 
     if do_loss:
         _print_risk(predictors, params_full, [n_train], loss_full, file=file)
 
-    if img_path is not None:
-        img_path = Path(img_path)
-        img_file = img_path.joinpath(f"{NOW_STR}.png")
+    if img_dir is not None:
+        img_file = Path(img_dir).joinpath(f"{now}.png")
         _save_current_fig(img_file)
 
         if file != sys.stdout:
-            print(f"\n![]({img_file.absolute()})", file=file)
+            print(f"\n![]({img_file.absolute().as_posix()})", file=file)
+
+    #
+    print('\n', file=file)
+    if hasattr(file, 'write') and file != sys.stdout:
+        file.close()
+
+    return loss_full
 
 
 def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
@@ -219,8 +238,7 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
 
     for i_mc in range(n_mc):
         if verbose:
-            # print(f"MC iteration: {i_mc + 1}/{n_mc}")
-            print(f"MC iteration: {i_mc + 1}/{n_mc}", end='\r')
+            print(f"MC iteration: {i_mc + 1}/{n_mc}")
 
         d = model.rvs(n_train[-1] + n_test)
         d_train, d_test = d[:n_train[-1]], d[n_train[-1]:]
@@ -268,16 +286,17 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
 
     loss_full = [loss / n_mc for loss in loss_full]
 
-    # Printing
+    now = get_now()
     if not hasattr(file, 'write'):
         file = open(file, 'a')
 
+    # Printing
+    print('\n')
     print(f"- Seed = {rng}")
     print(f"- Test samples: {n_test}")
     print(f"- MC iterations: {n_mc}")
-
     if file != sys.stdout:
-        print(f"### {NOW_STR}", file=file)
+        print(f"### {now}", file=file)
         print(f"- Seed = {rng}", file=file)
         print(f"- Test samples: {n_test}", file=file)
         print(f"- MC iterations: {n_mc}", file=file)
@@ -293,20 +312,16 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
         _plot_risk_eval_compare(loss_full, do_bayes, predictors, params_full, n_train, ax)
 
     if img_dir is not None and (plot_stats or plot_loss):
-        img_file = Path(img_dir).joinpath(f"{NOW_STR}.png")
+        img_file = Path(img_dir).joinpath(f"{now}.png")
         _save_current_fig(img_file)
 
         if file != sys.stdout:
             print(f"\n![]({img_file.absolute().as_posix()})", file=file)
 
-        print('\n', file=file)
-
+    #
+    print('\n', file=file)
     if hasattr(file, 'write') and file != sys.stdout:
         file.close()
-        # try:
-        #     file.close()
-        # except ValueError:
-        #     pass
 
     return y_stats_full, loss_full
 

@@ -1,13 +1,15 @@
-from itertools import groupby
 from functools import wraps
 from numbers import Integral
 from datetime import datetime
 
 import numpy as np
 
-NOW_STR = datetime.now().replace(microsecond=0).isoformat().replace(':', '_')
 
 DELTA = 1e250  # large value approximating the value of the Dirac delta function at zero
+
+
+def get_now():
+    return datetime.now().replace(microsecond=0).isoformat().replace(':', '_')
 
 
 class RandomGeneratorMixin:

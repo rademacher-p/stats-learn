@@ -20,7 +20,6 @@ from stats_learn.predictors.base import ModelRegressor, BayesRegressor
 from stats_learn.predictors.sklearn import SKLWrapper
 from stats_learn.util import funcs
 from stats_learn import results
-# from stats_learn.util.base import NOW_STR
 from stats_learn.util.data_processing import make_clipper
 from stats_learn.util.plotting import box_grid
 from stats_learn.predictors.torch import LitMLP, LitWrapper, reset_weights
