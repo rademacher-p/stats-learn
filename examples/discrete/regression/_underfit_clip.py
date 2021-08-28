@@ -104,3 +104,8 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
                                                  img_dir=img_dir, file=file, rng=seed)
 
+# Squared-Error vs. training data volume N
+n_train = np.insert(2**np.arange(11), 0, 0)
+y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
+                                                 plot_loss=True, print_loss=True,
+                                                 img_dir=img_dir, file=file, rng=seed)
