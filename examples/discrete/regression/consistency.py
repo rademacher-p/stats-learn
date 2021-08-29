@@ -1,4 +1,4 @@
-import sys
+# import sys
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -15,10 +15,11 @@ plt.style.use('../../../style.mplstyle')
 # seed = None
 seed = 12345
 
-# file = sys.stdout
+# file = None
 # img_dir = None
 file = '../../../logs/temp/temp.md'
-img_dir = '../../../images/temp/'
+# img_dir = '../../../images/temp/'
+img_dir = '../../../images/temp/hi.png'
 
 
 #%% Model and optimal predictor
@@ -102,28 +103,28 @@ n_train = 30
 
 d = model.rvs(n_train + n_test, rng=seed)
 d_train, d_test = np.split(d, [n_train])
-loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, img_dir=img_dir, file=file)
+loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, img_path=img_dir, file=file)
 
-# Prediction mean/variance, comparative
-n_train = 400
-y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
-                                                 stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
-                                                 img_dir=img_dir, file=file, rng=seed)
-
-# Dirichlet-based prediction mean/variance, varying N
-n_train = [0, 800, 4000]
-y_stats_full, loss_full = dir_predictor.assess(model, {'alpha_0': [1000]}, n_train, n_test, n_mc, stats=('mean', 'std'),
-                                               verbose=True, plot_stats=True, print_loss=True,
-                                               img_dir=img_dir, file=file, rng=seed)
-
-# Squared-Error vs. training data volume N
-n_train = np.arange(0, 4050, 50)
-y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
-                                                 plot_loss=True, print_loss=True,
-                                                 img_dir=img_dir, file=file, rng=seed)
-
-# Squared-Error vs. prior localization alpha_0
-n_train = [0, 100, 200, 400, 800]
-y_stats_full, loss_full = dir_predictor.assess(model, {'alpha_0': np.logspace(0., 5., 100)}, n_train, n_test, n_mc,
-                                               verbose=True, plot_loss=True, print_loss=True,
-                                               img_dir=img_dir, file=file, rng=seed)
+# # Prediction mean/variance, comparative
+# n_train = 400
+# y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
+#                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
+#                                                  img_dir=img_dir, file=file, rng=seed)
+#
+# # Dirichlet-based prediction mean/variance, varying N
+# n_train = [0, 800, 4000]
+# y_stats_full, loss_full = dir_predictor.assess(model, {'alpha_0': [1000]}, n_train, n_test, n_mc, stats=('mean', 'std'),
+#                                                verbose=True, plot_stats=True, print_loss=True,
+#                                                img_dir=img_dir, file=file, rng=seed)
+#
+# # Squared-Error vs. training data volume N
+# n_train = np.arange(0, 4050, 50)
+# y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
+#                                                  plot_loss=True, print_loss=True,
+#                                                  img_dir=img_dir, file=file, rng=seed)
+#
+# # Squared-Error vs. prior localization alpha_0
+# n_train = [0, 100, 200, 400, 800]
+# y_stats_full, loss_full = dir_predictor.assess(model, {'alpha_0': np.logspace(0., 5., 100)}, n_train, n_test, n_mc,
+#                                                verbose=True, plot_loss=True, print_loss=True,
+#                                                img_dir=img_dir, file=file, rng=seed)

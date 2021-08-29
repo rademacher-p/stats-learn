@@ -55,7 +55,6 @@ dir_params = {'alpha_0': [1e-5, 1e5]}
 # PyTorch
 weight_decays = [0., 1e-3]  # controls L2 regularization
 
-# proc_funcs = []
 proc_funcs = {'pre': [], 'post': [make_clipper([np.min(supp_x), np.max(supp_x)])]}
 
 lit_predictors = []
@@ -104,7 +103,7 @@ n_train = 20
 
 d = model.rvs(n_train + n_test, rng=seed)
 d_train, d_test = np.split(d, [n_train])
-loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, img_dir=img_dir, file=file)
+loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, img_path=img_dir, file=file)
 
 # Prediction mean/variance, comparative
 n_train = 128
