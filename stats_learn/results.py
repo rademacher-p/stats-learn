@@ -6,6 +6,7 @@ import pickle
 from collections import Iterable
 from typing import Union
 # from warnings import warn
+import logging
 
 from more_itertools import all_equal
 import numpy as np
@@ -18,7 +19,9 @@ from stats_learn.util.base import check_data_shape, get_now, RandomGeneratorMixi
 # from stats_learn.predictors.torch import LitWrapper
 
 
-def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_dir=None, file=None, ax=None):
+def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None, file=None, ax=None):
+    # TODO: make `assess_single_compare` or something? Make similar to `assess_compare` signature?
+
     if params is None:
         params_full = [{} for _ in predictors]
     else:
@@ -74,31 +77,71 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_dir=None, 
         ax.legend(handles=[h_data, *h_predictors])
     ax.set(title=title)
 
-    now = get_now()
-    if not hasattr(file, 'write'):
-        file = open(file, 'a')
 
-    # Printing
-    print('\n')
-    print(f"- Test samples: {n_test}")
-    if file != sys.stdout:
-        print(f"### {now}", file=file)
-        print(f"- Test samples: {n_test}", file=file)
+    # TODO: move to module top-level?
+    # logger = logging.getLogger(__name__)
+    logger = logging.getLogger('plot_fit_compare')
+    logger.setLevel(logging.DEBUG)
+    out_handler = logging.StreamHandler(stream=sys.stdout)
+    # out_formatter = logging.Formatter()
+    out_formatter = logging.Formatter('\n%(message)s')
+    # out_formatter = logging.Formatter('### %(asctime)s\n%(message)s\n', datefmt='%Y-%m-%d %H:%M:%S')
+    out_handler.setFormatter(out_formatter)
+    out_handler.setLevel(logging.INFO)
+    logger.addHandler(out_handler)
+    if file is not None:
+        file_handler = logging.FileHandler(file)
+        # file_formatter = logging.Formatter()
+        # file_formatter = logging.Formatter('%(message)s\n')
+        file_formatter = logging.Formatter('### %(asctime)s\n%(message)s\n', datefmt='%Y-%m-%d %H:%M:%S')
+        file_handler.setFormatter(file_formatter)
+        file_handler.setLevel(logging.DEBUG)
+        logger.addHandler(file_handler)
 
+    # message = f'### {get_now()}\n'
+    # message += f"- Test samples: {n_test}\n"
+    # logger.debug(f'### {get_now()}')
+    message = f"- Test samples: {n_test}\n"
     if do_loss:
-        _print_risk(predictors, params_full, [n_train], loss_full, file=file)
+        message += f"\n{_print_risk(predictors, params_full, [n_train], loss_full)}\n"
 
-    if img_dir is not None:
-        img_file = Path(img_dir).joinpath(f"{now}.png")
-        _save_current_fig(img_file)
+    logger.info(message)
 
-        if file != sys.stdout:
-            print(f"\n![]({img_file.absolute().as_posix()})", file=file)
+    if img_path is not None:
+        img_path = Path(img_path)
+        _save_current_fig(img_path)
+        # message += f"\n![]({img_path.absolute().as_posix()})\n"
+        logger.debug(f"![]({img_path.absolute().as_posix()})\n")
 
+    # logger.info(message)
+    # logger.debug(message)
+
+
+    # now = get_now()
+    # if not hasattr(file, 'write'):
+    #     file = open(file, 'a')
     #
-    print('\n', file=file)
-    if hasattr(file, 'write') and file != sys.stdout:
-        file.close()
+    # # Printing
+    # print('\n')
+    # print(f"- Test samples: {n_test}")
+    # if file != sys.stdout:
+    #     print(f"### {now}", file=file)
+    #     print(f"- Test samples: {n_test}", file=file)
+    #
+    # if do_loss:
+    #     _print_risk(predictors, params_full, [n_train], loss_full, file=file)
+    #
+    # if img_dir is not None:
+    #     img_file = Path(img_dir).joinpath(f"{now}.png")
+    #     _save_current_fig(img_file)
+    #
+    #     if file != sys.stdout:
+    #         print(f"\n![]({img_file.absolute().as_posix()})", file=file)
+    #
+    # #
+    # print('\n', file=file)
+    # if hasattr(file, 'write') and file != sys.stdout:
+    #     file.close()
 
     return loss_full
 
@@ -453,8 +496,8 @@ def plot_predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1
                           plot_stats=True, ax=ax)
 
 
-def _print_risk(predictors, params, n_train, losses, file=None):
-    title = '\n'
+def _print_risk(predictors, params, n_train, losses, file=None):  # FIXME
+    title = ''
     index_n = pd.Index(n_train, name='N')
     if len(predictors) == 1:
         predictor, param, loss = predictors[0], params[0], losses[0]
@@ -491,9 +534,12 @@ def _print_risk(predictors, params, n_train, losses, file=None):
 
     str_table = df.to_markdown(tablefmt='github', floatfmt='.3f')
     str_out = title + str_table
-    print(str_out)  # print to `stdout` in addition to file
-    if file != sys.stdout:
-        print(str_out, file=file)
+    # str_out = f"{title}\n{str_table}\n"
+
+    return str_out
+    # print(str_out)  # print to `stdout` in addition to file
+    # if file != sys.stdout:
+    #     print(str_out, file=file)
 
 
 def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, print_loss=False):
