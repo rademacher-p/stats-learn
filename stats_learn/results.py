@@ -44,7 +44,7 @@ def _file_logger(file, file_format):
         yield logger
 
 
-def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None, file=None, ax=None):
+def plot_fit_compare(predictors, d_train, d_test=(), params=None, log_path=None, img_path=None, ax=None):
     # TODO: make `assess_single_compare` or something? Make similar to `assess_compare` signature?
 
     if params is None:
@@ -115,14 +115,15 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None,
         _save_current_fig(img_path)
         file_format += f"\n![]({img_path.absolute().as_posix()})\n"
 
-    with _file_logger(file, file_format) as logger_:
+    with _file_logger(log_path, file_format) as logger_:
         logger_.info(message)
 
     return loss_full
 
 
 def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
-                   plot_stats=False, plot_loss=False, print_loss=False, img_path=None, file=None, ax=None, rng=None):
+                   plot_stats=False, plot_loss=False, print_loss=False, log_path=None, img_path=None, ax=None,
+                   rng=None):
     """
 
     Parameters
@@ -152,10 +153,10 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
         Enables plotting of average loss.
     print_loss : bool, optional
         Enables print-out of average loss table.
+    log_path : os.PathLike or str, optional
+        File for saving printed loss table and image path in Markdown format.
     img_path : os.PathLike or str, optional
         Directory for saving generated images.
-    file : file-like, optional
-        File for saving printed loss table and image path in Markdown format.
     ax : matplotlib.axes.Axes, optional
         Axes onto which stats/losses are plotted.
     rng : int or RandomState or Generator, optional
@@ -326,7 +327,7 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
         _save_current_fig(img_path)
         file_format += f"\n![]({img_path.absolute().as_posix()})\n"
 
-    with _file_logger(file, file_format) as logger_:
+    with _file_logger(log_path, file_format) as logger_:
         logger_.info(message)
 
     return y_stats_full, loss_full
