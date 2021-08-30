@@ -264,7 +264,7 @@ img_path = f'images/temp/{get_now()}.png'
 
 y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
-                                                 img_path=img_path, file=file, rng=seed)
+                                                 log_path=file, img_path=img_path, rng=seed)
 
 # y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
 #                                                     plot_loss=True, print_loss=True,

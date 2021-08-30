@@ -5,7 +5,6 @@ Supervised learning functions.
 from abc import ABC, abstractmethod
 from typing import Union
 from operator import itemgetter
-import sys
 
 import numpy as np
 
@@ -154,16 +153,17 @@ class Base(ABC):
         """Plot prediction function."""
         return self.space['x'].plot(self.predict, x, ax=ax, label=label)
 
-    def plot_fit(self, d_train, d_test=(), params=None, img_dir=None, file=None, ax=None):
-        return plot_fit_compare([self], d_train, d_test, [params], img_dir, file, ax)
+    def plot_fit(self, d_train, d_test=(), params=None, log_path=None, img_dir=None, ax=None):
+        return plot_fit_compare([self], d_train, d_test, [params], log_path, img_dir, ax)
 
     # Assess
     def assess(self, model=None, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
-               plot_stats=False, plot_loss=False, print_loss=False, img_path=None, file=sys.stdout, ax=None, rng=None):
+               plot_stats=False, plot_loss=False, print_loss=False, log_path=None, img_path=None, ax=None,
+               rng=None):
         if model is None:
             model = self._model_obj
         out = assess_compare([self], model, [params], n_train, n_test, n_mc, x, stats, verbose, plot_stats, plot_loss,
-                             print_loss, img_path, file, ax, rng)
+                             print_loss, log_path, img_path, ax, rng)
         return map(itemgetter(0), out)
 
     # Prediction statistics
