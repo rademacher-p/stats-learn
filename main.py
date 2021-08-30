@@ -261,7 +261,7 @@ file = sys.stdout
 
 y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
-                                                 img_dir='images/temp/', file=file, rng=seed)
+                                                 img_path='images/temp/', file=file, rng=seed)
 
 # y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
 #                                                     plot_loss=True, print_loss=True,
