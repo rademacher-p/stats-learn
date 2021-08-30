@@ -31,6 +31,9 @@ logger.addHandler(out_handler)
 @contextmanager
 def file_logger(file, file_format):
     if file is not None:
+        file = Path(file)
+        file.parent.mkdir(exist_ok=True)
+
         file_handler = logging.FileHandler(file)
         file_formatter = logging.Formatter(file_format, datefmt='%Y-%m-%d %H:%M:%S')
         file_handler.setFormatter(file_formatter)
@@ -107,6 +110,8 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None,
     file_format = '\n### %(asctime)s\n%(message)s\n'
     if img_path is not None:
         img_path = Path(img_path)
+        img_path.parent.mkdir(exist_ok=True)
+
         _save_current_fig(img_path)
         file_format += f"\n![]({img_path.absolute().as_posix()})\n"
 
@@ -316,6 +321,8 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
     file_format = '\n### %(asctime)s\n%(message)s\n'
     if img_path is not None and (plot_stats or plot_loss):
         img_path = Path(img_path)
+        img_path.parent.mkdir(exist_ok=True)
+
         _save_current_fig(img_path)
         file_format += f"\n![]({img_path.absolute().as_posix()})\n"
 

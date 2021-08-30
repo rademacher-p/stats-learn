@@ -159,11 +159,11 @@ class Base(ABC):
 
     # Assess
     def assess(self, model=None, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
-               plot_stats=False, plot_loss=False, print_loss=False, img_dir=None, file=sys.stdout, ax=None, rng=None):
+               plot_stats=False, plot_loss=False, print_loss=False, img_path=None, file=sys.stdout, ax=None, rng=None):
         if model is None:
             model = self._model_obj
         out = assess_compare([self], model, [params], n_train, n_test, n_mc, x, stats, verbose, plot_stats, plot_loss,
-                             print_loss, img_dir, file, ax, rng)
+                             print_loss, img_path, file, ax, rng)
         return map(itemgetter(0), out)
 
     # Prediction statistics

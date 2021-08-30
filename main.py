@@ -1,5 +1,4 @@
 import math
-import sys
 from pathlib import Path
 from copy import deepcopy
 # import pickle
@@ -255,7 +254,7 @@ temp = [
 predictors, params = zip(*temp)
 
 
-file = sys.stdout
+file = None
 # file = 'logs/temp/temp.md'
 
 
