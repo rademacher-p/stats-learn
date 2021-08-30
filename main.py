@@ -17,8 +17,9 @@ from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
 from stats_learn.predictors.sklearn import SKLWrapper
-from stats_learn.util import funcs
 from stats_learn import results
+from stats_learn.util import funcs
+from stats_learn.util.base import get_now
 from stats_learn.util.data_processing import make_clipper
 from stats_learn.util.plotting import box_grid
 from stats_learn.predictors.torch import LitMLP, LitWrapper, reset_weights
@@ -257,17 +258,20 @@ predictors, params = zip(*temp)
 file = None
 # file = 'logs/temp/temp.md'
 
+# img_path = None
+img_path = f'images/temp/{get_now()}.png'
+
 
 y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
-                                                 img_path='images/temp/', file=file, rng=seed)
+                                                 img_path=img_path, file=file, rng=seed)
 
 # y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
 #                                                     plot_loss=True, print_loss=True,
-#                                                     verbose=True, img_path='images/temp/', file=file)
+#                                                     verbose=True, img_path=img_path, file=file)
 
 # results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
-#                          img_path='images/temp/', file=file)
+#                          img_path=img_path, file=file)
 
 
 # with open(f'data/temp/{NOW_STR}.pkl', 'wb') as fid:

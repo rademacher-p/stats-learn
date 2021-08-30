@@ -9,6 +9,7 @@ from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
 from stats_learn.util import funcs
+from stats_learn.util.base import get_now
 from stats_learn import results
 from stats_learn.util.data_processing import make_clipper
 from stats_learn.predictors.torch import LitMLP, LitWrapper, reset_weights
@@ -21,7 +22,7 @@ seed = 12345
 # file = None
 # img_path = None
 file = '../../../logs/temp/temp.md'
-img_path = '../../../images/temp/hi.png'
+img_path = f'../../../images/temp/{get_now()}.png'
 
 if seed is not None:
     seed_everything(seed)  # PyTorch-Lightning seeding
