@@ -29,7 +29,7 @@ logger.addHandler(out_handler)
 
 
 @contextmanager
-def file_logger(file, file_format):
+def _file_logger(file, file_format):
     if file is not None:
         file = Path(file)
         file.parent.mkdir(exist_ok=True)
@@ -115,7 +115,7 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, img_path=None,
         _save_current_fig(img_path)
         file_format += f"\n![]({img_path.absolute().as_posix()})\n"
 
-    with file_logger(file, file_format) as logger_:
+    with _file_logger(file, file_format) as logger_:
         logger_.info(message)
 
     return loss_full
@@ -326,7 +326,7 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
         _save_current_fig(img_path)
         file_format += f"\n![]({img_path.absolute().as_posix()})\n"
 
-    with file_logger(file, file_format) as logger_:
+    with _file_logger(file, file_format) as logger_:
         logger_.info(message)
 
     return y_stats_full, loss_full
