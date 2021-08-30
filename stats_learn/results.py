@@ -19,7 +19,8 @@ from stats_learn.bayes import models as bayes_models
 from stats_learn.util.base import check_data_shape, RandomGeneratorMixin as RNGMix
 # from stats_learn.predictors.torch import LitWrapper
 
-# Logging
+
+#%% Logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 out_handler = logging.StreamHandler(stream=sys.stdout)
@@ -44,6 +45,20 @@ def _file_logger(file, file_format):
         yield logger
 
 
+def _log_msg(message, log_path, img_path):
+    file_format = '\n# %(asctime)s\n%(message)s\n'
+    if img_path is not None:
+        img_path = Path(img_path)
+        img_path.parent.mkdir(exist_ok=True)
+
+        _save_current_fig(img_path)
+        file_format += f"\n![]({img_path.absolute().as_posix()})\n"
+
+    with _file_logger(log_path, file_format) as logger_:
+        logger_.info(message)
+
+
+#%%
 def plot_fit_compare(predictors, d_train, d_test=(), params=None, log_path=None, img_path=None, ax=None):
     # TODO: make `assess_single_compare` or something? Make similar to `assess_compare` signature?
 
@@ -103,20 +118,11 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, log_path=None,
     ax.set(title=title)
 
     # Logging
-    message = f"- Test samples: {n_test}\n"
+    message = f"- Test samples: {n_test}"
     if do_loss:
-        message += f"\n{_print_risk(predictors, params_full, [n_train], loss_full)}"
+        message += f"\n\n{_print_risk(predictors, params_full, [n_train], loss_full)}"
 
-    file_format = '\n### %(asctime)s\n%(message)s\n'
-    if img_path is not None:
-        img_path = Path(img_path)
-        img_path.parent.mkdir(exist_ok=True)
-
-        _save_current_fig(img_path)
-        file_format += f"\n![]({img_path.absolute().as_posix()})\n"
-
-    with _file_logger(log_path, file_format) as logger_:
-        logger_.info(message)
+    _log_msg(message, log_path, img_path)
 
     return loss_full
 
@@ -179,6 +185,8 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
 
     if plot_stats and plot_loss:
         raise NotImplementedError("Cannot plot prediction statistics and losses at once.")
+    elif not (plot_stats or plot_loss):
+        img_path = None
 
     # if rng is not None and any(isinstance(predictor, LitWrapper) for predictor in predictors):  # FIXME
     #     if isinstance(rng, int):
@@ -315,20 +323,11 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
     # Logging
     message = f'- Seed = {rng}\n' \
               f'- Test samples: {n_test}\n' \
-              f'- MC iterations: {n_mc}\n'
+              f'- MC iterations: {n_mc}'
     if do_loss and print_loss:
-        message += f"\n{_print_risk(predictors, params_full, n_train, loss_full)}"
+        message += f"\n\n{_print_risk(predictors, params_full, n_train, loss_full)}"
 
-    file_format = '\n### %(asctime)s\n%(message)s\n'
-    if img_path is not None and (plot_stats or plot_loss):
-        img_path = Path(img_path)
-        img_path.parent.mkdir(exist_ok=True)
-
-        _save_current_fig(img_path)
-        file_format += f"\n![]({img_path.absolute().as_posix()})\n"
-
-    with _file_logger(log_path, file_format) as logger_:
-        logger_.info(message)
+    _log_msg(message, log_path, img_path)
 
     return y_stats_full, loss_full
 
