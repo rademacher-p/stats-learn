@@ -20,6 +20,9 @@ from stats_learn.util.base import check_data_shape, RandomGeneratorMixin as RNGM
 # from stats_learn.predictors.torch import LitWrapper
 
 
+PICKLE_FIGS = True
+
+
 #%% Logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -55,21 +58,13 @@ def _log_and_fig(message, log_path, ax, img_path):
 
         fig = ax.figure
         fig.savefig(img_path)
-        mpl_file = img_path.parent / f"{img_path.stem}.mpl"
-        with open(mpl_file, 'wb') as fid:
-            pickle.dump(fig, fid)
+        if PICKLE_FIGS:
+            mpl_file = img_path.parent / f"{img_path.stem}.mpl"
+            with open(mpl_file, 'wb') as fid:
+                pickle.dump(fig, fid)
 
     with _file_logger(log_path, file_format) as logger_:
         logger_.info(message)
-
-
-# def _save_current_fig(img_path):  # TODO: delete?
-#     mpl_file = img_path.parent / f"{img_path.stem}.mpl"
-#
-#     fig = plt.gcf()
-#     fig.savefig(img_path)
-#     with open(mpl_file, 'wb') as fid:
-#         pickle.dump(fig, fid)
 
 
 #%%
