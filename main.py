@@ -255,8 +255,8 @@ temp = [
 predictors, params = zip(*temp)
 
 
-file = None
-# file = 'logs/temp/temp.md'
+# log_path = None
+log_path = 'logs/temp/temp.md'
 
 # img_path = None
 img_path = f'images/temp/{get_now()}.png'
@@ -264,14 +264,14 @@ img_path = f'images/temp/{get_now()}.png'
 
 y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
-                                                 log_path=file, img_path=img_path, rng=seed)
+                                                 log_path=log_path, img_path=img_path, rng=seed)
 
 # y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
 #                                                     plot_loss=True, print_loss=True,
-#                                                     verbose=True, img_path=img_path, file=file)
+#                                                     verbose=True, log_path=log_path, img_path=img_path,)
 
 # results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
-#                          img_path=img_path, file=file)
+#                          log_path=log_path, img_path=img_path)
 
 
 # with open(f'data/temp/{NOW_STR}.pkl', 'wb') as fid:
