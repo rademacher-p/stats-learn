@@ -18,11 +18,10 @@ plt.style.use('../../../style.mplstyle')
 # seed = None
 seed = 12345
 
-# file = sys.stdout
-# img_dir = None
+# file = None
+# img_path = None
 file = '../../../logs/temp/temp.md'
-img_dir = '../../../images/temp/'
-
+img_path = '../../../images/temp/hi.png'
 
 if seed is not None:
     seed_everything(seed)  # PyTorch-Lightning seeding
@@ -103,15 +102,15 @@ n_train = 20
 
 d = model.rvs(n_train + n_test, rng=seed)
 d_train, d_test = np.split(d, [n_train])
-loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, img_path=img_dir, file=file)
+loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, img_path=img_path, file=file)
 
 # Prediction mean/variance, comparative
 n_train = 128
 y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
-                                                 img_path=img_dir, file=file, rng=seed)
+                                                 img_path=img_path, file=file, rng=seed)
 
 # Squared-Error vs. training data volume N
 n_train = np.insert(2**np.arange(11), 0, 0)
 y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
-                                                 plot_loss=True, print_loss=True, img_path=img_dir, file=file, rng=seed)
+                                                 plot_loss=True, print_loss=True, img_path=img_path, file=file, rng=seed)
