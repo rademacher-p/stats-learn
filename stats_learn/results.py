@@ -45,17 +45,31 @@ def _file_logger(file, file_format):
         yield logger
 
 
-def _log_msg(message, log_path, img_path):
+def _log_and_fig(message, log_path, ax, img_path):
     file_format = '\n# %(asctime)s\n%(message)s\n'
     if img_path is not None:
         img_path = Path(img_path)
         img_path.parent.mkdir(exist_ok=True)
 
-        _save_current_fig(img_path)
         file_format += f"\n![]({img_path.absolute().as_posix()})\n"
+
+        fig = ax.figure
+        fig.savefig(img_path)
+        mpl_file = img_path.parent / f"{img_path.stem}.mpl"
+        with open(mpl_file, 'wb') as fid:
+            pickle.dump(fig, fid)
 
     with _file_logger(log_path, file_format) as logger_:
         logger_.info(message)
+
+
+# def _save_current_fig(img_path):  # TODO: delete?
+#     mpl_file = img_path.parent / f"{img_path.stem}.mpl"
+#
+#     fig = plt.gcf()
+#     fig.savefig(img_path)
+#     with open(mpl_file, 'wb') as fid:
+#         pickle.dump(fig, fid)
 
 
 #%%
@@ -122,7 +136,7 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, log_path=None,
     if do_loss:
         message += f"\n\n{_print_risk(predictors, params_full, [n_train], loss_full)}"
 
-    _log_msg(message, log_path, img_path)
+    _log_and_fig(message, log_path, ax, img_path)
 
     return loss_full
 
@@ -327,18 +341,9 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
     if do_loss and print_loss:
         message += f"\n\n{_print_risk(predictors, params_full, n_train, loss_full)}"
 
-    _log_msg(message, log_path, img_path)
+    _log_and_fig(message, log_path, plt.gca(), img_path)
 
     return y_stats_full, loss_full
-
-
-def _save_current_fig(img_file):
-    mpl_file = img_file.parent / f"{img_file.stem}.mpl"
-
-    fig = plt.gcf()
-    fig.savefig(img_file)
-    with open(mpl_file, 'wb') as fid:
-        pickle.dump(fig, fid)
 
 
 def predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=None, stats=('mode',), verbose=False):
