@@ -81,8 +81,6 @@ else:
     model_eval = model
     opt_predictor = ModelRegressor(model_eval, name=r'$f_{\Theta}(\theta)$')
 
-# model_eval.rng = seed  # TODO
-
 
 #%% Bayesian learners
 
