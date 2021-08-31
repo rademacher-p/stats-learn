@@ -27,7 +27,7 @@ PICKLE_FIGS = True
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 out_handler = logging.StreamHandler(stream=sys.stdout)
-out_formatter = logging.Formatter('\n%(message)s\n')
+out_formatter = logging.Formatter('\n# %(asctime)s\n%(message)s\n', datefmt='%Y-%m-%d %H:%M:%S')
 out_handler.setFormatter(out_formatter)
 logger.addHandler(out_handler)
 
@@ -194,8 +194,6 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
 
     if plot_stats and plot_loss:
         raise NotImplementedError("Cannot plot prediction statistics and losses at once.")
-    elif not (plot_stats or plot_loss):
-        img_path = None
 
     # if rng is not None and any(isinstance(predictor, LitWrapper) for predictor in predictors):  # FIXME
     #     if isinstance(rng, int):
@@ -325,9 +323,13 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
     # Plot
     if do_stats and plot_stats:
         _plot_stats(y_stats_full, space_x, predictors, params_full, n_train, x, ax)
+        ax = plt.gca()
     elif do_loss and plot_loss:
         do_bayes = isinstance(model, bayes_models.Base)
         _plot_risk_eval_compare(loss_full, do_bayes, predictors, params_full, n_train, ax)
+        ax = plt.gca()
+    else:
+        img_path = None
 
     # Logging
     message = f'- Seed = {rng}\n' \
@@ -336,7 +338,7 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
     if do_loss and print_loss:
         message += f"\n\n{_print_risk(predictors, params_full, n_train, loss_full)}"
 
-    _log_and_fig(message, log_path, plt.gca(), img_path)
+    _log_and_fig(message, log_path, ax, img_path)
 
     return y_stats_full, loss_full
 
