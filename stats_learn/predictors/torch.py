@@ -22,7 +22,7 @@ def _build_torch_net(sizes):
     for in_out in zip(sizes[:-1], sizes[1:]):
         layers.append(nn.Linear(*in_out))
         layers.append(nn.ReLU())
-    layers.append(nn.Linear(sizes[-1], 1))
+    layers.pop()
     return nn.Sequential(*layers)
 
 

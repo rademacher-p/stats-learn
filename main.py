@@ -212,7 +212,7 @@ for weight_decay in weight_decays:
         'gpus': torch.cuda.device_count(),
     }
 
-    lit_model = LitMLP([size_x, *layer_sizes], optim_params=optim_params)
+    lit_model = LitMLP([model.size['x'], *layer_sizes, 1], optim_params=optim_params)
 
 
     def reset_func(model_):
