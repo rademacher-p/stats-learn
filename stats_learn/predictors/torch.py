@@ -10,29 +10,34 @@ from torch.utils.data import TensorDataset, DataLoader
 from stats_learn.loss_funcs import loss_se
 from stats_learn.predictors.base import Base
 
-num_workers = 0
-# num_workers = os.cpu_count()
+NUM_WORKERS = 0
+# NUM_WORKERS = os.cpu_count()
 
-pin_memory = True
-# pin_memory = False
+PIN_MEMORY = True
+# PIN_MEMORY = False
 
 
-def _build_torch_net(sizes):
-    layers = [nn.Flatten()]
-    for in_out in zip(sizes[:-1], sizes[1:]):
+def _build_torch_net(layer_sizes, activation=nn.ReLU(), start_layer=nn.Flatten(), end_layer=None):
+    layers = []
+    if start_layer is not None:
+        layers.append(start_layer)
+    for in_out in zip(layer_sizes[:-1], layer_sizes[1:]):
         layers.append(nn.Linear(*in_out))
-        layers.append(nn.ReLU())
+        layers.append(activation)
     layers.pop()
+    if end_layer is not None:
+        layers.append(end_layer)
     return nn.Sequential(*layers)
 
 
 class LitMLP(pl.LightningModule):
-    def __init__(self, layer_sizes, optim_class=torch.optim.Adam, optim_params=None):
+    def __init__(self, layer_sizes, activation=nn.ReLU(), start_layer=nn.Flatten(), end_layer=None,
+                 loss_func=functional.mse_loss, optim_cls=torch.optim.Adam, optim_params=None):
         super().__init__()
-        self.layer_sizes = layer_sizes
-        self.model = _build_torch_net(self.layer_sizes)
 
-        self.optim_class = optim_class
+        self.model = _build_torch_net(layer_sizes, activation, start_layer, end_layer)
+        self.loss_func = loss_func
+        self.optim_cls = optim_cls
         if optim_params is None:
             optim_params = {}
         self.optim_params = optim_params
@@ -48,13 +53,12 @@ class LitMLP(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         x, y = batch
         y_hat = self(x)
-        loss = functional.mse_loss(y_hat, y)
+        loss = self.loss_func(y_hat, y)
         self.log('train_loss', loss)
         return loss
 
     def configure_optimizers(self):
-        optimizer = self.optim_class(self.parameters(), **self.optim_params)
-        return optimizer
+        return self.optim_cls(self.parameters(), **self.optim_params)
 
 
 def reset_weights(model):
@@ -109,7 +113,7 @@ class LitWrapper(Base):  # TODO: move to submodule to avoid excess imports
 
         batch_size = len(x)  # TODO: no mini-batching! Allow user specification.
 
-        dl = DataLoader(ds, batch_size, shuffle=True, pin_memory=pin_memory, num_workers=num_workers)
+        dl = DataLoader(ds, batch_size, shuffle=True, pin_memory=PIN_MEMORY, num_workers=NUM_WORKERS)
 
         self.trainer.fit(self.model, dl)
 
