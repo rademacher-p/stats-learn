@@ -474,7 +474,7 @@ def _print_risk(predictors, params, n_train, losses):
         elif len(param) == 1:
             param_name, param_vals = list(param.items())[0]
             index_param = param_vals
-            title += f"{predictor.name}, varying {param_name}\n"
+            title += f"{predictor.name}, varying {param_name}\n\n"
             # index_param = pd.Index(param_vals, name=param_name)
             # title = predictor.name
             df = pd.DataFrame(loss, index_n, columns=index_param)

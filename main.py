@@ -204,7 +204,7 @@ for weight_decay in weight_decays:
         'max_epochs': 1,
         'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=10000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
-        'logger': pl_loggers.TensorBoardLogger('logs/', name=logger_name),
+        'logger': pl_loggers.TensorBoardLogger('logs/temp/', name=logger_name),
         'weights_summary': None,
         'gpus': torch.cuda.device_count(),
     }
