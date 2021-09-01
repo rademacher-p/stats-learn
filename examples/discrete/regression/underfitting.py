@@ -1,10 +1,8 @@
-from pathlib import Path
-
 import numpy as np
 from matplotlib import pyplot as plt
 import torch
 from pytorch_lightning.callbacks import EarlyStopping
-import pytorch_lightning.loggers as pl_loggers
+# import pytorch_lightning.loggers as pl_loggers
 from pytorch_lightning.utilities.seed import seed_everything
 
 from stats_learn.util.base import get_now
@@ -21,21 +19,17 @@ plt.style.use('../../../images/style.mplstyle')
 # seed = None
 seed = 12345
 
+if seed is not None:
+    seed_everything(seed)  # PyTorch-Lightning seeding
+
+
 # log_path = None
 # img_path = None
 
 # TODO: remove path stuff and image names below before release
-
-# log_path = 'log.md'
-# Path(log_path).unlink(missing_ok=True)
-# img_dir = ''
-
-log_path = 'temp/log.md'
-img_dir = f'temp/{get_now()}/'
-
-
-if seed is not None:
-    seed_everything(seed)  # PyTorch-Lightning seeding
+base_path = 'underfitting_temp/'
+log_path = base_path + 'log.md'
+img_dir = base_path + f'{get_now()}/'
 
 
 #%% Model and optimal predictor
@@ -76,10 +70,12 @@ for weight_decay in weight_decays:
     lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {weight_decay}$"
 
     trainer_params = {
-        'max_epochs': 50000,
+        # 'max_epochs': 50000,
+        'max_epochs': 1,
         'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=10000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
-        'logger': pl_loggers.TensorBoardLogger('logs/temp/', name=logger_name),
+        'logger': False,
+        # 'logger': pl_loggers.TensorBoardLogger('logs/', name=logger_name),
         'weights_summary': None,
         'gpus': torch.cuda.device_count(),
     }
