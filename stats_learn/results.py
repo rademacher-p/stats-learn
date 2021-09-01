@@ -21,13 +21,14 @@ from stats_learn.util.base import check_data_shape, RandomGeneratorMixin as RNGM
 
 
 PICKLE_FIGS = True
+DATE_FMT = '%Y-%m-%d %H:%M:%S'
 
 
 #%% Logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 out_handler = logging.StreamHandler(stream=sys.stdout)
-out_formatter = logging.Formatter('\n# %(asctime)s\n%(message)s\n', datefmt='%Y-%m-%d %H:%M:%S')
+out_formatter = logging.Formatter('\n# %(asctime)s\n%(message)s\n', datefmt=DATE_FMT)
 out_handler.setFormatter(out_formatter)
 logger.addHandler(out_handler)
 
@@ -39,7 +40,7 @@ def _file_logger(file, file_format):
         file.parent.mkdir(exist_ok=True)
 
         file_handler = logging.FileHandler(file)
-        file_formatter = logging.Formatter(file_format, datefmt='%Y-%m-%d %H:%M:%S')
+        file_formatter = logging.Formatter(file_format, datefmt=DATE_FMT)
         file_handler.setFormatter(file_formatter)
         logger.addHandler(file_handler)
         yield logger
