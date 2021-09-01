@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -20,13 +18,8 @@ seed = 12345
 
 # TODO: remove path stuff and image names below before release
 base_path = 'consistency_temp/'
-
 log_path = base_path + 'log.md'
-Path(log_path).unlink(missing_ok=True)
-img_dir = base_path
-
-# log_path = base_path + 'temp/log.md'
-# img_dir = base_path + f'temp/{get_now()}/'
+img_dir = base_path + f'{get_now()}/'
 
 
 #%% Model and optimal predictor

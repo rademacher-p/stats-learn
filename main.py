@@ -200,8 +200,7 @@ for weight_decay in weight_decays:
     lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {weight_decay}$"
 
     trainer_params = {
-        # 'max_epochs': 50000,
-        'max_epochs': 1,
+        'max_epochs': 50000,
         'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=10000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
         'logger': pl_loggers.TensorBoardLogger('logs/temp/', name=logger_name),
@@ -253,10 +252,10 @@ predictors, params = zip(*temp)
 
 
 log_path = None
-# log_path = 'temp.md'
+# log_path = 'temp/temp.md'
 
 img_path = None
-# img_path = f'{get_now()}.png'
+# img_path = f'temp/{get_now()}.png'
 
 
 y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
