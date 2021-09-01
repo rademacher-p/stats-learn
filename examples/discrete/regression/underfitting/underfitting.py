@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 from matplotlib import pyplot as plt
 import torch
@@ -5,6 +7,7 @@ from pytorch_lightning.callbacks import EarlyStopping
 import pytorch_lightning.loggers as pl_loggers
 from pytorch_lightning.utilities.seed import seed_everything
 
+from stats_learn.util.base import get_now
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
@@ -19,7 +22,16 @@ plt.style.use('../../../../images/style.mplstyle')
 seed = 12345
 
 # log_path = None
+# img_path = None
+
+# TODO: remove path stuff and image names below before release
 log_path = 'log.md'
+Path(log_path).unlink(missing_ok=True)
+img_dir = ''
+
+# log_path = 'temp/log.md'
+# img_dir = f'temp/{get_now()}/'
+
 
 if seed is not None:
     seed_everything(seed)  # PyTorch-Lightning seeding
@@ -66,7 +78,7 @@ for weight_decay in weight_decays:
         'max_epochs': 50000,
         'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=10000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
-        'logger': pl_loggers.TensorBoardLogger('../../../../logs/', name=logger_name),
+        'logger': pl_loggers.TensorBoardLogger('logs/temp/', name=logger_name),
         'weights_summary': None,
         'gpus': torch.cuda.device_count(),
     }
@@ -100,16 +112,22 @@ n_train = 20
 
 d = model.rvs(n_train + n_test, rng=seed)
 d_train, d_test = np.split(d, [n_train])
-loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, log_path=log_path, img_path='fit.png')
+
+img_path = img_dir + 'fit.png'
+loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, log_path=log_path, img_path=img_path)
 
 # Prediction mean/variance, comparative
 n_train = 128
+
+img_path = img_dir + 'predict_full.png'
 y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
-                                                 log_path=log_path, img_path='predict_full.png', rng=seed)
+                                                 log_path=log_path, img_path=img_path, rng=seed)
 
 # Squared-Error vs. training data volume N
 n_train = np.insert(2**np.arange(11), 0, 0)
+
+img_path = img_dir + 'risk_N.png'
 y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
                                                  plot_loss=True, print_loss=True, log_path=log_path,
-                                                 img_path='risk_N.png', rng=seed)
+                                                 img_path=img_path, rng=seed)

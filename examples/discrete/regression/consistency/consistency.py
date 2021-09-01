@@ -1,19 +1,30 @@
+from pathlib import Path
+
 import numpy as np
 from matplotlib import pyplot as plt
 
+from stats_learn.util.base import get_now
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
 from stats_learn.util import funcs
 from stats_learn import results
 
-# plt.style.use('../../../../images/style.mplstyle')
+plt.style.use('../../../../images/style.mplstyle')
 
 # seed = None
 seed = 12345
 
 # log_path = None
+# img_path = None
+
+# TODO: remove path stuff and image names below before release
 log_path = 'log.md'
+Path(log_path).unlink(missing_ok=True)
+img_dir = ''
+
+# log_path = 'temp/log.md'
+# img_dir = f'temp/{get_now()}/'
 
 
 #%% Model and optimal predictor
@@ -89,6 +100,9 @@ predictors, params = zip(*temp)
 
 
 #%% Results
+
+# TODO: bayes figs?
+
 n_test = 1000
 n_mc = 5
 
@@ -96,28 +110,38 @@ n_mc = 5
 n_train = 30
 d = model.rvs(n_train + n_test, rng=seed)
 d_train, d_test = np.split(d, [n_train])
-loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, log_path=log_path, img_path='fit.png')
+
+img_path = img_dir + 'fit.png'
+loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, log_path=log_path, img_path=img_path)
 
 # Prediction mean/variance, comparative
 n_train = 400
+
+img_path = img_dir + 'predict_a0.png'
 y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
-                                                 log_path=log_path, img_path='predict_a0.png', rng=seed)
+                                                 log_path=log_path, img_path=img_path, rng=seed)
 
 # Dirichlet-based prediction mean/variance, varying N
 n_train = [0, 800, 4000]
+
+img_path = img_dir + 'predict_N.png'
 y_stats_full, loss_full = dir_predictor.assess(model, {'alpha_0': [1000]}, n_train, n_test, n_mc, stats=('mean', 'std'),
                                                verbose=True, plot_stats=True, print_loss=True, log_path=log_path,
-                                               img_path='predict_N.png', rng=seed)
+                                               img_path=img_path, rng=seed)
 
 # Squared-Error vs. training data volume N
 n_train = np.arange(0, 4050, 50)
+
+img_path = img_dir + 'risk_N_leg_a0.png'
 y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
                                                  plot_loss=True, print_loss=True, log_path=log_path,
-                                                 img_path='risk_N_leg_a0.png', rng=seed)
+                                                 img_path=img_path, rng=seed)
 
 # Squared-Error vs. prior localization alpha_0
 n_train = [0, 100, 200, 400, 800]
+
+img_path = img_dir + 'risk_a0_leg_N.png'
 y_stats_full, loss_full = dir_predictor.assess(model, {'alpha_0': np.logspace(0., 5., 100)}, n_train, n_test, n_mc,
                                                verbose=True, plot_loss=True, print_loss=True, log_path=log_path,
-                                               img_path='risk_a0_leg_N.png', rng=seed)
+                                               img_path=img_path, rng=seed)
