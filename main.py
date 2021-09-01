@@ -25,8 +25,8 @@ from stats_learn.predictors.torch import LitMLP, LitWrapper, reset_weights
 
 np.set_printoptions(precision=3)
 
-plt.style.use('style.mplstyle')
-plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
+# plt.style.use('images/style.mplstyle')
+# plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
 
 # seed = None
 seed = 12345
@@ -109,7 +109,7 @@ prior_mean = rand_models.DataConditional.from_poly_mean(n_x, alpha_y_x_d, w_prio
 
 
 dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
-dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=proc_funcs, name=r'$\Dir$')
+dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=proc_funcs, name=r'$\mathrm{Dir}$')
 
 # dir_params = {}
 # dir_params = {'alpha_0': [10, 1000]}
@@ -151,7 +151,7 @@ proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
 
 norm_model = bayes_models.NormalLinear(prior_mean=w_prior_norm, prior_cov=.1, basis_y_x=basis_y_x, cov_y_x=.1,
                                        model_x=model_x, allow_singular=True)
-norm_predictor = BayesRegressor(norm_model, space=model.space, proc_funcs=proc_funcs, name=r'$\Ncal$')
+norm_predictor = BayesRegressor(norm_model, space=model.space, proc_funcs=proc_funcs, name=r'$\mathcal{N}$')
 
 # norm_params = {}
 # norm_params = {'prior_cov': [.1, .001]}
@@ -252,8 +252,8 @@ temp = [
 predictors, params = zip(*temp)
 
 
-# log_path = None
-log_path = 'temp.md'
+log_path = None
+# log_path = 'temp.md'
 
 img_path = None
 # img_path = f'{get_now()}.png'

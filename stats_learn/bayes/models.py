@@ -6,6 +6,7 @@ from abc import abstractmethod, ABC
 
 import numpy as np
 from scipy.stats._multivariate import _PSD
+from matplotlib import pyplot as plt
 
 from stats_learn.random import elements as rand_elements
 from stats_learn.random import models as rand_models
@@ -132,21 +133,37 @@ class NormalLinear(Base):
         #                                                 **self._prior_model_kwargs)
 
     def tex_params(self, key, val=None):
+        str_theta = r'\theta'
+        str_one = ""
+        # str_one = "1"
+        str_eye = ""
+        # str_eye = "I"
+        if plt.rcParams['text.usetex']:
+            if 'upgreek' in plt.rcParams['text.latex.preamble']:
+                str_theta = r'\uptheta'
+            if 'bm' in plt.rcParams['text.latex.preamble']:
+                str_one = r"\bm{1}"
+                str_eye = r"\bm{I}"
+
         if key == 'prior_mean':
-            key = r"\mu_{\uptheta}"
+            # key = r"\mu_{\uptheta}"
+            key = rf"\mu_{str_theta}"
             if val is not None:
                 val_np = np.array(val)
                 val = f"{val:.3f}"
                 if self.prior.shape != () and val_np.shape == ():
-                    val += r"\bm{1}"
+                    # val += r"\bm{1}"
+                    val += str_one
 
         elif key == 'prior_cov':
-            key = r"\Sigma_{\uptheta}"
+            # key = r"\Sigma_{\uptheta}"
+            key = rf"\Sigma_{str_theta}"
             if val is not None:
                 val_np = np.array(val)
                 val = f"{val:.3f}"
                 if self.prior.shape != () and val_np.shape == ():
-                    val += r"\bm{I}"
+                    # val += r"\bm{I}"
+                    val += str_eye
 
         return super(NormalLinear, NormalLinear).tex_params(key, val)
 
