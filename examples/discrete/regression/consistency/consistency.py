@@ -19,12 +19,13 @@ seed = 12345
 # img_path = None
 
 # TODO: remove path stuff and image names below before release
-log_path = 'log.md'
-Path(log_path).unlink(missing_ok=True)
-img_dir = ''
 
-# log_path = 'temp/log.md'
-# img_dir = f'temp/{get_now()}/'
+# log_path = 'log.md'
+# Path(log_path).unlink(missing_ok=True)
+# img_dir = ''
+
+log_path = 'temp/log.md'
+img_dir = f'temp/{get_now()}/'
 
 
 #%% Model and optimal predictor
