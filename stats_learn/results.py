@@ -22,6 +22,7 @@ from stats_learn.util.base import check_data_shape, RandomGeneratorMixin as RNGM
 
 PICKLE_FIGS = True
 DATE_FMT = '%Y-%m-%d %H:%M:%S'
+FILE_LOG_MODE = 'a'
 
 
 #%% Logging
@@ -39,7 +40,7 @@ def _file_logger(file, file_format):
         file = Path(file)
         file.parent.mkdir(exist_ok=True)
 
-        file_handler = logging.FileHandler(file)
+        file_handler = logging.FileHandler(file, mode=FILE_LOG_MODE)
         file_formatter = logging.Formatter(file_format, datefmt=DATE_FMT)
         file_handler.setFormatter(file_formatter)
         logger.addHandler(file_handler)

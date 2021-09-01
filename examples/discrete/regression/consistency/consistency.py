@@ -7,7 +7,7 @@ from stats_learn.predictors.base import ModelRegressor, BayesRegressor
 from stats_learn.util import funcs
 from stats_learn import results
 
-plt.style.use('../../../../style.mplstyle')
+# plt.style.use('../../../../images/style.mplstyle')
 
 # seed = None
 seed = 12345
