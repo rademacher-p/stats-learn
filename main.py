@@ -204,7 +204,7 @@ for weight_decay in weight_decays:
         'max_epochs': 1,
         'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=10000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
-        'logger': pl_loggers.TensorBoardLogger('logs/learn/', name=logger_name),
+        'logger': pl_loggers.TensorBoardLogger('logs/', name=logger_name),
         'weights_summary': None,
         'gpus': torch.cuda.device_count(),
     }
@@ -253,10 +253,10 @@ predictors, params = zip(*temp)
 
 
 # log_path = None
-log_path = 'logs/temp/temp.md'
+log_path = 'temp.md'
 
-# img_path = None
-img_path = f'images/temp/{get_now()}.png'
+img_path = None
+# img_path = f'{get_now()}.png'
 
 
 y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
