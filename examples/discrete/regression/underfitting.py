@@ -16,7 +16,7 @@ from stats_learn import results
 from stats_learn.util.data_processing import make_clipper
 from stats_learn.predictors.torch import LitMLP, LitWrapper, reset_weights
 
-plt.style.use('../../../../images/style.mplstyle')
+plt.style.use('../../../images/style.mplstyle')
 
 # seed = None
 seed = 12345

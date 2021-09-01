@@ -10,7 +10,7 @@ from stats_learn.predictors.base import ModelRegressor, BayesRegressor
 from stats_learn.util import funcs
 from stats_learn import results
 
-plt.style.use('../../../../images/style.mplstyle')
+plt.style.use('../../../images/style.mplstyle')
 
 # seed = None
 seed = 12345
@@ -19,13 +19,14 @@ seed = 12345
 # img_path = None
 
 # TODO: remove path stuff and image names below before release
+base_path = 'consistency_temp/'
 
-# log_path = 'log.md'
-# Path(log_path).unlink(missing_ok=True)
-# img_dir = ''
+log_path = base_path + 'log.md'
+Path(log_path).unlink(missing_ok=True)
+img_dir = base_path
 
-log_path = 'temp/log.md'
-img_dir = f'temp/{get_now()}/'
+# log_path = base_path + 'temp/log.md'
+# img_dir = base_path + f'temp/{get_now()}/'
 
 
 #%% Model and optimal predictor
