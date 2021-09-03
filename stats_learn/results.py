@@ -38,7 +38,7 @@ logger.addHandler(out_handler)
 def _file_logger(file, file_format):
     if file is not None:
         file = Path(file)
-        file.parent.mkdir(exist_ok=True)
+        file.parent.mkdir(parents=True, exist_ok=True)
 
         file_handler = logging.FileHandler(file, mode=FILE_LOG_MODE)
         file_formatter = logging.Formatter(file_format, datefmt=DATE_FMT)
@@ -54,7 +54,7 @@ def _log_and_fig(message, log_path, ax, img_path):
     file_format = '\n# %(asctime)s\n%(message)s\n'
     if img_path is not None:
         img_path = Path(img_path)
-        img_path.parent.mkdir(exist_ok=True)
+        img_path.parent.mkdir(parents=True, exist_ok=True)
 
         file_format += f"\n![]({img_path.absolute().as_posix()})\n"
 

@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import torch
 from pytorch_lightning.callbacks import EarlyStopping
-# import pytorch_lightning.loggers as pl_loggers
+import pytorch_lightning.loggers as pl_loggers
 from pytorch_lightning.utilities.seed import seed_everything
 
 from stats_learn.util.base import get_now
@@ -74,8 +74,8 @@ for weight_decay in weight_decays:
         'max_epochs': 1,
         'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=10000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
-        'logger': False,
-        # 'logger': pl_loggers.TensorBoardLogger('logs/', name=logger_name),
+        # 'logger': False,
+        'logger': pl_loggers.TensorBoardLogger(base_path + 'logs/', name=logger_name),
         'weights_summary': None,
         'gpus': torch.cuda.device_count(),
     }
