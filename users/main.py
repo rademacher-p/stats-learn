@@ -25,7 +25,7 @@ from stats_learn.predictors.torch import LitMLP, LitWrapper, reset_weights
 
 np.set_printoptions(precision=3)
 
-# plt.style.use('images/style.mplstyle')
+# plt.style.use('../images/style.mplstyle')
 # plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
 
 # seed = None
@@ -203,7 +203,7 @@ for weight_decay in weight_decays:
         'max_epochs': 50000,
         'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=10000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
-        'logger': pl_loggers.TensorBoardLogger('logs/temp/', name=logger_name),
+        'logger': pl_loggers.TensorBoardLogger('temp/logs/', name=logger_name),
         'weights_summary': None,
         'gpus': torch.cuda.device_count(),
     }
@@ -251,11 +251,10 @@ temp = [
 predictors, params = zip(*temp)
 
 
-log_path = None
-# log_path = 'temp/temp.md'
-
-img_path = None
-# img_path = f'temp/{get_now()}.png'
+# log_path = None
+# img_path = None
+log_path = 'temp/log.md'
+img_path = f'temp/images/{get_now()}.png'
 
 
 y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
