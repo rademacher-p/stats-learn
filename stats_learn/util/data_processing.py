@@ -52,7 +52,7 @@ def main():
     x = np.random.default_rng().random(10)
     print(x)
 
-    vals = np.linspace(0, 1, 11, endpoint=True)
+    vals = np.linspace(0, 1, 11)
     func_ = make_discretizer(vals)
     x_d = func_(x)
     print(x_d)
