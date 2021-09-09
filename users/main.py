@@ -60,7 +60,7 @@ nonlinear_model = funcs.make_inv_trig(shape_x)
 # nonlinear_model = funcs.make_rand_discrete(n_x, rng=seed)
 
 
-supp_x = box_grid(lims_x, n_x, endpoint=True)
+supp_x = box_grid(lims_x, n_x)
 model_x = rand_elements.Finite(supp_x, p=np.full(size_x*(n_x,), n_x**-size_x))
 # model = rand_models.DataConditional.from_poly_mean(n_x, alpha_y_x_d, w_model, model_x)
 model = rand_models.DataConditional.from_func_mean(n_x, alpha_y_x_d, nonlinear_model, model_x)
@@ -321,7 +321,7 @@ y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params,
 # for n_t, _params in zip(n_t_iter, dir_params_full):
 #     _temp = np.full(n_t, 2)
 #     _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
-#     prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_t, endpoint=True), p=_temp / _temp.sum())
+#     prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_t), p=_temp / _temp.sum())
 #     prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta,
 #                                         model_x=prior_mean_x)
 #

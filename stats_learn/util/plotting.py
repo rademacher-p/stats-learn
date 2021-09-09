@@ -70,7 +70,7 @@ def simplex_grid(n, shape, hull_mask=None):
 # print(binom(12, 2))
 
 
-def box_grid(lims, n=100, endpoint=False):
+def box_grid(lims, n=100, endpoint=True):
     lims = np.array(lims)
 
     # if endpoint:
