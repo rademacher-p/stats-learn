@@ -70,7 +70,7 @@ def _log_and_fig(message, log_path, ax, img_path):
 
 
 #%%
-def plot_fit_compare(predictors, d_train, d_test=(), params=None, log_path=None, img_path=None, ax=None):
+def plot_fit_compare(predictors, d_train, d_test=(), params=None, x=None, log_path=None, img_path=None, ax=None):
     # TODO: make `assess_single_compare` or something? Make similar to `assess_compare` signature?
 
     if params is None:
@@ -90,8 +90,12 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, log_path=None,
             loss = np.full((1, *params_shape), np.nan)
         loss_full.append(loss)
 
+    space_x = predictors[0].space['x']  # use first predictors space by default
+    if x is None:
+        x = space_x.x_plt
+
     if ax is None:
-        ax = predictors[0].space['x'].make_axes()  # use first predictors space by default
+        ax = space_x.make_axes()
 
     h_data = ax.scatter(d_train['x'], d_train['y'], c='k', marker='o', label='$D$')
     # if do_loss:
@@ -101,7 +105,7 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, log_path=None,
     for predictor, params, loss in zip(predictors, params_full, loss_full):
         predictor.fit(d_train)
         if len(params) == 0:
-            h = predictor.plot_predict(ax=ax, label=predictor.name)
+            h = predictor.plot_predict(x, ax=ax, label=predictor.name)
             h_predictors.extend(h)
 
             if do_loss:
@@ -112,7 +116,7 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, log_path=None,
             labels = [f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals]
             for i_v, (param_val, label) in enumerate(zip(param_vals, labels)):
                 predictor.set_params(**{param_name: param_val})
-                h = predictor.plot_predict(ax=ax, label=label)
+                h = predictor.plot_predict(x, ax=ax, label=label)
                 h_predictors.extend(h)
 
                 if do_loss:
