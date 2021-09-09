@@ -153,8 +153,8 @@ class Base(ABC):
         """Plot prediction function."""
         return self.space['x'].plot(self.predict, x, ax=ax, label=label)
 
-    def plot_fit(self, d_train, d_test=(), params=None, log_path=None, img_dir=None, ax=None):
-        return plot_fit_compare([self], d_train, d_test, [params], log_path, img_dir, ax)
+    def plot_fit(self, d_train, d_test=(), params=None, x=None, log_path=None, img_path=None, ax=None):
+        return plot_fit_compare([self], d_train, d_test, [params], x, log_path, img_path, ax)
 
     # Assess
     def assess(self, model=None, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
