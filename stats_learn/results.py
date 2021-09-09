@@ -70,7 +70,8 @@ def _log_and_fig(message, log_path, ax, img_path):
 
 
 #%%
-def plot_fit_compare(predictors, d_train, d_test=(), params=None, x=None, log_path=None, img_path=None, ax=None):
+def plot_fit_compare(predictors, d_train, d_test=(), params=None, x=None, verbose=False, log_path=None, img_path=None,
+                     ax=None):
     # TODO: make `assess_single_compare` or something? Make similar to `assess_compare` signature?
 
     if params is None:
@@ -103,6 +104,10 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, x=None, log_pa
 
     h_predictors = []
     for predictor, params, loss in zip(predictors, params_full, loss_full):
+        if verbose:
+            # print(f"  Predictor: {predictor.name}", end='\r')
+            print(f"  Predictor: {predictor.name}")  # TODO: make `verbose` int, add levels of control?
+
         predictor.fit(d_train)
         if len(params) == 0:
             h = predictor.plot_predict(x, ax=ax, label=predictor.name)
