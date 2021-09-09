@@ -452,7 +452,8 @@ class FiniteGeneric(Finite):
         set_ndim = len(set_shape)
         if set_ndim == 1 and self.shape == ():
             if np.issubdtype(self.dtype, np.number):
-                return ax.plot(x, y, '.', label=label)
+                # return ax.plot(x, y, '.', label=label)
+                return ax.plot(x, y, '.-', label=label)
             else:
                 return ax.stem(x, y, use_line_collection=True, label=label)
 
