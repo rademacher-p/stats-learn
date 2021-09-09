@@ -1,3 +1,6 @@
+# TODO: bayes figs?
+
+
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -80,9 +83,6 @@ predictors, params = zip(*temp)
 
 
 #%% Results
-
-# TODO: bayes figs?
-
 n_test = 1000
 n_mc = 5
 

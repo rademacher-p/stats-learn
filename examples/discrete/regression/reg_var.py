@@ -71,9 +71,7 @@ dir_params = {'alpha_0': [1e-5, 500, 1e5]}
 
 
 # PyTorch
-# weight_decays = [0., 1e-3]  # controls L2 regularization
-# weight_decays = [0]
-weight_decays = [1e-3]
+weight_decays = [0., 1e-3]  # controls L2 regularization
 
 proc_funcs = {'pre': [], 'post': [make_clipper([np.min(supp_x), np.max(supp_x)])]}
 
@@ -117,7 +115,7 @@ predictors, params = zip(*temp)
 
 #%% Results
 n_test = 1000
-n_mc = 1
+n_mc = 2
 
 
 # Sample regressor realizations
@@ -129,18 +127,18 @@ d_train, d_test = np.split(d, [n_train])
 img_path = img_dir + 'fit.png'
 loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, log_path=log_path, img_path=img_path)
 
-# # Prediction mean/variance, comparative
-# n_train = 128
-#
-# img_path = img_dir + 'predict_full.png'
-# y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
-#                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
-#                                                  log_path=log_path, img_path=img_path, rng=seed)
+# Prediction mean/variance, comparative
+n_train = 128
 
-# # Squared-Error vs. training data volume N
-# n_train = np.insert(3**np.arange(8), 0, 0)
-#
-# img_path = img_dir + 'risk_N.png'
-# y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
-#                                                  plot_loss=True, print_loss=True, log_path=log_path,
-#                                                  img_path=img_path, rng=seed)
+img_path = img_dir + 'predict_full.png'
+y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
+                                                 stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
+                                                 log_path=log_path, img_path=img_path, rng=seed)
+
+# Squared-Error vs. training data volume N
+n_train = np.insert(2**np.arange(10), 0, 0)
+
+img_path = img_dir + 'risk_N.png'
+y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
+                                                 plot_loss=True, print_loss=True, log_path=log_path,
+                                                 img_path=img_path, rng=seed)
