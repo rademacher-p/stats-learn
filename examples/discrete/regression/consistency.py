@@ -17,7 +17,8 @@ seed = 12345
 # img_path = None
 
 # TODO: remove path stuff and image names below before release
-base_path = 'consistency_temp/'
+# base_path = 'consistency_temp/'
+base_path = __file__[__file__.rfind('/')+1:].removesuffix('.py') + '_temp/'
 log_path = base_path + 'log.md'
 img_dir = base_path + f'{get_now()}/'
 
@@ -34,22 +35,6 @@ alpha_y_x = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_y-1))
 model = rand_models.DataConditional.from_func_mean(n_y, alpha_y_x, nonlinear_model, model_x)
 
 opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
-
-
-# shape_x = ()
-# size_x = math.prod(shape_x)
-# lims_x = np.broadcast_to([0, 1], (*shape_x, 2))
-# supp_x = box_grid(lims_x, n_x, endpoint=True)
-# model_x = rand_elements.Finite(supp_x, p=np.full(size_x*(n_x,), n_x**-size_x))
-#
-# nonlinear_model = funcs.make_inv_trig(shape_x)
-# var_y_x_const = 1/5
-#
-# alpha_y_x = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_y-1))
-# model = rand_models.DataConditional.from_func_mean(n_y, alpha_y_x, nonlinear_model, model_x)
-#
-# opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
-
 
 # do_bayes = False
 # # do_bayes = True

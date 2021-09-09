@@ -27,7 +27,8 @@ if seed is not None:
 # img_path = None
 
 # TODO: remove path stuff and image names below before release
-base_path = 'underfitting_temp/'
+# base_path = 'underfitting_temp/'
+base_path = __file__[__file__.rfind('/')+1:].removesuffix('.py') + '_temp/'
 log_path = base_path + 'log.md'
 img_dir = base_path + f'{get_now()}/'
 
@@ -70,8 +71,8 @@ for weight_decay in weight_decays:
     lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {weight_decay}$"
 
     trainer_params = {
-        # 'max_epochs': 50000,
-        'max_epochs': 1,
+        'max_epochs': 50000,
+        # 'max_epochs': 1,
         'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=10000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
         # 'logger': False,
@@ -105,7 +106,7 @@ n_test = 1000
 n_mc = 5
 
 # Sample regressor realizations
-n_train = 20
+n_train = 128
 
 d = model.rvs(n_train + n_test, rng=seed)
 d_train, d_test = np.split(d, [n_train])
