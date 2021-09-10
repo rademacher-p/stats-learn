@@ -27,10 +27,9 @@ if seed is not None:
 # img_path = None
 
 # TODO: remove path stuff and image names below before release
-# base_path = 'underfitting_temp/'
 base_path = __file__[__file__.rfind('/')+1:].removesuffix('.py') + '_temp/'
 log_path = base_path + 'log.md'
-img_dir = base_path + f'{get_now()}/'
+img_dir = base_path + f'images/{get_now()}/'
 
 
 #%% Model and optimal predictor
@@ -38,7 +37,7 @@ n_x = n_y = 128
 nonlinear_model = funcs.make_rand_discrete(n_x, rng=seed)
 var_y_x_const = 1/125
 
-supp_x = np.linspace(0, 1, n_x, endpoint=True)
+supp_x = np.linspace(0, 1, n_x)
 model_x = rand_elements.Finite(supp_x, p=None)
 
 alpha_y_x = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_y-1))
@@ -72,7 +71,6 @@ for weight_decay in weight_decays:
 
     trainer_params = {
         'max_epochs': 50000,
-        # 'max_epochs': 1,
         'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=10000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
         # 'logger': False,
