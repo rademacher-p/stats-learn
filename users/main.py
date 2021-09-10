@@ -336,6 +336,31 @@ y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params,
 # plot_risk_disc(predictors, model_eval, params, n_train, n_test=1, n_mc=50000, verbose=True, ax=None)
 # plt.xscale('log', base=2)
 
+
+# do_argmin = False
+# # do_argmin = True
+# ax = plt.gca()
+# if ax.get_xlabel() == r'$\alpha_0$':  # scale alpha axis, find localization minimum
+#     ax.set_xscale('log')
+#     lines = ax.get_lines()
+#     for line in lines:
+#         x_, y_ = line.get_data()
+#         if scale_alpha:
+#             label = line.get_label()
+#             _n_t = int(label[label.find('=')+1:-1])
+#             x_ /= _n_t
+#             line.set_data(x_, y_)
+#
+#         if do_argmin:
+#             idx = y_.argmin()
+#             x_i, y_i = x_[idx], y_[idx]
+#             ax.plot(x_i, y_i, marker='.', markersize=8, color=line.get_color())
+#     if scale_alpha:
+#         ax.set_xlabel(r'$\alpha_0 / |\mathcal{T}|$ ')
+#         _vals = dir_params['alpha_0']
+#         ax.set_xlim((min(_vals), max(_vals)))
+
+
 # # Scale alpha axis, find localization minimum
 # do_argmin = False
 # # do_argmin = True

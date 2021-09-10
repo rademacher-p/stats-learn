@@ -5,6 +5,10 @@ from copy import deepcopy
 
 import numpy as np
 from matplotlib import pyplot as plt
+import torch
+from pytorch_lightning.callbacks import EarlyStopping
+import pytorch_lightning.loggers as pl_loggers
+from pytorch_lightning.utilities.seed import seed_everything
 
 from stats_learn.util.base import get_now
 from stats_learn.random import elements as rand_elements, models as rand_models
@@ -14,12 +18,18 @@ from stats_learn.util import funcs
 from stats_learn import results
 from stats_learn.util.math import prob_disc
 from stats_learn.util.data_processing import make_discretizer
+from stats_learn.util.data_processing import make_clipper
+from stats_learn.predictors.torch import LitMLP, LitWrapper, reset_weights
 
 
 plt.style.use('../../../images/style.mplstyle')
 
 # seed = None
 seed = 12345
+
+if seed is not None:
+    seed_everything(seed)  # PyTorch-Lightning seeding
+
 
 # log_path = None
 # img_path = None
@@ -31,7 +41,16 @@ img_dir = base_path + f'images/{get_now()}/'
 
 
 #%% Model and optimal predictor
-nonlinear_model = funcs.make_inv_trig()
+# nonlinear_model = funcs.make_inv_trig()
+freq = 4
+def nonlinear_model(x):
+    y = np.sin(2*np.pi*freq*x)
+    y = np.where(y > 0, .75, .25)
+    # cond = (x <= .25) | ((x > .5) & (x <= .75))
+    # y = np.where(cond, .25, .75)
+    return y
+
+
 var_y_x_const = 1/5
 
 alpha_y_x = 1/var_y_x_const - 1
@@ -42,17 +61,19 @@ opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 
 
 #%% Learners
-w_prior = [.5, 0]
 
 # Dirichlet
+def prior_func(x):
+    return .5 + .35*np.sin(2*np.pi*freq*x)
 
-# dir_params = None
-# dir_params = {'alpha_0': [10]}
-dir_params = {'alpha_0': [.1]}
-# dir_params = {'alpha_0': np.logspace(-3, 3, 60)}
 
-n_t_iter = [4, 128, 4096]
-# n_t_iter = [2, 4, 8, 16]
+# dir_params = {'alpha_0': [500]}
+dir_params = {'alpha_0': np.logspace(-3, 3, 60)}
+
+# n_t_iter = [4, 128, 4096]
+# n_t_iter = [4, 8, 16, 32, 64, 128, 4096]
+# n_t_iter = [32, 64, 128, 256]
+n_t_iter = [128]
 
 # scale_alpha = True  # interpret `alpha_0` parameter as normalized w.r.t. discretization cardinality
 scale_alpha = False
@@ -63,9 +84,8 @@ scale_alpha = False
 #     supp_t = np.linspace(*model_x.lims, n_t)
 #
 #     prior_mean_x = rand_elements.DataEmpirical(supp_t, counts=prob_disc(supp_t.shape), space=model_x.space)
-#     prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x,
+#     prior_mean = rand_models.BetaLinear(weights=[1], basis_y_x=[prior_func], alpha_y_x=alpha_y_x,
 #                                         model_x=prior_mean_x)
-#
 #     dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
 #
 #     name_ = r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{n_t}$"
@@ -75,19 +95,17 @@ scale_alpha = False
 #     dir_predictors.append(dir_predictor)
 #
 #     if scale_alpha and _params is not None:
-#         # _params['alpha_0'] *= n_t
-#         _params['alpha_0'] = n_t * np.array(_params['alpha_0'])
+#         _params['alpha_0'] *= n_t
 
 
-alpha_0_norm = .1
-# alpha_0_norm = 250
+alpha_0_norm = 5
 dir_predictors = []
 dir_params_full = [None for __ in n_t_iter]
 for n_t in n_t_iter:
     supp_t = np.linspace(*model_x.lims, n_t)
 
     prior_mean_x = rand_elements.DataEmpirical(supp_t, counts=prob_disc(supp_t.shape), space=model_x.space)
-    prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x,
+    prior_mean = rand_models.BetaLinear(weights=[1], basis_y_x=[prior_func], alpha_y_x=alpha_y_x,
                                         model_x=prior_mean_x)
 
     dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=alpha_0_norm * n_t)
@@ -99,42 +117,69 @@ for n_t in n_t_iter:
     dir_predictors.append(dir_predictor)
 
 
-# Normal-prior LR
-norm_model = bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=.1, cov_y_x=.1, model_x=model_x,
-                                       allow_singular=True)
-norm_predictor = BayesRegressor(norm_model, space=model.space, name=r'$\mathcal{N}$')
 
-norm_params = {'prior_cov': [.1, .001]}
+
+# PyTorch
+weight_decays = [0., 1e-3]  # controls L2 regularization
+
+proc_funcs = {'pre': [], 'post': [make_clipper(model_x.lims)]}
+
+lit_predictors = []
+for weight_decay in weight_decays:
+    layer_sizes = [500, 500, 500, 500]
+    optim_params = {'lr': 1e-3, 'weight_decay': weight_decay}
+
+    logger_name = f"MLP {'-'.join(map(str, layer_sizes))}, lambda {weight_decay}"
+    lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {weight_decay}$"
+
+    trainer_params = {
+        'max_epochs': 50000,
+        'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=10000, check_on_train_epoch_end=True),
+        'checkpoint_callback': False,
+        # 'logger': False,
+        'logger': pl_loggers.TensorBoardLogger(base_path + 'logs/', name=logger_name),
+        'weights_summary': None,
+        'gpus': torch.cuda.device_count(),
+    }
+
+    lit_model = LitMLP([model.size['x'], *layer_sizes, 1], optim_params=optim_params)
+
+    def reset_func(model_):
+        model_.apply(reset_weights)
+        with torch.no_grad():
+            model_.model[-1].bias.fill_(.5)
+
+    lit_predictor = LitWrapper(lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name)
+    lit_predictors.append(lit_predictor)
 
 
 #
 temp = [
     (opt_predictor, None),
     *zip(dir_predictors, dir_params_full),
-    (norm_predictor, norm_params),
+    *((predictor, None) for predictor in lit_predictors),
 ]
 predictors, params = zip(*temp)
 
 
+
 #%% Results
-
-# FIXME: REMAKE figs with fixed NORMALIZED localization for prior use equality!!
-
 n_test = 1000
 n_mc = 5
 
-# Sample regressor realizations
-n_train = 30
-d = model.rvs(n_train + n_test, rng=seed)
-d_train, d_test = np.split(d, [n_train])
-x = np.linspace(0, 1, 10000)
 
-img_path = img_dir + 'fit.png'
-loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, x, verbose=True,
-                                     log_path=log_path, img_path=img_path)
+# # Sample regressor realizations
+# n_train = 256
+# d = model.rvs(n_train + n_test, rng=seed)
+# d_train, d_test = np.split(d, [n_train])
+# x = np.linspace(0, 1, 10000)
+#
+# img_path = img_dir + 'fit.png'
+# loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, x, verbose=True,
+#                                      log_path=log_path, img_path=img_path)
 
 # Prediction mean/variance, comparative
-n_train = 400
+n_train = 256
 
 img_path = img_dir + 'predict_T.png'
 y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
@@ -145,17 +190,15 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
 # n_train = [0, 400, 4000]
 # _t = 4
 # idx = n_t_iter.index(_t)
-# _params = None
-# # _params = {'alpha_0': [1000]}
 #
 # img_path = img_dir + f'predict_N_T{_t}.png'
-# y_stats_full, loss_full = dir_predictors[idx].assess(model, _params, n_train, n_test, n_mc,
+# y_stats_full, loss_full = dir_predictors[idx].assess(model, {'alpha_0': [1000]}, n_train, n_test, n_mc,
 #                                                      stats=('mean', 'std'),
 #                                                      verbose=True, plot_stats=True, print_loss=True,
 #                                                      log_path=log_path, img_path=img_path, rng=seed)
-
+#
 # # Squared-Error vs. training data volume N
-# n_train = np.arange(0, 4050, 50)
+# n_train = np.arange(0, 4500, 500)
 #
 # img_path = img_dir + 'risk_N_leg_T.png'
 # y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
@@ -163,14 +206,15 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
 #                                                  img_path=img_path, rng=seed)
 
 # # Squared-Error vs. prior localization alpha_0
-# n_train = 4
+# n_train = 100
 #
 # img_path = img_dir + 'risk_a0norm_leg_T.png'
 # y_stats_full, loss_full = results.assess_compare(dir_predictors, model, dir_params_full, n_train, n_test, n_mc,
 #                                                  verbose=True, plot_loss=True, print_loss=True, log_path=log_path,
 #                                                  img_path=img_path, rng=seed)
-
-
+#
+# do_argmin = False
+# # do_argmin = True
 # ax = plt.gca()
 # if ax.get_xlabel() == r'$\alpha_0$':  # scale alpha axis, find localization minimum
 #     ax.set_xscale('log')
@@ -183,59 +227,11 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
 #             x_ /= _n_t
 #             line.set_data(x_, y_)
 #
+#         if do_argmin:
+#             idx = y_.argmin()
+#             x_i, y_i = x_[idx], y_[idx]
+#             ax.plot(x_i, y_i, marker='.', markersize=8, color=line.get_color())
 #     if scale_alpha:
 #         ax.set_xlabel(r'$\alpha_0 / |\mathcal{T}|$')
 #         _vals = dir_params['alpha_0']
 #         ax.set_xlim((min(_vals), max(_vals)))
-
-
-# if scale_alpha:
-#     for num in plt.get_fignums():
-#         fig = plt.figure(num)
-#         for ax in fig.axes:
-#
-#             for line in ax.get_lines():
-#                 label = line.get_label()
-#
-#                 try:
-#                     idx_0 = label.index(r'$|\mathcal{T}| = ') + 17
-#                     idx_1 = label.find('$', idx_0)
-#                     _n_t = int(label[idx_0:idx_1])
-#                 except ValueError:
-#                     continue
-#
-#                 try:
-#                     idx_a = label.index(r'$\alpha_0 = ')
-#                     idx_0 = idx_a + 12
-#                     idx_1 = label.find('$', idx_0)
-#                     a0 = int(label[idx_0:idx_1])
-#
-#                     new_label = label[:idx_a] + r"$\alpha_0/|\mathcal{T}| = " + f"{a0/_n_t}$"
-#                     line.set_label(new_label)
-#
-#                 except ValueError:
-#                     continue
-#
-#             # fig.canvas.draw()
-#             plt.legend()
-#
-#                 # x_, y_ = line.get_data()
-#                 # x_ /= _n_t
-#                 # line.set_data(x_, y_)
-#                 # min_, max_ = min(x_), max(x_)
-#
-#             # if ax.get_xlabel() == r'$\alpha_0$':  # scale alpha axis, find localization minimum
-#             #     ax.set_xscale('log')
-#             #     ax.set_xlabel(r'$\alpha_0 / |\mathcal{T}|$ ')
-#             #
-#             #     # for line in ax.get_lines():
-#             #     #     x_, y_ = line.get_data()
-#             #     #     label = line.get_label()
-#             #     #     _n_t = int(label[label.find('=') + 1:-1])
-#             #     #     x_ /= _n_t
-#             #     #     line.set_data(x_, y_)
-#             #     #     min_, max_ = min(x_), max(x_)
-#             #
-#             #     # _vals = dir_params['alpha_0']
-#             #     # ax.set_xlim((min(_vals), max(_vals)))
-#             #     ax.set_xlim((min_, max_))

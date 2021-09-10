@@ -35,8 +35,8 @@ img_dir = base_path + f'images/{get_now()}/'
 #%% Model and optimal predictor
 n_x = n_y = 128
 
-freq = 4
 # nonlinear_model = funcs.make_inv_trig()
+freq = 4
 def nonlinear_model(x):
     y = np.sin(2*np.pi*freq*x)
     y = np.where(y > 0, .75, .25)
@@ -46,7 +46,7 @@ def nonlinear_model(x):
 
 var_y_x_const = 1/5
 
-supp_x = np.linspace(0, 1, n_x, endpoint=True)
+supp_x = np.linspace(0, 1, n_x)
 model_x = rand_elements.Finite(supp_x, p=None)
 
 alpha_y_x = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_y-1))
@@ -67,13 +67,13 @@ dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
 
 dir_predictor = BayesRegressor(dir_model, space=model.space, name=r'$\mathrm{Dir}$')
 # dir_params = {'alpha_0': [1e-5, 1e5]}
-dir_params = {'alpha_0': [1e-5, 500, 1e5]}
+dir_params = {'alpha_0': [1e-5, 400, 1e5]}
 
 
 # PyTorch
 weight_decays = [0., 1e-3]  # controls L2 regularization
 
-proc_funcs = {'pre': [], 'post': [make_clipper([np.min(supp_x), np.max(supp_x)])]}
+proc_funcs = {'pre': [], 'post': [make_clipper([min(supp_x), max(supp_x)])]}
 
 lit_predictors = []
 for weight_decay in weight_decays:
@@ -115,30 +115,39 @@ predictors, params = zip(*temp)
 
 #%% Results
 n_test = 1000
-n_mc = 2
+n_mc = 5
 
 
-# Sample regressor realizations
-n_train = 2000
+# # Sample regressor realizations
+# n_train = 2000
+#
+# d = model.rvs(n_train + n_test, rng=seed)
+# d_train, d_test = np.split(d, [n_train])
+#
+# img_path = img_dir + 'fit.png'
+# loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, log_path=log_path, img_path=img_path)
 
-d = model.rvs(n_train + n_test, rng=seed)
-d_train, d_test = np.split(d, [n_train])
+# # Prediction mean/variance, comparative
+# n_train = 256
+#
+# img_path = img_dir + 'predict_full.png'
+# y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
+#                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
+#                                                  log_path=log_path, img_path=img_path, rng=seed)
 
-img_path = img_dir + 'fit.png'
-loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, log_path=log_path, img_path=img_path)
+# # Squared-Error vs. training data volume N
+# n_train = np.insert(2**np.arange(12), 0, 0)
+#
+# img_path = img_dir + 'risk_N.png'
+# y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
+#                                                  plot_loss=True, print_loss=True, log_path=log_path,
+#                                                  img_path=img_path, rng=seed)
 
-# Prediction mean/variance, comparative
-n_train = 128
 
-img_path = img_dir + 'predict_full.png'
-y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
-                                                 stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
-                                                 log_path=log_path, img_path=img_path, rng=seed)
-
-# Squared-Error vs. training data volume N
-n_train = np.insert(2**np.arange(10), 0, 0)
-
-img_path = img_dir + 'risk_N.png'
-y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
-                                                 plot_loss=True, print_loss=True, log_path=log_path,
-                                                 img_path=img_path, rng=seed)
+# # Squared-Error vs. prior localization alpha_0
+# n_train = [0, 100, 200, 400]
+#
+# img_path = img_dir + 'risk_a0_leg_N.png'
+# y_stats_full, loss_full = dir_predictor.assess(model, {'alpha_0': np.logspace(0., 5., 60)}, n_train, n_test, n_mc,
+#                                                verbose=True, plot_loss=True, print_loss=True, log_path=log_path,
+#                                                img_path=img_path, rng=seed)
