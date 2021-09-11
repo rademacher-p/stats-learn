@@ -44,11 +44,10 @@ img_dir = base_path + f'images/{get_now()}/'
 # nonlinear_model = funcs.make_inv_trig()
 freq = 4
 def nonlinear_model(x):
-    y = np.sin(2*np.pi*freq*x)
-    y = np.where(y > 0, .75, .25)
-    # cond = (x <= .25) | ((x > .5) & (x <= .75))
-    # y = np.where(cond, .25, .75)
-    return y
+    # y = np.sin(2*np.pi*freq*x)
+    # y = np.where(y > 0, .75, .25)
+    # return y
+    return .5 + .35 * np.sin(2 * np.pi * freq * x)
 
 
 var_y_x_const = 1/5
@@ -64,24 +63,31 @@ opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 
 # Dirichlet
 def prior_func(x):
-    return .5 + .35*np.sin(2*np.pi*freq*x)
+    # return .5 + .35*np.sin(2*np.pi*freq*x)
+    y = np.sin(2*np.pi*freq*x)
+    y = np.where(y > 0, .75, .25)
+    return y
 
-
-# dir_params = {'alpha_0': [500]}
-dir_params = {'alpha_0': np.logspace(-3, 3, 60)}
 
 # n_t_iter = [4, 128, 4096]
 # n_t_iter = [4, 8, 16, 32, 64, 128, 4096]
 # n_t_iter = [32, 64, 128, 256]
-n_t_iter = [128]
+# n_t_iter = [16, 32, 64, 128]
+n_t_iter = [32, 128]
+# n_t_iter = [16]
+
 
 # scale_alpha = True  # interpret `alpha_0` parameter as normalized w.r.t. discretization cardinality
-scale_alpha = False
-
-# dir_predictors = []
+# # scale_alpha = False
+#
+# # dir_params = {'alpha_0': [500]}
+# dir_params = {'alpha_0': np.logspace(-3, 3, 60)}
+#
 # dir_params_full = [deepcopy(dir_params) for __ in n_t_iter]
+# dir_predictors = []
 # for n_t, _params in zip(n_t_iter, dir_params_full):
-#     supp_t = np.linspace(*model_x.lims, n_t)
+#     # supp_t = np.linspace(*model_x.lims, n_t)
+#     supp_t = np.linspace(*model_x.lims, n_t, endpoint=False) + .5 / n_t  # FIXME: cheap?
 #
 #     prior_mean_x = rand_elements.DataEmpirical(supp_t, counts=prob_disc(supp_t.shape), space=model_x.space)
 #     prior_mean = rand_models.BetaLinear(weights=[1], basis_y_x=[prior_func], alpha_y_x=alpha_y_x,
@@ -98,29 +104,35 @@ scale_alpha = False
 #         _params['alpha_0'] *= n_t
 
 
-alpha_0_norm = 5
+# alpha_0_norm = 5
+# dir_params_full = [None for __ in n_t_iter]
+# alpha_0_norm_iter = [5]
+alpha_0_norm_iter = [.005, 5]
+dir_params_full = [None for __ in range(len(n_t_iter) * len(alpha_0_norm_iter))]
 dir_predictors = []
-dir_params_full = [None for __ in n_t_iter]
 for n_t in n_t_iter:
-    supp_t = np.linspace(*model_x.lims, n_t)
+    for alpha_0_norm in alpha_0_norm_iter:
+        # supp_t = np.linspace(*model_x.lims, n_t)
+        supp_t = np.linspace(*model_x.lims, n_t, endpoint=False) + .5 / n_t  # FIXME: cheap?
 
-    prior_mean_x = rand_elements.DataEmpirical(supp_t, counts=prob_disc(supp_t.shape), space=model_x.space)
-    prior_mean = rand_models.BetaLinear(weights=[1], basis_y_x=[prior_func], alpha_y_x=alpha_y_x,
-                                        model_x=prior_mean_x)
+        prior_mean_x = rand_elements.DataEmpirical(supp_t, counts=prob_disc(supp_t.shape), space=model_x.space)
+        prior_mean = rand_models.BetaLinear(weights=[1], basis_y_x=[prior_func], alpha_y_x=alpha_y_x,
+                                            model_x=prior_mean_x)
 
-    dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=alpha_0_norm * n_t)
+        dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=alpha_0_norm * n_t)
 
-    name_ = r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{n_t}$" + r", $\alpha_0 / |\mathcal{T}| = " + f"{alpha_0_norm}$"
+        # FIXME
+        # name_ = r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{n_t}$" + r", $\alpha_0 / |\mathcal{T}| = " + f"{alpha_0_norm}$"
+        name_ = r'$\mathrm{Dir}$, $\mathcal{T} = ' + f"{n_t}$" + r", $\alpha_0 / \mathcal{T} = " + f"{alpha_0_norm}$"
 
-    dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=[make_discretizer(supp_t)], name=name_)
+        dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=[make_discretizer(supp_t)], name=name_)
 
-    dir_predictors.append(dir_predictor)
-
-
+        dir_predictors.append(dir_predictor)
 
 
 # PyTorch
 weight_decays = [0., 1e-3]  # controls L2 regularization
+# weight_decays = [1e-3]  # FIXME
 
 proc_funcs = {'pre': [], 'post': [make_clipper(model_x.lims)]}
 
@@ -162,7 +174,6 @@ temp = [
 predictors, params = zip(*temp)
 
 
-
 #%% Results
 n_test = 1000
 n_mc = 5
@@ -178,13 +189,14 @@ n_mc = 5
 # loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, x, verbose=True,
 #                                      log_path=log_path, img_path=img_path)
 
-# Prediction mean/variance, comparative
-n_train = 256
-
-img_path = img_dir + 'predict_T.png'
-y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
-                                                 stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
-                                                 log_path=log_path, img_path=img_path, rng=seed)
+# # Prediction mean/variance, comparative
+# n_train = 256
+#
+# img_path = img_dir + 'predict_T.png'
+# y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
+#                                                  stats=('mean', 'std'), verbose=True,
+#                                                  plot_stats=True, print_loss=True,
+#                                                  log_path=log_path, img_path=img_path, rng=seed)
 
 # # Dirichlet-based prediction mean/variance, varying N
 # n_train = [0, 400, 4000]
@@ -196,17 +208,17 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
 #                                                      stats=('mean', 'std'),
 #                                                      verbose=True, plot_stats=True, print_loss=True,
 #                                                      log_path=log_path, img_path=img_path, rng=seed)
-#
-# # Squared-Error vs. training data volume N
-# n_train = np.arange(0, 4500, 500)
-#
-# img_path = img_dir + 'risk_N_leg_T.png'
-# y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
-#                                                  plot_loss=True, print_loss=True, log_path=log_path,
-#                                                  img_path=img_path, rng=seed)
+
+# Squared-Error vs. training data volume N
+n_train = np.insert(2**np.arange(10), 0, 0)
+
+img_path = img_dir + 'risk_N_leg_T.png'
+y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
+                                                 plot_loss=True, print_loss=True, log_path=log_path,
+                                                 img_path=img_path, rng=seed)
 
 # # Squared-Error vs. prior localization alpha_0
-# n_train = 100
+# n_train = 32
 #
 # img_path = img_dir + 'risk_a0norm_leg_T.png'
 # y_stats_full, loss_full = results.assess_compare(dir_predictors, model, dir_params_full, n_train, n_test, n_mc,
