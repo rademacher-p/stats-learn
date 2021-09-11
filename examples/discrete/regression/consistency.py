@@ -27,14 +27,14 @@ img_dir = base_path + f'images/{get_now()}/'
 
 #%% Model and optimal predictor
 n_x = n_y = 128
-nonlinear_model = funcs.make_inv_trig()
+clairvoyant_func = funcs.make_inv_trig()
 var_y_x_const = 1/5
 
 supp_x = np.linspace(0, 1, n_x)
 model_x = rand_elements.Finite(supp_x, p=None)
 
 alpha_y_x = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_y-1))
-model = rand_models.DataConditional.from_func_mean(n_y, alpha_y_x, nonlinear_model, model_x)
+model = rand_models.DataConditional.from_func_mean(n_y, alpha_y_x, clairvoyant_func, model_x)
 
 opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 

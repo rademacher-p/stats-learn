@@ -14,7 +14,6 @@ from stats_learn.util.base import get_now
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
-from stats_learn.util import funcs
 from stats_learn import results
 from stats_learn.util.math import prob_disc
 from stats_learn.util.data_processing import make_discretizer
@@ -41,20 +40,21 @@ img_dir = base_path + f'images/{get_now()}/'
 
 
 #%% Model and optimal predictor
-# nonlinear_model = funcs.make_inv_trig()
-freq = 4
-def nonlinear_model(x):
+freq = 2
+def clairvoyant_func(x):
     # y = np.sin(2*np.pi*freq*x)
     # y = np.where(y > 0, .75, .25)
     # return y
     return .5 + .35 * np.sin(2 * np.pi * freq * x)
 
 
-var_y_x_const = 1/5
+# var_y_x_const = 1/5
+var_y_x_const = 1/2  # FIXME
+
 
 alpha_y_x = 1/var_y_x_const - 1
 model_x = rand_elements.Uniform([0, 1])
-model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x, model_x=model_x)
+model = rand_models.BetaLinear(weights=[1], basis_y_x=[clairvoyant_func], alpha_y_x=alpha_y_x, model_x=model_x)
 
 opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 
@@ -73,7 +73,7 @@ def prior_func(x):
 # n_t_iter = [4, 8, 16, 32, 64, 128, 4096]
 # n_t_iter = [32, 64, 128, 256]
 # n_t_iter = [16, 32, 64, 128]
-n_t_iter = [32, 128]
+n_t_iter = [32, 64, 128]
 # n_t_iter = [16]
 
 
@@ -106,8 +106,8 @@ n_t_iter = [32, 128]
 
 # alpha_0_norm = 5
 # dir_params_full = [None for __ in n_t_iter]
-# alpha_0_norm_iter = [5]
-alpha_0_norm_iter = [.005, 5]
+alpha_0_norm_iter = [5]
+# alpha_0_norm_iter = [.005, 5]
 dir_params_full = [None for __ in range(len(n_t_iter) * len(alpha_0_norm_iter))]
 dir_predictors = []
 for n_t in n_t_iter:
@@ -146,7 +146,7 @@ for weight_decay in weight_decays:
 
     trainer_params = {
         'max_epochs': 50000,
-        'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=10000, check_on_train_epoch_end=True),
+        'callbacks': EarlyStopping('train_loss', min_delta=1e-4, patience=10000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
         # 'logger': False,
         'logger': pl_loggers.TensorBoardLogger(base_path + 'logs/', name=logger_name),
