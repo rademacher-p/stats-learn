@@ -8,6 +8,7 @@ from typing import Union
 # from warnings import warn
 import logging
 from contextlib import contextmanager
+import inspect
 
 from more_itertools import all_equal
 import numpy as np
@@ -525,8 +526,6 @@ def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, 
     else:
         params_full = [item if item is not None else {} for item in params]
 
-    # if isinstance(n_train, (Integral, np.integer)):
-    #     n_train = [n_train]
     n_train = np.array(n_train).reshape(-1)
 
     loss_full = []
@@ -562,8 +561,6 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train: 
     else:
         params_full = [item if item is not None else {} for item in params]
 
-    # if isinstance(n_train, (Integral, np.integer)):
-    #     n_train = [n_train]
     n_train = np.array(n_train).reshape(-1)
 
     if ax is None:
@@ -666,19 +663,39 @@ def plot_risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_tes
 
 
 def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500, verbose=True, ax=None):
+
+    # TODO: integrate logging code? Cleanup!
+
+    n_t_iter = np.array([inspect.getclosurevars(pr.proc_funcs['pre'][0]).nonlocals['vals'].size for pr in predictors])
+
     if params is None:
         params_full = [{} for _ in predictors]
     else:
         params_full = [item if item is not None else {} for item in params]
 
-    if not all_equal(params_full):
+    # if not all_equal(params_full):
+    #     raise ValueError
+    # # TODO: check models for equality
+
+    if all(len(params) == 0 for params in params_full):
+        params = {}
+    elif all(list(params.keys()) == ['alpha_0'] for params in params_full):
+        a0_full = np.array([params['alpha_0'] for params in params_full])
+        if all(all_equal(arr) for arr in a0_full.transpose()):
+            params = {'alpha_0': a0_full[0]}
+            tex_map = lambda x: r"$\alpha_0 = " + f"{x}$"
+        else:
+            a0_full_norm = a0_full / n_t_iter[..., np.newaxis]
+            if all(all_equal(arr) for arr in a0_full_norm.transpose()):
+                params = {'alpha_0': a0_full_norm[0]}
+                tex_map = lambda x: r"$\alpha_0 / |\mathcal{T}| = " + f"{x}$"
+            else:
+                raise ValueError
+    else:
         raise ValueError
-    # TODO: check models for equality
 
-    losses = risk_eval_sim_compare(predictors, model, params, n_train, n_test, n_mc, verbose)
+    losses = risk_eval_sim_compare(predictors, model, params_full, n_train, n_test, n_mc, verbose)
 
-    # if isinstance(n_train, (Integral, np.integer)):
-    #     n_train = [n_train]
     n_train = np.array(n_train).reshape(-1)
 
     if ax is None:
@@ -690,11 +707,9 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
         ax.set(ylabel=ylabel)
 
     loss = np.stack(losses, axis=-1)
-    params = params_full[0]
 
-    x_plt = np.array([len(pr.model.space['x'].values) for pr in predictors])  # discretization set size
     # title = str(predictors[0].name)
-    title = r'$\Dir$'
+    title = r'$\mathrm{Dir}$'
 
     out = []
     if len(params) == 0:
@@ -709,12 +724,14 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
 
         if len(n_train) > 1 and len(param_vals) == 1:
             loss = loss.squeeze(axis=1)
-            title += f", {predictors[0].tex_params(param_name, param_vals[0])}"
+            # title += f", {predictors[0].tex_params(param_name, param_vals[0])}"
+            title += f", {tex_map(param_vals[0])}"
             labels = [f"$N = {n}$" for n in n_train]
         elif len(n_train) == 1 and len(param_vals) > 1:
             loss = loss.squeeze(axis=0)
             title += f", $N = {n_train[0]}$"
-            labels = [f"{predictors[0].tex_params(param_name, val)}" for val in param_vals]
+            # labels = [f"{predictors[0].tex_params(param_name, val)}" for val in param_vals]
+            labels = [f"{tex_map(val)}" for val in param_vals]
         else:
             raise ValueError
 
@@ -722,13 +739,13 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
         raise ValueError
 
     for loss_plt, label in zip(loss, labels):
-        plt_data = ax.plot(x_plt, loss_plt, label=label, marker='.')
+        plt_data = ax.plot(n_t_iter, loss_plt, label=label, marker='.')
         out.append(plt_data)
 
     if labels != [None]:
         ax.legend()
 
-    ax.set(xlabel=r'$|\Tcal|$')
+    ax.set(xlabel=r'$|\mathcal{T}|$')
     ax.set_title(title)
 
     return out

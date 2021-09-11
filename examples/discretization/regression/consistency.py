@@ -48,14 +48,16 @@ w_prior = [.5, 0]
 
 n_t_iter = [4, 128, 4096]
 # n_t_iter = [2, 4, 8, 16]
+# n_t_iter = 2 ** np.arange(1, 14)
 
 
-# # scale_alpha = True  # interpret `alpha_0` parameter as normalized w.r.t. discretization cardinality
-# scale_alpha = False
+# scale_alpha = True  # interpret `alpha_0` parameter as normalized w.r.t. discretization cardinality
+# # scale_alpha = False
 #
 # # dir_params = None
 # # dir_params = {'alpha_0': [10]}
-# dir_params = {'alpha_0': [.1]}
+# # dir_params = {'alpha_0': [.1]}
+# dir_params = {'alpha_0': [.1, 10]}
 # # dir_params = {'alpha_0': np.logspace(-3, 3, 60)}
 #
 # dir_params_full = [deepcopy(dir_params) for __ in n_t_iter]
@@ -118,11 +120,9 @@ predictors, params = zip(*temp)
 
 
 #%% Results
-
-# FIXME: REMAKE figs with fixed NORMALIZED localization for prior use equality!!
-
 n_test = 1000
-n_mc = 5
+n_mc = 15
+
 
 # Sample regressor realizations
 n_train = 30
@@ -134,13 +134,13 @@ img_path = img_dir + 'fit.png'
 loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, x, verbose=True,
                                      log_path=log_path, img_path=img_path)
 
-# Prediction mean/variance, comparative
-n_train = 400
-
-img_path = img_dir + 'predict_T.png'
-y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
-                                                 stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
-                                                 log_path=log_path, img_path=img_path, rng=seed)
+# # Prediction mean/variance, comparative
+# n_train = 400
+#
+# img_path = img_dir + 'predict_T.png'
+# y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
+#                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
+#                                                  log_path=log_path, img_path=img_path, rng=seed)
 
 # # Dirichlet-based prediction mean/variance, varying N
 # n_train = [0, 400, 4000]
@@ -240,3 +240,9 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
 #             #     # _vals = dir_params['alpha_0']
 #             #     # ax.set_xlim((min(_vals), max(_vals)))
 #             #     ax.set_xlim((min_, max_))
+
+
+# n_train = [0, 4, 40, 400]
+# # n_train = 400
+# results.plot_risk_disc(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, ax=None)
+# plt.xscale('log', base=2)
