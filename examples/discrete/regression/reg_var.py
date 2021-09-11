@@ -38,11 +38,10 @@ n_x = n_y = 128
 # nonlinear_model = funcs.make_inv_trig()
 freq = 4
 def nonlinear_model(x):
-    y = np.sin(2*np.pi*freq*x)
-    y = np.where(y > 0, .75, .25)
-    # cond = (x <= .25) | ((x > .5) & (x <= .75))
-    # y = np.where(cond, .25, .75)
-    return y
+    # y = np.sin(2*np.pi*freq*x)
+    # y = np.where(y > 0, .75, .25)
+    # return y
+    return .5 + .35 * np.sin(2 * np.pi * freq * x)
 
 var_y_x_const = 1/5
 
@@ -59,7 +58,10 @@ opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 
 # Dirichlet
 def prior_func(x):
-    return .5 + .35*np.sin(2*np.pi*freq*x)
+    # return .5 + .35*np.sin(2*np.pi*freq*x)
+    y = np.sin(2 * np.pi * freq * x)
+    y = np.where(y > 0, .75, .25)
+    return y
 
 
 prior_mean = rand_models.DataConditional.from_func_mean(n_y, alpha_y_x, prior_func, model_x)
@@ -67,11 +69,12 @@ dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
 
 dir_predictor = BayesRegressor(dir_model, space=model.space, name=r'$\mathrm{Dir}$')
 # dir_params = {'alpha_0': [1e-5, 1e5]}
-dir_params = {'alpha_0': [1e-5, 400, 1e5]}
+dir_params = {'alpha_0': [1e-5, 500]}
 
 
 # PyTorch
 weight_decays = [0., 1e-3]  # controls L2 regularization
+# weight_decays = [1e-3]  # FIXME
 
 proc_funcs = {'pre': [], 'post': [make_clipper([min(supp_x), max(supp_x)])]}
 
@@ -135,13 +138,13 @@ n_mc = 5
 #                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
 #                                                  log_path=log_path, img_path=img_path, rng=seed)
 
-# # Squared-Error vs. training data volume N
-# n_train = np.insert(2**np.arange(12), 0, 0)
-#
-# img_path = img_dir + 'risk_N.png'
-# y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
-#                                                  plot_loss=True, print_loss=True, log_path=log_path,
-#                                                  img_path=img_path, rng=seed)
+# Squared-Error vs. training data volume N
+n_train = np.insert(2**np.arange(10), 0, 0)
+
+img_path = img_dir + 'risk_N.png'
+y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
+                                                 plot_loss=True, print_loss=True, log_path=log_path,
+                                                 img_path=img_path, rng=seed)
 
 
 # # Squared-Error vs. prior localization alpha_0

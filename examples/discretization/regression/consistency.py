@@ -46,19 +46,20 @@ w_prior = [.5, 0]
 
 # Dirichlet
 
-# dir_params = None
-# dir_params = {'alpha_0': [10]}
-dir_params = {'alpha_0': [.1]}
-# dir_params = {'alpha_0': np.logspace(-3, 3, 60)}
-
 n_t_iter = [4, 128, 4096]
 # n_t_iter = [2, 4, 8, 16]
 
-# scale_alpha = True  # interpret `alpha_0` parameter as normalized w.r.t. discretization cardinality
-scale_alpha = False
 
-# dir_predictors = []
+# # scale_alpha = True  # interpret `alpha_0` parameter as normalized w.r.t. discretization cardinality
+# scale_alpha = False
+#
+# # dir_params = None
+# # dir_params = {'alpha_0': [10]}
+# dir_params = {'alpha_0': [.1]}
+# # dir_params = {'alpha_0': np.logspace(-3, 3, 60)}
+#
 # dir_params_full = [deepcopy(dir_params) for __ in n_t_iter]
+# dir_predictors = []
 # for n_t, _params in zip(n_t_iter, dir_params_full):
 #     supp_t = np.linspace(*model_x.lims, n_t)
 #
@@ -81,8 +82,8 @@ scale_alpha = False
 
 alpha_0_norm = .1
 # alpha_0_norm = 250
-dir_predictors = []
 dir_params_full = [None for __ in n_t_iter]
+dir_predictors = []
 for n_t in n_t_iter:
     supp_t = np.linspace(*model_x.lims, n_t)
 
