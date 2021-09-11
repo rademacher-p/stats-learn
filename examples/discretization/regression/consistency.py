@@ -31,12 +31,12 @@ img_dir = base_path + f'images/{get_now()}/'
 
 
 #%% Model and optimal predictor
-nonlinear_model = funcs.make_inv_trig()
+clairvoyant_func = funcs.make_inv_trig()
 var_y_x_const = 1/5
 
 alpha_y_x = 1/var_y_x_const - 1
 model_x = rand_elements.Uniform([0, 1])
-model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x, model_x=model_x)
+model = rand_models.BetaLinear(weights=[1], basis_y_x=[clairvoyant_func], alpha_y_x=alpha_y_x, model_x=model_x)
 
 opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 
