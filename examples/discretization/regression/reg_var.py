@@ -41,11 +41,28 @@ img_dir = base_path + f'images/{get_now()}/'
 
 #%% Model and optimal predictor
 freq = 2
+
+# def clairvoyant_func(x):
+#     # y = np.sin(2*np.pi*freq*x)
+#     # y = np.where(y > 0, .75, .25)
+#     # return y
+#     a = .35
+#     return .5 + a * np.sin(2 * np.pi * freq * x)
+
+
+# def clairvoyant_func(x):  # linear modulated square wave
+#     y = np.sin(2*np.pi*freq*x)
+#     y = np.where(y > 0, .5, -.5)
+#     return .5 + y * (.2 + .4 * x)
+
+
+# def clairvoyant_func(x):
+#     y = 2 * freq * x % 1
+#     return y
+
 def clairvoyant_func(x):
-    # y = np.sin(2*np.pi*freq*x)
-    # y = np.where(y > 0, .75, .25)
-    # return y
-    return .5 + .35 * np.sin(2 * np.pi * freq * x)
+    y = np.sin(2 * np.pi * freq * x)
+    return .5 + np.where(y > 0, .3, -.3) - .3*y
 
 
 # var_y_x_const = 1/5
@@ -65,15 +82,15 @@ opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 def prior_func(x):
     # return .5 + .35*np.sin(2*np.pi*freq*x)
     y = np.sin(2*np.pi*freq*x)
-    y = np.where(y > 0, .75, .25)
-    return y
+    a = .25
+    return np.where(y > 0, .5 + a, .5 - a)
 
 
 # n_t_iter = [4, 128, 4096]
 # n_t_iter = [4, 8, 16, 32, 64, 128, 4096]
 # n_t_iter = [32, 64, 128, 256]
-# n_t_iter = [16, 32, 64, 128]
-n_t_iter = [32, 64, 128]
+# n_t_iter = [8, 16, 32, 64, 128]
+n_t_iter = [8, 32, 128]
 # n_t_iter = [16]
 
 
@@ -106,7 +123,9 @@ n_t_iter = [32, 64, 128]
 
 # alpha_0_norm = 5
 # dir_params_full = [None for __ in n_t_iter]
-alpha_0_norm_iter = [5]
+alpha_0_norm_iter = [6.25]
+# alpha_0_norm_iter = [4]
+# alpha_0_norm_iter = 6.25 * np.array([1e-3, 1])
 # alpha_0_norm_iter = [.005, 5]
 dir_params_full = [None for __ in range(len(n_t_iter) * len(alpha_0_norm_iter))]
 dir_predictors = []
@@ -122,8 +141,9 @@ for n_t in n_t_iter:
         dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=alpha_0_norm * n_t)
 
         # FIXME
-        # name_ = r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{n_t}$" + r", $\alpha_0 / |\mathcal{T}| = " + f"{alpha_0_norm}$"
-        name_ = r'$\mathrm{Dir}$, $\mathcal{T} = ' + f"{n_t}$" + r", $\alpha_0 / \mathcal{T} = " + f"{alpha_0_norm}$"
+        name_ = r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{n_t}$" + \
+                r", $\alpha_0 / |\mathcal{T}| = " + f"{alpha_0_norm}$"
+        # name_ = r'$\mathrm{Dir}$, $\mathcal{T} = ' + f"{n_t}$" + r", $\alpha_0 / \mathcal{T} = " + f"{alpha_0_norm}$"
 
         dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=[make_discretizer(supp_t)], name=name_)
 
@@ -180,17 +200,17 @@ n_mc = 5
 
 
 # # Sample regressor realizations
-# n_train = 256
+# n_train = 128
 # d = model.rvs(n_train + n_test, rng=seed)
 # d_train, d_test = np.split(d, [n_train])
-# x = np.linspace(0, 1, 10000)
+# x_plt = np.linspace(0, 1, 10000)
 #
 # img_path = img_dir + 'fit.png'
-# loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, x, verbose=True,
+# loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, x_plt, verbose=True,
 #                                      log_path=log_path, img_path=img_path)
 
 # # Prediction mean/variance, comparative
-# n_train = 256
+# n_train = 128
 #
 # img_path = img_dir + 'predict_T.png'
 # y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
@@ -210,7 +230,7 @@ n_mc = 5
 #                                                      log_path=log_path, img_path=img_path, rng=seed)
 
 # Squared-Error vs. training data volume N
-n_train = np.insert(2**np.arange(10), 0, 0)
+n_train = np.insert(2**np.arange(13), 0, 0)
 
 img_path = img_dir + 'risk_N_leg_T.png'
 y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
