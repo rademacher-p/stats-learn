@@ -35,15 +35,21 @@ img_dir = base_path + f'images/{get_now()}/'
 n_x = n_y = 128
 
 freq = 2
+
+# def clairvoyant_func(x):
+#     # y = np.sin(2*np.pi*freq*x)
+#     # y = np.where(y > 0, .75, .25)
+#     # return y
+#     return .5 + .35 * np.sin(2 * np.pi * freq * x)
+
+
 def clairvoyant_func(x):
-    # y = np.sin(2*np.pi*freq*x)
-    # y = np.where(y > 0, .75, .25)
-    # return y
-    return .5 + .35 * np.sin(2 * np.pi * freq * x)
+    y = np.sin(2 * np.pi * freq * x)
+    return .5 + np.where(y > 0, .3, -.3) - .3*y
 
 
 # var_y_x_const = 1/5
-var_y_x_const = 1/2  # FIXME
+var_y_x_const = 1/2
 
 
 supp_x = np.linspace(0, 1, n_x)
@@ -58,18 +64,24 @@ opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 #%% Learners
 
 # Dirichlet
+# def prior_func(x):
+#     # return .5 + .35*np.sin(2*np.pi*freq*x)
+#     y = np.sin(2 * np.pi * freq * x)
+#     y = np.where(y > 0, .75, .25)
+#     return y
+
 def prior_func(x):
     # return .5 + .35*np.sin(2*np.pi*freq*x)
-    y = np.sin(2 * np.pi * freq * x)
-    y = np.where(y > 0, .75, .25)
-    return y
+    y = np.sin(2*np.pi*freq*x)
+    a = .25
+    return np.where(y > 0, .5 + a, .5 - a)
 
 
 prior_mean = rand_models.DataConditional.from_func_mean(n_y, alpha_y_x, prior_func, model_x)
 dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
 
 dir_predictor = BayesRegressor(dir_model, space=model.space, name=r'$\mathrm{Dir}$')
-# dir_params = {'alpha_0': [1e-5, 500]}
+
 dir_params = {'alpha_0': [8e-5, 800]}
 
 
@@ -140,7 +152,7 @@ n_mc = 5
 #                                                  log_path=log_path, img_path=img_path, rng=seed)
 
 # Squared-Error vs. training data volume N
-n_train = np.insert(2**np.arange(10), 0, 0)
+n_train = np.insert(2**np.arange(13), 0, 0)
 
 img_path = img_dir + 'risk_N.png'
 y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
