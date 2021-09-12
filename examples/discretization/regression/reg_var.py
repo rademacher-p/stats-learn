@@ -66,7 +66,7 @@ def clairvoyant_func(x):
 
 
 # var_y_x_const = 1/5
-var_y_x_const = 1/2  # FIXME
+var_y_x_const = 1/2
 
 
 alpha_y_x = 1/var_y_x_const - 1
@@ -156,7 +156,7 @@ for n_t in n_t_iter:
 
 # PyTorch
 weight_decays = [0., 1e-3]  # controls L2 regularization
-weight_decays = [1e-3]  # FIXME
+# weight_decays = [1e-3]  # FIXME
 
 proc_funcs = {'pre': [], 'post': [make_clipper(model_x.lims)]}
 
@@ -204,7 +204,7 @@ n_mc = 5
 
 
 # Sample regressor realizations
-n_train = 4096
+n_train = 128
 d = model.rvs(n_train + n_test, rng=seed)
 d_train, d_test = np.split(d, [n_train])
 x_plt = np.linspace(0, 1, 10000)
