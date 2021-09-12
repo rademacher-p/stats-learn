@@ -88,8 +88,9 @@ dir_params_full = [None for __ in n_t_iter]
 dir_predictors = []
 for n_t in n_t_iter:
     supp_t = np.linspace(*model_x.lims, n_t)
+    counts = prob_disc(supp_t.shape)
 
-    prior_mean_x = rand_elements.DataEmpirical(supp_t, counts=prob_disc(supp_t.shape), space=model_x.space)
+    prior_mean_x = rand_elements.DataEmpirical(supp_t, counts, space=model_x.space)
     prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x,
                                         model_x=prior_mean_x)
 
