@@ -51,6 +51,27 @@ n_t_iter = [4, 128, 4096]
 # n_t_iter = 2 ** np.arange(1, 14)
 
 
+alpha_0_norm = .1
+# alpha_0_norm = 250
+dir_params_full = [None for __ in n_t_iter]
+dir_predictors = []
+for n_t in n_t_iter:
+    supp_t = np.linspace(*model_x.lims, n_t)
+    counts = prob_disc(supp_t.shape)
+
+    prior_mean_x = rand_elements.DataEmpirical(supp_t, counts, space=model_x.space)
+    prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x,
+                                        model_x=prior_mean_x)
+
+    dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=alpha_0_norm * n_t)
+
+    name_ = r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{n_t}$" + r", $\alpha_0 / |\mathcal{T}| = " + f"{alpha_0_norm}$"
+
+    dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=[make_discretizer(supp_t)], name=name_)
+
+    dir_predictors.append(dir_predictor)
+
+
 # scale_alpha = True  # interpret `alpha_0` parameter as normalized w.r.t. discretization cardinality
 # # scale_alpha = False
 #
@@ -80,27 +101,6 @@ n_t_iter = [4, 128, 4096]
 #     if scale_alpha and _params is not None:
 #         # _params['alpha_0'] *= n_t
 #         _params['alpha_0'] = n_t * np.array(_params['alpha_0'])
-
-
-alpha_0_norm = .1
-# alpha_0_norm = 250
-dir_params_full = [None for __ in n_t_iter]
-dir_predictors = []
-for n_t in n_t_iter:
-    supp_t = np.linspace(*model_x.lims, n_t)
-    counts = prob_disc(supp_t.shape)
-
-    prior_mean_x = rand_elements.DataEmpirical(supp_t, counts, space=model_x.space)
-    prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x,
-                                        model_x=prior_mean_x)
-
-    dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=alpha_0_norm * n_t)
-
-    name_ = r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{n_t}$" + r", $\alpha_0 / |\mathcal{T}| = " + f"{alpha_0_norm}$"
-
-    dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=[make_discretizer(supp_t)], name=name_)
-
-    dir_predictors.append(dir_predictor)
 
 
 # Normal-prior LR
