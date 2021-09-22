@@ -1,9 +1,8 @@
 import math
-from copy import deepcopy
 # import pickle
 
 import numpy as np
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 
 from sklearn.neural_network import MLPRegressor
 
@@ -53,8 +52,7 @@ shape_x = ()
 size_x = math.prod(shape_x)
 lims_x = np.broadcast_to([0, 1], (*shape_x, 2))
 
-# w_model = [.5]
-w_model = [0, 1]
+w_model = [.5]
 
 nonlinear_model = funcs.make_inv_trig(shape_x)
 # nonlinear_model = funcs.make_rand_discrete(n_x, rng=seed)
@@ -72,14 +70,11 @@ model = rand_models.DataConditional.from_func_mean(n_x, alpha_y_x_d, nonlinear_m
 # model = rand_models.NormalLinear(weights=w_model, basis_y_x=None, cov_y_x=.1, model_x=model_x)
 
 
-do_bayes = False
-# do_bayes = True
-if do_bayes:
-    model_eval = bayes_models.Dirichlet(deepcopy(model), alpha_0=4e2)
-    opt_predictor = BayesRegressor(model_eval, name=r'$f^*$')
+# model = bayes_models.Dirichlet(model, alpha_0=4e2)
+if isinstance(model, bayes_models.Base):
+    opt_predictor = BayesRegressor(model, name=r'$f^*$')
 else:
-    model_eval = model
-    opt_predictor = ModelRegressor(model_eval, name=r'$f_{\Theta}(\theta)$')
+    opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 
 
 #%% Bayesian learners
@@ -112,27 +107,28 @@ dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
 dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=proc_funcs, name=r'$\mathrm{Dir}$')
 
 # dir_params = {}
-# dir_params = {'alpha_0': [10, 1000]}
+dir_params = {'alpha_0': [10, 1000]}
 # dir_params = {'alpha_0': [.001]}
 # dir_params = {'alpha_0': [20]}
 # dir_params = {'alpha_0': [.01, 100]}
-dir_params = {'alpha_0': [1e-5, 1e5]}
+# dir_params = {'alpha_0': [1e-5, 1e5]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': [40, 400, 4000]}
 # dir_params = {'alpha_0': 1e-6 + np.linspace(0, 20, 100)}
 # dir_params = {'alpha_0': np.logspace(-0., 5., 60)}
 # dir_params = {'alpha_0': np.logspace(-3., 3., 60)}
 
-if do_bayes:  # add true bayes model concentration
-    if model_eval.alpha_0 not in dir_params['alpha_0']:
-        dir_params['alpha_0'] = np.sort(np.concatenate((dir_params['alpha_0'], [model_eval.alpha_0])))
+
+if isinstance(model, bayes_models.Dirichlet):  # add true bayes model concentration
+    if model.alpha_0 not in dir_params['alpha_0']:
+        dir_params['alpha_0'] = np.sort(np.concatenate((dir_params['alpha_0'], [model.alpha_0])))
 
 
 # Normal learner
 
-# w_prior_norm = w_prior
+w_prior_norm = w_prior
 # w_prior_norm = [.5, *(0 for __ in range(n_x-1))]
-w_prior_norm = [.5, *(0 for __ in range(4))]
+# w_prior_norm = [.5, *(0 for __ in range(4))]
 basis_y_x = None
 
 # def make_delta_func(val):
@@ -154,8 +150,8 @@ norm_model = bayes_models.NormalLinear(prior_mean=w_prior_norm, prior_cov=.1, ba
 norm_predictor = BayesRegressor(norm_model, space=model.space, proc_funcs=proc_funcs, name=r'$\mathcal{N}$')
 
 # norm_params = {}
-# norm_params = {'prior_cov': [.1, .001]}
-norm_params = {'prior_cov': [1e6]}
+norm_params = {'prior_cov': [.1, .001]}
+# norm_params = {'prior_cov': [1e6]}
 # norm_params = {'prior_cov': [.1 / (.001 / n_x)]}
 # norm_params = {'prior_cov': [.1 / (20 / n_t)]}
 # norm_params = {'prior_cov': [100, .001]}
@@ -226,7 +222,7 @@ for weight_decay in weight_decays:
 
 #%% Results
 
-n_train = 128
+n_train = 400
 # n_train = [1, 4, 40, 400]
 # n_train = [20, 40, 200, 400, 2000]
 # n_train = np.insert(2**np.arange(11), 0, 0)
@@ -237,14 +233,14 @@ n_train = 128
 
 n_test = 1000
 
-n_mc = 1
+n_mc = 50
 
 
 temp = [
     (opt_predictor, None),
     (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
-    # (norm_predictor, norm_params),
+    (norm_predictor, norm_params),
     # (skl_predictor, None),
     # *((predictor, None) for predictor in lit_predictors),
 ]
@@ -257,16 +253,20 @@ log_path = 'temp/log.md'
 img_path = f'temp/images/{get_now()}.png'
 
 
-y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
+y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
                                                  log_path=log_path, img_path=img_path, rng=seed)
 
-# y_stats_full, loss_full = results.assess_compare(predictors, model_eval, params, n_train, n_test, n_mc,
-#                                                     plot_loss=True, print_loss=True,
-#                                                     verbose=True, log_path=log_path, img_path=img_path,)
+# y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
+#                                                  verbose=True, plot_loss=True, print_loss=True,
+#                                                  log_path=log_path, img_path=img_path, rng=seed)
 
 # results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
 #                          log_path=log_path, img_path=img_path)
+
+# y_stats_full, loss_full = dir_predictor.assess(model, dir_params, n_train, n_test, n_mc,
+#                                                verbose=True, plot_loss=True, print_loss=False,
+#                                                log_path=log_path, img_path=img_path, rng=seed)
 
 
 # with open(f'data/temp/{NOW_STR}.pkl', 'wb') as fid:

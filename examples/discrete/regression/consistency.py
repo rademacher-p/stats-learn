@@ -1,6 +1,3 @@
-# TODO: bayes figs?
-
-
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -38,15 +35,6 @@ model = rand_models.DataConditional.from_func_mean(n_y, alpha_y_x, clairvoyant_f
 
 opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 
-# do_bayes = False
-# # do_bayes = True
-# if do_bayes:
-#     model_eval = bayes_models.Dirichlet(deepcopy(model), alpha_0=4e2)
-#     opt_predictor = BayesRegressor(model_eval, name=r'$f^*$')
-# else:
-#     model_eval = model
-#     opt_predictor = ModelRegressor(model_eval, name=r'$f_{\Theta}(\theta)$')
-
 
 #%% Learners
 w_prior = [.5, 0]
@@ -58,10 +46,6 @@ dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
 dir_predictor = BayesRegressor(dir_model, space=model.space, name=r'$\mathrm{Dir}$')
 
 dir_params = {'alpha_0': [10, 1000]}
-
-# if do_bayes:  # add true bayes model concentration
-#     if model_eval.alpha_0 not in dir_params['alpha_0']:
-#         dir_params['alpha_0'] = np.sort(np.concatenate((dir_params['alpha_0'], [model_eval.alpha_0])))
 
 
 # Normal-prior LR
@@ -124,3 +108,5 @@ img_path = img_dir + 'risk_a0_leg_N.png'
 y_stats_full, loss_full = dir_predictor.assess(model, {'alpha_0': np.logspace(0., 5., 100)}, n_train, n_test, n_mc,
                                                verbose=True, plot_loss=True, print_loss=True, log_path=log_path,
                                                img_path=img_path, rng=seed)
+
+plt.gca().set_xscale('log')
