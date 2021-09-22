@@ -57,7 +57,10 @@ def _log_and_fig(message, log_path, ax, img_path):
         img_path = Path(img_path)
         img_path.parent.mkdir(parents=True, exist_ok=True)
 
-        file_format += f"\n![]({img_path.absolute().as_posix()})\n"
+        log_path = Path(log_path)
+        # str_ = img_path.absolute().as_posix()
+        str_ = img_path.relative_to(log_path.parent)
+        file_format += f"\n![]({str_})\n"
 
         fig = ax.figure
         fig.savefig(img_path)
