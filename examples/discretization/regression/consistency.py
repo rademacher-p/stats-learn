@@ -1,8 +1,6 @@
 # TODO: CLEANUP
 
 
-from copy import deepcopy
-
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -75,13 +73,12 @@ for n_t in n_t_iter:
 # scale_alpha = True  # interpret `alpha_0` parameter as normalized w.r.t. discretization cardinality
 # # scale_alpha = False
 #
-# # dir_params = None
 # # dir_params = {'alpha_0': [10]}
 # # dir_params = {'alpha_0': [.1]}
 # dir_params = {'alpha_0': [.1, 10]}
 # # dir_params = {'alpha_0': np.logspace(-3, 3, 60)}
 #
-# dir_params_full = [deepcopy(dir_params) for __ in n_t_iter]
+# dir_params_full = [dir_params.copy() for __ in n_t_iter]
 # dir_predictors = []
 # for n_t, _params in zip(n_t_iter, dir_params_full):
 #     supp_t = np.linspace(*model_x.lims, n_t)
