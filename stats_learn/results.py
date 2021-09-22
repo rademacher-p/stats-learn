@@ -337,9 +337,10 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
         _plot_stats(y_stats_full, space_x, predictors, params_full, n_train, x, ax)
         ax = plt.gca()
     elif do_loss and plot_loss:
-        do_bayes = isinstance(model, bayes_models.Base)
-        _plot_risk_eval_compare(loss_full, do_bayes, predictors, params_full, n_train, ax)
+        _plot_risk_eval_compare(loss_full, predictors, params_full, n_train, ax)
         ax = plt.gca()
+        if isinstance(model, bayes_models.Base):
+            ax.set(ylabel=r'$\mathcal{R}(f)$')  # different notation for bayes risk
     else:
         img_path = None
 
@@ -555,7 +556,7 @@ def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, 
     return loss_full
 
 
-def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train: Union[int, Iterable] = 0, ax=None):
+def _plot_risk_eval_compare(losses, predictors, params=None, n_train: Union[int, Iterable] = 0, ax=None):
     if params is None:
         params_full = [{} for _ in predictors]
     else:
@@ -565,11 +566,7 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train: 
 
     if ax is None:
         _, ax = plt.subplots()
-        if do_bayes:
-            ylabel = r'$\mathcal{R}(f)$'
-        else:
-            ylabel = r'$\mathcal{R}_{\Theta}(f;\theta)$'
-        ax.set(ylabel=ylabel)
+        ax.set(ylabel=r'$\mathcal{R}_{\Theta}(f;\theta)$')
 
     out = []
     if len(predictors) == 1:

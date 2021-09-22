@@ -167,3 +167,5 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
 # y_stats_full, loss_full = dir_predictor.assess(model, {'alpha_0': np.logspace(0., 5., 60)}, n_train, n_test, n_mc,
 #                                                verbose=True, plot_loss=True, print_loss=True, log_path=log_path,
 #                                                img_path=img_path, rng=seed)
+#
+# plt.gca().set_xscale('log')
