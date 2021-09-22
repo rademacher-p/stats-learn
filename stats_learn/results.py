@@ -59,7 +59,7 @@ def _log_and_fig(message, log_path, ax, img_path):
 
         log_path = Path(log_path)
         # str_ = img_path.absolute().as_posix()
-        str_ = img_path.relative_to(log_path.parent)
+        str_ = img_path.relative_to(log_path.parent).as_posix()
         file_format += f"\n![]({str_})\n"
 
         fig = ax.figure
