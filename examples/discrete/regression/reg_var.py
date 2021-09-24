@@ -33,6 +33,7 @@ img_dir = base_path + f'images/{get_now()}/'
 
 #%% Model and optimal predictor
 n_x = n_y = 128
+n_x = n_y = 32  # FIXME
 
 freq = 2
 
@@ -49,7 +50,8 @@ def clairvoyant_func(x):
 
 
 # var_y_x_const = 1/5
-var_y_x_const = 1/2
+# var_y_x_const = 1/2
+var_y_x_const = .8
 
 
 supp_x = np.linspace(0, 1, n_x)
@@ -73,7 +75,8 @@ opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 def prior_func(x):
     # return .5 + .35*np.sin(2*np.pi*freq*x)
     y = np.sin(2*np.pi*freq*x)
-    a = .25
+    # a = .25
+    a = .15
     return np.where(y > 0, .5 + a, .5 - a)
 
 
@@ -82,12 +85,16 @@ dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
 
 dir_predictor = BayesRegressor(dir_model, space=model.space, name=r'$\mathrm{Dir}$')
 
-dir_params = {'alpha_0': [8e-5, 800]}
+# dir_params = {'alpha_0': [8e-5, 800]}
+# dir_params = {'alpha_0': [5e-5, 500]}
+# dir_params = {'alpha_0': [1e-5, 120]}
+# dir_params = {'alpha_0': [1e-5, 2e3]}
+dir_params = {'alpha_0': [1e-5, 6e2]}
 
 
 # PyTorch
 weight_decays = [0., 1e-3]  # controls L2 regularization
-# weight_decays = [1e-3]  # FIXME
+weight_decays = [1e-3]  # FIXME
 
 proc_funcs = {'pre': [], 'post': [make_clipper([min(supp_x), max(supp_x)])]}
 
@@ -100,7 +107,8 @@ for weight_decay in weight_decays:
     lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {weight_decay}$"
 
     trainer_params = {
-        'max_epochs': 50000,
+        # 'max_epochs': 50000,
+        'max_epochs': 100000,
         'callbacks': EarlyStopping('train_loss', min_delta=1e-4, patience=10000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
         # 'logger': False,
@@ -144,7 +152,7 @@ n_mc = 5
 # loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, log_path=log_path, img_path=img_path)
 
 # # Prediction mean/variance, comparative
-# n_train = 128
+# n_train = 256
 #
 # img_path = img_dir + 'predict_full.png'
 # y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
@@ -152,7 +160,7 @@ n_mc = 5
 #                                                  log_path=log_path, img_path=img_path, rng=seed)
 
 # Squared-Error vs. training data volume N
-n_train = np.insert(2**np.arange(13), 0, 0)
+n_train = np.insert(2**np.arange(12), 0, 0)
 
 img_path = img_dir + 'risk_N.png'
 y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
