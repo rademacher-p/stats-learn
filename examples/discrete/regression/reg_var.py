@@ -75,8 +75,8 @@ opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 def prior_func(x):
     # return .5 + .35*np.sin(2*np.pi*freq*x)
     y = np.sin(2*np.pi*freq*x)
-    # a = .25
-    a = .15
+    a = .25
+    # a = .15
     return np.where(y > 0, .5 + a, .5 - a)
 
 
@@ -89,12 +89,13 @@ dir_predictor = BayesRegressor(dir_model, space=model.space, name=r'$\mathrm{Dir
 # dir_params = {'alpha_0': [5e-5, 500]}
 # dir_params = {'alpha_0': [1e-5, 120]}
 # dir_params = {'alpha_0': [1e-5, 2e3]}
-dir_params = {'alpha_0': [1e-5, 6e2]}
+# dir_params = {'alpha_0': [1e-5, 6e2]}  # 32pt, a=.15 prior
+dir_params = {'alpha_0': [1e-5, 220]}  # 32pt, a=.25 prior
 
 
 # PyTorch
 weight_decays = [0., 1e-3]  # controls L2 regularization
-weight_decays = [1e-3]  # FIXME
+# weight_decays = [1e-3]  # FIXME
 
 proc_funcs = {'pre': [], 'post': [make_clipper([min(supp_x), max(supp_x)])]}
 
@@ -139,7 +140,7 @@ predictors, params = zip(*temp)
 
 #%% Results
 n_test = 1000
-n_mc = 5
+n_mc = 10
 
 
 # # Sample regressor realizations
