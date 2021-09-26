@@ -50,8 +50,8 @@ def clairvoyant_func(x):
 
 
 # var_y_x_const = 1/5
-# var_y_x_const = 1/2
-var_y_x_const = .8
+var_y_x_const = 1/2
+# var_y_x_const = .8  # FIXME
 
 
 supp_x = np.linspace(0, 1, n_x)
@@ -89,13 +89,15 @@ dir_predictor = BayesRegressor(dir_model, space=model.space, name=r'$\mathrm{Dir
 # dir_params = {'alpha_0': [5e-5, 500]}
 # dir_params = {'alpha_0': [1e-5, 120]}
 # dir_params = {'alpha_0': [1e-5, 2e3]}
-# dir_params = {'alpha_0': [1e-5, 6e2]}  # 32pt, a=.15 prior
-dir_params = {'alpha_0': [1e-5, 220]}  # 32pt, a=.25 prior
+# dir_params = {'alpha_0': [1e-5, 6e2]}  # 32pt, var_c=.8, a=.15 prior
+# dir_params = {'alpha_0': [1e-5, 220]}  # 32pt, var_c=.8, a=.25 prior
+dir_params = {'alpha_0': [1e-5, 125]}  # 32pt, var_c=.5, a=.25 prior
 
 
 # PyTorch
 weight_decays = [0., 1e-3]  # controls L2 regularization
 # weight_decays = [1e-3]  # FIXME
+weight_decays = [0, 1e-3, 3e-3]
 
 proc_funcs = {'pre': [], 'post': [make_clipper([min(supp_x), max(supp_x)])]}
 
@@ -140,7 +142,7 @@ predictors, params = zip(*temp)
 
 #%% Results
 n_test = 1000
-n_mc = 10
+n_mc = 5
 
 
 # # Sample regressor realizations
@@ -152,21 +154,21 @@ n_mc = 10
 # img_path = img_dir + 'fit.png'
 # loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, log_path=log_path, img_path=img_path)
 
-# # Prediction mean/variance, comparative
-# n_train = 256
+# Prediction mean/variance, comparative
+n_train = 128
+
+img_path = img_dir + 'predict_full.png'
+y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
+                                                 stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
+                                                 log_path=log_path, img_path=img_path, rng=seed)
+
+# # Squared-Error vs. training data volume N
+# n_train = np.insert(2**np.arange(12), 0, 0)
 #
-# img_path = img_dir + 'predict_full.png'
-# y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
-#                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
-#                                                  log_path=log_path, img_path=img_path, rng=seed)
-
-# Squared-Error vs. training data volume N
-n_train = np.insert(2**np.arange(12), 0, 0)
-
-img_path = img_dir + 'risk_N.png'
-y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
-                                                 plot_loss=True, print_loss=True, log_path=log_path,
-                                                 img_path=img_path, rng=seed)
+# img_path = img_dir + 'risk_N.png'
+# y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
+#                                                  plot_loss=True, print_loss=True, log_path=log_path,
+#                                                  img_path=img_path, rng=seed)
 
 
 # # Squared-Error vs. prior localization alpha_0
