@@ -76,7 +76,6 @@ def prior_func(x):
     # return .5 + .35*np.sin(2*np.pi*freq*x)
     y = np.sin(2*np.pi*freq*x)
     a = .25
-    # a = .15
     return np.where(y > 0, .5 + a, .5 - a)
 
 
@@ -97,7 +96,7 @@ dir_params = {'alpha_0': [1e-5, 125]}  # 32pt, var_c=.5, a=.25 prior
 # PyTorch
 weight_decays = [0., 1e-3]  # controls L2 regularization
 # weight_decays = [1e-3]  # FIXME
-weight_decays = [0, 1e-3, 3e-3]
+# weight_decays = [0, 3e-3]
 
 proc_funcs = {'pre': [], 'post': [make_clipper([min(supp_x), max(supp_x)])]}
 
