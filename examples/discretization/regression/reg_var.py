@@ -90,14 +90,14 @@ def prior_func(x):
 # n_t_iter = [4, 8, 16, 32, 64, 128, 4096]
 # n_t_iter = [32, 64, 128, 256]
 # n_t_iter = [8, 16, 32, 64, 128]
-n_t_iter = [8, 32, 128]
-# n_t_iter = [32]
+# n_t_iter = [8, 32, 128]
+n_t_iter = [32]
 
 
 # alpha_0_norm = 5
 # dir_params_full = [None for __ in n_t_iter]
-alpha_0_norm_iter = [6.25]
-# alpha_0_norm_iter = 6.25 * np.array([1e-3, 1])
+# alpha_0_norm_iter = [6.25]
+alpha_0_norm_iter = 6.25 * np.array([1e-3, 1])
 # alpha_0_norm_iter = [4]
 # alpha_0_norm_iter = [.005, 5]
 dir_params_full = [None for __ in range(len(n_t_iter) * len(alpha_0_norm_iter))]
@@ -157,6 +157,7 @@ for n_t in n_t_iter:
 # PyTorch
 weight_decays = [0., 1e-3]  # controls L2 regularization
 # weight_decays = [1e-3]  # FIXME
+weight_decays = [0., 3e-3]
 
 proc_funcs = {'pre': [], 'post': [make_clipper(model_x.lims)]}
 
@@ -214,7 +215,7 @@ n_mc = 5
 #                                      log_path=log_path, img_path=img_path)
 
 # # Prediction mean/variance, comparative
-# n_train = 128
+# n_train = 64
 #
 # img_path = img_dir + 'predict_T.png'
 # y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
@@ -232,7 +233,7 @@ n_mc = 5
 #                                                    log_path=log_path, img_path=img_path, rng=seed)
 
 # Squared-Error vs. training data volume N
-n_train = np.insert(2**np.arange(13), 0, 0)
+n_train = np.insert(2**np.arange(12), 0, 0)
 
 img_path = img_dir + 'risk_N_leg_T.png'
 y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
