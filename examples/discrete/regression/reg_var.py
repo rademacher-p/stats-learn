@@ -76,7 +76,6 @@ def prior_func(x):
     # return .5 + .35*np.sin(2*np.pi*freq*x)
     y = np.sin(2*np.pi*freq*x)
     a = .25
-    # a = .15
     return np.where(y > 0, .5 + a, .5 - a)
 
 
@@ -95,9 +94,10 @@ dir_params = {'alpha_0': [1e-5, 125]}  # 32pt, var_c=.5, a=.25 prior
 
 
 # PyTorch
-weight_decays = [0., 1e-3]  # controls L2 regularization
+# weight_decays = [0., 1e-3]  # controls L2 regularization
 # weight_decays = [1e-3]  # FIXME
-weight_decays = [0, 1e-3, 3e-3]
+# weight_decays = [0, 3e-3]
+weight_decays = [1e-3]
 
 proc_funcs = {'pre': [], 'post': [make_clipper([min(supp_x), max(supp_x)])]}
 
@@ -110,7 +110,6 @@ for weight_decay in weight_decays:
     lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {weight_decay}$"
 
     trainer_params = {
-        # 'max_epochs': 50000,
         'max_epochs': 100000,
         'callbacks': EarlyStopping('train_loss', min_delta=1e-4, patience=10000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
@@ -134,7 +133,7 @@ for weight_decay in weight_decays:
 #
 temp = [
     (opt_predictor, None),
-    (dir_predictor, dir_params),
+    # (dir_predictor, dir_params),
     *((predictor, None) for predictor in lit_predictors),
 ]
 predictors, params = zip(*temp)

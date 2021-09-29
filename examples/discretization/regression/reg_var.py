@@ -90,13 +90,16 @@ def prior_func(x):
 # n_t_iter = [4, 8, 16, 32, 64, 128, 4096]
 # n_t_iter = [32, 64, 128, 256]
 # n_t_iter = [8, 16, 32, 64, 128]
-n_t_iter = [8, 32, 128]
-# n_t_iter = [32]
+# n_t_iter = [8, 32, 128]
+n_t_iter = [16]
+# n_t_iter = [16, 32, 64]
+# n_t_iter = 2 ** np.arange(1, 8)
 
 
 # alpha_0_norm = 5
 # dir_params_full = [None for __ in n_t_iter]
-alpha_0_norm_iter = [6.25]
+# alpha_0_norm_iter = [6.25]
+alpha_0_norm_iter = [1e-6, 4.5]
 # alpha_0_norm_iter = 6.25 * np.array([1e-3, 1])
 # alpha_0_norm_iter = [4]
 # alpha_0_norm_iter = [.005, 5]
@@ -118,7 +121,6 @@ for n_t in n_t_iter:
         # FIXME
         name_ = r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{n_t}$" + \
                 r", $\alpha_0 / |\mathcal{T}| = " + f"{alpha_0_norm}$"
-        # name_ = r'$\mathrm{Dir}$, $\mathcal{T} = ' + f"{n_t}$" + r", $\alpha_0 / \mathcal{T} = " + f"{alpha_0_norm}$"
 
         dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=[make_discretizer(supp_t)], name=name_)
 
@@ -157,6 +159,7 @@ for n_t in n_t_iter:
 # PyTorch
 weight_decays = [0., 1e-3]  # controls L2 regularization
 # weight_decays = [1e-3]  # FIXME
+weight_decays = [0., 3e-3]
 
 proc_funcs = {'pre': [], 'post': [make_clipper(model_x.lims)]}
 
@@ -169,7 +172,7 @@ for weight_decay in weight_decays:
     lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {weight_decay}$"
 
     trainer_params = {
-        'max_epochs': 50000,
+        'max_epochs': 100000,
         'callbacks': EarlyStopping('train_loss', min_delta=1e-3, patience=10000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
         # 'logger': False,
@@ -182,8 +185,8 @@ for weight_decay in weight_decays:
 
     def reset_func(model_):
         model_.apply(reset_weights)
-        with torch.no_grad():
-            model_.model[-1].bias.fill_(.5)
+        # with torch.no_grad():
+        #     model_.model[-1].bias.fill_(.5)  # FIXME: use the .5 init??
 
     lit_predictor = LitWrapper(lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name)
     lit_predictors.append(lit_predictor)
@@ -204,7 +207,7 @@ n_mc = 5
 
 
 # # Sample regressor realizations
-# n_train = 512
+# n_train = 128
 # d = model.rvs(n_train + n_test, rng=seed)
 # d_train, d_test = np.split(d, [n_train])
 # x_plt = np.linspace(0, 1, 10000)
@@ -232,7 +235,7 @@ n_mc = 5
 #                                                    log_path=log_path, img_path=img_path, rng=seed)
 
 # Squared-Error vs. training data volume N
-n_train = np.insert(2**np.arange(13), 0, 0)
+n_train = np.insert(2**np.arange(12), 0, 0)
 
 img_path = img_dir + 'risk_N_leg_T.png'
 y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
@@ -240,13 +243,31 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
                                                  img_path=img_path, rng=seed)
 
 # # Squared-Error vs. prior localization alpha_0
-# n_train = 32
+# n_train = 128
 #
 # img_path = img_dir + 'risk_a0norm_leg_T.png'
 # y_stats_full, loss_full = results.assess_compare(dir_predictors, model, dir_params_full, n_train, n_test, n_mc,
 #                                                  verbose=True, plot_loss=True, print_loss=True, log_path=log_path,
 #                                                  img_path=img_path, rng=seed)
 #
+# ax = plt.gca()
+# if ax.get_xlabel() == r'$\alpha_0$':  # scale alpha axis, find localization minimum
+#     ax.set_xscale('log')
+#     lines = ax.get_lines()
+#     for line in lines:
+#         x_, y_ = line.get_data()
+#         if scale_alpha:
+#             label = line.get_label()
+#             _n_t = int(label[label.find('=')+1:-1])
+#             x_ /= _n_t
+#             line.set_data(x_, y_)
+#
+#     if scale_alpha:
+#         ax.set_xlabel(r'$\alpha_0 / |\mathcal{T}|$')
+#         _vals = dir_params['alpha_0']
+#         ax.set_xlim((min(_vals), max(_vals)))
+
+
 # do_argmin = False
 # # do_argmin = True
 # ax = plt.gca()
@@ -269,3 +290,9 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
 #         ax.set_xlabel(r'$\alpha_0 / |\mathcal{T}|$')
 #         _vals = dir_params['alpha_0']
 #         ax.set_xlim((min(_vals), max(_vals)))
+
+
+# n_train = [16, 128, 512]
+# # n_train = 400
+# results.plot_risk_disc(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, ax=None)
+# plt.xscale('log', base=2)
