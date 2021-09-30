@@ -24,7 +24,7 @@ from stats_learn.predictors.torch import LitMLP, LitWrapper, reset_weights
 plt.style.use('../../../images/style.mplstyle')
 
 # seed = None
-seed = 12345
+seed = 123456
 
 if seed is not None:
     seed_everything(seed)  # PyTorch-Lightning seeding
@@ -100,6 +100,7 @@ n_t_iter = [16]
 # dir_params_full = [None for __ in n_t_iter]
 # alpha_0_norm_iter = [6.25]
 alpha_0_norm_iter = [1e-6, 4.5]
+# alpha_0_norm_iter = [4.5]
 # alpha_0_norm_iter = 6.25 * np.array([1e-3, 1])
 # alpha_0_norm_iter = [4]
 # alpha_0_norm_iter = [.005, 5]
@@ -157,9 +158,10 @@ for n_t in n_t_iter:
 
 
 # PyTorch
-weight_decays = [0., 1e-3]  # controls L2 regularization
+# weight_decays = [0., 1e-3]  # controls L2 regularization
 # weight_decays = [1e-3]  # FIXME
 weight_decays = [0., 3e-3]
+# weight_decays = [3e-3]
 
 proc_funcs = {'pre': [], 'post': [make_clipper(model_x.lims)]}
 
@@ -206,15 +208,15 @@ n_test = 1000
 n_mc = 5
 
 
-# # Sample regressor realizations
-# n_train = 128
-# d = model.rvs(n_train + n_test, rng=seed)
-# d_train, d_test = np.split(d, [n_train])
-# x_plt = np.linspace(0, 1, 10000)
-#
-# img_path = img_dir + 'fit.png'
-# loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, x_plt, verbose=True,
-#                                      log_path=log_path, img_path=img_path)
+# Sample regressor realizations
+n_train = 128
+d = model.rvs(n_train + n_test, rng=seed)
+d_train, d_test = np.split(d, [n_train])
+x_plt = np.linspace(0, 1, 10000)
+
+img_path = img_dir + 'fit.png'
+loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, x_plt, verbose=True,
+                                     log_path=log_path, img_path=img_path)
 
 # # Prediction mean/variance, comparative
 # n_train = 128
@@ -234,13 +236,13 @@ n_mc = 5
 #                                                    verbose=True, plot_stats=True, print_loss=True,
 #                                                    log_path=log_path, img_path=img_path, rng=seed)
 
-# Squared-Error vs. training data volume N
-n_train = np.insert(2**np.arange(12), 0, 0)
-
-img_path = img_dir + 'risk_N_leg_T.png'
-y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
-                                                 plot_loss=True, print_loss=True, log_path=log_path,
-                                                 img_path=img_path, rng=seed)
+# # Squared-Error vs. training data volume N
+# n_train = np.insert(2**np.arange(12), 0, 0)
+#
+# img_path = img_dir + 'risk_N_leg_T.png'
+# y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
+#                                                  plot_loss=True, print_loss=True, log_path=log_path,
+#                                                  img_path=img_path, rng=seed)
 
 # # Squared-Error vs. prior localization alpha_0
 # n_train = 128
