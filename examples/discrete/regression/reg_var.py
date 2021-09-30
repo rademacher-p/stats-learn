@@ -32,7 +32,7 @@ img_dir = base_path + f'images/{get_now()}/'
 
 
 #%% Model and optimal predictor
-n_x = n_y = 128
+# n_x = n_y = 128
 n_x = n_y = 32  # FIXME
 
 freq = 2
@@ -96,8 +96,8 @@ dir_params = {'alpha_0': [1e-5, 125]}  # 32pt, var_c=.5, a=.25 prior
 # PyTorch
 # weight_decays = [0., 1e-3]  # controls L2 regularization
 # weight_decays = [1e-3]  # FIXME
-# weight_decays = [0, 3e-3]
-weight_decays = [1e-3]
+weight_decays = [0, 3e-3]
+# weight_decays = [3e-3]
 
 proc_funcs = {'pre': [], 'post': [make_clipper([min(supp_x), max(supp_x)])]}
 
@@ -123,8 +123,8 @@ for weight_decay in weight_decays:
 
     def reset_func(model_):
         model_.apply(reset_weights)
-        with torch.no_grad():
-            model_.model[-1].bias.fill_(.5)
+        # with torch.no_grad():
+        #     model_.model[-1].bias.fill_(.5)
 
     lit_predictor = LitWrapper(lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name)
     lit_predictors.append(lit_predictor)
@@ -133,7 +133,7 @@ for weight_decay in weight_decays:
 #
 temp = [
     (opt_predictor, None),
-    # (dir_predictor, dir_params),
+    (dir_predictor, dir_params),
     *((predictor, None) for predictor in lit_predictors),
 ]
 predictors, params = zip(*temp)
@@ -144,22 +144,22 @@ n_test = 1000
 n_mc = 5
 
 
-# # Sample regressor realizations
-# n_train = 128
-#
-# d = model.rvs(n_train + n_test, rng=seed)
-# d_train, d_test = np.split(d, [n_train])
-#
-# img_path = img_dir + 'fit.png'
-# loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, log_path=log_path, img_path=img_path)
-
-# Prediction mean/variance, comparative
+# Sample regressor realizations
 n_train = 128
 
-img_path = img_dir + 'predict_full.png'
-y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
-                                                 stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
-                                                 log_path=log_path, img_path=img_path, rng=seed)
+d = model.rvs(n_train + n_test, rng=seed)
+d_train, d_test = np.split(d, [n_train])
+
+img_path = img_dir + 'fit.png'
+loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, log_path=log_path, img_path=img_path)
+
+# # Prediction mean/variance, comparative
+# n_train = 128
+#
+# img_path = img_dir + 'predict_full.png'
+# y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
+#                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
+#                                                  log_path=log_path, img_path=img_path, rng=seed)
 
 # # Squared-Error vs. training data volume N
 # n_train = np.insert(2**np.arange(12), 0, 0)
