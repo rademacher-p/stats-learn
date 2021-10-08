@@ -16,7 +16,7 @@ from stats_learn.util import plotting, spaces
 from stats_learn.util.base import DELTA, RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func
 
 
-#%% Base RE classes
+# %% Base RE classes
 
 class Base(RandomGeneratorMixin):
     """
@@ -100,7 +100,7 @@ class BaseRV(MixinRV, Base):
         # self._cov = None
 
 
-#%% Specific RE's
+# %% Specific RE's
 
 class Deterministic(Base):
     """

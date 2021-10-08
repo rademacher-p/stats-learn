@@ -214,7 +214,7 @@ class Finite(Discrete):
     pass
 
 
-#%%
+# %%
 
 
 # class Categorical(Finite):
@@ -473,7 +473,7 @@ class FiniteGeneric(Finite):
             raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
 
 
-#%%
+# %%
 class Continuous(Base):
     def __init__(self, shape):
         super().__init__(shape, np.float64)
@@ -610,7 +610,7 @@ class Euclidean(Box):
         self._x_plt = None
 
 
-#%%
+# %%
 
 # TODO: add integration and mode finding
 

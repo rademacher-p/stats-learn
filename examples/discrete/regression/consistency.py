@@ -22,7 +22,7 @@ log_path = base_path + 'log.md'
 img_dir = base_path + f'images/{get_now()}/'
 
 
-#%% Model and optimal predictor
+# %% Model and optimal predictor
 n_x = n_y = 128
 clairvoyant_func = funcs.make_inv_trig()
 var_y_x_const = 1/5
@@ -36,7 +36,7 @@ model = rand_models.DataConditional.from_func_mean(n_y, alpha_y_x, clairvoyant_f
 opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 
 
-#%% Learners
+# %% Learners
 w_prior = [.5, 0]
 
 # Dirichlet
@@ -65,7 +65,7 @@ temp = [
 predictors, params = zip(*temp)
 
 
-#%% Results
+# %% Results
 n_test = 1000
 n_mc = 5
 

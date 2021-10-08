@@ -14,7 +14,7 @@ from stats_learn.util import spaces
 from stats_learn.util.base import RandomGeneratorMixin, vectorize_func
 
 
-#%% Priors
+# %% Priors
 
 # TODO: Add deterministic DEP to effect a DP realization and sample!!
 

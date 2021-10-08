@@ -31,9 +31,8 @@ log_path = base_path + 'log.md'
 img_dir = base_path + f'images/{get_now()}/'
 
 
-#%% Model and optimal predictor
-# n_x = n_y = 128
-n_x = n_y = 32  # FIXME
+# %% Model and optimal predictor
+n_x = n_y = 32
 
 freq = 2
 
@@ -51,7 +50,6 @@ def clairvoyant_func(x):
 
 # var_y_x_const = 1/5
 var_y_x_const = 1/2
-# var_y_x_const = .8  # FIXME
 
 
 supp_x = np.linspace(0, 1, n_x)
@@ -63,7 +61,7 @@ model = rand_models.DataConditional.from_func_mean(n_y, alpha_y_x, clairvoyant_f
 opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 
 
-#%% Learners
+# %% Learners
 
 # Dirichlet
 # def prior_func(x):
@@ -94,10 +92,7 @@ dir_params = {'alpha_0': [1e-5, 125]}  # 32pt, var_c=.5, a=.25 prior
 
 
 # PyTorch
-# weight_decays = [0., 1e-3]  # controls L2 regularization
-# weight_decays = [1e-3]  # FIXME
-weight_decays = [0, 3e-3]
-# weight_decays = [3e-3]
+weight_decays = [0, 3e-3]  # controls L2 regularization
 
 proc_funcs = {'pre': [], 'post': [make_clipper([min(supp_x), max(supp_x)])]}
 
@@ -139,7 +134,7 @@ temp = [
 predictors, params = zip(*temp)
 
 
-#%% Results
+# %% Results
 n_test = 1000
 n_mc = 5
 
