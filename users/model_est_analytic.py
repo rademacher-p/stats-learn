@@ -16,7 +16,7 @@ else:
 
 
 
-#%% Model and prior mean
+# %% Model and prior mean
 n_x = 60
 
 n = 500
@@ -28,7 +28,7 @@ alpha = rand_elements.EmpiricalScalar(.3, n_x)
 alpha_x = .5
 
 
-#%% Make axes, plot model
+# %% Make axes, plot model
 space = spaces.check_spaces([model, alpha])
 y = space.x_plt
 __, ax = plt.subplots()
@@ -37,7 +37,7 @@ model_pf = model.pf(y)
 space.plot_xy(y, model_pf, y_std=np.zeros(y.shape), ax=ax, label=str_p_opt)
 
 
-#%% Plot learner bias/var
+# %% Plot learner bias/var
 
 # for n in [1, 100]:
 for alpha_0 in [.1, 10]:

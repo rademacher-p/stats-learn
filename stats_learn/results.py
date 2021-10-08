@@ -26,7 +26,7 @@ DATE_FMT = '%Y-%m-%d %H:%M:%S'
 FILE_LOG_MODE = 'a'
 
 
-#%% Logging
+# %% Logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 out_handler = logging.StreamHandler(stream=sys.stdout)
@@ -73,7 +73,7 @@ def _log_and_fig(message, log_path, ax, img_path):
         logger_.info(message)
 
 
-#%%
+# %%
 def plot_fit_compare(predictors, d_train, d_test=(), params=None, x=None, verbose=False, log_path=None, img_path=None,
                      ax=None):
     # TODO: make `assess_single_compare` or something? Make similar to `assess_compare` signature?

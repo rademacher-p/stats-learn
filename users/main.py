@@ -34,7 +34,7 @@ if seed is not None:
     seed_everything(seed)  # PyTorch-Lightning seeding
 
 
-#%% Model and optimal predictor
+# %% Model and optimal predictor
 n_x = 128
 
 # var_y_x_const = 1 / (n_x-1)
@@ -77,7 +77,7 @@ else:
     opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
 
 
-#%% Bayesian learners
+# %% Bayesian learners
 
 w_prior = [.5, 0]
 # w_prior = [1, 0]
@@ -158,7 +158,7 @@ norm_params = {'prior_cov': [.1, .001]}
 # norm_params = {'prior_cov': np.logspace(-7., 3., 60)}
 
 
-#%% Scikit-Learn
+# %% Scikit-Learn
 # skl_estimator, _name = LinearRegression(), 'LR'
 # skl_estimator, _name = SGDRegressor(max_iter=1000, tol=None), 'SGD'
 # skl_estimator, _name = GaussianProcessRegressor(), 'GP'
@@ -175,7 +175,7 @@ skl_estimator, skl_name = MLPRegressor(hidden_layer_sizes=[1000, 200, 100], alph
 skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
 
 
-#%% PyTorch
+# %% PyTorch
 # TODO: add citations to dissertation. PyTorch, Adam weight decay, etc.
 
 # weight_decays = [0.]  # controls L2 regularization
@@ -220,7 +220,7 @@ for weight_decay in weight_decays:
     lit_predictors.append(lit_predictor)
 
 
-#%% Results
+# %% Results
 
 n_train = 400
 # n_train = [1, 4, 40, 400]
@@ -273,7 +273,7 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
 #     pickle.dump(dict(y_stats=y_stats_full, losses=loss_full), fid)
 
 
-#%% Deprecated
+# %% Deprecated
 
 # plot_predict_stats_compare(predictors, model_eval, params, n_train, n_mc=100, x=None, do_std=True, verbose=True)
 # plot_risk_eval_sim_compare(predictors, model_eval, params, n_train, n_test=100, n_mc=100, verbose=True)
