@@ -139,7 +139,7 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, x=None, verbos
         title = f"{predictors[0].name}, " + title
     else:
         ax.legend(handles=[h_data, *h_predictors])
-    ax.set(title=title)
+    ax.set(title=title, ylabel='$y$')
 
     # Logging
     message = f"- Test samples: {n_test}"
@@ -343,7 +343,7 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
         _plot_risk_eval_compare(loss_full, predictors, params_full, n_train, ax)
         ax = plt.gca()
         if isinstance(model, bayes_models.Base):
-            ax.set(ylabel=r'$\mathcal{R}(f)$')  # different notation for bayes risk
+            ax.set(ylabel=r'$\mathcal{R}_\uptheta(f)$')  # different notation for bayes risk
     else:
         img_path = None
 
@@ -569,7 +569,7 @@ def _plot_risk_eval_compare(losses, predictors, params=None, n_train: Union[int,
 
     if ax is None:
         _, ax = plt.subplots()
-        ax.set(ylabel=r'$\mathcal{R}_{\Theta}(f;\theta)$')
+        ax.set(ylabel=r'$\mathcal{R}(f;\theta)$')
 
     out = []
     if len(predictors) == 1:
@@ -701,9 +701,9 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
     if ax is None:
         _, ax = plt.subplots()
         if isinstance(model, bayes_models.Base):
-            ylabel = r'$\mathcal{R}(f)$'
+            ylabel = r'$\mathcal{R}_\uptheta(f)$'
         else:
-            ylabel = r'$\mathcal{R}_{\Theta}(f;\theta)$'
+            ylabel = r'$\mathcal{R}(f;\theta)$'
         ax.set(ylabel=ylabel)
 
     loss = np.stack(losses, axis=-1)

@@ -72,7 +72,7 @@ alpha_y_x = 1/var_y_x_const - 1
 model_x = rand_elements.Uniform([0, 1])
 model = rand_models.BetaLinear(weights=[1], basis_y_x=[clairvoyant_func], alpha_y_x=alpha_y_x, model_x=model_x)
 
-opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
+opt_predictor = ModelRegressor(model, name=r'$f^*(\theta)$')
 
 
 # %% Learners
@@ -193,7 +193,7 @@ for weight_decay in weight_decays:
 #
 temp = [
     (opt_predictor, None),
-    # *zip(dir_predictors, dir_params_full),
+    *zip(dir_predictors, dir_params_full),
     *((predictor, None) for predictor in lit_predictors),
 ]
 predictors, params = zip(*temp)
@@ -204,24 +204,24 @@ n_test = 1000
 n_mc = 50
 
 
-# # Sample regressor realizations
-# n_train = 128
-# d = model.rvs(n_train + n_test, rng=seed)
-# d_train, d_test = np.split(d, [n_train])
-# x_plt = np.linspace(0, 1, 10000)
-#
-# img_path = img_dir + 'fit.png'
-# loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, x_plt, verbose=True,
-#                                      log_path=log_path, img_path=img_path)
-
-# Prediction mean/variance, comparative
+# Sample regressor realizations
 n_train = 128
+d = model.rvs(n_train + n_test, rng=seed)
+d_train, d_test = np.split(d, [n_train])
+x_plt = np.linspace(0, 1, 10000)
 
-img_path = img_dir + 'predict_T.png'
-y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
-                                                 stats=('mean', 'std'), verbose=True,
-                                                 plot_stats=True, print_loss=True,
-                                                 log_path=log_path, img_path=img_path, rng=seed)
+img_path = img_dir + 'fit.png'
+loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, x_plt, verbose=True,
+                                     log_path=log_path, img_path=img_path)
+
+# # Prediction mean/variance, comparative
+# n_train = 128
+#
+# img_path = img_dir + 'predict_T.png'
+# y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
+#                                                  stats=('mean', 'std'), verbose=True,
+#                                                  plot_stats=True, print_loss=True,
+#                                                  log_path=log_path, img_path=img_path, rng=seed)
 
 # # Dirichlet-based prediction mean/variance, varying N
 # n_train = [0, 400, 4000]

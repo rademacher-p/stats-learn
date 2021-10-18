@@ -72,9 +72,9 @@ model = rand_models.DataConditional.from_func_mean(n_x, alpha_y_x_d, nonlinear_m
 
 # model = bayes_models.Dirichlet(model, alpha_0=4e2)
 if isinstance(model, bayes_models.Base):
-    opt_predictor = BayesRegressor(model, name=r'$f^*$')
+    opt_predictor = BayesRegressor(model, name=r'$f_\uptheta$')
 else:
-    opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}(\theta)$')
+    opt_predictor = ModelRegressor(model, name=r'$f^*(\theta)$')
 
 
 # %% Bayesian learners
