@@ -64,10 +64,10 @@ class Base(ABC):
     def make_axes(self):  # TODO: axes kwargs
         if self.shape == ():
             _, ax = plt.subplots()
-            ax.set(xlabel='$x$', ylabel='$f(x)$')
+            ax.set(xlabel='$x$', ylabel='$y$')
         elif self.shape == (2,):
             _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-            ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$f(x)$')
+            ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$y$')
 
             ax.set_prop_cycle('color', ['1f77b4', 'ff7f0e', '2ca02c', 'd62728', '9467bd', '8c564b', 'e377c2',
                                         '7f7f7f', 'bcbd22', '17becf'])
@@ -323,7 +323,7 @@ class Finite(Discrete):
 #         elif set_ndim == 3 and self.shape == (3,):
 #             plt_data = ax.scatter(x[..., 0], x[..., 1], x[..., 2], s=15, c=y, label=label)
 #             c_bar = plt.colorbar(plt_data, ax=ax)
-#             c_bar.set_label('$f(x)$')
+#             c_bar.set_label('$y$')
 #
 #             return plt_data
 #
@@ -465,7 +465,7 @@ class FiniteGeneric(Finite):
             plt_data = ax.scatter(x[..., 0], x[..., 1], x[..., 2], s=15, c=y, label=label)
 
             c_bar = plt.colorbar(plt_data, ax=ax)
-            c_bar.set_label('$f(x)$')
+            c_bar.set_label('$y$')
 
             return plt_data
 
@@ -685,7 +685,7 @@ class Simplex(Continuous):
             raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
         c_bar = plt.colorbar(plt_data, ax=ax)
-        c_bar.set_label('$f(x)$')
+        c_bar.set_label('$y$')
 
         return plt_data
 
