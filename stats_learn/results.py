@@ -343,7 +343,7 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
         _plot_risk_eval_compare(loss_full, predictors, params_full, n_train, ax)
         ax = plt.gca()
         if isinstance(model, bayes_models.Base):
-            ax.set(ylabel=r'$\mathcal{R}_\uptheta(f)$')  # different notation for bayes risk
+            ax.set(ylabel=r'$R_\uptheta(f)$')  # different notation for bayes risk
     else:
         img_path = None
 
@@ -569,7 +569,7 @@ def _plot_risk_eval_compare(losses, predictors, params=None, n_train: Union[int,
 
     if ax is None:
         _, ax = plt.subplots()
-        ax.set(ylabel=r'$\mathcal{R}(f;\theta)$')
+        ax.set(ylabel=r'$R(f;\theta)$')
 
     out = []
     if len(predictors) == 1:
@@ -701,9 +701,9 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
     if ax is None:
         _, ax = plt.subplots()
         if isinstance(model, bayes_models.Base):
-            ylabel = r'$\mathcal{R}_\uptheta(f)$'
+            ylabel = r'$R_\uptheta(f)$'
         else:
-            ylabel = r'$\mathcal{R}(f;\theta)$'
+            ylabel = r'$R(f;\theta)$'
         ax.set(ylabel=ylabel)
 
     loss = np.stack(losses, axis=-1)
