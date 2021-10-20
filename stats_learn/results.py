@@ -66,8 +66,8 @@ def _log_and_fig(message, log_path, ax, img_path):
         fig.savefig(img_path)
         if PICKLE_FIGS:
             mpl_file = img_path.parent / f"{img_path.stem}.mpl"
-            with open(mpl_file, 'wb') as fid:
-                pickle.dump(fig, fid)
+            with open(mpl_file, 'wb') as f:
+                pickle.dump(fig, f)
 
     with _file_logger(log_path, file_format) as logger_:
         logger_.info(message)
