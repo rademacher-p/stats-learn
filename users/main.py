@@ -269,8 +269,8 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
 #                                                log_path=log_path, img_path=img_path, rng=seed)
 
 
-# with open(f'data/temp/{NOW_STR}.pkl', 'wb') as fid:
-#     pickle.dump(dict(y_stats=y_stats_full, losses=loss_full), fid)
+# with open(f'data/temp/{NOW_STR}.pkl', 'wb') as f:
+#     pickle.dump(dict(y_stats=y_stats_full, losses=loss_full), f)
 
 
 # %% Deprecated
@@ -287,8 +287,8 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
 #
 # fig = plt.gcf()
 # fig.savefig(image_path.joinpath(f"{NOW_STR}.png"))
-# with open(image_path.joinpath(f"{NOW_STR}.mpl"), 'wb') as fid:
-#     pickle.dump(fig, fid)
+# with open(image_path.joinpath(f"{NOW_STR}.mpl"), 'wb') as f:
+#     pickle.dump(fig, f)
 
 
 # model_x = rand_elements.Finite([0, .5], p=None)
