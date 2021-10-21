@@ -139,7 +139,7 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, x=None, verbos
         title = f"{predictors[0].name}, " + title
     else:
         ax.legend(handles=[h_data, *h_predictors])
-    ax.set(title=title, ylabel='$y$')
+    ax.set(title=title)
 
     # Logging
     message = f"- Test samples: {n_test}"
