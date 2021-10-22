@@ -2,17 +2,36 @@
 Loss functions.
 """
 
-# import numpy as np
+import numpy as np
 
 from stats_learn.util.base import check_data_shape
 
 
-def _check_inputs(y_est, y, shape):
-    y_est, set_shape_est = check_data_shape(y_est, shape)
+def _check_inputs(h, y, shape):
+    """
+    Check loss function input shapes.
+
+    Parameters
+    ----------
+    h : array_like
+        Decisions.
+    y : array_like
+        Target values.
+    shape : tuple
+        Shape of data tensors.
+
+    Returns
+    -------
+    np.ndarray
+    np.ndarray
+    tuple
+
+    """
+    h, set_shape_est = check_data_shape(h, shape)
     y, set_shape = check_data_shape(y, shape)
     if set_shape_est != set_shape:
         raise ValueError("Input must have same shape.")
-    return y_est, y, set_shape
+    return h, y, set_shape
 
 
 def loss_se(y_est, y, shape=()):

@@ -134,25 +134,25 @@ def vectorize_func(func, shape):
     return func_vec
 
 
-def vectorize_func_dec(shape):  # TODO: use?
-    def wrapper(func):
-        @wraps(func)
-        def func_vec(x):
-            x, set_shape = check_data_shape(x, shape)
-
-            _out = []
-            for x_i in x.reshape((-1,) + shape):
-                _out.append(func(x_i))
-            _out = np.asarray(_out)
-
-            # if len(_out) == 1:
-            #     return _out[0]
-            # else:
-            return _out.reshape(set_shape + _out.shape[1:])
-
-        return func_vec
-
-    return wrapper
+# def vectorize_func_dec(shape):  # TODO: use?
+#     def wrapper(func):
+#         @wraps(func)
+#         def func_vec(x):
+#             x, set_shape = check_data_shape(x, shape)
+#
+#             _out = []
+#             for x_i in x.reshape((-1,) + shape):
+#                 _out.append(func(x_i))
+#             _out = np.asarray(_out)
+#
+#             # if len(_out) == 1:
+#             #     return _out[0]
+#             # else:
+#             return _out.reshape(set_shape + _out.shape[1:])
+#
+#         return func_vec
+#
+#     return wrapper
 
 # def vectorize_first_arg(func):
 #     @wraps(func)

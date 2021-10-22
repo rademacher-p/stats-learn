@@ -11,7 +11,6 @@ from stats_learn.util import spaces
 from stats_learn.util.base import RandomGeneratorMixin
 
 
-
 # TODO: rename `model` attributes to `element`?
 
 
