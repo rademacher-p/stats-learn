@@ -15,7 +15,6 @@ from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
 from stats_learn import results
-from stats_learn.util.math import prob_disc
 from stats_learn.util.data_processing import make_discretizer
 from stats_learn.util.data_processing import make_clipper
 from stats_learn.predictors.torch import LitMLP, LitWrapper, reset_weights
@@ -107,9 +106,7 @@ dir_params_full = [None for __ in range(len(n_t_iter) * len(alpha_0_norm_iter))]
 dir_predictors = []
 for n_t in n_t_iter:
     for alpha_0_norm in alpha_0_norm_iter:
-        # supp_t = np.linspace(*model_x.lims, n_t)
-        # counts = prob_disc(supp_t.shape)
-        supp_t = np.linspace(*model_x.lims, n_t, endpoint=False) + .5 / n_t  # FIXME: cheap?
+        supp_t = np.linspace(*model_x.lims, n_t, endpoint=False) + .5 / n_t
         counts = np.ones_like(supp_t)
 
         prior_mean_x = rand_elements.DataEmpirical(supp_t, counts, space=model_x.space)
@@ -136,9 +133,7 @@ for n_t in n_t_iter:
 # dir_params_full = [deepcopy(dir_params) for __ in n_t_iter]
 # dir_predictors = []
 # for n_t, _params in zip(n_t_iter, dir_params_full):
-#     # supp_t = np.linspace(*model_x.lims, n_t)
-#     # counts = prob_disc(supp_t.shape)
-#     supp_t = np.linspace(*model_x.lims, n_t, endpoint=False) + .5 / n_t  # FIXME: cheap?
+#     supp_t = np.linspace(*model_x.lims, n_t, endpoint=False) + .5 / n_t
 #     counts = np.ones_like(supp_t)
 #
 #     prior_mean_x = rand_elements.DataEmpirical(supp_t, counts, space=model_x.space)

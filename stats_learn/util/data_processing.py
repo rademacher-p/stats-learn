@@ -29,6 +29,18 @@ def make_discretizer(vals):  # TODO: use sklearn.preprocessing.KBinsDiscretizer?
     return discretizer
 
 
+def prob_disc(shape):
+    """Create (unnormalized) probability array for a discretization grid. Lower edge/corner probabilities."""
+
+    p = np.ones(shape)
+    idx = np.nonzero(p)
+    n = np.zeros(p.size)
+    for i, size in zip(idx, shape):
+        n += np.all([i > 0, i < size-1], axis=0)
+    p[idx] = 2**n
+    return p
+
+
 def make_clipper(lims):
     """Create a function that clips inputs into a closed box space."""
     lims = np.array(lims)

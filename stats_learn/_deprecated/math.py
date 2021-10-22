@@ -1,6 +1,3 @@
-import numpy as np
-
-
 # def diag_multi(x):
 #     x = np.array(x)
 #     i = np.unravel_index(range(x.size), x.shape)
@@ -88,36 +85,22 @@ import numpy as np
 #                 return np.moveaxis(x, 0, -1) @ w @ y
 
 
-def simplex_round(x):
-    x = np.array(x)
-    if np.min(x) < 0:
-        raise ValueError("Input values must be non-negative.")
-    elif not np.isclose(x.sum(), 1):
-        raise ValueError("Input values must sum to one.")
-
-    out = np.zeros(x.size)
-    up = 1
-    for i, x_i in enumerate(x.flatten()):
-        if x_i < up / 2:
-            up -= x_i
-        else:
-            out[i] = 1
-            break
-
-    return out.reshape(x.shape)
-
-
-def prob_disc(shape):
-    """Create (unnormalized) probability array for a discretization grid. Lower edge/corner probabilities."""
-
-    p = np.ones(shape)
-    idx = np.nonzero(p)
-    n = np.zeros(p.size)
-    for i, size in zip(idx, shape):
-        n += np.all([i > 0, i < size-1], axis=0)
-    p[idx] = 2**n
-    return p
+# def simplex_round(x):
+#     x = np.array(x)
+#     if np.min(x) < 0:
+#         raise ValueError("Input values must be non-negative.")
+#     elif not np.isclose(x.sum(), 1):
+#         raise ValueError("Input values must sum to one.")
+#
+#     out = np.zeros(x.size)
+#     up = 1
+#     for i, x_i in enumerate(x.flatten()):
+#         if x_i < up / 2:
+#             up -= x_i
+#         else:
+#             out[i] = 1
+#             break
+#
+#     return out.reshape(x.shape)
 
 
-def main():
-    print(prob_disc((4, 3)))

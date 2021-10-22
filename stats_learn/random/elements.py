@@ -465,6 +465,25 @@ class Empirical(BaseRV):
         self._cov = (np.diagflat(self._mean).reshape(2 * self.shape)
                      - np.tensordot(self._mean, self._mean, 0)) / self._n
 
+    @staticmethod
+    def simplex_round(x):  # TODO: delete?
+        x = np.array(x)
+        if np.min(x) < 0:
+            raise ValueError("Input values must be non-negative.")
+        elif not np.isclose(x.sum(), 1):
+            raise ValueError("Input values must sum to one.")
+
+        out = np.zeros(x.size)
+        up = 1
+        for i, x_i in enumerate(x.flatten()):
+            if x_i < up / 2:
+                up -= x_i
+            else:
+                out[i] = 1
+                break
+
+        return out.reshape(x.shape)
+
     def _rvs(self, n, rng):
         return rng.multinomial(self._n, self._mean.flatten(), size=n).reshape(n, *self.shape) / self._n
 
