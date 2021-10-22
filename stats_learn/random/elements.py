@@ -12,7 +12,8 @@ import numpy as np
 from scipy.special import gammaln, xlogy, xlog1py, betaln
 from scipy.stats._multivariate import _PSD
 
-from stats_learn.util import plotting, spaces
+from stats_learn.util import plotting
+from stats_learn import spaces
 from stats_learn.util.base import DELTA, RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func
 
 

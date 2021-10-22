@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from stats_learn.random import elements as rand_elements
-from stats_learn.util import spaces, plotting
+from stats_learn.util import plotting
+from stats_learn import spaces
 
 plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{PhDmath}")

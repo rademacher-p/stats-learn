@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 
 from stats_learn.random import elements as rand_elements
 from stats_learn.random import models as rand_models
-from stats_learn.util import spaces
+from stats_learn import spaces
 from stats_learn.util.base import RandomGeneratorMixin, vectorize_func
 
 

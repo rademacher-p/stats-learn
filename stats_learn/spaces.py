@@ -2,17 +2,13 @@ from abc import ABC
 import math
 # from numbers import Integral
 
-from more_itertools import all_equal
-
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy import optimize, integrate
+from more_itertools import all_equal
 
 from stats_learn.util.base import check_data_shape
 from stats_learn.util.plotting import simplex_grid, box_grid, mesh_grid
-
-
-# plt.style.use('seaborn')
 
 
 # TODO: generalize plotting for non-numeric values (e.g. mode_y_x)

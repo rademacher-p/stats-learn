@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from stats_learn.random import elements as rand_elements
-from stats_learn.util import spaces
+from stats_learn import spaces
 from stats_learn.util.base import NOW_STR
 
 plt.rc('text', usetex=True)

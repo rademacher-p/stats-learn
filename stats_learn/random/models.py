@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 from stats_learn.random import elements as rand_elements
-from stats_learn.util import spaces
+from stats_learn import spaces
 from stats_learn.util.base import RandomGeneratorMixin, vectorize_func
 
 
