@@ -674,8 +674,8 @@ class Simplex(Continuous):
         if len(set_shape) != 1:
             raise ValueError()
 
-        kwargs = {'label': label, 's': 5, 'c': y}
-        kwargs.update(scatter_kwargs)
+        kwargs = {'label': label, 's': 5, 'c': y} | scatter_kwargs
+        # kwargs.update(scatter_kwargs)
 
         if self.shape == (2,):
             plt_data = ax.scatter(x[:, 0], x[:, 1], **kwargs)
