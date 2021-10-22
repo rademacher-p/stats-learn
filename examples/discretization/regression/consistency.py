@@ -8,7 +8,7 @@ from stats_learn.util.base import get_now
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
-from stats_learn import results, funcs
+from stats_learn import results
 from stats_learn.util.math import prob_disc
 from stats_learn.util.data_processing import make_discretizer
 
@@ -28,7 +28,10 @@ img_dir = base_path + f'images/{get_now()}/'
 
 
 # %% Model and optimal predictor
-clairvoyant_func = funcs.make_inv_trig()
+def clairvoyant_func(x):
+    return 1 / (2 + np.sin(2 * np.pi * x))
+
+
 var_y_x_const = 1/5
 
 alpha_y_x = 1/var_y_x_const - 1
@@ -125,10 +128,10 @@ n_mc = 15
 n_train = 30
 d = model.rvs(n_train + n_test, rng=seed)
 d_train, d_test = np.split(d, [n_train])
-x = np.linspace(0, 1, 10000)
+x_plt = np.linspace(0, 1, 10000)
 
 img_path = img_dir + 'fit.png'
-loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, x, verbose=True,
+loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, x_plt, verbose=True,
                                      log_path=log_path, img_path=img_path)
 
 # # Prediction mean/variance, comparative

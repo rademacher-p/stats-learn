@@ -15,7 +15,7 @@ from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
 from stats_learn.predictors.sklearn import SKLWrapper
-from stats_learn import results, funcs
+from stats_learn import results
 from stats_learn.util.base import get_now
 from stats_learn.util.data_processing import make_clipper
 from stats_learn.util.plotting import box_grid
@@ -31,6 +31,22 @@ seed = 12345
 
 if seed is not None:
     seed_everything(seed)  # PyTorch-Lightning seeding
+
+
+def make_inv_trig(shape=()):
+    def sin_orig(x):
+        axis = tuple(range(-len(shape), 0))
+        return 1 / (2 + np.sin(2 * np.pi * x.mean(axis)))
+    return sin_orig
+
+
+def make_rand_discrete(n, rng):
+    rng = np.random.default_rng(rng)
+    _rand_vals = dict(zip(np.linspace(0, 1, n), rng.random(n)))
+
+    def rand_discrete(x):
+        return _rand_vals[x]
+    return rand_discrete
 
 
 # %% Model and optimal predictor
@@ -53,8 +69,8 @@ lims_x = np.broadcast_to([0, 1], (*shape_x, 2))
 
 w_model = [.5]
 
-nonlinear_model = funcs.make_inv_trig(shape_x)
-# nonlinear_model = funcs.make_rand_discrete(n_x, rng=seed)
+nonlinear_model = make_inv_trig(shape_x)
+# nonlinear_model = make_rand_discrete(n_x, rng=seed)
 
 
 supp_x = box_grid(lims_x, n_x)
