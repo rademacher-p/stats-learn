@@ -4,12 +4,12 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from stats_learn.util.base import get_now
+from stats_learn.util import get_now
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
 from stats_learn import results
-from stats_learn.util.data_processing import make_discretizer, prob_disc
+from stats_learn.data_processing import make_discretizer, prob_disc
 
 plt.style.use('../../../images/style.mplstyle')
 

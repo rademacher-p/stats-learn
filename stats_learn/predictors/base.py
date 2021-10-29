@@ -12,7 +12,7 @@ from stats_learn.bayes import models as bayes_models
 from stats_learn.loss_funcs import loss_se, loss_01
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn import spaces
-from stats_learn.util.base import vectorize_func
+from stats_learn.util import vectorize_func
 
 from stats_learn.results import (plot_fit_compare, predict_stats_compare, plot_predict_stats_compare,
                                  risk_eval_sim_compare, risk_eval_comp_compare, plot_risk_eval_sim_compare,

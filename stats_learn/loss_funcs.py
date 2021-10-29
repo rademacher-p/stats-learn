@@ -4,7 +4,7 @@ Loss functions.
 
 import numpy as np
 
-from stats_learn.util.base import check_data_shape
+from stats_learn.util import check_data_shape
 
 
 def _check_inputs(h, y, shape):

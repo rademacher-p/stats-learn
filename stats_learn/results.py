@@ -17,7 +17,7 @@ import pandas as pd
 # from pytorch_lightning.utilities.seed import seed_everything
 
 from stats_learn.bayes import models as bayes_models
-from stats_learn.util.base import check_data_shape, RandomGeneratorMixin as RNGMix
+from stats_learn.util import check_data_shape, RandomGeneratorMixin as RNGMix
 # from stats_learn.predictors.torch import LitWrapper
 
 

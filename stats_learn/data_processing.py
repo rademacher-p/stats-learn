@@ -2,7 +2,7 @@ import math
 
 import numpy as np
 
-from stats_learn.util.base import check_data_shape
+from stats_learn.util import check_data_shape
 # from stats_learn.util.plotting import box_grid
 
 

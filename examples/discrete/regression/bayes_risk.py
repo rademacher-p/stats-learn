@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from stats_learn.util.base import get_now
+from stats_learn.util import get_now
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import BayesRegressor

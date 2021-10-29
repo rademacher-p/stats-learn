@@ -1,8 +1,6 @@
 # TODO: CLEANUP
 
 
-from copy import deepcopy
-
 import numpy as np
 from matplotlib import pyplot as plt
 import torch
@@ -10,13 +8,13 @@ from pytorch_lightning.callbacks import EarlyStopping
 import pytorch_lightning.loggers as pl_loggers
 from pytorch_lightning.utilities.seed import seed_everything
 
-from stats_learn.util.base import get_now
+from stats_learn.util import get_now
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
 from stats_learn import results
-from stats_learn.util.data_processing import make_discretizer
-from stats_learn.util.data_processing import make_clipper
+from stats_learn.data_processing import make_discretizer
+from stats_learn.data_processing import make_clipper
 from stats_learn.predictors.torch import LitMLP, LitWrapper, reset_weights
 
 
