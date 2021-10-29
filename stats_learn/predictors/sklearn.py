@@ -6,7 +6,7 @@ from stats_learn.loss_funcs import loss_se
 from stats_learn.predictors.base import Base
 
 
-class SKLWrapper(Base):  # TODO: rework for new reset/fit functionality
+class SKLPredictor(Base):  # TODO: rework for new reset/fit functionality
 
     # FIXME: inheritance feels broken
 

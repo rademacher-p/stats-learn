@@ -14,11 +14,11 @@ from pytorch_lightning.utilities.seed import seed_everything
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
-from stats_learn.predictors.sklearn import SKLWrapper
+from stats_learn.predictors.sklearn import SKLPredictor
 from stats_learn import results
 from stats_learn.util import get_now
 from stats_learn.preprocessing import make_clipper
-from stats_learn.predictors.torch import LitMLP, LitWrapper, reset_weights
+from stats_learn.predictors.torch import LitMLP, LitPredictor, reset_weights
 
 np.set_printoptions(precision=3)
 
@@ -185,7 +185,7 @@ skl_estimator, skl_name = MLPRegressor(hidden_layer_sizes=[1000, 200, 100], alph
 # TODO: try Adaboost, RandomForest, GP, BayesianRidge, KNeighbors, SVR
 
 # skl_estimator = Pipeline([('scaler', StandardScaler()), ('regressor', skl_estimator)])
-skl_predictor = SKLWrapper(skl_estimator, space=model.space, name=skl_name)
+skl_predictor = SKLPredictor(skl_estimator, space=model.space, name=skl_name)
 
 
 # %% PyTorch
@@ -228,7 +228,7 @@ for weight_decay in weight_decays:
             #     raise Exception
             model_.model[-1].bias.fill_(.5)
 
-    lit_predictor = LitWrapper(lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name)
+    lit_predictor = LitPredictor(lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name)
 
     lit_predictors.append(lit_predictor)
 

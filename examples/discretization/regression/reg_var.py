@@ -15,7 +15,7 @@ from stats_learn.predictors.base import ModelRegressor, BayesRegressor
 from stats_learn import results
 from stats_learn.preprocessing import make_discretizer
 from stats_learn.preprocessing import make_clipper
-from stats_learn.predictors.torch import LitMLP, LitWrapper, reset_weights
+from stats_learn.predictors.torch import LitMLP, LitPredictor, reset_weights
 
 
 plt.style.use('../../../images/style.mplstyle')
@@ -179,7 +179,7 @@ for weight_decay in weight_decays:
         # with torch.no_grad():
         #     model_.model[-1].bias.fill_(.5)  # FIXME: use the .5 init??
 
-    lit_predictor = LitWrapper(lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name)
+    lit_predictor = LitPredictor(lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name)
     lit_predictors.append(lit_predictor)
 
 

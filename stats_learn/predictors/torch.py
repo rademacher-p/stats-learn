@@ -66,7 +66,7 @@ def reset_weights(model):
         model.reset_parameters()
 
 
-class LitWrapper(Base):
+class LitPredictor(Base):
     def __init__(self, model, space, trainer_params=None, reset_func=None, proc_funcs=(), name=None):
         loss_func = loss_se  # TODO: Generalize!
         super().__init__(loss_func, space, proc_funcs, name)

@@ -18,7 +18,7 @@ import pandas as pd
 
 from stats_learn.bayes import models as bayes_models
 from stats_learn.util import check_data_shape, RandomGeneratorMixin as RNGMix
-# from stats_learn.predictors.torch import LitWrapper
+# from stats_learn.predictors.torch import LitPredictor
 
 
 PICKLE_FIGS = True
@@ -210,7 +210,7 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
     if plot_stats and plot_loss:
         raise NotImplementedError("Cannot plot prediction statistics and losses at once.")
 
-    # if rng is not None and any(isinstance(predictor, LitWrapper) for predictor in predictors):  # FIXME
+    # if rng is not None and any(isinstance(predictor, LitPredictor) for predictor in predictors):  # FIXME
     #     if isinstance(rng, int):
     #         seed_everything(rng)
     #     else:
