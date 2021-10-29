@@ -8,7 +8,6 @@ from scipy import optimize, integrate
 from more_itertools import all_equal
 
 from stats_learn.util.base import check_data_shape
-from stats_learn.util.plotting import box_grid, mesh_grid
 
 
 # TODO: generalize plotting for non-numeric values (e.g. mode_y_x)
@@ -398,11 +397,18 @@ class FiniteGeneric(Finite):
     values_flat = property(lambda self: self._vals_flat)
 
     @classmethod
-    def from_grid(cls, *vecs):
+    def from_outer(cls, *vecs):
         if len(vecs) == 1:
             return cls(vecs, ())
         else:
-            return cls(mesh_grid(*vecs), shape=(len(vecs),))
+            grid = np.stack(np.meshgrid(*vecs, indexing='ij'), axis=-1)
+            return cls(grid, shape=(len(vecs),))
+
+    @classmethod
+    def from_grid(cls, lims, n=100, endpoint=True):
+        grid = Box.make_grid(lims, n, endpoint)
+        shape = (grid.shape[-1],) if grid.ndim > 1 else ()
+        return cls(grid, shape)
 
     def __repr__(self):
         return f"FiniteGeneric({self.values})"
@@ -555,9 +561,25 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
     def lims_plot(self):
         return self._lims
 
+    @staticmethod
+    def make_grid(lims, n=100, endpoint=True):
+        lims = np.array(lims)
+        # if endpoint:
+        #     n += 1
+
+        if lims.shape == (2,):
+            return np.linspace(*lims, n, endpoint=endpoint)
+        elif lims.ndim == 2 and lims.shape[-1] == 2:
+            x_dim = [np.linspace(*lims_i, n, endpoint=endpoint) for lims_i in lims]
+            return np.stack(np.meshgrid(*x_dim, indexing='ij'), axis=-1)
+        else:
+            raise ValueError("Shape must be (2,) or (*, 2)")
+        # if not (lims[..., 0] <= lims[..., 1]).all():
+        #     raise ValueError("Upper values must meet or exceed lower values.")
+
     def set_x_plot(self):
         n_plt = 1000 if self.ndim == 0 else 100
-        self.x_plt = box_grid(self.lims_plot, n_plt, endpoint=False)
+        self.x_plt = self.make_grid(self.lims_plot, n_plt, endpoint=False)
 
     def plot(self, f, x=None, ax=None, label=None, **kwargs):
         x, y, set_shape = self._eval_func(f, x)
@@ -644,7 +666,7 @@ class Simplex(Continuous):
         self._x_plt = None
 
     @staticmethod
-    def simplex_grid(n, shape, hull_mask=None):
+    def make_grid(n, shape, hull_mask=None):
         """
         Generate a uniform grid over a simplex.
         """
@@ -698,7 +720,7 @@ class Simplex(Continuous):
         return g.reshape((-1,) + shape) / n
 
     def set_x_plot(self):
-        self.x_plt = self.simplex_grid(self.n_plot, self._shape)
+        self.x_plt = self.make_grid(self.n_plot, self._shape)
 
     def make_axes(self):
         if self.shape == (2,):

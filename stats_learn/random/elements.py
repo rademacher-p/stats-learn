@@ -12,7 +12,6 @@ import numpy as np
 from scipy.special import gammaln, xlogy, xlog1py, betaln
 from scipy.stats._multivariate import _PSD
 
-from stats_learn.util import plotting
 from stats_learn import spaces
 from stats_learn.util.base import RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func
 
@@ -207,6 +206,14 @@ class Finite(Base):  # TODO: DRY - use stat approx from the Finite space's metho
     def __repr__(self):
         return f"FiniteRE(support={self.supp}, p={self.p})"
 
+    @classmethod
+    def from_grid(cls, lims, n=100, endpoint=True, p=None, rng=None):
+        space = spaces.FiniteGeneric.from_grid(lims, n, endpoint)
+        if p is None:
+            p = np.ones(space.set_shape) / space.set_size
+
+        return cls(space.values, p, rng)
+
     # Input properties
     @property
     def supp(self):
@@ -389,8 +396,8 @@ class Dirichlet(BaseRV):
 
     def plot_pf(self, x=None, ax=None, **kwargs):
         if x is None and self.space._x_plt is None:
-            self.space.x_plt = self.space.simplex_grid(self.space.n_plot, self.shape,
-                                                       hull_mask=(self.mean < 1 / self.alpha_0))
+            self.space.x_plt = self.space.make_grid(self.space.n_plot, self.shape,
+                                                    hull_mask=(self.mean < 1 / self.alpha_0))
         return self.space.plot(self.pf, x, ax)
 
 

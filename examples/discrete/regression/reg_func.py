@@ -43,8 +43,7 @@ def clairvoyant_func(x):
 
 var_y_x_const = 1/125
 
-supp_x = np.linspace(0, 1, n_x)
-model_x = rand_elements.Finite(supp_x, p=None)
+model_x = rand_elements.Finite.from_grid([0, 1], n_x, p=None)
 
 alpha_y_x = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_y-1))
 model = rand_models.DataConditional.from_func_mean(n_y, alpha_y_x, clairvoyant_func, model_x)
@@ -65,7 +64,7 @@ dir_params = {'alpha_0': [1e-5, 1e5]}
 # PyTorch
 weight_decays = [0., 1e-3]  # controls L2 regularization
 
-proc_funcs = {'pre': [], 'post': [make_clipper([np.min(supp_x), np.max(supp_x)])]}
+proc_funcs = {'pre': [], 'post': [make_clipper([np.min(model_x.supp), np.max(model_x.supp)])]}
 
 lit_predictors = []
 for weight_decay in weight_decays:

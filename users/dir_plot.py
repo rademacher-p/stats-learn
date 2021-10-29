@@ -30,7 +30,7 @@ def plot_dirs(dirs, n_plot=None, titles=None, orient='h', same_cm=True, cm_hack=
         space.n_plot = n_plot
 
     for dir_i in dirs:
-        dir_i.space.x_plt = space.simplex_grid(space.n_plot, space.shape, hull_mask=(dir_i.mean < 1 / dir_i.alpha_0))
+        dir_i.space.x_plt = space.make_grid(space.n_plot, space.shape, hull_mask=(dir_i.mean < 1 / dir_i.alpha_0))
 
     x_vec = [dir_i.space.x_plt for dir_i in dirs]
     y_vec = [dir_i.pf(dir_i.space.x_plt) for dir_i in dirs]

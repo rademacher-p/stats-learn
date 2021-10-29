@@ -25,8 +25,7 @@ n_x = n_y = 128
 var_y_x_const = 1/5
 w_model = [.5]
 
-supp_x = np.linspace(0, 1, n_x)
-model_x = rand_elements.Finite(supp_x, p=None)
+model_x = rand_elements.Finite.from_grid([0, 1], n_x, p=None)
 
 alpha_y_x = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_y-1))
 prior_mean = rand_models.DataConditional.from_poly_mean(n_x, alpha_y_x, w_model, model_x)

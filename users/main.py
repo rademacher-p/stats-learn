@@ -18,7 +18,6 @@ from stats_learn.predictors.sklearn import SKLWrapper
 from stats_learn import results
 from stats_learn.util.base import get_now
 from stats_learn.util.data_processing import make_clipper
-from stats_learn.util.plotting import box_grid
 from stats_learn.predictors.torch import LitMLP, LitWrapper, reset_weights
 
 np.set_printoptions(precision=3)
@@ -73,8 +72,7 @@ nonlinear_model = make_inv_trig(shape_x)
 # nonlinear_model = make_rand_discrete(n_x, rng=seed)
 
 
-supp_x = box_grid(lims_x, n_x)
-model_x = rand_elements.Finite(supp_x, p=np.full(size_x*(n_x,), n_x**-size_x))
+model_x = rand_elements.Finite.from_grid([0, 1], n_x)
 # model = rand_models.DataConditional.from_poly_mean(n_x, alpha_y_x_d, w_model, model_x)
 model = rand_models.DataConditional.from_func_mean(n_x, alpha_y_x_d, nonlinear_model, model_x)
 
