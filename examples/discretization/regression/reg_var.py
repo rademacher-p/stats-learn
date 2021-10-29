@@ -13,8 +13,8 @@ from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
 from stats_learn import results
-from stats_learn.data_processing import make_discretizer
-from stats_learn.data_processing import make_clipper
+from stats_learn.preprocessing import make_discretizer
+from stats_learn.preprocessing import make_clipper
 from stats_learn.predictors.torch import LitMLP, LitWrapper, reset_weights
 
 
