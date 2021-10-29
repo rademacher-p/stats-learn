@@ -1,11 +1,9 @@
 from warnings import warn
 
-# import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
 from stats_learn.random import elements as rand_elements
-from stats_learn.util import plotting
 from stats_learn import spaces
 
 plt.rc('text', usetex=True)
@@ -28,9 +26,11 @@ def plot_dirs(dirs, n_plot=None, titles=None, orient='h', same_cm=True, cm_hack=
 
     if n_plot is None:
         n_plot = space.n_plot
+    if n_plot is not None:
+        space.n_plot = n_plot
 
     for dir_i in dirs:
-        dir_i.space.x_plt = plotting.simplex_grid(n_plot, dir_i.shape, hull_mask=(dir_i.mean < 1 / dir_i.alpha_0))
+        dir_i.space.x_plt = space.simplex_grid(space.n_plot, space.shape, hull_mask=(dir_i.mean < 1 / dir_i.alpha_0))
 
     x_vec = [dir_i.space.x_plt for dir_i in dirs]
     y_vec = [dir_i.pf(dir_i.space.x_plt) for dir_i in dirs]

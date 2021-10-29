@@ -5,9 +5,6 @@ from datetime import datetime
 import numpy as np
 
 
-DELTA = 1e250  # large value approximating the value of the Dirac delta function at zero
-
-
 def get_now():
     return datetime.now().replace(microsecond=0).isoformat().replace(':', '_')
 

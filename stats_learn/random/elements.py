@@ -14,11 +14,10 @@ from scipy.stats._multivariate import _PSD
 
 from stats_learn.util import plotting
 from stats_learn import spaces
-from stats_learn.util.base import DELTA, RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func
+from stats_learn.util.base import RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func
 
 
 # %% Base RE classes
-
 class Base(RandomGeneratorMixin):
     """
     Base class for random element objects.
@@ -390,8 +389,8 @@ class Dirichlet(BaseRV):
 
     def plot_pf(self, x=None, ax=None, **kwargs):
         if x is None and self.space._x_plt is None:
-            self.space.x_plt = plotting.simplex_grid(self.space.n_plot, self.shape,
-                                                     hull_mask=(self.mean < 1 / self.alpha_0))
+            self.space.x_plt = self.space.simplex_grid(self.space.n_plot, self.shape,
+                                                       hull_mask=(self.mean < 1 / self.alpha_0))
         return self.space.plot(self.pf, x, ax)
 
 
@@ -1124,7 +1123,7 @@ class DataEmpirical(Base):
             # delta = DELTA if isinstance(self.space, spaces.Continuous) else 1.
             if isinstance(self.space, spaces.Continuous):
                 # raise NotImplementedError
-                delta = DELTA
+                delta = 1e250  # large value approximating the value of the Dirac delta function at zero
             else:
                 delta = 1.
 
