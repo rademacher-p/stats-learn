@@ -18,8 +18,6 @@ from stats_learn.results import (plot_fit_compare, predict_stats_compare, plot_p
                                  risk_eval_sim_compare, risk_eval_comp_compare, plot_risk_eval_sim_compare,
                                  plot_risk_eval_comp_compare, assess_compare)
 
-# TODO: refactor into subpackages?
-
 
 class Base(ABC):
     def __init__(self, loss_func, space=None, proc_funcs=(), name=None):
