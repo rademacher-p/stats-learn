@@ -251,7 +251,6 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
     loss_full = []
     for params in params_full:
         params_shape = tuple(len(vals) for _, vals in params.items())
-        # loss = np.empty((n_mc, len(n_train_delta), *params_shape))
         if do_loss:
             loss = np.zeros((len(n_train), *params_shape))
         else:
@@ -401,15 +400,12 @@ def _plot_stats(y_stats_full, space_x, predictors, params, n_train: Union[int, I
                 title += f", $N = {n_train[0]}$"
                 if len(param_vals) == 1:
                     labels = [None]
-                    # title += f", ${param_name} = {param_vals[0]}$"
                     title += f", {predictor.tex_params(param_name, param_vals[0])}"
                 else:
-                    # labels = [f"${param_name} = {val}$" for val in param_vals]
                     labels = [f"{predictor.tex_params(param_name, val)}" for val in param_vals]
             elif len(param_vals) == 1:
                 y_stats = y_stats.squeeze(axis=1)
                 labels = [f"$N = {n}$" for n in n_train]
-                # title += f", ${param_name} = {param_vals[0]}$"
                 title += f", {predictor.tex_params(param_name, param_vals[0])}"
             else:
                 raise NotImplementedError
@@ -438,7 +434,6 @@ def _plot_stats(y_stats_full, space_x, predictors, params, n_train: Union[int, I
                 elif len(params) == 1:
                     y_stats = y_stats.squeeze(0)
                     param_name, param_vals = list(params.items())[0]
-                    # labels = [f"{predictor.name}, ${param_name} = {val}$" for val in param_vals]
                     labels = [f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals]
                 else:
                     raise ValueError
@@ -484,13 +479,10 @@ def _print_risk(predictors, params, n_train, losses):
         predictor, param, loss = predictors[0], params[0], losses[0]
         if len(param) == 0:
             df = pd.DataFrame(loss, index_n, columns=[predictor.name])
-            # df = pd.Series(loss, index_n, name=predictor.name)
         elif len(param) == 1:
             param_name, param_vals = list(param.items())[0]
             index_param = param_vals
             title += f"{predictor.name}, varying {param_name}\n\n"
-            # index_param = pd.Index(param_vals, name=param_name)
-            # title = predictor.name
             df = pd.DataFrame(loss, index_n, columns=index_param)
         else:
             raise NotImplementedError("Only up to one varying parameter currently supported.")
@@ -548,7 +540,6 @@ def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, 
                 idx_p = np.unravel_index(i_v, loss.shape[1:])
                 idx = (np.arange(len(n_train)),) + tuple([k for _ in range(len(n_train))] for k in idx_p)
                 loss[idx] = predictor.evaluate_comp(model, n_train, n_test)
-                # loss[:, np.unravel_index(i_v, loss.shape[2:])] = predictor.evaluate_comp(model, n_train)
 
             loss_full.append(loss)
 
@@ -593,11 +584,9 @@ def _plot_risk_eval_compare(losses, predictors, params=None, n_train: Union[int,
                 loss = np.transpose(loss)
                 xlabel, x_plt = '$N$', n_train
                 if len(param_vals) == 1:
-                    # title += f", {param_name} = {param_vals[0]}"
                     title += f", {predictor.tex_params(param_name, param_vals[0])}"
                     labels = [None]
                 else:
-                    # labels = [f"{param_name} = {val}" for val in param_vals]
                     labels = [f"{predictor.tex_params(param_name, val)}" for val in param_vals]
         else:
             raise NotImplementedError("Only up to one varying parameter currently supported.")
@@ -637,7 +626,6 @@ def _plot_risk_eval_compare(losses, predictors, params=None, n_train: Union[int,
                 elif len(params) == 1:
                     loss = np.transpose(loss)
                     param_name, param_vals = list(params.items())[0]
-                    # labels = [f"{predictor.name}, {param_name} = {val}" for val in param_vals]
                     labels = [f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals]
                 else:
                     raise NotImplementedError("Only up to one varying parameter currently supported.")
@@ -672,10 +660,6 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
         params_full = [{} for _ in predictors]
     else:
         params_full = [item if item is not None else {} for item in params]
-
-    # if not all_equal(params_full):
-    #     raise ValueError
-    # # TODO: check models for equality
 
     if all(len(params) == 0 for params in params_full):
         params = {}

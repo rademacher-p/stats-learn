@@ -12,7 +12,6 @@ from stats_learn.bayes import models as bayes_models
 from stats_learn.loss_funcs import loss_se, loss_01
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn import spaces
-from stats_learn.util import vectorize_func
 
 from stats_learn.results import (plot_fit_compare, predict_stats_compare, plot_predict_stats_compare,
                                  risk_eval_sim_compare, risk_eval_comp_compare, plot_risk_eval_sim_compare,
@@ -25,7 +24,6 @@ class Base(ABC):
 
         self._space = space
 
-        # self.proc_funcs = list(proc_funcs)
         if isinstance(proc_funcs, dict):
             self.proc_funcs = proc_funcs
         else:
@@ -41,9 +39,6 @@ class Base(ABC):
         if self._space is None:
             self._space = self._model_obj.space
         return self._space
-    # space = property(lambda self: self._space)
-
-    # space = property(lambda self: self._model_obj.space)
 
     shape = property(lambda self: {key: space.shape for key, space in self.space.items()})
     size = property(lambda self: {key: space.size for key, space in self.space.items()})
@@ -62,25 +57,18 @@ class Base(ABC):
     def tex_params(self, key, val=None):
         return self._model_obj.tex_params(key, val)
 
-    # def get_params(self, *args):
-    #     return {arg: getattr(self._model_obj, arg) for arg in args}
-
     def _proc_x(self, x):
-        # for func in self.proc_funcs:
         for func in self.proc_funcs['pre']:
             x = func(x)
         return x
 
     def _proc_y(self, y):
-        # for func in self.proc_funcs:
         for func in self.proc_funcs['post']:
             y = func(y)
         return y
 
     def _proc_data(self, d):
-        # x, y = self._proc_x(d['x']), d['y']
         x, y = self._proc_x(d['x']), self._proc_y(d['y'])
-        # dtype = [('x', d.dtype['x'].base, x.shape[1:]), ('y', d.dtype['y'].base, d.dtype['y'].shape)]
         dtype = [('x', d.dtype['x'].base, x.shape[1:]), ('y', d.dtype['y'].base, y.shape[1:])]
         return np.array(list(zip(x, y)), dtype=dtype)
 
@@ -93,19 +81,6 @@ class Base(ABC):
         if len(d) > 0:
             d = self._proc_data(d)
             self._fit(d)
-
-        # if d is None:
-        #     d = np.array([], dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
-        # d = self._proc_data(d)
-        #
-        # return self._fit(d)
-
-    # def fit(self, d=None, warm_start=False):
-    #     if d is None:
-    #         d = np.array([], dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
-    #
-    #     d = self._proc_data(d)
-    #     return self._fit(d, warm_start)
 
     @abstractmethod
     def _fit(self, d):
@@ -126,10 +101,6 @@ class Base(ABC):
         return y
 
     def _predict(self, x):
-        return vectorize_func(self._predict_single, shape=self.shape['x'])(x)
-
-    def _predict_single(self, x):
-        # raise NotImplementedError("Method must be overwritten.")  # TODO: numeric approx with loss and predictive!?
         pass
 
     def evaluate(self, d):
@@ -269,7 +240,6 @@ class ModelRegressor(RegressorMixin, Model):
 
 
 # %% Bayes model
-
 class Bayes(Base):
     def __init__(self, bayes_model, loss_func, space=None, proc_funcs=(), name=None):
         super().__init__(loss_func, space, proc_funcs, name=name)
@@ -297,16 +267,6 @@ class Bayes(Base):
 
     def reset(self):
         self.bayes_model.reset()
-
-    def plot_param_dist(self, x=None, ax_prior=None):  # TODO: improve or remove?
-        if x is None:
-            raise ValueError  # TODO
-
-        self.prior.plot_pf(x, ax=ax_prior)
-        # ax_posterior= plt_prior.axes
-        # ax_posterior = plt.gca()
-        ax_posterior = None
-        self.posterior.plot_pf(x, ax=ax_posterior)
 
 
 class BayesClassifier(ClassifierMixin, Bayes):

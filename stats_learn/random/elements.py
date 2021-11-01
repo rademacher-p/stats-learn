@@ -4,6 +4,7 @@ Random elements.
 
 # TODO: do ABC or PyCharm bug?
 
+from abc import ABC
 import math
 from numbers import Integral
 from typing import Optional, Union
@@ -17,7 +18,7 @@ from stats_learn.util import RandomGeneratorMixin, check_data_shape, check_valid
 
 
 # %% Base RE classes
-class Base(RandomGeneratorMixin):
+class Base(RandomGeneratorMixin, ABC):
     """
     Base class for random element objects.
     """
@@ -26,7 +27,6 @@ class Base(RandomGeneratorMixin):
         super().__init__(rng)
 
         self._space = None  # TODO: arg?
-
         self._mode = None  # TODO: make getter do numerical approx if None!?
 
     space = property(lambda self: self._space)
@@ -46,7 +46,6 @@ class Base(RandomGeneratorMixin):
         return vectorize_func(self._pf_single, self.shape)(x)  # TODO: decorator? better way?
 
     def _pf_single(self, x):
-        raise NotImplementedError("Method must be overwritten.")
         pass
 
     def plot_pf(self, x=None, ax=None, **kwargs):
@@ -100,7 +99,6 @@ class BaseRV(MixinRV, Base):
 
 
 # %% Specific RE's
-
 class Deterministic(Base):
     """
     Deterministic random element.
@@ -154,16 +152,6 @@ class DeterministicRV(MixinRV, Deterministic):
 
         self._mean = self._val
         self._cov = np.zeros(2 * self.shape)
-
-
-# rng = np.random.default_rng()
-# a = np.arange(6).reshape(3, 2)
-# # a = ['a','b','c']
-# b = Deterministic(a[1], rng)
-# b.mode
-# b.mean
-# b.cov
-# b.pf(b.rvs(8))
 
 
 # TODO: rename generic?
@@ -308,33 +296,6 @@ class FiniteRV(MixinRV, Finite):
         return self._cov
 
 
-# s = np.random.random((3, 1, 2))
-# pp = np.random.random((3,))
-# pp = pp / pp.sum()
-# f = Finite(s, pp)
-# f.rvs((2, 3))
-# f.pf(f.rvs((4, 5)))
-#
-# s = plotting.mesh_grid([0, 1], [0, 1, 2])
-# p_ = np.random.random((2, 3))
-# p_ = p_ / p_.sum()
-# # s, p_ = ['a', 'b', 'c'], [.3, .2, .5]
-# f2 = Finite(s, p_)
-# f2.pf(f2.rvs(4))
-# f2.plot_pf()
-# qq = None
-
-
-def _dirichlet_check_input(x, mean, alpha_0):
-    x, set_shape = check_valid_pmf(x, shape=mean.shape)
-
-    if np.logical_and(x == 0, mean < 1 / alpha_0).any():
-        raise ValueError("Each element in 'x' must be greater than "
-                         "zero if the corresponding mean element is less than 1 / alpha_0.")
-
-    return x, set_shape
-
-
 class Dirichlet(BaseRV):
     """
     Dirichlet random process, finite-supp realizations.
@@ -389,7 +350,11 @@ class Dirichlet(BaseRV):
         return rng.dirichlet(self._alpha_0 * self._mean.flatten(), size=n).reshape(n, *self.shape)
 
     def pf(self, x):
-        x, set_shape = _dirichlet_check_input(x, self._mean, self._alpha_0)
+        x, set_shape = check_valid_pmf(x, shape=self.shape)
+
+        if np.logical_and(x == 0, self.mean < 1 / self.alpha_0).any():
+            raise ValueError("Each element in 'x' must be greater than "
+                             "zero if the corresponding mean element is less than 1 / alpha_0.")
 
         log_pf = self._log_pf_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x).reshape(-1, self.size), -1)
         return np.exp(log_pf).reshape(set_shape)
@@ -399,29 +364,6 @@ class Dirichlet(BaseRV):
             self.space.x_plt = self.space.make_grid(self.space.n_plot, self.shape,
                                                     hull_mask=(self.mean < 1 / self.alpha_0))
         return self.space.plot(self.pf, x, ax)
-
-
-# rng_ = np.random.default_rng()
-# a0 = 10
-# m = np.random.random(3)
-# m = m / m.sum()
-# d = Dirichlet(m, a0, rng_)
-# d.plot_pf()
-# d.mean
-# d.mode
-# d.cov
-# d.rvs()
-# d.pf(d.rvs())
-# d.pf(d.rvs(4).reshape((2, 2)+d.mean.shape))
-
-
-def _empirical_check_input(x, n, mean):
-    x, set_shape = check_valid_pmf(x, shape=mean.shape)
-
-    if (np.minimum((n * x) % 1, (-n * x) % 1) > 1e-9).any():
-        raise ValueError("Each entry in 'x' must be a multiple of 1/n.")
-
-    return x, set_shape
 
 
 class Empirical(BaseRV):
@@ -494,26 +436,13 @@ class Empirical(BaseRV):
         return rng.multinomial(self._n, self._mean.flatten(), size=n).reshape(n, *self.shape) / self._n
 
     def pf(self, x):
-        x, set_shape = _empirical_check_input(x, self._n, self._mean)
+        x, set_shape = check_valid_pmf(x, shape=self.shape)
+        if (np.minimum((self._n * x) % 1, (-self._n * x) % 1) > 1e-9).any():
+            raise ValueError("Each entry in 'x' must be a multiple of 1/n.")
 
         log_pf = self._log_pf_coef + (xlogy(self._n * x, self._mean)
                                       - gammaln(self._n * x + 1)).reshape(-1, self.size).sum(axis=-1)
         return np.exp(log_pf).reshape(set_shape)
-
-
-# rng = np.random.default_rng()
-# n = 10
-# # m = np.random.random((1, 3))
-# m = np.random.default_rng().integers(10, size=(3,))
-# m = m / m.sum()
-# d = Empirical(m, n, rng)
-# d.plot_pf()
-# d.mean
-# d.mode
-# d.cov
-# d.rvs()
-# d.pf(d.rvs())
-# d.pf(d.rvs(4).reshape((2, 2) + d.mean.shape))
 
 
 class DirichletEmpirical(BaseRV):
@@ -578,23 +507,13 @@ class DirichletEmpirical(BaseRV):
         return rng.multinomial(self._n, theta_flat, size=n).reshape(n, *self.shape) / self._n
 
     def pf(self, x):
-        x, set_shape = _empirical_check_input(x, self._n, self._mean)
+        x, set_shape = check_valid_pmf(x, shape=self.shape)
+        if (np.minimum((self._n * x) % 1, (-self._n * x) % 1) > 1e-9).any():
+            raise ValueError("Each entry in 'x' must be a multiple of 1/n.")
 
         log_pf = self._log_pf_coef + (gammaln(self._alpha_0 * self._mean + self._n * x)
                                       - gammaln(self._n * x + 1)).reshape(-1, self.size).sum(axis=-1)
         return np.exp(log_pf).reshape(set_shape)
-
-
-# rng_ = np.random.default_rng()
-# n = 10
-# a0 = 600
-# m = np.ones((3,))
-# m = m / m.sum()
-# d = DirichletEmpirical(m, a0, n, rng_)
-# d.plot_pf()
-# d.mean
-# d.mode
-# d.cov
 
 
 class DirichletEmpiricalScalar(BaseRV):
@@ -651,11 +570,6 @@ class DirichletEmpiricalScalar(BaseRV):
         return self._multi.pf(np.stack((x, 1 - x), axis=-1))
 
 
-# de = DirichletEmpiricalScalar(.8, 5, 10)
-# de.pf(.3)
-# de.plot_pf()
-
-
 class Beta(BaseRV):
     """
     Beta random variable.
@@ -704,11 +618,11 @@ class Beta(BaseRV):
 
     # Attribute Updates
     def _update_attr(self):
-        # self._alpha_0 = self._a + self._b
+        a0 = self._a + self._b
 
         if self._a > 1:
             if self._b > 1:
-                self._mode = (self._a - 1) / (self._a + self._b - 2)
+                self._mode = (self._a - 1) / (a0 - 2)
             else:
                 self._mode = 1
         elif self._a <= 1:
@@ -719,8 +633,8 @@ class Beta(BaseRV):
             else:
                 self._mode = 0  # any in {0,1}
 
-        self._mean = self._a / (self._a + self._b)
-        self._cov = self._a * self._b / (self._a + self._b) ** 2 / (self._a + self._b + 1)
+        self._mean = self._a / a0
+        self._cov = self._a * self._b / a0 ** 2 / (a0 + 1)
 
     def _rvs(self, n, rng):
         return rng.beta(self._a, self._b, size=n)
@@ -866,7 +780,6 @@ class Uniform(BaseRV):
         b_flat = self.lims[..., 1].flatten()
         _temp = np.stack(tuple(rng.uniform(a, b, size=n) for a, b in zip(a_flat, b_flat)), axis=-1)
         return _temp.reshape((n, *self.shape))
-        # return rng.uniform(self._a, self._b, size=n)
 
     def pf(self, x):
         val = 1 / np.prod(self.lims[..., 1] - self.lims[..., 0])
@@ -902,9 +815,6 @@ class Normal(BaseRV):
         self._space = spaces.Euclidean(np.array(mean).shape)
 
         self.mean = mean
-        # self._mean = np.array(mean)
-        # self._mean_flat = self._mean.flatten()
-
         self.cov = cov
 
     def __repr__(self):
@@ -973,20 +883,6 @@ class Normal(BaseRV):
             self._space.lims_plot = lims
 
 
-# # mean_, cov_ = 1., 1.
-# mean_, cov_ = np.ones(2), np.eye(2)
-# norm = Normal(mean_, cov_)
-# norm.rvs(5)
-# plt_data = norm.plot_pf()
-#
-# delta = 0.01
-# # x = np.arange(-4, 4, delta)
-# x = np.stack(np.meshgrid(np.arange(-4, 4, delta), np.arange(-4, 4, delta)), axis=-1)
-#
-# y = norm.pf(x)
-# print(delta**2*y.sum())
-
-
 class NormalLinear(Normal):  # TODO: rework, only allow weights and cov to be set?
     def __init__(self, weights=(0.,), basis=np.ones(1), cov=(1.,), rng=None):
         self._basis = np.array(basis)
@@ -1013,10 +909,6 @@ class NormalLinear(Normal):  # TODO: rework, only allow weights and cov to be se
     @property
     def basis(self):
         return self._basis
-
-
-# bs = [[1, 0], [0, 1], [1, 1]]
-# a = NormalLinear(weights=np.ones(2), basis=np.array(bs), cov=np.eye(3))
 
 
 class DataEmpirical(Base):
@@ -1127,9 +1019,7 @@ class DataEmpirical(Base):
             # return self._p[idx]
 
             # FIXME: delta use needs to account for space dimensionality!?
-            # delta = DELTA if isinstance(self.space, spaces.Continuous) else 1.
             if isinstance(self.space, spaces.Continuous):
-                # raise NotImplementedError
                 delta = 1e250  # large value approximating the value of the Dirac delta function at zero
             else:
                 delta = 1.
@@ -1181,21 +1071,6 @@ class DataEmpiricalRV(MixinRV, DataEmpirical):
         return self._cov
 
 
-# # r = Beta(5, 5)
-# # # r = Finite(plotting.mesh_grid([0, 1], [3, 4, 5]), np.ones((2, 3)) / 6)
-# # # r = Finite(['a', 'b'], [.6, .4])
-# # e = DataEmpirical.from_data(r.rvs(10), space=r.space)
-# # e.add_data(r.rvs(10))
-#
-# # e = DataEmpirical(['a', 'b'], [5, 6], space=spaces.FiniteGeneric(['a', 'b']))
-# e = DataEmpirical([], [], space=spaces.FiniteGeneric([0, 1]))
-# # e.add_values(['b', 'c'], [4, 1])
-#
-# print(e)
-# e.plot_pf()
-# qq = None
-
-
 class Mixture(Base):
     def __new__(cls, dists, weights, rng=None):
         if all(isinstance(dist, MixinRV) for dist in dists):
@@ -1240,12 +1115,6 @@ class Mixture(Base):
         self._dists[idx] = dist
         self.weights[idx] = weight
         self._update_attr()  # weights setter not invoked
-        # try:
-        #     self._dists[idx] = dist
-        #     self.weights[idx] = weight
-        #     self._update_attr()     # weights setter not invoked
-        # except IndexError:
-        #     self.add_dist(dist, weight)
 
     # def add_dist(self, dist, weight):
     #     self._dists.append(dist)
@@ -1289,14 +1158,12 @@ class Mixture(Base):
         return out
 
     def pf(self, x):
-        # return sum(prob * dist.pf(x) for prob, dist in zip(self._p, self.dists) if prob > 0)
         return sum(self._p[i] * self.dists[i].pf(x) for i in self._idx_nonzero)
 
     def plot_pf(self, x=None, ax=None, **kwargs):
         if x is None and self.space.x_plt is None:
             # self.space.set_x_plot()
 
-            # dists_nonzero = [dist for (w, dist) in zip(self.weights, self.dists) if w > 0]
             dists_nonzero = [self.dists[i] for i in self._idx_nonzero]
 
             # Update space plotting attributes
@@ -1329,23 +1196,6 @@ class MixtureRV(MixinRV, Mixture):
     @property
     def mean(self):
         if self._mean is None:
-            # self._mean = sum(prob * dist.mean for prob, dist in zip(self._p, self.dists) if prob > 0)
             self._mean = sum(self._p[i] * self.dists[i].mean for i in self._idx_nonzero)
 
         return self._mean
-
-# # dists_ = [Beta(*args) for args in [[10, 5], [2, 12]]]
-# # dists_ = [Normal(mean, 1) for mean in [0, 4]]
-# # dists_ = [Normal(mean, 1) for mean in [[0, 0], [2, 3]]]
-# # dists_ = [Finite(['a', 'b'], p=[p_, 1-p_]) for p_ in [0, 1]]
-# # dists_ = [Finite([[0, 0], [0, 1]], p=[p_, 1-p_]) for p_ in [0, 1]]
-#
-# dists_ = [Normal(2)]
-# dists_.append(DataEmpirical.from_data(dists_[0].rvs(0)))
-#
-# m = Mixture(dists_, [5, 0])
-# m.rvs(10)
-# m.plot_pf()
-# print(m.space.integrate(m.pf))
-# print(m.space.moment(m.pf))
-# qq = None

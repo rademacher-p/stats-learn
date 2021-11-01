@@ -6,7 +6,7 @@ from stats_learn.spaces import Box
 np.set_printoptions(precision=3)
 
 
-def test_main():
+def test_main():  # TODO: test with assertions
     # test discretizer
     x = np.random.default_rng().random(10)
     print(x)

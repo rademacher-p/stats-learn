@@ -151,7 +151,7 @@ class Base(ABC):
             raise NotImplementedError  # TODO
 
 
-class Discrete(Base):
+class Discrete(Base, ABC):
     pass
 
     # def plot_xy(self, x, y, y_std=None, y_std_hi=None, ax=None, label=None, **error_kwargs):
@@ -205,7 +205,7 @@ class Discrete(Base):
     #     return plt_data
 
 
-class Finite(Discrete):
+class Finite(Discrete, ABC):
     pass
 
 
@@ -307,7 +307,7 @@ class FiniteGeneric(Finite):
 
 
 # %%
-class Continuous(Base):
+class Continuous(Base, ABC):
     def __init__(self, shape):
         super().__init__(shape, np.float64)
 
