@@ -3,7 +3,6 @@ import math
 import numpy as np
 
 from stats_learn.util import check_data_shape
-# from stats_learn.util.plotting import box_grid
 
 
 def make_discretizer(vals):  # TODO: use sklearn.preprocessing.KBinsDiscretizer?
@@ -57,37 +56,3 @@ def make_clipper(lims):
         return x
 
     return clipper
-
-
-# def main():
-#     # test discretizer
-#     x = np.random.default_rng().random(10)
-#     print(x)
-#
-#     vals = np.linspace(0, 1, 11)
-#     func_ = make_discretizer(vals)
-#     x_d = func_(x)
-#     print(x_d)
-#
-#     x = np.random.default_rng().random((10, 2))
-#     print(x)
-#
-#     vals = box_grid([[0, 1], [0, 1]], 11, True).reshape(-1, 2)
-#     func_ = make_discretizer(vals)
-#     x_d = func_(x)
-#     print(x_d)
-#
-#     # test clipper
-#     # lims = np.array((0, 1))
-#     lims = np.array([(0, 1), (0, 1)])
-#     clipper = make_clipper(lims)
-#
-#     x = np.random.default_rng().uniform(-1, 2, (10, *lims.shape[:-1]))
-#     print(x)
-#
-#     x_c = clipper(x)
-#     print(x_c)
-#
-#
-# if __name__ == '__main__':
-#     main()
