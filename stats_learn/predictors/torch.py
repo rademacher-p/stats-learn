@@ -44,7 +44,7 @@ class LitMLP(pl.LightningModule):
 
     def forward(self, x):
         y = self.model(x)
-        # low = torch.tensor(0., dtype=torch.float32).to(y.device)
+        # low = torch.tensor(0., dtype=torch.float32).to(y.device)  # TODO: delete clipping?
         # high = torch.tensor(1., dtype=torch.float32).to(y.device)
         # y = torch.where(y < 0., low, y)
         # y = torch.where(y > 1., high, y)

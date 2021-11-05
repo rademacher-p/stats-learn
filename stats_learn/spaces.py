@@ -20,13 +20,6 @@ def check_spaces(iter_):
         raise ValueError("All objects must have the same space attribute.")
 
 
-def check_spaces_x(iter_):
-    if all_equal((obj.space['x'] for obj in iter_)):
-        return iter_[0].space['x']
-    else:
-        raise ValueError("All objects must have the same space attribute.")
-
-
 class Base(ABC):
     def __init__(self, shape, dtype):
         self._shape = tuple(shape)
@@ -74,9 +67,6 @@ class Base(ABC):
 
         return ax
 
-    # def plot(self, f, x=None, ax=None, label=None, **kwargs):
-    #     raise Exception
-
     def plot(self, f, x=None, ax=None, label=None, **kwargs):
         x, y, set_shape = self._eval_func(f, x)
         return self.plot_xy(x, y, ax=ax, label=label)
@@ -90,7 +80,6 @@ class Base(ABC):
             raise NotImplementedError
 
         if len(set_shape) == 1 and self.shape == ():
-            # fmt = '-'
             fmt = '.-' if isinstance(self, Discrete) else '-'
 
             plt_data = ax.plot(x, y, fmt, label=label)

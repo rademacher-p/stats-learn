@@ -299,17 +299,14 @@ class BayesRegressor(RegressorMixin, Bayes):
                 w_cov = np.zeros((n_train.size, p_x.size))
                 w_bias = np.zeros((n_train.size, p_x.size))
                 for i_n, n_i in enumerate(n_train.flatten()):
-                    # rv = rand_elements.EmpiricalScalar(n_i, .5)
                     rv = rand_elements.Binomial(.5, n_i)
                     supp = rv.space.values
                     for i_x, (p_i, a_i) in enumerate(zip(p_x, alpha_x)):
                         rv.p = p_i
                         p_rv = rv.pf(supp)
 
-                        # den = (a_i + n_i * supp) ** 2
                         den = (a_i + supp) ** 2
 
-                        # w_cov[i_n, i_x] = (p_rv / den * n_i * supp).sum()
                         w_cov[i_n, i_x] = (p_rv / den * supp).sum()
                         w_bias[i_n, i_x] = (p_rv / den * a_i ** 2).sum()
 
@@ -334,7 +331,6 @@ class BayesRegressor(RegressorMixin, Bayes):
                     alpha_m = self.bayes_model.prior_mean.model_x.pf(x)
                     weights = (alpha_m + 1 / (alpha_0 + n_train[..., np.newaxis])) / (alpha_m + 1 / alpha_0)
 
-                    # return (alpha_m * weights * self.bayes_model.prior_mean.cov_y_x(x)).sum(axis=-1)
                     return np.dot(weights * self.bayes_model.prior_mean.cov_y_x(x), alpha_m)
                 else:
                     raise NotImplementedError

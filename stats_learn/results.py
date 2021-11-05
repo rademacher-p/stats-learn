@@ -58,7 +58,6 @@ def _log_and_fig(message, log_path, ax, img_path):
         img_path.parent.mkdir(parents=True, exist_ok=True)
 
         log_path = Path(log_path)
-        # str_ = img_path.absolute().as_posix()
         str_ = img_path.relative_to(log_path.parent).as_posix()
         file_format += f"\n![]({str_})\n"
 
@@ -103,8 +102,6 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, x=None, verbos
         ax = space_x.make_axes()
 
     h_data = ax.scatter(d_train['x'], d_train['y'], c='k', marker='o', label='$D$')
-    # if do_loss:
-    #     ax.scatter(d_test['x'], d_test['y'], c='k', marker='D', label=None)
 
     h_predictors = []
     for predictor, params, loss in zip(predictors, params_full, loss_full):
@@ -239,7 +236,6 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
     do_loss = n_test > 0
 
     if do_stats:
-        # space_x = check_spaces_x(predictors)
         space_x = model.space['x']
         if x is None:
             x = space_x.x_plt

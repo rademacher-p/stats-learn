@@ -2,8 +2,9 @@
 Bayesian random elements.
 """
 
+from abc import ABC, abstractmethod
+
 import numpy as np
-from matplotlib import pyplot as plt
 from scipy.stats._multivariate import _PSD
 
 from stats_learn.random import elements as rand_elements
@@ -14,9 +15,7 @@ from stats_learn.util import RandomGeneratorMixin
 # TODO: rename `model` attributes to `element`?
 
 
-# %% Priors
-
-class Base(RandomGeneratorMixin):
+class Base(RandomGeneratorMixin, ABC):
     def __init__(self, prior=None, rng=None):
         super().__init__(rng)
 
@@ -32,6 +31,7 @@ class Base(RandomGeneratorMixin):
     size = property(lambda self: self._space.size)
     ndim = property(lambda self: self._space.ndim)
 
+    @abstractmethod
     def random_model(self, rng=None):
         raise NotImplementedError
 
@@ -46,6 +46,7 @@ class Base(RandomGeneratorMixin):
 
         self._fit(d, warm_start)
 
+    @abstractmethod
     def _fit(self, d, warm_start=False):
         raise NotImplementedError
 
@@ -169,17 +170,6 @@ class NormalLinear(Base):
         self._prior_model_cov = self._make_posterior_model_cov(self.prior_cov)
 
 
-# basis = [[1, 0], [0, 1], [1, 1]]
-# a = NormalLinear(prior_mean=np.ones(2), prior_cov=10*np.eye(2), basis=basis, cov=np.eye(3), rng=None)
-# r = a.random_model()
-# d = r.rvs(10)
-# a.fit(d)
-# print(a.prior.mean)
-# print(a.posterior.mean)
-# print(r.weights)
-# qq = None
-
-
 class Dirichlet(Base):
     def __init__(self, prior_mean, alpha_0, rng=None):
         super().__init__(prior=None, rng=rng)
@@ -193,8 +183,6 @@ class Dirichlet(Base):
 
     def __setattr__(self, name, value):
         if name.startswith('prior_mean.'):
-            # setattr(self.prior_mean, name.removeprefix('prior_mean.'), value)
-            # self.posterior_model.set_dist_attr(0, **{name.removeprefix('prior_mean.'): value})
             self.posterior_model.set_dist_attr(0, **{name.replace('prior_mean.', ''): value})
         else:
             super().__setattr__(name, value)
@@ -247,32 +235,3 @@ class Dirichlet(Base):
             emp_dist = rand_elements.DataEmpirical([], [], space=self.space)
         emp_dist.add_data(d)
         self.emp_dist = emp_dist
-
-
-if __name__ == '__main__':
-    # alpha = rand_elements.Beta(5, 25)
-    # theta = rand_elements.Beta(25, 5)
-
-    alpha = rand_elements.Finite(['a', 'b'], [.2, .8])
-    theta = rand_elements.Finite(['a', 'b'], [.8, .2])
-
-    print(f"Mode = {theta.mode}")
-    # print(f"Mean = {theta.mean}")
-    theta.plot_pf()
-    plt.title("True")
-
-    a = Dirichlet(prior_mean=alpha, alpha_0=10)
-
-    # a.rvs(5)
-    print(f"Mode = {a.posterior_model.mode}")
-    # print(f"Mean = {a.posterior_model.mean}")
-    a.posterior_model.plot_pf()
-    plt.title("Prior")
-
-    a.fit(theta.rvs(100))
-    # a.rvs(10)
-    print(f"Mode = {a.posterior_model.mode}")
-    # print(f"Mean = {a.posterior_model.mean}")
-    a.posterior_model.plot_pf()
-    plt.title("Posterior")
-    pass

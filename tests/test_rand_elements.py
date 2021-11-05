@@ -1,12 +1,16 @@
 import numpy as np
+from matplotlib import pyplot as plt
 
 from stats_learn.random.elements import BaseRV, Deterministic, Finite, Beta, Dirichlet, Empirical, DirichletEmpirical, \
     DirichletEmpiricalScalar, Normal, NormalLinear, DataEmpirical, Mixture
 from stats_learn import spaces
 
+plt.matplotlib.interactive(False)
+
 rng = np.random.default_rng()
 
-RE = [
+
+RE_set = [
     (Deterministic, {'val': np.arange(6).reshape(3, 2)}),
     (Deterministic, {'val': ['a', 'b', 'c']}),
     (Finite, {'supp': rng.random((3, 3, 2)), 'p': np.full((3, 3), 1/9)}),
@@ -23,16 +27,21 @@ RE = [
 ]
 
 
-def test_re():
-    for cls, kwargs in RE:
-        re = cls(**kwargs)
+def test():
+    for cls, kwargs in RE_set:
+        e = cls(**kwargs)
 
-        re.mode
-        rvs = re.rvs(5)
-        re.pf(rvs)
+        e.mode
+        x = e.rvs(5)
+        e.pf(x)
+        # e.plot_pf(x)
 
-        if isinstance(re, BaseRV):
-            re.mean
-            re.cov
+        if isinstance(e, BaseRV):
+            e.mean
+            e.cov
 
         # TODO: check PF sum to approx unity. Use `space` integration method!
+
+
+if __name__ == '__main__':
+    test()

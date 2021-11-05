@@ -4,7 +4,7 @@ Random elements.
 
 # TODO: do ABC or PyCharm bug?
 
-from abc import ABC
+from abc import ABC, abstractmethod
 import math
 from numbers import Integral
 from typing import Optional, Union
@@ -62,13 +62,12 @@ class Base(RandomGeneratorMixin, ABC):
             raise TypeError("Input 'size' must be int or tuple.")
 
         rng = self._get_rng(rng)
-        # return self._rvs(math.prod(shape), rng).reshape(shape + self.shape)
         rvs = self._rvs(math.prod(shape), rng)
         return rvs.reshape(shape + rvs.shape[1:])  # TODO: use np.asscalar if possible?
 
+    @abstractmethod
     def _rvs(self, n, rng):
         raise NotImplementedError("Method must be overwritten.")
-        pass
 
 
 class MixinRV:
@@ -87,7 +86,7 @@ class MixinRV:
         return self._cov
 
 
-class BaseRV(MixinRV, Base):
+class BaseRV(MixinRV, Base, ABC):
     """
     Base class for random variable (numeric) objects.
     """
@@ -1115,16 +1114,6 @@ class Mixture(Base):
         self._dists[idx] = dist
         self.weights[idx] = weight
         self._update_attr()  # weights setter not invoked
-
-    # def add_dist(self, dist, weight):
-    #     self._dists.append(dist)
-    #     self.weights.append(weight)
-    #     self._update_attr()
-
-    # def del_dist(self, idx):
-    #     del self._dists[idx]
-    #     del self.weights[idx]
-    #     self._update_attr()
 
     @property
     def _idx_nonzero(self):

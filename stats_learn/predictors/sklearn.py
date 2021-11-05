@@ -17,12 +17,9 @@ class SKLPredictor(Base):  # TODO: rework for new reset/fit functionality
             raise ValueError("Estimator must be regressor-type.")
 
         super().__init__(loss_func, space, proc_funcs, name)
+
         self.estimator = estimator
-        # self._space = space
-
         self.can_warm_start = hasattr(self.estimator, 'warm_start')  # TODO: bugged if estimator is `Pipeline`?
-
-    # space = property(lambda self: self._space)
 
     @property
     def _model_obj(self):
