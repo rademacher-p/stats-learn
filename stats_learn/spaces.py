@@ -74,8 +74,12 @@ class Base(ABC):
 
         return ax
 
+    # def plot(self, f, x=None, ax=None, label=None, **kwargs):
+    #     raise Exception
+
     def plot(self, f, x=None, ax=None, label=None, **kwargs):
-        raise Exception
+        x, y, set_shape = self._eval_func(f, x)
+        return self.plot_xy(x, y, ax=ax, label=label)
 
     def plot_xy(self, x, y, y_std=None, y_std_hi=None, ax=None, label=None):
         if ax is None:
@@ -86,8 +90,8 @@ class Base(ABC):
             raise NotImplementedError
 
         if len(set_shape) == 1 and self.shape == ():
-            fmt = '-'
-            # fmt = '.-' if isinstance(self, Discrete) else '-'  # TODO: remove?
+            # fmt = '-'
+            fmt = '.-' if isinstance(self, Discrete) else '-'
 
             plt_data = ax.plot(x, y, fmt, label=label)
             if y_std is not None:
@@ -277,33 +281,33 @@ class FiniteGeneric(Finite):
     def set_x_plot(self):
         self.x_plt = self.values
 
-    def plot(self, f, x=None, ax=None, label=None, **kwargs):
-        if ax is None:
-            ax = self.make_axes()
-
-        x, y, set_shape = self._eval_func(f, x)
-
-        set_ndim = len(set_shape)
-        if set_ndim == 1 and self.shape == ():
-            if np.issubdtype(self.dtype, np.number):
-                return ax.plot(x, y, '.-', label=label)
-            else:
-                return ax.stem(x, y, use_line_collection=True, label=label)
-
-        elif set_ndim == 2 and self.shape == (2,) and np.issubdtype(self.dtype, np.number):
-            # return ax.bar3d(x[..., 0].flatten(), x[..., 1].flatten(), 0, 1, 1, y.flatten(), shade=True)
-            return ax.plot(x[..., 0].flatten(), x[..., 1].flatten(), y.flatten(), marker='.', linestyle='', label=label)
-
-        elif set_ndim == 3 and self.shape == (3,) and np.issubdtype(self.dtype, np.number):
-            plt_data = ax.scatter(x[..., 0], x[..., 1], x[..., 2], s=15, c=y, label=label)
-
-            c_bar = plt.colorbar(plt_data, ax=ax)
-            c_bar.set_label('$y$')
-
-            return plt_data
-
-        else:
-            raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
+    # def plot(self, f, x=None, ax=None, label=None, **kwargs):
+    #     if ax is None:
+    #         ax = self.make_axes()
+    #
+    #     x, y, set_shape = self._eval_func(f, x)
+    #
+    #     set_ndim = len(set_shape)
+    #     if set_ndim == 1 and self.shape == ():
+    #         if np.issubdtype(self.dtype, np.number):
+    #             return ax.plot(x, y, '.-', label=label)
+    #         else:
+    #             return ax.stem(x, y, use_line_collection=True, label=label)
+    #
+    #     elif set_ndim == 2 and self.shape == (2,) and np.issubdtype(self.dtype, np.number):
+    #         # return ax.bar3d(x[..., 0].flatten(), x[..., 1].flatten(), 0, 1, 1, y.flatten(), shade=True)
+    #         return ax.plot(x[..., 0].flatten(), x[..., 1].flatten(), y.flatten(), marker='.', linestyle='', label=label)
+    #
+    #     elif set_ndim == 3 and self.shape == (3,) and np.issubdtype(self.dtype, np.number):
+    #         plt_data = ax.scatter(x[..., 0], x[..., 1], x[..., 2], s=15, c=y, label=label)
+    #
+    #         c_bar = plt.colorbar(plt_data, ax=ax)
+    #         c_bar.set_label('$y$')
+    #
+    #         return plt_data
+    #
+    #     else:
+    #         raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
 
 
 # %%

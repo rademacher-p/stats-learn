@@ -3,21 +3,14 @@ import pickle
 
 from matplotlib import pyplot as plt
 
-plt.style.use('../images/style.mplstyle')
+plt.style.use('images/style.mplstyle')
 plt.matplotlib.interactive(False)
-
-
-def label_update(label):
-    label = label.replace(r'\Dir', r'\mathrm{Dir}')
-    if label == r'$f_{\Theta}(\theta)$':
-        label = r'$f^*(\theta)$'
-    return label
 
 
 def main(dirs):
     for dir_ in dirs:
         dir_ = Path(dir_)
-        subdir = dir_ / 'new'
+        subdir = dir_ / 'temp'
         subdir.mkdir()
         for filepath in dir_.glob('*.mpl'):
             filename = filepath.name
@@ -25,6 +18,7 @@ def main(dirs):
             with filepath.open('rb') as f:
                 fig = pickle.load(f)
 
+            # Modifications
             for ax in fig.axes:
                 ylabel = ax.get_ylabel()
                 ylabel = ylabel.replace(r'\Rcal', r'\mathcal{R}')
@@ -45,8 +39,7 @@ def main(dirs):
                 title = ax.get_title()
                 title.replace(r'\Dir', r'\mathrm{Dir}')
                 ax.set_title(title)
-
-                # TODO: title replace \Dir, ylabel replace bayes risk
+            # End mods
 
             fig.savefig(subdir / f"{filepath.stem}.png")
             mpl_file = subdir / filename
@@ -56,13 +49,20 @@ def main(dirs):
         # plt.show()
 
 
+def label_update(label):
+    label = label.replace(r'\Dir', r'\mathrm{Dir}')
+    if label == r'$f_{\Theta}(\theta)$':
+        label = r'$f^*(\theta)$'
+    return label
+
+
 if __name__ == '__main__':
-    # dirs = [
+    # dirs_ = [
     #     '../../docs/Figures/Discrete/SE/reg_func',
     #     # '../../docs/Figures/Discrete/SE/reg_var',
     #     # '../../docs/Figures/Discretization/SE/reg_var',
     # ]
-    # main(dirs)
+    # main(dirs_)
 
     import argparse
 
