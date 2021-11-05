@@ -14,6 +14,20 @@ from stats_learn.util import check_data_shape
 # TODO: issubset method?
 
 def check_spaces(iter_):
+    """
+    Check iterable of spaces for equivalence.
+
+    Parameters
+    ----------
+    iter_ : Iterable
+        Spaces
+
+    Returns
+    -------
+    Base
+        A space instance.
+
+    """
     if all_equal((obj.space for obj in iter_)):
         return iter_[0].space
     else:
@@ -22,6 +36,17 @@ def check_spaces(iter_):
 
 class Base(ABC):
     def __init__(self, shape, dtype):
+        """
+        Base class for spaces.
+
+        Parameters
+        ----------
+        shape : tuple
+            Shape of space elements.
+        dtype : type
+            Data type of space elements.
+
+        """
         self._shape = tuple(shape)
         self._size = math.prod(self._shape)
         self._ndim = len(self._shape)
@@ -38,6 +63,7 @@ class Base(ABC):
 
     @property
     def x_plt(self):
+        """Array of default values for plotting routines."""
         if self._x_plt is None:
             self.set_x_plot()
         return self._x_plt
@@ -50,6 +76,8 @@ class Base(ABC):
         pass
 
     def make_axes(self):  # TODO: axes kwargs
+        """Create axes for plotting."""
+
         if self.shape == ():
             _, ax = plt.subplots()
             ax.set(xlabel='$x$', ylabel='$y$')
@@ -68,10 +96,52 @@ class Base(ABC):
         return ax
 
     def plot(self, f, x=None, ax=None, label=None, **kwargs):
+        """
+        Plot a function.
+
+        Parameters
+        ----------
+        f : callable
+            The function to plot.
+        x : array_like, optional
+            Values to plot against. Defaults to `self.x_plt`.
+        ax : matplotlib.axes.Axes, optional
+        label : str, optional
+            Label for matplotlib.artist.Artist
+        kwargs : dict, optional
+            Additional plotting keyword arguments.
+
+        Returns
+        -------
+        matplotlib.artist.Artist or tuple of matplotlib.artist.Artist
+
+        """
         x, y, set_shape = self._eval_func(f, x)
         return self.plot_xy(x, y, ax=ax, label=label)
 
     def plot_xy(self, x, y, y_std=None, y_std_hi=None, ax=None, label=None):
+        """
+        Plot an array.
+
+        Parameters
+        ----------
+        x : array_like
+            Domain (i.e. space) values.
+        y : array_like
+            Range values.
+        y_std : array_like, optional
+            Standard deviation for error plotting.
+        y_std_hi : array_like, optional
+            Upper standard deviation, if different from lower defined in `y_std`.
+        ax : matplotlib.axes.Axes, optional
+        label : str, optional
+            Label for matplotlib.artist.Artist
+
+        Returns
+        -------
+        matplotlib.artist.Artist or tuple of matplotlib.artist.Artist
+
+        """
         if ax is None:
             ax = self.make_axes()
 
@@ -111,6 +181,8 @@ class Base(ABC):
         return plt_data
 
     def _eval_func(self, f, x=None):
+        """Evaluate callable."""
+
         if x is None:
             x = self.x_plt
 

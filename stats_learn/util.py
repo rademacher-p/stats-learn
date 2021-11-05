@@ -6,11 +6,20 @@ import numpy as np
 
 
 def get_now():
+    """Get ISO datetime in format compatible with Windows filename."""
     return datetime.now().replace(microsecond=0).isoformat().replace(':', '_')
 
 
 class RandomGeneratorMixin:
     def __init__(self, rng=None):
+        """
+        Provides a RNG property and methods for seeding.
+
+        Parameters
+        ----------
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+        """
         self.rng = rng
 
     @property
@@ -22,6 +31,7 @@ class RandomGeneratorMixin:
         self._rng = self.make_rng(val)
 
     def _get_rng(self, rng=None):
+        """Returns own RNG or makes a new one."""
         if rng is None:
             return self._rng
         else:
@@ -34,12 +44,12 @@ class RandomGeneratorMixin:
 
         Parameters
         ----------
-        rng : int or RandomState or Generator, optional
+        rng : int or np.random.RandomState or np.random.Generator, optional
             Random number generator seed or object.
 
         Returns
         -------
-        Generator
+        np.random.Generator
 
         """
         if rng is None:
@@ -53,6 +63,23 @@ class RandomGeneratorMixin:
 
 
 def check_data_shape(x, shape=()):
+    """
+    Checks that trailing elements of array shape match desired data shape.
+
+    Parameters
+    ----------
+    x : array_like
+    shape : tuple, optional
+        Shape of data tensors.
+
+    Returns
+    -------
+    np.ndarray
+        The data tensor as a NumPy array.
+    tuple
+        The shape of the data set (i.e., the leading elements of the array shape).
+
+    """
     x = np.array(x)
 
     idx = x.ndim - len(shape)
@@ -65,6 +92,27 @@ def check_data_shape(x, shape=()):
 
 
 def check_valid_pmf(p, shape=None, full_support=False, tol=1e-9):
+    """
+    Check that array is a valid probability mass function.
+
+    Parameters
+    ----------
+    p : array_like
+    shape : tuple, optional
+        Shape of PMF tensors.
+    full_support : bool, optional
+        Raises `ValueError` if the PMF is not full-support (i.e. if any elements are zero)
+    tol : float, optional
+        Tolerance for ensuring PMF sums to unity.
+
+    Returns
+    -------
+    np.ndarray
+        The PMF as a NumPy array.
+    tuple
+        The shape of the set of PMFs (i.e., the leading elements of the array shape).
+
+    """
     if shape is None:
         p = np.array(p)
         set_shape = ()
@@ -88,6 +136,20 @@ def check_valid_pmf(p, shape=None, full_support=False, tol=1e-9):
 
 
 def vectorize_func(func, shape):
+    """
+    Vectorizes a callable according to specified input shape.
+
+    Parameters
+    ----------
+    func : callable
+    shape : tuple, optional
+        Shape of data tensors.
+
+    Returns
+    -------
+    function
+
+    """
     @wraps(func)
     def func_vec(x):
         x, set_shape = check_data_shape(x, shape)

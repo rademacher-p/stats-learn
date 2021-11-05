@@ -186,7 +186,7 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
         Directory for saving generated images.
     ax : matplotlib.axes.Axes, optional
         Axes onto which stats/losses are plotted.
-    rng : int or RandomState or Generator, optional
+    rng : int or np.random.RandomState or np.random.Generator, optional
             Random number generator seed or object.
 
     Returns

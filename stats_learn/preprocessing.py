@@ -6,7 +6,20 @@ from stats_learn.util import check_data_shape
 
 
 def make_discretizer(vals):  # TODO: use sklearn.preprocessing.KBinsDiscretizer?
-    """Create a rounding discretization function."""
+    """
+    Create a rounding discretization function.
+
+    Parameters
+    ----------
+    vals : array_like
+        Values to which to round.
+
+    Returns
+    -------
+    function
+        The rounding function.
+
+    """
     vals = np.array(vals)
 
     shape = vals.shape[1:]
@@ -41,7 +54,20 @@ def prob_disc(shape):
 
 
 def make_clipper(lims):
-    """Create a function that clips inputs into a closed box space."""
+    """
+    Create a function that clips inputs into a closed box space.
+
+    Parameters
+    ----------
+    lims : array_like
+        Array of lower and upper bounds to clip inputs to.
+
+    Returns
+    -------
+    function
+        Clipping function.
+
+    """
     lims = np.array(lims)
 
     low, high = lims[..., 0], lims[..., 1]
