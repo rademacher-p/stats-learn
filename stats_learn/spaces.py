@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 import math
 from numbers import Integral
 
@@ -72,8 +72,9 @@ class Base(ABC):
     def x_plt(self, val):
         self._x_plt = val
 
+    @abstractmethod
     def set_x_plot(self):
-        pass
+        raise NotImplementedError
 
     def make_axes(self):  # TODO: axes kwargs
         """Create axes for plotting."""
@@ -217,6 +218,7 @@ class Base(ABC):
 
 
 class Discrete(Base, ABC):
+    """Base class for discrete spaces."""
     pass
 
     # def plot_xy(self, x, y, y_std=None, y_std_hi=None, ax=None, label=None, **error_kwargs):
@@ -271,11 +273,23 @@ class Discrete(Base, ABC):
 
 
 class Finite(Discrete, ABC):
+    """Base class for finite spaces."""
     pass
 
 
 class FiniteGeneric(Finite):
     def __init__(self, values, shape=()):  # TODO: flatten and ignore set shape?
+        """
+        Finite-dimensional space with specified values.
+
+        Parameters
+        ----------
+        values : array_like
+            Explicit elements of space.
+        shape : tuple, optional
+            Shape of space elements.
+
+        """
         self.values = np.array(values)
         super().__init__(shape, self.values.dtype)
 
@@ -296,6 +310,7 @@ class FiniteGeneric(Finite):
 
     @classmethod
     def from_outer(cls, *vecs):
+        """Define support as outer product of tensors."""
         if len(vecs) == 1:
             return cls(vecs, ())
         else:
@@ -304,6 +319,7 @@ class FiniteGeneric(Finite):
 
     @classmethod
     def from_grid(cls, lims, n=100, endpoint=True):
+        """Define support as grid over a Box space."""
         grid = Box.make_grid(lims, n, endpoint)
         shape = (grid.shape[-1],) if grid.ndim > 1 else ()
         return cls(grid, shape)
@@ -371,9 +387,9 @@ class FiniteGeneric(Finite):
     #         raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
 
 
-# %%
 class Continuous(Base, ABC):
     def __init__(self, shape):
+        """Base class for continuous spaces."""
         super().__init__(shape, np.float64)
 
     @property
@@ -416,6 +432,15 @@ class Continuous(Base, ABC):
 
 class Box(Continuous):  # TODO: make Box inherit from Euclidean?
     def __init__(self, lims):
+        """
+        Orthotope space.
+
+        Parameters
+        ----------
+        lims : array_like
+            Lower and upper limits for each dimension.
+
+        """
         self.lims = lims
         super().__init__(shape=self.lims.shape[:-1])
 
@@ -459,6 +484,24 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
 
     @staticmethod
     def make_grid(lims, n=100, endpoint=True):
+        """
+        Make a equally-spaced grid of tensors.
+
+        Parameters
+        ----------
+        lims : array_like
+            Lower and upper limits for each dimension.
+        n : int, optional
+            Number of points defining the plot grid.
+        endpoint : bool, optional
+            If True, the upper limit values are included in the grid.
+
+        Returns
+        -------
+        numpy.ndarray
+
+        """
+
         lims = np.array(lims)
         # if not (lims[..., 0] <= lims[..., 1]).all():
         #     raise ValueError("Upper values must meet or exceed lower values.")
@@ -482,6 +525,15 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
 
 class Euclidean(Box):
     def __init__(self, shape):
+        """
+        A Euclidean space.
+
+        Parameters
+        ----------
+        shape : tuple
+            Shape of space elements.
+
+        """
         if isinstance(shape, (Integral, np.integer)):
             shape = (shape,)
 
@@ -521,12 +573,19 @@ class Euclidean(Box):
         self._x_plt = None
 
 
-# %%
-
-# TODO: add integration and mode finding
-
 class Simplex(Continuous):
+    # TODO: add integration and mode finding
+
     def __init__(self, shape):
+        """
+        A simplex space.
+
+        Parameters
+        ----------
+        shape : tuple
+            Shape of space elements.
+
+        """
         super().__init__(shape)
         self._n_plot = 40
 
@@ -551,6 +610,7 @@ class Simplex(Continuous):
 
     @property
     def n_plot(self):
+        """Number of points defining the default plot grid."""
         return self._n_plot
 
     @n_plot.setter
@@ -561,7 +621,21 @@ class Simplex(Continuous):
     @staticmethod
     def make_grid(n, shape, hull_mask=None):
         """
-        Generate a uniform grid over a simplex.
+        Make a equally-spaced grid of tensors.
+
+        Parameters
+        ----------
+        n : int, optional
+            Number of points defining the plot grid.
+        shape : tuple
+            Shape of space elements.
+        hull_mask : array_like, optional
+            Where True, defines boundaries to exclude.
+
+        Returns
+        -------
+        numpy.ndarray
+
         """
 
         if type(n) is not int or n < 1:
@@ -649,6 +723,17 @@ class Simplex(Continuous):
 
 class SimplexDiscrete(Simplex):
     def __init__(self, n, shape):
+        """
+        Finite grid over Simplex space.
+
+        Parameters
+        ----------
+        n : int
+            Number of points defining the grid.
+        shape : tuple
+            Shape of space elements.
+
+        """
         self.n = n
         super().__init__(shape)
 

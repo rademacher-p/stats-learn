@@ -74,7 +74,7 @@ def check_data_shape(x, shape=()):
 
     Returns
     -------
-    np.ndarray
+    numpy.ndarray
         The data tensor as a NumPy array.
     tuple
         The shape of the data set (i.e., the leading elements of the array shape).
@@ -107,7 +107,7 @@ def check_valid_pmf(p, shape=None, full_support=False, tol=1e-9):
 
     Returns
     -------
-    np.ndarray
+    numpy.ndarray
         The PMF as a NumPy array.
     tuple
         The shape of the set of PMFs (i.e., the leading elements of the array shape).
@@ -137,7 +137,7 @@ def check_valid_pmf(p, shape=None, full_support=False, tol=1e-9):
 
 def vectorize_func(func, shape):
     """
-    Vectorizes a callable according to specified input shape.
+    Vectorize a callable according to specified input shape.
 
     Parameters
     ----------
@@ -166,5 +166,3 @@ def vectorize_func(func, shape):
             return _out
 
     return func_vec
-
-

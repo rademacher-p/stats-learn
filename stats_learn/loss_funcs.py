@@ -1,5 +1,3 @@
-import numpy as np
-
 from stats_learn.util import check_data_shape
 
 
@@ -18,9 +16,9 @@ def _check_inputs(h, y, shape):
 
     Returns
     -------
-    np.ndarray
+    numpy.ndarray
         Decisions.
-    np.ndarray
+    numpy.ndarray
         Target values.
     tuple
         Shape of data set (such that `value + shape = h.shape`)
@@ -48,7 +46,7 @@ def loss_se(y_est, y, shape=()):
 
     Returns
     -------
-    np.ndarray
+    numpy.ndarray
         The squared-error losses.
 
     """
@@ -71,7 +69,7 @@ def loss_01(y_hyp, y, shape=()):
 
     Returns
     -------
-    np.ndarray
+    numpy.ndarray
         The zero-one losses.
 
     """

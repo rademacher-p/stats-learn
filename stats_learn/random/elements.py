@@ -801,7 +801,7 @@ class Normal(BaseRV):
         allow_singular
         mean : float or Iterable of float
             Mean
-        cov : float or np.ndarray
+        cov : float or numpy.ndarray
             Covariance
         rng : np.random.Generator or int, optional
             Random number generator
