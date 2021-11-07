@@ -314,8 +314,8 @@ class DataConditional(Base):
         return self.model_x.p
 
     @p_x.setter
-    def p_x(self, val):
-        self.model_x.p = val
+    def p_x(self, value):
+        self.model_x.p = value
 
     @property
     def mode_x(self):
@@ -392,8 +392,8 @@ class ClassConditional(MixinRVx, Base):
         return self.model_y.p
 
     @p_y.setter
-    def p_y(self, val):
-        self.model_y.p = val
+    def p_y(self, value):
+        self.model_y.p = value
         self._update_attr()
 
     def _update_attr(self):
@@ -554,13 +554,13 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
         return self._cov_repr
 
     @cov_y_x_.setter
-    def cov_y_x_(self, val):
-        if callable(val):
-            self._cov_repr = val
-            self._cov_y_x_single = val
+    def cov_y_x_(self, value):
+        if callable(value):
+            self._cov_repr = value
+            self._cov_y_x_single = value
             _temp = self._cov_y_x_single(self.model_x.sample()).shape
         else:
-            self._cov_repr = np.array(val)
+            self._cov_repr = np.array(value)
             self._cov_y_x_single = lambda x: self._cov_repr
             _temp = self._cov_repr.shape
 
@@ -784,8 +784,8 @@ class Mixture(Base):
         self._update_attr()
 
     def set_dist_attr(self, idx, **dist_kwargs):  # TODO: improved implementation w/ direct self.dists access?
-        for key, val in dist_kwargs.items():
-            setattr(self._dists[idx], key, val)
+        for key, value in dist_kwargs.items():
+            setattr(self._dists[idx], key, value)
         self._update_attr()
 
     def set_dist(self, idx, dist, weight):  # TODO: type check?

@@ -144,16 +144,16 @@ w_prior_norm = w_prior
 # w_prior_norm = [.5, *(0 for __ in range(4))]
 basis_y_x = None
 
-# def make_delta_func(val):
-#     return lambda x: np.where(x == val, 1, 0)
+# def make_delta_func(value):
+#     return lambda x: np.where(x == value, 1, 0)
 # w_prior_norm = [.5 for __ in supp_x]
-# basis_y_x = [make_delta_func(val) for val in supp_x]
+# basis_y_x = [make_delta_func(value) for value in supp_x]
 
-# def make_square_func(val):
+# def make_square_func(value):
 #     delta = 0.5 / (supp_t.size-1)
-#     return lambda x: np.where((x >= val-delta) & (x < val+delta), 1, 0)
+#     return lambda x: np.where((x >= value-delta) & (x < value+delta), 1, 0)
 # w_prior_norm = [.5 for __ in supp_t]
-# basis_y_x = [make_square_func(val) for val in supp_t]
+# basis_y_x = [make_square_func(value) for value in supp_t]
 
 # proc_funcs = []
 proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}

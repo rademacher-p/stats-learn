@@ -28,8 +28,8 @@ class RandomGeneratorMixin:
         return self._rng
 
     @rng.setter
-    def rng(self, val):
-        self._rng = self.make_rng(val)
+    def rng(self, value):
+        self._rng = self.make_rng(value)
 
     def _get_rng(self, rng=None):
         """Returns own RNG or makes a new one."""

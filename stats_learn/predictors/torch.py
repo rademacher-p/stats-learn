@@ -90,8 +90,8 @@ class LitPredictor(Base):
         raise NotImplementedError
 
     def set_params(self, **kwargs):
-        for key, val in kwargs.items():
-            setattr(self.model, key, val)
+        for key, value in kwargs.items():
+            setattr(self.model, key, value)
 
     def _reset_trainer(self):
         self.trainer = pl.Trainer(**deepcopy(self.trainer_params))

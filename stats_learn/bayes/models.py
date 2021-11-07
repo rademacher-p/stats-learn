@@ -37,11 +37,11 @@ class Base(RandomGeneratorMixin, ABC):
     dtype = property(lambda self: {key: space.dtype for key, space in self._space.items()})
 
     @staticmethod
-    def tex_params(key, val=None):
-        if val is None:
+    def tex_params(key, value=None):
+        if value is None:
             return r"${}$".format(key)
         else:
-            return r"${} = {}$".format(key, val)
+            return r"${} = {}$".format(key, value)
 
     def random_model(self, rng=None):
         raise NotImplementedError
@@ -110,7 +110,7 @@ class NormalLinear(Base):
         self.posterior = rand_elements.Normal(self.prior_mean, self.prior_cov, allow_singular=self.allow_singular)
         self.posterior_model = rand_models.NormalLinear(**self._prior_model_kwargs)
 
-    def tex_params(self, key, val=None):
+    def tex_params(self, key, value=None):
         str_theta = r'\theta'
         str_one = ""
         str_eye = ""
@@ -123,21 +123,21 @@ class NormalLinear(Base):
 
         if key == 'prior_mean':
             key = rf"\mu_{str_theta}"
-            if val is not None:
-                val_np = np.array(val)
-                val = f"{val:.3f}"
+            if value is not None:
+                val_np = np.array(value)
+                value = f"{value:.3f}"
                 if self.prior.shape != () and val_np.shape == ():
-                    val += str_one
+                    value += str_one
 
         elif key == 'prior_cov':
             key = rf"\Sigma_{str_theta}"
-            if val is not None:
-                val_np = np.array(val)
-                val = f"{val:.3f}"
+            if value is not None:
+                val_np = np.array(value)
+                value = f"{value:.3f}"
                 if self.prior.shape != () and val_np.shape == ():
-                    val += str_eye
+                    value += str_eye
 
-        return super(NormalLinear, NormalLinear).tex_params(key, val)
+        return super(NormalLinear, NormalLinear).tex_params(key, value)
 
     # Methods
     def random_model(self, rng=None):
@@ -172,8 +172,8 @@ class NormalLinear(Base):
 
         kwargs = self._prior_model_kwargs.copy()
         del kwargs['basis_y_x']
-        for key, val in kwargs.items():
-            setattr(self.posterior_model, key, val)
+        for key, value in kwargs.items():
+            setattr(self.posterior_model, key, value)
 
     @property
     def _prior_model_kwargs(self):
@@ -201,8 +201,8 @@ class NormalLinear(Base):
         return self._model_x
 
     @model_x.setter
-    def model_x(self, val):
-        self._model_x = val
+    def model_x(self, value):
+        self._model_x = value
         self._reset_posterior()
 
     @property
@@ -213,13 +213,13 @@ class NormalLinear(Base):
     def cov_y_x(self):
         return self._cov_y_x
 
-    def _set_cov_y_x(self, val):
-        self._cov_y_x = np.array(val)
+    def _set_cov_y_x(self, value):
+        self._cov_y_x = np.array(value)
         self._prec_U_y_x = _PSD(self._cov_y_x.reshape(2 * (self.size['y'],)), allow_singular=self.allow_singular).U
 
     @cov_y_x.setter
-    def cov_y_x(self, val):
-        self._set_cov_y_x(val)
+    def cov_y_x(self, value):
+        self._set_cov_y_x(value)
         self._reset_posterior()
 
     # Prior parameters
@@ -228,8 +228,8 @@ class NormalLinear(Base):
         return self.prior.mean
 
     @prior_mean.setter
-    def prior_mean(self, val):
-        self.prior.mean = val
+    def prior_mean(self, value):
+        self.prior.mean = value
         self._update_posterior(mean_only=True)
 
     @property
@@ -237,8 +237,8 @@ class NormalLinear(Base):
         return self.prior.cov
 
     @prior_cov.setter
-    def prior_cov(self, val):
-        self.prior.cov = val
+    def prior_cov(self, value):
+        self.prior.cov = value
         self._set_prior_persistent_attr()
         self._update_posterior()
 
@@ -262,10 +262,10 @@ class Dirichlet(Base):  # TODO: DRY from random.elements?
         return f"Dirichlet(alpha_0={self.alpha_0}, n={self.n}, prior_mean={self.prior_mean})"
 
     @staticmethod
-    def tex_params(key, val=None):
+    def tex_params(key, value=None):
         if key == 'alpha_0':
             key = r"\alpha_0"
-        return super(Dirichlet, Dirichlet).tex_params(key, val)
+        return super(Dirichlet, Dirichlet).tex_params(key, value)
 
     def __setattr__(self, name, value):
         if name.startswith('prior_mean.'):
@@ -278,24 +278,24 @@ class Dirichlet(Base):  # TODO: DRY from random.elements?
         return self.posterior_model.dists[0]
 
     @prior_mean.setter
-    def prior_mean(self, val):
-        self.posterior_model.set_dist(0, val, self.alpha_0)
+    def prior_mean(self, value):
+        self.posterior_model.set_dist(0, value, self.alpha_0)
 
     @property
     def alpha_0(self):
         return self.posterior_model.weights[0]
 
     @alpha_0.setter
-    def alpha_0(self, val):
-        self.posterior_model.weights = [val, self.n]
+    def alpha_0(self, value):
+        self.posterior_model.weights = [value, self.n]
 
     @property
     def emp_dist(self):
         return self.posterior_model.dists[1]
 
     @emp_dist.setter
-    def emp_dist(self, val):
-        self.posterior_model.set_dist(1, val, val.n)
+    def emp_dist(self, value):
+        self.posterior_model.set_dist(1, value, value.n)
 
     n = property(lambda self: self.emp_dist.n)
 

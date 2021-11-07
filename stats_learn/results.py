@@ -103,7 +103,7 @@ def _print_risk(predictors, params, n_train, losses):
             elif len(param) == 1:
                 data.append(loss)
                 param_name, param_vals = list(param.items())[0]
-                columns.extend([f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals])
+                columns.extend([f"{predictor.name}, {predictor.tex_params(param_name, value)}" for value in param_vals])
             else:
                 raise NotImplementedError("Only up to one varying parameter currently supported.")
 
@@ -156,7 +156,7 @@ def _plot_predict_stats(y_stats_full, space_x, predictors, params, n_train: Unio
                     labels = [None]
                     title += f", {predictor.tex_params(param_name, param_vals[0])}"
                 else:
-                    labels = [f"{predictor.tex_params(param_name, val)}" for val in param_vals]
+                    labels = [f"{predictor.tex_params(param_name, value)}" for value in param_vals]
             elif len(param_vals) == 1:
                 y_stats = y_stats.squeeze(axis=1)
                 labels = [f"$N = {n}$" for n in n_train]
@@ -188,7 +188,7 @@ def _plot_predict_stats(y_stats_full, space_x, predictors, params, n_train: Unio
                 elif len(params) == 1:
                     y_stats = y_stats.squeeze(0)
                     param_name, param_vals = list(params.items())[0]
-                    labels = [f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals]
+                    labels = [f"{predictor.name}, {predictor.tex_params(param_name, value)}" for value in param_vals]
                 else:
                     raise ValueError
 
@@ -256,7 +256,7 @@ def _plot_risk_eval_compare(losses, predictors, params=None, n_train: Union[int,
                     title += f", {predictor.tex_params(param_name, param_vals[0])}"
                     labels = [None]
                 else:
-                    labels = [f"{predictor.tex_params(param_name, val)}" for val in param_vals]
+                    labels = [f"{predictor.tex_params(param_name, value)}" for value in param_vals]
         else:
             raise NotImplementedError("Only up to one varying parameter currently supported.")
 
@@ -295,7 +295,7 @@ def _plot_risk_eval_compare(losses, predictors, params=None, n_train: Union[int,
                 elif len(params) == 1:
                     loss = np.transpose(loss)
                     param_name, param_vals = list(params.items())[0]
-                    labels = [f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals]
+                    labels = [f"{predictor.name}, {predictor.tex_params(param_name, value)}" for value in param_vals]
                 else:
                     raise NotImplementedError("Only up to one varying parameter currently supported.")
 
@@ -396,7 +396,7 @@ def assess_single_compare(predictors, d_train=None, d_test=None, params=None, x=
 
         elif len(params) == 1:
             param_name, param_vals = list(params.items())[0]
-            labels = [f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals]
+            labels = [f"{predictor.name}, {predictor.tex_params(param_name, value)}" for value in param_vals]
             for i_v, (param_val, label) in enumerate(zip(param_vals, labels)):
                 predictor.set_params(**{param_name: param_val})
                 h = predictor.plot_predict(x, ax=ax, label=label)
@@ -764,8 +764,8 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, 
         elif len(n_train) == 1 and len(param_vals) > 1:
             loss = loss.squeeze(axis=0)
             title += f", $N = {n_train[0]}$"
-            # labels = [f"{predictors[0].tex_params(param_name, val)}" for val in param_vals]
-            labels = [f"{tex_map(val)}" for val in param_vals]
+            # labels = [f"{predictors[0].tex_params(param_name, value)}" for value in param_vals]
+            labels = [f"{tex_map(value)}" for value in param_vals]
         else:
             raise ValueError
 

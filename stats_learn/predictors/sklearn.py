@@ -26,8 +26,8 @@ class SKLPredictor(Base):  # TODO: rework for new reset/fit functionality
         raise NotImplementedError
 
     def set_params(self, **kwargs):
-        for key, val in kwargs.items():
-            setattr(self.estimator, key, val)
+        for key, value in kwargs.items():
+            setattr(self.estimator, key, value)
 
     def reset(self):
         self.estimator = skl.base.clone(self.estimator)  # manually reset learner if `fit` is not called

@@ -107,8 +107,8 @@ class NormalLinear(Base):
         self.posterior.mean = self.prior_mean
         self.posterior.cov = self.prior_cov
 
-        for key, val in self._prior_model_kwargs.items():
-            setattr(self.posterior_model, key, val)
+        for key, value in self._prior_model_kwargs.items():
+            setattr(self.posterior_model, key, value)
 
     @property
     def _prior_model_kwargs(self):
@@ -135,14 +135,14 @@ class NormalLinear(Base):
     def cov(self):
         return self._cov
 
-    def _set_cov(self, val):
-        self._cov = np.array(val)
+    def _set_cov(self, value):
+        self._cov = np.array(value)
         self._prec_U = _PSD(self._cov.reshape(2 * (self.size,)), allow_singular=self.allow_singular).U
         self._basis_white = np.dot(self.basis.T, self._prec_U).T
 
     @cov.setter
-    def cov(self, val):
-        self._set_cov(val)
+    def cov(self, value):
+        self._set_cov(value)
         self._reset_posterior()
 
     # Prior parameters
@@ -151,8 +151,8 @@ class NormalLinear(Base):
         return self.prior.mean
 
     @prior_mean.setter
-    def prior_mean(self, val):
-        self.prior.mean = val
+    def prior_mean(self, value):
+        self.prior.mean = value
         self._update_posterior(mean_only=True)
 
     @property
@@ -160,8 +160,8 @@ class NormalLinear(Base):
         return self.prior.cov
 
     @prior_cov.setter
-    def prior_cov(self, val):
-        self.prior.cov = val
+    def prior_cov(self, value):
+        self.prior.cov = value
         self._set_prior_persistent_attr()
         self._update_posterior()
 
@@ -192,24 +192,24 @@ class Dirichlet(Base):
         return self.posterior_model.dists[0]
 
     @prior_mean.setter
-    def prior_mean(self, val):
-        self.posterior_model.set_dist(0, val, self.alpha_0)
+    def prior_mean(self, value):
+        self.posterior_model.set_dist(0, value, self.alpha_0)
 
     @property
     def alpha_0(self):
         return self.posterior_model.weights[0]
 
     @alpha_0.setter
-    def alpha_0(self, val):
-        self.posterior_model.weights = [val, self.n]
+    def alpha_0(self, value):
+        self.posterior_model.weights = [value, self.n]
 
     @property
     def emp_dist(self):
         return self.posterior_model.dists[1]
 
     @emp_dist.setter
-    def emp_dist(self, val):
-        self.posterior_model.set_dist(1, val, val.n)
+    def emp_dist(self, value):
+        self.posterior_model.set_dist(1, value, value.n)
 
     n = property(lambda self: self.emp_dist.n)
 

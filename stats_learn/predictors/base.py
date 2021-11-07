@@ -51,11 +51,11 @@ class Base(ABC):
         raise NotImplementedError
 
     def set_params(self, **kwargs):  # TODO: improve? wrapper to ignore non-changing param set?
-        for key, val in kwargs.items():
-            setattr(self._model_obj, key, val)
+        for key, value in kwargs.items():
+            setattr(self._model_obj, key, value)
 
-    def tex_params(self, key, val=None):
-        return self._model_obj.tex_params(key, val)
+    def tex_params(self, key, value=None):
+        return self._model_obj.tex_params(key, value)
 
     def _proc_x(self, x):
         for func in self.proc_funcs['pre']:

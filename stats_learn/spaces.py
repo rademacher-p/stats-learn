@@ -72,8 +72,8 @@ class Base(ABC):
         return self._x_plt
 
     @x_plt.setter
-    def x_plt(self, val):
-        self._x_plt = val
+    def x_plt(self, value):
+        self._x_plt = value
 
     @abstractmethod
     def set_x_plot(self):
@@ -471,8 +471,8 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
         return self._lims
 
     @lims.setter
-    def lims(self, val):
-        self._lims = np.array(val)
+    def lims(self, value):
+        self._lims = np.array(value)
 
         if self.lims.shape[-1] != 2:
             raise ValueError("Trailing shape must be (2,)")
@@ -571,8 +571,8 @@ class Euclidean(Box):
         return self._lims_plot
 
     @lims_plot.setter
-    def lims_plot(self, val):
-        self._lims_plot = np.broadcast_to(val, shape=(*self.shape, 2))
+    def lims_plot(self, value):
+        self._lims_plot = np.broadcast_to(value, shape=(*self.shape, 2))
         self._x_plt = None
 
 
@@ -617,8 +617,8 @@ class Simplex(Continuous):
         return self._n_plot
 
     @n_plot.setter
-    def n_plot(self, val):
-        self._n_plot = val
+    def n_plot(self, value):
+        self._n_plot = value
         self._x_plt = None
 
     @staticmethod

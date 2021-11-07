@@ -174,72 +174,72 @@ class BaseRV(MixinRV, Base, ABC):
 class Deterministic(Base):
     # TODO: redundant, just use FiniteGeneric? or change to ContinuousRV for integration? General dirac mix?
 
-    def __new__(cls, val, rng=None):
+    def __new__(cls, value, rng=None):
         """
         Deterministic random element.
 
         Parameters
         ----------
-        val : array_like
+        value : array_like
             The deterministic value.
         rng : int or np.random.RandomState or np.random.Generator, optional
             Random number generator seed or object.
 
         """
-        if np.issubdtype(np.array(val).dtype, np.number):
+        if np.issubdtype(np.array(value).dtype, np.number):
             return super().__new__(DeterministicRV)
         else:
             return super().__new__(cls)
 
-    def __init__(self, val, rng=None):
+    def __init__(self, value, rng=None):
         """
         Deterministic random element.
 
         Parameters
         ----------
-        val : array_like
+        value : array_like
             The deterministic value.
         rng : int or np.random.RandomState or np.random.Generator, optional
             Random number generator seed or object.
 
         """
         super().__init__(rng)
-        self.val = val
+        self.value = value
 
     # Input properties
     @property
-    def val(self):
+    def value(self):
         """The deterministic value."""
-        return self._val
+        return self._value
 
-    @val.setter
-    def val(self, val):
-        self._val = np.array(val)
-        self._space = spaces.FiniteGeneric(self._val, shape=self._val.shape)
+    @value.setter
+    def value(self, value):
+        self._value = np.array(value)
+        self._space = spaces.FiniteGeneric(self._value, shape=self._value.shape)
 
-        self._mode = self._val
+        self._mode = self._value
 
     def _sample(self, n, rng):
-        return np.broadcast_to(self._val, (n, *self.shape))
+        return np.broadcast_to(self._value, (n, *self.shape))
 
     def prob(self, x):
-        return np.where(np.all(x.reshape(-1, self.size) == self._val.flatten(), axis=-1), 1., 0.)
+        return np.where(np.all(x.reshape(-1, self.size) == self._value.flatten(), axis=-1), 1., 0.)
 
 
 class DeterministicRV(MixinRV, Deterministic):
     """Deterministic random variable."""
 
     # @property
-    # def val(self):
-    #     return self.val
+    # def value(self):
+    #     return self.value
 
-    @Deterministic.val.setter
-    # @val.setter
-    def val(self, val):
-        # super(DeterministicRV, self.__class__).val.fset(self, val)
-        Deterministic.val.fset(self, val)
+    @Deterministic.value.setter
+    # @value.setter
+    def value(self, value):
+        # super(DeterministicRV, self.__class__).value.fset(self, value)
+        Deterministic.value.fset(self, value)
 
-        self._mean = self._val
+        self._mean = self._value
         self._cov = np.zeros(2 * self.shape)
 
 
@@ -341,8 +341,8 @@ class FiniteGeneric(Base):
     def _prob_single(self, x):
         eq_supp = np.all(x == self._supp_flat, axis=tuple(range(1, 1 + self.ndim)))
         # eq_supp = np.empty(self.space.set_size, dtype=np.bool)
-        # for i, val in enumerate(self._supp_flat):
-        #     eq_supp[i] = np.allclose(x, val)
+        # for i, value in enumerate(self._supp_flat):
+        #     eq_supp[i] = np.allclose(x, value)
 
         if eq_supp.sum() == 0:
             raise ValueError("Input 'x' must be in the support.")
@@ -798,12 +798,12 @@ class Binomial(BaseRV):
 
     # Attribute Updates
     def _update_attr(self):
-        _val = (self._n + 1) * self._p
-        if _val == 0 or _val % 1 != 0:
-            self._mode = math.floor(_val)
-        elif _val - 1 in range(self._n):
-            self._mode = _val
-        elif _val - 1 == self._n:
+        temp = (self._n + 1) * self._p
+        if temp == 0 or temp % 1 != 0:
+            self._mode = math.floor(temp)
+        elif temp - 1 in range(self._n):
+            self._mode = temp
+        elif temp - 1 == self._n:
             self._mode = self._n
 
         self._mean = self._n * self._p
@@ -871,8 +871,8 @@ class Uniform(BaseRV):
         return self.space.lims
 
     @lims.setter
-    def lims(self, val):
-        self.space.lims = val
+    def lims(self, value):
+        self.space.lims = value
         self._update_attr()
 
     # Attribute Updates
@@ -889,13 +889,12 @@ class Uniform(BaseRV):
         return _temp.reshape((n, *self.shape))
 
     def prob(self, x):
-        val = 1 / np.prod(self.lims[..., 1] - self.lims[..., 0])
-
         x, set_shape = check_data_shape(x, self.shape)
         if not np.all((x >= self.lims[..., 0])) and np.all((x <= self.lims[..., 1])):
             raise ValueError(f"Values must be in interval {self.lims}")
 
-        return np.full(set_shape, val)
+        pr = 1 / np.prod(self.lims[..., 1] - self.lims[..., 0])
+        return np.full(set_shape, pr)
 
 
 class Normal(BaseRV):
@@ -1007,8 +1006,8 @@ class NormalLinear(Normal):  # TODO: rework, only allow weights and cov to be se
         return self._weights
 
     @weights.setter
-    def weights(self, val):
-        self._weights = np.array(val)
+    def weights(self, value):
+        self._weights = np.array(value)
         if self._weights.ndim != 1:
             raise ValueError("Weights must be 1-dimensional.")
         self.mean = self._basis @ self._weights
@@ -1214,8 +1213,8 @@ class Mixture(Base):
 
     def set_dist_attr(self, idx, **dist_kwargs):
         dist = self._dists[idx]
-        for key, val in dist_kwargs.items():
-            setattr(dist, key, val)
+        for key, value in dist_kwargs.items():
+            setattr(dist, key, value)
         self._update_attr()
 
     def set_dist(self, idx, dist, weight):  # TODO: type check?
