@@ -33,7 +33,7 @@ def plot_dirs(dirs, n_plot=None, titles=None, orient='h', same_cm=True, cm_hack=
         dir_i.space.x_plt = space.make_grid(space.n_plot, space.shape, hull_mask=(dir_i.mean < 1 / dir_i.alpha_0))
 
     x_vec = [dir_i.space.x_plt for dir_i in dirs]
-    y_vec = [dir_i.pf(dir_i.space.x_plt) for dir_i in dirs]
+    y_vec = [dir_i.prob(dir_i.space.x_plt) for dir_i in dirs]
     for i in range(n_dirs):
         i_sort = np.argsort(y_vec[i])
         x_vec[i] = x_vec[i][i_sort]
@@ -79,7 +79,7 @@ def plot_dirs(dirs, n_plot=None, titles=None, orient='h', same_cm=True, cm_hack=
         ax.set_ylabel(r'$\thetac(\Ycal_2; x)$')
         ax.set_zlabel(r'$\thetac(\Ycal_3; x)$')
 
-        space.plot(dir_i.pf, x, ax=ax, c=c, s=3)
+        space.plot(dir_i.prob, x, ax=ax, c=c, s=3)
 
         ax.set_title(title)
 
@@ -128,9 +128,9 @@ if __name__ == '__main__':
 # ax[1].set_zlim(0, 1)
 # ax[1].view_init(45, 45)
 #
-# dir_post.plot_pf(ax=ax[1])
+# dir_post.plot_prob(ax=ax[1])
 
 # fig, ax = plt.subplots(1, 2, subplot_kw={'projection': '3d'})
 
-# dir_prior.plot_pf(ax=ax[0])
-# dir_post.plot_pf(ax=ax[1])
+# dir_prior.plot_prob(ax=ax[0])
+# dir_post.plot_prob(ax=ax[1])

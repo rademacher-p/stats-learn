@@ -33,14 +33,14 @@ def test():
 
         e.mode
         x = e.sample(5)
-        e.pf(x)
-        # e.plot_pf(x)
+        e.prob(x)
+        # e.plot_prob(x)
 
         if isinstance(e, BaseRV):
             e.mean
             e.cov
 
-        # TODO: check PF sum to approx unity. Use `space` integration method!
+        # TODO: check prob sum to approx unity. Use `space` integration method!
 
 
 if __name__ == '__main__':

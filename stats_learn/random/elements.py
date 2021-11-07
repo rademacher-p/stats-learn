@@ -37,7 +37,7 @@ class Base(RandomGeneratorMixin, ABC):
 
     mode = property(lambda self: self._mode)
 
-    def pf(self, x):
+    def prob(self, x):
         """
         Probability function.
 
@@ -59,12 +59,12 @@ class Base(RandomGeneratorMixin, ABC):
         # if x is None:
         #     x = self.space.x_plt  # TODO: add default x_plt
 
-        return vectorize_func(self._pf_single, self.shape)(x)  # TODO: decorator? better way?
+        return vectorize_func(self._prob_single, self.shape)(x)  # TODO: decorator? better way?
 
-    def _pf_single(self, x):
+    def _prob_single(self, x):
         pass
 
-    def plot_pf(self, x=None, ax=None, **kwargs):
+    def plot_prob(self, x=None, ax=None, **kwargs):
         """
         Plot the probability function.
 
@@ -81,7 +81,7 @@ class Base(RandomGeneratorMixin, ABC):
         matplotlib.artist.Artist or tuple of matplotlib.artist.Artist
 
         """
-        return self.space.plot(self.pf, x, ax, **kwargs)
+        return self.space.plot(self.prob, x, ax, **kwargs)
 
     def sample(self, size=None, rng=None):
         """
@@ -220,7 +220,7 @@ class Deterministic(Base):
     def _sample(self, n, rng):
         return np.broadcast_to(self._val, (n, *self.shape))
 
-    def pf(self, x):
+    def prob(self, x):
         return np.where(np.all(x.reshape(-1, self.size) == self._val.flatten(), axis=-1), 1., 0.)
 
 
@@ -337,7 +337,7 @@ class Finite(Base):
     def _sample(self, n, rng):
         return rng.choice(self._supp_flat, size=n, p=self._p_flat)
 
-    def _pf_single(self, x):
+    def _prob_single(self, x):
         eq_supp = np.all(x == self._supp_flat, axis=tuple(range(1, 1 + self.ndim)))
         # eq_supp = np.empty(self.space.set_size, dtype=np.bool)
         # for i, val in enumerate(self._supp_flat):
@@ -448,28 +448,28 @@ class Dirichlet(BaseRV):
         self._cov = (np.diagflat(self._mean).reshape(2 * self.shape)
                      - np.tensordot(self._mean, self._mean, 0)) / (self._alpha_0 + 1)
 
-        self._log_pf_coef = gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
+        self._log_prob_coef = gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
 
         self.space.x_plt = None
 
     def _sample(self, n, rng):
         return rng.dirichlet(self._alpha_0 * self._mean.flatten(), size=n).reshape(n, *self.shape)
 
-    def pf(self, x):
+    def prob(self, x):
         x, set_shape = check_valid_pmf(x, shape=self.shape)
 
         if np.logical_and(x == 0, self.mean < 1 / self.alpha_0).any():
             raise ValueError("Each element in 'x' must be greater than "
                              "zero if the corresponding mean element is less than 1 / alpha_0.")
 
-        log_pf = self._log_pf_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x).reshape(-1, self.size), -1)
-        return np.exp(log_pf).reshape(set_shape)
+        log_prob = self._log_prob_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x).reshape(-1, self.size), -1)
+        return np.exp(log_prob).reshape(set_shape)
 
-    def plot_pf(self, x=None, ax=None, **kwargs):
+    def plot_prob(self, x=None, ax=None, **kwargs):
         if x is None and self.space._x_plt is None:
             self.space.x_plt = self.space.make_grid(self.space.n_plot, self.shape,
                                                     hull_mask=(self.mean < 1 / self.alpha_0))
-        return self.space.plot(self.pf, x, ax)
+        return self.space.plot(self.prob, x, ax)
 
 
 class Empirical(BaseRV):
@@ -511,7 +511,7 @@ class Empirical(BaseRV):
 
     # Attribute Updates
     def _update_attr(self):
-        self._log_pf_coef = gammaln(self._n + 1)
+        self._log_prob_coef = gammaln(self._n + 1)
 
         # self._mode = ((self._n * self._mean) // 1) + simplex_round((self._n * self._mean) % 1)  # FIXME: broken
         self._mode = None
@@ -541,14 +541,14 @@ class Empirical(BaseRV):
     def _sample(self, n, rng):
         return rng.multinomial(self._n, self._mean.flatten(), size=n).reshape(n, *self.shape) / self._n
 
-    def pf(self, x):
+    def prob(self, x):
         x, set_shape = check_valid_pmf(x, shape=self.shape)
         if (np.minimum((self._n * x) % 1, (-self._n * x) % 1) > 1e-9).any():
             raise ValueError("Each entry in 'x' must be a multiple of 1/n.")
 
-        log_pf = self._log_pf_coef + (xlogy(self._n * x, self._mean)
-                                      - gammaln(self._n * x + 1)).reshape(-1, self.size).sum(axis=-1)
-        return np.exp(log_pf).reshape(set_shape)
+        log_prob = self._log_prob_coef + (xlogy(self._n * x, self._mean)
+                                        - gammaln(self._n * x + 1)).reshape(-1, self.size).sum(axis=-1)
+        return np.exp(log_prob).reshape(set_shape)
 
 
 class DirichletEmpirical(BaseRV):
@@ -605,21 +605,21 @@ class DirichletEmpirical(BaseRV):
         self._cov = ((self._n + self._alpha_0) / self._n / (1 + self._alpha_0)
                      * (np.diagflat(self._mean).reshape(2 * self.shape) - np.tensordot(self._mean, self._mean, 0)))
 
-        self._log_pf_coef = (gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
-                             + gammaln(self._n + 1) - gammaln(self._alpha_0 + self._n))
+        self._log_prob_coef = (gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
+                               + gammaln(self._n + 1) - gammaln(self._alpha_0 + self._n))
 
     def _sample(self, n, rng):
         theta_flat = rng.dirichlet(self._alpha_0 * self._mean.flatten())
         return rng.multinomial(self._n, theta_flat, size=n).reshape(n, *self.shape) / self._n
 
-    def pf(self, x):
+    def prob(self, x):
         x, set_shape = check_valid_pmf(x, shape=self.shape)
         if (np.minimum((self._n * x) % 1, (-self._n * x) % 1) > 1e-9).any():
             raise ValueError("Each entry in 'x' must be a multiple of 1/n.")
 
-        log_pf = self._log_pf_coef + (gammaln(self._alpha_0 * self._mean + self._n * x)
-                                      - gammaln(self._n * x + 1)).reshape(-1, self.size).sum(axis=-1)
-        return np.exp(log_pf).reshape(set_shape)
+        log_prob = self._log_prob_coef + (gammaln(self._alpha_0 * self._mean + self._n * x)
+                                        - gammaln(self._n * x + 1)).reshape(-1, self.size).sum(axis=-1)
+        return np.exp(log_prob).reshape(set_shape)
 
 
 class DirichletEmpiricalScalar(BaseRV):
@@ -671,9 +671,9 @@ class DirichletEmpiricalScalar(BaseRV):
         p = rng.beta(a, b)
         return rng.binomial(self.n, p, size=n) / self.n
 
-    def pf(self, x):
+    def prob(self, x):
         x = np.array(x)
-        return self._multi.pf(np.stack((x, 1 - x), axis=-1))
+        return self._multi.prob(np.stack((x, 1 - x), axis=-1))
 
 
 class Beta(BaseRV):
@@ -745,10 +745,10 @@ class Beta(BaseRV):
     def _sample(self, n, rng):
         return rng.beta(self._a, self._b, size=n)
 
-    def pf(self, x):
+    def prob(self, x):
         x = np.array(x)
-        log_pf = xlog1py(self._b - 1.0, -x) + xlogy(self._a - 1.0, x) - betaln(self._a, self._b)
-        return np.exp(log_pf)
+        log_prob = xlog1py(self._b - 1.0, -x) + xlogy(self._a - 1.0, x) - betaln(self._a, self._b)
+        return np.exp(log_prob)
 
 
 class Binomial(BaseRV):
@@ -811,11 +811,11 @@ class Binomial(BaseRV):
     def _sample(self, n, rng):
         return rng.binomial(self._n, self._p, size=n)
 
-    def pf(self, x):
+    def prob(self, x):
         x = np.floor(x)
         combiln = (gammaln(self._n + 1) - (gammaln(x + 1) + gammaln(self._n - x + 1)))
-        log_pf = combiln + xlogy(x, self._p) + xlog1py(self._n - x, -self._p)
-        return np.exp(log_pf)
+        log_prob = combiln + xlogy(x, self._p) + xlog1py(self._n - x, -self._p)
+        return np.exp(log_prob)
 
 
 class EmpiricalScalar(Binomial):
@@ -846,9 +846,9 @@ class EmpiricalScalar(Binomial):
     def _sample(self, n, rng):
         return super()._sample(n, rng) / self._n
 
-    def pf(self, x):
+    def prob(self, x):
         x = np.array(x) * self._n
-        return super().pf(x)
+        return super().prob(x)
 
 
 class Uniform(BaseRV):
@@ -887,7 +887,7 @@ class Uniform(BaseRV):
         _temp = np.stack(tuple(rng.uniform(a, b, size=n) for a, b in zip(a_flat, b_flat)), axis=-1)
         return _temp.reshape((n, *self.shape))
 
-    def pf(self, x):
+    def prob(self, x):
         val = 1 / np.prod(self.lims[..., 1] - self.lims[..., 0])
 
         x, set_shape = check_data_shape(x, self.shape)
@@ -962,21 +962,21 @@ class Normal(BaseRV):
 
         psd = _PSD(self._cov_flat, allow_singular=self.allow_singular)
         self.prec_U = psd.U
-        self._log_pf_coef = -0.5 * (psd.rank * np.log(2 * np.pi) + psd.log_pdet)
+        self._log_prob_coef = -0.5 * (psd.rank * np.log(2 * np.pi) + psd.log_pdet)
 
         self._set_lims_plot()
 
     def _sample(self, n, rng):
         return rng.multivariate_normal(self._mean_flat, self._cov_flat, size=n).reshape(n, *self.shape)
 
-    def pf(self, x):
+    def prob(self, x):
         x, set_shape = check_data_shape(x, self.shape)
 
         dev = x.reshape(-1, self.size) - self._mean_flat
         maha = np.sum(np.square(np.dot(dev, self.prec_U)), axis=-1)
 
-        log_pf = self._log_pf_coef + -0.5 * maha.reshape(set_shape)
-        return np.exp(log_pf)
+        log_prob = self._log_prob_coef + -0.5 * maha.reshape(set_shape)
+        return np.exp(log_prob)
 
     def _set_lims_plot(self):
         if self.shape in {(), (2,)}:
@@ -1119,7 +1119,7 @@ class DataEmpirical(Base):
     def _sample(self, size, rng):
         return rng.choice(self.data['x'], size, p=self._p)
 
-    def _pf_single(self, x):
+    def _prob_single(self, x):
         idx = self._get_idx(x)
         if idx is not None:
             # return self._p[idx]
@@ -1134,14 +1134,14 @@ class DataEmpirical(Base):
         else:
             return 0.
 
-    def plot_pf(self, x=None, ax=None, **kwargs):
+    def plot_prob(self, x=None, ax=None, **kwargs):
         if x is None and self.space.x_plt is None:
             # self.space.set_x_plot()
             if isinstance(self.space, spaces.Continuous) and self.shape in {()}:
                 # add empirical values to the plot support (so impulses are not missed)
                 self.space.x_plt = np.sort(np.unique(np.concatenate((self.space.x_plt, self.data['x']))))
 
-        return self.space.plot(self.pf, x, ax)
+        return self.space.plot(self.prob, x, ax)
 
 
 class DataEmpiricalRV(MixinRV, DataEmpirical):
@@ -1239,7 +1239,7 @@ class Mixture(Base):
             if self._idx_nonzero.size == 1:
                 self._mode = self._dists[self._idx_nonzero.item()].mode
             else:
-                self._mode = self.space.argmax(self.pf)
+                self._mode = self.space.argmax(self.prob)
 
         return self._mode
 
@@ -1253,10 +1253,10 @@ class Mixture(Base):
 
         return out
 
-    def pf(self, x):
-        return sum(self._p[i] * self.dists[i].pf(x) for i in self._idx_nonzero)
+    def prob(self, x):
+        return sum(self._p[i] * self.dists[i].prob(x) for i in self._idx_nonzero)
 
-    def plot_pf(self, x=None, ax=None, **kwargs):
+    def plot_prob(self, x=None, ax=None, **kwargs):
         if x is None and self.space.x_plt is None:
             # self.space.set_x_plot()
 
@@ -1275,7 +1275,7 @@ class Mixture(Base):
 
                 self.space.x_plt = np.sort(np.unique(x))
 
-        return self.space.plot(self.pf, x, ax)
+        return self.space.plot(self.prob, x, ax)
 
 
 class MixtureRV(MixinRV, Mixture):

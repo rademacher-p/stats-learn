@@ -14,8 +14,6 @@ else:
     str_p_bayes = r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \psi}$'
 
 
-
-
 # %% Model and prior mean
 n_x = 60
 
@@ -33,8 +31,8 @@ space = spaces.check_spaces([model, alpha])
 y = space.x_plt
 __, ax = plt.subplots()
 
-model_pf = model.pf(y)
-space.plot_xy(y, model_pf, y_std=np.zeros(y.shape), ax=ax, label=str_p_opt)
+model_pr = model.prob(y)
+space.plot_xy(y, model_pr, y_std=np.zeros(y.shape), ax=ax, label=str_p_opt)
 
 
 # %% Plot learner bias/var
@@ -42,33 +40,33 @@ space.plot_xy(y, model_pf, y_std=np.zeros(y.shape), ax=ax, label=str_p_opt)
 # for n in [1, 100]:
 for alpha_0 in [.1, 10]:
 
-    n_pf = np.arange(n + 1)
-    model_x_pf = rand_elements.Binomial(p_x, n).pf(n_pf)
-    e_gamma = np.dot(model_x_pf, 1 / (1 + n_pf / (alpha_0 * alpha_x)))
+    n_pr = np.arange(n + 1)
+    model_x_pr = rand_elements.Binomial(p_x, n).prob(n_pr)
+    e_gamma = np.dot(model_x_pr, 1 / (1 + n_pr / (alpha_0 * alpha_x)))
 
-    mean = e_gamma * alpha.pf(y) + (1 - e_gamma) * model_pf
-    bias = mean - model_pf
+    mean = e_gamma * alpha.prob(y) + (1 - e_gamma) * model_pr
+    bias = mean - model_pr
 
-    cov_lo = np.zeros(n_pf.shape + y.shape)
-    cov_hi = np.zeros(n_pf.shape + y.shape)
-    for n in n_pf:
+    cov_lo = np.zeros(n_pr.shape + y.shape)
+    cov_hi = np.zeros(n_pr.shape + y.shape)
+    for n in n_pr:
         if n > 0:
-            for i, p in enumerate(model_pf):
+            for i, p in enumerate(model_pr):
                 emp = rand_elements.EmpiricalScalar(p, n)
                 supp = emp.space.x_plt
-                emp_pf = emp.pf(supp)
+                emp_pr = emp.prob(supp)
 
                 idx = supp <= p
-                cov_lo[n, i] = np.dot(emp_pf[idx], (supp[idx] - p)**2)
+                cov_lo[n, i] = np.dot(emp_pr[idx], (supp[idx] - p) ** 2)
                 idx = supp > p
-                cov_hi[n, i] = np.dot(emp_pf[idx], (supp[idx] - p) ** 2)
+                cov_hi[n, i] = np.dot(emp_pr[idx], (supp[idx] - p) ** 2)
 
         gamma = 1 / (1 + n / (alpha_0*alpha_x))
         cov_lo[n] *= (1 - gamma) ** 2
         cov_hi[n] *= (1 - gamma) ** 2
 
-    cov_lo = np.tensordot(model_x_pf, cov_lo, axes=(0, 0))
-    cov_hi = np.tensordot(model_x_pf, cov_hi, axes=(0, 0))
+    cov_lo = np.tensordot(model_x_pr, cov_lo, axes=(0, 0))
+    cov_hi = np.tensordot(model_x_pr, cov_hi, axes=(0, 0))
 
     cov = cov_lo + cov_hi
     err = np.sqrt((bias ** 2 + cov).sum())

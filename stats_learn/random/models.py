@@ -14,7 +14,7 @@ from stats_learn import spaces
 from stats_learn.util import RandomGeneratorMixin, vectorize_func
 
 
-# TODO: add marginal/conditional pf methods
+# TODO: add marginal/conditional prob methods
 
 
 class Base(RandomGeneratorMixin, ABC):
@@ -422,11 +422,11 @@ class ClassConditional(MixinRVx, Base):
         return self.model_x.cov
 
     def mode_y_x(self, x):
-        temp = np.array([dist.pf(x) * p for dist, p in zip(self.dists, self.p_y)])
+        temp = np.array([dist.prob(x) * p for dist, p in zip(self.dists, self.p_y)])
         return self.space['y'].values[temp.argmax(axis=0)]
 
     def model_y_x(self, x):
-        temp = np.array([dist.pf(x) * p for dist, p in zip(self.dists, self.p_y)])
+        temp = np.array([dist.prob(x) * p for dist, p in zip(self.dists, self.p_y)])
         p_y_x = temp / temp.sum()
         return rand_elements.Finite(self.space['y'].values, p_y_x)
 
@@ -829,7 +829,7 @@ class Mixture(Base):
             return rand_elements.Mixture(*args)
 
     def _weights_y_x(self, x):
-        return np.array([w * dist.model_x.pf(x) for w, dist in zip(self.weights, self.dists)])
+        return np.array([w * dist.model_x.prob(x) for w, dist in zip(self.weights, self.dists)])
 
     def _sample(self, n, rng):
         idx_rng = rng.choice(self.n_dists, size=n, p=self._p)

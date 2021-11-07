@@ -221,7 +221,7 @@ class ModelRegressor(RegressorMixin, Model):
             if isinstance(model.space['x'], spaces.FiniteGeneric):
                 x = model.space['x'].values_flat
 
-                p_x = model.model_x.pf(x)
+                p_x = model.model_x.prob(x)
 
                 cov_y_x = model.cov_y_x(x)
                 bias_sq = (self.predict(x) - model.mean_y_x(x)) ** 2
@@ -286,8 +286,8 @@ class BayesRegressor(RegressorMixin, Bayes):
 
                 x = model.space['x'].values_flat
 
-                p_x = model.model_x.pf(x)
-                alpha_x = self.bayes_model.alpha_0 * self.bayes_model.prior_mean.model_x.pf(x)
+                p_x = model.model_x.prob(x)
+                alpha_x = self.bayes_model.alpha_0 * self.bayes_model.prior_mean.model_x.prob(x)
 
                 cov_y_x = model.cov_y_x(x)
                 bias_sq = (self.bayes_model.prior_mean.mean_y_x(x) - model.mean_y_x(x)) ** 2
@@ -299,7 +299,7 @@ class BayesRegressor(RegressorMixin, Bayes):
                     supp = rv.space.values
                     for i_x, (p_i, a_i) in enumerate(zip(p_x, alpha_x)):
                         rv.p = p_i
-                        p_rv = rv.pf(supp)
+                        p_rv = rv.prob(supp)
 
                         den = (a_i + supp) ** 2
 
@@ -324,7 +324,7 @@ class BayesRegressor(RegressorMixin, Bayes):
                     x = model.space['x'].values_flat
 
                     alpha_0 = self.bayes_model.alpha_0
-                    alpha_m = self.bayes_model.prior_mean.model_x.pf(x)
+                    alpha_m = self.bayes_model.prior_mean.model_x.prob(x)
                     weights = (alpha_m + 1 / (alpha_0 + n_train[..., np.newaxis])) / (alpha_m + 1 / alpha_0)
 
                     return np.dot(weights * self.bayes_model.prior_mean.cov_y_x(x), alpha_m)

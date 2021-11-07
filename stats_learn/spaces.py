@@ -13,6 +13,9 @@ from stats_learn.util import check_data_shape
 # TODO: generalize plotting for non-numeric values (e.g. mode_y_x)
 # TODO: issubset method?
 
+# TODO: add vectorized `contains` method?
+
+
 def check_spaces(iter_):
     """
     Check iterable of spaces for equivalence.
