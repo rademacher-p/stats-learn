@@ -46,11 +46,11 @@ class Base(RandomGeneratorMixin, ABC):
     def random_model(self, rng=None):
         raise NotImplementedError
 
-    rvs = rand_elements.Base.rvs
+    sample = rand_elements.Base.sample
 
-    def _rvs(self, size, rng):
+    def _sample(self, size, rng):
         model = self.random_model(rng)
-        return model.rvs(size)
+        return model.sample(size)
 
     def fit(self, d=(), warm_start=False):
         if not warm_start:
@@ -145,7 +145,7 @@ class NormalLinear(Base):
 
         model_kwargs = {'basis_y_x': self.basis_y_x, 'cov_y_x': self.cov_y_x, 'model_x': self.model_x,
                         'rng': rng}
-        rand_kwargs = {'weights': self.prior.rvs(rng=rng)}
+        rand_kwargs = {'weights': self.prior.sample(rng=rng)}
 
         return rand_models.NormalLinear(**model_kwargs, **rand_kwargs)
 
@@ -302,14 +302,14 @@ class Dirichlet(Base):  # TODO: DRY from random.elements?
     def random_model(self, rng=None):
         raise NotImplementedError  # TODO: implement for finite in subclass?
 
-    def _rvs(self, n, rng):
+    def _sample(self, n, rng):
         # Samples directly from the marginal Dirichlet-Empirical data distribution
 
         _out = np.array([tuple(np.empty(self.shape[c], self.dtype[c]) for c in 'xy') for _ in range(n)],
                         dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
         for i in range(n):
             if rng.random() <= (1 + i / self.alpha_0) ** -1:
-                _out[i] = self.prior_mean.rvs(rng=rng)  # sample from mean distribution
+                _out[i] = self.prior_mean.sample(rng=rng)  # sample from mean distribution
             else:
                 _out[i] = rng.choice(_out[:i])
 

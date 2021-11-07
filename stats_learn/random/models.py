@@ -63,11 +63,11 @@ class Base(RandomGeneratorMixin, ABC):
     def plot_mode_y_x(self, x=None, ax=None):
         return self.space['x'].plot(self.mode_y_x, x, ax)
 
-    rvs = rand_elements.Base.rvs
+    sample = rand_elements.Base.sample
 
-    def _rvs(self, n, rng):
-        d_x = np.array(self.model_x.rvs(n, rng=rng))
-        d_y = np.array([self.model_y_x(x).rvs(rng=rng) for x in d_x])
+    def _sample(self, n, rng):
+        d_x = np.array(self.model_x.sample(n, rng=rng))
+        d_y = np.array([self.model_y_x(x).sample(rng=rng) for x in d_x])
 
         return np.array(list(zip(d_x, d_y)), dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
 
@@ -159,7 +159,7 @@ class DataSet(Base):
         rng = self._get_rng(rng)
         rng.shuffle(self.data)
 
-    def _rvs(self, n, rng):
+    def _sample(self, n, rng):
         if self.idx + n > len(self.data):
             if self.iter_mode == 'once':
                 raise ValueError("DataSet model is exhausted.")
@@ -174,7 +174,7 @@ class DataSet(Base):
 
 # class DataConditionalGeneric(Base):
 #     def __new__(cls, model_x, model_y_x, rng=None):
-#         is_numeric_y = isinstance(model_y_x(model_x.rvs()), rand_elements.MixinRV)
+#         is_numeric_y = isinstance(model_y_x(model_x.sample()), rand_elements.MixinRV)
 #         if isinstance(model_x, rand_elements.MixinRV):
 #             if is_numeric_y:
 #                 return super().__new__(DataConditionalRVxy)
@@ -193,7 +193,7 @@ class DataSet(Base):
 #         self._update_x()
 #
 #         self._model_y_x_ = model_y_x
-#         self._space['y'] = self.model_y_x(self._model_x.rvs()).space
+#         self._space['y'] = self.model_y_x(self._model_x.sample()).space
 #
 #     @property
 #     def model_x(self):
@@ -434,9 +434,9 @@ class ClassConditional(MixinRVx, Base):
         idx = self.space['y'].values.tolist().index(y)
         return self.dists[idx]
 
-    def _rvs(self, n, rng):
-        d_y = np.array(self.model_y.rvs(n, rng=rng))
-        d_x = np.array([self.model_x_y(y).rvs(rng=rng) for y in d_y])
+    def _sample(self, n, rng):
+        d_y = np.array(self.model_y.sample(n, rng=rng))
+        d_x = np.array([self.model_x_y(y).sample(rng=rng) for y in d_y])
 
         return np.array(list(zip(d_x, d_y)), dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
 
@@ -558,7 +558,7 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
         if callable(val):
             self._cov_repr = val
             self._cov_y_x_single = val
-            _temp = self._cov_y_x_single(self.model_x.rvs()).shape
+            _temp = self._cov_y_x_single(self.model_x.sample()).shape
         else:
             self._cov_repr = np.array(val)
             self._cov_y_x_single = lambda x: self._cov_repr
@@ -704,7 +704,7 @@ class DataEmpirical(Base):
         else:
             return np.nan
 
-    def _rvs(self, size, rng):
+    def _sample(self, size, rng):
         return rng.choice(self.data[['x', 'y']], size, p=self._p)
 
 
@@ -831,14 +831,14 @@ class Mixture(Base):
     def _weights_y_x(self, x):
         return np.array([w * dist.model_x.pf(x) for w, dist in zip(self.weights, self.dists)])
 
-    def _rvs(self, n, rng):
+    def _sample(self, n, rng):
         idx_rng = rng.choice(self.n_dists, size=n, p=self._p)
         out = np.array([tuple(np.empty(self.shape[c], self.dtype[c]) for c in 'xy') for _ in range(n)],
                        dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
         for i, dist in enumerate(self.dists):
             idx = np.flatnonzero(i == idx_rng)
             if idx.size > 0:
-                out[idx] = dist.rvs(size=idx.size)
+                out[idx] = dist.sample(size=idx.size)
 
         return out
 

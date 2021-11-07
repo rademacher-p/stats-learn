@@ -562,7 +562,7 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
         if verbose:
             print(f"MC iteration: {i_mc + 1}/{n_mc}")
 
-        d = model.rvs(n_train[-1] + n_test)
+        d = model.sample(n_train[-1] + n_test)
         d_train, d_test = d[:n_train[-1]], d[n_train[-1]:]
 
         for predictor, params, y_stats, loss in zip(predictors, params_full, y_stats_full, loss_full):

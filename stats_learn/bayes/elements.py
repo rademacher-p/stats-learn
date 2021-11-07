@@ -35,10 +35,10 @@ class Base(RandomGeneratorMixin, ABC):
     def random_model(self, rng=None):
         raise NotImplementedError
 
-    rvs = rand_elements.Base.rvs
+    sample = rand_elements.Base.sample
 
-    def _rvs(self, n, rng):
-        return self.random_model(rng)._rvs(n, rng)
+    def _sample(self, n, rng):
+        return self.random_model(rng)._sample(n, rng)
 
     def fit(self, d=None, warm_start=False):
         if d is None:
@@ -85,7 +85,7 @@ class NormalLinear(Base):
         rng = self._get_rng(rng)
 
         model_kwargs = {'basis': self.basis, 'cov': self.cov, 'rng': rng}
-        rand_kwargs = {'weights': self.prior.rvs(rng=rng)}
+        rand_kwargs = {'weights': self.prior.sample(rng=rng)}
 
         return rand_elements.NormalLinear(**model_kwargs, **rand_kwargs)
 
@@ -216,13 +216,13 @@ class Dirichlet(Base):
     def random_model(self, rng=None):
         raise NotImplementedError  # TODO: implement for finite in subclass?
 
-    def _rvs(self, n, rng):
+    def _sample(self, n, rng):
         # Samples directly from the marginal Dirichlet-Empirical data distribution
 
         _out = np.empty((n, *self.shape), dtype=self.space.dtype)
         for i in range(n):
             if rng.random() <= self.alpha_0 / (self.alpha_0 + i):
-                _out[i] = self.prior_mean.rvs(rng=rng)  # sample from mean distribution
+                _out[i] = self.prior_mean.sample(rng=rng)  # sample from mean distribution
             else:
                 _out[i] = rng.choice(_out[:i])
 

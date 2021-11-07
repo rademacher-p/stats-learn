@@ -74,19 +74,19 @@ n_mc = 50
 
 # Sample regressor realizations
 n_train = 30
-d = model.rvs(n_train + n_test, rng=seed)
+d = model.sample(n_train + n_test, rng=seed)
 d_train, d_test = np.split(d, [n_train])
 
 img_path = img_dir + 'fit.png'
 loss_full = results.assess_single_compare(predictors, d_train, d_test, params, log_path=log_path, img_path=img_path)
 
-# # Prediction mean/variance, comparative
-# n_train = 400
-#
-# img_path = img_dir + 'predict_a0.png'
-# y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
-#                                                  stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
-#                                                  log_path=log_path, img_path=img_path, rng=seed)
+# Prediction mean/variance, comparative
+n_train = 400
+
+img_path = img_dir + 'predict_a0.png'
+y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
+                                                 stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
+                                                 log_path=log_path, img_path=img_path, rng=seed)
 
 # # Dirichlet-based prediction mean/variance, varying N
 # n_train = [0, 800, 4000]

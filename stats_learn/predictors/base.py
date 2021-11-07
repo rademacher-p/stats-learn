@@ -91,7 +91,7 @@ class Base(ABC):
         raise NotImplementedError
 
     def fit_from_model(self, model, n_train=0, rng=None, warm_start=False):
-        d = model.rvs(n_train, rng=rng)  # generate train/test data
+        d = model.sample(n_train, rng=rng)  # generate train/test data
         self.fit(d, warm_start)  # train learner
 
     def predict(self, x):
@@ -112,7 +112,7 @@ class Base(ABC):
         model.rng = rng
         loss = np.empty(n_mc)
         for i_mc in range(n_mc):
-            d = model.rvs(n_test)  # generate train/test data
+            d = model.sample(n_test)  # generate train/test data
             loss[i_mc] = self.evaluate(d)  # make decision and assess
 
         return loss.mean()

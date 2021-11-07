@@ -19,9 +19,9 @@ def test():
 
         try:
             e = b.random_model()
-            d = e.rvs(5)
+            d = e.sample(5)
         except NotImplementedError:
-            d = b.rvs(5)
+            d = b.sample(5)
 
         b.fit(d)
         b.posterior

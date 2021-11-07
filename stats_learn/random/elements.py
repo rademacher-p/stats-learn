@@ -83,7 +83,7 @@ class Base(RandomGeneratorMixin, ABC):
         """
         return self.space.plot(self.pf, x, ax, **kwargs)
 
-    def rvs(self, size=None, rng=None):
+    def sample(self, size=None, rng=None):
         """
         Randomly generate elements.
 
@@ -110,11 +110,11 @@ class Base(RandomGeneratorMixin, ABC):
             raise TypeError("Input 'size' must be int or tuple.")
 
         rng = self._get_rng(rng)
-        rvs = self._rvs(math.prod(shape), rng)
-        return rvs.reshape(shape + rvs.shape[1:])  # TODO: use np.asscalar if possible?
+        samples = self._sample(math.prod(shape), rng)
+        return samples.reshape(shape + samples.shape[1:])  # TODO: use np.asscalar if possible?
 
     @abstractmethod
-    def _rvs(self, n, rng):
+    def _sample(self, n, rng):
         """
         Randomly generate elements, core functionality.
 
@@ -217,7 +217,7 @@ class Deterministic(Base):
 
         self._mode = self._val
 
-    def _rvs(self, n, rng):
+    def _sample(self, n, rng):
         return np.broadcast_to(self._val, (n, *self.shape))
 
     def pf(self, x):
@@ -334,7 +334,7 @@ class Finite(Base):
 
         return self._mode
 
-    def _rvs(self, n, rng):
+    def _sample(self, n, rng):
         return rng.choice(self._supp_flat, size=n, p=self._p_flat)
 
     def _pf_single(self, x):
@@ -452,7 +452,7 @@ class Dirichlet(BaseRV):
 
         self.space.x_plt = None
 
-    def _rvs(self, n, rng):
+    def _sample(self, n, rng):
         return rng.dirichlet(self._alpha_0 * self._mean.flatten(), size=n).reshape(n, *self.shape)
 
     def pf(self, x):
@@ -538,7 +538,7 @@ class Empirical(BaseRV):
 
         return out.reshape(x.shape)
 
-    def _rvs(self, n, rng):
+    def _sample(self, n, rng):
         return rng.multinomial(self._n, self._mean.flatten(), size=n).reshape(n, *self.shape) / self._n
 
     def pf(self, x):
@@ -608,7 +608,7 @@ class DirichletEmpirical(BaseRV):
         self._log_pf_coef = (gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
                              + gammaln(self._n + 1) - gammaln(self._alpha_0 + self._n))
 
-    def _rvs(self, n, rng):
+    def _sample(self, n, rng):
         theta_flat = rng.dirichlet(self._alpha_0 * self._mean.flatten())
         return rng.multinomial(self._n, theta_flat, size=n).reshape(n, *self.shape) / self._n
 
@@ -666,7 +666,7 @@ class DirichletEmpiricalScalar(BaseRV):
     def cov(self):
         return self._multi.cov[0, 0]
 
-    def _rvs(self, n, rng):
+    def _sample(self, n, rng):
         a, b = self.alpha_0 * self._multi.mean
         p = rng.beta(a, b)
         return rng.binomial(self.n, p, size=n) / self.n
@@ -742,7 +742,7 @@ class Beta(BaseRV):
         self._mean = self._a / a0
         self._cov = self._a * self._b / a0 ** 2 / (a0 + 1)
 
-    def _rvs(self, n, rng):
+    def _sample(self, n, rng):
         return rng.beta(self._a, self._b, size=n)
 
     def pf(self, x):
@@ -808,7 +808,7 @@ class Binomial(BaseRV):
         self._mean = self._n * self._p
         self._cov = self._n * self._p * (1 - self._p)
 
-    def _rvs(self, n, rng):
+    def _sample(self, n, rng):
         return rng.binomial(self._n, self._p, size=n)
 
     def pf(self, x):
@@ -843,8 +843,8 @@ class EmpiricalScalar(Binomial):
         self._mean /= self._n
         self._cov /= (self._n ** 2)
 
-    def _rvs(self, n, rng):
-        return super()._rvs(n, rng) / self._n
+    def _sample(self, n, rng):
+        return super()._sample(n, rng) / self._n
 
     def pf(self, x):
         x = np.array(x) * self._n
@@ -881,7 +881,7 @@ class Uniform(BaseRV):
         _temp = (self.lims[..., 1] - self.lims[..., 0]).flatten() ** 2 / 12
         self._cov = np.diag(_temp).reshape(2 * self.shape)
 
-    def _rvs(self, n, rng):
+    def _sample(self, n, rng):
         a_flat = self.lims[..., 0].flatten()
         b_flat = self.lims[..., 1].flatten()
         _temp = np.stack(tuple(rng.uniform(a, b, size=n) for a, b in zip(a_flat, b_flat)), axis=-1)
@@ -966,7 +966,7 @@ class Normal(BaseRV):
 
         self._set_lims_plot()
 
-    def _rvs(self, n, rng):
+    def _sample(self, n, rng):
         return rng.multivariate_normal(self._mean_flat, self._cov_flat, size=n).reshape(n, *self.shape)
 
     def pf(self, x):
@@ -1116,7 +1116,7 @@ class DataEmpirical(Base):
 
         return self._mode
 
-    def _rvs(self, size, rng):
+    def _sample(self, size, rng):
         return rng.choice(self.data['x'], size, p=self._p)
 
     def _pf_single(self, x):
@@ -1243,13 +1243,13 @@ class Mixture(Base):
 
         return self._mode
 
-    def _rvs(self, n, rng):
+    def _sample(self, n, rng):
         idx_rng = rng.choice(self.n_dists, size=n, p=self._p)
         out = np.empty((n, *self.shape), dtype=self.space.dtype)
         for i, dist in enumerate(self.dists):
             idx = np.flatnonzero(i == idx_rng)
             if idx.size > 0:
-                out[idx] = dist.rvs(size=idx.size)
+                out[idx] = dist.sample(size=idx.size)
 
         return out
 

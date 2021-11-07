@@ -23,7 +23,7 @@ RE_set = [
     (Normal, {'mean': [1, 1], 'cov': np.eye(2)}),
     (NormalLinear, {'weights': np.ones(2), 'basis': [[1, 0], [0, 1], [1, 1]], 'cov': np.eye(3)}),
     (DataEmpirical, {'values': ['a', 'b'], 'counts': [5, 10], 'space':spaces.FiniteGeneric(['a', 'b'])}),
-    (Mixture, {'dists': [Normal(), DataEmpirical.from_data(Normal().rvs(10))], 'weights': [2, 10]})
+    (Mixture, {'dists': [Normal(), DataEmpirical.from_data(Normal().sample(10))], 'weights': [2, 10]})
 ]
 
 
@@ -32,7 +32,7 @@ def test():
         e = cls(**kwargs)
 
         e.mode
-        x = e.rvs(5)
+        x = e.sample(5)
         e.pf(x)
         # e.plot_pf(x)
 

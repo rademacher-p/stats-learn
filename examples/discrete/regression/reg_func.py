@@ -111,7 +111,7 @@ n_mc = 5
 # Sample regressor realizations
 n_train = 128
 
-d = model.rvs(n_train + n_test, rng=seed)
+d = model.sample(n_train + n_test, rng=seed)
 d_train, d_test = np.split(d, [n_train])
 
 img_path = img_dir + 'fit.png'

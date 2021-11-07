@@ -199,7 +199,7 @@ n_mc = 50
 
 # Sample regressor realizations
 n_train = 128
-d = model.rvs(n_train + n_test, rng=seed)
+d = model.sample(n_train + n_test, rng=seed)
 d_train, d_test = np.split(d, [n_train])
 x_plt = np.linspace(0, 1, 10000)
 
