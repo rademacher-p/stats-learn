@@ -51,7 +51,7 @@ def clairvoyant_func(x):
 var_y_x_const = 1/2
 
 
-model_x = rand_elements.Finite.from_grid([0, 1], n_x, p=None)
+model_x = rand_elements.FiniteGeneric.from_grid([0, 1], n_x, p=None)
 
 
 alpha_y_x = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_y-1))

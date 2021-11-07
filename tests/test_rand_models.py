@@ -10,9 +10,9 @@ plt.matplotlib.interactive(False)
 
 RM_set = [
     (DataConditional, {'dists': [rand_elements.Normal(mean) for mean in [0, 1]],
-                       'model_x': rand_elements.Finite([0, 1])}),
+                       'model_x': rand_elements.FiniteGeneric([0, 1])}),
     (ClassConditional, {'dists': [rand_elements.Normal(mean) for mean in [0, 1]],
-                        'model_y': rand_elements.Finite(['a', 'b'])}),
+                        'model_y': rand_elements.FiniteGeneric(['a', 'b'])}),
     (NormalLinear, dict(basis_y_x=(lambda x: np.ones_like(x), lambda x: x**2,), weights=(1, 2), cov_y_x=.01,
                         model_x=rand_elements.Normal(4))),
     (NormalLinear, dict(weights=(1, 2), cov_y_x=.01, model_x=rand_elements.Normal([0, 0]))),

@@ -27,7 +27,7 @@ def check_spaces(iter_):
 
     Returns
     -------
-    Base
+    Base or dict
         A space instance.
 
     """

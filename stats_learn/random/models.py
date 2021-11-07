@@ -223,7 +223,7 @@ class DataSet(Base):
 #
 #     @classmethod
 #     def from_finite(cls, dists, supp_x, p_x=None, rng=None):
-#         model_x = rand_elements.Finite(supp_x, p_x)
+#         model_x = rand_elements.FiniteGeneric(supp_x, p_x)
 #
 #         def model_y_x(x):
 #             eq_supp = np.all(x == model_x.space._vals_flat, axis=tuple(range(1, 1 + model_x.space.ndim)))
@@ -332,7 +332,7 @@ class DataConditional(Base):
 
     @classmethod
     def from_finite(cls, dists, supp_x, p_x=None, rng=None):
-        model_x = rand_elements.Finite(supp_x, p_x)
+        model_x = rand_elements.FiniteGeneric(supp_x, p_x)
         return cls(dists, model_x, rng)
 
 
@@ -380,8 +380,8 @@ class ClassConditional(MixinRVx, Base):
 
     @classmethod
     def from_finite(cls, dists, supp_y, p_y=None, rng=None):
-        # model_y = rand_elements.Finite(np.array(supp_y, dtype='U').flatten(), p_y)
-        model_y = rand_elements.Finite(supp_y, p_y)  # TODO: shouldn't enforce dtype
+        # model_y = rand_elements.FiniteGeneric(np.array(supp_y, dtype='U').flatten(), p_y)
+        model_y = rand_elements.FiniteGeneric(supp_y, p_y)  # TODO: shouldn't enforce dtype
         return cls(dists, model_y, rng)
 
     dists = property(lambda self: self._dists)
@@ -428,7 +428,7 @@ class ClassConditional(MixinRVx, Base):
     def model_y_x(self, x):
         temp = np.array([dist.prob(x) * p for dist, p in zip(self.dists, self.p_y)])
         p_y_x = temp / temp.sum()
-        return rand_elements.Finite(self.space['y'].values, p_y_x)
+        return rand_elements.FiniteGeneric(self.space['y'].values, p_y_x)
 
     def model_x_y(self, y):
         idx = self.space['y'].values.tolist().index(y)
@@ -751,7 +751,7 @@ class Mixture(Base):
             else:
                 return super().__new__(cls)
 
-    def __init__(self, dists, weights, rng=None):  # TODO: special implementation for Finite? get modes, etc?
+    def __init__(self, dists, weights, rng=None):  # TODO: special implementation for FiniteGeneric? get modes, etc?
         super().__init__(rng)
         self._dists = list(dists)
 

@@ -145,10 +145,12 @@ class MixinRV:
 
     @property
     def mean(self):
+        """First moment."""
         return self._mean
 
     @property
     def cov(self):
+        """Second central moment."""
         return self._cov
 
 
@@ -170,7 +172,7 @@ class BaseRV(MixinRV, Base, ABC):
 
 
 class Deterministic(Base):
-    # TODO: redundant, just use Finite? or change to ContinuousRV for integration? General dirac mix?
+    # TODO: redundant, just use FiniteGeneric? or change to ContinuousRV for integration? General dirac mix?
 
     def __new__(cls, val, rng=None):
         """
@@ -241,10 +243,9 @@ class DeterministicRV(MixinRV, Deterministic):
         self._cov = np.zeros(2 * self.shape)
 
 
-class Finite(Base):
-    # TODO: DRY - use stat approx from the Finite space's methods?
+class FiniteGeneric(Base):
+    # TODO: DRY - use stat approx from the FiniteGeneric space's methods?
 
-    # TODO: rename `FiniteGeneric`?
     # FIXME: NOT SUPPORT! Use `values`? Conform with space...
 
     def __new__(cls, supp, p=None, rng=None):
@@ -260,7 +261,7 @@ class Finite(Base):
 
         """
         if np.issubdtype(np.array(supp).dtype, np.number):
-            return super().__new__(FiniteRV)
+            return super().__new__(FiniteGenericRV)
         else:
             return super().__new__(cls)
 
@@ -280,7 +281,7 @@ class Finite(Base):
         self.p = p
 
     def __eq__(self, other):
-        if isinstance(other, Finite):
+        if isinstance(other, FiniteGeneric):
             return np.all(self.supp == other.supp) and np.all(self.p == other.p)
         return NotImplemented
 
@@ -349,7 +350,7 @@ class Finite(Base):
         return self._p_flat[eq_supp].squeeze()
 
 
-class FiniteRV(MixinRV, Finite):
+class FiniteGenericRV(MixinRV, FiniteGeneric):
     """
     Generic RV drawn from a finite support set using an explicitly defined PMF.
     """
@@ -1184,7 +1185,7 @@ class Mixture(Base):
         else:
             return super().__new__(cls)
 
-    def __init__(self, dists, weights, rng=None):  # TODO: special implementation for Finite? get modes, etc?
+    def __init__(self, dists, weights, rng=None):  # TODO: special implementation for FiniteGeneric? get modes, etc?
         super().__init__(rng)
         self._dists = list(dists)
 

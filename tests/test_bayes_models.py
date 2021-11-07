@@ -11,8 +11,8 @@ RM_set = [
     (NormalLinear, dict(prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
                         model_x=rand_elements.Normal())),
     (Dirichlet, dict(prior_mean=rand_models.NormalLinear(weights=(2,), basis_y_x=(lambda x: 1,), cov_y_x=.1,
-                                                         model_x=rand_elements.Finite(np.linspace(0, 1, 10,
-                                                                                                  endpoint=False))),
+                                                         model_x=rand_elements.FiniteGeneric(np.linspace(0, 1, 10,
+                                                                                                         endpoint=False))),
                      alpha_0=1)),
 ]
 

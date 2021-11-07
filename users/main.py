@@ -72,7 +72,7 @@ nonlinear_model = make_inv_trig(shape_x)
 # nonlinear_model = make_rand_discrete(n_x, rng=seed)
 
 
-model_x = rand_elements.Finite.from_grid([0, 1], n_x)
+model_x = rand_elements.FiniteGeneric.from_grid([0, 1], n_x)
 # model = rand_models.DataConditional.from_poly_mean(n_x, alpha_y_x_d, w_model, model_x)
 model = rand_models.DataConditional.from_func_mean(n_x, alpha_y_x_d, nonlinear_model, model_x)
 
@@ -109,7 +109,7 @@ prior_mean = rand_models.DataConditional.from_poly_mean(n_x, alpha_y_x_d, w_prio
 # supp_t = box_grid(model_x.lims, n_t, endpoint=True)
 # # _temp = np.ones(model_x.size*(n_t,))
 # _temp = prob_disc(model_x.size*(n_t,))
-# # prior_mean_x = rand_elements.Finite(supp_t, p=_temp/_temp.sum())
+# # prior_mean_x = rand_elements.FiniteGeneric(supp_t, p=_temp/_temp.sum())
 # prior_mean_x = rand_elements.DataEmpirical(supp_t, counts=_temp, space=model_x.space)
 # proc_funcs.append(make_discretizer(supp_t.reshape(-1, *model_x.shape)))
 #
@@ -304,9 +304,9 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
 #     pickle.dump(fig, f)
 
 
-# model_x = rand_elements.Finite([0, .5], p=None)
-# model = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
-# prior_mean = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.9, .9)], model_x)
+# model_x = rand_elements.FiniteGeneric([0, .5], p=None)
+# model = rand_models.DataConditional([rand_elements.FiniteGeneric([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
+# prior_mean = rand_models.DataConditional([rand_elements.FiniteGeneric([0, .5], [p, 1 - p]) for p in (.9, .9)], model_x)
 
 
 # _name = r'$\mathrm{Dir}$'
@@ -334,7 +334,7 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
 # for n_t, _params in zip(n_t_iter, dir_params_full):
 #     _temp = np.full(n_t, 2)
 #     _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
-#     prior_mean_x = rand_elements.Finite(np.linspace(0, 1, n_t), p=_temp / _temp.sum())
+#     prior_mean_x = rand_elements.FiniteGeneric(np.linspace(0, 1, n_t), p=_temp / _temp.sum())
 #     prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta,
 #                                         model_x=prior_mean_x)
 #

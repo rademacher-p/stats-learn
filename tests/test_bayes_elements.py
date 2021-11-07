@@ -9,7 +9,7 @@ plt.matplotlib.interactive(False)
 
 RE_set = [
     (NormalLinear, dict(prior_mean=np.ones(2), prior_cov=10*np.eye(2), basis=[[1, 0], [0, 1], [1, 1]], cov=np.eye(3))),
-    (Dirichlet, dict(prior_mean=rand_elements.Finite(['a', 'b'], [.2, .8]), alpha_0=10)),
+    (Dirichlet, dict(prior_mean=rand_elements.FiniteGeneric(['a', 'b'], [.2, .8]), alpha_0=10)),
 ]
 
 
