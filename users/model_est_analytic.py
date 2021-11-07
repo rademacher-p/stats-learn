@@ -53,13 +53,13 @@ for alpha_0 in [.1, 10]:
         if n > 0:
             for i, p in enumerate(model_pr):
                 emp = rand_elements.EmpiricalScalar(p, n)
-                supp = emp.space.x_plt
-                emp_pr = emp.prob(supp)
+                values = emp.space.x_plt
+                emp_pr = emp.prob(values)
 
-                idx = supp <= p
-                cov_lo[n, i] = np.dot(emp_pr[idx], (supp[idx] - p) ** 2)
-                idx = supp > p
-                cov_hi[n, i] = np.dot(emp_pr[idx], (supp[idx] - p) ** 2)
+                idx = values <= p
+                cov_lo[n, i] = np.dot(emp_pr[idx], (values[idx] - p) ** 2)
+                idx = values > p
+                cov_hi[n, i] = np.dot(emp_pr[idx], (values[idx] - p) ** 2)
 
         gamma = 1 / (1 + n / (alpha_0*alpha_x))
         cov_lo[n] *= (1 - gamma) ** 2

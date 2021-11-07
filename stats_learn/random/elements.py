@@ -246,52 +246,60 @@ class DeterministicRV(MixinRV, Deterministic):
 class FiniteGeneric(Base):
     # TODO: DRY - use stat approx from the FiniteGeneric space's methods?
 
-    # FIXME: NOT SUPPORT! Use `values`? Conform with space...
-
-    def __new__(cls, supp, p=None, rng=None):
+    def __new__(cls, values, p=None, rng=None):
         """
-        Finite-domain random element with specified support and probabilities.
+        Finite-domain random element with specified domain and probabilities.
 
         Parameters
         ----------
-        supp : array_like
-        p
+        values : array_like
+        p : array_like, optional
         rng : int or np.random.RandomState or np.random.Generator, optional
             Random number generator seed or object.
 
         """
-        if np.issubdtype(np.array(supp).dtype, np.number):
+        if np.issubdtype(np.array(values).dtype, np.number):
             return super().__new__(FiniteGenericRV)
         else:
             return super().__new__(cls)
 
-    def __init__(self, supp, p=None, rng=None):
+    def __init__(self, values, p=None, rng=None):
+        """
+        Finite-domain random element with specified domain and probabilities.
+
+        Parameters
+        ----------
+        values : array_like
+        p : array_like, optional
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
 
-        _supp = np.array(supp)
+        values = np.array(values)
 
         if p is None:
-            size_p = _supp.shape[0]
+            size_p = values.shape[0]
             p = np.ones(size_p) / size_p
         else:
             p = np.array(p)
 
-        self._space = spaces.FiniteGeneric(_supp, shape=_supp.shape[p.ndim:])
-
+        self._space = spaces.FiniteGeneric(values, shape=values.shape[p.ndim:])
         self.p = p
 
     def __eq__(self, other):
         if isinstance(other, FiniteGeneric):
-            return np.all(self.supp == other.supp) and np.all(self.p == other.p)
+            return np.all(self.values == other.values) and np.all(self.p == other.p)
         return NotImplemented
 
     def __deepcopy__(self, memodict=None):
         # if memodict is None:
         #     memodict = {}
-        return type(self)(self.supp, self.p, self.rng)
+        return type(self)(self.values, self.p, self.rng)
 
     def __repr__(self):
-        return f"FiniteRE(support={self.supp}, p={self.p})"
+        return f"FiniteGeneric(values={self.values}, p={self.p})"
 
     @classmethod
     def from_grid(cls, lims, n=100, endpoint=True, p=None, rng=None):
@@ -303,11 +311,11 @@ class FiniteGeneric(Base):
 
     # Input properties
     @property
-    def supp(self):
+    def values(self):
         return self.space.values
 
     @property
-    def _supp_flat(self):
+    def _values_flat(self):
         return self.space.values_flat
 
     @property
@@ -326,50 +334,48 @@ class FiniteGeneric(Base):
         self._p_flat = self._p.flatten()
 
         self._mode = None
-        # self._mode = self._supp_flat[np.argmax(self._p_flat)]
+        # self._mode = self._values_flat[np.argmax(self._p_flat)]
 
     @property
     def mode(self):
         if self._mode is None:
-            self._mode = self._supp_flat[np.argmax(self._p_flat)]
+            self._mode = self._values_flat[np.argmax(self._p_flat)]
 
         return self._mode
 
     def _sample(self, n, rng):
-        return rng.choice(self._supp_flat, size=n, p=self._p_flat)
+        return rng.choice(self._values_flat, size=n, p=self._p_flat)
 
     def _prob_single(self, x):
-        eq_supp = np.all(x == self._supp_flat, axis=tuple(range(1, 1 + self.ndim)))
-        # eq_supp = np.empty(self.space.set_size, dtype=np.bool)
-        # for i, value in enumerate(self._supp_flat):
-        #     eq_supp[i] = np.allclose(x, value)
+        eq = np.all(x == self._values_flat, axis=tuple(range(1, 1 + self.ndim)))
+        # eq = np.empty(self.space.set_size, dtype=np.bool)
+        # for i, value in enumerate(self._values_flat):
+        #     eq[i] = np.allclose(x, value)
 
-        if eq_supp.sum() == 0:
-            raise ValueError("Input 'x' must be in the support.")
+        if eq.sum() == 0:
+            raise ValueError("Input 'x' must be in the domain.")
 
-        return self._p_flat[eq_supp].squeeze()
+        return self._p_flat[eq].squeeze()
 
 
 class FiniteGenericRV(MixinRV, FiniteGeneric):
-    """
-    Generic RV drawn from a finite support set using an explicitly defined PMF.
-    """
+    """Finite-domain random variable with specified domain and probabilities."""
 
     def _update_attr(self):
         super()._update_attr()
 
-        # mean_flat = self._p_flat @ self._supp_flat
+        # mean_flat = self._p_flat @ self._values_flat
         # self._mean = mean_flat.reshape(self.shape)
         #
-        # ctr_flat = self._supp_flat - mean_flat
+        # ctr_flat = self._values_flat - mean_flat
         # outer_flat = (ctr_flat[:, np.newaxis] * ctr_flat[..., np.newaxis]).reshape(self._p.size, -1)
         # self._cov = (self._p_flat @ outer_flat).reshape(2 * self.shape)
 
         # TODO: clean up?
 
-        # self._mean = np.tensordot(self._p_flat, self._supp_flat, axes=[0, 0])
+        # self._mean = np.tensordot(self._p_flat, self._values_flat, axes=[0, 0])
         #
-        # ctr = self._supp_flat - self._mean
+        # ctr = self._values_flat - self._mean
         # # outer = np.empty((len(ctr), *(2 * self.shape)))
         # # for i, ctr_i in enumerate(ctr):
         # #     outer[i] = np.tensordot(ctr_i, ctr_i, 0)
@@ -382,14 +388,14 @@ class FiniteGenericRV(MixinRV, FiniteGeneric):
     @property
     def mean(self):
         if self._mean is None:
-            self._mean = np.tensordot(self._p_flat, self._supp_flat, axes=(0, 0))
+            self._mean = np.tensordot(self._p_flat, self._values_flat, axes=(0, 0))
 
         return self._mean
 
     @property
     def cov(self):
         if self._cov is None:
-            ctr = self._supp_flat - self.mean
+            ctr = self._values_flat - self.mean
             self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p_flat, ctr))
 
         return self._cov
@@ -475,7 +481,7 @@ class Dirichlet(BaseRV):
 
 class Empirical(BaseRV):
     """
-    Empirical random process, finite-supp realizations.
+    Empirical random process, finite-domain realizations.
     """
 
     def __init__(self, mean, n, rng=None):
@@ -554,7 +560,7 @@ class Empirical(BaseRV):
 
 class DirichletEmpirical(BaseRV):
     """
-    Dirichlet-Empirical random process, finite-supp realizations.
+    Dirichlet-Empirical random process, finite-domain realizations.
     """
 
     def __init__(self, mean, alpha_0, n, rng=None):
@@ -1138,7 +1144,7 @@ class DataEmpirical(Base):
         if x is None and self.space.x_plt is None:
             # self.space.set_x_plot()
             if isinstance(self.space, spaces.Continuous) and self.shape in {()}:
-                # add empirical values to the plot support (so impulses are not missed)
+                # add empirical values to the plot (so impulses are not missed)
                 self.space.x_plt = np.sort(np.unique(np.concatenate((self.space.x_plt, self.data['x']))))
 
         return self.space.plot(self.prob, x, ax)

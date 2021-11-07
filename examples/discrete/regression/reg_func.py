@@ -64,7 +64,7 @@ dir_params = {'alpha_0': [1e-5, 1e5]}
 # PyTorch
 weight_decays = [0., 1e-3]  # controls L2 regularization
 
-proc_funcs = {'pre': [], 'post': [make_clipper([np.min(model_x.supp), np.max(model_x.supp)])]}
+proc_funcs = {'pre': [], 'post': [make_clipper([np.min(model_x.values), np.max(model_x.values)])]}
 
 lit_predictors = []
 for weight_decay in weight_decays:

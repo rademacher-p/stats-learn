@@ -296,20 +296,19 @@ class FiniteGeneric(Finite):
         self.values = np.array(values)
         super().__init__(shape, self.values.dtype)
 
-        _supp_shape = self.values.shape
         _idx_split = self.values.ndim - self.ndim
-        if _supp_shape[_idx_split:] != self.shape:
+        if self.values.shape[_idx_split:] != self.shape:
             raise ValueError(f"Support trailing shape must be {self.shape}.")
 
-        self.set_shape = _supp_shape[:_idx_split]
+        self.set_shape = self.values.shape[:_idx_split]
         self.set_size = math.prod(self.set_shape)
         self.set_ndim = len(self.set_shape)
 
-        self._vals_flat = self.values.reshape(-1, *self.shape)
-        if len(self._vals_flat) != len(np.unique(self._vals_flat, axis=0)):
+        self._values_flat = self.values.reshape(-1, *self.shape)
+        if len(self._values_flat) != len(np.unique(self._values_flat, axis=0)):
             raise ValueError("Input 'values' must have unique values")
 
-    values_flat = property(lambda self: self._vals_flat)
+    values_flat = property(lambda self: self._values_flat)
 
     @classmethod
     def from_outer(cls, *vecs):
@@ -338,24 +337,24 @@ class FiniteGeneric(Finite):
     def __contains__(self, item):
         item = np.array(item)
         if item.shape == self.shape and item.dtype == self.dtype:
-            # eq_supp = np.all(item.flatten() == self._vals_flat, axis=-1)
-            eq_supp = np.all(item == self._vals_flat, axis=tuple(range(1, 1 + self.ndim)))
-            return eq_supp.sum() > 0
+            # eq = np.all(item.flatten() == self._values_flat, axis=-1)
+            eq = np.all(item == self._values_flat, axis=tuple(range(1, 1 + self.ndim)))
+            return eq.sum() > 0
         else:
             return False
 
     def _minimize(self, f):
-        i_opt = np.argmin(f(self._vals_flat))
-        return self._vals_flat[i_opt]
+        i_opt = np.argmin(f(self._values_flat))
+        return self._values_flat[i_opt]
 
         # # ranges = (np.mgrid[:self.set_size],)
         # ranges = (slice(self.set_size), )
-        # i_opt = int(optimize.brute(lambda i: f(self._vals_flat[int(i)]), ranges))
+        # i_opt = int(optimize.brute(lambda i: f(self._values_flat[int(i)]), ranges))
         #
-        # return self._vals_flat[i_opt]
+        # return self._values_flat[i_opt]
 
     def integrate(self, f):
-        y_flat = f(self._vals_flat)
+        y_flat = f(self._values_flat)
         return y_flat.sum(0)
 
     def set_x_plot(self):

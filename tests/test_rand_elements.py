@@ -13,8 +13,8 @@ rng = np.random.default_rng()
 RE_set = [
     (Deterministic, {'value': np.arange(6).reshape(3, 2)}),
     (Deterministic, {'value': ['a', 'b', 'c']}),
-    (FiniteGeneric, {'supp': rng.random((3, 3, 2)), 'p': np.full((3, 3), 1 / 9)}),
-    (FiniteGeneric, {'supp': ['a', 'b', 'c']}),
+    (FiniteGeneric, {'values': rng.random((3, 3, 2)), 'p': np.full((3, 3), 1 / 9)}),
+    (FiniteGeneric, {'values': ['a', 'b', 'c']}),
     (Dirichlet, {'mean': np.full((3,), 1/3), 'alpha_0': 10}),
     (Empirical, {'mean': np.full((3,), 1/3), 'n': 10}),
     (DirichletEmpirical, {'mean': np.full((3,), 1/3), 'alpha_0': 10, 'n': 10}),

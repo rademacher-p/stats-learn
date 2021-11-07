@@ -104,10 +104,10 @@ dir_params_full = [None for __ in range(len(n_t_iter) * len(alpha_0_norm_iter))]
 dir_predictors = []
 for n_t in n_t_iter:
     for alpha_0_norm in alpha_0_norm_iter:
-        supp_t = np.linspace(*model_x.lims, n_t, endpoint=False) + .5 / n_t
-        counts = np.ones_like(supp_t)
+        values_t = np.linspace(*model_x.lims, n_t, endpoint=False) + .5 / n_t
+        counts = np.ones_like(values_t)
 
-        prior_mean_x = rand_elements.DataEmpirical(supp_t, counts, space=model_x.space)
+        prior_mean_x = rand_elements.DataEmpirical(values_t, counts, space=model_x.space)
         prior_mean = rand_models.BetaLinear(weights=[1], basis_y_x=[prior_func], alpha_y_x=alpha_y_x,
                                             model_x=prior_mean_x)
 
@@ -117,7 +117,7 @@ for n_t in n_t_iter:
         name_ = r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{n_t}$" + \
                 r", $\alpha_0 / |\mathcal{T}| = " + f"{alpha_0_norm}$"
 
-        dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=[make_discretizer(supp_t)], name=name_)
+        dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=[make_discretizer(values_t)], name=name_)
 
         dir_predictors.append(dir_predictor)
 
@@ -131,17 +131,17 @@ for n_t in n_t_iter:
 # dir_params_full = [deepcopy(dir_params) for __ in n_t_iter]
 # dir_predictors = []
 # for n_t, _params in zip(n_t_iter, dir_params_full):
-#     supp_t = np.linspace(*model_x.lims, n_t, endpoint=False) + .5 / n_t
-#     counts = np.ones_like(supp_t)
+#     values_t = np.linspace(*model_x.lims, n_t, endpoint=False) + .5 / n_t
+#     counts = np.ones_like(values_t)
 #
-#     prior_mean_x = rand_elements.DataEmpirical(supp_t, counts, space=model_x.space)
+#     prior_mean_x = rand_elements.DataEmpirical(values_t, counts, space=model_x.space)
 #     prior_mean = rand_models.BetaLinear(weights=[1], basis_y_x=[prior_func], alpha_y_x=alpha_y_x,
 #                                         model_x=prior_mean_x)
 #     dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
 #
 #     name_ = r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{n_t}$"
 #
-#     dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=[make_discretizer(supp_t)], name=name_)
+#     dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=[make_discretizer(values_t)], name=name_)
 #
 #     dir_predictors.append(dir_predictor)
 #

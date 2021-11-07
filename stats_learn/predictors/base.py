@@ -296,14 +296,14 @@ class BayesRegressor(RegressorMixin, Bayes):
                 w_bias = np.zeros((n_train.size, p_x.size))
                 for i_n, n_i in enumerate(n_train.flatten()):
                     rv = rand_elements.Binomial(.5, n_i)
-                    supp = rv.space.values
+                    values = rv.space.values
                     for i_x, (p_i, a_i) in enumerate(zip(p_x, alpha_x)):
                         rv.p = p_i
-                        p_rv = rv.prob(supp)
+                        p_rv = rv.prob(values)
 
-                        den = (a_i + supp) ** 2
+                        den = (a_i + values) ** 2
 
-                        w_cov[i_n, i_x] = (p_rv / den * supp).sum()
+                        w_cov[i_n, i_x] = (p_rv / den * values).sum()
                         w_bias[i_n, i_x] = (p_rv / den * a_i ** 2).sum()
 
                 risk = np.dot(cov_y_x * (1 + w_cov) + bias_sq * w_bias, p_x)

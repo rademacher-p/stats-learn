@@ -222,12 +222,12 @@ class DataSet(Base):
 #         return self.model_y_x(x).mode
 #
 #     @classmethod
-#     def from_finite(cls, dists, supp_x, p_x=None, rng=None):
-#         model_x = rand_elements.FiniteGeneric(supp_x, p_x)
+#     def from_finite(cls, dists, values_x, p_x=None, rng=None):
+#         model_x = rand_elements.FiniteGeneric(values_x, p_x)
 #
 #         def model_y_x(x):
-#             eq_supp = np.all(x == model_x.space._vals_flat, axis=tuple(range(1, 1 + model_x.space.ndim)))
-#             idx = np.flatnonzero(eq_supp).item()
+#             eq = np.all(x == model_x.space._values_flat, axis=tuple(range(1, 1 + model_x.space.ndim)))
+#             idx = np.flatnonzero(eq).item()
 #             return dists[idx]
 #
 #         return cls(model_x, model_y_x, rng)
@@ -283,9 +283,9 @@ class DataConditional(Base):
     @classmethod
     def from_func_mean(cls, n, alpha_0, func, model_x, rng=None):
         if np.isinf(alpha_0):
-            dists = [rand_elements.EmpiricalScalar(func(x), n - 1) for x in model_x.supp]
+            dists = [rand_elements.EmpiricalScalar(func(x), n - 1) for x in model_x.values]
         else:
-            dists = [rand_elements.DirichletEmpiricalScalar(func(x), alpha_0, n - 1) for x in model_x.supp]
+            dists = [rand_elements.DirichletEmpiricalScalar(func(x), alpha_0, n - 1) for x in model_x.values]
         return cls(dists, model_x, rng)
 
     @classmethod
@@ -331,8 +331,8 @@ class DataConditional(Base):
         return self.model_y_x(x).mode
 
     @classmethod
-    def from_finite(cls, dists, supp_x, p_x=None, rng=None):
-        model_x = rand_elements.FiniteGeneric(supp_x, p_x)
+    def from_finite(cls, dists, values_x, p_x=None, rng=None):
+        model_x = rand_elements.FiniteGeneric(values_x, p_x)
         return cls(dists, model_x, rng)
 
 
@@ -379,9 +379,9 @@ class ClassConditional(MixinRVx, Base):
         self._space['x'] = spaces.check_spaces(self.dists)
 
     @classmethod
-    def from_finite(cls, dists, supp_y, p_y=None, rng=None):
-        # model_y = rand_elements.FiniteGeneric(np.array(supp_y, dtype='U').flatten(), p_y)
-        model_y = rand_elements.FiniteGeneric(supp_y, p_y)  # TODO: shouldn't enforce dtype
+    def from_finite(cls, dists, values_y, p_y=None, rng=None):
+        # model_y = rand_elements.FiniteGeneric(np.array(values_y, dtype='U').flatten(), p_y)
+        model_y = rand_elements.FiniteGeneric(values_y, p_y)  # TODO: shouldn't enforce dtype
         return cls(dists, model_y, rng)
 
     dists = property(lambda self: self._dists)
