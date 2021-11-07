@@ -1,9 +1,3 @@
-"""
-Random elements.
-"""
-
-# TODO: do ABC or PyCharm bug?
-
 from abc import ABC, abstractmethod
 import math
 from numbers import Integral
@@ -17,13 +11,17 @@ from stats_learn import spaces
 from stats_learn.util import RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func
 
 
-# %% Base RE classes
 class Base(RandomGeneratorMixin, ABC):
-    """
-    Base class for random element objects.
-    """
-
     def __init__(self, rng=None):
+        """
+        Base class for random element objects.
+
+        Parameters
+        ----------
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
 
         self._space = None  # TODO: arg?
@@ -39,7 +37,25 @@ class Base(RandomGeneratorMixin, ABC):
 
     mode = property(lambda self: self._mode)
 
-    def pf(self, x):  # TODO: perform input checks using `space.__contains__`?
+    def pf(self, x):
+        """
+        Probability function.
+
+        Parameters
+        ----------
+        x : array_like
+            Random element domain values.
+
+        Returns
+        -------
+        np.ndarray
+            Probability mass if `self.space` is a `spaces.Discrete` subclass; probability density if `spaces.Continuous`
+            subclass.
+
+        """
+
+        # TODO: perform input checks using `space.__contains__`?
+
         # if x is None:
         #     x = self.space.x_plt  # TODO: add default x_plt
 
@@ -49,9 +65,41 @@ class Base(RandomGeneratorMixin, ABC):
         pass
 
     def plot_pf(self, x=None, ax=None, **kwargs):
+        """
+        Plot the probability function.
+
+        Parameters
+        ----------
+        x : array_like, optional
+            Random element domain values.
+        ax : matplotlib.axes.Axes, optional
+        kwargs : dict, optional
+            Additional keyword arguments for `self.space.plot` method.
+
+        Returns
+        -------
+        matplotlib.artist.Artist or tuple of matplotlib.artist.Artist
+
+        """
         return self.space.plot(self.pf, x, ax, **kwargs)
 
     def rvs(self, size=None, rng=None):
+        """
+        Randomly generate elements.
+
+        Parameters
+        ----------
+        size : int or tuple, optional
+            Number or shape of set of random elements generated.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        Returns
+        -------
+        np.ndarray
+            Array of random elements.
+
+        """
         if size is None:
             shape = ()
         elif isinstance(size, (Integral, np.integer)):
@@ -67,10 +115,28 @@ class Base(RandomGeneratorMixin, ABC):
 
     @abstractmethod
     def _rvs(self, n, rng):
+        """
+        Randomly generate elements, core functionality.
+
+        Parameters
+        ----------
+        n : int
+            Number of elements to generate.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        Returns
+        -------
+        np.ndarray
+            Array of random elements.
+
+        """
         raise NotImplementedError("Method must be overwritten.")
 
 
 class MixinRV:
+    """Mixin class for random variables (numeric domain)."""
+
     _mean: Optional[Union[float, np.ndarray]]
     _cov: Optional[Union[float, np.ndarray]]
 
@@ -87,37 +153,61 @@ class MixinRV:
 
 
 class BaseRV(MixinRV, Base, ABC):
-    """
-    Base class for random variable (numeric) objects.
-    """
-
     def __init__(self, rng=None):
+        """
+        Base class for random variable (numeric) objects.
+
+        Parameters
+        ----------
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
+
         # self._mean = None
         # self._cov = None
 
 
-# %% Specific RE's
 class Deterministic(Base):
-    """
-    Deterministic random element.
-    """
-
     # TODO: redundant, just use Finite? or change to ContinuousRV for integration? General dirac mix?
 
     def __new__(cls, val, rng=None):
+        """
+        Deterministic random element.
+
+        Parameters
+        ----------
+        val : array_like
+            The deterministic value.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         if np.issubdtype(np.array(val).dtype, np.number):
             return super().__new__(DeterministicRV)
         else:
             return super().__new__(cls)
 
     def __init__(self, val, rng=None):
+        """
+        Deterministic random element.
+
+        Parameters
+        ----------
+        val : array_like
+            The deterministic value.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
         self.val = val
 
     # Input properties
     @property
     def val(self):
+        """The deterministic value."""
         return self._val
 
     @val.setter
@@ -135,9 +225,7 @@ class Deterministic(Base):
 
 
 class DeterministicRV(MixinRV, Deterministic):
-    """
-    Deterministic random variable.
-    """
+    """Deterministic random variable."""
 
     # @property
     # def val(self):
@@ -153,13 +241,24 @@ class DeterministicRV(MixinRV, Deterministic):
         self._cov = np.zeros(2 * self.shape)
 
 
-# TODO: rename generic?
-class Finite(Base):  # TODO: DRY - use stat approx from the Finite space's methods?
-    """
-    Generic RE drawn from a finite support set using an explicitly defined PMF.
-    """
+class Finite(Base):
+    # TODO: DRY - use stat approx from the Finite space's methods?
+
+    # TODO: rename `FiniteGeneric`?
+    # FIXME: NOT SUPPORT! Use `values`? Conform with space...
 
     def __new__(cls, supp, p=None, rng=None):
+        """
+        Finite-domain random element with specified support and probabilities.
+
+        Parameters
+        ----------
+        supp : array_like
+        p
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         if np.issubdtype(np.array(supp).dtype, np.number):
             return super().__new__(FiniteRV)
         else:
@@ -296,11 +395,19 @@ class FiniteRV(MixinRV, Finite):
 
 
 class Dirichlet(BaseRV):
-    """
-    Dirichlet random process, finite-supp realizations.
-    """
-
     def __init__(self, mean, alpha_0, rng=None):
+        """
+        Dirichlet random process, finite-domain realizations.
+
+        Parameters
+        ----------
+        mean : array_like
+        alpha_0 : float
+            Localization parameter.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
         self._space = spaces.Simplex(np.array(mean).shape)
 

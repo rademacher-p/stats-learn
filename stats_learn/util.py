@@ -19,6 +19,7 @@ class RandomGeneratorMixin:
         ----------
         rng : int or np.random.RandomState or np.random.Generator, optional
             Random number generator seed or object.
+
         """
         self.rng = rng
 
@@ -109,7 +110,7 @@ def check_valid_pmf(p, shape=None, full_support=False, tol=1e-9):
     -------
     numpy.ndarray
         The PMF as a NumPy array.
-    tuple
+    tuple, optional
         The shape of the set of PMFs (i.e., the leading elements of the array shape).
 
     """
