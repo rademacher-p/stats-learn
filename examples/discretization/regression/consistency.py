@@ -129,8 +129,8 @@ d_train, d_test = np.split(d, [n_train])
 x_plt = np.linspace(0, 1, 10000)
 
 img_path = img_dir + 'fit.png'
-loss_full = results.plot_fit_compare(predictors, d_train, d_test, params, x_plt, verbose=True,
-                                     log_path=log_path, img_path=img_path)
+loss_full = results.assess_single_compare(predictors, d_train, d_test, params, x_plt, verbose=True, log_path=log_path,
+                                          img_path=img_path)
 
 # # Prediction mean/variance, comparative
 # n_train = 400

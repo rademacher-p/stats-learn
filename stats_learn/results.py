@@ -17,7 +17,7 @@ import pandas as pd
 # from pytorch_lightning.utilities.seed import seed_everything
 
 from stats_learn.bayes import models as bayes_models
-from stats_learn.util import check_data_shape, RandomGeneratorMixin as RNGMix
+from stats_learn.util import check_data_shape
 # from stats_learn.predictors.torch import LitPredictor
 
 
@@ -37,6 +37,8 @@ logger.addHandler(out_handler)
 
 @contextmanager
 def _file_logger(file, file_format):
+    """Adds temporary FileHandler to logger."""
+
     if file is not None:
         file = Path(file)
         file.parent.mkdir(parents=True, exist_ok=True)
@@ -52,6 +54,8 @@ def _file_logger(file, file_format):
 
 
 def _log_and_fig(message, log_path, ax, img_path):
+    """Save figure, add figure to message format and log."""
+
     file_format = '\n# %(asctime)s\n%(message)s\n'
     if img_path is not None:
         img_path = Path(img_path)
@@ -73,17 +77,24 @@ def _log_and_fig(message, log_path, ax, img_path):
 
 
 # %%
-def plot_fit_compare(predictors, d_train, d_test=(), params=None, x=None, verbose=False, log_path=None, img_path=None,
-                     ax=None):
-    # TODO: make `assess_single_compare` or something? Make similar to `assess_compare` signature?
+def assess_single_compare(predictors, d_train=None, d_test=None, params=None, x=None, verbose=False, log_path=None,
+                          img_path=None, ax=None):
+    # TODO: Make similar to `assess_compare` signature?
+
+    space = predictors[0].space  # use first predictors space by default
+
+    if d_train is None:
+        d_train = np.array([], dtype=[(c, space[c].dtype, space[c].shape) for c in 'xy'])
+    if d_test is None:
+        d_test = np.array([], dtype=[(c, space[c].dtype, space[c].shape) for c in 'xy'])
+
+    n_train, n_test = map(len, (d_train, d_test))
+    do_loss = n_test > 0
 
     if params is None:
         params_full = [{} for _ in predictors]
     else:
         params_full = [item if item is not None else {} for item in params]
-
-    n_train, n_test = map(len, (d_train, d_test))
-    do_loss = n_test > 0
 
     loss_full = []
     for params in params_full:
@@ -94,12 +105,11 @@ def plot_fit_compare(predictors, d_train, d_test=(), params=None, x=None, verbos
             loss = np.full((1, *params_shape), np.nan)
         loss_full.append(loss)
 
-    space_x = predictors[0].space['x']  # use first predictors space by default
     if x is None:
-        x = space_x.x_plt
+        x = space['x'].x_plt
 
     if ax is None:
-        ax = space_x.make_axes()
+        ax = space['x'].make_axes()
 
     h_data = ax.scatter(d_train['x'], d_train['y'], c='k', marker='o', label='$D$')
 
@@ -213,7 +223,8 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
     #     else:
     #         warn("Can only seed PyTorch-Lightning with an `int` rng.")
 
-    model.rng = RNGMix.make_rng(rng)
+    # model.rng = RNGMix.make_rng(rng)
+    model.rng = rng
 
     if params is None:
         params_full = [{} for _ in predictors]

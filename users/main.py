@@ -274,7 +274,7 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
 #                                                  verbose=True, plot_loss=True, print_loss=True,
 #                                                  log_path=log_path, img_path=img_path, rng=seed)
 
-# results.plot_fit_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
+# results.assess_single_compare(predictors, model.rvs(n_train), model.rvs(n_test), params,
 #                          log_path=log_path, img_path=img_path)
 
 # y_stats_full, loss_full = dir_predictor.assess(model, dir_params, n_train, n_test, n_mc,
