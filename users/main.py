@@ -403,7 +403,7 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
 
 # plot_risk_eval_comp_compare(predictors, model_eval, params, n_train, verbose=False, ax=None)
 
-# print(f"\nAnalytical Risk = {opt_predictor.evaluate_comp(n_train=n_train)}")
+# print(f"\nAnalytical Risk = {opt_predictor.evaluate_analytic(n_train=n_train)}")
 
 # if isinstance(model, rand_models.Base):
 #     risk_an = opt_predictor.risk_min()

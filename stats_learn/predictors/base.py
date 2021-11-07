@@ -14,8 +14,8 @@ from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn import spaces
 
 from stats_learn.results import (assess_single_compare, predict_stats_compare, plot_predict_stats_compare,
-                                 risk_eval_sim_compare, risk_eval_comp_compare, plot_risk_eval_sim_compare,
-                                 plot_risk_eval_comp_compare, assess_compare)
+                                 risk_eval_sim_compare, risk_eval_analytic_compare, plot_risk_eval_sim_compare,
+                                 assess_compare)
 
 
 class Base(ABC):
@@ -122,7 +122,7 @@ class Base(ABC):
         """Plot prediction function."""
         return self.space['x'].plot(self.predict, x, ax=ax, label=label)
 
-    # Assess
+    # Assessment
     def assess_single(self, d_train=None, d_test=None, params=None, x=None, verbose=False, log_path=None, img_path=None,
                       ax=None):
         return assess_single_compare([self], d_train, d_test, [params], x, verbose, log_path, img_path, ax)
@@ -136,7 +136,7 @@ class Base(ABC):
                              print_loss, log_path, img_path, ax, rng)
         return map(itemgetter(0), out)
 
-    # Prediction statistics
+    # Assessment shortcuts
     def predict_stats(self, model=None, params=None, n_train=0, n_mc=1, x=None, stats=('mode',), verbose=False):
         if model is None:
             model = self._model_obj
@@ -148,7 +148,6 @@ class Base(ABC):
             model = self._model_obj
         return plot_predict_stats_compare([self], model, [params], n_train, n_mc, x, do_std, verbose, ax)
 
-    # Risk evaluation
     def risk_eval_sim(self, model=None, params=None, n_train=0, n_test=1, n_mc=1, verbose=False):
         if model is None:
             model = self._model_obj
@@ -159,15 +158,11 @@ class Base(ABC):
             model = self._model_obj
         return plot_risk_eval_sim_compare([self], model, [params], n_train, n_test, n_mc, verbose, ax)
 
-    def risk_eval_comp(self, model=None, params=None, n_train=0, n_test=1, verbose=False):
+    # Analytical evaluation
+    def risk_eval_analytic(self, model=None, params=None, n_train=0, n_test=1, verbose=False):
         if model is None:
             model = self._model_obj
-        return risk_eval_comp_compare([self], model, [params], n_train, n_test, verbose)[0]
-
-    def plot_risk_eval_comp(self, model=None, params=None, n_train=0, n_test=1, verbose=False, ax=None):
-        if model is None:
-            model = self._model_obj
-        return plot_risk_eval_comp_compare([self], model, [params], n_train, n_test, verbose, ax)
+        return risk_eval_analytic_compare([self], model, [params], n_train, n_test, verbose)[0]
 
 
 class ClassifierMixin:
@@ -216,7 +211,7 @@ class ModelRegressor(RegressorMixin, Model):
     def __init__(self, model, space=None, proc_funcs=(), name=None):
         super().__init__(model, loss_se, space, proc_funcs, name)
 
-    def evaluate_comp(self, model=None, n_train=0, n_test=1):
+    def evaluate_analytic(self, model=None, n_train=0, n_test=1):
         if model is None:
             model = self._model_obj
 
@@ -279,7 +274,7 @@ class BayesRegressor(RegressorMixin, Bayes):
     def __init__(self, bayes_model, space=None, proc_funcs=(), name=None):
         super().__init__(bayes_model, loss_se, space, proc_funcs, name)
 
-    def evaluate_comp(self, model=None, n_train=0, n_test=1):
+    def evaluate_analytic(self, model=None, n_train=0, n_test=1):
         if model is None:
             model = self._model_obj
 
