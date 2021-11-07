@@ -35,7 +35,10 @@ class Base(RandomGeneratorMixin, ABC):
 
     dtype = property(lambda self: self._space.dtype)
 
-    mode = property(lambda self: self._mode)
+    @property
+    def mode(self):
+        """The most likely domain value."""
+        return self._mode
 
     def prob(self, x):
         """
@@ -253,7 +256,9 @@ class FiniteGeneric(Base):
         Parameters
         ----------
         values : array_like
+            Explicit domain values.
         p : array_like, optional
+            Probabilities for each value in the domain. Defaults to uniform.
         rng : int or np.random.RandomState or np.random.Generator, optional
             Random number generator seed or object.
 
@@ -270,7 +275,9 @@ class FiniteGeneric(Base):
         Parameters
         ----------
         values : array_like
+            Explicit domain values.
         p : array_like, optional
+            Probabilities for each value in the domain. Defaults to uniform.
         rng : int or np.random.RandomState or np.random.Generator, optional
             Random number generator seed or object.
 
@@ -303,6 +310,27 @@ class FiniteGeneric(Base):
 
     @classmethod
     def from_grid(cls, lims, n=100, endpoint=True, p=None, rng=None):
+        """
+        Create random variable with a finite grid of domain values.
+
+        Parameters
+        ----------
+        lims : array_like
+            Lower and upper limits for each dimension.
+        n : int, optional
+            Number of points defining the grid.
+        endpoint : bool, optional
+            If True, the upper limit values are included in the grid.
+        p : array_like, optional
+            Probabilities for each value. Defaults to uniform.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        Returns
+        -------
+        FiniteGeneric
+
+        """
         space = spaces.FiniteGeneric.from_grid(lims, n, endpoint)
         if p is None:
             p = np.ones(space.set_shape) / space.set_size
@@ -312,6 +340,7 @@ class FiniteGeneric(Base):
     # Input properties
     @property
     def values(self):
+        """Domain values."""
         return self.space.values
 
     @property
@@ -320,6 +349,7 @@ class FiniteGeneric(Base):
 
     @property
     def p(self):
+        """Probability mass values."""
         return self._p
 
     @p.setter
@@ -363,25 +393,6 @@ class FiniteGenericRV(MixinRV, FiniteGeneric):
 
     def _update_attr(self):
         super()._update_attr()
-
-        # mean_flat = self._p_flat @ self._values_flat
-        # self._mean = mean_flat.reshape(self.shape)
-        #
-        # ctr_flat = self._values_flat - mean_flat
-        # outer_flat = (ctr_flat[:, np.newaxis] * ctr_flat[..., np.newaxis]).reshape(self._p.size, -1)
-        # self._cov = (self._p_flat @ outer_flat).reshape(2 * self.shape)
-
-        # TODO: clean up?
-
-        # self._mean = np.tensordot(self._p_flat, self._values_flat, axes=[0, 0])
-        #
-        # ctr = self._values_flat - self._mean
-        # # outer = np.empty((len(ctr), *(2 * self.shape)))
-        # # for i, ctr_i in enumerate(ctr):
-        # #     outer[i] = np.tensordot(ctr_i, ctr_i, 0)
-        # # self._cov = np.tensordot(self._p, outer, axes=[0, 0])
-        # self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p_flat, ctr))
-
         self._mean = None
         self._cov = None
 
@@ -428,6 +439,7 @@ class Dirichlet(BaseRV):
     # Input properties
     @property
     def alpha_0(self):
+        """Dirichlet localization (i.e. concentration) parameter."""
         return self._alpha_0
 
     @alpha_0.setter
@@ -480,11 +492,19 @@ class Dirichlet(BaseRV):
 
 
 class Empirical(BaseRV):
-    """
-    Empirical random process, finite-domain realizations.
-    """
-
     def __init__(self, mean, n, rng=None):
+        """
+        Empirical random process, finite-domain realizations.
+
+        Parameters
+        ----------
+        mean : array_like
+        n : int
+            Number of samples characterizing the realized empirical distributions.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
 
         self._n = n
@@ -500,6 +520,7 @@ class Empirical(BaseRV):
     # Input properties
     @property
     def n(self):
+        """Number of samples characterizing the realized empirical distributions."""
         return self._n
 
     @n.setter
@@ -554,16 +575,26 @@ class Empirical(BaseRV):
             raise ValueError("Each entry in 'x' must be a multiple of 1/n.")
 
         log_prob = self._log_prob_coef + (xlogy(self._n * x, self._mean)
-                                        - gammaln(self._n * x + 1)).reshape(-1, self.size).sum(axis=-1)
+                                          - gammaln(self._n * x + 1)).reshape(-1, self.size).sum(axis=-1)
         return np.exp(log_prob).reshape(set_shape)
 
 
 class DirichletEmpirical(BaseRV):
-    """
-    Dirichlet-Empirical random process, finite-domain realizations.
-    """
-
     def __init__(self, mean, alpha_0, n, rng=None):
+        """
+        Dirichlet-Empirical random process, finite-domain realizations.
+
+        Parameters
+        ----------
+        mean : array_like
+        alpha_0 : float
+            Localization parameter.
+        n : int
+            Number of samples characterizing the realized empirical distributions.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
         self._space = spaces.SimplexDiscrete(n, np.array(mean).shape)
 
@@ -589,6 +620,7 @@ class DirichletEmpirical(BaseRV):
 
     @property
     def alpha_0(self):
+        """Dirichlet localization (i.e. concentration) parameter."""
         return self._alpha_0
 
     @alpha_0.setter
@@ -598,6 +630,7 @@ class DirichletEmpirical(BaseRV):
 
     @property
     def n(self):
+        """Number of samples characterizing the realized empirical distributions."""
         return self._n
 
     @n.setter
@@ -625,16 +658,30 @@ class DirichletEmpirical(BaseRV):
             raise ValueError("Each entry in 'x' must be a multiple of 1/n.")
 
         log_prob = self._log_prob_coef + (gammaln(self._alpha_0 * self._mean + self._n * x)
-                                        - gammaln(self._n * x + 1)).reshape(-1, self.size).sum(axis=-1)
+                                          - gammaln(self._n * x + 1)).reshape(-1, self.size).sum(axis=-1)
         return np.exp(log_prob).reshape(set_shape)
 
 
 class DirichletEmpiricalScalar(BaseRV):
-    """
-    Scalar Dirichlet-Empirical random variable.
-    """
-
     def __init__(self, mean, alpha_0, n, rng=None):
+        """
+        Scalar Dirichlet-Empirical random variable.
+
+        Parameters
+        ----------
+        mean : array_like
+        alpha_0 : float
+            Localization parameter.
+        n : int
+            Number of samples characterizing the realized empirical distributions.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        Notes
+        -----
+        Equivalent to the first element of a 2-dimensional `DirichletEmpirical` random variable.
+
+        """
         super().__init__(rng)
 
         self._multi = DirichletEmpirical([mean, 1 - mean], alpha_0, n, rng)
@@ -654,6 +701,7 @@ class DirichletEmpiricalScalar(BaseRV):
 
     @property
     def alpha_0(self):
+        """Dirichlet localization (i.e. concentration) parameter."""
         return self._multi.alpha_0
 
     @alpha_0.setter
@@ -662,6 +710,7 @@ class DirichletEmpiricalScalar(BaseRV):
 
     @property
     def n(self):
+        """Number of samples characterizing the realized empirical distributions."""
         return self._multi.n
 
     @n.setter
@@ -684,11 +733,20 @@ class DirichletEmpiricalScalar(BaseRV):
 
 
 class Beta(BaseRV):
-    """
-    Beta random variable.
-    """
+    def __init__(self, a=1., b=1., rng=None):
+        """
+        Beta random variable.
 
-    def __init__(self, a=1, b=1, rng=None):
+        Parameters
+        ----------
+        a : float, optional
+            First concentration parameter.
+        b : float, optional
+            Second concentration parameter.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
         self._space = spaces.Box((0, 1))
 
@@ -704,11 +762,28 @@ class Beta(BaseRV):
 
     @classmethod
     def from_mean(cls, mean, alpha_0, rng=None):
+        """
+        Create Beta RV using mean and total concentration.
+
+        Parameters
+        ----------
+        mean : float
+        alpha_0 : float
+            Total concentration. Conceptually identical to `Dirichlet` parameter.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        Returns
+        -------
+        Beta
+
+        """
         return cls(alpha_0 * mean, alpha_0 * (1 - mean), rng)
 
     # Input properties
     @property
     def a(self):
+        """First concentration parameter."""
         return self._a
 
     @a.setter
@@ -720,6 +795,7 @@ class Beta(BaseRV):
 
     @property
     def b(self):
+        """Second concentration parameter."""
         return self._b
 
     @b.setter
@@ -759,11 +835,20 @@ class Beta(BaseRV):
 
 
 class Binomial(BaseRV):
-    """
-    Binomial random variable.
-    """
-
     def __init__(self, p, n, rng=None):
+        """
+        Binomial random variable.
+
+        Parameters
+        ----------
+        p : float
+            The probability of the implied Bernoulli RV samples.
+        n : int
+            The number of implied Bernoulli RV samples.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
         self._space = spaces.FiniteGeneric(np.arange(n + 1))
 
@@ -782,6 +867,7 @@ class Binomial(BaseRV):
     # Input properties
     @property
     def n(self):
+        """The number of implied Bernoulli RV samples."""
         return self._n
 
     @n.setter
@@ -793,6 +879,7 @@ class Binomial(BaseRV):
 
     @property
     def p(self):
+        """The probability of the implied Bernoulli RV samples."""
         return self._p
 
     @p.setter
@@ -826,11 +913,23 @@ class Binomial(BaseRV):
 
 
 class EmpiricalScalar(Binomial):
-    """
-    Scalar empirical random variable. Equivalent to normalized Binomial RV.
-    """
-
     def __init__(self, mean, n, rng=None):
+        """
+        Scalar empirical random variable
+
+        Parameters
+        ----------
+        mean : float
+        n : int
+            The number of implied Bernoulli RV samples.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        Notes
+        -----
+        Equivalent to the first element of a 2-dimensional `Empirical` random variable.
+
+        """
         super().__init__(mean, n, rng)
         if self.n == 0:
             raise ValueError
