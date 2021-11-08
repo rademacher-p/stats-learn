@@ -1,8 +1,5 @@
-"""
-Bayesian random elements.
-"""
-
 from abc import ABC, abstractmethod
+from typing import Optional
 
 import numpy as np
 from scipy.stats._multivariate import _PSD
@@ -17,13 +14,24 @@ from stats_learn.util import RandomGeneratorMixin
 
 class Base(RandomGeneratorMixin, ABC):
     def __init__(self, prior=None, rng=None):
+        """
+        Base class for Bayesian random elements.
+
+        Parameters
+        ----------
+        prior : rand_elements.Base, optional
+            Random element characterizing the prior distribution of the element parameters.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
 
         self._space = None
 
         self.prior = prior
-        self.posterior = None
-        self.posterior_model = None
+        self.posterior = None  # the posterior distribution of the element parameters.
+        self.posterior_model = None  # the posterior element given the observations.
 
     space = property(lambda self: self._space)
 
@@ -33,6 +41,7 @@ class Base(RandomGeneratorMixin, ABC):
 
     @abstractmethod
     def random_model(self, rng=None):
+        """Generate a random element with a randomly selected parameterization."""
         raise NotImplementedError
 
     sample = rand_elements.Base.sample
@@ -41,6 +50,20 @@ class Base(RandomGeneratorMixin, ABC):
         return self.random_model(rng)._sample(n, rng)
 
     def fit(self, d=None, warm_start=False):
+        """
+        Refine the posterior using observations.
+
+        Parameters
+        ----------
+        d : array_like
+            The observations.
+        warm_start : bool, optional
+
+
+        Returns
+        -------
+
+        """
         if d is None:
             d = np.array([])
 
@@ -54,12 +77,32 @@ class Base(RandomGeneratorMixin, ABC):
 class NormalLinear(Base):
     def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis=None, cov=1., *, allow_singular=False,
                  rng=None):
+        """
+        Normal random variable with mean defined in terms of basis tensors and weights characterized by a Normal
+        distribution.
+
+        Parameters
+        ----------
+        prior_mean : array_like
+            Mean of Normal prior random variable.
+        prior_cov : array_like
+            Covariance of Normal prior random variable.
+        basis : array_like
+            Basis tensors, such that `mean = basis @ weights`.
+        cov : float or numpy.ndarray
+            Covariance tensor.
+        allow_singular : bool, optional
+            Whether to allow a singular prior covariance matrix.
+        rng : np.random.Generator or int, optional
+            Random number generator seed or object.
+
+        """
 
         # Prior
         prior = rand_elements.Normal(prior_mean, prior_cov)
         super().__init__(prior, rng)
         if self.prior.ndim > 1:
-            raise ValueError
+            raise NotImplementedError("Only 1-dimensional priors are supported.")
 
         self.allow_singular = allow_singular
 
@@ -68,8 +111,8 @@ class NormalLinear(Base):
 
         # Model
         if basis is None:
-            self._basis = np.vstack((np.eye(self.prior.size),
-                                     np.zeros((self.size - self.prior.size, self.prior.size))))
+            self._basis = np.concatenate((np.eye(self.prior.size),
+                                          np.zeros((self.size - self.prior.size, self.prior.size))))
         else:
             self._basis = np.array(basis)
 
