@@ -915,7 +915,7 @@ class Binomial(BaseRV):
 class EmpiricalScalar(Binomial):
     def __init__(self, mean, n, rng=None):
         """
-        Scalar empirical random variable
+        Scalar empirical random variable.
 
         Parameters
         ----------
@@ -958,11 +958,18 @@ class EmpiricalScalar(Binomial):
 
 
 class Uniform(BaseRV):
-    """
-    Uniform random variable.
-    """
-
     def __init__(self, lims, rng=None):
+        """
+        Uniform random variable over a Box space.
+
+        Parameters
+        ----------
+        lims : array_like
+            Lower and upper limits for each dimension.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
         self._space = spaces.Box(lims)
         self._update_attr()
@@ -973,6 +980,7 @@ class Uniform(BaseRV):
     # Input properties
     @property
     def lims(self):
+        """Lower and upper limits for each dimension."""
         return self.space.lims
 
     @lims.setter
@@ -1009,14 +1017,13 @@ class Normal(BaseRV):
 
         Parameters
         ----------
-        *
-        allow_singular
         mean : float or Iterable of float
-            Mean
         cov : float or numpy.ndarray
-            Covariance
+            Covariance tensor.
+        allow_singular : bool, optional
+            Whether to allow a singular covariance matrix.
         rng : np.random.Generator or int, optional
-            Random number generator
+            Random number generator seed or object.
 
         """
 
@@ -1094,8 +1101,26 @@ class Normal(BaseRV):
             self._space.lims_plot = lims
 
 
-class NormalLinear(Normal):  # TODO: rework, only allow weights and cov to be set?
+class NormalLinear(Normal):
+    # TODO: rework, only allow weights and cov to be set?
+    # FIXME: NOT BASIS (incomplete). Rename dictionary?
+
     def __init__(self, weights=(0.,), basis=np.ones(1), cov=(1.,), rng=None):
+        """
+        Normal random variable with mean defined in terms of basis tensors.
+
+        Parameters
+        ----------
+        weights : array_like
+            Weights defining the mean in terms of the basis tensors.
+        basis : array_like
+            Basis tensors, such that `mean = basis @ weights`.
+        cov : float or numpy.ndarray
+            Covariance tensor.
+        rng : np.random.Generator or int, optional
+            Random number generator seed or object.
+
+        """
         self._basis = np.array(basis)
 
         _mean_temp = np.empty(self._basis.shape[:-1])
@@ -1108,6 +1133,7 @@ class NormalLinear(Normal):  # TODO: rework, only allow weights and cov to be se
 
     @property
     def weights(self):
+        """Weights defining the mean in terms of the basis tensors."""
         return self._weights
 
     @weights.setter
@@ -1119,14 +1145,29 @@ class NormalLinear(Normal):  # TODO: rework, only allow weights and cov to be se
 
     @property
     def basis(self):
+        """Basis tensors, such that `mean = basis @ weights`."""
         return self._basis
 
 
 class DataEmpirical(Base):
-
     # TODO: subclass for FiniteGeneric space?
 
     def __new__(cls, values, counts, space=None, rng=None):
+        """
+        A random variable drawn from an empirical distribution.
+
+        Parameters
+        ----------
+        values : array_like
+            The values forming the empirical distribution.
+        counts : array_like
+            The number of observations for each value.
+        space : spaces.Base, optional
+            The domain. Defaults to a Euclidean space.
+        rng : np.random.Generator or int, optional
+            Random number generator seed or object.
+
+        """
         if space is not None:
             dtype = space.dtype
         else:
@@ -1138,6 +1179,21 @@ class DataEmpirical(Base):
             return super().__new__(cls)
 
     def __init__(self, values, counts, space=None, rng=None):
+        """
+        A random variable drawn from an empirical distribution.
+
+        Parameters
+        ----------
+        values : array_like
+            The values forming the empirical distribution.
+        counts : array_like
+            The number of observations for each value.
+        space : spaces.Base, optional
+            The domain. Defaults to a Euclidean space.
+        rng : np.random.Generator or int, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
 
         values, counts = map(np.array, (values, counts))
@@ -1160,7 +1216,25 @@ class DataEmpirical(Base):
 
     @classmethod
     def from_data(cls, d, space=None, rng=None):
-        return cls(*cls._count_data(d), space, rng)
+        """
+        Create RV from a dataset.
+
+        Parameters
+        ----------
+        d : array_like
+            The data forming the empirical distribution.
+        space : spaces.Base, optional
+            The domain. Defaults to a Euclidean space.
+        rng : np.random.Generator or int, optional
+            Random number generator seed or object.
+
+        Returns
+        -------
+        DataEmpirical
+
+        """
+        values, counts = cls._count_data(d)
+        return cls(values, counts, space, rng)
 
     def _init_attr(self):
         self._mode = np.full(self.shape, np.nan)
@@ -1172,8 +1246,8 @@ class DataEmpirical(Base):
     def _structure_data(self, values, counts):
         return np.array(list(zip(values, counts)), dtype=[('x', self.dtype, self.shape), ('n', np.int32,)])
 
-    def _get_idx(self, value):
-        idx = np.flatnonzero(np.all(value == self.data['x'], axis=tuple(range(1, 1 + self.ndim))))
+    def _get_idx(self, x):
+        idx = np.flatnonzero(np.all(x == self.data['x'], axis=tuple(range(1, 1 + self.ndim))))
         if idx.size == 1:
             return idx.item()
         elif idx.size == 0:
@@ -1182,9 +1256,29 @@ class DataEmpirical(Base):
             raise ValueError
 
     def add_data(self, d):
+        """
+        Add data to the empirical distribution.
+
+        Parameters
+        ----------
+        d : array_like
+            New data added to the empirical distribution.
+
+        """
         self.add_values(*self._count_data(d))
 
     def add_values(self, values, counts):
+        """
+        Add new values to the empirical distribution.
+
+        Parameters
+        ----------
+        values : array_like
+            New values for the empirical distribution.
+        counts : array_like
+            The number of observations for each value.
+
+        """
         values, counts = map(np.array, (values, counts))
         n_new = counts.sum(dtype=np.int32)
         if n_new == 0:
@@ -1283,13 +1377,41 @@ class DataEmpiricalRV(MixinRV, DataEmpirical):
 
 
 class Mixture(Base):
+    # TODO: special implementation for FiniteGeneric? get modes, etc?
+
     def __new__(cls, dists, weights, rng=None):
+        """
+        Mixture of random elements.
+
+        Parameters
+        ----------
+        dists : iterable of Base
+            The random elements to be mixed.
+        weights : array_like
+            The weights combining the random elements.
+        rng : np.random.Generator or int, optional
+            Random number generator seed or object.
+
+        """
         if all(isinstance(dist, MixinRV) for dist in dists):
             return super().__new__(MixtureRV)
         else:
             return super().__new__(cls)
 
-    def __init__(self, dists, weights, rng=None):  # TODO: special implementation for FiniteGeneric? get modes, etc?
+    def __init__(self, dists, weights, rng=None):
+        """
+        Mixture of random elements.
+
+        Parameters
+        ----------
+        dists : iterable of Base
+            The random elements to be mixed.
+        weights : array_like
+            The weights combining the random elements.
+        rng : np.random.Generator or int, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
         self._dists = list(dists)
 
@@ -1306,6 +1428,7 @@ class Mixture(Base):
 
     @property
     def weights(self):
+        """The weights combining the random elements."""
         return self._weights
 
     @weights.setter
@@ -1329,17 +1452,16 @@ class Mixture(Base):
 
     @property
     def _idx_nonzero(self):
+        """Indices of distributions with non-zero weight."""
         return np.flatnonzero(self._weights)
 
     def _update_attr(self):
+        self._p = self._weights / self._weights.sum()
+        self._mode = None
         self.space.x_plt = None
 
-        self._p = self._weights / self._weights.sum()
-
-        self._mode = None
-
     @property
-    def mode(self):  # TODO: implement similar functionality throughout for costly dependent attributes!!!
+    def mode(self):
         if self._mode is None:
             if self._idx_nonzero.size == 1:
                 self._mode = self._dists[self._idx_nonzero.item()].mode
