@@ -72,13 +72,13 @@ class Base(ABC):
         dtype = [('x', d.dtype['x'].base, x.shape[1:]), ('y', d.dtype['y'].base, y.shape[1:])]
         return np.array(list(zip(x, y)), dtype=dtype)
 
-    def fit(self, d=(), warm_start=False):
+    def fit(self, d=None, warm_start=False):
         if not warm_start:
             self.reset()
         elif not self.can_warm_start:
             raise ValueError("Predictor does not support warm start fitting.")
 
-        if len(d) > 0:
+        if d is not None and len(d) > 0:
             d = self._proc_data(d)
             self._fit(d)
 

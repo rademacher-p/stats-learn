@@ -52,13 +52,13 @@ class Base(RandomGeneratorMixin, ABC):
         model = self.random_model(rng)
         return model.sample(size)
 
-    def fit(self, d=(), warm_start=False):
+    def fit(self, d=None, warm_start=False):  # FIXME: default None, set to structured array!?
         if not warm_start:
             self.reset()
         elif not self.can_warm_start:
             raise ValueError("Bayes model does not support warm start fitting.")
 
-        if len(d) > 0:
+        if d is not None and len(d) > 0:
             self._fit(d)
 
     @abstractmethod
