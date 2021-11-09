@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 
 import numpy as np
 from scipy.stats._multivariate import _PSD
@@ -13,6 +12,8 @@ from stats_learn.util import RandomGeneratorMixin
 
 
 class Base(RandomGeneratorMixin, ABC):
+    can_warm_start = False
+
     def __init__(self, prior=None, rng=None):
         """
         Base class for Bayesian random elements.
@@ -64,17 +65,27 @@ class Base(RandomGeneratorMixin, ABC):
         -------
 
         """
-        if d is None:
-            d = np.array([])
+        if not warm_start:
+            self.reset()
+        elif not self.can_warm_start:
+            raise ValueError("Bayes model does not support warm start fitting.")
 
-        self._fit(d, warm_start)
+        if d is not None and len(d) > 0:
+            self._fit(d)
 
     @abstractmethod
-    def _fit(self, d, warm_start=False):
+    def _fit(self, d):
+        raise NotImplementedError
+
+    @abstractmethod
+    def reset(self):
+        """Reset posterior fit to prior."""
         raise NotImplementedError
 
 
 class NormalLinear(Base):
+    can_warm_start = True
+
     def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis=None, cov=1., *, allow_singular=False,
                  rng=None):
         """
@@ -120,6 +131,9 @@ class NormalLinear(Base):
         self._set_prior_persistent_attr()
 
         # Learning
+        self._n = 0
+        self._mean_data_temp = np.zeros(self.prior.shape)
+
         self.posterior = rand_elements.Normal(self.prior_mean, self.prior_cov)
         self.posterior_model = rand_elements.NormalLinear(**self._prior_model_kwargs)
 
@@ -132,17 +146,17 @@ class NormalLinear(Base):
 
         return rand_elements.NormalLinear(**model_kwargs, **rand_kwargs)
 
-    def _fit(self, d, warm_start=False):
-        if not warm_start:  # reset learning attributes
-            self.n = 0
-            self._mean_data_temp = np.zeros(self.prior.shape)
+    def reset(self):
+        self._n = 0
+        self._mean_data_temp = np.zeros(self.prior.shape)
+        self._reset_posterior()
 
-        n = len(d)
-        if n > 0:  # update data-dependent attributes
-            self.n += n
+    def _fit(self, d):
+        # update data-dependent attributes
+        self._n += len(d)
 
-            y_white = np.dot(d.reshape(n, self.size), self._prec_U)
-            self._mean_data_temp += sum(self._basis_white.T @ y_i for y_i in y_white)
+        y_white = np.dot(d.reshape(len(d), self.size), self._prec_U)
+        self._mean_data_temp += sum(self._basis_white.T @ y_i for y_i in y_white)
 
         self._update_posterior()
 
@@ -150,7 +164,9 @@ class NormalLinear(Base):
         self.posterior.mean = self.prior_mean
         self.posterior.cov = self.prior_cov
 
-        for key, value in self._prior_model_kwargs.items():
+        kwargs = self._prior_model_kwargs.copy()
+        del kwargs['basis']
+        for key, value in kwargs.items():
             setattr(self.posterior_model, key, value)
 
     @property
@@ -160,7 +176,7 @@ class NormalLinear(Base):
     def _update_posterior(self, mean_only=False):
         if not mean_only:
             self.posterior.cov = np.linalg.inv(self._cov_prior_inv
-                                               + self.n * self._basis_white.T @ self._basis_white)
+                                               + self._n * self._basis_white.T @ self._basis_white)
             self.posterior_model.cov = self._make_posterior_model_cov(self.posterior.cov)
 
         self.posterior.mean = self.posterior.cov @ (self._cov_prior_inv @ self.prior_mean + self._mean_data_temp)
@@ -214,6 +230,8 @@ class NormalLinear(Base):
 
 
 class Dirichlet(Base):
+    can_warm_start = True
+
     def __init__(self, prior_mean, alpha_0, rng=None):
         super().__init__(prior=None, rng=rng)
         self._space = prior_mean.space
@@ -271,10 +289,10 @@ class Dirichlet(Base):
 
         return _out
 
-    def _fit(self, d, warm_start=False):
-        if warm_start:
-            emp_dist = self.emp_dist
-        else:
-            emp_dist = rand_elements.DataEmpirical([], [], space=self.space)
+    def reset(self):
+        self.emp_dist = rand_elements.DataEmpirical([], [], space=self.space)
+
+    def _fit(self, d):
+        emp_dist = self.emp_dist
         emp_dist.add_data(d)
-        self.emp_dist = emp_dist
+        self.emp_dist = emp_dist  # triggers setter

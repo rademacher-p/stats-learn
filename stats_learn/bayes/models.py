@@ -52,7 +52,7 @@ class Base(RandomGeneratorMixin, ABC):
         model = self.random_model(rng)
         return model.sample(size)
 
-    def fit(self, d=None, warm_start=False):  # FIXME: default None, set to structured array!?
+    def fit(self, d=None, warm_start=False):
         if not warm_start:
             self.reset()
         elif not self.can_warm_start:
@@ -247,11 +247,11 @@ class NormalLinear(Base):
         self._prior_model_cov = self._make_posterior_model_cov(self.prior_cov)
 
 
-class Dirichlet(Base):  # TODO: DRY from random.elements?
+class Dirichlet(Base):
     can_warm_start = True
 
     def __init__(self, prior_mean, alpha_0, rng=None):
-        super().__init__(prior=None, rng=rng)  # TODO: check prior??
+        super().__init__(prior=None, rng=rng)
 
         self._space = prior_mean.space
 
@@ -321,5 +321,4 @@ class Dirichlet(Base):  # TODO: DRY from random.elements?
     def _fit(self, d):
         emp_dist = self.emp_dist
         emp_dist.add_data(d)
-        self.emp_dist = emp_dist  # triggers setter
         self.emp_dist = emp_dist  # triggers setter
