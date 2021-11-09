@@ -8,7 +8,7 @@ from stats_learn import spaces
 from stats_learn.util import RandomGeneratorMixin
 
 
-# TODO: rename `model` attributes to `element`?
+# TODO: rename `model` attributes to `element`? Find common term for both?
 
 
 class Base(RandomGeneratorMixin, ABC):
@@ -59,16 +59,13 @@ class Base(RandomGeneratorMixin, ABC):
         d : array_like
             The observations.
         warm_start : bool, optional
-
-
-        Returns
-        -------
+            If `False`, `reset` is invoked to restore unfit state.
 
         """
         if not warm_start:
             self.reset()
         elif not self.can_warm_start:
-            raise ValueError("Bayes model does not support warm start fitting.")
+            raise ValueError("Bayes element does not support warm start fitting.")
 
         if d is not None and len(d) > 0:
             self._fit(d)
@@ -79,11 +76,12 @@ class Base(RandomGeneratorMixin, ABC):
 
     @abstractmethod
     def reset(self):
-        """Reset posterior fit to prior."""
+        """Restore unfit prior state."""
         raise NotImplementedError
 
 
 class NormalLinear(Base):
+    prior: rand_elements.Normal
     can_warm_start = True
 
     def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis=None, cov=1., *, allow_singular=False,
@@ -139,6 +137,7 @@ class NormalLinear(Base):
 
     # Methods
     def random_model(self, rng=None):
+        """Generate a random element with a randomly selected parameterization."""
         rng = self._get_rng(rng)
 
         model_kwargs = {'basis': self.basis, 'cov': self.cov, 'rng': rng}
@@ -147,6 +146,7 @@ class NormalLinear(Base):
         return rand_elements.NormalLinear(**model_kwargs, **rand_kwargs)
 
     def reset(self):
+        """Restore unfit prior state."""
         self._n = 0
         self._mean_data_temp = np.zeros(self.prior.shape)
         self._reset_posterior()
@@ -161,6 +161,7 @@ class NormalLinear(Base):
         self._update_posterior()
 
     def _reset_posterior(self):
+        """Resets posterior attributes to prior state."""
         self.posterior.mean = self.prior_mean
         self.posterior.cov = self.prior_cov
 
@@ -188,6 +189,7 @@ class NormalLinear(Base):
     # Model parameters
     @property
     def basis(self):
+        """Basis tensors, such that `mean = basis @ weights`."""
         return self._basis
 
     @property
@@ -207,6 +209,7 @@ class NormalLinear(Base):
     # Prior parameters
     @property
     def prior_mean(self):
+        """Access the mean of the `prior`."""
         return self.prior.mean
 
     @prior_mean.setter
@@ -216,6 +219,7 @@ class NormalLinear(Base):
 
     @property
     def prior_cov(self):
+        """Access the covariance of the `prior`."""
         return self.prior.cov
 
     @prior_cov.setter
@@ -233,6 +237,19 @@ class Dirichlet(Base):
     can_warm_start = True
 
     def __init__(self, prior_mean, alpha_0, rng=None):
+        """
+        Generic random element whose distribution is characterized by a Dirichlet process.
+
+        Parameters
+        ----------
+        prior_mean : rand_elements.Base
+            Random element characterizing the mean of the Dirichlet process.
+        alpha_0 : float
+            Dirichlet localization (i.e. concentration) parameter.
+        rng : np.random.Generator or int, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(prior=None, rng=rng)
         self._space = prior_mean.space
 
@@ -250,6 +267,7 @@ class Dirichlet(Base):
 
     @property
     def prior_mean(self):
+        """Random element characterizing the mean of the Dirichlet process."""
         return self.posterior_model.dists[0]
 
     @prior_mean.setter
@@ -258,6 +276,7 @@ class Dirichlet(Base):
 
     @property
     def alpha_0(self):
+        """Dirichlet localization (i.e. concentration) parameter."""
         return self.posterior_model.weights[0]
 
     @alpha_0.setter
@@ -266,6 +285,7 @@ class Dirichlet(Base):
 
     @property
     def emp_dist(self):
+        """The empirical distribution formed by observations."""
         return self.posterior_model.dists[1]
 
     @emp_dist.setter
@@ -275,6 +295,7 @@ class Dirichlet(Base):
     n = property(lambda self: self.emp_dist.n)
 
     def random_model(self, rng=None):
+        """Generate a random element with a randomly selected parameterization."""
         raise NotImplementedError  # TODO: implement for finite in subclass?
 
     def _sample(self, n, rng):
@@ -290,6 +311,7 @@ class Dirichlet(Base):
         return _out
 
     def reset(self):
+        """Restore unfit prior state."""
         self.emp_dist = rand_elements.DataEmpirical([], [], space=self.space)
 
     def _fit(self, d):
