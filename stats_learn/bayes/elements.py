@@ -56,7 +56,7 @@ class Base(RandomGeneratorMixin, ABC):
 
         Parameters
         ----------
-        d : array_like
+        d : array_like, optional
             The observations.
         warm_start : bool, optional
             If `False`, `reset` is invoked to restore unfit state.
@@ -92,13 +92,13 @@ class NormalLinear(Base):
 
         Parameters
         ----------
-        prior_mean : array_like
+        prior_mean : array_like, optional
             Mean of Normal prior random variable.
-        prior_cov : array_like
+        prior_cov : array_like, optional
             Covariance of Normal prior random variable.
-        basis : array_like
-            Basis tensors, such that `mean = basis @ weights`.
-        cov : float or numpy.ndarray
+        basis : array_like, optional
+            Basis tensors, such that `mean = basis @ weights`. Defaults to Euclidean basis.
+        cov : float or numpy.ndarray, optional
             Covariance tensor.
         allow_singular : bool, optional
             Whether to allow a singular prior covariance matrix.
@@ -152,7 +152,6 @@ class NormalLinear(Base):
         self._reset_posterior()
 
     def _fit(self, d):
-        # update data-dependent attributes
         self._n += len(d)
 
         y_white = np.dot(d.reshape(len(d), self.size), self._prec_U)
@@ -161,7 +160,6 @@ class NormalLinear(Base):
         self._update_posterior()
 
     def _reset_posterior(self):
-        """Resets posterior attributes to prior state."""
         self.posterior.mean = self.prior_mean
         self.posterior.cov = self.prior_cov
 

@@ -1,7 +1,3 @@
-"""
-Bayesian SL models.
-"""
-
 from abc import abstractmethod, ABC
 
 import numpy as np
@@ -20,6 +16,17 @@ class Base(RandomGeneratorMixin, ABC):
     can_warm_start = False
 
     def __init__(self, prior=None, rng=None):
+        """
+        Base class for Bayesian random models.
+
+        Parameters
+        ----------
+        prior : rand_elements.Base, optional
+            Random element characterizing the prior distribution of the element parameters.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
 
         self._space = {'x': None, 'y': None}
@@ -36,14 +43,8 @@ class Base(RandomGeneratorMixin, ABC):
 
     dtype = property(lambda self: {key: space.dtype for key, space in self._space.items()})
 
-    @staticmethod
-    def tex_params(key, value=None):
-        if value is None:
-            return r"${}$".format(key)
-        else:
-            return r"${} = {}$".format(key, value)
-
     def random_model(self, rng=None):
+        """Generate a random element with a randomly selected parameterization."""
         raise NotImplementedError
 
     sample = rand_elements.Base.sample
@@ -53,6 +54,17 @@ class Base(RandomGeneratorMixin, ABC):
         return model.sample(size)
 
     def fit(self, d=None, warm_start=False):
+        """
+        Refine the posterior using observations.
+
+        Parameters
+        ----------
+        d : array_like, optional
+            The observations.
+        warm_start : bool, optional
+            If `False`, `reset` is invoked to restore unfit state.
+
+        """
         if not warm_start:
             self.reset()
         elif not self.can_warm_start:
@@ -67,14 +79,46 @@ class Base(RandomGeneratorMixin, ABC):
 
     @abstractmethod
     def reset(self):
+        """Restore unfit prior state."""
         raise NotImplementedError
+
+    @staticmethod
+    def tex_params(key, value=None):
+        """Format attributes as strings for LaTeX."""
+        if value is None:
+            return r"${}$".format(key)
+        else:
+            return r"${} = {}$".format(key, value)
 
 
 class NormalLinear(Base):
+    prior: rand_elements.Normal
     can_warm_start = True
 
     def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
                  model_x=rand_elements.Normal(), *, allow_singular=False, rng=None):
+        """
+        Random model characterized by a Normal predictive distribution with mean defined in terms of basis functions
+        and weights characterized by a Normal distribution.
+
+        Parameters
+        ----------
+        prior_mean : array_like, optional
+            Mean of Normal prior random variable.
+        prior_cov : array_like, optional
+            Covariance of Normal prior random variable.
+        basis_y_x : iterable of callable, optional
+            Basis functions. Defaults to polynomial functions.
+        cov_y_x : float or numpy.ndarray, optional
+            Covariance tensor characterizing fixed variance of `y`.
+        model_x : rand_elements.Base, optional
+            Random variable characterizing the marginal distribution of `x`.
+        allow_singular : bool, optional
+            Whether to allow a singular prior covariance matrix.
+        rng : np.random.Generator or int, optional
+            Random number generator seed or object.
+
+        """
 
         self.allow_singular = allow_singular
 
@@ -110,37 +154,9 @@ class NormalLinear(Base):
         self.posterior = rand_elements.Normal(self.prior_mean, self.prior_cov, allow_singular=self.allow_singular)
         self.posterior_model = rand_models.NormalLinear(**self._prior_model_kwargs)
 
-    def tex_params(self, key, value=None):
-        str_theta = r'\theta'
-        str_one = ""
-        str_eye = ""
-        if plt.rcParams['text.usetex']:
-            if 'upgreek' in plt.rcParams['text.latex.preamble']:
-                str_theta = r'\uptheta'
-            if 'bm' in plt.rcParams['text.latex.preamble']:
-                str_one = r"\bm{1}"
-                str_eye = r"\bm{I}"
-
-        if key == 'prior_mean':
-            key = rf"\mu_{str_theta}"
-            if value is not None:
-                val_np = np.array(value)
-                value = f"{value:.3f}"
-                if self.prior.shape != () and val_np.shape == ():
-                    value += str_one
-
-        elif key == 'prior_cov':
-            key = rf"\Sigma_{str_theta}"
-            if value is not None:
-                val_np = np.array(value)
-                value = f"{value:.3f}"
-                if self.prior.shape != () and val_np.shape == ():
-                    value += str_eye
-
-        return super(NormalLinear, NormalLinear).tex_params(key, value)
-
     # Methods
     def random_model(self, rng=None):
+        """Generate a random element with a randomly selected parameterization."""
         rng = self._get_rng(rng)
 
         model_kwargs = {'basis_y_x': self.basis_y_x, 'cov_y_x': self.cov_y_x, 'model_x': self.model_x,
@@ -150,12 +166,12 @@ class NormalLinear(Base):
         return rand_models.NormalLinear(**model_kwargs, **rand_kwargs)
 
     def reset(self):
+        """Restore unfit prior state."""
         self._cov_data_inv = np.zeros(2 * self.prior.shape)
         self._mean_data_temp = np.zeros(self.prior.shape)
         self._reset_posterior()
 
     def _fit(self, d):
-        # update data-dependent attributes
         psi = np.array([np.array([func(x_i) for func in self.basis_y_x])
                         for x_i in d['x']]).reshape((len(d), self.prior.size, self.size['y']))
         psi_white = np.dot(psi, self._prec_U_y_x)
@@ -198,6 +214,7 @@ class NormalLinear(Base):
     # Model parameters
     @property
     def model_x(self):
+        """Random variable characterizing the marginal distribution of `x`."""
         return self._model_x
 
     @model_x.setter
@@ -207,10 +224,12 @@ class NormalLinear(Base):
 
     @property
     def basis_y_x(self):
+        """Basis functions."""
         return self._basis_y_x
 
     @property
     def cov_y_x(self):
+        """Covariance tensor characterizing fixed variance of `y`."""
         return self._cov_y_x
 
     def _set_cov_y_x(self, value):
@@ -225,6 +244,7 @@ class NormalLinear(Base):
     # Prior parameters
     @property
     def prior_mean(self):
+        """Access the mean of the `prior`."""
         return self.prior.mean
 
     @prior_mean.setter
@@ -234,6 +254,7 @@ class NormalLinear(Base):
 
     @property
     def prior_cov(self):
+        """Access the covariance of the `prior`."""
         return self.prior.cov
 
     @prior_cov.setter
@@ -246,11 +267,54 @@ class NormalLinear(Base):
         self._cov_prior_inv = np.linalg.inv(self.prior_cov)
         self._prior_model_cov = self._make_posterior_model_cov(self.prior_cov)
 
+    def tex_params(self, key, value=None):
+        """Format attributes as strings for LaTeX."""
+        str_theta = r'\theta'
+        str_one = ""
+        str_eye = ""
+        if plt.rcParams['text.usetex']:
+            if 'upgreek' in plt.rcParams['text.latex.preamble']:
+                str_theta = r'\uptheta'
+            if 'bm' in plt.rcParams['text.latex.preamble']:
+                str_one = r"\bm{1}"
+                str_eye = r"\bm{I}"
+
+        if key == 'prior_mean':
+            key = rf"\mu_{str_theta}"
+            if value is not None:
+                val_np = np.array(value)
+                value = f"{value:.3f}"
+                if self.prior.shape != () and val_np.shape == ():
+                    value += str_one
+
+        elif key == 'prior_cov':
+            key = rf"\Sigma_{str_theta}"
+            if value is not None:
+                val_np = np.array(value)
+                value = f"{value:.3f}"
+                if self.prior.shape != () and val_np.shape == ():
+                    value += str_eye
+
+        return super(NormalLinear, NormalLinear).tex_params(key, value)
+
 
 class Dirichlet(Base):
     can_warm_start = True
 
     def __init__(self, prior_mean, alpha_0, rng=None):
+        """
+        Generic random model whose joint distribution is characterized by a Dirichlet process.
+
+        Parameters
+        ----------
+        prior_mean : rand_models.Base
+            Random model characterizing the mean of the Dirichlet process.
+        alpha_0 : float
+            Dirichlet localization (i.e. concentration) parameter.
+        rng : np.random.Generator or int, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(prior=None, rng=rng)
 
         self._space = prior_mean.space
@@ -261,12 +325,6 @@ class Dirichlet(Base):
     def __repr__(self):
         return f"Dirichlet(alpha_0={self.alpha_0}, n={self.n}, prior_mean={self.prior_mean})"
 
-    @staticmethod
-    def tex_params(key, value=None):
-        if key == 'alpha_0':
-            key = r"\alpha_0"
-        return super(Dirichlet, Dirichlet).tex_params(key, value)
-
     def __setattr__(self, name, value):
         if name.startswith('prior_mean.'):
             self.posterior_model.set_dist_attr(0, **{name.replace('prior_mean.', ''): value})
@@ -275,6 +333,7 @@ class Dirichlet(Base):
 
     @property
     def prior_mean(self):
+        """Random model characterizing the mean of the Dirichlet process."""
         return self.posterior_model.dists[0]
 
     @prior_mean.setter
@@ -283,6 +342,7 @@ class Dirichlet(Base):
 
     @property
     def alpha_0(self):
+        """Dirichlet localization (i.e. concentration) parameter."""
         return self.posterior_model.weights[0]
 
     @alpha_0.setter
@@ -291,6 +351,7 @@ class Dirichlet(Base):
 
     @property
     def emp_dist(self):
+        """The empirical distribution formed by observations."""
         return self.posterior_model.dists[1]
 
     @emp_dist.setter
@@ -300,6 +361,7 @@ class Dirichlet(Base):
     n = property(lambda self: self.emp_dist.n)
 
     def random_model(self, rng=None):
+        """Generate a random model with a randomly selected parameterization."""
         raise NotImplementedError  # TODO: implement for finite in subclass?
 
     def _sample(self, n, rng):
@@ -316,9 +378,17 @@ class Dirichlet(Base):
         return _out
 
     def reset(self):
+        """Restore unfit prior state."""
         self.emp_dist = rand_models.DataEmpirical([], [], space=self.space)
 
     def _fit(self, d):
         emp_dist = self.emp_dist
         emp_dist.add_data(d)
         self.emp_dist = emp_dist  # triggers setter
+
+    @staticmethod
+    def tex_params(key, value=None):
+        """Format attributes as strings for LaTeX."""
+        if key == 'alpha_0':
+            key = r"\alpha_0"
+        return super(Dirichlet, Dirichlet).tex_params(key, value)
