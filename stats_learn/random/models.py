@@ -1,7 +1,3 @@
-"""
-SL models.
-"""
-
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import Optional, Dict
@@ -18,12 +14,23 @@ from stats_learn.util import RandomGeneratorMixin, vectorize_func
 
 
 class Base(RandomGeneratorMixin, ABC):
-    """
-    Base class for supervised learning data models.
-    """
     _space: Dict[str, Optional[spaces.Base]]
 
     def __init__(self, rng=None):
+        """
+        Base class for random supervised learning models.
+
+        Parameters
+        ----------
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        Notes
+        -----
+        Implements a joint distribution between an random elements `x` and `y`. For supervised learning, it is assumed
+        that the former is observed while the latter is not.
+
+        """
         super().__init__(rng)
         self._space = {'x': None, 'y': None}
 
@@ -42,25 +49,69 @@ class Base(RandomGeneratorMixin, ABC):
 
     @property
     def model_x(self):
+        """Random variable characterizing the marginal distribution of `x`."""
         return self._model_x
 
     @abstractmethod
     def model_y_x(self, x):
+        """
+        Generate the conditional random variable of `y` given `x`
+
+        Parameters
+        ----------
+        x : array_like
+            Observed random element value.
+
+        Returns
+        -------
+        rand_elements.Base
+            The distribution of `y` given `x`
+
+        """
         raise NotImplementedError
 
     # TODO: default stats to reference `model_x` and `model_y_x` attributes?
 
     @property
     def mode_x(self):
+        """The most probable value of `x`."""
         return self._mode_x
 
     def mode_y_x(self, x):
+        """
+        The most probable values of `y`, given `x` values.
+
+        Parameters
+        ----------
+        x : array_like
+            Observed random element values.
+
+        Returns
+        -------
+        np.ndarray
+
+        """
         return vectorize_func(self._mode_y_x_single, self.shape['x'])(x)
 
     def _mode_y_x_single(self, x):
         pass
 
     def plot_mode_y_x(self, x=None, ax=None):
+        """
+        Plot the mode of `y` for different `x` values.
+
+        Parameters
+        ----------
+        x : array_like, optional
+            Observed random element values. Defaults to `self.space.x_plt`.
+        ax : matplotlib.axes.Axes, optional
+            Axes onto which stats/losses are plotted.
+
+        Returns
+        -------
+        matplotlib.artist.Artist or tuple of matplotlib.artist.Artist
+
+        """
         return self.space['x'].plot(self.mode_y_x, x, ax)
 
     sample = rand_elements.Base.sample
@@ -73,103 +124,101 @@ class Base(RandomGeneratorMixin, ABC):
 
 
 class MixinRVx:
+    """Mixin class for observed random variables `x` (numeric)."""
+
     _mean_x: Optional[np.ndarray]
     _cov_x: Optional[np.ndarray]
 
     @property
     def mean_x(self):
+        """First moment of `x`."""
         return self._mean_x
 
     @property
     def cov_x(self):
+        """Second central moment of `x`."""
         return self._cov_x
 
 
 class MixinRVy:
+    """Mixin class for unobserved random variables `y` (numeric)."""
+
     space: dict
     shape: dict
 
     def mean_y_x(self, x):
+        """
+        The first moments of `y`, given `x` values.
+
+        Parameters
+        ----------
+        x : array_like
+            Observed random element values.
+
+        Returns
+        -------
+        np.ndarray
+
+        """
         return vectorize_func(self._mean_y_x_single, self.shape['x'])(x)
 
     def _mean_y_x_single(self, x):
         pass
 
     def plot_mean_y_x(self, x=None, ax=None):
+        """
+        Plot the mean of `y` for different `x` values.
+
+        Parameters
+        ----------
+        x : array_like, optional
+            Observed random element values. Defaults to `self.space.x_plt`.
+        ax : matplotlib.axes.Axes, optional
+            Axes onto which stats/losses are plotted.
+
+        Returns
+        -------
+        matplotlib.artist.Artist or tuple of matplotlib.artist.Artist
+
+        """
         return self.space['x'].plot(self.mean_y_x, x, ax)
 
     def cov_y_x(self, x):
+        """
+        The second central moments of `y`, given `x` values.
+
+        Parameters
+        ----------
+        x : array_like
+            Observed random element values.
+
+        Returns
+        -------
+        np.ndarray
+
+        """
         return vectorize_func(self._cov_y_x_single, self.shape['x'])(x)
 
     def _cov_y_x_single(self, x):
         pass
 
     def plot_cov_y_x(self, x=None, ax=None):
+        """
+        Plot the covariance of `y` for different `x` values.
+
+        Parameters
+        ----------
+        x : array_like, optional
+            Observed random element values. Defaults to `self.space.x_plt`.
+        ax : matplotlib.axes.Axes, optional
+            Axes onto which stats/losses are plotted.
+
+        Returns
+        -------
+        matplotlib.artist.Artist or tuple of matplotlib.artist.Artist
+
+        """
         return self.space['x'].plot(self.cov_y_x, x, ax)
-
-
-class DataSet(Base):
-    def __init__(self, data, space=None, iter_mode='once', shuffle_mode='never', rng=None):
-        super().__init__(rng)
-
-        self.data = data
-
-        if space is not None:
-            self._space = space
-        else:
-            for c in 'xy':
-                dtype = data.dtype[c]
-                if np.issubdtype(dtype.base, np.number):
-                    self._space[c] = spaces.Euclidean(dtype.shape)
-                else:
-                    self._space[c] = spaces.FiniteGeneric(data[c], shape=dtype.shape)  # TODO: check...
-
-        self.iter_mode = iter_mode
-        self.shuffle_mode = shuffle_mode
-
-        self.idx = None
-        self.restart(shuffle=(self.shuffle_mode in {'once', 'repeat'}))
-
-    def __repr__(self):
-        return f"DataSet({len(self.data)})"
-
-    def model_y_x(self, x):
-        raise NotImplementedError
-
-    @classmethod
-    def from_xy(cls, x, y, space=None, iter_mode='once', shuffle_mode='never', rng=None):
-        data = np.array(list(zip(x, y)), dtype=[('x', x.dtype, x.shape[1:]), ('y', y.dtype, y.shape[1:])])
-
-        return cls(data, space, iter_mode, shuffle_mode, rng)
-
-    @classmethod
-    def from_csv(cls, path, y_name, space=None, iter_mode='once', shuffle_mode='never', rng=None):
-        df_x = pd.read_csv(path)
-        df_y = df_x.pop(y_name)
-        x, y = df_x.to_numpy(), df_y.to_numpy()
-
-        return cls.from_xy(x, y, space, iter_mode, shuffle_mode, rng)
-
-    def restart(self, shuffle=False, rng=None):
-        self.idx = 0
-        if shuffle:
-            self.shuffle(rng)
-
-    def shuffle(self, rng=None):
-        rng = self._get_rng(rng)
-        rng.shuffle(self.data)
-
-    def _sample(self, n, rng):
-        if self.idx + n > len(self.data):
-            if self.iter_mode == 'once':
-                raise ValueError("DataSet model is exhausted.")
-            elif self.iter_mode == 'repeat':
-                self.restart(shuffle=(self.shuffle_mode == 'repeat'), rng=rng)
-                # TODO: use trailing samples?
-
-        out = self.data[self.idx:self.idx+n]
-        self.idx += n
-        return out
 
 
 # class DataConditionalGeneric(Base):

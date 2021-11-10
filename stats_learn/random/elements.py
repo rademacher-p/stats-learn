@@ -14,7 +14,7 @@ from stats_learn.util import RandomGeneratorMixin, check_data_shape, check_valid
 class Base(RandomGeneratorMixin, ABC):
     def __init__(self, rng=None):
         """
-        Base class for random element objects.
+        Base class for random elements.
 
         Parameters
         ----------
@@ -37,7 +37,7 @@ class Base(RandomGeneratorMixin, ABC):
 
     @property
     def mode(self):
-        """The most likely domain value."""
+        """The most probable domain value."""
         return self._mode
 
     def prob(self, x):
@@ -160,7 +160,7 @@ class MixinRV:
 class BaseRV(MixinRV, Base, ABC):
     def __init__(self, rng=None):
         """
-        Base class for random variable (numeric) objects.
+        Base class for random variables (numeric).
 
         Parameters
         ----------
