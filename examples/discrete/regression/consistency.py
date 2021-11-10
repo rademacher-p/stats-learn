@@ -1,11 +1,11 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from stats_learn.util import get_now
-from stats_learn.random import elements as rand_elements, models as rand_models
+from stats_learn import results
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
-from stats_learn import results
+from stats_learn.random import elements as rand_elements, models as rand_models
+from stats_learn.util import get_now
 
 plt.style.use('../../../images/style.mplstyle')
 
@@ -16,10 +16,9 @@ seed = 12345
 # img_path = None
 
 # TODO: remove path stuff and image names below before release
-base_path = __file__[__file__.rfind('/')+1:].removesuffix('.py') + '_temp/'
+base_path = __file__[__file__.rfind('/') + 1:].removesuffix('.py') + '_temp/'
 log_path = base_path + 'log.md'
 img_dir = base_path + f'images/{get_now()}/'
-
 
 # %% Model and optimal predictor
 n_x = n_y = 128
@@ -29,15 +28,14 @@ def clairvoyant_func(x):
     return 1 / (2 + np.sin(2 * np.pi * x))
 
 
-var_y_x_const = 1/5
+var_y_x_const = 1 / 5
 
 model_x = rand_elements.FiniteGeneric.from_grid([0, 1], n_x, p=None)
 
-alpha_y_x = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_y-1))
+alpha_y_x = (1 - var_y_x_const) / (np.float64(var_y_x_const) - 1 / (n_y - 1))
 model = rand_models.DataConditional.from_mean_emp(alpha_y_x, n_y, clairvoyant_func, model_x)
 
 opt_predictor = ModelRegressor(model, name=r'$f^*(\theta)$')
-
 
 # %% Learners
 w_prior = [.5, 0]
@@ -50,14 +48,12 @@ dir_predictor = BayesRegressor(dir_model, space=model.space, name=r'$\mathrm{Dir
 
 dir_params = {'alpha_0': [10, 1000]}
 
-
 # Normal-prior LR
 norm_model = bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=.1, cov_y_x=.1, model_x=model_x,
                                        allow_singular=True)
 norm_predictor = BayesRegressor(norm_model, space=model.space, name=r'$\mathcal{N}$')
 
 norm_params = {'prior_cov': [.1, .001]}
-
 
 #
 temp = [
@@ -66,7 +62,6 @@ temp = [
     (norm_predictor, norm_params),
 ]
 predictors, params = zip(*temp)
-
 
 # %% Results
 n_test = 1000

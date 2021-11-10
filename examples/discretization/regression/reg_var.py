@@ -2,21 +2,20 @@
 
 
 import numpy as np
-from matplotlib import pyplot as plt
-import torch
-from pytorch_lightning.callbacks import EarlyStopping
 import pytorch_lightning.loggers as pl_loggers
+import torch
+from matplotlib import pyplot as plt
+from pytorch_lightning.callbacks import EarlyStopping
 from pytorch_lightning.utilities.seed import seed_everything
 
-from stats_learn.util import get_now
-from stats_learn.random import elements as rand_elements, models as rand_models
+from stats_learn import results
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
-from stats_learn import results
-from stats_learn.preprocessing import make_discretizer
-from stats_learn.preprocessing import make_clipper
 from stats_learn.predictors.torch import LitMLP, LitPredictor, reset_weights
-
+from stats_learn.preprocessing import make_clipper
+from stats_learn.preprocessing import make_discretizer
+from stats_learn.random import elements as rand_elements, models as rand_models
+from stats_learn.util import get_now
 
 plt.style.use('../../../images/style.mplstyle')
 
@@ -26,18 +25,17 @@ seed = 12345
 if seed is not None:
     seed_everything(seed)  # PyTorch-Lightning seeding
 
-
 # log_path = None
 # img_path = None
 
 # TODO: remove path stuff and image names below before release
-base_path = __file__[__file__.rfind('/')+1:].removesuffix('.py') + '_temp/'
+base_path = __file__[__file__.rfind('/') + 1:].removesuffix('.py') + '_temp/'
 log_path = base_path + 'log.md'
 img_dir = base_path + f'images/{get_now()}/'
 
-
 # %% Model and optimal predictor
 freq = 2
+
 
 # def clairvoyant_func(x):
 #     # y = np.sin(2*np.pi*freq*x)
@@ -59,13 +57,12 @@ freq = 2
 
 def clairvoyant_func(x):
     y = np.sin(2 * np.pi * freq * x)
-    return .5 + np.where(y > 0, .3, -.3) - .3*y
+    return .5 + np.where(y > 0, .3, -.3) - .3 * y
 
 
-var_y_x_const = 1/2
+var_y_x_const = 1 / 2
 
-
-alpha_y_x = 1/var_y_x_const - 1
+alpha_y_x = 1 / var_y_x_const - 1
 model_x = rand_elements.Uniform([0, 1])
 model = rand_models.BetaLinear(weights=[1], basis_y_x=[clairvoyant_func], alpha_y_x=alpha_y_x, model_x=model_x)
 
@@ -77,7 +74,7 @@ opt_predictor = ModelRegressor(model, name=r'$f^*(\theta)$')
 # Dirichlet
 def prior_func(x):
     # return .5 + .35*np.sin(2*np.pi*freq*x)
-    y = np.sin(2*np.pi*freq*x)
+    y = np.sin(2 * np.pi * freq * x)
     a = .25
     return np.where(y > 0, .5 + a, .5 - a)
 
@@ -117,10 +114,10 @@ for n_t in n_t_iter:
         name_ = r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{n_t}$" + \
                 r", $\alpha_0 / |\mathcal{T}| = " + f"{alpha_0_norm}$"
 
-        dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=[make_discretizer(values_t)], name=name_)
+        dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=[make_discretizer(values_t)],
+                                       name=name_)
 
         dir_predictors.append(dir_predictor)
-
 
 # scale_alpha = True  # interpret `alpha_0` parameter as normalized w.r.t. discretization cardinality
 # # scale_alpha = False
@@ -174,14 +171,15 @@ for weight_decay in weight_decays:
 
     lit_model = LitMLP([model.size['x'], *layer_sizes, 1], optim_params=optim_params)
 
+
     def reset_func(model_):
         model_.apply(reset_weights)
         # with torch.no_grad():
         #     model_.model[-1].bias.fill_(.5)  # FIXME: use the .5 init??
 
+
     lit_predictor = LitPredictor(lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name)
     lit_predictors.append(lit_predictor)
-
 
 #
 temp = [
@@ -191,11 +189,9 @@ temp = [
 ]
 predictors, params = zip(*temp)
 
-
 # %% Results
 n_test = 1000
 n_mc = 50
-
 
 # Sample regressor realizations
 n_train = 128

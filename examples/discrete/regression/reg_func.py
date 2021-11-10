@@ -1,17 +1,17 @@
 import numpy as np
-from matplotlib import pyplot as plt
-import torch
-from pytorch_lightning.callbacks import EarlyStopping
 import pytorch_lightning.loggers as pl_loggers
+import torch
+from matplotlib import pyplot as plt
+from pytorch_lightning.callbacks import EarlyStopping
 from pytorch_lightning.utilities.seed import seed_everything
 
-from stats_learn.util import get_now
-from stats_learn.random import elements as rand_elements, models as rand_models
+from stats_learn import results
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
-from stats_learn import results
-from stats_learn.preprocessing import make_clipper
 from stats_learn.predictors.torch import LitMLP, LitPredictor, reset_weights
+from stats_learn.preprocessing import make_clipper
+from stats_learn.random import elements as rand_elements, models as rand_models
+from stats_learn.util import get_now
 
 plt.style.use('../../../images/style.mplstyle')
 
@@ -21,15 +21,13 @@ seed = 12345
 if seed is not None:
     seed_everything(seed)  # PyTorch-Lightning seeding
 
-
 # log_path = None
 # img_path = None
 
 # TODO: remove path stuff and image names below before release
-base_path = __file__[__file__.rfind('/')+1:].removesuffix('.py') + '_temp/'
+base_path = __file__[__file__.rfind('/') + 1:].removesuffix('.py') + '_temp/'
 log_path = base_path + 'log.md'
 img_dir = base_path + f'images/{get_now()}/'
-
 
 # %% Model and optimal predictor
 n_x = n_y = 128
@@ -41,15 +39,14 @@ def clairvoyant_func(x):
     return _rand_vals[x]
 
 
-var_y_x_const = 1/125
+var_y_x_const = 1 / 125
 
 model_x = rand_elements.FiniteGeneric.from_grid([0, 1], n_x, p=None)
 
-alpha_y_x = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_y-1))
+alpha_y_x = (1 - var_y_x_const) / (np.float64(var_y_x_const) - 1 / (n_y - 1))
 model = rand_models.DataConditional.from_mean_emp(alpha_y_x, n_y, clairvoyant_func, model_x)
 
 opt_predictor = ModelRegressor(model, name=r'$f^*(\theta)$')
-
 
 # %% Learners
 
@@ -59,7 +56,6 @@ dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
 
 dir_predictor = BayesRegressor(dir_model, space=model.space, name=r'$\mathrm{Dir}$')
 dir_params = {'alpha_0': [1e-5, 1e5]}
-
 
 # PyTorch
 weight_decays = [0., 1e-3]  # controls L2 regularization
@@ -86,14 +82,15 @@ for weight_decay in weight_decays:
 
     lit_model = LitMLP([model.size['x'], *layer_sizes, 1], optim_params=optim_params)
 
+
     def reset_func(model_):
         model_.apply(reset_weights)
         with torch.no_grad():
             model_.model[-1].bias.fill_(.5)
 
+
     lit_predictor = LitPredictor(lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name)
     lit_predictors.append(lit_predictor)
-
 
 #
 temp = [
@@ -102,7 +99,6 @@ temp = [
     *((predictor, None) for predictor in lit_predictors),
 ]
 predictors, params = zip(*temp)
-
 
 # %% Results
 n_test = 1000
