@@ -1,11 +1,10 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes.models import NormalLinear, Dirichlet
+from stats_learn.random import elements as rand_elements, models as rand_models
 
 plt.matplotlib.interactive(False)
-
 
 RM_set = [
     (NormalLinear, dict(prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
