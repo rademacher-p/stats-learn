@@ -59,7 +59,7 @@ class Base(RandomGeneratorMixin, ABC):
 
         Parameters
         ----------
-        d : array_like, optional
+        d : np.ndarray, optional
             The observations.
         warm_start : bool, optional
             If `False`, `reset` is invoked to restore unfit state.

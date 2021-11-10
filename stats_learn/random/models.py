@@ -866,7 +866,7 @@ class DataEmpirical(Base):
 
         Parameters
         ----------
-        d : array_like
+        d : np.ndarray
             The data forming the empirical distribution.
         space : dict, optional
             The domain for `x` and `y`. Each defaults to a Euclidean space.
@@ -896,7 +896,7 @@ class DataEmpirical(Base):
 
         Parameters
         ----------
-        d : array_like
+        d : np.ndarray
             New data added to the empirical distribution.
 
         """

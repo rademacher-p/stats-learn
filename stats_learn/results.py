@@ -469,9 +469,10 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
 
     Returns
     -------
-    tuple of list of ndarray
-        Length 2 tuple of lists, each list has length `len(predictors)`. First element contains prediction
-        statistics, second element contains empirical risk values.
+    list of ndarray
+        One item per predictor containing prediction statistics for each parameterization.
+    list of ndarray
+        One item per predictor containing empirical risk values for each parameterization.
 
     Notes
     -----

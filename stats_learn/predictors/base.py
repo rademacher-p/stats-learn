@@ -1,7 +1,3 @@
-"""
-Supervised learning functions.
-"""
-
 from abc import ABC, abstractmethod
 from typing import Union
 from operator import itemgetter
@@ -18,8 +14,22 @@ from stats_learn.results import (assess_single_compare, predict_stats_compare, p
                                  assess_compare)
 
 
+# Base class and Mixins
 class Base(ABC):
     def __init__(self, loss_func, space=None, proc_funcs=(), name=None):
+        """
+        Base class for supervised learning predictors.
+
+        Parameters
+        ----------
+        loss_func : callable
+        space : dict, optional
+            The domain for `x` and `y`. Defaults to the model's space.
+        proc_funcs : iterable of callable of dict of iterable of callable
+            Sequentially-invoked preprocessing functions for `x` and `y`.
+        name : str, optional
+
+        """
         self.loss_func = loss_func
 
         self._space = space
@@ -28,14 +38,15 @@ class Base(ABC):
             self.proc_funcs = proc_funcs
         else:
             self.proc_funcs = {'pre': list(proc_funcs), 'post': []}
-        self.name = name
+        self.name = str(name)
 
-        self.model = None
+        self.model = None  # `random.models.Base` object used to generate predictions
 
-        self.can_warm_start = False
+        self.can_warm_start = False  # enables incremental training
 
     @property
     def space(self):
+        """The domain for `x` and `y`. Defaults to the model's space."""
         if self._space is None:
             self._space = self._model_obj.space
         return self._space
@@ -51,6 +62,7 @@ class Base(ABC):
         raise NotImplementedError
 
     def set_params(self, **kwargs):  # TODO: improve? wrapper to ignore non-changing param set?
+        """Set parameters of the learning model object."""
         for key, value in kwargs.items():
             setattr(self._model_obj, key, value)
 
@@ -73,6 +85,17 @@ class Base(ABC):
         return np.array(list(zip(x, y)), dtype=dtype)
 
     def fit(self, d=None, warm_start=False):
+        """
+        Refine the learning model using observations.
+
+        Parameters
+        ----------
+        d : np.ndarray, optional
+            The training data.
+        warm_start : bool, optional
+            If `False`, `reset` is invoked to restore unfit state.
+
+        """
         if not warm_start:
             self.reset()
         elif not self.can_warm_start:
@@ -88,13 +111,43 @@ class Base(ABC):
 
     @abstractmethod
     def reset(self):
+        """Restore unfit prior state."""
         raise NotImplementedError
 
-    def fit_from_model(self, model, n_train=0, rng=None, warm_start=False):
+    def fit_from_model(self, model, n_train=0, warm_start=False, rng=None):
+        """
+        Refine the learning model using data randomly drawn from a model.
+
+        Parameters
+        ----------
+        model : rand_models.Base
+            Model for training data generation.
+        n_train : int, optional
+            Number of training samples.
+        warm_start : bool, optional
+            If `False`, `reset` is invoked to restore unfit state.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         d = model.sample(n_train, rng=rng)  # generate train/test data
         self.fit(d, warm_start)  # train learner
 
     def predict(self, x):
+        """
+        Generate predictions for given `x` values.
+
+        Parameters
+        ----------
+        x : array_like
+            Observed random element values.
+
+        Returns
+        -------
+        np.ndarray
+            Prediction values.
+
+        """
         x = self._proc_x(x)
         y = self._predict(x)
         y = self._proc_y(y)
@@ -104,11 +157,44 @@ class Base(ABC):
         pass
 
     def evaluate(self, d):
+        """
+        Evaluate predictor using test data.
+
+        Parameters
+        ----------
+        d : np.ndarray
+            The test data.
+
+        Returns
+        -------
+        float
+            Empirical risk (i.e. average test loss).
+
+        """
         loss = self.loss_func(self.predict(d['x']), d['y'], shape=self.shape['y'])
         return loss.mean()
 
     def evaluate_from_model(self, model, n_test=1, n_mc=1, rng=None):
-        """Average empirical risk achieved from a given data model."""
+        """
+        Evaluate predictor using test data randomly drawn from a given data model.
+
+        Parameters
+        ----------
+        model : rand_models.Base
+            Model for training data generation.
+        n_test : int, optional
+            Number of test samples.
+        n_mc : int, optional
+            Number of Monte Carlo simulation iterations.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        Returns
+        -------
+        float
+            Empirical risk (i.e. average test loss).
+
+        """
         model.rng = rng
         loss = np.empty(n_mc)
         for i_mc in range(n_mc):
@@ -119,17 +205,104 @@ class Base(ABC):
 
     # Plotting utilities
     def plot_predict(self, x=None, ax=None, label=None):
-        """Plot prediction function."""
+        """
+        Plot prediction function.
+
+        Parameters
+        ----------
+        x : array_like, optional
+            Values to plot against. Defaults to `self.x_plt`.
+        ax : matplotlib.axes.Axes, optional
+        label : str, optional
+            Label for matplotlib.artist.Artist
+
+        Returns
+        -------
+        matplotlib.artist.Artist or tuple of matplotlib.artist.Artist
+
+        """
         return self.space['x'].plot(self.predict, x, ax=ax, label=label)
 
     # Assessment
     def assess_single(self, d_train=None, d_test=None, params=None, x=None, verbose=False, log_path=None, img_path=None,
                       ax=None):
+        """
+        Assess predictor using a single dataset.
+
+        Parameters
+        ----------
+        d_train : array_like, optional
+            Training data.
+        d_test : array_like, optional
+            Testing data.
+        params : dict, optional
+            Predictor parameters to evaluate. Outer product of each parameter array is assessed.
+        x : iterable, optional
+            Values of observed element to use for assessment of prediction statistics.
+        verbose : bool, optional
+            Enables iteration print-out.
+        log_path : os.PathLike or str, optional
+            File for saving printed loss table and image path in Markdown format.
+        img_path : os.PathLike or str, optional
+            Directory for saving generated images.
+        ax : matplotlib.axes.Axes, optional
+            Axes onto which stats/losses are plotted.
+
+        Returns
+        -------
+        list of ndarray
+            Empirical risk values for each parameterization.
+
+        """
         return assess_single_compare([self], d_train, d_test, [params], x, verbose, log_path, img_path, ax)
 
     def assess(self, model=None, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
                plot_stats=False, plot_loss=False, print_loss=False, log_path=None, img_path=None, ax=None,
                rng=None):
+        """
+        Assess predictor using Monte Carlo simulation of prediction statistics and empirical risk.
+
+        Parameters
+        ----------
+        model : stats_learn.random.models.Base
+            Data-generating model.
+        params : iterable of dict, optional
+            Predictor parameters to evaluate. Outer product of each parameter array is assessed.
+        n_train : int or iterable, optional
+            Training data volume.
+        n_test : int, optional
+            Test data volume.
+        n_mc : int, optional
+            Number of Monte Carlo simulation iterations.
+        x : iterable, optional
+            Values of observed element to use for assessment of prediction statistics.
+        stats : iterable of str, optional
+            Names of the statistics to generate, e.g. 'mean', 'std', 'cov', 'mode', etc.
+        verbose : bool, optional
+            Enables iteration print-out.
+        plot_stats : bool, optional
+            Enables plotting of prediction statistics.
+        plot_loss : bool, optional
+            Enables plotting of average loss.
+        print_loss : bool, optional
+            Enables print-out of average loss table.
+        log_path : os.PathLike or str, optional
+            File for saving printed loss table and image path in Markdown format.
+        img_path : os.PathLike or str, optional
+            Directory for saving generated images.
+        ax : matplotlib.axes.Axes, optional
+            Axes onto which stats/losses are plotted.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+                Random number generator seed or object.
+
+        Returns
+        -------
+        ndarray
+            Prediction statistics for each parameterization.
+        ndarray
+            Empirical risk values for each parameterization.
+
+        """
         if model is None:
             model = self._model_obj
         out = assess_compare([self], model, [params], n_train, n_test, n_mc, x, stats, verbose, plot_stats, plot_loss,
@@ -166,6 +339,7 @@ class Base(ABC):
 
 
 class ClassifierMixin:
+    """Uses model conditional mode to minimize 0-1 loss."""
     model: rand_models.Base
 
     def _predict(self, x):
@@ -173,15 +347,31 @@ class ClassifierMixin:
 
 
 class RegressorMixin:
+    """Uses model conditional mean to minimize squared-error loss."""
     model: Union[rand_models.Base, rand_models.MixinRVy]
 
     def _predict(self, x):
         return self.model.mean_y_x(x)
 
 
-# %% Fixed model
+# Fixed model predictors
 class Model(Base):
     def __init__(self, model, loss_func, space=None, proc_funcs=(), name=None):
+        """
+        Predictor based on fixed data model.
+
+        Parameters
+        ----------
+        model : rand_models.Base
+            Fixed model used to generate predictions.
+        loss_func : callable
+        space : dict, optional
+            The domain for `x` and `y`. Defaults to the model's space.
+        proc_funcs : iterable of callable of dict of iterable of callable
+            Sequentially-invoked preprocessing functions for `x` and `y`.
+        name : str, optional
+
+        """
         super().__init__(loss_func, space, proc_funcs, name)
         self.model = model
 
@@ -198,20 +388,66 @@ class Model(Base):
     def reset(self):
         pass
 
-    def fit_from_model(self, model, n_train=0, rng=None, warm_start=False):
+    def fit_from_model(self, model, n_train=0, warm_start=False, rng=None):
         pass  # skip unnecessary data generation
 
 
 class ModelClassifier(ClassifierMixin, Model):
     def __init__(self, model, space=None, proc_funcs=(), name=None):
+        """
+        Classifier based on fixed data model.
+
+        Parameters
+        ----------
+        model : rand_models.Base
+            Fixed model used to generate predictions.
+        space : dict, optional
+            The domain for `x` and `y`. Defaults to the model's space.
+        proc_funcs : iterable of callable of dict of iterable of callable
+            Sequentially-invoked preprocessing functions for `x` and `y`.
+        name : str, optional
+
+        """
         super().__init__(model, loss_01, space, proc_funcs, name)
 
 
 class ModelRegressor(RegressorMixin, Model):
     def __init__(self, model, space=None, proc_funcs=(), name=None):
+        """
+        Regressor based on fixed data model.
+
+        Parameters
+        ----------
+        model : rand_models.Base
+            Fixed model used to generate predictions.
+        space : dict, optional
+            The domain for `x` and `y`. Defaults to the model's space.
+        proc_funcs : iterable of callable of dict of iterable of callable
+            Sequentially-invoked preprocessing functions for `x` and `y`.
+        name : str, optional
+
+        """
         super().__init__(model, loss_se, space, proc_funcs, name)
 
     def evaluate_analytic(self, model=None, n_train=0, n_test=1):
+        """
+        Analytically calculate risk.
+
+        Parameters
+        ----------
+        model : rand_models.Base
+            Model for training data generation.
+        n_train : int, optional
+            Number of training samples.
+        n_test : int, optional
+            Number of testing samples.
+
+        Returns
+        -------
+        float
+            Analytical risk.
+
+        """
         if model is None:
             model = self._model_obj
 
@@ -235,9 +471,24 @@ class ModelRegressor(RegressorMixin, Model):
             raise NotImplementedError
 
 
-# %% Bayes model
+# Bayes model predictors
 class Bayes(Base):
     def __init__(self, bayes_model, loss_func, space=None, proc_funcs=(), name=None):
+        """
+        Predictor based on Bayesian data model.
+
+        Parameters
+        ----------
+        bayes_model : bayes_models.Base
+            Bayes model used for fitting and to generate predictions.
+        loss_func : callable
+        space : dict, optional
+            The domain for `x` and `y`. Defaults to the model's space.
+        proc_funcs : iterable of callable of dict of iterable of callable
+            Sequentially-invoked preprocessing functions for `x` and `y`.
+        name : str, optional
+
+        """
         super().__init__(loss_func, space, proc_funcs, name=name)
 
         self.bayes_model = bayes_model
@@ -262,19 +513,66 @@ class Bayes(Base):
         self.bayes_model.fit(d, warm_start=True)
 
     def reset(self):
+        """Invoke reset of the Bayesian model."""
         self.bayes_model.reset()
 
 
 class BayesClassifier(ClassifierMixin, Bayes):
     def __init__(self, bayes_model, space=None, proc_funcs=(), name=None):
+        """
+        Classifier based on Bayesian data model.
+
+        Parameters
+        ----------
+        bayes_model : bayes_models.Base
+            Bayes model used for fitting and to generate predictions.
+        space : dict, optional
+            The domain for `x` and `y`. Defaults to the model's space.
+        proc_funcs : iterable of callable of dict of iterable of callable
+            Sequentially-invoked preprocessing functions for `x` and `y`.
+        name : str, optional
+
+        """
         super().__init__(bayes_model, loss_01, space, proc_funcs, name)
 
 
 class BayesRegressor(RegressorMixin, Bayes):
     def __init__(self, bayes_model, space=None, proc_funcs=(), name=None):
+        """
+        Regressor based on Bayesian data model.
+
+        Parameters
+        ----------
+        bayes_model : bayes_models.Base
+            Bayes model used for fitting and to generate predictions.
+        space : dict, optional
+            The domain for `x` and `y`. Defaults to the model's space.
+        proc_funcs : iterable of callable of dict of iterable of callable
+            Sequentially-invoked preprocessing functions for `x` and `y`.
+        name : str, optional
+
+        """
         super().__init__(bayes_model, loss_se, space, proc_funcs, name)
 
     def evaluate_analytic(self, model=None, n_train=0, n_test=1):
+        """
+        Analytically calculate risk.
+
+        Parameters
+        ----------
+        model : rand_models.Base
+            Model for training data generation.
+        n_train : int, optional
+            Number of training samples.
+        n_test : int, optional
+            Number of testing samples.
+
+        Returns
+        -------
+        float
+            Analytical risk.
+
+        """
         if model is None:
             model = self._model_obj
 
