@@ -14,7 +14,6 @@ from pytorch_lightning.utilities.seed import seed_everything
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
-from stats_learn.predictors.sklearn import SKLPredictor
 from stats_learn import results
 from stats_learn.util import get_now
 from stats_learn.preprocessing import make_clipper
@@ -185,7 +184,7 @@ skl_estimator, skl_name = MLPRegressor(hidden_layer_sizes=[1000, 200, 100], alph
 # TODO: try Adaboost, RandomForest, GP, BayesianRidge, KNeighbors, SVR
 
 # skl_estimator = Pipeline([('scaler', StandardScaler()), ('regressor', skl_estimator)])
-skl_predictor = SKLPredictor(skl_estimator, space=model.space, name=skl_name)
+# skl_predictor = SKLPredictor(skl_estimator, space=model.space, name=skl_name)
 
 
 # %% PyTorch
