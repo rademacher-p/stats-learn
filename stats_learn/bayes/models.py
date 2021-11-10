@@ -98,7 +98,7 @@ class NormalLinear(Base):
     def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
                  model_x=rand_elements.Normal(), *, allow_singular=False, rng=None):
         """
-        Random model characterized by a Normal predictive distribution with mean defined in terms of basis functions
+        Random model characterized by a Normal conditional distribution with mean defined in terms of basis functions
         and weights characterized by a Normal distribution.
 
         Parameters
@@ -110,7 +110,7 @@ class NormalLinear(Base):
         basis_y_x : iterable of callable, optional
             Basis functions. Defaults to polynomial functions.
         cov_y_x : float or numpy.ndarray, optional
-            Covariance tensor characterizing fixed variance of `y`.
+            Conditional covariance of Normal distributions.
         model_x : rand_elements.Base, optional
             Random variable characterizing the marginal distribution of `x`.
         allow_singular : bool, optional

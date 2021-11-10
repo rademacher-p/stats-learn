@@ -73,8 +73,8 @@ nonlinear_model = make_inv_trig(shape_x)
 
 
 model_x = rand_elements.FiniteGeneric.from_grid([0, 1], n_x)
-# model = rand_models.DataConditional.from_poly_mean(n_x, alpha_y_x_d, w_model, model_x)
-model = rand_models.DataConditional.from_func_mean(n_x, alpha_y_x_d, nonlinear_model, model_x)
+# model = rand_models.DataConditional.from_mean_poly_emp(n_x, alpha_y_x_d, w_model, model_x)
+model = rand_models.DataConditional.from_mean_emp(alpha_y_x_d, n_x, nonlinear_model, model_x)
 
 # model_x = rand_elements.Uniform(lims_x)
 # # model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
@@ -100,9 +100,9 @@ w_prior = [.5, 0]
 # Dirichlet learner
 proc_funcs = []
 
-prior_mean = rand_models.DataConditional.from_poly_mean(n_x, alpha_y_x_d, w_prior, model_x)
+prior_mean = rand_models.DataConditional.from_mean_poly_emp(alpha_y_x_d, n_x, w_prior, model_x)
 # _func = lambda x: .5*(1-np.sin(2*np.pi*x))
-# prior_mean = rand_models.DataConditional.from_func_mean(n_x, alpha_y_x_d, _func, model_x)
+# prior_mean = rand_models.DataConditional.from_mean_emp(n_x, alpha_y_x_d, _func, model_x)
 
 
 # n_t = 16

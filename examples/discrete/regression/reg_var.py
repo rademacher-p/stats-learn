@@ -55,7 +55,7 @@ model_x = rand_elements.FiniteGeneric.from_grid([0, 1], n_x, p=None)
 
 
 alpha_y_x = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_y-1))
-model = rand_models.DataConditional.from_func_mean(n_y, alpha_y_x, clairvoyant_func, model_x)
+model = rand_models.DataConditional.from_mean_emp(alpha_y_x, n_y, clairvoyant_func, model_x)
 
 opt_predictor = ModelRegressor(model, name=r'$f^*(\theta)$')
 
@@ -76,7 +76,7 @@ def prior_func(x):
     return np.where(y > 0, .5 + a, .5 - a)
 
 
-prior_mean = rand_models.DataConditional.from_func_mean(n_y, alpha_y_x, prior_func, model_x)
+prior_mean = rand_models.DataConditional.from_mean_emp(alpha_y_x, n_y, prior_func, model_x)
 dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
 
 dir_predictor = BayesRegressor(dir_model, space=model.space, name=r'$\mathrm{Dir}$')

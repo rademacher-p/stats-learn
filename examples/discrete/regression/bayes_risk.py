@@ -28,7 +28,7 @@ w_model = [.5]
 model_x = rand_elements.FiniteGeneric.from_grid([0, 1], n_x, p=None)
 
 alpha_y_x = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_y-1))
-prior_mean = rand_models.DataConditional.from_poly_mean(n_x, alpha_y_x, w_model, model_x)
+prior_mean = rand_models.DataConditional.from_mean_poly_emp(alpha_y_x, n_x, w_model, model_x)
 model = bayes_models.Dirichlet(prior_mean, alpha_0=4e2)
 
 

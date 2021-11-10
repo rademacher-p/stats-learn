@@ -746,6 +746,10 @@ class Beta(BaseRV):
         rng : int or np.random.RandomState or np.random.Generator, optional
             Random number generator seed or object.
 
+        Notes
+        -----
+        Defaults to uniform.
+
         """
         super().__init__(rng)
         self._space = spaces.Box((0, 1))
@@ -761,14 +765,14 @@ class Beta(BaseRV):
         return f"Beta({self.a}, {self.b})"
 
     @classmethod
-    def from_mean(cls, mean, alpha_0, rng=None):
+    def from_mean(cls, mean=.5, alpha_0=2, rng=None):
         """
         Create Beta RV using mean and total concentration.
 
         Parameters
         ----------
-        mean : float
-        alpha_0 : float
+        mean : float, optional
+        alpha_0 : float, optional
             Total concentration. Conceptually identical to `Dirichlet` parameter.
         rng : int or np.random.RandomState or np.random.Generator, optional
             Random number generator seed or object.
@@ -776,6 +780,10 @@ class Beta(BaseRV):
         Returns
         -------
         Beta
+
+        Notes
+        -----
+        Defaults to uniform.
 
         """
         return cls(alpha_0 * mean, alpha_0 * (1 - mean), rng)
@@ -1154,7 +1162,7 @@ class DataEmpirical(Base):
 
     def __new__(cls, values, counts, space=None, rng=None):
         """
-        A random variable drawn from an empirical distribution.
+        A random element drawn from an empirical distribution.
 
         Parameters
         ----------
@@ -1180,7 +1188,7 @@ class DataEmpirical(Base):
 
     def __init__(self, values, counts, space=None, rng=None):
         """
-        A random variable drawn from an empirical distribution.
+        A random element drawn from an empirical distribution.
 
         Parameters
         ----------
@@ -1217,7 +1225,7 @@ class DataEmpirical(Base):
     @classmethod
     def from_data(cls, d, space=None, rng=None):
         """
-        Create RV from a dataset.
+        Create random element from a dataset.
 
         Parameters
         ----------
@@ -1440,12 +1448,36 @@ class Mixture(Base):
         self._update_attr()
 
     def set_dist_attr(self, idx, **dist_kwargs):
+        """
+        Set attributes of a distribution.
+
+        Parameters
+        ----------
+        idx : int
+            The distribution index in `dists`.
+        dist_kwargs : dict, optional
+            Keyword arguments for attribute set.
+
+        """
         dist = self._dists[idx]
         for key, value in dist_kwargs.items():
             setattr(dist, key, value)
         self._update_attr()
 
     def set_dist(self, idx, dist, weight):  # TODO: type check?
+        """
+        Set a distribution.
+
+        Parameters
+        ----------
+        idx : int
+            The distribution index to overwrite.
+        dist : Base
+            The new distribution.
+        weight : float
+            The new weight.
+
+        """
         self._dists[idx] = dist
         self.weights[idx] = weight
         self._update_attr()  # weights setter not invoked

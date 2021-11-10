@@ -3,7 +3,6 @@ from copy import deepcopy
 from typing import Optional, Dict
 
 import numpy as np
-import pandas as pd
 
 from stats_learn.random import elements as rand_elements
 from stats_learn import spaces
@@ -303,6 +302,19 @@ class MixinRVy:
 
 class DataConditional(Base):
     def __new__(cls, dists, model_x, rng=None):
+        """
+        Model with a finite-domain random element for `x` and explicit conditional distributions of `y`.
+
+        Parameters
+        ----------
+        dists : iterable of rand_elements.Base
+            Explicit conditional random elements characterizing `y` for each possible value of `x`.
+        model_x : rand_element.Base
+            Random variable characterizing the marginal distribution of `x`.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         is_numeric_y = all(isinstance(dist, rand_elements.MixinRV) for dist in dists)
         if isinstance(model_x, rand_elements.MixinRV):
             if is_numeric_y:
@@ -316,6 +328,19 @@ class DataConditional(Base):
                 return super().__new__(cls)
 
     def __init__(self, dists, model_x, rng=None):
+        """
+        Model with a finite-domain random element for `x` and explicit conditional distributions.
+
+        Parameters
+        ----------
+        dists : iterable of rand_elements.Base
+            Explicit conditional random elements characterizing `y` for each possible value of `x`.
+        model_x : rand_element.Base
+            Random variable characterizing the marginal distribution of `x`.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
 
         self._dists = list(dists)
@@ -330,7 +355,56 @@ class DataConditional(Base):
         self._space['y'] = spaces.check_spaces(self.dists)
 
     @classmethod
-    def from_func_mean(cls, n, alpha_0, func, model_x, rng=None):
+    def from_finite(cls, dists, values_x, p_x=None, rng=None):
+        """
+        Constructor for `FiniteGeneric` marginal model of `x`.
+
+        Parameters
+        ----------
+        dists : iterable of rand_elements.Base
+            Explicit conditional random elements characterizing `y` for each possible value of `x`.
+        values_x : array_like
+            Explicit domain values for `x`.
+        p_x : array_like, optional
+            Probabilities for each value `x` in the domain. Defaults to uniform.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        Returns
+        -------
+        DataConditional
+
+        """
+        model_x = rand_elements.FiniteGeneric(values_x, p_x)
+        return cls(dists, model_x, rng)
+
+    @classmethod
+    def from_mean_emp(cls, alpha_0, n, func, model_x, rng=None):
+        """
+        Construct Dirichlet-Empirical conditional random variables from the conditional mean function.
+
+        Parameters
+        ----------
+        alpha_0 : float
+            Localization parameter.
+        n : int
+            Number of samples characterizing the realized empirical distributions.
+        func : callable
+            The conditional mean function.
+        model_x : rand_element.Base
+            Random variable characterizing the marginal distribution of `x`.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        Returns
+        -------
+        DataConditional
+
+        Notes
+        -----
+        If `alpha_0` is infinite, `EmpiricalScalar` distributions are generated instead.
+
+        """
         if np.isinf(alpha_0):
             dists = [rand_elements.EmpiricalScalar(func(x), n - 1) for x in model_x.values]
         else:
@@ -338,10 +412,31 @@ class DataConditional(Base):
         return cls(dists, model_x, rng)
 
     @classmethod
-    def from_poly_mean(cls, n, alpha_0, weights, model_x, rng=None):
+    def from_mean_poly_emp(cls, alpha_0, n, weights, model_x, rng=None):
+        """
+        Construct Dirichlet-Empirical conditional random variables with a polynomial conditional mean function.
+
+        Parameters
+        ----------
+        alpha_0 : float
+            Localization parameter.
+        n : int
+            Number of samples characterizing the realized empirical distributions.
+        weights : array_like
+            The weights combining the polynomial functions into the conditional mean function.
+        model_x : rand_element.Base
+            Random variable characterizing the marginal distribution of `x`.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        Returns
+        -------
+        DataConditional
+
+        """
         def poly_func(x):
             return sum(w * x ** i for i, w in enumerate(weights))
-        return cls.from_func_mean(n, alpha_0, poly_func, model_x, rng)
+        return cls.from_mean_emp(alpha_0, n, poly_func, model_x, rng)
 
     def __eq__(self, other):
         if isinstance(other, DataConditional):
@@ -360,6 +455,7 @@ class DataConditional(Base):
 
     @property
     def p_x(self):
+        """The marginal probabilities for values `x`."""
         return self.model_x.p
 
     @p_x.setter
@@ -378,11 +474,6 @@ class DataConditional(Base):
 
     def _mode_y_x_single(self, x):
         return self.model_y_x(x).mode
-
-    @classmethod
-    def from_finite(cls, dists, values_x, p_x=None, rng=None):
-        model_x = rand_elements.FiniteGeneric(values_x, p_x)
-        return cls(dists, model_x, rng)
 
 
 class DataConditionalRVx(MixinRVx, DataConditional):
@@ -412,6 +503,19 @@ class DataConditionalRVxy(DataConditionalRVy, DataConditionalRVx):
 
 class ClassConditional(MixinRVx, Base):
     def __init__(self, dists, model_y, rng=None):
+        """
+        Model with a finite-domain random element for `y` and explicit conditional distributions of `x`.
+
+        Parameters
+        ----------
+        dists : iterable of rand_elements.Base
+            Explicit conditional random elements characterizing `x` for each possible value of `y`.
+        model_y : rand_element.Base
+            Random variable characterizing the marginal distribution of `y`.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
 
         self._dists = list(dists)
@@ -429,8 +533,27 @@ class ClassConditional(MixinRVx, Base):
 
     @classmethod
     def from_finite(cls, dists, values_y, p_y=None, rng=None):
-        # model_y = rand_elements.FiniteGeneric(np.array(values_y, dtype='U').flatten(), p_y)
+        """
+        Constructor for `FiniteGeneric` marginal model of `y`.
+
+        Parameters
+        ----------
+        dists : iterable of rand_elements.Base
+            Explicit conditional random elements characterizing `x` for each possible value of `y`.
+        values_y : array_like
+            Explicit domain values for `y`.
+        p_y : array_like, optional
+            Probabilities for each value `y` in the domain. Defaults to uniform.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        Returns
+        -------
+        ClassConditional
+
+        """
         model_y = rand_elements.FiniteGeneric(values_y, p_y)  # TODO: shouldn't enforce dtype
+        # model_y = rand_elements.FiniteGeneric(np.array(values_y, dtype='U').flatten(), p_y)
         return cls(dists, model_y, rng)
 
     dists = property(lambda self: self._dists)
@@ -438,6 +561,7 @@ class ClassConditional(MixinRVx, Base):
 
     @property
     def p_y(self):
+        """The marginal probabilities for values `y`."""
         return self.model_y.p
 
     @p_y.setter
@@ -492,6 +616,22 @@ class ClassConditional(MixinRVx, Base):
 
 class BetaLinear(MixinRVx, MixinRVy, Base):  # TODO: DRY with NormalLinear
     def __init__(self, weights=(0.,), basis_y_x=None, alpha_y_x=2., model_x=rand_elements.Beta(), rng=None):
+        """
+        Model characterized by a Beta conditional distribution with mean defined in terms of basis functions.
+
+        Parameters
+        ----------
+        weights : array_like
+            The weights combining the basis functions into the conditional mean function.
+        basis_y_x : iterable of callable, optional
+            Basis functions. Defaults to polynomial functions.
+        alpha_y_x : float, optional
+            Total conditional Beta concentration. Defaults to uniform.
+        model_x : rand_element.Base
+            Random variable characterizing the marginal distribution of `x`.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+        """
         super().__init__(rng)
 
         self._space['x'] = model_x.space
@@ -516,6 +656,7 @@ class BetaLinear(MixinRVx, MixinRVy, Base):  # TODO: DRY with NormalLinear
 
     @property
     def basis_y_x(self):
+        """Basis functions."""
         return self._basis_y_x
 
     @property
@@ -554,6 +695,23 @@ class BetaLinear(MixinRVx, MixinRVy, Base):  # TODO: DRY with NormalLinear
 
 class NormalLinear(MixinRVx, MixinRVy, Base):
     def __init__(self, weights=(0.,), basis_y_x=None, cov_y_x=1., model_x=rand_elements.Normal(), rng=None):
+        """
+        Model characterized by a Normal conditional distribution with mean defined in terms of basis functions.
+
+        Parameters
+        ----------
+        weights : array_like
+            The weights combining the basis functions into the conditional mean function.
+        basis_y_x : iterable of callable, optional
+            Basis functions. Defaults to polynomial functions.
+        cov_y_x : float or callable, optional
+            Conditional covariance of Normal distributions.
+        model_x : rand_element.Base
+            Random variable characterizing the marginal distribution of `x`.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
 
         self.model_x = model_x
@@ -575,6 +733,7 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
 
     @property
     def basis_y_x(self):
+        """Basis functions."""
         return self._basis_y_x
 
     @property
@@ -629,6 +788,21 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
 
 class DataEmpirical(Base):
     def __new__(cls, values, counts, space=None, rng=None):
+        """
+        A random model drawn from an empirical distribution.
+
+        Parameters
+        ----------
+        values : array_like
+            The values forming the empirical distribution.
+        counts : array_like
+            The number of observations for each value.
+        space : dict, optional
+            The domain for `x` and `y`. Each defaults to a Euclidean space.
+        rng : np.random.Generator or int, optional
+            Random number generator seed or object.
+
+        """
         if space is not None:
             dtype = {c: space[c].dtype for c in 'xy'}
         else:
@@ -647,6 +821,21 @@ class DataEmpirical(Base):
                 return super().__new__(cls)
 
     def __init__(self, values, counts, space=None, rng=None):
+        """
+        A random model drawn from an empirical distribution.
+
+        Parameters
+        ----------
+        values : array_like
+            The values forming the empirical distribution.
+        counts : array_like
+            The number of observations for each value.
+        space : dict, optional
+            The domain for `x` and `y`. Each defaults to a Euclidean space.
+        rng : np.random.Generator or int, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
 
         values, counts = map(np.array, (values, counts))
@@ -672,6 +861,23 @@ class DataEmpirical(Base):
 
     @classmethod
     def from_data(cls, d, space=None, rng=None):
+        """
+        Create random model from a dataset.
+
+        Parameters
+        ----------
+        d : array_like
+            The data forming the empirical distribution.
+        space : dict, optional
+            The domain for `x` and `y`. Each defaults to a Euclidean space.
+        rng : np.random.Generator or int, optional
+            Random number generator seed or object.
+
+        Returns
+        -------
+        DataEmpirical
+
+        """
         return cls(*cls._count_data(d), space, rng)
 
     @staticmethod
@@ -685,9 +891,29 @@ class DataEmpirical(Base):
                                ('n', int,)])
 
     def add_data(self, d):
+        """
+        Add data to the empirical distribution.
+
+        Parameters
+        ----------
+        d : array_like
+            New data added to the empirical distribution.
+
+        """
         self.add_values(*self._count_data(d))
 
     def add_values(self, values, counts):
+        """
+        Add new values to the empirical distribution.
+
+        Parameters
+        ----------
+        values : array_like
+            New values for the empirical distribution.
+        counts : array_like
+            The number of observations for each value.
+
+        """
         values, counts = map(np.array, (values, counts))
         n_new = counts.sum(dtype=int)
         if n_new == 0:
@@ -788,7 +1014,22 @@ class DataEmpiricalRVxy(DataEmpiricalRVx, DataEmpiricalRVy):
 
 
 class Mixture(Base):
+    # TODO: special implementation for FiniteGeneric? get modes, etc?
+
     def __new__(cls, dists, weights, rng=None):
+        """
+        Mixture of random models.
+
+        Parameters
+        ----------
+        dists : iterable of Base
+            The random models to be mixed.
+        weights : array_like
+            The weights combining the random models.
+        rng : np.random.Generator or int, optional
+            Random number generator seed or object.
+
+        """
         if all(isinstance(dist, MixinRVx) for dist in dists):
             if all(isinstance(dist, MixinRVy) for dist in dists):
                 return super().__new__(MixtureRVxy)
@@ -800,7 +1041,20 @@ class Mixture(Base):
             else:
                 return super().__new__(cls)
 
-    def __init__(self, dists, weights, rng=None):  # TODO: special implementation for FiniteGeneric? get modes, etc?
+    def __init__(self, dists, weights, rng=None):
+        """
+        Mixture of random models.
+
+        Parameters
+        ----------
+        dists : iterable of Base
+            The random models to be mixed.
+        weights : array_like
+            The weights combining the random models.
+        rng : np.random.Generator or int, optional
+            Random number generator seed or object.
+
+        """
         super().__init__(rng)
         self._dists = list(dists)
 
@@ -822,6 +1076,7 @@ class Mixture(Base):
 
     @property
     def weights(self):
+        """The weights combining the random models."""
         return self._weights
 
     @weights.setter
@@ -833,11 +1088,35 @@ class Mixture(Base):
         self._update_attr()
 
     def set_dist_attr(self, idx, **dist_kwargs):  # TODO: improved implementation w/ direct self.dists access?
+        """
+        Set attributes of a distribution.
+
+        Parameters
+        ----------
+        idx : int
+            The distribution index in `dists`.
+        dist_kwargs : dict, optional
+            Keyword arguments for attribute set.
+
+        """
         for key, value in dist_kwargs.items():
             setattr(self._dists[idx], key, value)
         self._update_attr()
 
     def set_dist(self, idx, dist, weight):  # TODO: type check?
+        """
+        Set a distribution.
+
+        Parameters
+        ----------
+        idx : int
+            The distribution index to overwrite.
+        dist : Base
+            The new distribution.
+        weight : float
+            The new weight.
+
+        """
         self._dists[idx] = dist
         self.weights[idx] = weight
         self._update_attr()  # weights setter not invoked
