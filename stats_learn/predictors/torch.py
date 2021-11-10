@@ -1,10 +1,10 @@
 from copy import deepcopy
 from functools import partial
 
+import pytorch_lightning as pl
 import torch
 from torch import nn
 from torch.nn import functional
-import pytorch_lightning as pl
 from torch.utils.data import TensorDataset, DataLoader
 
 from stats_learn.loss_funcs import loss_se

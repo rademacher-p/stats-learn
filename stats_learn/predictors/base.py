@@ -1,14 +1,13 @@
 from abc import ABC, abstractmethod
-from typing import Union
 from operator import itemgetter
+from typing import Union
 
 import numpy as np
 
+from stats_learn import spaces
 from stats_learn.bayes import models as bayes_models
 from stats_learn.loss_funcs import loss_se, loss_01
 from stats_learn.random import elements as rand_elements, models as rand_models
-from stats_learn import spaces
-
 from stats_learn.results import (assess_single_compare, predict_stats_compare, plot_predict_stats_compare,
                                  risk_eval_sim_compare, risk_eval_analytic_compare, plot_risk_eval_sim_compare,
                                  assess_compare)

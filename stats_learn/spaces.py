@@ -1,11 +1,11 @@
-from abc import ABC, abstractmethod
 import math
+from abc import ABC, abstractmethod
 from numbers import Integral
 
 import numpy as np
 from matplotlib import pyplot as plt
-from scipy import optimize, integrate
 from more_itertools import all_equal
+from scipy import optimize, integrate
 
 from stats_learn.util import check_data_shape
 

@@ -1,30 +1,31 @@
-import math
-import sys
-from itertools import product
-from pathlib import Path
-import pickle
-from collections import Iterable
-from typing import Union
+import inspect
 # from warnings import warn
 import logging
+import math
+import pickle
+import sys
+from collections import Iterable
 from contextlib import contextmanager
-import inspect
+from itertools import product
+from pathlib import Path
+from typing import Union
 
-from more_itertools import all_equal
 import numpy as np
-from matplotlib import pyplot as plt
 import pandas as pd
-# from pytorch_lightning.utilities.seed import seed_everything
+from matplotlib import pyplot as plt
+from more_itertools import all_equal
 
 from stats_learn.bayes import models as bayes_models
 from stats_learn.util import check_data_shape
+
+# from pytorch_lightning.utilities.seed import seed_everything
+
 # from stats_learn.predictors.torch import LitPredictor
 
 
 PICKLE_FIGS = True
 DATE_FMT = '%Y-%m-%d %H:%M:%S'
 FILE_LOG_MODE = 'a'
-
 
 # Logging setup
 logger = logging.getLogger(__name__)
@@ -576,7 +577,7 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
                     slice_ = slice(0, n_train[i_n])
                     warm_start = False  # resets learner for new iteration
                 else:  # fit with incremental data partitions
-                    slice_ = slice(n_train[i_n-1], n_train[i_n])
+                    slice_ = slice(n_train[i_n - 1], n_train[i_n])
                     warm_start = True
 
                 predictor.fit(d_train[slice_], warm_start=warm_start)
@@ -660,7 +661,7 @@ def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n
 
 def plot_risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None):
     return assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=verbose, plot_loss=True,
-                          print_loss=True,  ax=ax)
+                          print_loss=True, ax=ax)
 
 
 # Additional utilities

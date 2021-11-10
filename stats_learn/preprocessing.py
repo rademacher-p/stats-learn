@@ -48,8 +48,8 @@ def prob_disc(shape):
     idx = np.nonzero(p)
     n = np.zeros(p.size)
     for i, size in zip(idx, shape):
-        n += np.all([i > 0, i < size-1], axis=0)
-    p[idx] = 2**n
+        n += np.all([i > 0, i < size - 1], axis=0)
+    p[idx] = 2 ** n
     return p
 
 

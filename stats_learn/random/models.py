@@ -4,8 +4,8 @@ from typing import Optional, Dict
 
 import numpy as np
 
-from stats_learn.random import elements as rand_elements
 from stats_learn import spaces
+from stats_learn.random import elements as rand_elements
 from stats_learn.util import RandomGeneratorMixin, vectorize_func
 
 
@@ -434,8 +434,10 @@ class DataConditional(Base):
         DataConditional
 
         """
+
         def poly_func(x):
             return sum(w * x ** i for i, w in enumerate(weights))
+
         return cls.from_mean_emp(alpha_0, n, poly_func, model_x, rng)
 
     def __eq__(self, other):

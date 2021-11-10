@@ -1,6 +1,6 @@
+from datetime import datetime
 from functools import wraps
 from numbers import Integral
-from datetime import datetime
 
 import numpy as np
 
@@ -151,6 +151,7 @@ def vectorize_func(func, shape):
     function
 
     """
+
     @wraps(func)
     def func_vec(x):
         x, set_shape = check_data_shape(x, shape)
