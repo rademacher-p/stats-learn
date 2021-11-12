@@ -1,3 +1,5 @@
+"""Loss functions for regression and classification."""
+
 from stats_learn.util import check_data_shape
 
 

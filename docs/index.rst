@@ -11,7 +11,7 @@ This package provides a framework to explore statistical learning with a Bayesia
    This project is under active development @ https://github.com/rademacher-p/stats-learn
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 4
    :caption: Contents:
 
    source/modules

@@ -1,3 +1,5 @@
+"""Random models of jointly distributed `x` and `y` elements for supervised learning."""
+
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import Optional, Dict
@@ -13,23 +15,23 @@ from stats_learn.util import RandomGeneratorMixin, vectorize_func
 
 
 class Base(RandomGeneratorMixin, ABC):
+    """
+    Base class for random supervised learning models.
+
+    Parameters
+    ----------
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    Notes
+    -----
+    Implements a joint distribution between an random elements `x` and `y`. For supervised learning, it is assumed
+    that the former is observed while the latter is not.
+
+    """
     _space: Dict[str, Optional[spaces.Base]]
 
     def __init__(self, rng=None):
-        """
-        Base class for random supervised learning models.
-
-        Parameters
-        ----------
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        Notes
-        -----
-        Implements a joint distribution between an random elements `x` and `y`. For supervised learning, it is assumed
-        that the former is observed while the latter is not.
-
-        """
         super().__init__(rng)
         self._space = {'x': None, 'y': None}
 
@@ -301,20 +303,20 @@ class MixinRVy:
 
 
 class DataConditional(Base):
+    """
+    Model with a finite-domain random element for `x` and explicit conditional distributions of `y`.
+
+    Parameters
+    ----------
+    dists : iterable of rand_elements.Base
+        Explicit conditional random elements characterizing `y` for each possible value of `x`.
+    model_x : rand_element.Base
+        Random variable characterizing the marginal distribution of `x`.
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    """
     def __new__(cls, dists, model_x, rng=None):
-        """
-        Model with a finite-domain random element for `x` and explicit conditional distributions of `y`.
-
-        Parameters
-        ----------
-        dists : iterable of rand_elements.Base
-            Explicit conditional random elements characterizing `y` for each possible value of `x`.
-        model_x : rand_element.Base
-            Random variable characterizing the marginal distribution of `x`.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        """
         is_numeric_y = all(isinstance(dist, rand_elements.MixinRV) for dist in dists)
         if isinstance(model_x, rand_elements.MixinRV):
             if is_numeric_y:
@@ -328,19 +330,6 @@ class DataConditional(Base):
                 return super().__new__(cls)
 
     def __init__(self, dists, model_x, rng=None):
-        """
-        Model with a finite-domain random element for `x` and explicit conditional distributions.
-
-        Parameters
-        ----------
-        dists : iterable of rand_elements.Base
-            Explicit conditional random elements characterizing `y` for each possible value of `x`.
-        model_x : rand_element.Base
-            Random variable characterizing the marginal distribution of `x`.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        """
         super().__init__(rng)
 
         self._dists = list(dists)
@@ -504,20 +493,20 @@ class DataConditionalRVxy(DataConditionalRVy, DataConditionalRVx):
 
 
 class ClassConditional(MixinRVx, Base):
+    """
+    Model with a finite-domain random element for `y` and explicit conditional distributions of `x`.
+
+    Parameters
+    ----------
+    dists : iterable of rand_elements.Base
+        Explicit conditional random elements characterizing `x` for each possible value of `y`.
+    model_y : rand_element.Base
+        Random variable characterizing the marginal distribution of `y`.
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    """
     def __init__(self, dists, model_y, rng=None):
-        """
-        Model with a finite-domain random element for `y` and explicit conditional distributions of `x`.
-
-        Parameters
-        ----------
-        dists : iterable of rand_elements.Base
-            Explicit conditional random elements characterizing `x` for each possible value of `y`.
-        model_y : rand_element.Base
-            Random variable characterizing the marginal distribution of `y`.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        """
         super().__init__(rng)
 
         self._dists = list(dists)
@@ -616,24 +605,27 @@ class ClassConditional(MixinRVx, Base):
         return np.array(list(zip(d_x, d_y)), dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
 
 
-class BetaLinear(MixinRVx, MixinRVy, Base):  # TODO: DRY with NormalLinear
-    def __init__(self, weights=(0.,), basis_y_x=None, alpha_y_x=2., model_x=rand_elements.Beta(), rng=None):
-        """
-        Model characterized by a Beta conditional distribution with mean defined in terms of basis functions.
+class BetaLinear(MixinRVx, MixinRVy, Base):
+    """
+    Model characterized by a Beta conditional distribution with mean defined in terms of basis functions.
 
-        Parameters
-        ----------
-        weights : array_like
-            The weights combining the basis functions into the conditional mean function.
-        basis_y_x : iterable of callable, optional
-            Basis functions. Defaults to polynomial functions.
-        alpha_y_x : float, optional
-            Total conditional Beta concentration. Defaults to uniform.
-        model_x : rand_element.Base
-            Random variable characterizing the marginal distribution of `x`.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-        """
+    Parameters
+    ----------
+    weights : array_like
+        The weights combining the basis functions into the conditional mean function.
+    basis_y_x : iterable of callable, optional
+        Basis functions. Defaults to polynomial functions.
+    alpha_y_x : float, optional
+        Total conditional Beta concentration. Defaults to uniform.
+    model_x : rand_element.Base
+        Random variable characterizing the marginal distribution of `x`.
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+    """
+
+    # TODO: DRY with NormalLinear
+
+    def __init__(self, weights=(0.,), basis_y_x=None, alpha_y_x=2., model_x=rand_elements.Beta(), rng=None):
         super().__init__(rng)
 
         self._space['x'] = model_x.space
@@ -696,24 +688,24 @@ class BetaLinear(MixinRVx, MixinRVy, Base):  # TODO: DRY with NormalLinear
 
 
 class NormalLinear(MixinRVx, MixinRVy, Base):
+    """
+    Model characterized by a Normal conditional distribution with mean defined in terms of basis functions.
+
+    Parameters
+    ----------
+    weights : array_like
+        The weights combining the basis functions into the conditional mean function.
+    basis_y_x : iterable of callable, optional
+        Basis functions. Defaults to polynomial functions.
+    cov_y_x : float or callable, optional
+        Conditional covariance of Normal distributions.
+    model_x : rand_element.Base
+        Random variable characterizing the marginal distribution of `x`.
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    """
     def __init__(self, weights=(0.,), basis_y_x=None, cov_y_x=1., model_x=rand_elements.Normal(), rng=None):
-        """
-        Model characterized by a Normal conditional distribution with mean defined in terms of basis functions.
-
-        Parameters
-        ----------
-        weights : array_like
-            The weights combining the basis functions into the conditional mean function.
-        basis_y_x : iterable of callable, optional
-            Basis functions. Defaults to polynomial functions.
-        cov_y_x : float or callable, optional
-            Conditional covariance of Normal distributions.
-        model_x : rand_element.Base
-            Random variable characterizing the marginal distribution of `x`.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        """
         super().__init__(rng)
 
         self.model_x = model_x
@@ -789,22 +781,22 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
 
 
 class DataEmpirical(Base):
+    """
+    A random model drawn from an empirical distribution.
+
+    Parameters
+    ----------
+    values : array_like
+        The values forming the empirical distribution.
+    counts : array_like
+        The number of observations for each value.
+    space : dict, optional
+        The domain for `x` and `y`. Each defaults to a Euclidean space.
+    rng : np.random.Generator or int, optional
+        Random number generator seed or object.
+
+    """
     def __new__(cls, values, counts, space=None, rng=None):
-        """
-        A random model drawn from an empirical distribution.
-
-        Parameters
-        ----------
-        values : array_like
-            The values forming the empirical distribution.
-        counts : array_like
-            The number of observations for each value.
-        space : dict, optional
-            The domain for `x` and `y`. Each defaults to a Euclidean space.
-        rng : np.random.Generator or int, optional
-            Random number generator seed or object.
-
-        """
         if space is not None:
             dtype = {c: space[c].dtype for c in 'xy'}
         else:
@@ -823,21 +815,6 @@ class DataEmpirical(Base):
                 return super().__new__(cls)
 
     def __init__(self, values, counts, space=None, rng=None):
-        """
-        A random model drawn from an empirical distribution.
-
-        Parameters
-        ----------
-        values : array_like
-            The values forming the empirical distribution.
-        counts : array_like
-            The number of observations for each value.
-        space : dict, optional
-            The domain for `x` and `y`. Each defaults to a Euclidean space.
-        rng : np.random.Generator or int, optional
-            Random number generator seed or object.
-
-        """
         super().__init__(rng)
 
         values, counts = map(np.array, (values, counts))
@@ -1016,22 +993,22 @@ class DataEmpiricalRVxy(DataEmpiricalRVx, DataEmpiricalRVy):
 
 
 class Mixture(Base):
+    """
+    Mixture of random models.
+
+    Parameters
+    ----------
+    dists : iterable of Base
+        The random models to be mixed.
+    weights : array_like
+        The weights combining the random models.
+    rng : np.random.Generator or int, optional
+        Random number generator seed or object.
+
+    """
     # TODO: special implementation for FiniteGeneric? get modes, etc?
 
     def __new__(cls, dists, weights, rng=None):
-        """
-        Mixture of random models.
-
-        Parameters
-        ----------
-        dists : iterable of Base
-            The random models to be mixed.
-        weights : array_like
-            The weights combining the random models.
-        rng : np.random.Generator or int, optional
-            Random number generator seed or object.
-
-        """
         if all(isinstance(dist, MixinRVx) for dist in dists):
             if all(isinstance(dist, MixinRVy) for dist in dists):
                 return super().__new__(MixtureRVxy)
@@ -1044,19 +1021,6 @@ class Mixture(Base):
                 return super().__new__(cls)
 
     def __init__(self, dists, weights, rng=None):
-        """
-        Mixture of random models.
-
-        Parameters
-        ----------
-        dists : iterable of Base
-            The random models to be mixed.
-        weights : array_like
-            The weights combining the random models.
-        rng : np.random.Generator or int, optional
-            Random number generator seed or object.
-
-        """
         super().__init__(rng)
         self._dists = list(dists)
 

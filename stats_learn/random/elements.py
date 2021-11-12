@@ -1,3 +1,5 @@
+"""Random elements and variables with random sampling, statistic generation, and visualization tools."""
+
 import math
 from abc import ABC, abstractmethod
 from numbers import Integral
@@ -12,16 +14,16 @@ from stats_learn.util import RandomGeneratorMixin, check_data_shape, check_valid
 
 
 class Base(RandomGeneratorMixin, ABC):
+    """
+    Base class for random elements.
+
+    Parameters
+    ----------
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    """
     def __init__(self, rng=None):
-        """
-        Base class for random elements.
-
-        Parameters
-        ----------
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        """
         super().__init__(rng)
 
         self._space = None  # TODO: arg?
@@ -158,16 +160,16 @@ class MixinRV:
 
 
 class BaseRV(MixinRV, Base, ABC):
+    """
+    Base class for random variables (numeric).
+
+    Parameters
+    ----------
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    """
     def __init__(self, rng=None):
-        """
-        Base class for random variables (numeric).
-
-        Parameters
-        ----------
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        """
         super().__init__(rng)
 
         # self._mean = None
@@ -175,37 +177,26 @@ class BaseRV(MixinRV, Base, ABC):
 
 
 class Deterministic(Base):
+    """
+    Deterministic random element.
+
+    Parameters
+    ----------
+    value : array_like
+        The deterministic value.
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    """
     # TODO: redundant, just use FiniteGeneric? or change to ContinuousRV for integration? General dirac mix?
 
     def __new__(cls, value, rng=None):
-        """
-        Deterministic random element.
-
-        Parameters
-        ----------
-        value : array_like
-            The deterministic value.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        """
         if np.issubdtype(np.array(value).dtype, np.number):
             return super().__new__(DeterministicRV)
         else:
             return super().__new__(cls)
 
     def __init__(self, value, rng=None):
-        """
-        Deterministic random element.
-
-        Parameters
-        ----------
-        value : array_like
-            The deterministic value.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        """
         super().__init__(rng)
         self.value = value
 
@@ -247,41 +238,28 @@ class DeterministicRV(MixinRV, Deterministic):
 
 
 class FiniteGeneric(Base):
+    """
+    Finite-domain random element with specified domain and probabilities.
+
+    Parameters
+    ----------
+    values : array_like
+        Explicit domain values.
+    p : array_like, optional
+        Probabilities for each value in the domain. Defaults to uniform.
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    """
     # TODO: DRY - use stat approx from the FiniteGeneric space's methods?
 
     def __new__(cls, values, p=None, rng=None):
-        """
-        Finite-domain random element with specified domain and probabilities.
-
-        Parameters
-        ----------
-        values : array_like
-            Explicit domain values.
-        p : array_like, optional
-            Probabilities for each value in the domain. Defaults to uniform.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        """
         if np.issubdtype(np.array(values).dtype, np.number):
             return super().__new__(FiniteGenericRV)
         else:
             return super().__new__(cls)
 
     def __init__(self, values, p=None, rng=None):
-        """
-        Finite-domain random element with specified domain and probabilities.
-
-        Parameters
-        ----------
-        values : array_like
-            Explicit domain values.
-        p : array_like, optional
-            Probabilities for each value in the domain. Defaults to uniform.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        """
         super().__init__(rng)
 
         values = np.array(values)
@@ -413,19 +391,19 @@ class FiniteGenericRV(MixinRV, FiniteGeneric):
 
 
 class Dirichlet(BaseRV):
+    """
+    Dirichlet random process, finite-domain realizations.
+
+    Parameters
+    ----------
+    mean : array_like
+    alpha_0 : float
+        Localization parameter.
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    """
     def __init__(self, mean, alpha_0, rng=None):
-        """
-        Dirichlet random process, finite-domain realizations.
-
-        Parameters
-        ----------
-        mean : array_like
-        alpha_0 : float
-            Localization parameter.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        """
         super().__init__(rng)
         self._space = spaces.Simplex(np.array(mean).shape)
 
@@ -492,19 +470,19 @@ class Dirichlet(BaseRV):
 
 
 class Empirical(BaseRV):
+    """
+    Empirical random process, finite-domain realizations.
+
+    Parameters
+    ----------
+    mean : array_like
+    n : int
+        Number of samples characterizing the realized empirical distributions.
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    """
     def __init__(self, mean, n, rng=None):
-        """
-        Empirical random process, finite-domain realizations.
-
-        Parameters
-        ----------
-        mean : array_like
-        n : int
-            Number of samples characterizing the realized empirical distributions.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        """
         super().__init__(rng)
 
         self._n = n
@@ -580,21 +558,21 @@ class Empirical(BaseRV):
 
 
 class DirichletEmpirical(BaseRV):
+    """
+    Dirichlet-Empirical random process, finite-domain realizations.
+
+    Parameters
+    ----------
+    mean : array_like
+    alpha_0 : float
+        Localization parameter.
+    n : int
+        Number of samples characterizing the realized empirical distributions.
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    """
     def __init__(self, mean, alpha_0, n, rng=None):
-        """
-        Dirichlet-Empirical random process, finite-domain realizations.
-
-        Parameters
-        ----------
-        mean : array_like
-        alpha_0 : float
-            Localization parameter.
-        n : int
-            Number of samples characterizing the realized empirical distributions.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        """
         super().__init__(rng)
         self._space = spaces.SimplexDiscrete(n, np.array(mean).shape)
 
@@ -663,25 +641,25 @@ class DirichletEmpirical(BaseRV):
 
 
 class DirichletEmpiricalScalar(BaseRV):
+    """
+    Scalar Dirichlet-Empirical random variable.
+
+    Parameters
+    ----------
+    mean : array_like
+    alpha_0 : float
+        Localization parameter.
+    n : int
+        Number of samples characterizing the realized empirical distributions.
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    Notes
+    -----
+    Equivalent to the first element of a 2-dimensional `DirichletEmpirical` random variable.
+
+    """
     def __init__(self, mean, alpha_0, n, rng=None):
-        """
-        Scalar Dirichlet-Empirical random variable.
-
-        Parameters
-        ----------
-        mean : array_like
-        alpha_0 : float
-            Localization parameter.
-        n : int
-            Number of samples characterizing the realized empirical distributions.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        Notes
-        -----
-        Equivalent to the first element of a 2-dimensional `DirichletEmpirical` random variable.
-
-        """
         super().__init__(rng)
 
         self._multi = DirichletEmpirical([mean, 1 - mean], alpha_0, n, rng)
@@ -733,24 +711,24 @@ class DirichletEmpiricalScalar(BaseRV):
 
 
 class Beta(BaseRV):
+    """
+    Beta random variable.
+
+    Parameters
+    ----------
+    a : float, optional
+        First concentration parameter.
+    b : float, optional
+        Second concentration parameter.
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    Notes
+    -----
+    Defaults to uniform.
+
+    """
     def __init__(self, a=1., b=1., rng=None):
-        """
-        Beta random variable.
-
-        Parameters
-        ----------
-        a : float, optional
-            First concentration parameter.
-        b : float, optional
-            Second concentration parameter.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        Notes
-        -----
-        Defaults to uniform.
-
-        """
         super().__init__(rng)
         self._space = spaces.Box((0, 1))
 
@@ -843,20 +821,20 @@ class Beta(BaseRV):
 
 
 class Binomial(BaseRV):
+    """
+    Binomial random variable.
+
+    Parameters
+    ----------
+    p : float
+        The probability of the implied Bernoulli RV samples.
+    n : int
+        The number of implied Bernoulli RV samples.
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    """
     def __init__(self, p, n, rng=None):
-        """
-        Binomial random variable.
-
-        Parameters
-        ----------
-        p : float
-            The probability of the implied Bernoulli RV samples.
-        n : int
-            The number of implied Bernoulli RV samples.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        """
         super().__init__(rng)
         self._space = spaces.FiniteGeneric(np.arange(n + 1))
 
@@ -921,23 +899,23 @@ class Binomial(BaseRV):
 
 
 class EmpiricalScalar(Binomial):
+    """
+    Scalar empirical random variable.
+
+    Parameters
+    ----------
+    mean : float
+    n : int
+        The number of implied Bernoulli RV samples.
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    Notes
+    -----
+    Equivalent to the first element of a 2-dimensional `Empirical` random variable.
+
+    """
     def __init__(self, mean, n, rng=None):
-        """
-        Scalar empirical random variable.
-
-        Parameters
-        ----------
-        mean : float
-        n : int
-            The number of implied Bernoulli RV samples.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        Notes
-        -----
-        Equivalent to the first element of a 2-dimensional `Empirical` random variable.
-
-        """
         super().__init__(mean, n, rng)
         if self.n == 0:
             raise ValueError
@@ -966,18 +944,18 @@ class EmpiricalScalar(Binomial):
 
 
 class Uniform(BaseRV):
+    """
+    Uniform random variable over a Box space.
+
+    Parameters
+    ----------
+    lims : array_like
+        Lower and upper limits for each dimension.
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    """
     def __init__(self, lims, rng=None):
-        """
-        Uniform random variable over a Box space.
-
-        Parameters
-        ----------
-        lims : array_like
-            Lower and upper limits for each dimension.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        """
         super().__init__(rng)
         self._space = spaces.Box(lims)
         self._update_attr()
@@ -1019,22 +997,21 @@ class Uniform(BaseRV):
 
 
 class Normal(BaseRV):
+    """
+    Normal random variable.
+
+    Parameters
+    ----------
+    mean : float or Iterable of float
+    cov : float or numpy.ndarray
+        Covariance tensor.
+    allow_singular : bool, optional
+        Whether to allow a singular covariance matrix.
+    rng : np.random.Generator or int, optional
+        Random number generator seed or object.
+
+    """
     def __init__(self, mean=0., cov=1., *, allow_singular=False, rng=None):
-        """
-        Normal random variable.
-
-        Parameters
-        ----------
-        mean : float or Iterable of float
-        cov : float or numpy.ndarray
-            Covariance tensor.
-        allow_singular : bool, optional
-            Whether to allow a singular covariance matrix.
-        rng : np.random.Generator or int, optional
-            Random number generator seed or object.
-
-        """
-
         super().__init__(rng)
         self.allow_singular = allow_singular
 
@@ -1110,25 +1087,25 @@ class Normal(BaseRV):
 
 
 class NormalLinear(Normal):
+    """
+    Normal random variable with mean defined in terms of basis tensors.
+
+    Parameters
+    ----------
+    weights : array_like
+        Weights defining the mean in terms of the basis tensors.
+    basis : array_like
+        Basis tensors, such that `mean = basis @ weights`.
+    cov : float or numpy.ndarray
+        Covariance tensor.
+    rng : np.random.Generator or int, optional
+        Random number generator seed or object.
+
+    """
     # TODO: rework, only allow weights and cov to be set?
     # FIXME: NOT BASIS (incomplete). Rename dictionary?
 
     def __init__(self, weights=(0.,), basis=np.ones(1), cov=(1.,), rng=None):
-        """
-        Normal random variable with mean defined in terms of basis tensors.
-
-        Parameters
-        ----------
-        weights : array_like
-            Weights defining the mean in terms of the basis tensors.
-        basis : array_like
-            Basis tensors, such that `mean = basis @ weights`.
-        cov : float or numpy.ndarray
-            Covariance tensor.
-        rng : np.random.Generator or int, optional
-            Random number generator seed or object.
-
-        """
         self._basis = np.array(basis)
 
         _mean_temp = np.empty(self._basis.shape[:-1])
@@ -1158,24 +1135,24 @@ class NormalLinear(Normal):
 
 
 class DataEmpirical(Base):
+    """
+    A random element drawn from an empirical distribution.
+
+    Parameters
+    ----------
+    values : array_like
+        The values forming the empirical distribution.
+    counts : array_like
+        The number of observations for each value.
+    space : spaces.Base, optional
+        The domain. Defaults to a Euclidean space.
+    rng : np.random.Generator or int, optional
+        Random number generator seed or object.
+
+    """
     # TODO: subclass for FiniteGeneric space?
 
     def __new__(cls, values, counts, space=None, rng=None):
-        """
-        A random element drawn from an empirical distribution.
-
-        Parameters
-        ----------
-        values : array_like
-            The values forming the empirical distribution.
-        counts : array_like
-            The number of observations for each value.
-        space : spaces.Base, optional
-            The domain. Defaults to a Euclidean space.
-        rng : np.random.Generator or int, optional
-            Random number generator seed or object.
-
-        """
         if space is not None:
             dtype = space.dtype
         else:
@@ -1187,21 +1164,6 @@ class DataEmpirical(Base):
             return super().__new__(cls)
 
     def __init__(self, values, counts, space=None, rng=None):
-        """
-        A random element drawn from an empirical distribution.
-
-        Parameters
-        ----------
-        values : array_like
-            The values forming the empirical distribution.
-        counts : array_like
-            The number of observations for each value.
-        space : spaces.Base, optional
-            The domain. Defaults to a Euclidean space.
-        rng : np.random.Generator or int, optional
-            Random number generator seed or object.
-
-        """
         super().__init__(rng)
 
         values, counts = map(np.array, (values, counts))
@@ -1385,41 +1347,28 @@ class DataEmpiricalRV(MixinRV, DataEmpirical):
 
 
 class Mixture(Base):
+    """
+    Mixture of random elements.
+
+    Parameters
+    ----------
+    dists : iterable of Base
+        The random elements to be mixed.
+    weights : array_like
+        The weights combining the random elements.
+    rng : np.random.Generator or int, optional
+        Random number generator seed or object.
+
+    """
     # TODO: special implementation for FiniteGeneric? get modes, etc?
 
     def __new__(cls, dists, weights, rng=None):
-        """
-        Mixture of random elements.
-
-        Parameters
-        ----------
-        dists : iterable of Base
-            The random elements to be mixed.
-        weights : array_like
-            The weights combining the random elements.
-        rng : np.random.Generator or int, optional
-            Random number generator seed or object.
-
-        """
         if all(isinstance(dist, MixinRV) for dist in dists):
             return super().__new__(MixtureRV)
         else:
             return super().__new__(cls)
 
     def __init__(self, dists, weights, rng=None):
-        """
-        Mixture of random elements.
-
-        Parameters
-        ----------
-        dists : iterable of Base
-            The random elements to be mixed.
-        weights : array_like
-            The weights combining the random elements.
-        rng : np.random.Generator or int, optional
-            Random number generator seed or object.
-
-        """
         super().__init__(rng)
         self._dists = list(dists)
 

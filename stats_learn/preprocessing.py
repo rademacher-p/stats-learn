@@ -1,3 +1,5 @@
+"""Functions for preprocessing observations before training/prediction."""
+
 import math
 
 import numpy as np

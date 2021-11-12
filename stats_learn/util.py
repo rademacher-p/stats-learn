@@ -1,3 +1,5 @@
+"""Common utilities."""
+
 from datetime import datetime
 from functools import wraps
 from numbers import Integral
@@ -11,16 +13,16 @@ def get_now():
 
 
 class RandomGeneratorMixin:
+    """
+    Provides a RNG property and methods for seeding.
+
+    Parameters
+    ----------
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    """
     def __init__(self, rng=None):
-        """
-        Provides a RNG property and methods for seeding.
-
-        Parameters
-        ----------
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        """
         self.rng = rng
 
     @property

@@ -1,3 +1,5 @@
+"""Assessment tools for learning and prediction performance."""
+
 import inspect
 # from warnings import warn
 import logging

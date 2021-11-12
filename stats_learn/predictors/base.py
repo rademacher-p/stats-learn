@@ -1,3 +1,5 @@
+"""Fixed and learning predictors for supervised learning applications."""
+
 from abc import ABC, abstractmethod
 from operator import itemgetter
 from typing import Union
@@ -13,22 +15,22 @@ from stats_learn.results import (assess_single_compare, predict_stats_compare, p
                                  assess_compare)
 
 
-# Base class and Mixins
+# Base and Mixin classes
 class Base(ABC):
+    """
+    Base class for supervised learning predictors.
+
+    Parameters
+    ----------
+    loss_func : callable
+    space : dict, optional
+        The domain for `x` and `y`. Defaults to the model's space.
+    proc_funcs : iterable of callable of dict of iterable of callable
+        Sequentially-invoked preprocessing functions for `x` and `y`.
+    name : str, optional
+
+    """
     def __init__(self, loss_func, space=None, proc_funcs=(), name=None):
-        """
-        Base class for supervised learning predictors.
-
-        Parameters
-        ----------
-        loss_func : callable
-        space : dict, optional
-            The domain for `x` and `y`. Defaults to the model's space.
-        proc_funcs : iterable of callable of dict of iterable of callable
-            Sequentially-invoked preprocessing functions for `x` and `y`.
-        name : str, optional
-
-        """
         self.loss_func = loss_func
 
         self._space = space
@@ -353,24 +355,24 @@ class RegressorMixin:
         return self.model.mean_y_x(x)
 
 
-# Fixed model predictors
+# Static predictors using fixed data models
 class Model(Base):
+    """
+    Predictor based on fixed data model.
+
+    Parameters
+    ----------
+    model : rand_models.Base
+        Fixed model used to generate predictions.
+    loss_func : callable
+    space : dict, optional
+        The domain for `x` and `y`. Defaults to the model's space.
+    proc_funcs : iterable of callable of dict of iterable of callable
+        Sequentially-invoked preprocessing functions for `x` and `y`.
+    name : str, optional
+
+    """
     def __init__(self, model, loss_func, space=None, proc_funcs=(), name=None):
-        """
-        Predictor based on fixed data model.
-
-        Parameters
-        ----------
-        model : rand_models.Base
-            Fixed model used to generate predictions.
-        loss_func : callable
-        space : dict, optional
-            The domain for `x` and `y`. Defaults to the model's space.
-        proc_funcs : iterable of callable of dict of iterable of callable
-            Sequentially-invoked preprocessing functions for `x` and `y`.
-        name : str, optional
-
-        """
         super().__init__(loss_func, space, proc_funcs, name)
         self.model = model
 
@@ -392,40 +394,40 @@ class Model(Base):
 
 
 class ModelClassifier(ClassifierMixin, Model):
+    """
+    Classifier based on fixed data model.
+
+    Parameters
+    ----------
+    model : rand_models.Base
+        Fixed model used to generate predictions.
+    space : dict, optional
+        The domain for `x` and `y`. Defaults to the model's space.
+    proc_funcs : iterable of callable of dict of iterable of callable
+        Sequentially-invoked preprocessing functions for `x` and `y`.
+    name : str, optional
+
+    """
     def __init__(self, model, space=None, proc_funcs=(), name=None):
-        """
-        Classifier based on fixed data model.
-
-        Parameters
-        ----------
-        model : rand_models.Base
-            Fixed model used to generate predictions.
-        space : dict, optional
-            The domain for `x` and `y`. Defaults to the model's space.
-        proc_funcs : iterable of callable of dict of iterable of callable
-            Sequentially-invoked preprocessing functions for `x` and `y`.
-        name : str, optional
-
-        """
         super().__init__(model, loss_01, space, proc_funcs, name)
 
 
 class ModelRegressor(RegressorMixin, Model):
+    """
+    Regressor based on fixed data model.
+
+    Parameters
+    ----------
+    model : rand_models.Base
+        Fixed model used to generate predictions.
+    space : dict, optional
+        The domain for `x` and `y`. Defaults to the model's space.
+    proc_funcs : iterable of callable of dict of iterable of callable
+        Sequentially-invoked preprocessing functions for `x` and `y`.
+    name : str, optional
+
+    """
     def __init__(self, model, space=None, proc_funcs=(), name=None):
-        """
-        Regressor based on fixed data model.
-
-        Parameters
-        ----------
-        model : rand_models.Base
-            Fixed model used to generate predictions.
-        space : dict, optional
-            The domain for `x` and `y`. Defaults to the model's space.
-        proc_funcs : iterable of callable of dict of iterable of callable
-            Sequentially-invoked preprocessing functions for `x` and `y`.
-        name : str, optional
-
-        """
         super().__init__(model, loss_se, space, proc_funcs, name)
 
     def evaluate_analytic(self, model=None, n_train=0, n_test=1):
@@ -470,24 +472,24 @@ class ModelRegressor(RegressorMixin, Model):
             raise NotImplementedError
 
 
-# Bayes model predictors
+# Learning predictors using Bayesian data models
 class Bayes(Base):
+    """
+    Predictor based on Bayesian data model.
+
+    Parameters
+    ----------
+    bayes_model : bayes_models.Base
+        Bayes model used for fitting and to generate predictions.
+    loss_func : callable
+    space : dict, optional
+        The domain for `x` and `y`. Defaults to the model's space.
+    proc_funcs : iterable of callable of dict of iterable of callable
+        Sequentially-invoked preprocessing functions for `x` and `y`.
+    name : str, optional
+
+    """
     def __init__(self, bayes_model, loss_func, space=None, proc_funcs=(), name=None):
-        """
-        Predictor based on Bayesian data model.
-
-        Parameters
-        ----------
-        bayes_model : bayes_models.Base
-            Bayes model used for fitting and to generate predictions.
-        loss_func : callable
-        space : dict, optional
-            The domain for `x` and `y`. Defaults to the model's space.
-        proc_funcs : iterable of callable of dict of iterable of callable
-            Sequentially-invoked preprocessing functions for `x` and `y`.
-        name : str, optional
-
-        """
         super().__init__(loss_func, space, proc_funcs, name=name)
 
         self.bayes_model = bayes_model
@@ -517,40 +519,40 @@ class Bayes(Base):
 
 
 class BayesClassifier(ClassifierMixin, Bayes):
+    """
+    Classifier based on Bayesian data model.
+
+    Parameters
+    ----------
+    bayes_model : bayes_models.Base
+        Bayes model used for fitting and to generate predictions.
+    space : dict, optional
+        The domain for `x` and `y`. Defaults to the model's space.
+    proc_funcs : iterable of callable of dict of iterable of callable
+        Sequentially-invoked preprocessing functions for `x` and `y`.
+    name : str, optional
+
+    """
     def __init__(self, bayes_model, space=None, proc_funcs=(), name=None):
-        """
-        Classifier based on Bayesian data model.
-
-        Parameters
-        ----------
-        bayes_model : bayes_models.Base
-            Bayes model used for fitting and to generate predictions.
-        space : dict, optional
-            The domain for `x` and `y`. Defaults to the model's space.
-        proc_funcs : iterable of callable of dict of iterable of callable
-            Sequentially-invoked preprocessing functions for `x` and `y`.
-        name : str, optional
-
-        """
         super().__init__(bayes_model, loss_01, space, proc_funcs, name)
 
 
 class BayesRegressor(RegressorMixin, Bayes):
+    """
+    Regressor based on Bayesian data model.
+
+    Parameters
+    ----------
+    bayes_model : bayes_models.Base
+        Bayes model used for fitting and to generate predictions.
+    space : dict, optional
+        The domain for `x` and `y`. Defaults to the model's space.
+    proc_funcs : iterable of callable of dict of iterable of callable
+        Sequentially-invoked preprocessing functions for `x` and `y`.
+    name : str, optional
+
+    """
     def __init__(self, bayes_model, space=None, proc_funcs=(), name=None):
-        """
-        Regressor based on Bayesian data model.
-
-        Parameters
-        ----------
-        bayes_model : bayes_models.Base
-            Bayes model used for fitting and to generate predictions.
-        space : dict, optional
-            The domain for `x` and `y`. Defaults to the model's space.
-        proc_funcs : iterable of callable of dict of iterable of callable
-            Sequentially-invoked preprocessing functions for `x` and `y`.
-        name : str, optional
-
-        """
         super().__init__(bayes_model, loss_se, space, proc_funcs, name)
 
     def evaluate_analytic(self, model=None, n_train=0, n_test=1):

@@ -40,18 +40,18 @@ def check_spaces(iter_):
 
 
 class Base(ABC):
+    """
+    Base class for spaces.
+
+    Parameters
+    ----------
+    shape : tuple
+        Shape of space elements.
+    dtype : type
+        Data type of space elements.
+
+    """
     def __init__(self, shape, dtype):
-        """
-        Base class for spaces.
-
-        Parameters
-        ----------
-        shape : tuple
-            Shape of space elements.
-        dtype : type
-            Data type of space elements.
-
-        """
         self._shape = tuple(shape)
         self._size = math.prod(self._shape)
         self._ndim = len(self._shape)
@@ -283,18 +283,19 @@ class Finite(Discrete, ABC):
 
 
 class FiniteGeneric(Finite):
+    """
+    Finite-dimensional space with specified values.
+
+    Parameters
+    ----------
+    values : array_like
+        Explicit elements of space.
+    shape : tuple, optional
+        Shape of space elements.
+
+    """
     def __init__(self, values, shape=()):  # TODO: flatten and ignore set shape?
-        """
-        Finite-dimensional space with specified values.
 
-        Parameters
-        ----------
-        values : array_like
-            Explicit elements of space.
-        shape : tuple, optional
-            Shape of space elements.
-
-        """
         self.values = np.array(values)
         super().__init__(shape, self.values.dtype)
 
@@ -435,16 +436,17 @@ class Continuous(Base, ABC):
 
 
 class Box(Continuous):  # TODO: make Box inherit from Euclidean?
+    """
+    Orthotope space.
+
+    Parameters
+    ----------
+    lims : array_like
+        Lower and upper limits for each dimension.
+
+    """
     def __init__(self, lims):
-        """
-        Orthotope space.
 
-        Parameters
-        ----------
-        lims : array_like
-            Lower and upper limits for each dimension.
-
-        """
         self.lims = lims
         super().__init__(shape=self.lims.shape[:-1])
 
@@ -528,16 +530,16 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
 
 
 class Euclidean(Box):
+    """
+    A Euclidean space.
+
+    Parameters
+    ----------
+    shape : tuple
+        Shape of space elements.
+
+    """
     def __init__(self, shape):
-        """
-        A Euclidean space.
-
-        Parameters
-        ----------
-        shape : tuple
-            Shape of space elements.
-
-        """
         if isinstance(shape, (Integral, np.integer)):
             shape = (shape,)
 
@@ -578,18 +580,18 @@ class Euclidean(Box):
 
 
 class Simplex(Continuous):
+    """
+    A simplex space.
+
+    Parameters
+    ----------
+    shape : tuple
+        Shape of space elements.
+
+    """
     # TODO: add integration and mode finding
 
     def __init__(self, shape):
-        """
-        A simplex space.
-
-        Parameters
-        ----------
-        shape : tuple
-            Shape of space elements.
-
-        """
         super().__init__(shape)
         self._n_plot = 40
 
@@ -726,18 +728,18 @@ class Simplex(Continuous):
 
 
 class SimplexDiscrete(Simplex):
+    """
+    Finite grid over Simplex space.
+
+    Parameters
+    ----------
+    n : int
+        Number of points defining the grid.
+    shape : tuple
+        Shape of space elements.
+
+    """
     def __init__(self, n, shape):
-        """
-        Finite grid over Simplex space.
-
-        Parameters
-        ----------
-        n : int
-            Number of points defining the grid.
-        shape : tuple
-            Shape of space elements.
-
-        """
         self.n = n
         super().__init__(shape)
 

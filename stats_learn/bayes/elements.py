@@ -1,3 +1,5 @@
+"""Bayesian random elements with prior sampling and posterior fitting."""
+
 from abc import ABC, abstractmethod
 
 import numpy as np
@@ -12,20 +14,20 @@ from stats_learn.util import RandomGeneratorMixin
 
 
 class Base(RandomGeneratorMixin, ABC):
+    """
+    Base class for Bayesian random elements.
+
+    Parameters
+    ----------
+    prior : rand_elements.Base, optional
+        Random element characterizing the prior distribution of the element parameters.
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    """
     can_warm_start = False
 
     def __init__(self, prior=None, rng=None):
-        """
-        Base class for Bayesian random elements.
-
-        Parameters
-        ----------
-        prior : rand_elements.Base, optional
-            Random element characterizing the prior distribution of the element parameters.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        """
         super().__init__(rng)
 
         self._space = None
@@ -81,32 +83,31 @@ class Base(RandomGeneratorMixin, ABC):
 
 
 class NormalLinear(Base):
+    """
+    Normal random variable with mean defined in terms of basis tensors and weights characterized by a Normal
+    distribution.
+
+    Parameters
+    ----------
+    prior_mean : array_like, optional
+        Mean of Normal prior random variable.
+    prior_cov : array_like, optional
+        Covariance of Normal prior random variable.
+    basis : array_like, optional
+        Basis tensors, such that `mean = basis @ weights`. Defaults to Euclidean basis.
+    cov : float or numpy.ndarray, optional
+        Covariance tensor.
+    allow_singular : bool, optional
+        Whether to allow a singular prior covariance matrix.
+    rng : np.random.Generator or int, optional
+        Random number generator seed or object.
+
+    """
     prior: rand_elements.Normal
     can_warm_start = True
 
     def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis=None, cov=1., *, allow_singular=False,
                  rng=None):
-        """
-        Normal random variable with mean defined in terms of basis tensors and weights characterized by a Normal
-        distribution.
-
-        Parameters
-        ----------
-        prior_mean : array_like, optional
-            Mean of Normal prior random variable.
-        prior_cov : array_like, optional
-            Covariance of Normal prior random variable.
-        basis : array_like, optional
-            Basis tensors, such that `mean = basis @ weights`. Defaults to Euclidean basis.
-        cov : float or numpy.ndarray, optional
-            Covariance tensor.
-        allow_singular : bool, optional
-            Whether to allow a singular prior covariance matrix.
-        rng : np.random.Generator or int, optional
-            Random number generator seed or object.
-
-        """
-
         # Prior
         prior = rand_elements.Normal(prior_mean, prior_cov)
         super().__init__(prior, rng)
@@ -232,22 +233,22 @@ class NormalLinear(Base):
 
 
 class Dirichlet(Base):
+    """
+    Generic random element whose distribution is characterized by a Dirichlet process.
+
+    Parameters
+    ----------
+    prior_mean : rand_elements.Base
+        Random element characterizing the mean of the Dirichlet process.
+    alpha_0 : float
+        Dirichlet localization (i.e. concentration) parameter.
+    rng : np.random.Generator or int, optional
+        Random number generator seed or object.
+
+    """
     can_warm_start = True
 
     def __init__(self, prior_mean, alpha_0, rng=None):
-        """
-        Generic random element whose distribution is characterized by a Dirichlet process.
-
-        Parameters
-        ----------
-        prior_mean : rand_elements.Base
-            Random element characterizing the mean of the Dirichlet process.
-        alpha_0 : float
-            Dirichlet localization (i.e. concentration) parameter.
-        rng : np.random.Generator or int, optional
-            Random number generator seed or object.
-
-        """
         super().__init__(prior=None, rng=rng)
         self._space = prior_mean.space
 

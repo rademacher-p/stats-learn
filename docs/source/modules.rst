@@ -2,6 +2,6 @@ stats_learn
 ===========
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 5
 
    stats_learn

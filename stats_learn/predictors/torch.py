@@ -1,3 +1,5 @@
+"""Learning predictors using PyTorch networks."""
+
 from copy import deepcopy
 from functools import partial
 
@@ -43,26 +45,26 @@ def _build_torch_net(layer_sizes, activation=nn.ReLU(), start_layer=nn.Flatten()
 
 
 class LitMLP(pl.LightningModule):
+    """
+    PyTorch-Lightning sequential MLP.
+
+    Parameters
+    ----------
+    layer_sizes : iterable of int
+        Hidden layer sizes.
+    activation : nn.Module, optional
+    start_layer : nn.Module, optional
+    end_layer : nn.Module, optional
+    loss_func : callable, optional
+        The loss function for network training.
+    optim_cls : class, optional
+        The optimizer class.
+    optim_params : dict, optional
+        Keyword arguments for optimizer instantiation.
+
+    """
     def __init__(self, layer_sizes, activation=nn.ReLU(), start_layer=nn.Flatten(), end_layer=None,
                  loss_func=functional.mse_loss, optim_cls=torch.optim.Adam, optim_params=None):
-        """
-        PyTorch-Lightning sequential MLP.
-
-        Parameters
-        ----------
-        layer_sizes : iterable of int
-            Hidden layer sizes.
-        activation : nn.Module, optional
-        start_layer : nn.Module, optional
-        end_layer : nn.Module, optional
-        loss_func : callable, optional
-            The loss function for network training.
-        optim_cls : class, optional
-            The optimizer class.
-        optim_params : dict, optional
-            Keyword arguments for optimizer instantiation.
-
-        """
         super().__init__()
 
         self.model = _build_torch_net(layer_sizes, activation, start_layer, end_layer)
@@ -98,25 +100,25 @@ def reset_weights(model):
 
 
 class LitPredictor(Base):
+    """
+    Regressor using PyTorch module.
+
+    Parameters
+    ----------
+    model : pl.LightningModule
+        The PyTorch-Lightning module used for prediction.
+    space : dict, optional
+        The domain for `x` and `y`. Defaults to the model's space.
+    trainer_params : dict, optional
+        Keyword arguments for `pl.Trainer` instantiation.
+    reset_func : callable, optional
+        Function that calls `model` and resets to unfit state.
+    proc_funcs : iterable of callable of dict of iterable of callable
+        Sequentially-invoked preprocessing functions for `x` and `y`.
+    name : str, optional
+
+    """
     def __init__(self, model, space, trainer_params=None, reset_func=None, proc_funcs=(), name=None):
-        """
-        Regressor using PyTorch module.
-
-        Parameters
-        ----------
-        model : pl.LightningModule
-            The PyTorch-Lightning module used for prediction.
-        space : dict, optional
-            The domain for `x` and `y`. Defaults to the model's space.
-        trainer_params : dict, optional
-            Keyword arguments for `pl.Trainer` instantiation.
-        reset_func : callable, optional
-            Function that calls `model` and resets to unfit state.
-        proc_funcs : iterable of callable of dict of iterable of callable
-            Sequentially-invoked preprocessing functions for `x` and `y`.
-        name : str, optional
-
-        """
         loss_func = loss_se  # TODO: Generalize!
         super().__init__(loss_func, space, proc_funcs, name)
 
