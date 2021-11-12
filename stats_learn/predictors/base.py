@@ -265,7 +265,7 @@ class Base(ABC):
 
         Parameters
         ----------
-        model : stats_learn.random.models.Base
+        model : random.models.Base or bayes.models.Base
             Data-generating model.
         params : iterable of dict, optional
             Predictor parameters to evaluate. Outer product of each parameter array is assessed.

@@ -437,7 +437,7 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
     Parameters
     ----------
     predictors : iterable of stats_learn.predictors.Base
-    model : stats_learn.random.models.Base
+    model : random.models.Base or bayes.models.Base
         Data-generating model.
     params : iterable of dict, optional
         Predictor parameters to evaluate. Each element corresponds to an element of `predictors` and contains an

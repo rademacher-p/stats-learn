@@ -18,3 +18,8 @@ where the path points to the directory of this README. Note that the
 Example scripts for reproduction of results are located in the `examples` directory.
 
 To replicate the figures using LaTeX formatting... need latex, packages...
+
+```
+python examples\discrete\regression\argparse_consistency.py
+-l=temp/log.md -i --style=images/style.mplstyle --seed=12345
+```
