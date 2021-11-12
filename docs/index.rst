@@ -8,7 +8,7 @@ Welcome to Statistical Learning's documentation!
 This package provides a framework to explore statistical learning with a Bayesian focus.
 
 .. note::
-   This project is under active development @ https://github.com/rademacher-p/stats-learn
+   This project is under active development at https://github.com/rademacher-p/stats-learn
 
 .. toctree::
    :maxdepth: 4
