@@ -236,7 +236,7 @@ class Base(ABC):
             Testing data.
         params : dict, optional
             Predictor parameters to evaluate. Outer product of each parameter array is assessed.
-        x : iterable, optional
+        x : array_like, optional
             Values of observed element to use for assessment of prediction statistics.
         verbose : bool, optional
             Enables iteration print-out.
@@ -273,7 +273,7 @@ class Base(ABC):
             Test data volume.
         n_mc : int, optional
             Number of Monte Carlo simulation iterations.
-        x : iterable, optional
+        x : array_like, optional
             Values of observed element to use for assessment of prediction statistics.
         stats : iterable of str, optional
             Names of the statistics to generate, e.g. 'mean', 'std', 'cov', 'mode', etc.

@@ -1,3 +1,5 @@
+"""Spaces for extrema-finding, integration, plotting, etc."""
+
 import math
 from abc import ABC, abstractmethod
 from numbers import Integral

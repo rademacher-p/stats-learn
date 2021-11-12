@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'stats-learn'
+project = 'Statistical Learning'
 copyright = '2021, Paul Rademacher'
 author = 'Paul Rademacher'
 

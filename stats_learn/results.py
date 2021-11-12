@@ -329,7 +329,7 @@ def assess_single_compare(predictors, d_train=None, d_test=None, params=None, x=
         Predictor parameters to evaluate. Each element corresponds to an element of `predictors` and contains an
         optional dictionary mapping parameter names to various values. Outer product of each parameter array is
         assessed.
-    x : iterable, optional
+    x : array_like, optional
         Values of observed element to use for assessment of prediction statistics.
     verbose : bool, optional
         Enables iteration print-out.
@@ -447,7 +447,7 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
         Test data volume.
     n_mc : int, optional
         Number of Monte Carlo simulation iterations.
-    x : iterable, optional
+    x : array_like, optional
         Values of observed element to use for assessment of prediction statistics.
     stats : iterable of str, optional
         Names of the statistics to generate, e.g. 'mean', 'std', 'cov', 'mode', etc.
