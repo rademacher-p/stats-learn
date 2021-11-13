@@ -31,7 +31,7 @@ def main(log_path, img_dir, seed):
     n_train = np.arange(0, 4050, 50)
     dir_params = {'alpha_0': [40, 400, 4000]}
 
-    img_path = None if img_dir is None else img_dir + 'risk_bayes_N_leg_a0.png'
+    img_path = None if img_dir is None else img_dir / 'risk_bayes_N_leg_a0.png'
     dir_predictor.assess(model, dir_params, n_train, n_test, n_mc, verbose=True, plot_loss=True, print_loss=False,
                          log_path=log_path, img_path=img_path, rng=seed)
 
@@ -39,7 +39,7 @@ def main(log_path, img_dir, seed):
     n_train = [0, 100, 200, 400, 800]
     dir_params = {'alpha_0': np.sort(np.concatenate((np.logspace(-0., 5., 60), [model.alpha_0])))}
 
-    img_path = None if img_dir is None else img_dir + 'risk_bayes_a0_leg_N.png'
+    img_path = None if img_dir is None else img_dir / 'risk_bayes_a0_leg_N.png'
     dir_predictor.assess(model, dir_params, n_train, n_test, n_mc, verbose=True, plot_loss=True, print_loss=False,
                          log_path=log_path, img_path=img_path, rng=seed)
 
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     if log_path_ is not None and args.save_img:
         log_path_ = Path(log_path_)
         from stats_learn.util import get_now
-        img_dir_ = str(log_path_.parent / f"images/{get_now()}/")
+        img_dir_ = log_path_.parent / f"images/{get_now()}"
     else:
         img_dir_ = None
 

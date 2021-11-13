@@ -125,27 +125,27 @@ def main(log_path=None, img_dir=None, seed=None):
     d = model.sample(n_train + n_test, rng=seed)
     d_train, d_test = np.split(d, [n_train])
 
-    img_path = None if img_dir is None else img_dir + 'fit.png'
+    img_path = None if img_dir is None else img_dir / 'fit.png'
     results.assess_single_compare(predictors, d_train, d_test, params, log_path=log_path, img_path=img_path)
 
     # Prediction mean/variance, comparative
     n_train = 128
 
-    img_path = None if img_dir is None else img_dir + 'predict_full.png'
+    img_path = None if img_dir is None else img_dir / 'predict_full.png'
     results.assess_compare(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
                            plot_stats=True, print_loss=True, log_path=log_path, img_path=img_path, rng=seed)
 
     # Squared-Error vs. training data volume N
     n_train = np.insert(2**np.arange(12), 0, 0)
 
-    img_path = None if img_dir is None else img_dir + 'risk_N.png'
+    img_path = None if img_dir is None else img_dir / 'risk_N.png'
     results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True,
                            print_loss=True, log_path=log_path, img_path=img_path, rng=seed)
 
     # Squared-Error vs. prior localization alpha_0
     n_train = [0, 100, 200, 400]
 
-    img_path = None if img_dir is None else img_dir + 'risk_a0_leg_N.png'
+    img_path = None if img_dir is None else img_dir / 'risk_a0_leg_N.png'
     dir_predictor.assess(model, {'alpha_0': np.logspace(0., 5., 60)}, n_train, n_test, n_mc, verbose=True,
                          plot_loss=True, print_loss=True, log_path=log_path, img_path=img_path, rng=seed)
 
@@ -166,7 +166,7 @@ if __name__ == '__main__':
     if log_path_ is not None and args.save_img:
         log_path_ = Path(log_path_)
         from stats_learn.util import get_now
-        img_dir_ = str(log_path_.parent / f"images/{get_now()}/")
+        img_dir_ = log_path_.parent / f"images/{get_now()}"
     else:
         img_dir_ = None
 
