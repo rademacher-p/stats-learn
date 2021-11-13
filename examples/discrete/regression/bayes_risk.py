@@ -49,7 +49,7 @@ def main(log_path, img_dir, seed):
 if __name__ == '__main__':
     import argparse
 
-    parser = argparse.ArgumentParser(description='Consistent regressor example on a discrete domain')
+    parser = argparse.ArgumentParser(description='Example: Bayesian risk for Dirichlet regressor on a discrete domain')
     parser.add_argument('-l', '--log_path', type=str, default=None, help='Path to log file')
     parser.add_argument('-i', '--save_img', action="store_true", help='Save images to log')
     parser.add_argument('--style', type=str, default=None, help='Matplotlib style')
