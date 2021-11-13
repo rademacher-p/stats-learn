@@ -8,7 +8,7 @@ from stats_learn.random import elements as rand_elements, models as rand_models
 
 
 def main(log_path, img_dir, seed):
-    # %% Model and optimal predictor
+    # # Model and optimal predictor
     n_x = n_y = 128
     var_y_x_const = 1 / 5
     w_model = [.5]
@@ -19,11 +19,11 @@ def main(log_path, img_dir, seed):
     prior_mean = rand_models.DataConditional.from_mean_poly_emp(alpha_y_x, n_x, w_model, model_x)
     model = bayes_models.Dirichlet(prior_mean, alpha_0=4e2)
 
-    # %% Dirichlet Learner
+    # # Dirichlet Learner
     dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
     dir_predictor = BayesRegressor(dir_model, name=r'$\mathrm{Dir}$')
 
-    # %% Results
+    # # Results
     n_test = 100
     n_mc = 1000
 

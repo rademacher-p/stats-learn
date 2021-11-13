@@ -15,7 +15,7 @@ from stats_learn.random import elements as rand_elements, models as rand_models
 
 
 def main(log_path=None, img_dir=None, seed=None):
-    # %% Model and optimal predictor
+    # # Model and optimal predictor
     n_x = n_y = 32
 
     freq = 2
@@ -39,7 +39,7 @@ def main(log_path=None, img_dir=None, seed=None):
 
     opt_predictor = ModelRegressor(model, name=r'$f^*(\theta)$')
 
-    # %% Learners
+    # # Learners
 
     # Dirichlet
     # def prior_func(x):
@@ -115,7 +115,7 @@ def main(log_path=None, img_dir=None, seed=None):
     ]
     predictors, params = zip(*temp)
 
-    # %% Results
+    # # Results
     n_test = 1000
     n_mc = 5
 

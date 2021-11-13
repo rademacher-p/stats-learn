@@ -33,7 +33,7 @@ base_path = __file__[__file__.rfind('/') + 1:].removesuffix('.py') + '_temp/'
 log_path = base_path + 'log.md'
 img_dir = base_path + f'images/{get_now()}/'
 
-# %% Model and optimal predictor
+# # Model and optimal predictor
 freq = 2
 
 
@@ -69,7 +69,7 @@ model = rand_models.BetaLinear(weights=[1], basis_y_x=[clairvoyant_func], alpha_
 opt_predictor = ModelRegressor(model, name=r'$f^*(\theta)$')
 
 
-# %% Learners
+# # Learners
 
 # Dirichlet
 def prior_func(x):
@@ -189,7 +189,7 @@ temp = [
 ]
 predictors, params = zip(*temp)
 
-# %% Results
+# # Results
 n_test = 1000
 n_mc = 50
 

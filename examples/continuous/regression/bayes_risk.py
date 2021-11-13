@@ -19,7 +19,7 @@ base_path = __file__[__file__.rfind('/') + 1:].removesuffix('.py') + '_temp/'
 log_path = base_path + 'log.md'
 img_dir = base_path + f'images/{get_now()}/'
 
-# %% Model and optimal predictor
+# # Model and optimal predictor
 var_y_x_const = 1 / 5
 w_model = [.5]
 
@@ -29,11 +29,11 @@ prior_mean = rand_models.BetaLinear(weights=w_model, alpha_y_x=alpha_y_x, model_
 
 model = bayes_models.Dirichlet(prior_mean, alpha_0=4e2)
 
-# %% Dirichlet Learner
+# # Dirichlet Learner
 dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
 dir_predictor = BayesRegressor(dir_model, name=r'$\mathrm{Dir}$')
 
-# %% Results
+# # Results
 n_test = 100
 n_mc = 1000
 

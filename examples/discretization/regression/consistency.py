@@ -25,7 +25,7 @@ log_path = base_path + 'log.md'
 img_dir = base_path + f'images/{get_now()}/'
 
 
-# %% Model and optimal predictor
+# # Model and optimal predictor
 def clairvoyant_func(x):
     return 1 / (2 + np.sin(2 * np.pi * x))
 
@@ -38,7 +38,7 @@ model = rand_models.BetaLinear(weights=[1], basis_y_x=[clairvoyant_func], alpha_
 
 opt_predictor = ModelRegressor(model, name=r'$f^*(\theta)$')
 
-# %% Learners
+# # Learners
 w_prior = [.5, 0]
 
 # Dirichlet
@@ -113,7 +113,7 @@ temp = [
 ]
 predictors, params = zip(*temp)
 
-# %% Results
+# # Results
 n_test = 1000
 n_mc = 15
 
