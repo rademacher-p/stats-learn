@@ -1,6 +1,7 @@
+from pathlib import Path
+
 import numpy as np
 from matplotlib import pyplot as plt
-from pathlib import Path
 
 from stats_learn import results
 from stats_learn.bayes import models as bayes_models
@@ -100,11 +101,11 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--save_img', action="store_true", help='Save images to log')
     parser.add_argument('--style', type=str, default=None, help='Matplotlib style')
     parser.add_argument('--seed', type=int, default=None, help='RNG seed')
+
     args = parser.parse_args()
 
-    log_path_ = args.log_path
+    log_path_ = Path(args.log_path)
     if log_path_ is not None and args.save_img:
-        log_path_ = Path(log_path_)
         from stats_learn.util import get_now
         img_dir_ = log_path_.parent / f"images/{get_now()}"
     else:

@@ -1,8 +1,9 @@
+from pathlib import Path
+
 import numpy as np
 import pytorch_lightning.loggers as pl_loggers
 import torch
 from matplotlib import pyplot as plt
-from pathlib import Path
 from pytorch_lightning.callbacks import EarlyStopping
 from pytorch_lightning.utilities.seed import seed_everything
 
@@ -83,7 +84,7 @@ def main(log_path=None, img_dir=None, seed=None):
         if log_path is None:
             logger = False
         else:
-            logger_path = str(log_path_.parent / 'logs/')
+            logger_path = str(log_path.parent / 'logs/')
             logger_name = f"MLP {'-'.join(map(str, layer_sizes))}, lambda {weight_decay}"
             logger = pl_loggers.TensorBoardLogger(logger_path, name=logger_name)
         trainer_params = {
@@ -160,11 +161,11 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--save_img', action="store_true", help='Save images to log')
     parser.add_argument('--style', type=str, default=None, help='Matplotlib style')
     parser.add_argument('--seed', type=int, default=None, help='RNG seed')
+
     args = parser.parse_args()
 
-    log_path_ = args.log_path
+    log_path_ = Path(args.log_path)
     if log_path_ is not None and args.save_img:
-        log_path_ = Path(log_path_)
         from stats_learn.util import get_now
         img_dir_ = log_path_.parent / f"images/{get_now()}"
     else:
