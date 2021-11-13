@@ -24,6 +24,11 @@ from stats_learn.util import check_data_shape
 
 # from stats_learn.predictors.torch import LitPredictor
 
+if plt.rcParams['text.usetex'] and 'upgreek' in plt.rcParams['text.latex.preamble']:
+    str_risk_bayes = r'$R_\uptheta(f)$'
+else:
+    str_risk_bayes = r'$R_\theta(f)$'
+
 
 PICKLE_FIGS = True
 DATE_FMT = '%Y-%m-%d %H:%M:%S'
@@ -621,7 +626,7 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
         _plot_risk_eval_compare(loss_full, predictors, params_full, n_train, ax)
         ax = plt.gca()
         if isinstance(model, bayes_models.Base):
-            ax.set(ylabel=r'$R_\uptheta(f)$')  # different notation for bayes risk
+            ax.set(ylabel=str_risk_bayes)  # different notation for bayes risk
     else:
         img_path = None
 
@@ -739,7 +744,7 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, 
     if ax is None:
         _, ax = plt.subplots()
         if isinstance(model, bayes_models.Base):
-            ylabel = r'$R_\uptheta(f)$'
+            ylabel = str_risk_bayes
         else:
             ylabel = r'$R(f;\theta)$'
         ax.set(ylabel=ylabel)
