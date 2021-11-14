@@ -310,7 +310,7 @@ class DataConditional(Base):
     ----------
     dists : iterable of rand_elements.Base
         Explicit conditional random elements characterizing `y` for each possible value of `x`.
-    model_x : rand_elements.Base
+    model_x : stats_learn.random.elements.Base
         Random variable characterizing the marginal distribution of `x`.
     rng : int or np.random.RandomState or np.random.Generator, optional
         Random number generator seed or object.
@@ -380,7 +380,7 @@ class DataConditional(Base):
             Number of samples characterizing the realized empirical distributions.
         func : callable
             The conditional mean function.
-        model_x : rand_elements.Base
+        model_x : stats_learn.random.elements.Base
             Random variable characterizing the marginal distribution of `x`.
         rng : int or np.random.RandomState or np.random.Generator, optional
             Random number generator seed or object.
@@ -413,7 +413,7 @@ class DataConditional(Base):
             Number of samples characterizing the realized empirical distributions.
         weights : array_like
             The weights combining the polynomial functions into the conditional mean function.
-        model_x : rand_elements.Base
+        model_x : stats_learn.random.elements.Base
             Random variable characterizing the marginal distribution of `x`.
         rng : int or np.random.RandomState or np.random.Generator, optional
             Random number generator seed or object.
@@ -500,7 +500,7 @@ class ClassConditional(MixinRVx, Base):
     ----------
     dists : iterable of rand_elements.Base
         Explicit conditional random elements characterizing `x` for each possible value of `y`.
-    model_y : rand_elements.Base
+    model_y : stats_learn.random.elements.Base
         Random variable characterizing the marginal distribution of `y`.
     rng : int or np.random.RandomState or np.random.Generator, optional
         Random number generator seed or object.
@@ -617,7 +617,7 @@ class BetaLinear(MixinRVx, MixinRVy, Base):
         Basis functions. Defaults to polynomial functions.
     alpha_y_x : float, optional
         Total conditional Beta concentration. Defaults to uniform.
-    model_x : rand_elements.Base
+    model_x : stats_learn.random.elements.Base
         Random variable characterizing the marginal distribution of `x`.
     rng : int or np.random.RandomState or np.random.Generator, optional
         Random number generator seed or object.
@@ -699,7 +699,7 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
         Basis functions. Defaults to polynomial functions.
     cov_y_x : float or callable, optional
         Conditional covariance of Normal distributions.
-    model_x : rand_elements.Base
+    model_x : stats_learn.random.elements.Base
         Random variable characterizing the marginal distribution of `x`.
     rng : int or np.random.RandomState or np.random.Generator, optional
         Random number generator seed or object.

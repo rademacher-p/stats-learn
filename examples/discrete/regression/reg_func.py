@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(description='Example: regularization against fu
 parser.add_argument('-m', '--mc', type=int, default=1, help='Number of Monte Carlo iterations')
 parser.add_argument('-l', '--log_path', type=str, default=None, help='Path to log file')
 parser.add_argument('-i', '--save_img', action="store_true", help='Save images to log')
-parser.add_argument('--style', type=str, default=None, help='Matplotlib style')
+parser.add_argument('--style', type=str, default=None, help='Path to .mplstyle Matplotlib style')
 parser.add_argument('--seed', type=int, default=None, help='RNG seed')
 
 args = parser.parse_args()
@@ -47,15 +47,13 @@ seed = args.seed
 
 # # Model and optimal predictor
 n_x = n_y = 128
+var_y_x_const = 1 / 125
 
 _rand_vals = dict(zip(np.linspace(0, 1, n_x), np.random.default_rng(seed).random(n_x)))
 
 
 def clairvoyant_func(x):
     return _rand_vals[x]
-
-
-var_y_x_const = 1 / 125
 
 
 model_x = rand_elements.FiniteGeneric.from_grid([0, 1], n_x, p=None)
@@ -139,7 +137,7 @@ results.assess_single_compare(predictors, d_train, d_test, params, verbose=True,
 n_train = 128
 
 results.assess_compare(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
-                       plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict_full.png'),
+                       plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict.png'),
                        rng=seed)
 
 # Squared-Error vs. training data volume N

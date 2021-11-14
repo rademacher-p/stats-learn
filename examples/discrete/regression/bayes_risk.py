@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser(description='Example: Bayesian risk for Dirichl
 parser.add_argument('-m', '--mc', type=int, default=1, help='Number of Monte Carlo iterations')
 parser.add_argument('-l', '--log_path', type=str, default=None, help='Path to log file')
 parser.add_argument('-i', '--save_img', action="store_true", help='Save images to log')
-parser.add_argument('--style', type=str, default=None, help='Matplotlib style')
+parser.add_argument('--style', type=str, default=None, help='Path to .mplstyle Matplotlib style')
 parser.add_argument('--seed', type=int, default=None, help='RNG seed')
 
 args = parser.parse_args()
@@ -48,6 +48,7 @@ model_x = rand_elements.FiniteGeneric.from_grid([0, 1], n_x, p=None)
 alpha_y_x = (1 - var_y_x_const) / (np.float64(var_y_x_const) - 1 / (n_y - 1))
 prior_mean = rand_models.DataConditional.from_mean_poly_emp(alpha_y_x, n_x, w_model, model_x)
 model = bayes_models.Dirichlet(prior_mean, alpha_0=4e2)
+
 
 # # Dirichlet Learner
 dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)

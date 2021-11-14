@@ -19,6 +19,8 @@ Example scripts for reproduction of results are located in the `examples` direct
 
 To replicate the figures using LaTeX formatting... need latex, packages...
 
+log path doesn't have to exist
+
 ```
 python examples\discrete\regression\argparse_consistency.py
 -l=temp/log.md -i --style=images/style.mplstyle --seed=12345

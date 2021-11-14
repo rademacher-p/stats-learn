@@ -19,7 +19,7 @@ class Base(RandomGeneratorMixin, ABC):
 
     Parameters
     ----------
-    prior : rand_elements.Base, optional
+    prior : stats_learn.random.elements.Base, optional
         Random element characterizing the prior distribution of the element parameters.
     rng : int or np.random.RandomState or np.random.Generator, optional
         Random number generator seed or object.
@@ -238,7 +238,7 @@ class Dirichlet(Base):
 
     Parameters
     ----------
-    prior_mean : rand_elements.Base
+    prior_mean : stats_learn.random.elements.Base
         Random element characterizing the mean of the Dirichlet process.
     alpha_0 : float
         Dirichlet localization (i.e. concentration) parameter.

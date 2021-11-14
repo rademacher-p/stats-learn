@@ -20,7 +20,7 @@ class Base(RandomGeneratorMixin, ABC):
 
     Parameters
     ----------
-    prior : rand_elements.Base, optional
+    prior : stats_learn.random.elements.Base, optional
         Random element characterizing the prior distribution of the element parameters.
     rng : int or np.random.RandomState or np.random.Generator, optional
         Random number generator seed or object.
@@ -108,7 +108,7 @@ class NormalLinear(Base):
         Basis functions. Defaults to polynomial functions.
     cov_y_x : float or numpy.ndarray, optional
         Conditional covariance of Normal distributions.
-    model_x : rand_elements.Base, optional
+    model_x : stats_learn.random.elements.Base, optional
         Random variable characterizing the marginal distribution of `x`.
     allow_singular : bool, optional
         Whether to allow a singular prior covariance matrix.
@@ -306,7 +306,7 @@ class Dirichlet(Base):
 
     Parameters
     ----------
-    prior_mean : rand_models.Base
+    prior_mean : stats_learn.random.models.Base
         Random model characterizing the mean of the Dirichlet process.
     alpha_0 : float
         Dirichlet localization (i.e. concentration) parameter.

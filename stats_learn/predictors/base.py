@@ -121,7 +121,7 @@ class Base(ABC):
 
         Parameters
         ----------
-        model : rand_models.Base
+        model : stats_learn.random.models.Base
             Model for training data generation.
         n_train : int, optional
             Number of training samples.
@@ -181,7 +181,7 @@ class Base(ABC):
 
         Parameters
         ----------
-        model : rand_models.Base
+        model : stats_learn.random.models.Base
             Model for training data generation.
         n_test : int, optional
             Number of test samples.
@@ -265,7 +265,7 @@ class Base(ABC):
 
         Parameters
         ----------
-        model : random.models.Base or bayes.models.Base
+        model : stats_learn.random.models.Base or stats_learn.bayes.models.Base
             Data-generating model.
         params : iterable of dict, optional
             Predictor parameters to evaluate. Outer product of each parameter array is assessed.
@@ -362,7 +362,7 @@ class Model(Base):
 
     Parameters
     ----------
-    model : rand_models.Base
+    model : stats_learn.random.models.Base
         Fixed model used to generate predictions.
     loss_func : callable
     space : dict, optional
@@ -399,7 +399,7 @@ class ModelClassifier(ClassifierMixin, Model):
 
     Parameters
     ----------
-    model : rand_models.Base
+    model : stats_learn.random.models.Base
         Fixed model used to generate predictions.
     space : dict, optional
         The domain for `x` and `y`. Defaults to the model's space.
@@ -418,7 +418,7 @@ class ModelRegressor(RegressorMixin, Model):
 
     Parameters
     ----------
-    model : rand_models.Base
+    model : stats_learn.random.models.Base
         Fixed model used to generate predictions.
     space : dict, optional
         The domain for `x` and `y`. Defaults to the model's space.
@@ -436,7 +436,7 @@ class ModelRegressor(RegressorMixin, Model):
 
         Parameters
         ----------
-        model : rand_models.Base
+        model : stats_learn.random.models.Base
             Model for training data generation.
         n_train : int, optional
             Number of training samples.
@@ -479,7 +479,7 @@ class Bayes(Base):
 
     Parameters
     ----------
-    bayes_model : bayes_models.Base
+    bayes_model : stats_learn.bayes.models.Base
         Bayes model used for fitting and to generate predictions.
     loss_func : callable
     space : dict, optional
@@ -524,7 +524,7 @@ class BayesClassifier(ClassifierMixin, Bayes):
 
     Parameters
     ----------
-    bayes_model : bayes_models.Base
+    bayes_model : stats_learn.bayes.models.Base
         Bayes model used for fitting and to generate predictions.
     space : dict, optional
         The domain for `x` and `y`. Defaults to the model's space.
@@ -543,7 +543,7 @@ class BayesRegressor(RegressorMixin, Bayes):
 
     Parameters
     ----------
-    bayes_model : bayes_models.Base
+    bayes_model : stats_learn.bayes.models.Base
         Bayes model used for fitting and to generate predictions.
     space : dict, optional
         The domain for `x` and `y`. Defaults to the model's space.
@@ -561,7 +561,7 @@ class BayesRegressor(RegressorMixin, Bayes):
 
         Parameters
         ----------
-        model : rand_models.Base
+        model : stats_learn.random.models.Base
             Model for training data generation.
         n_train : int, optional
             Number of training samples.

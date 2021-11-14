@@ -421,7 +421,7 @@ def assess_single_compare(predictors, d_train=None, d_test=None, params=None, x=
         title = f"{predictors[0].name}, " + title
     else:
         ax.legend(handles=[h_data, *h_predictors])
-    ax.set(title=title)
+    ax.set_title(title)
 
     # Logging
     message = f"- Test samples: {n_test}"
@@ -442,7 +442,7 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
     Parameters
     ----------
     predictors : iterable of stats_learn.predictors.Base
-    model : random.models.Base or bayes.models.Base
+    model : stats_learn.random.models.Base or stats_learn.bayes.models.Base
         Data-generating model.
     params : iterable of dict, optional
         Predictor parameters to evaluate. Each element corresponds to an element of `predictors` and contains an

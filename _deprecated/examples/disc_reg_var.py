@@ -73,9 +73,24 @@ def prior_func(x):
     return np.where(y > 0, .5 + a, .5 - a)
 
 
+# n_t_iter = [4, 128, 4096]
+# n_t_iter = [4, 8, 16, 32, 64, 128, 4096]
+# n_t_iter = [32, 64, 128, 256]
+# n_t_iter = [8, 16, 32, 64, 128]
+# n_t_iter = [8, 32, 128]
 n_t_iter = [16]
-alpha_0_norm_iter = [1e-6, 4.5]
+# n_t_iter = [16, 32, 64]
+# n_t_iter = 2 ** np.arange(1, 8)
 
+
+# alpha_0_norm = 5
+# dir_params_full = [None for __ in n_t_iter]
+# alpha_0_norm_iter = [6.25]
+alpha_0_norm_iter = [1e-6, 4.5]
+# alpha_0_norm_iter = [4.5]
+# alpha_0_norm_iter = 6.25 * np.array([1e-3, 1])
+# alpha_0_norm_iter = [4]
+# alpha_0_norm_iter = [.005, 5]
 dir_params_full = [None for __ in range(len(n_t_iter) * len(alpha_0_norm_iter))]
 dir_predictors = []
 for n_t in n_t_iter:
@@ -89,37 +104,40 @@ for n_t in n_t_iter:
 
         dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=alpha_0_norm * n_t)
 
+        # FIXME
         name_ = r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{n_t}$" + \
                 r", $\alpha_0 / |\mathcal{T}| = " + f"{alpha_0_norm}$"
+
         dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=[make_discretizer(values_t)],
                                        name=name_)
 
         dir_predictors.append(dir_predictor)
 
-
-scale_alpha = True  # interpret `alpha_0` parameter as normalized w.r.t. discretization cardinality
-
-
-def make_normalized(n_t_iter_, dir_params_):
-    dir_params_full_ = [dir_params_.copy() for __ in n_t_iter_]
-    dir_predictors_ = []
-    for n_t_, params_ in zip(n_t_iter_, dir_params_full_):
-        values_t_ = np.linspace(*model_x.lims, n_t_, endpoint=False) + .5 / n_t_
-
-        prior_mean_x_ = rand_elements.DataEmpirical(values_t_, counts=np.ones_like(values_t), space=model_x.space)
-        prior_mean_ = rand_models.BetaLinear(weights=[1], basis_y_x=[prior_func], alpha_y_x=alpha_y_x,
-                                             model_x=prior_mean_x_)
-
-        dir_model_ = bayes_models.Dirichlet(prior_mean_, alpha_0=10)
-        dir_predictor_ = BayesRegressor(dir_model_, space=model.space, proc_funcs=[make_discretizer(values_t_)],
-                                        name=r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{n_t_}$")
-
-        dir_predictors_.append(dir_predictor_)
-
-        if scale_alpha and params_ is not None:
-            params_['alpha_0'] = n_t_ * np.array(params_['alpha_0'])
-
-    return dir_predictors_, dir_params_full_
+# scale_alpha = True  # interpret `alpha_0` parameter as normalized w.r.t. discretization cardinality
+# # scale_alpha = False
+#
+# # dir_params = {'alpha_0': [500]}
+# dir_params = {'alpha_0': np.logspace(-3, 3, 60)}
+#
+# dir_params_full = [deepcopy(dir_params) for __ in n_t_iter]
+# dir_predictors = []
+# for n_t, _params in zip(n_t_iter, dir_params_full):
+#     values_t = np.linspace(*model_x.lims, n_t, endpoint=False) + .5 / n_t
+#     counts = np.ones_like(values_t)
+#
+#     prior_mean_x = rand_elements.DataEmpirical(values_t, counts, space=model_x.space)
+#     prior_mean = rand_models.BetaLinear(weights=[1], basis_y_x=[prior_func], alpha_y_x=alpha_y_x,
+#                                         model_x=prior_mean_x)
+#     dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
+#
+#     name_ = r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{n_t}$"
+#
+#     dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=[make_discretizer(values_t)], name=name_)
+#
+#     dir_predictors.append(dir_predictor)
+#
+#     if scale_alpha and _params is not None:
+#         _params['alpha_0'] *= n_t
 
 
 # PyTorch
@@ -138,25 +156,24 @@ for weight_decay in weight_decays:
     logger_name = f"MLP {'-'.join(map(str, layer_sizes))}, lambda {weight_decay}"
     lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {weight_decay}$"
 
-    if log_path is None:
-        logger = False
-    else:
-        logger_path = str(log_path.parent / 'logs/')
-        logger_name = f"MLP {'-'.join(map(str, layer_sizes))}, lambda {weight_decay}"
-        logger = pl_loggers.TensorBoardLogger(logger_path, name=logger_name)
     trainer_params = {
         'max_epochs': 100000,
         'callbacks': EarlyStopping('train_loss', min_delta=1e-3, patience=10000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
-        'logger': logger,
+        # 'logger': False,
+        'logger': pl_loggers.TensorBoardLogger(base_path + 'logs/', name=logger_name),
         'weights_summary': None,
         'gpus': torch.cuda.device_count(),
     }
 
     lit_model = LitMLP([model.size['x'], *layer_sizes, 1], optim_params=optim_params)
 
+
     def reset_func(model_):
         model_.apply(reset_weights)
+        # with torch.no_grad():
+        #     model_.model[-1].bias.fill_(.5)  # FIXME: use the .5 init??
+
 
     lit_predictor = LitPredictor(lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name)
     lit_predictors.append(lit_predictor)
@@ -169,9 +186,9 @@ temp = [
 ]
 predictors, params = zip(*temp)
 
-
 # # Results
 n_test = 1000
+n_mc = 50
 
 # Sample regressor realizations
 n_train = 128
@@ -179,43 +196,64 @@ d = model.sample(n_train + n_test, rng=seed)
 d_train, d_test = np.split(d, [n_train])
 x_plt = np.linspace(0, 1, 10000)
 
-results.assess_single_compare(predictors, d_train, d_test, params, x_plt, verbose=True, log_path=log_path,
-                              img_path=get_img_path('fit.png'))
+img_path = img_dir + 'fit.png'
+loss_full = results.assess_single_compare(predictors, d_train, d_test, params, x_plt, verbose=True, log_path=log_path,
+                                          img_path=img_path)
 
 # Prediction mean/variance, comparative
 n_train = 128
 
-results.assess_compare(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
-                       plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict.png'),
-                       rng=seed)
+img_path = img_dir + 'predict_T.png'
+y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
+                                                 stats=('mean', 'std'), verbose=True,
+                                                 plot_stats=True, print_loss=True,
+                                                 log_path=log_path, img_path=img_path, rng=seed)
+
+# Dirichlet-based prediction mean/variance, varying N
+n_train = [0, 400, 4000]
+
+img_path = img_dir + f'predict_N_T{n_t_iter[0]}.png'
+y_stats_full, loss_full = dir_predictors[0].assess(model, dir_params_full[0], n_train, n_test, n_mc,
+                                                   stats=('mean', 'std'),
+                                                   verbose=True, plot_stats=True, print_loss=True,
+                                                   log_path=log_path, img_path=img_path, rng=seed)
 
 # Squared-Error vs. training data volume N
 n_train = np.insert(2**np.arange(12), 0, 0)
 
-results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True, print_loss=True,
-                       log_path=log_path, img_path=get_img_path('risk_N.png'), rng=seed)
+img_path = img_dir + 'risk_N_leg_T.png'
+y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True,
+                                                 plot_loss=True, print_loss=True, log_path=log_path,
+                                                 img_path=img_path, rng=seed)
+
+# Squared-Error vs. prior localization alpha_0
+n_train = 128
+
+img_path = img_dir + 'risk_a0norm_leg_T.png'
+y_stats_full, loss_full = results.assess_compare(dir_predictors, model, dir_params_full, n_train, n_test, n_mc,
+                                                 verbose=True, plot_loss=True, print_loss=True, log_path=log_path,
+                                                 img_path=img_path, rng=seed)
+
+ax = plt.gca()
+if ax.get_xlabel() == r'$\alpha_0$':  # scale alpha axis, find localization minimum
+    ax.set_xscale('log')
+    lines = ax.get_lines()
+    for line in lines:
+        x_, y_ = line.get_data()
+        if scale_alpha:
+            label = line.get_label()
+            _n_t = int(label[label.find('=')+1:-1])
+            x_ /= _n_t
+            line.set_data(x_, y_)
+
+    if scale_alpha:
+        ax.set_xlabel(r'$\alpha_0 / |\mathcal{T}|$')
+        _vals = dir_params['alpha_0']
+        ax.set_xlim((min(_vals), max(_vals)))
 
 
-
-# # # Dirichlet-based prediction mean/variance, varying N
-# n_train = [0, 400, 4000]
-# _t = 16
-#
-# idx = n_t_iter.index(_t)
-# dir_predictors[idx].assess(model, dir_params_full[idx], n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
-#                            plot_stats=True, print_loss=True, log_path=log_path,
-#                            img_path=get_img_path(f'predict_N_T{_t}.png'), rng=seed)
-
-
-# # Squared-Error vs. prior localization alpha_0
-# n_train = 128
-#
-# dir_params = {'alpha_0': np.logspace(-3, 3, 60)}
-# dir_predictors, dir_params_full = make_normalized([2, 4, 8, 16], dir_params)
-#
-# results.assess_compare(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, plot_loss=True,
-#                        print_loss=True, log_path=log_path, img_path=get_img_path('risk_a0norm_leg_T.png'), rng=seed)
-#
+# do_argmin = False
+# # do_argmin = True
 # ax = plt.gca()
 # if ax.get_xlabel() == r'$\alpha_0$':  # scale alpha axis, find localization minimum
 #     ax.set_xscale('log')
@@ -228,16 +266,17 @@ results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose
 #             x_ /= _n_t
 #             line.set_data(x_, y_)
 #
+#         if do_argmin:
+#             idx = y_.argmin()
+#             x_i, y_i = x_[idx], y_[idx]
+#             ax.plot(x_i, y_i, marker='.', markersize=8, color=line.get_color())
 #     if scale_alpha:
 #         ax.set_xlabel(r'$\alpha_0 / |\mathcal{T}|$')
 #         _vals = dir_params['alpha_0']
 #         ax.set_xlim((min(_vals), max(_vals)))
 
 
-# # Squared-Error vs. discretization |T|, various N
 # n_train = [16, 128, 512]
-#
-# dir_predictors, dir_params_full = make_normalized(2 ** np.arange(1, 8), {'alpha_0': [4.5]})
-#
+# # n_train = 400
 # results.plot_risk_disc(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, ax=None)
 # plt.xscale('log', base=2)

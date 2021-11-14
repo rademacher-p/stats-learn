@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(description='Example: regularization against ov
 parser.add_argument('-m', '--mc', type=int, default=1, help='Number of Monte Carlo iterations')
 parser.add_argument('-l', '--log_path', type=str, default=None, help='Path to log file')
 parser.add_argument('-i', '--save_img', action="store_true", help='Save images to log')
-parser.add_argument('--style', type=str, default=None, help='Matplotlib style')
+parser.add_argument('--style', type=str, default=None, help='Path to .mplstyle Matplotlib style')
 parser.add_argument('--seed', type=int, default=None, help='RNG seed')
 
 args = parser.parse_args()
@@ -47,22 +47,13 @@ seed = args.seed
 
 # # Model and optimal predictor
 n_x = n_y = 32
-
-freq = 2
-
-# def clairvoyant_func(x):
-#     # y = np.sin(2*np.pi*freq*x)
-#     # y = np.where(y > 0, .75, .25)
-#     # return y
-#     return .5 + .35 * np.sin(2 * np.pi * freq * x)
+var_y_x_const = 1 / 2
 
 
 def clairvoyant_func(x):
-    y = np.sin(2 * np.pi * freq * x)
+    y = np.sin(2 * np.pi * 2 * x)
     return .5 + np.where(y > 0, .3, -.3) - .3 * y
 
-
-var_y_x_const = 1 / 2
 
 model_x = rand_elements.FiniteGeneric.from_grid([0, 1], n_x, p=None)
 
@@ -75,15 +66,8 @@ opt_predictor = ModelRegressor(model, name=r'$f^*(\theta)$')
 # # Learners
 
 # Dirichlet
-# def prior_func(x):
-#     # return .5 + .35*np.sin(2*np.pi*freq*x)
-#     y = np.sin(2 * np.pi * freq * x)
-#     y = np.where(y > 0, .75, .25)
-#     return y
-
 def prior_func(x):
-    # return .5 + .35*np.sin(2*np.pi*freq*x)
-    y = np.sin(2 * np.pi * freq * x)
+    y = np.sin(2 * np.pi * 2 * x)
     a = .25
     return np.where(y > 0, .5 + a, .5 - a)
 
@@ -92,14 +76,7 @@ prior_mean = rand_models.DataConditional.from_mean_emp(alpha_y_x, n_y, prior_fun
 dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
 
 dir_predictor = BayesRegressor(dir_model, space=model.space, name=r'$\mathrm{Dir}$')
-
-# dir_params = {'alpha_0': [8e-5, 800]}
-# dir_params = {'alpha_0': [5e-5, 500]}
-# dir_params = {'alpha_0': [1e-5, 120]}
-# dir_params = {'alpha_0': [1e-5, 2e3]}
-# dir_params = {'alpha_0': [1e-5, 6e2]}  # 32pt, var_c=.8, a=.15 prior
-# dir_params = {'alpha_0': [1e-5, 220]}  # 32pt, var_c=.8, a=.25 prior
-dir_params = {'alpha_0': [1e-5, 125]}  # 32pt, var_c=.5, a=.25 prior
+dir_params = {'alpha_0': [1e-5, 125]}
 
 # PyTorch
 if seed is not None:
@@ -121,7 +98,7 @@ for weight_decay in weight_decays:
         logger_name = f"MLP {'-'.join(map(str, layer_sizes))}, lambda {weight_decay}"
         logger = pl_loggers.TensorBoardLogger(logger_path, name=logger_name)
     trainer_params = {
-        'max_epochs': 100000,
+        'max_epochs': 10000,
         'callbacks': EarlyStopping('train_loss', min_delta=1e-4, patience=10000, check_on_train_epoch_end=True),
         'checkpoint_callback': False,
         'logger': logger,
@@ -133,8 +110,6 @@ for weight_decay in weight_decays:
 
     def reset_func(model_):
         model_.apply(reset_weights)
-        # with torch.no_grad():
-        #     model_.model[-1].bias.fill_(.5)
 
     lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {weight_decay}$"
     lit_predictor = LitPredictor(lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name)
@@ -164,7 +139,7 @@ results.assess_single_compare(predictors, d_train, d_test, params, log_path=log_
 n_train = 128
 
 results.assess_compare(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
-                       plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict_full.png'),
+                       plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict.png'),
                        rng=seed)
 
 # Squared-Error vs. training data volume N
@@ -173,11 +148,13 @@ n_train = np.insert(2**np.arange(12), 0, 0)
 results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True,
                        print_loss=True, log_path=log_path, img_path=get_img_path('risk_N.png'), rng=seed)
 
-# Squared-Error vs. prior localization alpha_0
-n_train = [0, 100, 200, 400]
 
-dir_predictor.assess(model, {'alpha_0': np.logspace(0., 5., 60)}, n_train, n_test, n_mc, verbose=True,
-                     plot_loss=True, print_loss=True, log_path=log_path, img_path=get_img_path('risk_a0_leg_N.png'),
-                     rng=seed)
 
-plt.gca().set_xscale('log')
+# # Squared-Error vs. prior localization alpha_0
+# n_train = [0, 100, 200, 400]
+#
+# dir_predictor.assess(model, {'alpha_0': np.logspace(0., 5., 60)}, n_train, n_test, n_mc, verbose=True,
+#                      plot_loss=True, print_loss=True, log_path=log_path, img_path=get_img_path('risk_a0_leg_N.png'),
+#                      rng=seed)
+#
+# plt.gca().set_xscale('log')
