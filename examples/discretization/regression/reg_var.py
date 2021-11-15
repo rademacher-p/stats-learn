@@ -155,10 +155,7 @@ for weight_decay in weight_decays:
 
     lit_model = LitMLP([model.size['x'], *layer_sizes, 1], optim_params=optim_params)
 
-    def reset_func(model_):
-        model_.apply(reset_weights)
-
-    lit_predictor = LitPredictor(lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name)
+    lit_predictor = LitPredictor(lit_model, model.space, trainer_params, proc_funcs=(), name=lit_name)
     lit_predictors.append(lit_predictor)
 
 #
