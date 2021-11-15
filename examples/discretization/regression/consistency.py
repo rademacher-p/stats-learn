@@ -146,12 +146,13 @@ n_train = [0, 400, 4000]
 _t = 4
 _alpha_0_norm = 250
 dir_params = {'alpha_0': [_alpha_0_norm * _t]}
+idx = n_t_iter.index(_t)
 _title = r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{_t}$" + r", $\alpha_0 / |\mathcal{T}| = " + f"{_alpha_0_norm}$"
 
-idx = n_t_iter.index(_t)
 dir_predictors[idx].assess(model, dir_params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
                            plot_stats=True, print_loss=True, log_path=log_path,
                            img_path=get_img_path(f'predict_N_T{_t}.png'), rng=seed)
+
 plt.gca().set(title=_title)
 
 # Squared-Error vs. training data volume N
@@ -190,6 +191,7 @@ n_train = [0, 4, 40, 400]
 dir_predictors, dir_params_full = make_normalized(2 ** np.arange(1, 14), {'alpha_0': [.1]})
 
 results.plot_risk_disc(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, ax=None)
+
 plt.xscale('log', base=2)
 
 # Squared-Error vs. discretization |T|, various alpha_0
@@ -197,4 +199,5 @@ n_train = 400
 dir_predictors, dir_params_full = make_normalized(2 ** np.arange(1, 14), {'alpha_0': [.1, 10]})
 
 results.plot_risk_disc(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, ax=None)
+
 plt.xscale('log', base=2)

@@ -129,7 +129,6 @@ n_test = 1000
 
 # Sample regressor realizations
 n_train = 128
-
 d = model.sample(n_train + n_test, rng=seed)
 d_train, d_test = np.split(d, [n_train])
 

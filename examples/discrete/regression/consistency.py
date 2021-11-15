@@ -96,6 +96,7 @@ results.assess_single_compare(predictors, d_train, d_test, params, log_path=log_
 
 # Prediction mean/variance, comparative
 n_train = 400
+
 results.assess_compare(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
                        plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict_a0.png'),
                        rng=seed)
