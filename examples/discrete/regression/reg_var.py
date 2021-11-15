@@ -11,7 +11,7 @@ from pytorch_lightning.utilities.seed import seed_everything
 from stats_learn import results
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
-from stats_learn.predictors.torch import LitMLP, LitPredictor, reset_weights
+from stats_learn.predictors.torch import LitMLP, LitPredictor
 from stats_learn.preprocessing import make_clipper
 from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.util import get_now
@@ -19,6 +19,8 @@ from stats_learn.util import get_now
 
 # # Input
 parser = argparse.ArgumentParser(description='Example: regularization against overfitting on a discrete domain')
+parser.add_argument('sims', nargs='*', choices=['fit', 'predict', 'risk_N', 'risk_a0_leg_N'],
+                    help=f'Simulations to run')
 parser.add_argument('-m', '--mc', type=int, default=1, help='Number of Monte Carlo iterations')
 parser.add_argument('-l', '--log_path', default=None, help='Path to log file')
 parser.add_argument('-i', '--save_img', action="store_true", help='Save images to log')
@@ -27,6 +29,7 @@ parser.add_argument('--seed', type=int, default=None, help='RNG seed')
 
 args = parser.parse_args()
 
+sim_names = args.sims
 n_mc = args.mc
 
 log_path = Path(args.log_path)
@@ -125,32 +128,35 @@ predictors, params = zip(*temp)
 n_test = 1000
 
 # Sample regressor realizations
-n_train = 128
-d = model.sample(n_train + n_test, rng=seed)
-d_train, d_test = np.split(d, [n_train])
+if 'fit' in sim_names:
+    n_train = 128
+    d = model.sample(n_train + n_test, rng=seed)
+    d_train, d_test = np.split(d, [n_train])
 
-results.assess_single_compare(predictors, d_train, d_test, params, log_path=log_path, img_path=get_img_path('fit.png'))
+    results.assess_single_compare(predictors, d_train, d_test, params, log_path=log_path,
+                                  img_path=get_img_path('fit.png'))
 
 # Prediction mean/variance, comparative
-n_train = 128
+if 'predict' in sim_names:
+    n_train = 128
 
-results.assess_compare(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
-                       plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict.png'),
-                       rng=seed)
+    results.assess_compare(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
+                           plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict.png'),
+                           rng=seed)
 
 # Squared-Error vs. training data volume N
-n_train = np.insert(2**np.arange(12), 0, 0)
+if 'risk_N' in sim_names:
+    n_train = np.insert(2**np.arange(12), 0, 0)
 
-results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True,
-                       print_loss=True, log_path=log_path, img_path=get_img_path('risk_N.png'), rng=seed)
+    results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True,
+                           print_loss=True, log_path=log_path, img_path=get_img_path('risk_N.png'), rng=seed)
 
+# Squared-Error vs. prior localization alpha_0
+if 'risk_a0_leg_N':
+    n_train = [0, 100, 200, 400]
 
+    dir_predictor.assess(model, {'alpha_0': np.logspace(0., 5., 60)}, n_train, n_test, n_mc, verbose=True,
+                         plot_loss=True, print_loss=True, log_path=log_path, img_path=get_img_path('risk_a0_leg_N.png'),
+                         rng=seed)
 
-# # Squared-Error vs. prior localization alpha_0
-# n_train = [0, 100, 200, 400]
-#
-# dir_predictor.assess(model, {'alpha_0': np.logspace(0., 5., 60)}, n_train, n_test, n_mc, verbose=True,
-#                      plot_loss=True, print_loss=True, log_path=log_path, img_path=get_img_path('risk_a0_leg_N.png'),
-#                      rng=seed)
-#
-# plt.gca().set_xscale('log')
+    plt.gca().set_xscale('log')

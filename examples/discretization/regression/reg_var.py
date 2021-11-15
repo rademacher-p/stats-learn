@@ -11,7 +11,7 @@ from pytorch_lightning.utilities.seed import seed_everything
 from stats_learn import results
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
-from stats_learn.predictors.torch import LitMLP, LitPredictor, reset_weights
+from stats_learn.predictors.torch import LitMLP, LitPredictor
 from stats_learn.preprocessing import make_clipper
 from stats_learn.preprocessing import make_discretizer
 from stats_learn.random import elements as rand_elements, models as rand_models
@@ -21,6 +21,8 @@ from stats_learn.util import get_now
 # # Input
 parser = argparse.ArgumentParser(description='Example: discretized regularization against overfitting '
                                              'on a continuous domain')
+parser.add_argument('sims', nargs='*', choices=['fit', 'predict', 'risk_N', 'predict_N_T16.png', 'risk_a0norm_leg_T',
+                                                'risk_T_leg_N'], help=f'Simulations to run')
 parser.add_argument('-m', '--mc', type=int, default=1, help='Number of Monte Carlo iterations')
 parser.add_argument('-l', '--log_path', default=None, help='Path to log file')
 parser.add_argument('-i', '--save_img', action="store_true", help='Save images to log')
@@ -29,6 +31,7 @@ parser.add_argument('--seed', type=int, default=None, help='RNG seed')
 
 args = parser.parse_args()
 
+sim_names = args.sims
 n_mc = args.mc
 
 log_path = Path(args.log_path)
@@ -171,70 +174,72 @@ predictors, params = zip(*temp)
 n_test = 1000
 
 # Sample regressor realizations
-n_train = 128
-d = model.sample(n_train + n_test, rng=seed)
-d_train, d_test = np.split(d, [n_train])
-x_plt = np.linspace(0, 1, 10000)
+if 'fit' in sim_names:
+    n_train = 128
+    d = model.sample(n_train + n_test, rng=seed)
+    d_train, d_test = np.split(d, [n_train])
+    x_plt = np.linspace(0, 1, 10000)
 
-results.assess_single_compare(predictors, d_train, d_test, params, x_plt, verbose=True, log_path=log_path,
-                              img_path=get_img_path('fit.png'))
+    results.assess_single_compare(predictors, d_train, d_test, params, x_plt, verbose=True, log_path=log_path,
+                                  img_path=get_img_path('fit.png'))
 
 # Prediction mean/variance, comparative
-n_train = 128
+if 'predict' in sim_names:
+    n_train = 128
 
-results.assess_compare(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
-                       plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict.png'),
-                       rng=seed)
+    results.assess_compare(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
+                           plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict.png'),
+                           rng=seed)
 
 # Squared-Error vs. training data volume N
-n_train = np.insert(2**np.arange(12), 0, 0)
+if 'risk_N' in sim_names:
+    n_train = np.insert(2**np.arange(12), 0, 0)
 
-results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True, print_loss=True,
-                       log_path=log_path, img_path=get_img_path('risk_N.png'), rng=seed)
+    results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True,
+                           print_loss=True, log_path=log_path, img_path=get_img_path('risk_N.png'), rng=seed)
 
+# # Dirichlet-based prediction mean/variance, varying N
+if 'predict_N_T16.png' in sim_names:
+    n_train = [0, 400, 4000]
+    _t = 16
 
+    idx = n_t_iter.index(_t)
+    dir_predictors[idx].assess(model, dir_params_full[idx], n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
+                               plot_stats=True, print_loss=True, log_path=log_path,
+                               img_path=get_img_path(f'predict_N_T{_t}.png'), rng=seed)
 
-# # # Dirichlet-based prediction mean/variance, varying N
-# n_train = [0, 400, 4000]
-# _t = 16
-#
-# idx = n_t_iter.index(_t)
-# dir_predictors[idx].assess(model, dir_params_full[idx], n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
-#                            plot_stats=True, print_loss=True, log_path=log_path,
-#                            img_path=get_img_path(f'predict_N_T{_t}.png'), rng=seed)
+# Squared-Error vs. prior localization alpha_0
+if 'risk_a0norm_leg_T' in sim_names:
+    n_train = 128
 
+    dir_params = {'alpha_0': np.logspace(-3, 3, 60)}
+    dir_predictors, dir_params_full = make_normalized([2, 4, 8, 16], dir_params)
 
-# # Squared-Error vs. prior localization alpha_0
-# n_train = 128
-#
-# dir_params = {'alpha_0': np.logspace(-3, 3, 60)}
-# dir_predictors, dir_params_full = make_normalized([2, 4, 8, 16], dir_params)
-#
-# results.assess_compare(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, plot_loss=True,
-#                        print_loss=True, log_path=log_path, img_path=get_img_path('risk_a0norm_leg_T.png'), rng=seed)
-#
-# ax = plt.gca()
-# if ax.get_xlabel() == r'$\alpha_0$':  # scale alpha axis, find localization minimum
-#     ax.set_xscale('log')
-#     lines = ax.get_lines()
-#     for line in lines:
-#         x_, y_ = line.get_data()
-#         if scale_alpha:
-#             label = line.get_label()
-#             _n_t = int(label[label.find('=')+1:-1])
-#             x_ /= _n_t
-#             line.set_data(x_, y_)
-#
-#     if scale_alpha:
-#         ax.set_xlabel(r'$\alpha_0 / |\mathcal{T}|$')
-#         _vals = dir_params['alpha_0']
-#         ax.set_xlim((min(_vals), max(_vals)))
+    results.assess_compare(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, plot_loss=True,
+                           print_loss=True, log_path=log_path, img_path=get_img_path('risk_a0norm_leg_T.png'), rng=seed)
 
+    ax = plt.gca()
+    if ax.get_xlabel() == r'$\alpha_0$':  # scale alpha axis, find localization minimum
+        ax.set_xscale('log')
+        lines = ax.get_lines()
+        for line in lines:
+            x_, y_ = line.get_data()
+            if scale_alpha:
+                label = line.get_label()
+                _n_t = int(label[label.find('=')+1:-1])
+                x_ /= _n_t
+                line.set_data(x_, y_)
 
-# # Squared-Error vs. discretization |T|, various N
-# n_train = [16, 128, 512]
-#
-# dir_predictors, dir_params_full = make_normalized(2 ** np.arange(1, 8), {'alpha_0': [4.5]})
-#
-# results.plot_risk_disc(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, ax=None)
-# plt.xscale('log', base=2)
+        if scale_alpha:
+            ax.set_xlabel(r'$\alpha_0 / |\mathcal{T}|$')
+            _vals = dir_params['alpha_0']
+            ax.set_xlim((min(_vals), max(_vals)))
+
+# Squared-Error vs. discretization |T|, various N
+if 'risk_T_leg_N' in sim_names:
+    n_train = [16, 128, 512]
+
+    dir_predictors, dir_params_full = make_normalized(2 ** np.arange(1, 8), {'alpha_0': [4.5]})
+
+    results.plot_risk_disc(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, ax=None)
+    plt.xscale('log', base=2)
