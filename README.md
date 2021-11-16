@@ -15,8 +15,8 @@ where the path points to the directory of this README. Note that the
 [editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be used to track any package modifications.
 
 ## Examples
-Example scripts for reproduction of results are located in the `examples` directory. They can be invoked from the 
-command line and given a variety of arguments to control the simulations. A demonstrative help message is shown below, 
+Example scripts for reproduction of results are located in the `examples` directory. They can be invoked from the
+command line and given a variety of arguments to control the simulations. A demonstrative help message is shown below,
 along with an exemplifying usage from the package top level.
 
 ```
@@ -41,21 +41,21 @@ optional arguments:
 ```
 
 ```commandline
-python examples\discrete\regression\consistency.py -m 1000 -l temp/log.md -i 
---style images/style.mplstyle --seed 12345 fit risk_N_leg_a0 
+python examples\discrete\regression\consistency.py -m 1000 -l temp/log.md -i
+--style images/style.mplstyle --seed 12345 fit risk_N_leg_a0
 ```
 
-Observe that the positional arguments are a variable number of strings specifying which images to generate. The `--mc` 
-option allows control over how many simulated datasets are generated for statistically meaningful results; the `--seed` 
-option controls random number generation for reproducibility. 
+Observe that the positional arguments are a variable number of strings specifying which images to generate. The `--mc`
+option allows control over how many simulated datasets are generated for statistically meaningful results; the `--seed`
+option controls random number generation for reproducibility.
 
-The `--log_path` and `--save_img` options enable logging 
-of result tables and/or images into a Markdown-format file for future use; note that the specified log path file will 
-be created if it does not exist. Additionally, note that a specific [Matplotlib](https://matplotlib.org/) `--style` can 
-be specified for custom formatting. 
+The `--log_path` and `--save_img` options enable logging
+of result tables and/or images into a Markdown-format file for future use; note that the specified log path file will
+be created if it does not exist. Additionally, note that a specific [Matplotlib](https://matplotlib.org/) `--style` can
+be specified for custom formatting.
 
 To implement the same formatting used throughout the publication, a provided style
-can be used (as shown above); note that this style requires [LaTeX](https://www.latex-project.org/), as well as the 
+can be used (as shown above); note that this style requires [LaTeX](https://www.latex-project.org/), as well as the
 [bm](https://www.ctan.org/pkg/bm) and [upgreek](https://www.ctan.org/pkg/upgreek) packages.
 
 ## Example
