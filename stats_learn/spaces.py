@@ -378,7 +378,8 @@ class FiniteGeneric(Finite):
     #
     #     elif set_ndim == 2 and self.shape == (2,) and np.issubdtype(self.dtype, np.number):
     #         # return ax.bar3d(x[..., 0].flatten(), x[..., 1].flatten(), 0, 1, 1, y.flatten(), shade=True)
-    #         return ax.plot(x[..., 0].flatten(), x[..., 1].flatten(), y.flatten(), marker='.', linestyle='', label=label)
+    #         return ax.plot(x[..., 0].flatten(), x[..., 1].flatten(), y.flatten(), marker='.', linestyle='',
+    #                        label=label)
     #
     #     elif set_ndim == 3 and self.shape == (3,) and np.issubdtype(self.dtype, np.number):
     #         plt_data = ax.scatter(x[..., 0], x[..., 1], x[..., 2], s=15, c=y, label=label)

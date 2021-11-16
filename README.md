@@ -63,26 +63,24 @@ can be used (as shown above); note that this style requires [LaTeX](https://www.
 import numpy as np
 from matplotlib import pyplot as plt
 
-from stats_learn import results
-from stats_learn.bayes import models as bayes_models
+from stats_learn import random, bayes, results
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
-from stats_learn.random import models as rand_models
 
 seed = 12345
 plt.style.use('images/style.mplstyle')
 
-model = rand_models.NormalLinear(weights=[1, 1])
+model = random.models.NormalLinear(weights=[1, 1])
 
 # Predictors
 opt_predictor = ModelRegressor(model, name='Optimal')
 
-norm_model = bayes_models.NormalLinear(prior_mean=[0, 0], prior_cov=1, allow_singular=True)
+norm_model = bayes.models.NormalLinear(prior_mean=[0, 0], prior_cov=1, allow_singular=True)
 norm_predictor = BayesRegressor(norm_model, name='Normal')
 norm_params = {'prior_cov': [.01, .1]}
 
 # Results
 n_test = 10
-n_mc = 100
+n_mc = 10
 
 predictors = [opt_predictor, norm_predictor]
 params = [None, norm_params]

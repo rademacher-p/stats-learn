@@ -1,8 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from stats_learn.random import elements as rand_elements
-from stats_learn import spaces
+from stats_learn import spaces, random
 
 # plt.style.use('../images/style.mplstyle')
 
@@ -18,11 +17,11 @@ else:
 n_x = 60
 
 n = 500
-model = rand_elements.EmpiricalScalar(.7, n_x)
+model = random.elements.EmpiricalScalar(.7, n_x)
 p_x = .5
 
 alpha_0 = 10
-alpha = rand_elements.EmpiricalScalar(.3, n_x)
+alpha = random.elements.EmpiricalScalar(.3, n_x)
 alpha_x = .5
 
 
@@ -41,7 +40,7 @@ space.plot_xy(y, model_pr, y_std=np.zeros(y.shape), ax=ax, label=str_p_opt)
 for alpha_0 in [.1, 10]:
 
     n_pr = np.arange(n + 1)
-    model_x_pr = rand_elements.Binomial(p_x, n).prob(n_pr)
+    model_x_pr = random.elements.Binomial(p_x, n).prob(n_pr)
     e_gamma = np.dot(model_x_pr, 1 / (1 + n_pr / (alpha_0 * alpha_x)))
 
     mean = e_gamma * alpha.prob(y) + (1 - e_gamma) * model_pr
@@ -52,7 +51,7 @@ for alpha_0 in [.1, 10]:
     for n in n_pr:
         if n > 0:
             for i, p in enumerate(model_pr):
-                emp = rand_elements.EmpiricalScalar(p, n)
+                emp = random.elements.EmpiricalScalar(p, n)
                 values = emp.space.x_plt
                 emp_pr = emp.prob(values)
 

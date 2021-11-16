@@ -6,8 +6,7 @@ from typing import Optional, Dict
 
 import numpy as np
 
-from stats_learn import spaces
-from stats_learn.random import elements as rand_elements
+from stats_learn import spaces, random
 from stats_learn.util import RandomGeneratorMixin, vectorize_func
 
 
@@ -65,7 +64,7 @@ class Base(RandomGeneratorMixin, ABC):
 
         Returns
         -------
-        rand_elements.Base
+        random.elements.Base
             The distribution of `y` given `x`
 
         """
@@ -115,7 +114,7 @@ class Base(RandomGeneratorMixin, ABC):
         """
         return self.space['x'].plot(self.mode_y_x, x, ax)
 
-    sample = rand_elements.Base.sample
+    sample = random.elements.Base.sample
 
     def _sample(self, n, rng):
         d_x = np.array(self.model_x.sample(n, rng=rng))
@@ -222,10 +221,28 @@ class MixinRVy:
         return self.space['x'].plot(self.cov_y_x, x, ax)
 
 
+class BaseRVx(MixinRVx, Base):
+    @abstractmethod
+    def model_y_x(self, x):
+        raise NotImplementedError
+
+
+class BaseRVy(MixinRVy, Base):
+    @abstractmethod
+    def model_y_x(self, x):
+        raise NotImplementedError
+
+
+class BaseRVxy(MixinRVx, MixinRVy, Base):
+    @abstractmethod
+    def model_y_x(self, x):
+        raise NotImplementedError
+
+
 # class DataConditionalGeneric(Base):
 #     def __new__(cls, model_x, model_y_x, rng=None):
-#         is_numeric_y = isinstance(model_y_x(model_x.sample()), rand_elements.MixinRV)
-#         if isinstance(model_x, rand_elements.MixinRV):
+#         is_numeric_y = isinstance(model_y_x(model_x.sample()), random.elements.MixinRV)
+#         if isinstance(model_x, random.elements.MixinRV):
 #             if is_numeric_y:
 #                 return super().__new__(DataConditionalRVxy)
 #             else:
@@ -273,7 +290,7 @@ class MixinRVy:
 #
 #     @classmethod
 #     def from_finite(cls, dists, values_x, p_x=None, rng=None):
-#         model_x = rand_elements.FiniteGeneric(values_x, p_x)
+#         model_x = random.elements.FiniteGeneric(values_x, p_x)
 #
 #         def model_y_x(x):
 #             eq = np.all(x == model_x.space._values_flat, axis=tuple(range(1, 1 + model_x.space.ndim)))
@@ -308,7 +325,7 @@ class DataConditional(Base):
 
     Parameters
     ----------
-    dists : iterable of rand_elements.Base
+    dists : iterable of random.elements.Base
         Explicit conditional random elements characterizing `y` for each possible value of `x`.
     model_x : stats_learn.random.elements.Base
         Random variable characterizing the marginal distribution of `x`.
@@ -317,8 +334,8 @@ class DataConditional(Base):
 
     """
     def __new__(cls, dists, model_x, rng=None):
-        is_numeric_y = all(isinstance(dist, rand_elements.MixinRV) for dist in dists)
-        if isinstance(model_x, rand_elements.MixinRV):
+        is_numeric_y = all(isinstance(dist, random.elements.MixinRV) for dist in dists)
+        if isinstance(model_x, random.elements.MixinRV):
             if is_numeric_y:
                 return super().__new__(DataConditionalRVxy)
             else:
@@ -338,8 +355,8 @@ class DataConditional(Base):
         self._space['x'] = self.model_x.space
         if not isinstance(self.space['x'], spaces.FiniteGeneric):
             raise ValueError(f"Data space must be finite.")
-        elif self.space['x'].set_size != len(self.dists):
-            raise ValueError(f"Data space must have {len(self.dists)} elements.")
+        elif self.space['x'].set_shape != (len(self.dists),):
+            raise ValueError("Data space set shape must match number of distributions.")
 
         self._space['y'] = spaces.check_spaces(self.dists)
 
@@ -350,7 +367,7 @@ class DataConditional(Base):
 
         Parameters
         ----------
-        dists : iterable of rand_elements.Base
+        dists : iterable of random.elements.Base
             Explicit conditional random elements characterizing `y` for each possible value of `x`.
         values_x : array_like
             Explicit domain values for `x`.
@@ -364,7 +381,7 @@ class DataConditional(Base):
         DataConditional
 
         """
-        model_x = rand_elements.FiniteGeneric(values_x, p_x)
+        model_x = random.elements.FiniteGeneric(values_x, p_x)
         return cls(dists, model_x, rng)
 
     @classmethod
@@ -395,9 +412,9 @@ class DataConditional(Base):
 
         """
         if np.isinf(alpha_0):
-            dists = [rand_elements.EmpiricalScalar(func(x), n - 1) for x in model_x.values]
+            dists = [random.elements.EmpiricalScalar(func(x), n - 1) for x in model_x.space.values]
         else:
-            dists = [rand_elements.DirichletEmpiricalScalar(func(x), alpha_0, n - 1) for x in model_x.values]
+            dists = [random.elements.DirichletEmpiricalScalar(func(x), alpha_0, n - 1) for x in model_x.space.values]
         return cls(dists, model_x, rng)
 
     @classmethod
@@ -444,14 +461,14 @@ class DataConditional(Base):
     dists = property(lambda self: self._dists)
     model_x = property(lambda self: self._model_x)
 
-    @property
-    def p_x(self):
-        """The marginal probabilities for values `x`."""
-        return self.model_x.p
-
-    @p_x.setter
-    def p_x(self, value):
-        self.model_x.p = value
+    # @property  # TODO: delete? More general, not necessarily `FiniteGeneric` element!
+    # def p_x(self):
+    #     """The marginal probabilities for values `x`."""
+    #     return self.model_x.p
+    #
+    # @p_x.setter
+    # def p_x(self, value):
+    #     self.model_x.p = value
 
     @property
     def mode_x(self):
@@ -468,6 +485,8 @@ class DataConditional(Base):
 
 
 class DataConditionalRVx(MixinRVx, DataConditional):
+    model_x: random.elements.BaseRV
+
     def _get_idx_x(self, x):
         return np.flatnonzero(np.isclose(x, self.space['x'].values)).item()
 
@@ -498,7 +517,7 @@ class ClassConditional(MixinRVx, Base):
 
     Parameters
     ----------
-    dists : iterable of rand_elements.Base
+    dists : iterable of random.elements.Base
         Explicit conditional random elements characterizing `x` for each possible value of `y`.
     model_y : stats_learn.random.elements.Base
         Random variable characterizing the marginal distribution of `y`.
@@ -513,12 +532,14 @@ class ClassConditional(MixinRVx, Base):
         self._model_y = model_y
 
         self._space['y'] = self.model_y.space
-        if not (isinstance(self.space['y'], spaces.Finite) and self.space['y'].ndim == 0):
-            raise ValueError
+        if not isinstance(self.space['y'], spaces.FiniteGeneric):
+            raise ValueError(f"Class space must be finite.")
         elif self.space['y'].set_shape != (len(self.dists),):
-            raise ValueError("Incorrect number of conditional distributions.")
-        elif not np.issubdtype(self.space['y'].dtype, 'U'):
-            raise ValueError("Space must be categorical")
+            raise ValueError("Class space set shape must match number of distributions.")
+        # elif not np.issubdtype(self.space['y'].dtype, 'U'):  # TODO: deprecate dtype enforce
+        #     raise ValueError("Space must be categorical")
+
+        self._p_y = None
 
         self._space['x'] = spaces.check_spaces(self.dists)
 
@@ -529,7 +550,7 @@ class ClassConditional(MixinRVx, Base):
 
         Parameters
         ----------
-        dists : iterable of rand_elements.Base
+        dists : iterable of random.elements.Base
             Explicit conditional random elements characterizing `x` for each possible value of `y`.
         values_y : array_like
             Explicit domain values for `y`.
@@ -543,8 +564,8 @@ class ClassConditional(MixinRVx, Base):
         ClassConditional
 
         """
-        model_y = rand_elements.FiniteGeneric(values_y, p_y)  # TODO: shouldn't enforce dtype
-        # model_y = rand_elements.FiniteGeneric(np.array(values_y, dtype='U').flatten(), p_y)
+        model_y = random.elements.FiniteGeneric(values_y, p_y)  # TODO: shouldn't enforce dtype
+        # model_y = random.elements.FiniteGeneric(np.array(values_y, dtype='U').flatten(), p_y)
         return cls(dists, model_y, rng)
 
     dists = property(lambda self: self._dists)
@@ -553,12 +574,15 @@ class ClassConditional(MixinRVx, Base):
     @property
     def p_y(self):
         """The marginal probabilities for values `y`."""
-        return self.model_y.p
+        if self._p_y is None:
+            self._p_y = self.model_y.prob(self.space['y'].x_plt)
+        return self._p_y
+        # return self.model_y.p
 
-    @p_y.setter
-    def p_y(self, value):
-        self.model_y.p = value
-        self._update_attr()
+    # @p_y.setter  # TODO: delete?
+    # def p_y(self, value):
+    #     self.model_y.p = value
+    #     self._update_attr()
 
     def _update_attr(self):
         self._model_x = None
@@ -569,7 +593,7 @@ class ClassConditional(MixinRVx, Base):
     @property
     def model_x(self):
         if self._model_x is None:
-            self._model_x = rand_elements.MixtureRV(self.dists, self.p_y)
+            self._model_x = random.elements.MixtureRV(self.dists, self.p_y)
 
         return self._model_x
 
@@ -592,7 +616,7 @@ class ClassConditional(MixinRVx, Base):
     def model_y_x(self, x):
         temp = np.array([dist.prob(x) * p for dist, p in zip(self.dists, self.p_y)])
         p_y_x = temp / temp.sum()
-        return rand_elements.FiniteGeneric(self.space['y'].values, p_y_x)
+        return random.elements.FiniteGeneric(self.space['y'].values, p_y_x)
 
     def model_x_y(self, y):
         idx = self.space['y'].values.tolist().index(y)
@@ -625,7 +649,7 @@ class BetaLinear(MixinRVx, MixinRVy, Base):
 
     # TODO: DRY with NormalLinear
 
-    def __init__(self, weights=(0.,), basis_y_x=None, alpha_y_x=2., model_x=rand_elements.Beta(), rng=None):
+    def __init__(self, weights=(0.,), basis_y_x=None, alpha_y_x=2., model_x=random.elements.Beta(), rng=None):
         super().__init__(rng)
 
         self._space['x'] = model_x.space
@@ -681,7 +705,7 @@ class BetaLinear(MixinRVx, MixinRVy, Base):
         return mean * (1 - mean) / (self.alpha_y_x + 1)
 
     def model_y_x(self, x):
-        return rand_elements.Beta.from_mean(self.mean_y_x(x), self.alpha_y_x)
+        return random.elements.Beta.from_mean(self.mean_y_x(x), self.alpha_y_x)
 
     def _mode_y_x_single(self, x):
         return self.model_y_x(x).mode
@@ -705,7 +729,7 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
         Random number generator seed or object.
 
     """
-    def __init__(self, weights=(0.,), basis_y_x=None, cov_y_x=1., model_x=rand_elements.Normal(), rng=None):
+    def __init__(self, weights=(0.,), basis_y_x=None, cov_y_x=1., model_x=random.elements.Normal(), rng=None):
         super().__init__(rng)
 
         self.model_x = model_x
@@ -777,7 +801,7 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
     def model_y_x(self, x):
         mean = self.mean_y_x(x)
         cov = self._cov_y_x_single(x)
-        return rand_elements.Normal(mean, cov)
+        return random.elements.Normal(mean, cov)
 
 
 class DataEmpirical(Base):
@@ -828,7 +852,7 @@ class DataEmpirical(Base):
         else:
             self._space = space
 
-        self._model_x = rand_elements.DataEmpirical([], [], space=self.space['x'])
+        self._model_x = random.elements.DataEmpirical([], [], space=self.space['x'])
         self._models_y_x = []
 
         self.n = 0
@@ -920,7 +944,7 @@ class DataEmpirical(Base):
 
             idx = self._model_x._get_idx(x_add)
             if idx is None:
-                self._models_y_x.append(rand_elements.DataEmpirical(values_y, counts_y, self.space['y']))
+                self._models_y_x.append(random.elements.DataEmpirical(values_y, counts_y, self.space['y']))
             else:
                 self._models_y_x[idx].add_values(values_y, counts_y)
 
@@ -949,7 +973,7 @@ class DataEmpirical(Base):
         if idx is not None:
             return self._models_y_x[idx]
         else:
-            return rand_elements.DataEmpirical([], [], space=self.space['y'])
+            return random.elements.DataEmpirical([], [], space=self.space['y'])
 
     def _mode_y_x_single(self, x):
         idx = self._get_idx_x(x)
@@ -1102,7 +1126,7 @@ class Mixture(Base):
                 self._model_x = self._dists[self._idx_nonzero.item()].model_x
             else:
                 args = zip(*[(self.dists[i].model_x, self.weights[i]) for i in self._idx_nonzero])
-                self._model_x = rand_elements.Mixture(*args)
+                self._model_x = random.elements.Mixture(*args)
 
         return self._model_x
 
@@ -1120,7 +1144,7 @@ class Mixture(Base):
             return self._dists[idx_nonzero.item()].model_y_x(x)
         else:
             args = zip(*[(self.dists[i].model_y_x(x), _weights[i]) for i in idx_nonzero])
-            return rand_elements.Mixture(*args)
+            return random.elements.Mixture(*args)
 
     def _weights_y_x(self, x):
         return np.array([w * dist.model_x.prob(x) for w, dist in zip(self.weights, self.dists)])

@@ -5,8 +5,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 from scipy.stats._multivariate import _PSD
 
-from stats_learn import spaces
-from stats_learn.random import elements as rand_elements
+from stats_learn import spaces, random
 from stats_learn.util import RandomGeneratorMixin
 
 
@@ -47,7 +46,7 @@ class Base(RandomGeneratorMixin, ABC):
         """Generate a random element with a randomly selected parameterization."""
         raise NotImplementedError
 
-    sample = rand_elements.Base.sample
+    sample = random.elements.Base.sample
 
     def _sample(self, n, rng):
         return self.random_model(rng)._sample(n, rng)
@@ -103,13 +102,13 @@ class NormalLinear(Base):
         Random number generator seed or object.
 
     """
-    prior: rand_elements.Normal
+    prior: random.elements.Normal
     can_warm_start = True
 
     def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis=None, cov=1., *, allow_singular=False,
                  rng=None):
         # Prior
-        prior = rand_elements.Normal(prior_mean, prior_cov)
+        prior = random.elements.Normal(prior_mean, prior_cov)
         super().__init__(prior, rng)
         if self.prior.ndim > 1:
             raise NotImplementedError("Only 1-dimensional priors are supported.")
@@ -133,8 +132,8 @@ class NormalLinear(Base):
         self._n = 0
         self._mean_data_temp = np.zeros(self.prior.shape)
 
-        self.posterior = rand_elements.Normal(self.prior_mean, self.prior_cov)
-        self.posterior_model = rand_elements.NormalLinear(**self._prior_model_kwargs)
+        self.posterior = random.elements.Normal(self.prior_mean, self.prior_cov)
+        self.posterior_model = random.elements.NormalLinear(**self._prior_model_kwargs)
 
     # Methods
     def random_model(self, rng=None):
@@ -144,7 +143,7 @@ class NormalLinear(Base):
         model_kwargs = {'basis': self.basis, 'cov': self.cov, 'rng': rng}
         rand_kwargs = {'weights': self.prior.sample(rng=rng)}
 
-        return rand_elements.NormalLinear(**model_kwargs, **rand_kwargs)
+        return random.elements.NormalLinear(**model_kwargs, **rand_kwargs)
 
     def reset(self):
         """Restore unfit prior state."""
@@ -252,8 +251,8 @@ class Dirichlet(Base):
         super().__init__(prior=None, rng=rng)
         self._space = prior_mean.space
 
-        _emp_dist = rand_elements.DataEmpirical([], [], space=self.space)
-        self.posterior_model = rand_elements.Mixture([prior_mean, _emp_dist], [alpha_0, _emp_dist.n])
+        _emp_dist = random.elements.DataEmpirical([], [], space=self.space)
+        self.posterior_model = random.elements.Mixture([prior_mean, _emp_dist], [alpha_0, _emp_dist.n])
 
     def __repr__(self):
         return f"Dirichlet(alpha_0={self.alpha_0}, n={self.n}, prior_mean={self.prior_mean})"
@@ -311,7 +310,7 @@ class Dirichlet(Base):
 
     def reset(self):
         """Restore unfit prior state."""
-        self.emp_dist = rand_elements.DataEmpirical([], [], space=self.space)
+        self.emp_dist = random.elements.DataEmpirical([], [], space=self.space)
 
     def _fit(self, d):
         emp_dist = self.emp_dist

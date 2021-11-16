@@ -6,10 +6,8 @@ from typing import Union
 
 import numpy as np
 
-from stats_learn import spaces
-from stats_learn.bayes import models as bayes_models
+from stats_learn import spaces, random, bayes
 from stats_learn.loss_funcs import loss_se, loss_01
-from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.results import (assess_single_compare, predict_stats_compare, plot_predict_stats_compare,
                                  risk_eval_sim_compare, risk_eval_analytic_compare, plot_risk_eval_sim_compare,
                                  assess_compare)
@@ -341,7 +339,7 @@ class Base(ABC):
 
 class ClassifierMixin:
     """Uses model conditional mode to minimize 0-1 loss."""
-    model: rand_models.Base
+    model: random.models.Base
 
     def _predict(self, x):
         return self.model.mode_y_x(x)
@@ -349,7 +347,7 @@ class ClassifierMixin:
 
 class RegressorMixin:
     """Uses model conditional mean to minimize squared-error loss."""
-    model: Union[rand_models.Base, rand_models.MixinRVy]
+    model: Union[random.models.Base, random.models.MixinRVy]
 
     def _predict(self, x):
         return self.model.mean_y_x(x)
@@ -454,7 +452,7 @@ class ModelRegressor(RegressorMixin, Model):
 
         n_train = np.array(n_train)
 
-        if isinstance(model, (rand_models.Base, rand_models.MixinRVy)):
+        if isinstance(model, random.models.BaseRVy):
             if isinstance(model.space['x'], spaces.FiniteGeneric):
                 x = model.space['x'].values_flat
 
@@ -468,7 +466,7 @@ class ModelRegressor(RegressorMixin, Model):
             else:
                 raise NotImplementedError
 
-        elif isinstance(model, bayes_models.Base):
+        elif isinstance(model, bayes.models.Base):
             raise NotImplementedError
 
 
@@ -579,9 +577,9 @@ class BayesRegressor(RegressorMixin, Bayes):
 
         n_train = np.array(n_train)
 
-        if isinstance(model, (rand_models.Base, rand_models.MixinRVy)):
+        if isinstance(model, (random.models.Base, random.models.MixinRVy)):
             if (isinstance(model.space['x'], spaces.FiniteGeneric)
-                    and isinstance(self.bayes_model, bayes_models.Dirichlet)):
+                    and isinstance(self.bayes_model, bayes.models.Dirichlet)):
 
                 x = model.space['x'].values_flat
 
@@ -594,7 +592,7 @@ class BayesRegressor(RegressorMixin, Bayes):
                 w_cov = np.zeros((n_train.size, p_x.size))
                 w_bias = np.zeros((n_train.size, p_x.size))
                 for i_n, n_i in enumerate(n_train.flatten()):
-                    rv = rand_elements.Binomial(.5, n_i)
+                    rv = random.elements.Binomial(.5, n_i)
                     values = rv.space.values
                     for i_x, (p_i, a_i) in enumerate(zip(p_x, alpha_x)):
                         rv.p = p_i
@@ -611,12 +609,12 @@ class BayesRegressor(RegressorMixin, Bayes):
             else:
                 raise NotImplementedError
 
-        elif isinstance(model, bayes_models.Base):
+        elif isinstance(model, bayes.models.Base):
 
             if (isinstance(model.space['x'], spaces.FiniteGeneric)
-                    and isinstance(self.bayes_model, bayes_models.Dirichlet)):
+                    and isinstance(self.bayes_model, bayes.models.Dirichlet)):
 
-                if (isinstance(model, bayes_models.Dirichlet) and model.alpha_0 == self.bayes_model.alpha_0
+                if (isinstance(model, bayes.models.Dirichlet) and model.alpha_0 == self.bayes_model.alpha_0
                         and model.prior_mean == self.bayes_model.prior_mean and n_test == 1):
                     # Minimum Bayesian squared-error
 

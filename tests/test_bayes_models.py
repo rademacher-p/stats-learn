@@ -1,17 +1,16 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
+from stats_learn import random
 from stats_learn.bayes.models import NormalLinear, Dirichlet
-from stats_learn.random import elements as rand_elements, models as rand_models
 
 plt.matplotlib.interactive(False)
 
 RM_set = [
     (NormalLinear, dict(prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
-                        model_x=rand_elements.Normal())),
-    (Dirichlet, dict(prior_mean=rand_models.NormalLinear(weights=(2,), basis_y_x=(lambda x: 1,), cov_y_x=.1,
-                                                         model_x=rand_elements.FiniteGeneric(np.linspace(0, 1, 10,
-                                                                                                         endpoint=False))),
+                        model_x=random.elements.Normal())),
+    (Dirichlet, dict(prior_mean=random.models.NormalLinear(weights=(2,), basis_y_x=(lambda x: 1,), cov_y_x=.1,
+                                                           model_x=random.elements.FiniteGeneric(np.linspace(0, 1, 10, endpoint=False))),
                      alpha_0=1)),
 ]
 

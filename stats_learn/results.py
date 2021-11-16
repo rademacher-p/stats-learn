@@ -17,7 +17,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from more_itertools import all_equal
 
-from stats_learn.bayes import models as bayes_models
+from stats_learn import bayes
 from stats_learn.util import check_data_shape
 
 # from pytorch_lightning.utilities.seed import seed_everything
@@ -625,7 +625,7 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
     elif do_loss and plot_loss:
         _plot_risk_eval_compare(loss_full, predictors, params_full, n_train, ax)
         ax = plt.gca()
-        if isinstance(model, bayes_models.Base):
+        if isinstance(model, bayes.models.Base):
             ax.set(ylabel=str_risk_bayes)  # different notation for bayes risk
     else:
         img_path = None
@@ -743,7 +743,7 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, 
 
     if ax is None:
         _, ax = plt.subplots()
-        if isinstance(model, bayes_models.Base):
+        if isinstance(model, bayes.models.Base):
             ylabel = str_risk_bayes
         else:
             ylabel = r'$R(f;\theta)$'

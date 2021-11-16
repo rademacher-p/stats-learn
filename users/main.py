@@ -11,10 +11,8 @@ from pytorch_lightning.callbacks import EarlyStopping
 import pytorch_lightning.loggers as pl_loggers
 from pytorch_lightning.utilities.seed import seed_everything
 
-from stats_learn.random import elements as rand_elements, models as rand_models
-from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
-from stats_learn import results
+from stats_learn import random, bayes, results
 from stats_learn.util import get_now
 from stats_learn.preprocessing import make_clipper
 from stats_learn.predictors.torch import LitMLP, LitPredictor, reset_weights
@@ -71,19 +69,19 @@ nonlinear_model = make_inv_trig(shape_x)
 # nonlinear_model = make_rand_discrete(n_x, rng=seed)
 
 
-model_x = rand_elements.FiniteGeneric.from_grid([0, 1], n_x)
-# model = rand_models.DataConditional.from_mean_poly_emp(n_x, alpha_y_x_d, w_model, model_x)
-model = rand_models.DataConditional.from_mean_emp(alpha_y_x_d, n_x, nonlinear_model, model_x)
+model_x = random.elements.FiniteGeneric.from_grid([0, 1], n_x)
+# model = random.models.DataConditional.from_mean_poly_emp(n_x, alpha_y_x_d, w_model, model_x)
+model = random.models.DataConditional.from_mean_emp(alpha_y_x_d, n_x, nonlinear_model, model_x)
 
-# model_x = rand_elements.Uniform(lims_x)
-# # model = rand_models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
-# model = rand_models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x)
+# model_x = random.elements.Uniform(lims_x)
+# # model = random.models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
+# model = random.models.BetaLinear(weights=[1], basis_y_x=[nonlinear_model], alpha_y_x=alpha_y_x_beta, model_x=model_x)
 
-# model = rand_models.NormalLinear(weights=w_model, basis_y_x=None, cov_y_x=.1, model_x=model_x)
+# model = random.models.NormalLinear(weights=w_model, basis_y_x=None, cov_y_x=.1, model_x=model_x)
 
 
-# model = bayes_models.Dirichlet(model, alpha_0=4e2)
-if isinstance(model, bayes_models.Base):
+# model = bayes.models.Dirichlet(model, alpha_0=4e2)
+if isinstance(model, bayes.models.Base):
     opt_predictor = BayesRegressor(model, name=r'$f_\uptheta$')
 else:
     opt_predictor = ModelRegressor(model, name=r'$f^*(\theta)$')
@@ -99,23 +97,23 @@ w_prior = [.5, 0]
 # Dirichlet learner
 proc_funcs = []
 
-prior_mean = rand_models.DataConditional.from_mean_poly_emp(alpha_y_x_d, n_x, w_prior, model_x)
+prior_mean = random.models.DataConditional.from_mean_poly_emp(alpha_y_x_d, n_x, w_prior, model_x)
 # _func = lambda x: .5*(1-np.sin(2*np.pi*x))
-# prior_mean = rand_models.DataConditional.from_mean_emp(n_x, alpha_y_x_d, _func, model_x)
+# prior_mean = random.models.DataConditional.from_mean_emp(n_x, alpha_y_x_d, _func, model_x)
 
 
 # n_t = 16
 # values_t = box_grid(model_x.lims, n_t, endpoint=True)
 # # _temp = np.ones(model_x.size*(n_t,))
 # _temp = prob_disc(model_x.size*(n_t,))
-# # prior_mean_x = rand_elements.FiniteGeneric(values_t, p=_temp/_temp.sum())
-# prior_mean_x = rand_elements.DataEmpirical(values_t, counts=_temp, space=model_x.space)
+# # prior_mean_x = random.elements.FiniteGeneric(values_t, p=_temp/_temp.sum())
+# prior_mean_x = random.elements.DataEmpirical(values_t, counts=_temp, space=model_x.space)
 # proc_funcs.append(make_discretizer(values_t.reshape(-1, *model_x.shape)))
 #
-# prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
+# prior_mean = random.models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=prior_mean_x)
 
 
-dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
+dir_model = bayes.models.Dirichlet(prior_mean, alpha_0=10)
 dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=proc_funcs, name=r'$\mathrm{Dir}$')
 
 # dir_params = {}
@@ -131,7 +129,7 @@ dir_params = {'alpha_0': [10, 1000]}
 # dir_params = {'alpha_0': np.logspace(-3., 3., 60)}
 
 
-if isinstance(model, bayes_models.Dirichlet):  # add true bayes model concentration
+if isinstance(model, bayes.models.Dirichlet):  # add true bayes model concentration
     if model.alpha_0 not in dir_params['alpha_0']:
         dir_params['alpha_0'] = np.sort(np.concatenate((dir_params['alpha_0'], [model.alpha_0])))
 
@@ -157,7 +155,7 @@ basis_y_x = None
 # proc_funcs = []
 proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
 
-norm_model = bayes_models.NormalLinear(prior_mean=w_prior_norm, prior_cov=.1, basis_y_x=basis_y_x, cov_y_x=.1,
+norm_model = bayes.models.NormalLinear(prior_mean=w_prior_norm, prior_cov=.1, basis_y_x=basis_y_x, cov_y_x=.1,
                                        model_x=model_x, allow_singular=True)
 norm_predictor = BayesRegressor(norm_model, space=model.space, proc_funcs=proc_funcs, name=r'$\mathcal{N}$')
 
@@ -303,9 +301,9 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
 #     pickle.dump(fig, f)
 
 
-# model_x = rand_elements.FiniteGeneric([0, .5], p=None)
-# model = rand_models.DataConditional([rand_elements.FiniteGeneric([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
-# prior_mean = rand_models.DataConditional([rand_elements.FiniteGeneric([0, .5], [p, 1 - p]) for p in (.9, .9)], model_x)
+# model_x = rand.elements.FiniteGeneric([0, .5], p=None)
+# model = random.models.DataConditional([random.elements.FiniteGeneric([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
+# prior_mean = random.models.DataConditional([random.elements.FiniteGeneric([0, .5], [p, 1 - p]) for p in (.9, .9)], model_x)
 
 
 # _name = r'$\mathrm{Dir}$'
@@ -333,11 +331,11 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
 # for n_t, _params in zip(n_t_iter, dir_params_full):
 #     _temp = np.full(n_t, 2)
 #     _temp[[0, -1]] = 1  # first/last half weight due to rounding discretizer and uniform marginal model
-#     prior_mean_x = rand_elements.FiniteGeneric(np.linspace(0, 1, n_t), p=_temp / _temp.sum())
-#     prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta,
+#     prior_mean_x = random.elements.FiniteGeneric(np.linspace(0, 1, n_t), p=_temp / _temp.sum())
+#     prior_mean = random.models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x_beta,
 #                                         model_x=prior_mean_x)
 #
-#     dir_predictors.append(BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=0.01),
+#     dir_predictors.append(BayesRegressor(bayes.models.Dirichlet(prior_mean, alpha_0=0.01),
 #                                          space=model.space, proc_funcs=[make_discretizer(prior_mean_x.values)],
 #                                          name=r'$\mathrm{Dir}$, $|\mathcal{T}| = card$'.replace('card', str(n_t)),
 #                                          ))
@@ -404,10 +402,10 @@ y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_tr
 
 # print(f"\nAnalytical Risk = {opt_predictor.evaluate_analytic(n_train=n_train)}")
 
-# if isinstance(model, rand_models.Base):
+# if isinstance(model, random.models.Base):
 #     risk_an = opt_predictor.risk_min()
 #     print(f"Min risk = {risk_an}")
-# elif isinstance(model, bayes_models.Base):
+# elif isinstance(model, bayes.models.Base):
 #     risk_an = opt_predictor.bayes_risk_min(n_train)
 #     print(f"Min Bayes risk = {risk_an}")
 # else:

@@ -3,8 +3,7 @@ from warnings import warn
 import matplotlib.pyplot as plt
 import numpy as np
 
-from stats_learn.random import elements as rand_elements
-from stats_learn import spaces
+from stats_learn import spaces, random
 
 plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r"\usepackage{PhDmath}")
@@ -87,14 +86,14 @@ def plot_dirs(dirs, n_plot=None, titles=None, orient='h', same_cm=True, cm_hack=
 def prior_post():
     mean = np.array([.4, .3, .3])
     alpha_0 = 6
-    dir_prior = rand_elements.Dirichlet(mean, alpha_0)
+    dir_prior = random.elements.Dirichlet(mean, alpha_0)
 
     psi = np.array([0, 1 / 3, 2 / 3])
     n = 3
 
     alpha_0_post = alpha_0 + n
     mean_post = (alpha_0 * mean + n * psi) / alpha_0_post
-    dir_post = rand_elements.Dirichlet(mean_post, alpha_0_post)
+    dir_post = random.elements.Dirichlet(mean_post, alpha_0_post)
 
     dirs = [dir_prior, dir_post]
 
@@ -107,7 +106,7 @@ def prior_post():
 def localization():
     mean = np.array(np.ones(3) / 3)
     alpha_0_vec = [1e2, 1e-2]
-    dirs = [rand_elements.Dirichlet(mean, alpha_0) for alpha_0 in alpha_0_vec]
+    dirs = [random.elements.Dirichlet(mean, alpha_0) for alpha_0 in alpha_0_vec]
 
     # titles = [r'$\alpha_0 \alpha_\mathrm{m}(x) \to 0$',
     #           r'$\alpha_0 \alpha_\mathrm{m}(x) \to \infty$']
