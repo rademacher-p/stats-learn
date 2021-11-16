@@ -4,9 +4,8 @@ from pathlib import Path
 import numpy as np
 from matplotlib import pyplot as plt
 
-from stats_learn.bayes import models as bayes_models
+from stats_learn import random, bayes
 from stats_learn.predictors.base import BayesRegressor
-from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.util import get_now
 
 
@@ -46,15 +45,15 @@ n_x = n_y = 128
 var_y_x_const = 1 / 5
 w_model = [.5]
 
-model_x = rand_elements.FiniteGeneric.from_grid([0, 1], n_x, p=None)
+model_x = random.elements.FiniteGeneric.from_grid([0, 1], n_x, p=None)
 
 alpha_y_x = (1 - var_y_x_const) / (np.float64(var_y_x_const) - 1 / (n_y - 1))
-prior_mean = rand_models.DataConditional.from_mean_poly_emp(alpha_y_x, n_x, w_model, model_x)
-model = bayes_models.Dirichlet(prior_mean, alpha_0=4e2)
+prior_mean = random.models.DataConditional.from_mean_poly_emp(alpha_y_x, n_x, w_model, model_x)
+model = bayes.models.Dirichlet(prior_mean, alpha_0=4e2)
 
 
 # # Dirichlet Learner
-dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
+dir_model = bayes.models.Dirichlet(prior_mean, alpha_0=10)
 dir_predictor = BayesRegressor(dir_model, name=r'$\mathrm{Dir}$')
 
 

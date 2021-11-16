@@ -8,13 +8,11 @@ from matplotlib import pyplot as plt
 from pytorch_lightning.callbacks import EarlyStopping
 from pytorch_lightning.utilities.seed import seed_everything
 
-from stats_learn import results
-from stats_learn.bayes import models as bayes_models
+from stats_learn import random, bayes, results
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
 from stats_learn.predictors.torch import LitMLP, LitPredictor
 from stats_learn.preprocessing import make_clipper
 from stats_learn.preprocessing import make_discretizer
-from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.util import get_now
 
 
@@ -59,10 +57,10 @@ def clairvoyant_func(x):
     return .5 + np.where(y > 0, .3, -.3) - .3 * y
 
 
-model_x = rand_elements.Uniform([0, 1])
+model_x = random.elements.Uniform([0, 1])
 
 alpha_y_x = 1 / var_y_x_const - 1
-model = rand_models.BetaLinear(weights=[1], basis_y_x=[clairvoyant_func], alpha_y_x=alpha_y_x, model_x=model_x)
+model = random.models.BetaLinear(weights=[1], basis_y_x=[clairvoyant_func], alpha_y_x=alpha_y_x, model_x=model_x)
 
 opt_predictor = ModelRegressor(model, name=r'$f^*(\theta)$')
 
@@ -86,11 +84,11 @@ for n_t in n_t_iter:
         values_t = np.linspace(*model_x.lims, n_t, endpoint=False) + .5 / n_t
         counts = np.ones_like(values_t)
 
-        prior_mean_x = rand_elements.DataEmpirical(values_t, counts, space=model_x.space)
-        prior_mean = rand_models.BetaLinear(weights=[1], basis_y_x=[prior_func], alpha_y_x=alpha_y_x,
-                                            model_x=prior_mean_x)
+        prior_mean_x = random.elements.DataEmpirical(values_t, counts, space=model_x.space)
+        prior_mean = random.models.BetaLinear(weights=[1], basis_y_x=[prior_func], alpha_y_x=alpha_y_x,
+                                              model_x=prior_mean_x)
 
-        dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=alpha_0_norm * n_t)
+        dir_model = bayes.models.Dirichlet(prior_mean, alpha_0=alpha_0_norm * n_t)
 
         name_ = r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{n_t}$" + \
                 r", $\alpha_0 / |\mathcal{T}| = " + f"{alpha_0_norm}$"
@@ -109,11 +107,11 @@ def make_normalized(n_t_iter_, dir_params_):
     for n_t_, params_ in zip(n_t_iter_, dir_params_full_):
         values_t_ = np.linspace(*model_x.lims, n_t_, endpoint=False) + .5 / n_t_
 
-        prior_mean_x_ = rand_elements.DataEmpirical(values_t_, counts=np.ones_like(values_t), space=model_x.space)
-        prior_mean_ = rand_models.BetaLinear(weights=[1], basis_y_x=[prior_func], alpha_y_x=alpha_y_x,
-                                             model_x=prior_mean_x_)
+        prior_mean_x_ = random.elements.DataEmpirical(values_t_, counts=np.ones_like(values_t), space=model_x.space)
+        prior_mean_ = random.models.BetaLinear(weights=[1], basis_y_x=[prior_func], alpha_y_x=alpha_y_x,
+                                               model_x=prior_mean_x_)
 
-        dir_model_ = bayes_models.Dirichlet(prior_mean_, alpha_0=10)
+        dir_model_ = bayes.models.Dirichlet(prior_mean_, alpha_0=10)
         dir_predictor_ = BayesRegressor(dir_model_, space=model.space, proc_funcs=[make_discretizer(values_t_)],
                                         name=r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{n_t_}$")
 

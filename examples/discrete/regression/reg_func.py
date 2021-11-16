@@ -8,12 +8,10 @@ from matplotlib import pyplot as plt
 from pytorch_lightning.callbacks import EarlyStopping
 from pytorch_lightning.utilities.seed import seed_everything
 
-from stats_learn import results
-from stats_learn.bayes import models as bayes_models
+from stats_learn import random, bayes, results
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
 from stats_learn.predictors.torch import LitMLP, LitPredictor, reset_weights
 from stats_learn.preprocessing import make_clipper
-from stats_learn.random import elements as rand_elements, models as rand_models
 from stats_learn.util import get_now
 
 
@@ -58,10 +56,10 @@ def clairvoyant_func(x):
     return _rand_vals[x]
 
 
-model_x = rand_elements.FiniteGeneric.from_grid([0, 1], n_x, p=None)
+model_x = random.elements.FiniteGeneric.from_grid([0, 1], n_x, p=None)
 
 alpha_y_x = (1 - var_y_x_const) / (np.float64(var_y_x_const) - 1 / (n_y - 1))
-model = rand_models.DataConditional.from_mean_emp(alpha_y_x, n_y, clairvoyant_func, model_x)
+model = random.models.DataConditional.from_mean_emp(alpha_y_x, n_y, clairvoyant_func, model_x)
 
 opt_predictor = ModelRegressor(model, name=r'$f^*(\theta)$')
 
@@ -69,8 +67,8 @@ opt_predictor = ModelRegressor(model, name=r'$f^*(\theta)$')
 # # Learners
 
 # Dirichlet
-prior_mean = rand_models.DataConditional.from_mean_emp(alpha_y_x, n_y, lambda x: .5, model_x)
-dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
+prior_mean = random.models.DataConditional.from_mean_emp(alpha_y_x, n_y, lambda x: .5, model_x)
+dir_model = bayes.models.Dirichlet(prior_mean, alpha_0=10)
 
 dir_predictor = BayesRegressor(dir_model, space=model.space, name=r'$\mathrm{Dir}$')
 dir_params = {'alpha_0': [1e-5, 1e5]}
