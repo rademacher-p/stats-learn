@@ -6,11 +6,8 @@ from typing import Union
 
 import numpy as np
 
-from stats_learn import spaces, random, bayes
+from stats_learn import spaces, random, bayes, results
 from stats_learn.loss_funcs import loss_se, loss_01
-from stats_learn.results import (assess_single_compare, predict_stats_compare, plot_predict_stats_compare,
-                                 risk_eval_sim_compare, risk_eval_analytic_compare, plot_risk_eval_sim_compare,
-                                 assess_compare)
 
 
 # Base and Mixin classes
@@ -223,8 +220,8 @@ class Base(ABC):
         return self.space['x'].plot(self.predict, x, ax=ax, label=label)
 
     # Assessment
-    def assess_single(self, d_train=None, d_test=None, params=None, x=None, verbose=False, log_path=None, img_path=None,
-                      ax=None):
+    def data_assess(self, d_train=None, d_test=None, params=None, x=None, verbose=False, log_path=None, img_path=None,
+                    ax=None):
         """
         Assess predictor using a single dataset.
 
@@ -253,11 +250,11 @@ class Base(ABC):
             Empirical risk values for each parameterization.
 
         """
-        return assess_single_compare([self], d_train, d_test, [params], x, verbose, log_path, img_path, ax)
+        return results.data_assess([self], d_train, d_test, [params], x, verbose, log_path, img_path, ax)
 
-    def assess(self, model=None, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
-               plot_stats=False, plot_loss=False, print_loss=False, log_path=None, img_path=None, ax=None,
-               rng=None):
+    def model_assess(self, model=None, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
+                     plot_stats=False, plot_loss=False, print_loss=False, log_path=None, img_path=None, ax=None,
+                     rng=None):
         """
         Assess predictor using Monte Carlo simulation of prediction statistics and empirical risk.
 
@@ -304,37 +301,37 @@ class Base(ABC):
         """
         if model is None:
             model = self._model_obj
-        out = assess_compare([self], model, [params], n_train, n_test, n_mc, x, stats, verbose, plot_stats, plot_loss,
-                             print_loss, log_path, img_path, ax, rng)
+        out = results.model_assess([self], model, [params], n_train, n_test, n_mc, x, stats, verbose, plot_stats,
+                                   plot_loss, print_loss, log_path, img_path, ax, rng)
         return map(itemgetter(0), out)
 
     # Assessment shortcuts
     def predict_stats(self, model=None, params=None, n_train=0, n_mc=1, x=None, stats=('mode',), verbose=False):
         if model is None:
             model = self._model_obj
-        return predict_stats_compare([self], model, [params], n_train, n_mc, x, stats, verbose)[0]
+        return results.predict_stats([self], model, [params], n_train, n_mc, x, stats, verbose)[0]
 
     def plot_predict_stats(self, model=None, params=None, n_train=0, n_mc=1, x=None, do_std=False, verbose=False,
                            ax=None):
         if model is None:
             model = self._model_obj
-        return plot_predict_stats_compare([self], model, [params], n_train, n_mc, x, do_std, verbose, ax)
+        return results.plot_predict_stats([self], model, [params], n_train, n_mc, x, do_std, verbose, ax)
 
     def risk_eval_sim(self, model=None, params=None, n_train=0, n_test=1, n_mc=1, verbose=False):
         if model is None:
             model = self._model_obj
-        return risk_eval_sim_compare([self], model, [params], n_train, n_test, n_mc, verbose)[0]
+        return results.risk_eval_sim([self], model, [params], n_train, n_test, n_mc, verbose)[0]
 
     def plot_risk_eval_sim(self, model=None, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None):
         if model is None:
             model = self._model_obj
-        return plot_risk_eval_sim_compare([self], model, [params], n_train, n_test, n_mc, verbose, ax)
+        return results.plot_risk_eval_sim([self], model, [params], n_train, n_test, n_mc, verbose, ax)
 
     # Analytical evaluation
     def risk_eval_analytic(self, model=None, params=None, n_train=0, n_test=1, verbose=False):
         if model is None:
             model = self._model_obj
-        return risk_eval_analytic_compare([self], model, [params], n_train, n_test, verbose)[0]
+        return results.risk_eval_analytic([self], model, [params], n_train, n_test, verbose)[0]
 
 
 class ClassifierMixin:

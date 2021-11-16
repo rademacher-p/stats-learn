@@ -8,7 +8,6 @@ from stats_learn import random, bayes, results
 from stats_learn.predictors.base import ModelRegressor, BayesRegressor
 from stats_learn.util import get_now
 
-
 # # Input
 parser = argparse.ArgumentParser(description='Example: consistent regressor on a discrete domain')
 parser.add_argument('sims', nargs='*', choices=['fit', 'predict_a0', 'predict_N', 'risk_N_leg_a0', 'risk_a0_leg_N'],
@@ -28,6 +27,7 @@ log_path = Path(args.log_path)
 if log_path is not None and args.save_img:
     img_dir = log_path.parent / f"images/{get_now()}"
 
+
     def get_img_path(filename):
         return img_dir / filename
 else:
@@ -38,7 +38,6 @@ if args.style is not None:
     plt.style.use(args.style)
 
 seed = args.seed
-
 
 # # Model and optimal predictor
 n_x = n_y = 128
@@ -55,7 +54,6 @@ alpha_y_x = (1 - var_y_x_const) / (np.float64(var_y_x_const) - 1 / (n_y - 1))
 model = random.models.DataConditional.from_mean_emp(alpha_y_x, n_y, clairvoyant_func, model_x)
 
 opt_predictor = ModelRegressor(model, name=r'$f^*(\theta)$')
-
 
 # # Learners
 w_prior = [.5, 0]
@@ -83,7 +81,6 @@ temp = [
 ]
 predictors, params = zip(*temp)
 
-
 # # Results
 n_test = 1000
 
@@ -93,38 +90,37 @@ if 'fit' in sim_names:
     d = model.sample(n_train + n_test, rng=seed)
     d_train, d_test = np.split(d, [n_train])
 
-    results.assess_single_compare(predictors, d_train, d_test, params, log_path=log_path,
-                                  img_path=get_img_path('fit.png'))
+    results.data_assess(predictors, d_train, d_test, params, log_path=log_path, img_path=get_img_path('fit.png'))
 
 # Prediction mean/variance, comparative
 if 'predict_a0' in sim_names:
     n_train = 400
 
-    results.assess_compare(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
-                           plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict_a0.png'),
-                           rng=seed)
+    results.model_assess(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
+                         plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict_a0.png'),
+                         rng=seed)
 
 # Dirichlet-based prediction mean/variance, varying N
 if 'predict_N' in sim_names:
     n_train = [0, 800, 4000]
 
-    dir_predictor.assess(model, {'alpha_0': [1000]}, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
-                         plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict_N.png'),
-                         rng=seed)
+    dir_predictor.model_assess(model, {'alpha_0': [1000]}, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
+                               plot_stats=True, print_loss=True, log_path=log_path,
+                               img_path=get_img_path('predict_N.png'), rng=seed)
 
 # Squared-Error vs. training data volume N
 if 'risk_N_leg_a0' in sim_names:
     n_train = np.arange(0, 4050, 50)
 
-    results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True,
-                           print_loss=True, log_path=log_path, img_path=get_img_path('risk_N_leg_a0.png'), rng=seed)
+    results.model_assess(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True,
+                         print_loss=True, log_path=log_path, img_path=get_img_path('risk_N_leg_a0.png'), rng=seed)
 
 # Squared-Error vs. prior localization alpha_0
 if 'risk_a0_leg_N' in sim_names:
     n_train = [0, 100, 200, 400, 800]
 
-    dir_predictor.assess(model, {'alpha_0': np.logspace(0., 5., 100)}, n_train, n_test, n_mc, verbose=True,
-                         plot_loss=True, print_loss=True, log_path=log_path, img_path=get_img_path('risk_a0_leg_N.png'),
-                         rng=seed)
+    dir_predictor.model_assess(model, {'alpha_0': np.logspace(0., 5., 100)}, n_train, n_test, n_mc, verbose=True,
+                               plot_loss=True, print_loss=True, log_path=log_path,
+                               img_path=get_img_path('risk_a0_leg_N.png'), rng=seed)
 
     plt.gca().set_xscale('log')

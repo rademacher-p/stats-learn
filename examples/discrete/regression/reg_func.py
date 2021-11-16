@@ -130,20 +130,20 @@ if 'fit' in sim_names:
     d = model.sample(n_train + n_test, rng=seed)
     d_train, d_test = np.split(d, [n_train])
 
-    results.assess_single_compare(predictors, d_train, d_test, params, verbose=True, log_path=log_path,
-                                  img_path=get_img_path('fit.png'))
+    results.data_assess(predictors, d_train, d_test, params, verbose=True, log_path=log_path,
+                        img_path=get_img_path('fit.png'))
 
 # Prediction mean/variance, comparative
 if 'predict' in sim_names:
     n_train = 128
 
-    results.assess_compare(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
-                           plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict.png'),
-                           rng=seed)
+    results.model_assess(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
+                         plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict.png'),
+                         rng=seed)
 
 # Squared-Error vs. training data volume N
 if 'risk_N' in sim_names:
     n_train = np.insert(2**np.arange(11), 0, 0)
 
-    results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True,
-                           print_loss=True, log_path=log_path, img_path=get_img_path('risk_N.png'), rng=seed)
+    results.model_assess(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True,
+                         print_loss=True, log_path=log_path, img_path=get_img_path('risk_N.png'), rng=seed)

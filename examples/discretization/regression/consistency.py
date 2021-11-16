@@ -133,16 +133,16 @@ if 'fit' in sim_names:
     d_train, d_test = np.split(d, [n_train])
     x_plt = np.linspace(0, 1, 10000)
 
-    results.assess_single_compare(predictors, d_train, d_test, params, x_plt, verbose=True, log_path=log_path,
-                                  img_path=get_img_path('fit.png'))
+    results.data_assess(predictors, d_train, d_test, params, x_plt, verbose=True, log_path=log_path,
+                        img_path=get_img_path('fit.png'))
 
 # Prediction mean/variance, comparative
 if 'predict_T' in sim_names:
     n_train = 400
 
-    results.assess_compare(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
-                           plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict_T.png'),
-                           rng=seed)
+    results.model_assess(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
+                         plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict_T.png'),
+                         rng=seed)
 
 # Dirichlet-based prediction mean/variance, varying N
 if 'predict_N_T4.png' in sim_names:
@@ -153,9 +153,9 @@ if 'predict_N_T4.png' in sim_names:
     idx = n_t_iter.index(_t)
     _title = r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{_t}$" + r", $\alpha_0 / |\mathcal{T}| = " + f"{_alpha_0_norm}$"
 
-    dir_predictors[idx].assess(model, dir_params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
-                               plot_stats=True, print_loss=True, log_path=log_path,
-                               img_path=get_img_path(f'predict_N_T{_t}.png'), rng=seed)
+    dir_predictors[idx].model_assess(model, dir_params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
+                                     plot_stats=True, print_loss=True, log_path=log_path,
+                                     img_path=get_img_path(f'predict_N_T{_t}.png'), rng=seed)
 
     plt.gca().set(title=_title)
 
@@ -163,8 +163,8 @@ if 'predict_N_T4.png' in sim_names:
 if 'risk_N_leg_T' in sim_names:
     n_train = np.arange(0, 4050, 50)
 
-    results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True,
-                           print_loss=True, log_path=log_path, img_path=get_img_path('risk_N_leg_T.png'), rng=seed)
+    results.model_assess(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True,
+                         print_loss=True, log_path=log_path, img_path=get_img_path('risk_N_leg_T.png'), rng=seed)
 
 # Squared-Error vs. prior localization alpha_0
 if 'risk_a0norm_leg_T' in sim_names:
@@ -172,8 +172,8 @@ if 'risk_a0norm_leg_T' in sim_names:
     dir_params = {'alpha_0': np.logspace(-3, 3, 60)}
     dir_predictors, dir_params_full = make_normalized([2, 4, 8, 16], dir_params)
 
-    results.assess_compare(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, plot_loss=True,
-                           print_loss=True, log_path=log_path, img_path=get_img_path('risk_a0norm_leg_T.png'), rng=seed)
+    results.model_assess(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, plot_loss=True,
+                         print_loss=True, log_path=log_path, img_path=get_img_path('risk_a0norm_leg_T.png'), rng=seed)
 
     ax = plt.gca()
     if ax.get_xlabel() == r'$\alpha_0$':  # scale alpha axis, find localization minimum

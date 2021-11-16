@@ -27,13 +27,13 @@ params = [None, norm_params]
 n_train = 10
 d = model.sample(n_train + n_test, rng=seed)
 d_train, d_test = np.split(d, [n_train])
-results.assess_single_compare(predictors, d_train, d_test, params, verbose=True)
+results.data_assess(predictors, d_train, d_test, params, verbose=True)
 
 # Prediction mean/variance
 n_train = 10
-results.assess_compare(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
-                       plot_stats=True, print_loss=True, rng=seed)
+results.model_assess(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
+                     plot_stats=True, print_loss=True, rng=seed)
 
 # Squared-Error vs. training data volume
 n_train = np.linspace(0, 100, 21, dtype=int)
-results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True, rng=seed)
+results.model_assess(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True, rng=seed)

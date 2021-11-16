@@ -320,8 +320,8 @@ def _plot_risk_eval_compare(losses, predictors, params=None, n_train: Union[int,
 
 
 # Assessment tools
-def assess_single_compare(predictors, d_train=None, d_test=None, params=None, x=None, verbose=False, log_path=None,
-                          img_path=None, ax=None):
+def data_assess(predictors, d_train=None, d_test=None, params=None, x=None, verbose=False, log_path=None,
+                img_path=None, ax=None):
     """
     Assess and compare various predictors using a single dataset.
 
@@ -433,9 +433,9 @@ def assess_single_compare(predictors, d_train=None, d_test=None, params=None, x=
     return loss_full
 
 
-def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
-                   plot_stats=False, plot_loss=False, print_loss=False, log_path=None, img_path=None, ax=None,
-                   rng=None):
+def model_assess(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
+                 plot_stats=False, plot_loss=False, print_loss=False, log_path=None, img_path=None, ax=None,
+                 rng=None):
     """
     Assess and compare various predictors using Monte Carlo simulation of prediction statistics and empirical risk.
 
@@ -643,36 +643,36 @@ def assess_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, 
 
 
 # Assessment shortcuts
-def predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=None, do_std=False, verbose=False):
+def predict_stats(predictors, model, params=None, n_train=0, n_mc=1, x=None, do_std=False, verbose=False):
     stats = ['mean']
     if do_std:
         stats.append('std')
-    y_stats_full, __ = assess_compare(predictors, model, params, n_train, n_mc=n_mc, x=x, stats=stats, verbose=verbose)
+    y_stats_full, __ = model_assess(predictors, model, params, n_train, n_mc=n_mc, x=x, stats=stats, verbose=verbose)
     return y_stats_full
 
 
-def plot_predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=None, do_std=False, verbose=False,
-                               ax=None):
+def plot_predict_stats(predictors, model, params=None, n_train=0, n_mc=1, x=None, do_std=False, verbose=False,
+                       ax=None):
     stats = ['mean']
     if do_std:
         stats.append('std')
-    return assess_compare(predictors, model, params, n_train, n_mc=n_mc, x=x, stats=stats, verbose=verbose,
-                          plot_stats=True, ax=ax)
+    return model_assess(predictors, model, params, n_train, n_mc=n_mc, x=x, stats=stats, verbose=verbose,
+                        plot_stats=True, ax=ax)
 
 
-def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False):
-    __, loss_full = assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=verbose,
-                                   print_loss=True)
+def risk_eval_sim(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False):
+    __, loss_full = model_assess(predictors, model, params, n_train, n_test, n_mc, verbose=verbose,
+                                 print_loss=True)
     return loss_full
 
 
-def plot_risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None):
-    return assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=verbose, plot_loss=True,
-                          print_loss=True, ax=ax)
+def plot_risk_eval_sim(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None):
+    return model_assess(predictors, model, params, n_train, n_test, n_mc, verbose=verbose, plot_loss=True,
+                        print_loss=True, ax=ax)
 
 
 # Additional utilities
-def risk_eval_analytic_compare(predictors, model, params=None, n_train=0, n_test=1, verbose=False):
+def risk_eval_analytic(predictors, model, params=None, n_train=0, n_test=1, verbose=False):
     """Assess various predictors using analytical risk calculation."""
 
     if params is None:
@@ -737,7 +737,7 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, 
     else:
         raise ValueError
 
-    __, losses = assess_compare(predictors, model, params_full, n_train, n_test, n_mc, verbose)
+    __, losses = model_assess(predictors, model, params_full, n_train, n_test, n_mc, verbose)
 
     n_train = np.array(n_train).reshape(-1)
 

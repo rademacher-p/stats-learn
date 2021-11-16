@@ -63,5 +63,5 @@ if 'risk_bayes_N_leg_a0' in sim_names:
     n_train = np.arange(0, 4050, 50)
     dir_params = {'alpha_0': [40, 400, 4000]}
 
-    dir_predictor.assess(model, dir_params, n_train, n_test, n_mc, verbose=True, plot_loss=True, print_loss=False,
-                         log_path=log_path, img_path=get_img_path('risk_bayes_N_leg_a0.png'), rng=seed)
+    dir_predictor.model_assess(model, dir_params, n_train, n_test, n_mc, verbose=True, plot_loss=True, print_loss=False,
+                               log_path=log_path, img_path=get_img_path('risk_bayes_N_leg_a0.png'), rng=seed)
