@@ -19,7 +19,7 @@ PIN_MEMORY = True
 # PIN_MEMORY = False
 
 
-def _build_torch_mlp(layer_sizes, activation=nn.ReLU(), start_layer=nn.Flatten(), end_layer=None):
+def _build_mlp(layer_sizes, activation=nn.ReLU(), start_layer=nn.Flatten(), end_layer=None):
     """
     PyTorch-Lightning sequential MLP.
 
@@ -31,14 +31,18 @@ def _build_torch_mlp(layer_sizes, activation=nn.ReLU(), start_layer=nn.Flatten()
     start_layer : nn.Module, optional
     end_layer : nn.Module, optional
 
+    Returns
+    -------
+    nn.Sequential
+
     """
     layers = []
     if start_layer is not None:
         layers.append(start_layer)
-    for in_out in zip(layer_sizes[:-1], layer_sizes[1:]):
-        layers.append(nn.Linear(*in_out))
-        layers.append(activation)
-    layers.pop()
+    for i, (in_, out_) in enumerate(zip(layer_sizes[:-1], layer_sizes[1:])):
+        layers.append(nn.Linear(in_, out_))
+        if i < len(layer_sizes) - 2:
+            layers.append(activation)
     if end_layer is not None:
         layers.append(end_layer)
     return nn.Sequential(*layers)
@@ -67,7 +71,7 @@ class LitMLP(pl.LightningModule):
                  loss_func=functional.mse_loss, optim_cls=torch.optim.Adam, optim_params=None):
         super().__init__()
 
-        self.model = _build_torch_mlp(layer_sizes, activation, start_layer, end_layer)
+        self.model = _build_mlp(layer_sizes, activation, start_layer, end_layer)
         self.loss_func = loss_func
         self.optim_cls = optim_cls
         if optim_params is None:
