@@ -108,8 +108,7 @@ def make_normalized(n_t_iter_, dir_params_):
 
 
 # Normal-prior LR
-norm_model = bayes.models.NormalLinear(prior_mean=w_prior, prior_cov=.1, cov_y_x=.1, model_x=model_x,
-                                       allow_singular=True)
+norm_model = bayes.models.NormalLinear(prior_mean=w_prior, prior_cov=.1, cov_y_x=.1, model_x=model_x)
 norm_predictor = BayesRegressor(norm_model, space=model.space, name=r'$\mathcal{N}$')
 
 norm_params = {'prior_cov': [.1, .001]}

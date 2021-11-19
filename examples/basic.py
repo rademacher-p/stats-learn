@@ -10,7 +10,7 @@ model = random.models.NormalLinear(weights=[1, 1])
 # Predictors
 opt_predictor = ModelRegressor(model, name='Optimal')
 
-norm_model = bayes.models.NormalLinear(prior_mean=[0, 0], prior_cov=1, allow_singular=True)
+norm_model = bayes.models.NormalLinear(prior_mean=[0, 0], prior_cov=1)
 norm_predictor = BayesRegressor(norm_model, name='Normal')
 
 # Results

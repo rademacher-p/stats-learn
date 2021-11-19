@@ -1011,7 +1011,7 @@ class Normal(BaseRV):
         Random number generator seed or object.
 
     """
-    def __init__(self, mean=0., cov=1., *, allow_singular=False, rng=None):
+    def __init__(self, mean=0., cov=1., *, allow_singular=True, rng=None):
         super().__init__(rng)
         self.allow_singular = allow_singular
 

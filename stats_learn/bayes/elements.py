@@ -105,7 +105,7 @@ class NormalLinear(Base):
     prior: random.elements.Normal
     can_warm_start = True
 
-    def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis=None, cov=1., *, allow_singular=False,
+    def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis=None, cov=1., *, allow_singular=True,
                  rng=None):
         # Prior
         prior = random.elements.Normal(prior_mean, prior_cov)

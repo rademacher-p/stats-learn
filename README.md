@@ -1,5 +1,7 @@
 # Statistical Learning
-This package provides a framework to explore statistical learning with a Bayesian focus.
+This package provides a framework to explore statistical learning with a Bayesian focus. 
+
+TODO: Supervised learning
 
 *Note*: This project is under active development at https://github.com/rademacher-p/stats-learn
 
@@ -36,7 +38,7 @@ model = random.models.NormalLinear(weights=[1, 1])
 # Predictors
 opt_predictor = ModelRegressor(model, name='Optimal')
 
-norm_model = bayes.models.NormalLinear(prior_mean=[0, 0], prior_cov=1, allow_singular=True)
+norm_model = bayes.models.NormalLinear(prior_mean=[0, 0], prior_cov=1)
 norm_predictor = BayesRegressor(norm_model, name='Normal')
 
 # Results

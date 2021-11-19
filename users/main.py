@@ -156,7 +156,7 @@ basis_y_x = None
 proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
 
 norm_model = bayes.models.NormalLinear(prior_mean=w_prior_norm, prior_cov=.1, basis_y_x=basis_y_x, cov_y_x=.1,
-                                       model_x=model_x, allow_singular=True)
+                                       model_x=model_x)
 norm_predictor = BayesRegressor(norm_model, space=model.space, proc_funcs=proc_funcs, name=r'$\mathcal{N}$')
 
 # norm_params = {}

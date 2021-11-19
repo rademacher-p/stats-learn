@@ -118,7 +118,7 @@ class NormalLinear(Base):
     can_warm_start = True
 
     def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis_y_x=None, cov_y_x=1.,
-                 model_x=random.elements.Normal(), *, allow_singular=False, rng=None):
+                 model_x=random.elements.Normal(), *, allow_singular=True, rng=None):
 
         self.allow_singular = allow_singular
 
