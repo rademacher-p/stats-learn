@@ -130,7 +130,7 @@ if 'fit' in sim_names:
     d = model.sample(n_train + n_test, rng=seed)
     d_train, d_test = np.split(d, [n_train])
 
-    results.data_assess(predictors, d_train, d_test, params, verbose=True, log_path=log_path,
+    results.data_assess(predictors, d_train, d_test, params, verbose=True, plot_fit=True, log_path=log_path,
                         img_path=get_img_path('fit.png'))
 
 # Prediction mean/variance, comparative

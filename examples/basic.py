@@ -37,7 +37,7 @@ predictors = [opt_predictor, norm_predictor]
 params = [None, {'prior_cov': [.01, .1, 1]}]
 
 # Sample regressor realizations
-results.data_assess(predictors, d_train, d_test, params, verbose=True)
+results.data_assess(predictors, d_train, d_test, params, verbose=True, plot_fit=True)
 
 # Prediction mean/variance
 results.model_assess(predictors, model, params, n_train, n_test, n_mc=10, stats=('mean', 'std'), verbose=True,

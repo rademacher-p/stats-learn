@@ -320,8 +320,8 @@ def _plot_risk_eval_compare(losses, predictors, params=None, n_train: Union[int,
 
 
 # Assessment tools
-def data_assess(predictors, d_train=None, d_test=None, params=None, x=None, verbose=False, log_path=None,
-                img_path=None, ax=None):
+def data_assess(predictors, d_train=None, d_test=None, params=None, x=None, verbose=False, plot_fit=False,
+                log_path=None, img_path=None, ax=None):
     """
     Assess and compare various predictors using a single dataset.
 
@@ -340,6 +340,8 @@ def data_assess(predictors, d_train=None, d_test=None, params=None, x=None, verb
         Values of observed element to use for assessment of prediction statistics.
     verbose : bool, optional
         Enables iteration print-out.
+    plot_fit : bool, optional
+        Enables plotting of fit predictors.
     log_path : os.PathLike or str, optional
         File for saving printed loss table and image path in Markdown format.
     img_path : os.PathLike or str, optional
@@ -383,10 +385,10 @@ def data_assess(predictors, d_train=None, d_test=None, params=None, x=None, verb
     if x is None:
         x = space['x'].x_plt
 
-    if ax is None:
-        ax = space['x'].make_axes()
-
-    h_data = ax.scatter(d_train['x'], d_train['y'], c='k', marker='o', label='$D$')
+    if plot_fit:
+        if ax is None:
+            ax = space['x'].make_axes()
+        h_data = ax.scatter(d_train['x'], d_train['y'], c='k', marker='o', label='$D$')
 
     h_predictors = []
     for predictor, params, loss in zip(predictors, params_full, loss_full):
@@ -396,8 +398,9 @@ def data_assess(predictors, d_train=None, d_test=None, params=None, x=None, verb
 
         predictor.fit(d_train)
         if len(params) == 0:
-            h = predictor.plot_predict(x, ax=ax, label=predictor.name)
-            h_predictors.extend(h)
+            if plot_fit:
+                h = predictor.plot_predict(x, ax=ax, label=predictor.name)
+                h_predictors.extend(h)
 
             if do_loss:
                 loss[0] += predictor.evaluate(d_test)
@@ -407,8 +410,10 @@ def data_assess(predictors, d_train=None, d_test=None, params=None, x=None, verb
             labels = [f"{predictor.name}, {predictor.tex_params(param_name, value)}" for value in param_vals]
             for i_v, (param_val, label) in enumerate(zip(param_vals, labels)):
                 predictor.set_params(**{param_name: param_val})
-                h = predictor.plot_predict(x, ax=ax, label=label)
-                h_predictors.extend(h)
+
+                if plot_fit:
+                    h = predictor.plot_predict(x, ax=ax, label=label)
+                    h_predictors.extend(h)
 
                 if do_loss:
                     idx = (0, *np.unravel_index(i_v, loss.shape[1:]))
@@ -416,12 +421,13 @@ def data_assess(predictors, d_train=None, d_test=None, params=None, x=None, verb
         else:
             raise NotImplementedError("Only up to one varying parameter currently supported.")
 
-    title = f"$N = {n_train}$"
-    if len(predictors) == 1 and len(params_full[0]) == 0:
-        title = f"{predictors[0].name}, " + title
-    else:
-        ax.legend(handles=[h_data, *h_predictors])
-    ax.set_title(title)
+    if plot_fit:
+        title = f"$N = {n_train}$"
+        if len(predictors) == 1 and len(params_full[0]) == 0:
+            title = f"{predictors[0].name}, " + title
+        else:
+            ax.legend(handles=[h_data, *h_predictors])
+        ax.set_title(title)
 
     # Logging
     message = f"- Test samples: {n_test}"

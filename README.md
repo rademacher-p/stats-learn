@@ -69,7 +69,7 @@ The `results` module provides various functions that enable fair and reproducibl
 visualizations and formatted output. The code below can be executed after the previous snippet. The `data_assess` 
 function provides convenient replication of the functionality above, 
 
-For convenient and statistically meaningful assessments, 
+For convenient and statistically meaningful assessments,
 
 ```python
 from stats_learn import results
@@ -78,7 +78,7 @@ predictors = [opt_predictor, norm_predictor]
 params = [None, {'prior_cov': [.01, .1, 1]}]
 
 # Sample regressor realizations
-results.data_assess(predictors, d_train, d_test, params, verbose=True)
+results.data_assess(predictors, d_train, d_test, params, verbose=True, plot_fit=True)
 
 # Prediction mean/variance
 results.model_assess(predictors, model, params, n_train, n_test, n_mc=10, stats=('mean', 'std'), verbose=True,

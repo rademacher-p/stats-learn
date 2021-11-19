@@ -220,8 +220,8 @@ class Base(ABC):
         return self.space['x'].plot(self.predict, x, ax=ax, label=label)
 
     # Assessment
-    def data_assess(self, d_train=None, d_test=None, params=None, x=None, verbose=False, log_path=None, img_path=None,
-                    ax=None):
+    def data_assess(self, d_train=None, d_test=None, params=None, x=None, verbose=False, plot_fit=False, log_path=None,
+                    img_path=None, ax=None):
         """
         Assess predictor using a single dataset.
 
@@ -237,6 +237,8 @@ class Base(ABC):
             Values of observed element to use for assessment of prediction statistics.
         verbose : bool, optional
             Enables iteration print-out.
+        plot_fit : bool, optional
+            Enables plotting of fit predictors.
         log_path : os.PathLike or str, optional
             File for saving printed loss table and image path in Markdown format.
         img_path : os.PathLike or str, optional
@@ -250,7 +252,7 @@ class Base(ABC):
             Empirical risk values for each parameterization.
 
         """
-        return results.data_assess([self], d_train, d_test, [params], x, verbose, log_path, img_path, ax)
+        return results.data_assess([self], d_train, d_test, [params], x, verbose, plot_fit, log_path, img_path, ax)
 
     def model_assess(self, model=None, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
                      plot_stats=False, plot_loss=False, print_loss=False, log_path=None, img_path=None, ax=None,
