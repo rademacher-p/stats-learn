@@ -8,6 +8,8 @@ Welcome to Statistical Learning's documentation!
 This package provides a framework to explore statistical learning with a Bayesian focus. The objective is to create and
 apply prediction functions to the most common applications in machine learning: regression and classification.
 
+A function is :py:class:`stats_learn.random.elements.Normal`
+
 The :doc:`predictors <stats_learn.predictors>` are derived from statistical models
 (i.e. probability distributions) of the joint :math:`\xrm` and :math:`\yrm` random elements. By defining the conditional
 statistics :math:`\Prm(y|x)`, the predictor can operate on novel observations :math:`x` and make predictions about
