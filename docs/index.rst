@@ -8,9 +8,12 @@ Welcome to Statistical Learning's documentation!
 This package provides a framework to explore statistical learning with a Bayesian focus. The objective is to create and
 apply prediction functions to the most common applications in machine learning: regression and classification.
 
+.. math::
+   \bm{x}
+
 The :doc:`predictors <source/stats_learn.predictors>` are derived from statistical models
-(i.e. probability distributions) of the joint :math:`x` and :math:`y` random elements. By defining the conditional
-statistics :math:`P_y(y|x)`, the predictor can operate on novel observations :math:`x` and make predictions about
+(i.e. probability distributions) of the joint :math:`x` and :math:`\mathrm{y}` random elements. By defining the conditional
+statistics :math:`\mathrm{P}(y|x)`, the predictor can operate on novel observations :math:`x` and make predictions about
 unobserved values :math:`y`.
 
 For non-learning predictors, :doc:`fixed models <source/stats_learn.random>` are used to define the model statistics

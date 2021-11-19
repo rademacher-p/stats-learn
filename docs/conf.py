@@ -32,6 +32,11 @@ extensions = [
     'sphinx.ext.napoleon',
 ]
 
+# latex_additional_files = ["PhDmath.sty"]
+latex_elements = {
+    'preamble': r'\usepackage{bm}'
+}
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
