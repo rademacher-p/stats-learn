@@ -161,7 +161,7 @@ if 'predict_N_T4.png' in sim_names:
 
 # Squared-Error vs. training data volume N
 if 'risk_N_leg_T' in sim_names:
-    n_train = np.arange(0, 4050, 50)
+    n_train = np.linspace(0, 4000, 81, dtype=int)
 
     results.model_assess(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True,
                          print_loss=True, log_path=log_path, img_path=get_img_path('risk_N_leg_T.png'), rng=seed)
@@ -195,7 +195,7 @@ if 'risk_a0norm_leg_T' in sim_names:
 # Squared-Error vs. discretization |T|, various N
 if 'risk_T_leg_N' in sim_names:
     n_train = [0, 4, 40, 400]
-    dir_predictors, dir_params_full = make_normalized(2 ** np.arange(1, 14), {'alpha_0': [.1]})
+    dir_predictors, dir_params_full = make_normalized(np.logspace(1, 13, 13, base=2, dtype=int), {'alpha_0': [.1]})
 
     results.plot_risk_disc(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, ax=None)
 
@@ -204,7 +204,7 @@ if 'risk_T_leg_N' in sim_names:
 # Squared-Error vs. discretization |T|, various alpha_0
 if 'risk_T_leg_a0':
     n_train = 400
-    dir_predictors, dir_params_full = make_normalized(2 ** np.arange(1, 14), {'alpha_0': [.1, 10]})
+    dir_predictors, dir_params_full = make_normalized(np.logspace(1, 13, 13, base=2, dtype=int), {'alpha_0': [.1, 10]})
 
     results.plot_risk_disc(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, ax=None)
 

@@ -191,7 +191,7 @@ if 'predict' in sim_names:
 
 # Squared-Error vs. training data volume N
 if 'risk_N' in sim_names:
-    n_train = np.insert(2**np.arange(12), 0, 0)
+    n_train = np.insert(np.logspace(0, 10, 11, base=2, dtype=int), 0, 0)
 
     results.model_assess(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True,
                          print_loss=True, log_path=log_path, img_path=get_img_path('risk_N.png'), rng=seed)
@@ -237,7 +237,7 @@ if 'risk_a0norm_leg_T' in sim_names:
 if 'risk_T_leg_N' in sim_names:
     n_train = [16, 128, 512]
 
-    dir_predictors, dir_params_full = make_normalized(2 ** np.arange(1, 8), {'alpha_0': [4.5]})
+    dir_predictors, dir_params_full = make_normalized(np.logspace(1, 7, 7, base=2, dtype=int), {'alpha_0': [4.5]})
 
     results.plot_risk_disc(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, ax=None)
     plt.xscale('log', base=2)

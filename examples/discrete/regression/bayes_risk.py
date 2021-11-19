@@ -62,7 +62,7 @@ n_test = 100
 
 # Bayes Squared-Error vs. N
 if 'risk_bayes_N_leg_a0' in sim_names:
-    n_train = np.arange(0, 4050, 50)
+    n_train = np.linspace(0, 4000, 81, dtype=int)
     dir_params = {'alpha_0': [40, 400, 4000]}
 
     dir_predictor.model_assess(model, dir_params, n_train, n_test, n_mc, verbose=True, plot_loss=True, print_loss=False,

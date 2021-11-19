@@ -17,11 +17,11 @@ norm_predictor = BayesRegressor(norm_model, name='Normal')
 norm_params = {'prior_cov': [.01, .1]}
 
 # Results
-n_test = 10
-n_mc = 10
-
 predictors = [opt_predictor, norm_predictor]
 params = [None, norm_params]
+
+n_test = 10
+n_mc = 10
 
 # Sample regressor realizations
 n_train = 10

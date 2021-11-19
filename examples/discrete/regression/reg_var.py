@@ -143,7 +143,7 @@ if 'predict' in sim_names:
 
 # Squared-Error vs. training data volume N
 if 'risk_N' in sim_names:
-    n_train = np.insert(2**np.arange(12), 0, 0)
+    n_train = np.insert(np.logspace(0, 11, 12, base=2, dtype=int), 0, 0)
 
     results.model_assess(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True,
                          print_loss=True, log_path=log_path, img_path=get_img_path('risk_N.png'), rng=seed)
