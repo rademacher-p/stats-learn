@@ -3,7 +3,7 @@ This package provides a framework to explore statistical learning with a Bayesia
 
 TODO: Supervised learning
 
-*Note*: This project is under active development at https://github.com/rademacher-p/stats-learn
+*Note*: This project is under active development
 
 ## Installation
 The package can be installed locally using

@@ -21,7 +21,7 @@ functionality for fitting posterior distributions and thus enabling adaptation o
 data :math:`\Drm = (\ldots, (\xrm_i, \yrm_i), \ldots)`
 
 .. note::
-   This project is under active development at https://github.com/rademacher-p/stats-learn
+   This project is under active development
 
 .. toctree::
    :maxdepth: 4
