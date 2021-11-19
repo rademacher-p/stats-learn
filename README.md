@@ -68,10 +68,14 @@ Trained learner loss = 0.951
 ```
 
 The `results` module provides various functions that enable fair and reproducible evaluations, as well as provide 
-visualizations and formatted output. The code below can be executed after the previous snippet. The `data_assess` 
-function provides convenient replication of the functionality above, 
+visualizations and formatted output. Furthermore, they allow convenient assessments for different learner 
+hyperparameters, modifying attributes and re-fitting as needed.
 
-For convenient and statistically meaningful assessments,
+The code below can be executed after the previous snippet. The `data_assess` function provides replication of the 
+functionality above, including a Markdown-formatted loss table and a plot showing how the `predict` functions fit 
+the training data. The `model_assess` function performs Monte Carlo approximation of the expected loss by repeatedly 
+generating and evaluating on new datasets, enabling statistically meaningful assessments. Observe that it can be used 
+for both visualization of both the prediction statistics and of the average loss.
 
 ```python
 from stats_learn import results
@@ -91,12 +95,27 @@ n_train = range(0, 100, 5)
 results.model_assess(predictors, model, params, n_train, n_test, n_mc=10, verbose=True, plot_loss=True, rng=seed)
 ```
 
+Output:
+
+![Fitting](images/ex_basic_fit.png)
+
 |                                 |    10 |
 |---------------------------------|-------|
 | Optimal                         | 0.549 |
 | Normal, $\Sigma_\theta = 0.010$ | 3.171 |
 | Normal, $\Sigma_\theta = 0.100$ | 2.034 |
 | Normal, $\Sigma_\theta = 1.000$ | 0.951 |
+
+![Prediction statistics](images/ex_basic_stats.png)
+
+|                                 |    10 |
+|---------------------------------|-------|
+| Optimal                         | 1.005 |
+| Normal, $\Sigma_\theta = 0.010$ | 2.689 |
+| Normal, $\Sigma_\theta = 0.100$ | 1.629 |
+| Normal, $\Sigma_\theta = 1.000$ | 1.205 |
+
+![Empirical risk](images/ex_basic_loss.png)
 
 ## Results
 Scripts for reproduction of results are located in the `examples` directory. They can be invoked from the
