@@ -3,22 +3,102 @@ This package provides a framework to explore statistical learning with a Bayesia
 
 *Note*: This project is under active development at https://github.com/rademacher-p/stats-learn
 
-## Documentation
-Documentation is provided locally at [docs/_build/html/index.html](docs/_build/html/index.html)
-
 ## Installation
 The package can be installed locally using
 ```
 pip install <path>
 ```
-where the path points to the directory of this README. Note that the
+where the `<path>` is the directory containing this README. Note that the
 [editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be used to track any package modifications.
 
-## Examples
-Example scripts for reproduction of results are located in the `examples` directory. They can be invoked from the
-command line and given a variety of arguments to control the simulations. A demonstrative help message is shown below,
-along with an exemplifying usage from the package top level.
+## Documentation
+Documentation is provided locally at [docs/build/html/index.html](docs/build/html/index.html)
 
+## Example
+A basic example of model creation, learner definition, and performance assessment is shown below. The `model` 
+attribute defines a jointly Normal distribution where the expected value of `y` conditioned on `x` is characterized 
+by a polynomial function. 
+
+Two different predictors are instantiated. First, the `opt_predictor` uses knowledge of the `model` to 
+determine the optimal `predict` function. Second, a learning regressor is formulated using a Bayesian data 
+model `norm_model`; this object implements a Normal distribution `norm_model.prior` to characterize uncertainty about 
+the true model `weights`. 
+
+Training and testing data are randomly generated using the model `sample` method and each predictor is assessed 
+using its `evaluate` method. Once the learning `norm_predictor` is `fit` to the data, its squared-error loss is reduced.
+
+```python
+from stats_learn import random, bayes
+from stats_learn.predictors.base import ModelRegressor, BayesRegressor
+
+model = random.models.NormalLinear(weights=[1, 1])
+
+# Predictors
+opt_predictor = ModelRegressor(model, name='Optimal')
+
+norm_model = bayes.models.NormalLinear(prior_mean=[0, 0], prior_cov=1, allow_singular=True)
+norm_predictor = BayesRegressor(norm_model, name='Normal')
+
+# Results
+seed = 12345
+n_train = 10
+n_test = 20
+
+d = model.sample(n_train + n_test, rng=seed)
+d_train, d_test = d[:n_train], d[n_train:]
+
+loss_min = opt_predictor.evaluate(d_test)
+print(f"Minimum loss = {loss_min:.3f}")
+
+loss_prior = norm_predictor.evaluate(d_test)  # use the prior distribution
+print(f"Untrained learner loss = {loss_prior:.3f}")
+
+norm_predictor.fit(d_train)  # fit the posterior distribution
+loss_fit = norm_predictor.evaluate(d_test)
+print(f"Trained learner loss = {loss_fit:.3f}")
+```
+
+Output:
+```
+Minimum loss = 0.549
+Prior learner loss = 3.413
+Trained learner loss = 0.951
+```
+
+The `results` module provides various functions that enable fair and reproducible evaluations, as well as provide 
+visualizations and formatted output. The code below can be executed after the previous snippet. The `data_assess` 
+function provides convenient replication of the functionality above, 
+
+For convenient and statistically meaningful assessments, 
+
+```python
+from stats_learn import results
+
+predictors = [opt_predictor, norm_predictor]
+params = [None, {'prior_cov': [.01, .1, 1]}]
+
+# Sample regressor realizations
+results.data_assess(predictors, d_train, d_test, params, verbose=True)
+
+# Prediction mean/variance
+results.model_assess(predictors, model, params, n_train, n_test, n_mc=10, stats=('mean', 'std'), verbose=True,
+                     plot_stats=True, print_loss=True, rng=seed)
+
+# Squared-Error vs. training data volume
+n_train = range(0, 100, 5)
+results.model_assess(predictors, model, params, n_train, n_test, n_mc=10, verbose=True, plot_loss=True, rng=seed)
+```
+
+|                                 |    10 |
+|---------------------------------|-------|
+| Optimal                         | 0.549 |
+| Normal, $\Sigma_\theta = 0.010$ | 3.171 |
+| Normal, $\Sigma_\theta = 0.100$ | 2.034 |
+| Normal, $\Sigma_\theta = 1.000$ | 0.951 |
+
+## Results
+Scripts for reproduction of results are located in the `examples` directory. They can be invoked from the
+command line and given a variety of arguments to control the simulations. A demonstrative help message is shown below:
 ```
 usage: consistency.py [-h] [-m MC] [-l LOG_PATH] [-i] [--style STYLE] [--seed SEED]
                       [{fit,predict_a0,predict_N,risk_N_leg_a0,risk_a0_leg_N} ...]
@@ -39,7 +119,7 @@ optional arguments:
   --seed SEED           RNG seed
 
 ```
-
+An exemplifying usage from the package top level is:
 ```commandline
 python examples\discrete\regression\consistency.py -m 1000 -l temp/log.md -i
 --style images/style.mplstyle --seed 12345 fit risk_N_leg_a0
@@ -54,50 +134,6 @@ of result tables and/or images into a Markdown-format file for future use; note 
 be created if it does not exist. Additionally, note that a specific [Matplotlib](https://matplotlib.org/) `--style` can
 be specified for custom formatting.
 
-To implement the same formatting used throughout the publication, a provided style
+To implement the same formatting used throughout the publication, the provided style `images/style.mplstyle`
 can be used (as shown above); note that this style requires [LaTeX](https://www.latex-project.org/), as well as the
 [bm](https://www.ctan.org/pkg/bm) and [upgreek](https://www.ctan.org/pkg/upgreek) packages.
-
-## Example
-
-```python
-import numpy as np
-from matplotlib import pyplot as plt
-
-from stats_learn import random, bayes, results
-from stats_learn.predictors.base import ModelRegressor, BayesRegressor
-
-seed = 12345
-plt.style.use('images/style.mplstyle')
-
-model = random.models.NormalLinear(weights=[1, 1])
-
-# Predictors
-opt_predictor = ModelRegressor(model, name='Optimal')
-
-norm_model = bayes.models.NormalLinear(prior_mean=[0, 0], prior_cov=1, allow_singular=True)
-norm_predictor = BayesRegressor(norm_model, name='Normal')
-norm_params = {'prior_cov': [.01, .1]}
-
-# Results
-n_test = 10
-n_mc = 10
-
-predictors = [opt_predictor, norm_predictor]
-params = [None, norm_params]
-
-# Sample regressor realizations
-n_train = 10
-d = model.sample(n_train + n_test, rng=seed)
-d_train, d_test = np.split(d, [n_train])
-results.data_assess(predictors, d_train, d_test, params, verbose=True)
-
-# Prediction mean/variance
-n_train = 10
-results.model_assess(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
-                     plot_stats=True, print_loss=True, rng=seed)
-
-# Squared-Error vs. training data volume
-n_train = np.linspace(0, 100, 21, dtype=int)
-results.model_assess(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True, rng=seed)
-```
