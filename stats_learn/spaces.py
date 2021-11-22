@@ -123,9 +123,9 @@ class Base(ABC):
 
         """
         x, y, set_shape = self._eval_func(f, x)
-        return self.plot_xy(x, y, ax=ax, label=label)
+        return self.plot_xy(x, y, ax=ax, label=label, **kwargs)
 
-    def plot_xy(self, x, y, y_std=None, y_std_hi=None, ax=None, label=None):
+    def plot_xy(self, x, y, y_std=None, y_std_hi=None, ax=None, label=None, **kwargs):
         """
         Plot an array.
 
@@ -141,7 +141,9 @@ class Base(ABC):
             Upper standard deviation, if different from lower defined in `y_std`.
         ax : matplotlib.axes.Axes, optional
         label : str, optional
-            Label for matplotlib.artist.Artist
+            Label for matplotlib.artist.Artist\
+        kwargs : dict, optional
+            Additional plotting keyword arguments.
 
         Returns
         -------
@@ -156,9 +158,13 @@ class Base(ABC):
             raise NotImplementedError
 
         if len(set_shape) == 1 and self.shape == ():
-            fmt = '.-' if isinstance(self, Discrete) else '-'
+            kwargs_base = {
+                'marker': '.' if isinstance(self, Discrete) else '',
+                'linestyle': '-',
+            }
+            kwargs = kwargs_base | kwargs
 
-            plt_data = ax.plot(x, y, fmt, label=label)
+            plt_data = ax.plot(x, y, label=label, **kwargs)
             if y_std is not None:
                 if y_std_hi is None:
                     y_std_hi = y_std
@@ -166,8 +172,11 @@ class Base(ABC):
                 plt_data_std = ax.fill_between(x, y - y_std, y + y_std_hi, alpha=0.5)
                 plt_data = (plt_data, plt_data_std)
 
+        elif len(set_shape) == 1 and self.shape == (2,):
+            plt_data = ax.plot(x[..., 0], x[..., 1], y, label=label, **kwargs)
+
         elif len(set_shape) == 2 and self.shape == (2,):
-            plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, shade=False, label=label)
+            plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, shade=False, label=label, **kwargs)
             plt_data._facecolors2d, plt_data._edgecolors2d = plt_data._facecolor3d, plt_data._edgecolor3d
             # FIXME: use MAYAVI package for 3D??
             # plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, cmap='viridis')
@@ -180,6 +189,8 @@ class Base(ABC):
             #     plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y - y_std, shade=False)
             #     plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y + y_std_hi, shade=False)
             #     plt_data = (plt_data, (plt_data_lo, plt_data_hi))
+
+            plt_data = [plt_data]
 
         else:
             raise NotImplementedError
@@ -527,7 +538,7 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
 
     def plot(self, f, x=None, ax=None, label=None, **kwargs):
         x, y, set_shape = self._eval_func(f, x)
-        return self.plot_xy(x, y, ax=ax, label=label)
+        return self.plot_xy(x, y, ax=ax, label=label, **kwargs)
 
 
 class Euclidean(Box):
@@ -705,7 +716,7 @@ class Simplex(Continuous):
         else:
             raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
-    def plot(self, f, x=None, ax=None, label=None, **scatter_kwargs):
+    def plot(self, f, x=None, ax=None, label=None, **kwargs):
         if ax is None:
             ax = self.make_axes()
 
@@ -713,7 +724,7 @@ class Simplex(Continuous):
         if len(set_shape) != 1:
             raise ValueError()
 
-        kwargs = {'label': label, 's': 5, 'c': y} | scatter_kwargs
+        kwargs = {'label': label, 's': 5, 'c': y} | kwargs
 
         if self.shape == (2,):
             plt_data = ax.scatter(x[:, 0], x[:, 1], **kwargs)

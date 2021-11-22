@@ -385,12 +385,13 @@ def data_assess(predictors, d_train=None, d_test=None, params=None, x=None, verb
     if x is None:
         x = space['x'].x_plt
 
+    handles = []
     if plot_fit:
         if ax is None:
             ax = space['x'].make_axes()
-        h_data = ax.scatter(d_train['x'], d_train['y'], c='k', marker='o', label='$D$')
+        h_data = space['x'].plot_xy(d_train['x'], d_train['y'], ax=ax, marker='o', c='k', linestyle='', label='$D$')
+        handles.extend(h_data)
 
-    h_predictors = []
     for predictor, params, loss in zip(predictors, params_full, loss_full):
         if verbose:
             # print(f"  Predictor: {predictor.name}", end='\r')
@@ -400,7 +401,7 @@ def data_assess(predictors, d_train=None, d_test=None, params=None, x=None, verb
         if len(params) == 0:
             if plot_fit:
                 h = predictor.plot_predict(x, ax=ax, label=predictor.name)
-                h_predictors.extend(h)
+                handles.extend(h)
 
             if do_loss:
                 loss[0] += predictor.evaluate(d_test)
@@ -413,7 +414,7 @@ def data_assess(predictors, d_train=None, d_test=None, params=None, x=None, verb
 
                 if plot_fit:
                     h = predictor.plot_predict(x, ax=ax, label=label)
-                    h_predictors.extend(h)
+                    handles.extend(h)
 
                 if do_loss:
                     idx = (0, *np.unravel_index(i_v, loss.shape[1:]))
@@ -426,7 +427,7 @@ def data_assess(predictors, d_train=None, d_test=None, params=None, x=None, verb
         if len(predictors) == 1 and len(params_full[0]) == 0:
             title = f"{predictors[0].name}, " + title
         else:
-            ax.legend(handles=[h_data, *h_predictors])
+            ax.legend(handles=handles)
         ax.set_title(title)
 
     # Logging
