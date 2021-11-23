@@ -46,9 +46,9 @@ class Base(ABC):
     Parameters
     ----------
     shape : tuple
-        Shape of space elements.
+        Shape of the space values.
     dtype : type
-        Data type of space elements.
+        Data type of the space values.
 
     """
     def __init__(self, shape, dtype):
@@ -63,7 +63,7 @@ class Base(ABC):
     @property
     def shape(self):
         """
-        Shape of space values.
+        Shape of the space values.
 
         Returns
         -------
@@ -75,7 +75,7 @@ class Base(ABC):
     @property  # TODO: `cached_property`?
     def size(self):
         """
-        Size of space values.
+        Size of the space values.
 
         Returns
         -------
@@ -87,7 +87,7 @@ class Base(ABC):
     @property
     def ndim(self):
         """
-        Dimensionality of space values.
+        Dimensionality of the space values.
 
         Returns
         -------
@@ -99,7 +99,7 @@ class Base(ABC):
     @property
     def dtype(self):
         """
-        Data type of space values.
+        Data type of the space values.
 
         Returns
         -------
@@ -344,7 +344,7 @@ class FiniteGeneric(Finite):
     values : array_like
         Explicit elements of space.
     shape : tuple, optional
-        Shape of space elements.
+        Shape of the space values.
 
     """
     def __init__(self, values, shape=()):  # TODO: flatten and ignore set shape?
@@ -589,7 +589,7 @@ class Euclidean(Box):
     Parameters
     ----------
     shape : tuple
-        Shape of space elements.
+        Shape of the space values.
 
     """
     def __init__(self, shape):
@@ -639,7 +639,7 @@ class Simplex(Continuous):
     Parameters
     ----------
     shape : tuple
-        Shape of space elements.
+        Shape of the space values.
 
     """
     # TODO: add integration and mode finding
@@ -687,7 +687,7 @@ class Simplex(Continuous):
         n : int, optional
             Number of points defining the plot grid.
         shape : tuple
-            Shape of space elements.
+            Shape of the space values.
         hull_mask : array_like, optional
             Where True, defines boundaries to exclude.
 
@@ -789,7 +789,7 @@ class SimplexDiscrete(Simplex):
     n : int
         Number of points defining the grid.
     shape : tuple
-        Shape of space elements.
+        Shape of the space values.
 
     """
     def __init__(self, n, shape):
