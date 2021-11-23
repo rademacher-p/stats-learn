@@ -9,8 +9,8 @@ inference and decision functions. Additionally, customization enables comparison
 machine learning packages. The `predictors.torch` submodule uses [PyTorch](https://pytorch.org/)
 (and [PyTorch Lightning](https://www.pytorchlightning.ai/)) to implement neural networks in the `stats_learn` API.
 
-Also included (`results` submodule) are various functions that enable fair and reproducible evaluations, as well as 
-provide visualizations and Markdown-formatted output. Furthermore, they allow efficient assessments for learners 
+Also included (in the `results` submodule) are various functions that enable fair and reproducible evaluations, as 
+well as provide visualizations and Markdown-formatted output. Furthermore, they allow efficient assessments for learners 
 across a set of hyperparameter values.
 
 **Note**: This project is under active development.
@@ -20,7 +20,7 @@ The package can be installed locally using
 ```
 pip install <path>
 ```
-where the `<path>` is the directory containing this README. Note that the
+where the `<path>` is the directory containing `setup.cfg` (and this README). Note that the
 [editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be used to track any package modifications.
 
 ## Documentation
