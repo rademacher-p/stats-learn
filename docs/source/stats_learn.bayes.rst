@@ -4,6 +4,8 @@ stats\_learn.bayes package
 Submodules
 ----------
 
+.. _bayes.elements:
+
 stats\_learn.bayes.elements module
 ----------------------------------
 
@@ -18,14 +20,6 @@ stats\_learn.bayes.models module
 --------------------------------
 
 .. automodule:: stats_learn.bayes.models
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: stats_learn.bayes
    :members:
    :undoc-members:
    :show-inheritance:

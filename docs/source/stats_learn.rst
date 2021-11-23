@@ -53,11 +53,3 @@ stats\_learn.util module
    :members:
    :undoc-members:
    :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: stats_learn
-   :members:
-   :undoc-members:
-   :show-inheritance:

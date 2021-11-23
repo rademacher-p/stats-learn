@@ -4,6 +4,8 @@ stats\_learn.random package
 Submodules
 ----------
 
+.. _random.elements:
+
 stats\_learn.random.elements module
 -----------------------------------
 
@@ -18,14 +20,6 @@ stats\_learn.random.models module
 ---------------------------------
 
 .. automodule:: stats_learn.random.models
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: stats_learn.random
    :members:
    :undoc-members:
    :show-inheritance:

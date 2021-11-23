@@ -1,6 +1,6 @@
 # Statistical Learning
 This package provides a framework to explore statistical learning with a Bayesian focus. It implements a variety of 
-`random.elements`, as well as `random.models` of `(x, y)` data for supervised learning. The `bayes` subpackage 
+`random.elements`, as well as `random.models` of data for supervised learning. The `bayes` subpackage 
 implements similar elements/models with `prior` attributes to statistically characterize parameter uncertainty and 
 `fit` methods to adapt posteriors. 
 
@@ -24,7 +24,7 @@ where the `<path>` is the directory containing this README. Note that the
 [editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be used to track any package modifications.
 
 ## Documentation
-Documentation is provided locally at [docs/build/html/index.html](docs/build/html/index.html)
+API documentation is provided locally at [docs/build/html/index.html](docs/build/html/index.html)
 
 ## Quickstart
 A basic example of model creation, learner definition, and performance assessment is shown below. The `model` 

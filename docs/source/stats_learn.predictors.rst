@@ -12,18 +12,12 @@ stats\_learn.predictors.base module
    :undoc-members:
    :show-inheritance:
 
+.. _predictors.torch:
+
 stats\_learn.predictors.torch module
 ------------------------------------
 
 .. automodule:: stats_learn.predictors.torch
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: stats_learn.predictors
    :members:
    :undoc-members:
    :show-inheritance:
