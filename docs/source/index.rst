@@ -3,15 +3,17 @@ Welcome to Statistical Learning's documentation!
 This package provides a framework to explore statistical learning with a Bayesian focus. The objective is to create and
 apply prediction functions to the most common applications in machine learning: regression and classification.
 
-This :mod:`stats_learn` package provides a framework to explore statistical learning with a Bayesian focus. It
+The :mod:`stats_learn` package provides a framework to explore statistical learning with a Bayesian focus. It
 implements a variety of
-:mod:`random.elements`, as well as :mod:`random.models` of data for supervised learning. The :mod:`bayes` subpackage
-implements similar elements/models with :func:`prior <stats_learn.bayes.elements.Base.prior>` attributes to statistically characterize parameter uncertainty and
-:func:`fit <stats_learn.bayes.elements.Base.fit>` methods to adapt posteriors.
+:mod:`random.elements <stats_learn.random.elements>` and :ref:`random elements <random.elements>`, as well as
+:mod:`random.models <stats_learn.random.models>` of data for supervised learning. The :mod:`bayes <stats_learn.bayes>`
+subpackage implements similar elements/models with :func:`prior <stats_learn.bayes.elements.Base.prior>` attributes to
+statistically characterize parameter uncertainty and :func:`fit <stats_learn.bayes.elements.Base.fit>` methods to
+adapt posteriors.
 
-For supervised learning, the `predictors` subpackage provides objects that use these statistical models to define
-inference and decision functions. Additionally, customization enables comparison with learning objects from popular
-machine learning packages. The `predictors.torch` submodule uses `PyTorch <https://pytorch.org/>`_
+For supervised learning, the :mod:`predictors <stats_learn.predictors>` subpackage provides objects that use these
+statistical models to define inference and decision functions. Additionally, customization enables comparison with
+learning objects from popular machine learning packages. The :mod:`predictors.torch` submodule uses `PyTorch <https://pytorch.org/>`_
 (and `PyTorch Lightning <https://www.pytorchlightning.ai/>`_) to implement neural networks in the `stats_learn` API.
 
 Also included (`results` submodule) are various functions that enable fair and reproducible evaluations, as well as

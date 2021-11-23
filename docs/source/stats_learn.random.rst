@@ -1,6 +1,11 @@
 random
 ===========================
 
+.. automodule:: stats_learn.random
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 .. _random.elements:
 
 elements

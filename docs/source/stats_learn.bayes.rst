@@ -1,6 +1,11 @@
 bayes
 ==========================
 
+.. automodule:: stats_learn.bayes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 .. _bayes.elements:
 
 elements

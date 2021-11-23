@@ -1,6 +1,11 @@
 predictors
 ===============================
 
+.. automodule:: stats_learn.predictors
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 base
 -----------------------------------
 
