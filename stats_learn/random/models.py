@@ -107,7 +107,7 @@ class Base(RandomGeneratorMixin, ABC):
     @abstractmethod
     def model_y_x(self, x):
         r"""
-        Generate the conditional random variable :math:`\yrm` given :math:`x`
+        Generate the conditional random element :math:`\yrm` given :math:`x`
 
         Parameters
         ----------
