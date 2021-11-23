@@ -1,9 +1,19 @@
 # Statistical Learning
-This package provides a framework to explore statistical learning with a Bayesian focus. 
+This package provides a framework to explore statistical learning with a Bayesian focus. It implements a variety of 
+`random.elements`, as well as `random.models` of `(x, y)` data for supervised learning. The `bayes` subpackage 
+implements similar elements/models with `prior` attributes to statistically characterize parameter uncertainty and 
+`fit` methods to adapt posteriors. 
 
-TODO: Supervised learning
+For supervised learning, the `predictors` subpackage provides objects that use these statistical models to define 
+inference and decision functions. Additionally, customization enables comparison with learning objects from popular 
+machine learning packages. The `predictors.torch` submodule uses [PyTorch](https://pytorch.org/)
+(and [PyTorch Lightning](https://www.pytorchlightning.ai/)) to implement neural networks in the `stats_learn` API.
 
-*Note*: This project is under active development.
+Also included (`results` submodule) are various functions that enable fair and reproducible evaluations, as well as 
+provide visualizations and Markdown-formatted output. Furthermore, they allow efficient assessments for learners 
+across a set of hyperparameter values.
+
+**Note**: This project is under active development.
 
 ## Installation
 The package can be installed locally using
@@ -16,7 +26,7 @@ where the `<path>` is the directory containing this README. Note that the
 ## Documentation
 Documentation is provided locally at [docs/build/html/index.html](docs/build/html/index.html)
 
-## Example
+## Quickstart
 A basic example of model creation, learner definition, and performance assessment is shown below. The `model` 
 attribute defines a jointly Normal distribution where the expected value of `y` conditioned on `x` is characterized 
 by a polynomial function. 
@@ -67,15 +77,11 @@ Prior learner loss = 3.413
 Trained learner loss = 0.951
 ```
 
-The `results` module provides various functions that enable fair and reproducible evaluations, as well as provide 
-visualizations and formatted output. Furthermore, they allow convenient assessments for different learner 
-hyperparameters, modifying attributes and re-fitting as needed.
-
 The code below can be executed after the previous snippet. The `data_assess` function provides replication of the 
-functionality above, including a Markdown-formatted loss table and a plot showing how the `predict` functions fit 
-the training data. The `model_assess` function performs Monte Carlo approximation of the expected loss by repeatedly 
-generating and evaluating on new datasets, enabling statistically meaningful assessments. Observe that it can be used 
-for both visualization of both the prediction statistics and of the average loss.
+functionality above, including a loss table and a graphic showing how the `predict` functions fit the training data. 
+The `model_assess` function performs Monte Carlo approximation of the expected loss by repeatedly generating and 
+evaluating on new datasets, enabling statistically meaningful evaluation. Observe that it can be used for both 
+visualization of both the prediction statistics and of the average loss.
 
 ```python
 from stats_learn import results
@@ -117,7 +123,7 @@ Output:
 
 ![Empirical risk](images/ex_basic_loss.png)
 
-## Results
+## Examples
 Scripts for reproduction of results are located in the `examples` directory. They can be invoked from the
 command line and given a variety of arguments to control the simulations. A demonstrative help message is shown below:
 ```
@@ -146,15 +152,9 @@ python examples\discrete\regression\consistency.py -m 1000 -l temp/log.md -i
 --style images/style.mplstyle --seed 12345 fit risk_N_leg_a0
 ```
 
-Observe that the positional arguments are a variable number of strings specifying which images to generate. The `--mc`
-option allows control over how many simulated datasets are generated for statistically meaningful results; the `--seed`
-option controls random number generation for reproducibility.
-
-The `--log_path` and `--save_img` options enable logging
-of result tables and/or images into a Markdown-format file for future use; note that the specified log path file will
-be created if it does not exist. Additionally, note that a specific [Matplotlib](https://matplotlib.org/) `--style` can
-be specified for custom formatting.
-
-To implement the same formatting used throughout the publication, the provided style `images/style.mplstyle`
-can be used (as shown above); note that this style requires [LaTeX](https://www.latex-project.org/), as well as the
+The `--log_path` and `--save_img` options enable logging of result tables and/or images into a Markdown-format file 
+for future use; note that the specified log path file will be created if it does not exist. Additionally, note that 
+a specific [Matplotlib](https://matplotlib.org/) `--style` can be specified for custom formatting. To implement the 
+same formatting used throughout the publication, the provided style `images/style.mplstyle` can be used (as shown 
+above); note that this style requires [LaTeX](https://www.latex-project.org/), as well as the
 [bm](https://www.ctan.org/pkg/bm) and [upgreek](https://www.ctan.org/pkg/upgreek) packages.
