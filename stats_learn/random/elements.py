@@ -29,13 +29,65 @@ class Base(RandomGeneratorMixin, ABC):
         self._space = None  # TODO: arg?
         self._mode = None  # TODO: make getter do numerical approx if None!?
 
-    space = property(lambda self: self._space)
+    @property
+    def space(self):
+        """
+        The domain.
 
-    shape = property(lambda self: self._space.shape)
-    size = property(lambda self: self._space.size)
-    ndim = property(lambda self: self._space.ndim)
+        Returns
+        -------
+        spaces.Base
 
-    dtype = property(lambda self: self._space.dtype)
+        """
+        return self._space
+
+    @property
+    def shape(self):
+        """
+        Shape of the random elements.
+
+        Returns
+        -------
+        tuple
+
+        """
+        return self.space.shape
+
+    @property  # TODO: `cached_property`?
+    def size(self):
+        """
+        Size of random elements.
+
+        Returns
+        -------
+        int
+
+        """
+        return self.space.size
+
+    @property
+    def ndim(self):
+        """
+        Dimensionality of random elements.
+
+        Returns
+        -------
+        int
+
+        """
+        return self.space.ndim
+
+    @property
+    def dtype(self):
+        """
+        Data type of random elements.
+
+        Returns
+        -------
+        np.dtype
+
+        """
+        return self.space.dtype
 
     @property
     def mode(self):
@@ -251,6 +303,8 @@ class FiniteGeneric(Base):
         Random number generator seed or object.
 
     """
+    space: spaces.FiniteGeneric
+
     # TODO: DRY - use stat approx from the FiniteGeneric space's methods?
 
     def __new__(cls, values, p=None, rng=None):
@@ -403,6 +457,8 @@ class Dirichlet(BaseRV):
         Random number generator seed or object.
 
     """
+    space: spaces.Simplex
+
     def __init__(self, mean, alpha_0, rng=None):
         super().__init__(rng)
         self._space = spaces.Simplex(np.array(mean).shape)
@@ -955,6 +1011,8 @@ class Uniform(BaseRV):
         Random number generator seed or object.
 
     """
+    space: spaces.Box
+
     def __init__(self, lims, rng=None):
         super().__init__(rng)
         self._space = spaces.Box(lims)

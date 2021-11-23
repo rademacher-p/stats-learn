@@ -1,6 +1,10 @@
-r"""Bayesian random models of jointly distributed :math:`\xrm` and :math:`\yrm` elements with prior sampling and posterior fitting."""
+r"""
+Bayesian random models of jointly distributed :math:`\xrm` and :math:`\yrm` elements with prior sampling and posterior
+fitting.
+"""
 
 from abc import abstractmethod, ABC
+from typing import Dict, Optional
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -24,6 +28,8 @@ class Base(RandomGeneratorMixin, ABC):
         Random number generator seed or object.
 
     """
+    _space: Dict[str, Optional[spaces.Base]]
+
     can_warm_start = False
 
     def __init__(self, prior=None, rng=None):
@@ -35,13 +41,65 @@ class Base(RandomGeneratorMixin, ABC):
         self.posterior = None
         self.posterior_model = None
 
-    space = property(lambda self: self._space)
+    @property
+    def space(self):
+        """
+        The domain.
 
-    shape = property(lambda self: {key: space.shape for key, space in self._space.items()})
-    size = property(lambda self: {key: space.size for key, space in self._space.items()})
-    ndim = property(lambda self: {key: space.ndim for key, space in self._space.items()})
+        Returns
+        -------
+        dict of spaces.Base
 
-    dtype = property(lambda self: {key: space.dtype for key, space in self._space.items()})
+        """
+        return self._space
+
+    @property
+    def shape(self):
+        """
+        Shape of the random models.
+
+        Returns
+        -------
+        dict of tuple
+
+        """
+        return {key: space.shape for key, space in self._space.items()}
+
+    @property
+    def size(self):
+        """
+        Size of random models.
+
+        Returns
+        -------
+        dict of int
+
+        """
+        return {key: space.size for key, space in self._space.items()}
+
+    @property
+    def ndim(self):
+        """
+        Dimensionality of random models.
+
+        Returns
+        -------
+        dict of int
+
+        """
+        return {key: space.ndim for key, space in self._space.items()}
+
+    @property
+    def dtype(self):
+        """
+        Data type of random models.
+
+        Returns
+        -------
+        dict of np.dtype
+
+        """
+        return {key: space.dtype for key, space in self._space.items()}
 
     def random_model(self, rng=None):
         """Generate a random element with a randomly selected parameterization."""

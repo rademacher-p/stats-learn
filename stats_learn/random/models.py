@@ -37,15 +37,67 @@ class Base(RandomGeneratorMixin, ABC):
         self._model_x = None
         self._mode_x = None
 
-    space = property(lambda self: self._space)
-
-    shape = property(lambda self: {key: space.shape for key, space in self._space.items()})
-    size = property(lambda self: {key: space.size for key, space in self._space.items()})
-    ndim = property(lambda self: {key: space.ndim for key, space in self._space.items()})
-
-    dtype = property(lambda self: {key: space.dtype for key, space in self._space.items()})
-
     # TODO: use NumPy structured dtypes to detail type and shape!?!
+
+    @property
+    def space(self):
+        """
+        The domain.
+
+        Returns
+        -------
+        dict of spaces.Base
+
+        """
+        return self._space
+
+    @property
+    def shape(self):
+        """
+        Shape of the random models.
+
+        Returns
+        -------
+        dict of tuple
+
+        """
+        return {key: space.shape for key, space in self._space.items()}
+
+    @property
+    def size(self):
+        """
+        Size of random models.
+
+        Returns
+        -------
+        dict of int
+
+        """
+        return {key: space.size for key, space in self._space.items()}
+
+    @property
+    def ndim(self):
+        """
+        Dimensionality of random models.
+
+        Returns
+        -------
+        dict of int
+
+        """
+        return {key: space.ndim for key, space in self._space.items()}
+
+    @property
+    def dtype(self):
+        """
+        Data type of random models.
+
+        Returns
+        -------
+        dict of np.dtype
+
+        """
+        return {key: space.dtype for key, space in self._space.items()}
 
     @property
     def model_x(self):
@@ -411,6 +463,8 @@ class DataConditional(Base):
         If `alpha_0` is infinite, `EmpiricalScalar` distributions are generated instead.
 
         """
+        # if not isinstance(model_x.space, spaces.FiniteGeneric):
+        #     raise ValueError("`model_x` must have `FiniteGeneric` space.")
         if np.isinf(alpha_0):
             dists = [random.elements.EmpiricalScalar(func(x), n - 1) for x in model_x.space.values]
         else:

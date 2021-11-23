@@ -60,11 +60,53 @@ class Base(ABC):
 
         self._x_plt = None
 
-    shape = property(lambda self: self._shape)
-    size = property(lambda self: self._size)
-    ndim = property(lambda self: self._ndim)
+    @property
+    def shape(self):
+        """
+        Shape of space values.
 
-    dtype = property(lambda self: self._dtype)
+        Returns
+        -------
+        tuple
+
+        """
+        return self._shape
+
+    @property  # TODO: `cached_property`?
+    def size(self):
+        """
+        Size of space values.
+
+        Returns
+        -------
+        int
+
+        """
+        return self._size
+
+    @property
+    def ndim(self):
+        """
+        Dimensionality of space values.
+
+        Returns
+        -------
+        int
+
+        """
+        return self._ndim
+
+    @property
+    def dtype(self):
+        """
+        Data type of space values.
+
+        Returns
+        -------
+        np.dtype
+
+        """
+        return self._dtype
 
     @property
     def x_plt(self):
@@ -458,7 +500,6 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
 
     """
     def __init__(self, lims):
-
         self.lims = lims
         super().__init__(shape=self.lims.shape[:-1])
 

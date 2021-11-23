@@ -23,6 +23,11 @@ class Base(RandomGeneratorMixin, ABC):
     rng : int or np.random.RandomState or np.random.Generator, optional
         Random number generator seed or object.
 
+    Attributes
+    ----------
+    prior : stats_learn.random.elements.Base, optional
+        Random element characterizing the prior distribution of the element parameters.
+
     """
     can_warm_start = False
 
@@ -35,11 +40,65 @@ class Base(RandomGeneratorMixin, ABC):
         self.posterior = None  # the posterior distribution of the element parameters.
         self.posterior_model = None  # the posterior element given the observations.
 
-    space = property(lambda self: self._space)
+    @property
+    def space(self):
+        """
+        The domain.
 
-    shape = property(lambda self: self._space.shape)
-    size = property(lambda self: self._space.size)
-    ndim = property(lambda self: self._space.ndim)
+        Returns
+        -------
+        spaces.Base
+
+        """
+        return self._space
+
+    @property
+    def shape(self):
+        """
+        Shape of the random elements.
+
+        Returns
+        -------
+        tuple
+
+        """
+        return self.space.shape
+
+    @property
+    def size(self):
+        """
+        Size of random elements.
+
+        Returns
+        -------
+        int
+
+        """
+        return self.space.size
+
+    @property
+    def ndim(self):
+        """
+        Dimensionality of random elements.
+
+        Returns
+        -------
+        int
+
+        """
+        return self.space.ndim
+
+    @property
+    def dtype(self):
+        """
+        Data type of random elements.
+
+        Returns
+        -------
+        np.dtype
+
+        """
+        return self.space.dtype
 
     @abstractmethod
     def random_model(self, rng=None):
