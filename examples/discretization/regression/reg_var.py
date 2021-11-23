@@ -39,7 +39,7 @@ if log_path is not None and args.save_img:
     def get_img_path(filename):
         return img_dir / filename
 else:
-    def get_img_path(filename):
+    def get_img_path(_filename):
         return None
 
 if args.style is not None:

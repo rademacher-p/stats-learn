@@ -37,7 +37,7 @@ if log_path is not None and args.save_img:
     def get_img_path(filename):
         return img_dir / filename
 else:
-    def get_img_path(filename):
+    def get_img_path(_filename):
         return None
 
 if args.style is not None:
@@ -150,7 +150,7 @@ if 'risk_N' in sim_names:
                          print_loss=True, log_path=log_path, img_path=get_img_path('risk_N.png'), rng=seed)
 
 # Squared-Error vs. prior localization alpha_0
-if 'risk_a0_leg_N':
+if 'risk_a0_leg_N' in sim_names:
     n_train = [0, 100, 200, 400]
 
     dir_predictor.model_assess(model, {'alpha_0': np.logspace(0., 5., 60)}, n_train, n_test, n_mc, verbose=True,

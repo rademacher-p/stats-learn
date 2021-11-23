@@ -32,7 +32,7 @@ if log_path is not None and args.save_img:
     def get_img_path(filename):
         return img_dir / filename
 else:
-    def get_img_path(filename):
+    def get_img_path(_filename):
         return None
 
 if args.style is not None:
@@ -201,7 +201,7 @@ if 'risk_T_leg_N' in sim_names:
     plt.xscale('log', base=2)
 
 # Squared-Error vs. discretization |T|, various alpha_0
-if 'risk_T_leg_a0':
+if 'risk_T_leg_a0' in sim_names:
     n_train = 400
     dir_predictors, dir_params_full = make_normalized(np.logspace(1, 13, 13, base=2, dtype=int), {'alpha_0': [.1, 10]})
 
