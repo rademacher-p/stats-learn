@@ -1,5 +1,5 @@
 from stats_learn import random, bayes, results
-from stats_learn.predictors.base import ModelRegressor, BayesRegressor
+from stats_learn.predictors import ModelRegressor, BayesRegressor
 
 model = random.models.NormalLinear(weights=[1, 1])
 
@@ -35,10 +35,10 @@ params = [None, {'prior_cov': [.01, .1, 1]}]
 # Sample regressor realizations
 results.data_assess(predictors, d_train, d_test, params, verbose=True, plot_fit=True)
 
-# Prediction mean/variance
-results.model_assess(predictors, model, params, n_train, n_test, n_mc=1000, stats=('mean', 'std'), verbose=True,
-                     plot_stats=True, print_loss=True, rng=seed)
-
-# Squared-Error vs. training data volume
-n_train = range(0, 100, 5)
-results.model_assess(predictors, model, params, n_train, n_test, n_mc=1000, verbose=True, plot_loss=True, rng=seed)
+# # Prediction mean/variance
+# results.model_assess(predictors, model, params, n_train, n_test, n_mc=1000, stats=('mean', 'std'), verbose=True,
+#                      plot_stats=True, print_loss=True, rng=seed)
+#
+# # Squared-Error vs. training data volume
+# n_train = range(0, 100, 5)
+# results.model_assess(predictors, model, params, n_train, n_test, n_mc=1000, verbose=True, plot_loss=True, rng=seed)

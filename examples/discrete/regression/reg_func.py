@@ -9,7 +9,7 @@ from pytorch_lightning.callbacks import EarlyStopping
 from pytorch_lightning.utilities.seed import seed_everything
 
 from stats_learn import random, bayes, results
-from stats_learn.predictors.base import ModelRegressor, BayesRegressor
+from stats_learn.predictors import ModelRegressor, BayesRegressor
 from stats_learn.predictors.torch import LitMLP, LitPredictor, reset_weights
 from stats_learn.preprocessing import make_clipper
 from stats_learn.util import get_now

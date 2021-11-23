@@ -11,7 +11,7 @@ from pytorch_lightning.callbacks import EarlyStopping
 import pytorch_lightning.loggers as pl_loggers
 from pytorch_lightning.utilities.seed import seed_everything
 
-from stats_learn.predictors.base import ModelRegressor, BayesRegressor
+from stats_learn.predictors import ModelRegressor, BayesRegressor
 from stats_learn import random, bayes, results
 from stats_learn.util import get_now
 from stats_learn.preprocessing import make_clipper

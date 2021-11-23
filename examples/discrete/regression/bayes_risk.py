@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from stats_learn import random, bayes
-from stats_learn.predictors.base import BayesRegressor
+from stats_learn.predictors import BayesRegressor
 from stats_learn.util import get_now
 
 

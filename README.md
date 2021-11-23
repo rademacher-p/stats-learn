@@ -31,7 +31,7 @@ using its `evaluate` method. Once the learning `norm_predictor` is `fit` to the 
 
 ```python
 from stats_learn import random, bayes
-from stats_learn.predictors.base import ModelRegressor, BayesRegressor
+from stats_learn.predictors import ModelRegressor, BayesRegressor
 
 model = random.models.NormalLinear(weights=[1, 1])
 
