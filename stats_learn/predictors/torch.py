@@ -104,7 +104,7 @@ def reset_weights(model):
 
 
 class LitPredictor(Base):
-    """
+    r"""
     Regressor using PyTorch module.
 
     Parameters
@@ -112,13 +112,13 @@ class LitPredictor(Base):
     model : pl.LightningModule
         The PyTorch-Lightning module used for prediction.
     space : dict, optional
-        The domain for `x` and `y`. Defaults to the model's space.
+        The domain for :math:`\xrm` and :math:`\yrm`. Defaults to the model's space.
     trainer_params : dict, optional
         Keyword arguments for `pl.Trainer` instantiation.
     reset_func : callable, optional
         Function that calls `model` and resets to unfit state.
     proc_funcs : iterable of callable of dict of iterable of callable
-        Sequentially-invoked preprocessing functions for `x` and `y`.
+        Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 
     """

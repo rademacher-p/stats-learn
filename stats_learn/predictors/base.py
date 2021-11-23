@@ -12,16 +12,16 @@ from stats_learn.loss_funcs import loss_se, loss_01
 
 # Base and Mixin classes
 class Base(ABC):
-    """
+    r"""
     Base class for supervised learning predictors.
 
     Parameters
     ----------
     loss_func : callable
     space : dict, optional
-        The domain for `x` and `y`. Defaults to the model's space.
+        The domain for :math:`\xrm` and :math:`\yrm`. Defaults to the model's space.
     proc_funcs : iterable of callable of dict of iterable of callable
-        Sequentially-invoked preprocessing functions for `x` and `y`.
+        Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 
     """
@@ -42,7 +42,7 @@ class Base(ABC):
 
     @property
     def space(self):
-        """The domain for `x` and `y`. Defaults to the model's space."""
+        r"""The domain for :math:`\xrm` and :math:`\yrm`. Defaults to the model's space."""
         if self._space is None:
             self._space = self._model_obj.space
         return self._space
@@ -130,8 +130,8 @@ class Base(ABC):
         self.fit(d, warm_start)  # train learner
 
     def predict(self, x):
-        """
-        Generate predictions for given `x` values.
+        r"""
+        Generate predictions for given :math:`x` values.
 
         Parameters
         ----------
@@ -354,7 +354,7 @@ class RegressorMixin:
 
 # Static predictors using fixed data models
 class Model(Base):
-    """
+    r"""
     Predictor based on fixed data model.
 
     Parameters
@@ -363,9 +363,9 @@ class Model(Base):
         Fixed model used to generate predictions.
     loss_func : callable
     space : dict, optional
-        The domain for `x` and `y`. Defaults to the model's space.
+        The domain for :math:`\xrm` and :math:`\yrm`. Defaults to the model's space.
     proc_funcs : iterable of callable of dict of iterable of callable
-        Sequentially-invoked preprocessing functions for `x` and `y`.
+        Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 
     """
@@ -391,7 +391,7 @@ class Model(Base):
 
 
 class ModelClassifier(ClassifierMixin, Model):
-    """
+    r"""
     Classifier based on fixed data model.
 
     Parameters
@@ -399,9 +399,9 @@ class ModelClassifier(ClassifierMixin, Model):
     model : stats_learn.random.models.Base
         Fixed model used to generate predictions.
     space : dict, optional
-        The domain for `x` and `y`. Defaults to the model's space.
+        The domain for :math:`\xrm` and :math:`\yrm`. Defaults to the model's space.
     proc_funcs : iterable of callable of dict of iterable of callable
-        Sequentially-invoked preprocessing functions for `x` and `y`.
+        Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 
     """
@@ -410,7 +410,7 @@ class ModelClassifier(ClassifierMixin, Model):
 
 
 class ModelRegressor(RegressorMixin, Model):
-    """
+    r"""
     Regressor based on fixed data model.
 
     Parameters
@@ -418,9 +418,9 @@ class ModelRegressor(RegressorMixin, Model):
     model : stats_learn.random.models.Base
         Fixed model used to generate predictions.
     space : dict, optional
-        The domain for `x` and `y`. Defaults to the model's space.
+        The domain for :math:`\xrm` and :math:`\yrm`. Defaults to the model's space.
     proc_funcs : iterable of callable of dict of iterable of callable
-        Sequentially-invoked preprocessing functions for `x` and `y`.
+        Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 
     """
@@ -471,7 +471,7 @@ class ModelRegressor(RegressorMixin, Model):
 
 # Learning predictors using Bayesian data models
 class Bayes(Base):
-    """
+    r"""
     Predictor based on Bayesian data model.
 
     Parameters
@@ -480,9 +480,9 @@ class Bayes(Base):
         Bayes model used for fitting and to generate predictions.
     loss_func : callable
     space : dict, optional
-        The domain for `x` and `y`. Defaults to the model's space.
+        The domain for :math:`\xrm` and :math:`\yrm`. Defaults to the model's space.
     proc_funcs : iterable of callable of dict of iterable of callable
-        Sequentially-invoked preprocessing functions for `x` and `y`.
+        Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 
     """
@@ -516,7 +516,7 @@ class Bayes(Base):
 
 
 class BayesClassifier(ClassifierMixin, Bayes):
-    """
+    r"""
     Classifier based on Bayesian data model.
 
     Parameters
@@ -524,9 +524,9 @@ class BayesClassifier(ClassifierMixin, Bayes):
     bayes_model : stats_learn.bayes.models.Base
         Bayes model used for fitting and to generate predictions.
     space : dict, optional
-        The domain for `x` and `y`. Defaults to the model's space.
+        The domain for :math:`\xrm` and :math:`\yrm`. Defaults to the model's space.
     proc_funcs : iterable of callable of dict of iterable of callable
-        Sequentially-invoked preprocessing functions for `x` and `y`.
+        Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 
     """
@@ -535,7 +535,7 @@ class BayesClassifier(ClassifierMixin, Bayes):
 
 
 class BayesRegressor(RegressorMixin, Bayes):
-    """
+    r"""
     Regressor based on Bayesian data model.
 
     Parameters
@@ -543,9 +543,9 @@ class BayesRegressor(RegressorMixin, Bayes):
     bayes_model : stats_learn.bayes.models.Base
         Bayes model used for fitting and to generate predictions.
     space : dict, optional
-        The domain for `x` and `y`. Defaults to the model's space.
+        The domain for :math:`\xrm` and :math:`\yrm`. Defaults to the model's space.
     proc_funcs : iterable of callable of dict of iterable of callable
-        Sequentially-invoked preprocessing functions for `x` and `y`.
+        Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 
     """
