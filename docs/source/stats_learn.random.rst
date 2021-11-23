@@ -12,6 +12,8 @@ stats\_learn.random.elements module
    :undoc-members:
    :show-inheritance:
 
+.. _random.models:
+
 stats\_learn.random.models module
 ---------------------------------
 

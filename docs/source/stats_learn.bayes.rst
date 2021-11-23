@@ -12,6 +12,8 @@ stats\_learn.bayes.elements module
    :undoc-members:
    :show-inheritance:
 
+.. _bayes.models:
+
 stats\_learn.bayes.models module
 --------------------------------
 

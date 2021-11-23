@@ -15,8 +15,8 @@ The :doc:`predictors <stats_learn.predictors>` are derived from statistical mode
 statistics :math:`\Prm(y|x)`, the predictor can operate on novel observations :math:`x` and make predictions about
 unobserved values :math:`y`.
 
-For non-learning predictors, :doc:`fixed models <stats_learn.random>` are used to define the model statistics
-and thus the prediction function. For learning predictors, :doc:`Bayesian models <stats_learn.bayes>` provide
+For non-learning predictors, :ref:`fixed models <random.models>` are used to define the model statistics
+and thus the prediction function. For learning predictors, :ref:`Bayesian models <bayes.models>` provide
 functionality for fitting posterior distributions and thus enabling adaptation of the prediction function to training
 data :math:`\Drm = (\ldots, (\xrm_i, \yrm_i), \ldots)`
 
