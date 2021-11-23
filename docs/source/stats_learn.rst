@@ -1,6 +1,11 @@
 stats\_learn
 ====================
 
+.. automodule:: stats_learn
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 .. toctree::
    :maxdepth: 4
 
