@@ -1,10 +1,7 @@
-stats\_learn.predictors package
+predictors
 ===============================
 
-Submodules
-----------
-
-stats\_learn.predictors.base module
+base
 -----------------------------------
 
 .. automodule:: stats_learn.predictors.base
@@ -14,7 +11,7 @@ stats\_learn.predictors.base module
 
 .. _predictors.torch:
 
-stats\_learn.predictors.torch module
+torch
 ------------------------------------
 
 .. automodule:: stats_learn.predictors.torch

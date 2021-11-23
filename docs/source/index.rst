@@ -1,28 +1,24 @@
-.. Statistical Learning documentation master file, created by
-   sphinx-quickstart on Fri Nov 12 11:56:00 2021.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to Statistical Learning's documentation!
 ================================================
 This package provides a framework to explore statistical learning with a Bayesian focus. The objective is to create and
 apply prediction functions to the most common applications in machine learning: regression and classification.
 
-This package provides a framework to explore statistical learning with a Bayesian focus. It implements a variety of
-`random.elements`, as well as `random.models` of data for supervised learning. The `bayes` subpackage
-implements similar elements/models with `prior` attributes to statistically characterize parameter uncertainty and
-`fit` methods to adapt posteriors.
+This :mod:`stats_learn` package provides a framework to explore statistical learning with a Bayesian focus. It
+implements a variety of
+:mod:`random.elements`, as well as :mod:`random.models` of data for supervised learning. The :mod:`bayes` subpackage
+implements similar elements/models with :func:`prior <stats_learn.bayes.elements.Base.prior>` attributes to statistically characterize parameter uncertainty and
+:func:`fit <stats_learn.bayes.elements.Base.fit>` methods to adapt posteriors.
 
 For supervised learning, the `predictors` subpackage provides objects that use these statistical models to define
 inference and decision functions. Additionally, customization enables comparison with learning objects from popular
-machine learning packages. The `predictors.torch` submodule uses [PyTorch](https://pytorch.org/)
-(and [PyTorch Lightning](https://www.pytorchlightning.ai/)) to implement neural networks in the `stats_learn` API.
+machine learning packages. The `predictors.torch` submodule uses `PyTorch <https://pytorch.org/>`_
+(and `PyTorch Lightning <https://www.pytorchlightning.ai/>`_) to implement neural networks in the `stats_learn` API.
 
 Also included (`results` submodule) are various functions that enable fair and reproducible evaluations, as well as
 provide visualizations and Markdown-formatted output. Furthermore, they allow efficient assessments for learners
 across a set of hyperparameter values.
 
-Dat function is :py:class:`stats_learn.random.elements.Normal`
+Dat function is :class:`stats_learn.random.elements.Normal` with method :func:`stats_learn.random.elements.Normal.prob`
 
 The :doc:`predictors <stats_learn.predictors>` are derived from statistical models
 (i.e. probability distributions) of the joint :math:`\xrm` and :math:`\yrm` random elements. By defining the conditional
@@ -39,21 +35,34 @@ data :math:`\Drm = (\ldots, (\xrm_i, \yrm_i), \ldots)`
 
 .. code-block::
 
-   from stats_learn import results
+   from stats_learn import random, bayes
+   from stats_learn.predictors import ModelRegressor, BayesRegressor
 
-   predictors = [opt_predictor, norm_predictor]
-   params = [None, {'prior_cov': [.01, .1, 1]}]
+   model = random.models.NormalLinear(weights=[1, 1])
 
-   # Sample regressor realizations
-   results.data_assess(predictors, d_train, d_test, params, verbose=True, plot_fit=True)
+   # Predictors
+   opt_predictor = ModelRegressor(model, name='Optimal')
 
-   # Prediction mean/variance
-   results.model_assess(predictors, model, params, n_train, n_test, n_mc=10, stats=('mean', 'std'), verbose=True,
-                        plot_stats=True, print_loss=True, rng=seed)
+   norm_model = bayes.models.NormalLinear(prior_mean=[0, 0], prior_cov=1)
+   norm_predictor = BayesRegressor(norm_model, name='Normal')
 
-   # Squared-Error vs. training data volume
-   n_train = range(0, 100, 5)
-   results.model_assess(predictors, model, params, n_train, n_test, n_mc=10, verbose=True, plot_loss=True, rng=seed)
+   # Results
+   seed = 12345
+   n_train = 10
+   n_test = 20
+
+   d = model.sample(n_train + n_test, rng=seed)
+   d_train, d_test = d[:n_train], d[n_train:]
+
+   loss_min = opt_predictor.evaluate(d_test)
+   print(f"Minimum loss = {loss_min:.3f}")
+
+   loss_prior = norm_predictor.evaluate(d_test)  # use the prior distribution
+   print(f"Untrained learner loss = {loss_prior:.3f}")
+
+   norm_predictor.fit(d_train)  # fit the posterior distribution
+   loss_fit = norm_predictor.evaluate(d_test)
+   print(f"Trained learner loss = {loss_fit:.3f}")
 
 .. toctree::
    :maxdepth: 4

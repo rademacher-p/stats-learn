@@ -1,12 +1,9 @@
-stats\_learn.random package
+random
 ===========================
-
-Submodules
-----------
 
 .. _random.elements:
 
-stats\_learn.random.elements module
+elements
 -----------------------------------
 
 .. automodule:: stats_learn.random.elements
@@ -16,7 +13,7 @@ stats\_learn.random.elements module
 
 .. _random.models:
 
-stats\_learn.random.models module
+models
 ---------------------------------
 
 .. automodule:: stats_learn.random.models

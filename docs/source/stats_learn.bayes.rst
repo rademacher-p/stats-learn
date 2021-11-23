@@ -1,12 +1,9 @@
-stats\_learn.bayes package
+bayes
 ==========================
-
-Submodules
-----------
 
 .. _bayes.elements:
 
-stats\_learn.bayes.elements module
+elements
 ----------------------------------
 
 .. automodule:: stats_learn.bayes.elements
@@ -16,7 +13,7 @@ stats\_learn.bayes.elements module
 
 .. _bayes.models:
 
-stats\_learn.bayes.models module
+models
 --------------------------------
 
 .. automodule:: stats_learn.bayes.models

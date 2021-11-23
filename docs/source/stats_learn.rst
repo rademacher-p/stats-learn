@@ -1,8 +1,5 @@
-stats\_learn package
+stats\_learn
 ====================
-
-Subpackages
------------
 
 .. toctree::
    :maxdepth: 4
@@ -11,10 +8,7 @@ Subpackages
    stats_learn.predictors
    stats_learn.random
 
-Submodules
-----------
-
-stats\_learn.loss\_funcs module
+loss\_funcs
 -------------------------------
 
 .. automodule:: stats_learn.loss_funcs
@@ -22,7 +16,7 @@ stats\_learn.loss\_funcs module
    :undoc-members:
    :show-inheritance:
 
-stats\_learn.preprocessing module
+preprocessing
 ---------------------------------
 
 .. automodule:: stats_learn.preprocessing
@@ -30,7 +24,7 @@ stats\_learn.preprocessing module
    :undoc-members:
    :show-inheritance:
 
-stats\_learn.results module
+results
 ---------------------------
 
 .. automodule:: stats_learn.results
@@ -38,7 +32,7 @@ stats\_learn.results module
    :undoc-members:
    :show-inheritance:
 
-stats\_learn.spaces module
+spaces
 --------------------------
 
 .. automodule:: stats_learn.spaces
@@ -46,7 +40,7 @@ stats\_learn.spaces module
    :undoc-members:
    :show-inheritance:
 
-stats\_learn.util module
+util
 ------------------------
 
 .. automodule:: stats_learn.util

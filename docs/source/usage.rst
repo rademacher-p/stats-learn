@@ -8,6 +8,10 @@ To use Statistical Learning, first install the local package using pip:
 
 .. code-block:: console
 
-   (.venv) $ pip install <path>
+   pip install <path>
 
-Note that `<path>` should point to the top-level directory `stats-learn`
+Note that `<path>` should point to the top-level directory `stats-learn`.
+
+Quickstart
+----------
+
