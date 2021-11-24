@@ -19,7 +19,6 @@ across a set of hyperparameter values.
 The package can be installed locally using
 ```
 pip install <path>
-pip install -r <path>/requirements.txt
 ```
 where the `<path>` is the directory containing `setup.cfg` (and this README). Note that the
 [editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be used to track any package modifications.
