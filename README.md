@@ -24,7 +24,7 @@ where the `<path>` is the directory containing `setup.cfg` (and this README). No
 [editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be used to track any package modifications.
 
 ## Documentation
-API documentation is provided locally at [docs/build/html/index.html](docs/build/html/index.html)
+API documentation is provided locally at `docs/API/index.html`
 
 ## Quickstart
 A basic example of model creation, learner definition, and performance assessment is shown below. The `model` 
