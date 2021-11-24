@@ -25,8 +25,8 @@ model :code:`norm_model`; this object implements a Normal distribution :code:`no
 uncertainty about the true model :code:`weights`.
 
 Training and testing data are randomly generated using the model :code:`sample` method and each predictor is assessed
-using its :code:`evaluate` method. Once the learning :code:`norm_predictor` is `fit` to the data, its squared-error
-loss is reduced.
+using its :code:`evaluate` method. Once the learning :code:`norm_predictor` is :code:`fit` to the data, its
+squared-error loss is reduced.
 
 .. code-block::
 
@@ -72,7 +72,7 @@ The code below can be executed after the previous snippet. The :code:`data_asses
 functionality above, including a loss table and a graphic showing how the :code:`predict` functions fit the training
 data. The :code:`model_assess` function performs Monte Carlo approximation of the expected loss by repeatedly
 generating and evaluating on new datasets, enabling statistically meaningful evaluation. Observe that it can be used
-for bothvisualization of both the prediction statistics and of the average loss.
+for both visualization of both the prediction statistics and of the average loss.
 
 .. code-block::
 
