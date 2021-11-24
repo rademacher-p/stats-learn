@@ -149,7 +149,7 @@ optional arguments:
 ```
 An exemplifying usage from the package top level is:
 ```commandline
-python examples\discrete\regression\consistency.py -m 1000 -l temp/log.md -i --style images/style.mplstyle --seed 12345 fit risk_N_leg_a0
+python examples\discrete\regression\consistency.py -m 1000 -l log.md -i --style images/style.mplstyle --seed 12345 fit risk_N_leg_a0
 ```
 
 The `--log_path` and `--save_img` options enable logging of result tables and/or images into a Markdown-format file 
