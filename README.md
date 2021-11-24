@@ -19,6 +19,7 @@ across a set of hyperparameter values.
 The package can be installed locally using
 ```
 pip install <path>
+pip install -r <path>/requirements.txt
 ```
 where the `<path>` is the directory containing `setup.cfg` (and this README). Note that the
 [editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be used to track any package modifications.
@@ -148,8 +149,7 @@ optional arguments:
 ```
 An exemplifying usage from the package top level is:
 ```commandline
-python examples\discrete\regression\consistency.py -m 1000 -l temp/log.md -i
---style images/style.mplstyle --seed 12345 fit risk_N_leg_a0
+python examples\discrete\regression\consistency.py -m 1000 -l temp/log.md -i --style images/style.mplstyle --seed 12345 fit risk_N_leg_a0
 ```
 
 The `--log_path` and `--save_img` options enable logging of result tables and/or images into a Markdown-format file 
