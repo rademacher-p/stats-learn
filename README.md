@@ -1,4 +1,6 @@
 # Statistical Learning
+**Note**: This project is under active development.
+
 This package provides a framework to explore statistical learning with a Bayesian focus. It implements a variety of 
 `random.elements`, as well as `random.models` of data for supervised learning. The `bayes` subpackage 
 implements similar elements/models with `prior` attributes to statistically characterize parameter uncertainty and 
@@ -12,8 +14,6 @@ machine learning packages. The `predictors.torch` submodule uses [PyTorch](https
 Also included (in the `results` submodule) are various functions that enable fair and reproducible evaluations, as 
 well as provide visualizations and Markdown-formatted output. Furthermore, they allow efficient assessments for learners 
 across a set of hyperparameter values.
-
-**Note**: This project is under active development.
 
 ## Installation
 The package can be installed locally using

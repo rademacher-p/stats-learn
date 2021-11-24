@@ -1,27 +1,9 @@
 Welcome to Statistical Learning's documentation!
 ================================================
-The :mod:`stats_learn` package provides a framework to explore statistical learning with a Bayesian focus. It
-implements a variety of
-:mod:`random.elements <stats_learn.random.elements>`, as well as :mod:`random.models <stats_learn.random.models>` of
-data for supervised learning. The :mod:`bayes <stats_learn.bayes>` subpackage implements similar elements/models with
-:func:`prior <stats_learn.bayes.elements.Base.prior>` attributes to statistically characterize parameter uncertainty
-and :func:`fit <stats_learn.bayes.elements.Base.fit>` methods to adapt posteriors.
-
-For supervised learning, the :mod:`predictors <stats_learn.predictors>` subpackage provides objects that use these
-statistical models to define inference and decision functions. Additionally, customization enables comparison with
-learning objects from popular machine learning packages. The :mod:`predictors.torch <stats_learn.predictors.torch>`
-submodule uses `PyTorch <https://pytorch.org/>`_ (and `PyTorch Lightning <https://www.pytorchlightning.ai/>`_) to
-implement neural networks in the :mod:`stats_learn` API.
-
-Also included (in the :mod:`results <stats_learn.results>` submodule) are various functions that enable fair and
-reproducible evaluations, as well as provide visualizations and Markdown-formatted output. Furthermore, they allow
-efficient assessments for learners across a set of hyperparameter values.
 
 .. note::
    This project is under active development.
 
-TODO
--------------------
 The :mod:`stats_learn` package provides a framework to explore statistical learning with a Bayesian focus.
 
 A variety of :ref:`random elements <random.elements>` :math:`\xrm \in \Xcal` are implemented in the
@@ -64,22 +46,6 @@ enable fair and reproducible evaluations, as well as provide visualizations and 
 expected loss by using a specified model to randomly generate datasets for evaluation. These functions also allow
 each learner to be assessed over a set of hyperparameter values, performing computationally efficient retraining when
 possible.
-
-
-Supervised Learning
--------------------
-The :ref:`random models <random.models>` define fixed joint distributions :math:`\Prm_{\yrm,\xrm}` over the
-observed :ref:`random elements <random.elements>` :math:`\xrm \in \Xcal` and the unobserved elements
-:math:`\yrm \in \Ycal`. The :ref:`Bayesian models <bayes.models>` define parametric representations
-:math:`\Prm_{\yrm,\xrm | \uptheta}` and use prior distributions :math:`\Prm_{\uptheta}` to characterize the model
-uncertainty. Using observed training data pairs :math:`\Drm = (\ldots, (\xrm_i, \yrm_i), \ldots)`, the posterior
-:math:`\Prm_{\uptheta | \Drm}` can be formed and used to formulate the Bayesian distribution
-:math:`\Prm_{\yrm,\xrm | \Drm}`.
-
-The :doc:`predictors <stats_learn.predictors>` use these statistical models to define learning and prediction functions.
-By forming the predictive distribution :math:`\Prm_{\yrm | \xrm}` (or :math:`\Prm_{\yrm | \xrm, \Drm}` for Bayesian
-models), they can operate on novel observations :math:`\xrm` and generate decisions :math:`h \in \Hcal` for arbitrary
-loss functions :math:`L: \Hcal \times \Ycal \mapsto \Rbbgeq`.
 
 .. toctree::
    :maxdepth: 4
