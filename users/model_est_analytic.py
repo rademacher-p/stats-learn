@@ -3,13 +3,13 @@ from matplotlib import pyplot as plt
 
 from stats_learn import spaces, random
 
-# plt.style.use('../images/style.mplstyle')
+plt.style.use('images/style.mplstyle')
 
 if plt.rcParams['text.usetex'] and 'upgreek' in plt.rcParams['text.latex.preamble']:
-    str_p_opt = r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \uptheta}$'
+    str_p_opt = r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \uprho}$'
     str_p_bayes = r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \uppsi}$'
 else:
-    str_p_opt = r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \theta}$'
+    str_p_opt = r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \rho}$'
     str_p_bayes = r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \psi}$'
 
 

@@ -1,5 +1,5 @@
-from pathlib import Path
 import pickle
+from pathlib import Path
 
 from matplotlib import pyplot as plt
 
@@ -29,6 +29,9 @@ def main(dirs):
                 elif ylabel == r'$f(x)$':
                     ax.set_ylabel(r'$y$')
 
+                if ylabel == r'$R(f;\theta)$':
+                    ax.set_ylabel(r'$R(f;\rho)$')
+
                 handles, labels = ax.get_legend_handles_labels()
                 labels = list(map(label_update, labels))
                 if labels[-1] == '$D$':
@@ -53,6 +56,10 @@ def label_update(label):
     label = label.replace(r'\Dir', r'\mathrm{Dir}')
     if label == r'$f_{\Theta}(\theta)$':
         label = r'$f^*(\theta)$'
+
+    if label == r'$f^*(\theta)$':
+        label = r'$f^*(\rho)$'
+
     return label
 
 
