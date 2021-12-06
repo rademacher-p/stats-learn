@@ -12,11 +12,11 @@ from torch.utils.data import TensorDataset, DataLoader
 from stats_learn.loss_funcs import loss_se
 from stats_learn.predictors.base import Base
 
-NUM_WORKERS = 0
-# NUM_WORKERS = os.cpu_count()
+num_workers = 0
+# num_workers = os.cpu_count()
 
-PIN_MEMORY = True
-# PIN_MEMORY = False
+pin_memory = True
+# pin_memory = False
 
 
 def _build_mlp(layer_sizes, activation=nn.ReLU(), start_layer=nn.Flatten(), end_layer=None):
@@ -168,7 +168,7 @@ class LitPredictor(Base):
 
         batch_size = len(x)  # TODO: no mini-batching! Allow user specification.
 
-        dl = DataLoader(ds, batch_size, shuffle=True, pin_memory=PIN_MEMORY, num_workers=NUM_WORKERS)
+        dl = DataLoader(ds, batch_size, shuffle=True, pin_memory=pin_memory, num_workers=num_workers)
 
         self.trainer.fit(self.model, dl)
 

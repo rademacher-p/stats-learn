@@ -30,15 +30,15 @@ else:
     str_risk_bayes = r'$R_\theta(f)$'
 
 
-PICKLE_FIGS = True
-DATE_FMT = '%Y-%m-%d %H:%M:%S'
-FILE_LOG_MODE = 'a'
+pickle_figs = True
+date_fmt = '%Y-%m-%d %H:%M:%S'
+file_log_mode = 'a'
 
 # Logging setup
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 out_handler = logging.StreamHandler(stream=sys.stdout)
-out_formatter = logging.Formatter('\n# %(asctime)s\n%(message)s\n', datefmt=DATE_FMT)
+out_formatter = logging.Formatter('\n# %(asctime)s\n%(message)s\n', datefmt=date_fmt)
 out_handler.setFormatter(out_formatter)
 logger.addHandler(out_handler)
 
@@ -51,8 +51,8 @@ def _file_logger(file, file_format):
         file = Path(file)
         file.parent.mkdir(parents=True, exist_ok=True)
 
-        file_handler = logging.FileHandler(file, mode=FILE_LOG_MODE)
-        file_formatter = logging.Formatter(file_format, datefmt=DATE_FMT)
+        file_handler = logging.FileHandler(file, mode=file_log_mode)
+        file_formatter = logging.Formatter(file_format, datefmt=date_fmt)
         file_handler.setFormatter(file_formatter)
         logger.addHandler(file_handler)
         yield logger
@@ -75,7 +75,7 @@ def _log_and_fig(message, log_path, ax, img_path):
 
         fig = ax.figure
         fig.savefig(img_path)
-        if PICKLE_FIGS:
+        if pickle_figs:
             mpl_file = img_path.parent / f"{img_path.stem}.mpl"
             with open(mpl_file, 'wb') as f:
                 pickle.dump(fig, f)
