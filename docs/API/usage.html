@@ -167,22 +167,22 @@
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>To use Statistical Learning, first install the local package using pip:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install &lt;path&gt;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install &lt;path&gt;
 </pre></div>
 </div>
-<p>Note that <code class="code docutils literal notranslate"><span class="pre">&lt;path&gt;</span></code> should point to the top-level directory containing <code class="code docutils literal notranslate"><span class="pre">setup.cfg</span></code>.</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">&lt;path&gt;</span></code> should point to the top-level directory containing <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code>.</p>
 </div>
 <div class="section" id="quickstart">
 <h2>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h2>
-<p>A basic example of model creation, learner definition, and performance assessment is shown below. The <code class="code docutils literal notranslate"><span class="pre">model</span></code>
-attribute defines a jointly Normal distribution where the expected value of <code class="code docutils literal notranslate"><span class="pre">y</span></code> conditioned on <code class="code docutils literal notranslate"><span class="pre">x</span></code> is
+<p>A basic example of model creation, learner definition, and performance assessment is shown below. The <code class="docutils literal notranslate"><span class="pre">model</span></code>
+attribute defines a jointly Normal distribution where the expected value of <code class="docutils literal notranslate"><span class="pre">y</span></code> conditioned on <code class="docutils literal notranslate"><span class="pre">x</span></code> is
 characterized by a polynomial function.</p>
-<p>Two different predictors are instantiated. First, the <code class="code docutils literal notranslate"><span class="pre">opt_predictor</span></code> uses knowledge of the <cite>model</cite> to
-determine the optimal <code class="code docutils literal notranslate"><span class="pre">predict</span></code> function. Second, a learning regressor is formulated using a Bayesian data
-model <code class="code docutils literal notranslate"><span class="pre">norm_model</span></code>; this object implements a Normal distribution <code class="code docutils literal notranslate"><span class="pre">norm_model.prior</span></code> to characterize
-uncertainty about the true model <code class="code docutils literal notranslate"><span class="pre">weights</span></code>.</p>
-<p>Training and testing data are randomly generated using the model <code class="code docutils literal notranslate"><span class="pre">sample</span></code> method and each predictor is assessed
-using its <code class="code docutils literal notranslate"><span class="pre">evaluate</span></code> method. Once the learning <code class="code docutils literal notranslate"><span class="pre">norm_predictor</span></code> is <code class="code docutils literal notranslate"><span class="pre">fit</span></code> to the data, its
+<p>Two different predictors are instantiated. First, the <code class="docutils literal notranslate"><span class="pre">opt_predictor</span></code> uses knowledge of the <cite>model</cite> to
+determine the optimal <code class="docutils literal notranslate"><span class="pre">predict</span></code> function. Second, a learning regressor is formulated using a Bayesian data
+model <code class="docutils literal notranslate"><span class="pre">norm_model</span></code>; this object implements a Normal distribution <code class="docutils literal notranslate"><span class="pre">norm_model.prior</span></code> to characterize
+uncertainty about the true model <code class="docutils literal notranslate"><span class="pre">weights</span></code>.</p>
+<p>Training and testing data are randomly generated using the model <code class="docutils literal notranslate"><span class="pre">sample</span></code> method and each predictor is assessed
+using its <code class="docutils literal notranslate"><span class="pre">evaluate</span></code> method. Once the learning <code class="docutils literal notranslate"><span class="pre">norm_predictor</span></code> is <code class="docutils literal notranslate"><span class="pre">fit</span></code> to the data, its
 squared-error loss is reduced.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">stats_learn</span> <span class="kn">import</span> <span class="n">random</span><span class="p">,</span> <span class="n">bayes</span>
 <span class="kn">from</span> <span class="nn">stats_learn.predictors</span> <span class="kn">import</span> <span class="n">ModelRegressor</span><span class="p">,</span> <span class="n">BayesRegressor</span>
@@ -215,9 +215,9 @@ squared-error loss is reduced.</p>
 </pre></div>
 </div>
 <p>Output:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Minimum loss = 0.549</span>
-<span class="go">Prior learner loss = 3.413</span>
-<span class="go">Trained learner loss = 0.951</span>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Minimum loss = 0.549
+Prior learner loss = 3.413
+Trained learner loss = 0.951
 </pre></div>
 </div>
 <p>The code below can be executed after the previous snippet. The <code class="code docutils literal notranslate"><span class="pre">data_assess</span></code> function provides replication of the
@@ -244,16 +244,16 @@ for both visualization of both the prediction statistics and of the average loss
 </div>
 <p>Output:</p>
 <img alt="_images/ex_basic_fit.png" src="_images/ex_basic_fit.png" />
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">|                                 |    10 |</span>
-<span class="go">|---------------------------------|-------|</span>
-<span class="go">| Optimal                         | 0.549 |</span>
-<span class="go">| Normal, $\Sigma_\theta = 0.010$ | 3.171 |</span>
-<span class="go">| Normal, $\Sigma_\theta = 0.100$ | 2.034 |</span>
-<span class="go">| Normal, $\Sigma_\theta = 1.000$ | 0.951 |</span>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|                                 |    10 |
+|---------------------------------|-------|
+| Optimal                         | 0.549 |
+| Normal, $\Sigma_\theta = 0.010$ | 3.171 |
+| Normal, $\Sigma_\theta = 0.100$ | 2.034 |
+| Normal, $\Sigma_\theta = 1.000$ | 0.951 |
 </pre></div>
 </div>
 <img alt="_images/ex_basic_stats.png" src="_images/ex_basic_stats.png" />
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>|                                 |    10 |
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|                                 |    10 |
 |---------------------------------|-------|
 | Optimal                         | 1.005 |
 | Normal, $\Sigma_\theta = 0.010$ | 2.689 |

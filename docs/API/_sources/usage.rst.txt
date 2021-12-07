@@ -6,26 +6,26 @@ Installation
 
 To use Statistical Learning, first install the local package using pip:
 
-.. code-block:: console
+.. code-block:: bash
 
    pip install <path>
 
-Note that :code:`<path>` should point to the top-level directory containing :code:`setup.cfg`.
+Note that ``<path>`` should point to the top-level directory containing ``setup.cfg``.
 
 Quickstart
 ----------
 
-A basic example of model creation, learner definition, and performance assessment is shown below. The :code:`model`
-attribute defines a jointly Normal distribution where the expected value of :code:`y` conditioned on :code:`x` is
+A basic example of model creation, learner definition, and performance assessment is shown below. The ``model``
+attribute defines a jointly Normal distribution where the expected value of ``y`` conditioned on ``x`` is
 characterized by a polynomial function.
 
-Two different predictors are instantiated. First, the :code:`opt_predictor` uses knowledge of the `model` to
-determine the optimal :code:`predict` function. Second, a learning regressor is formulated using a Bayesian data
-model :code:`norm_model`; this object implements a Normal distribution :code:`norm_model.prior` to characterize
-uncertainty about the true model :code:`weights`.
+Two different predictors are instantiated. First, the ``opt_predictor`` uses knowledge of the `model` to
+determine the optimal ``predict`` function. Second, a learning regressor is formulated using a Bayesian data
+model ``norm_model``; this object implements a Normal distribution ``norm_model.prior`` to characterize
+uncertainty about the true model ``weights``.
 
-Training and testing data are randomly generated using the model :code:`sample` method and each predictor is assessed
-using its :code:`evaluate` method. Once the learning :code:`norm_predictor` is :code:`fit` to the data, its
+Training and testing data are randomly generated using the model ``sample`` method and each predictor is assessed
+using its ``evaluate`` method. Once the learning ``norm_predictor`` is ``fit`` to the data, its
 squared-error loss is reduced.
 
 .. code-block::
@@ -62,7 +62,7 @@ squared-error loss is reduced.
 
 Output:
 
-.. code-block:: console
+.. code-block:: none
 
     Minimum loss = 0.549
     Prior learner loss = 3.413
@@ -96,7 +96,7 @@ Output:
 
 .. image:: ../../images/ex_basic_fit.png
 
-.. code-block:: console
+.. code-block:: none
 
     |                                 |    10 |
     |---------------------------------|-------|
@@ -107,7 +107,7 @@ Output:
 
 .. image:: ../../images/ex_basic_stats.png
 
-.. code-block::
+.. code-block:: none
 
     |                                 |    10 |
     |---------------------------------|-------|
