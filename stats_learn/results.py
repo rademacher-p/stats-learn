@@ -237,7 +237,7 @@ def _plot_risk_eval_compare(losses, predictors, params=None, n_train: Union[int,
 
     if ax is None:
         _, ax = plt.subplots()
-        ax.set(ylabel=r'$R(f;\theta)$')
+        ax.set(ylabel=r'$R(f; \rho)$')
 
     out = []
     if len(predictors) == 1:
@@ -753,7 +753,7 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, 
         if isinstance(model, bayes.models.Base):
             ylabel = str_risk_bayes
         else:
-            ylabel = r'$R(f;\theta)$'
+            ylabel = r'$R(f; \rho)$'
         ax.set(ylabel=ylabel)
 
     loss = np.stack(losses, axis=-1)

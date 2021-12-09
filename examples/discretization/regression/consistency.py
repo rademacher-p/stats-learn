@@ -54,7 +54,7 @@ model_x = random.elements.Uniform([0, 1])
 alpha_y_x = 1 / var_y_x_const - 1
 model = random.models.BetaLinear(weights=[1], basis_y_x=[clairvoyant_func], alpha_y_x=alpha_y_x, model_x=model_x)
 
-opt_predictor = ModelRegressor(model, name=r'$f^*(\theta)$')
+opt_predictor = ModelRegressor(model, name=r'$f^*(\rho)$')
 
 
 # # Learners

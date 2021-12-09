@@ -74,9 +74,9 @@ def plot_dirs(dirs, n_plot=None, titles=None, orient='h', same_cm=True, cm_hack=
 
         ax.view_init(45, 45)
 
-        ax.set_xlabel(r'$\thetac(\Ycal_1; x)$')
-        ax.set_ylabel(r'$\thetac(\Ycal_2; x)$')
-        ax.set_zlabel(r'$\thetac(\Ycal_3; x)$')
+        ax.set_xlabel(r'$\rhoc(\Ycal_1; x)$')
+        ax.set_ylabel(r'$\rhoc(\Ycal_2; x)$')
+        ax.set_zlabel(r'$\rhoc(\Ycal_3; x)$')
 
         space.plot(dir_i.prob, x, ax=ax, c=c, s=3)
 
