@@ -3,6 +3,7 @@
 from copy import deepcopy
 from functools import partial
 
+import numpy as np
 import pytorch_lightning as pl
 import torch
 from torch import nn
@@ -19,7 +20,7 @@ pin_memory = True
 # pin_memory = False
 
 
-def _build_mlp(layer_sizes, activation=nn.ReLU(), start_layer=nn.Flatten(), end_layer=None):
+def _build_mlp(layer_sizes, activation=nn.ReLU(), start_layer=None, end_layer=None):
     """
     PyTorch-Lightning sequential MLP.
 
@@ -67,7 +68,7 @@ class LitMLP(pl.LightningModule):
         Keyword arguments for optimizer instantiation.
 
     """
-    def __init__(self, layer_sizes, activation=nn.ReLU(), start_layer=nn.Flatten(), end_layer=None,
+    def __init__(self, layer_sizes, activation=nn.ReLU(), start_layer=None, end_layer=None,
                  loss_func=functional.mse_loss, optim_cls=torch.optim.Adam, optim_params=None):
         super().__init__()
 
@@ -155,14 +156,12 @@ class LitPredictor(Base):
         self.reset_func(self.model)
         self._reset_trainer()
 
-    def _reshape_batches(self, *arrays):
-        shape_x = self.shape['x']
-        if shape_x == ():  # cast to non-scalar shape
-            shape_x = (1,)
-        return tuple(map(lambda x: x.reshape(-1, *shape_x), arrays))
+    @staticmethod
+    def _unscalar(x):
+        return x[..., np.newaxis] if x.ndim == 1 else x
 
     def _fit(self, d):
-        x, y = self._reshape_batches(d['x'], d['y'])
+        x, y = map(self._unscalar, (d['x'], d['y']))
         x, y = map(partial(torch.tensor, dtype=torch.float32), (x, y))
         ds = TensorDataset(x, y)
 
@@ -173,7 +172,7 @@ class LitPredictor(Base):
         self.trainer.fit(self.model, dl)
 
     def _predict(self, x):
-        x, = self._reshape_batches(x)
+        x = self._unscalar(x)
         x = torch.tensor(x, requires_grad=False, dtype=torch.float32)
         y_hat = self.model(x).detach().numpy()
         y_hat = y_hat.reshape(-1, *self.shape['y'])

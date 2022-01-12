@@ -32,7 +32,10 @@ args = parser.parse_args()
 sim_names = args.sims
 n_mc = args.mc
 
-log_path = Path(args.log_path)
+log_path = args.log_path
+if log_path is not None:
+    log_path = Path(log_path)
+
 if log_path is not None and args.save_img:
     img_dir = log_path.parent / f"images/{get_now()}"
 

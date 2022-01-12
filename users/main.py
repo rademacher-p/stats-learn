@@ -243,16 +243,16 @@ n_train = 400
 
 n_test = 1000
 
-n_mc = 50
+n_mc = 5
 
 
 temp = [
     (opt_predictor, None),
     (dir_predictor, dir_params),
     # *(zip(dir_predictors, dir_params_full)),
-    (norm_predictor, norm_params),
+    # (norm_predictor, norm_params),
     # (skl_predictor, None),
-    # *((predictor, None) for predictor in lit_predictors),
+    *((predictor, None) for predictor in lit_predictors),
 ]
 predictors, params = zip(*temp)
 
