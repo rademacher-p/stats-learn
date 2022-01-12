@@ -6,11 +6,11 @@ import logging
 import math
 import pickle
 import sys
-from collections import Iterable
 from contextlib import contextmanager
 from itertools import product
 from pathlib import Path
 from typing import Union
+from collections import Collection
 
 import numpy as np
 import pandas as pd
@@ -124,7 +124,7 @@ def _print_risk(predictors, params, n_train, losses):
     return title + str_table
 
 
-def _plot_predict_stats(y_stats_full, space_x, predictors, params, n_train: Union[int, Iterable] = 0, x=None, ax=None):
+def _plot_predict_stats(y_stats_full, space_x, predictors, params, n_train: Union[int, Collection] = 0, x=None, ax=None):
     """Plots prediction statistics for various predictors and parameterizations."""
 
     if x is None:
@@ -225,7 +225,7 @@ def _plot_predict_stats(y_stats_full, space_x, predictors, params, n_train: Unio
     return out
 
 
-def _plot_risk_eval_compare(losses, predictors, params=None, n_train: Union[int, Iterable] = 0, ax=None):
+def _plot_risk_eval_compare(losses, predictors, params=None, n_train: Union[int, Collection] = 0, ax=None):
     """Plots empirical risk for various predictors and parameterizations."""
 
     if params is None:
@@ -327,12 +327,12 @@ def data_assess(predictors, d_train=None, d_test=None, params=None, x=None, verb
 
     Parameters
     ----------
-    predictors : iterable of stats_learn.predictors.Base
+    predictors : Collection of stats_learn.predictors.Base
     d_train : array_like, optional
         Training data.
     d_test : array_like, optional
         Testing data.
-    params : iterable of dict, optional
+    params : Collection of dict, optional
         Predictor parameters to evaluate. Each element corresponds to an element of `predictors` and contains an
         optional dictionary mapping parameter names to various values. Outer product of each parameter array is
         assessed.
@@ -448,14 +448,14 @@ def model_assess(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, x=
 
     Parameters
     ----------
-    predictors : iterable of stats_learn.predictors.Base
+    predictors : Collection of stats_learn.predictors.Base
     model : stats_learn.random.models.Base or stats_learn.bayes.models.Base
         Data-generating model.
-    params : iterable of dict, optional
+    params : Collection of dict, optional
         Predictor parameters to evaluate. Each element corresponds to an element of `predictors` and contains an
         optional dictionary mapping parameter names to various values. Outer product of each parameter array is
         assessed.
-    n_train : int or iterable, optional
+    n_train : int or Collection of int, optional
         Training data volume.
     n_test : int, optional
         Test data volume.
@@ -463,7 +463,7 @@ def model_assess(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, x=
         Number of Monte Carlo simulation iterations.
     x : array_like, optional
         Values of observed element to use for assessment of prediction statistics.
-    stats : iterable of str, optional
+    stats : Collection of str, optional
         Names of the statistics to generate, e.g. 'mean', 'std', 'cov', 'mode', etc.
     verbose : bool, optional
         Enables iteration print-out.

@@ -20,7 +20,7 @@ class Base(ABC):
     loss_func : callable
     space : dict, optional
         The domain for :math:`\xrm` and :math:`\yrm`. Defaults to the model's space.
-    proc_funcs : iterable of callable of dict of iterable of callable
+    proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 
@@ -264,9 +264,9 @@ class Base(ABC):
         ----------
         model : stats_learn.random.models.Base or stats_learn.bayes.models.Base
             Data-generating model.
-        params : iterable of dict, optional
+        params : Collection of dict, optional
             Predictor parameters to evaluate. Outer product of each parameter array is assessed.
-        n_train : int or iterable, optional
+        n_train : int or Collection of int, optional
             Training data volume.
         n_test : int, optional
             Test data volume.
@@ -274,7 +274,7 @@ class Base(ABC):
             Number of Monte Carlo simulation iterations.
         x : array_like, optional
             Values of observed element to use for assessment of prediction statistics.
-        stats : iterable of str, optional
+        stats : Collection of str, optional
             Names of the statistics to generate, e.g. 'mean', 'std', 'cov', 'mode', etc.
         verbose : bool, optional
             Enables iteration print-out.
@@ -364,7 +364,7 @@ class Model(Base):
     loss_func : callable
     space : dict, optional
         The domain for :math:`\xrm` and :math:`\yrm`. Defaults to the model's space.
-    proc_funcs : iterable of callable of dict of iterable of callable
+    proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 
@@ -400,7 +400,7 @@ class ModelClassifier(ClassifierMixin, Model):
         Fixed model used to generate predictions.
     space : dict, optional
         The domain for :math:`\xrm` and :math:`\yrm`. Defaults to the model's space.
-    proc_funcs : iterable of callable of dict of iterable of callable
+    proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 
@@ -419,7 +419,7 @@ class ModelRegressor(RegressorMixin, Model):
         Fixed model used to generate predictions.
     space : dict, optional
         The domain for :math:`\xrm` and :math:`\yrm`. Defaults to the model's space.
-    proc_funcs : iterable of callable of dict of iterable of callable
+    proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 
@@ -481,7 +481,7 @@ class Bayes(Base):
     loss_func : callable
     space : dict, optional
         The domain for :math:`\xrm` and :math:`\yrm`. Defaults to the model's space.
-    proc_funcs : iterable of callable of dict of iterable of callable
+    proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 
@@ -525,7 +525,7 @@ class BayesClassifier(ClassifierMixin, Bayes):
         Bayes model used for fitting and to generate predictions.
     space : dict, optional
         The domain for :math:`\xrm` and :math:`\yrm`. Defaults to the model's space.
-    proc_funcs : iterable of callable of dict of iterable of callable
+    proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 
@@ -544,7 +544,7 @@ class BayesRegressor(RegressorMixin, Bayes):
         Bayes model used for fitting and to generate predictions.
     space : dict, optional
         The domain for :math:`\xrm` and :math:`\yrm`. Defaults to the model's space.
-    proc_funcs : iterable of callable of dict of iterable of callable
+    proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 

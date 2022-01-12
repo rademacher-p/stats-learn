@@ -377,7 +377,7 @@ class DataConditional(Base):
 
     Parameters
     ----------
-    dists : iterable of random.elements.Base
+    dists : Collection of random.elements.Base
         Explicit conditional random elements characterizing :math:`\yrm` for each possible value of :math:`x`.
     model_x : stats_learn.random.elements.Base
         Random variable characterizing the marginal distribution of :math:`\xrm`.
@@ -419,7 +419,7 @@ class DataConditional(Base):
 
         Parameters
         ----------
-        dists : iterable of random.elements.Base
+        dists : Collection of random.elements.Base
             Explicit conditional random elements characterizing :math:`\yrm` for each possible value of :math:`x`.
         values_x : array_like
             Explicit domain values for :math:`x`.
@@ -571,7 +571,7 @@ class ClassConditional(MixinRVx, Base):
 
     Parameters
     ----------
-    dists : iterable of random.elements.Base
+    dists : Collection of random.elements.Base
         Explicit conditional random elements characterizing :math:`\xrm` for each possible value of :math:`y`.
     model_y : stats_learn.random.elements.Base
         Random variable characterizing the marginal distribution of :math:`\yrm`.
@@ -604,7 +604,7 @@ class ClassConditional(MixinRVx, Base):
 
         Parameters
         ----------
-        dists : iterable of random.elements.Base
+        dists : Collection of random.elements.Base
             Explicit conditional random elements characterizing :math:`\xrm` for each possible value of :math:`y`.
         values_y : array_like
             Explicit domain values for :math:`y`.
@@ -691,7 +691,7 @@ class BetaLinear(MixinRVx, MixinRVy, Base):
     ----------
     weights : array_like
         The weights combining the basis functions into the conditional mean function.
-    basis_y_x : iterable of callable, optional
+    basis_y_x : Collection of callable, optional
         Basis functions. Defaults to polynomial functions.
     alpha_y_x : float, optional
         Total conditional Beta concentration. Defaults to uniform.
@@ -773,7 +773,7 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
     ----------
     weights : array_like
         The weights combining the basis functions into the conditional mean function.
-    basis_y_x : iterable of callable, optional
+    basis_y_x : Collection of callable, optional
         Basis functions. Defaults to polynomial functions.
     cov_y_x : float or callable, optional
         Conditional covariance of Normal distributions.
@@ -1076,7 +1076,7 @@ class Mixture(Base):
 
     Parameters
     ----------
-    dists : iterable of Base
+    dists : Collection of Base
         The random models to be mixed.
     weights : array_like
         The weights combining the random models.

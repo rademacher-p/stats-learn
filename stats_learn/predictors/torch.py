@@ -25,7 +25,7 @@ def _build_mlp(layer_sizes, activation=nn.ReLU(), start_layer=nn.Flatten(), end_
 
     Parameters
     ----------
-    layer_sizes : iterable of int
+    layer_sizes : Collection of int
         Hidden layer sizes.
     activation : nn.Module, optional
     start_layer : nn.Module, optional
@@ -54,7 +54,7 @@ class LitMLP(pl.LightningModule):
 
     Parameters
     ----------
-    layer_sizes : iterable of int
+    layer_sizes : Collection of int
         Hidden layer sizes.
     activation : nn.Module, optional
     start_layer : nn.Module, optional
@@ -117,7 +117,7 @@ class LitPredictor(Base):
         Keyword arguments for `pl.Trainer` instantiation.
     reset_func : callable, optional
         Function that calls `model` and resets to unfit state.
-    proc_funcs : iterable of callable of dict of iterable of callable
+    proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 

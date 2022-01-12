@@ -18,14 +18,13 @@ from stats_learn.util import check_data_shape
 # TODO: add vectorized `contains` method?
 
 
-def check_spaces(iter_):
+def check_spaces(spaces):
     """
-    Check iterable of spaces for equivalence.
+    Check spaces for equivalence.
 
     Parameters
     ----------
-    iter_ : Iterable
-        Spaces
+    spaces : Collection
 
     Returns
     -------
@@ -33,8 +32,8 @@ def check_spaces(iter_):
         A space instance.
 
     """
-    if all_equal((obj.space for obj in iter_)):
-        return iter_[0].space
+    if all_equal((obj.space for obj in spaces)):
+        return spaces[0].space
     else:
         raise ValueError("All objects must have the same space attribute.")
 

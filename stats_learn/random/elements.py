@@ -1060,7 +1060,7 @@ class Normal(BaseRV):
 
     Parameters
     ----------
-    mean : float or Iterable of float
+    mean : float or Collection of float
     cov : float or numpy.ndarray
         Covariance tensor.
     allow_singular : bool, optional
@@ -1410,7 +1410,7 @@ class Mixture(Base):
 
     Parameters
     ----------
-    dists : iterable of Base
+    dists : Collection of Base
         The random elements to be mixed.
     weights : array_like
         The weights combining the random elements.

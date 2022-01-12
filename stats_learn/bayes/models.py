@@ -160,7 +160,7 @@ class NormalLinear(Base):
         Mean of Normal prior random variable.
     prior_cov : array_like, optional
         Covariance of Normal prior random variable.
-    basis_y_x : iterable of callable, optional
+    basis_y_x : Collection of callable, optional
         Basis functions. Defaults to polynomial functions.
     cov_y_x : float or numpy.ndarray, optional
         Conditional covariance of Normal distributions.
