@@ -9,8 +9,7 @@ import sys
 from contextlib import contextmanager
 from itertools import product
 from pathlib import Path
-from typing import Union
-from collections import Collection
+from typing import Union, Collection
 
 import numpy as np
 import pandas as pd
