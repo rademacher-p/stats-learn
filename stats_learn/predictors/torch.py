@@ -20,17 +20,17 @@ pin_memory = True
 # pin_memory = False
 
 
-def _build_mlp(layer_sizes, activation=nn.ReLU(), start_layer=None, end_layer=None):
+def build_mlp(layer_sizes, activation=nn.ReLU, last_act=False):
     """
-    PyTorch-Lightning sequential MLP.
+    PyTorch sequential MLP.
 
     Parameters
     ----------
     layer_sizes : Collection of int
         Hidden layer sizes.
     activation : nn.Module, optional
-    start_layer : nn.Module, optional
-    end_layer : nn.Module, optional
+    last_act : bool, optional
+        Include final activation function.
 
     Returns
     -------
@@ -38,14 +38,10 @@ def _build_mlp(layer_sizes, activation=nn.ReLU(), start_layer=None, end_layer=No
 
     """
     layers = []
-    if start_layer is not None:
-        layers.append(start_layer)
     for i, (in_, out_) in enumerate(zip(layer_sizes[:-1], layer_sizes[1:])):
         layers.append(nn.Linear(in_, out_))
-        if i < len(layer_sizes) - 2:
-            layers.append(activation)
-    if end_layer is not None:
-        layers.append(end_layer)
+        if last_act or i < len(layer_sizes) - 2:
+            layers.append(activation())
     return nn.Sequential(*layers)
 
 
@@ -58,8 +54,6 @@ class LitMLP(pl.LightningModule):
     layer_sizes : Collection of int
         Hidden layer sizes.
     activation : nn.Module, optional
-    start_layer : nn.Module, optional
-    end_layer : nn.Module, optional
     loss_func : callable, optional
         The loss function for network training.
     optim_cls : class, optional
@@ -68,11 +62,11 @@ class LitMLP(pl.LightningModule):
         Keyword arguments for optimizer instantiation.
 
     """
-    def __init__(self, layer_sizes, activation=nn.ReLU(), start_layer=None, end_layer=None,
-                 loss_func=functional.mse_loss, optim_cls=torch.optim.Adam, optim_params=None):
+    def __init__(self, layer_sizes, activation=nn.ReLU(), loss_func=functional.mse_loss, optim_cls=torch.optim.Adam,
+                 optim_params=None):
         super().__init__()
 
-        self.model = _build_mlp(layer_sizes, activation, start_layer, end_layer)
+        self.model = build_mlp(layer_sizes, activation)
         self.loss_func = loss_func
         self.optim_cls = optim_cls
         if optim_params is None:
