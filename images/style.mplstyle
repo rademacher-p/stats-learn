@@ -4,3 +4,4 @@ text.usetex : True
 # text.latex.preamble : \usepackage{PhDmath,bm}
 text.latex.preamble : \usepackage{upgreek,bm}
 # figure.autolayout : True
+savefig.bbox : tight

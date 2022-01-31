@@ -13,8 +13,6 @@ def main(dirs):
         subdir = dir_ / 'temp'
         subdir.mkdir()
         for filepath in dir_.glob('*.mpl'):
-            filename = filepath.name
-
             with filepath.open('rb') as f:
                 fig = pickle.load(f)
 
@@ -45,7 +43,7 @@ def main(dirs):
             # End mods
 
             fig.savefig(subdir / f"{filepath.stem}.png")
-            mpl_file = subdir / filename
+            mpl_file = subdir / filepath.name
             with open(mpl_file, 'wb') as f:
                 pickle.dump(fig, f)
 
