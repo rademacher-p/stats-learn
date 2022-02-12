@@ -260,7 +260,7 @@ predictors, params = zip(*temp)
 # log_path = None
 # img_path = None
 log_path = 'temp/log.md'
-img_path = f'temp/images/{get_now()}.png'
+img_path = f'temp/images/{get_now()}'
 
 
 y_stats_full, loss_full = results.model_assess(predictors, model, params, n_train, n_test, n_mc,
@@ -296,7 +296,7 @@ y_stats_full, loss_full = results.model_assess(predictors, model, params, n_trai
 # image_path = Path('./images/temp/')
 #
 # fig = plt.gcf()
-# fig.savefig(image_path.joinpath(f"{NOW_STR}.png"))
+# fig.savefig(image_path.joinpath(f"{NOW_STR}"))
 # with open(image_path.joinpath(f"{NOW_STR}.mpl"), 'wb') as f:
 #     pickle.dump(fig, f)
 

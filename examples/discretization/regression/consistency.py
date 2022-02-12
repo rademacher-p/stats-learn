@@ -136,18 +136,18 @@ if 'fit' in sim_names:
     x_plt = np.linspace(0, 1, 10000)
 
     results.data_assess(predictors, d_train, d_test, params, x_plt, verbose=True, plot_fit=True, log_path=log_path,
-                        img_path=get_img_path('fit.png'))
+                        img_path=get_img_path('fit'))
 
 # Prediction mean/variance, comparative
 if 'predict_T' in sim_names:
     n_train = 400
 
     results.model_assess(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
-                         plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict_T.png'),
+                         plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict_T'),
                          rng=seed)
 
 # Dirichlet-based prediction mean/variance, varying N
-if 'predict_N_T4.png' in sim_names:
+if 'predict_N_T4' in sim_names:
     n_train = [0, 400, 4000]
     _t = 4
     _alpha_0_norm = 250
@@ -157,7 +157,7 @@ if 'predict_N_T4.png' in sim_names:
 
     dir_predictors[idx].model_assess(model, dir_params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
                                      plot_stats=True, print_loss=True, log_path=log_path,
-                                     img_path=get_img_path(f'predict_N_T{_t}.png'), rng=seed)
+                                     img_path=get_img_path(f'predict_N_T{_t}'), rng=seed)
 
     plt.gca().set(title=_title)
 
@@ -166,7 +166,7 @@ if 'risk_N_leg_T' in sim_names:
     n_train = np.linspace(0, 4000, 81, dtype=int)
 
     results.model_assess(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True,
-                         print_loss=True, log_path=log_path, img_path=get_img_path('risk_N_leg_T.png'), rng=seed)
+                         print_loss=True, log_path=log_path, img_path=get_img_path('risk_N_leg_T'), rng=seed)
 
 # Squared-Error vs. prior localization alpha_0
 if 'risk_a0norm_leg_T' in sim_names:
@@ -175,7 +175,7 @@ if 'risk_a0norm_leg_T' in sim_names:
     dir_predictors, dir_params_full = make_normalized([2, 4, 8, 16], dir_params)
 
     results.model_assess(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, plot_loss=True,
-                         print_loss=True, log_path=log_path, img_path=get_img_path('risk_a0norm_leg_T.png'), rng=seed)
+                         print_loss=True, log_path=log_path, img_path=get_img_path('risk_a0norm_leg_T'), rng=seed)
 
     ax = plt.gca()
     if ax.get_xlabel() == r'$\alpha_0$':  # scale alpha axis, find localization minimum

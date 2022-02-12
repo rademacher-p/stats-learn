@@ -19,7 +19,7 @@ from stats_learn.util import get_now
 # # Input
 parser = argparse.ArgumentParser(description='Example: discretized regularization against overfitting '
                                              'on a continuous domain')
-parser.add_argument('sims', nargs='*', choices=['fit', 'predict', 'risk_N', 'predict_N_T16.png', 'risk_a0norm_leg_T',
+parser.add_argument('sims', nargs='*', choices=['fit', 'predict', 'risk_N', 'predict_N_T16', 'risk_a0norm_leg_T',
                                                 'risk_T_leg_N'], help=f'Simulations to run')
 parser.add_argument('-m', '--mc', type=int, default=1, help='Number of Monte Carlo iterations')
 parser.add_argument('-l', '--log_path', default=None, help='Path to log file')
@@ -182,14 +182,14 @@ if 'fit' in sim_names:
     x_plt = np.linspace(0, 1, 10000)
 
     results.data_assess(predictors, d_train, d_test, params, x_plt, verbose=True, plot_fit=True, log_path=log_path,
-                        img_path=get_img_path('fit.png'))
+                        img_path=get_img_path('fit'))
 
 # Prediction mean/variance, comparative
 if 'predict' in sim_names:
     n_train = 128
 
     results.model_assess(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
-                         plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict.png'),
+                         plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict'),
                          rng=seed)
 
 # Squared-Error vs. training data volume N
@@ -197,17 +197,17 @@ if 'risk_N' in sim_names:
     n_train = np.insert(np.logspace(0, 10, 11, base=2, dtype=int), 0, 0)
 
     results.model_assess(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True,
-                         print_loss=True, log_path=log_path, img_path=get_img_path('risk_N.png'), rng=seed)
+                         print_loss=True, log_path=log_path, img_path=get_img_path('risk_N'), rng=seed)
 
 # # Dirichlet-based prediction mean/variance, varying N
-if 'predict_N_T16.png' in sim_names:
+if 'predict_N_T16' in sim_names:
     n_train = [0, 400, 4000]
     _t = 16
 
     idx = n_t_iter.index(_t)
     dir_predictors[idx].model_assess(model, dir_params_full[idx], n_train, n_test, n_mc, stats=('mean', 'std'),
                                      verbose=True, plot_stats=True, print_loss=True, log_path=log_path,
-                                     img_path=get_img_path(f'predict_N_T{_t}.png'), rng=seed)
+                                     img_path=get_img_path(f'predict_N_T{_t}'), rng=seed)
 
 # Squared-Error vs. prior localization alpha_0
 if 'risk_a0norm_leg_T' in sim_names:
@@ -217,7 +217,7 @@ if 'risk_a0norm_leg_T' in sim_names:
     dir_predictors, dir_params_full = make_normalized([2, 4, 8, 16], dir_params)
 
     results.model_assess(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, plot_loss=True,
-                         print_loss=True, log_path=log_path, img_path=get_img_path('risk_a0norm_leg_T.png'), rng=seed)
+                         print_loss=True, log_path=log_path, img_path=get_img_path('risk_a0norm_leg_T'), rng=seed)
 
     ax = plt.gca()
     if ax.get_xlabel() == r'$\alpha_0$':  # scale alpha axis, find localization minimum

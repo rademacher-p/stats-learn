@@ -135,14 +135,14 @@ if 'fit' in sim_names:
     d_train, d_test = np.split(d, [n_train])
 
     results.data_assess(predictors, d_train, d_test, params, verbose=True, plot_fit=True, log_path=log_path,
-                        img_path=get_img_path('fit.png'))
+                        img_path=get_img_path('fit'))
 
 # Prediction mean/variance, comparative
 if 'predict' in sim_names:
     n_train = 128
 
     results.model_assess(predictors, model, params, n_train, n_test, n_mc, stats=('mean', 'std'), verbose=True,
-                         plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict.png'),
+                         plot_stats=True, print_loss=True, log_path=log_path, img_path=get_img_path('predict'),
                          rng=seed)
 
 # Squared-Error vs. training data volume N
@@ -150,7 +150,7 @@ if 'risk_N' in sim_names:
     n_train = np.insert(np.logspace(0, 11, 12, base=2, dtype=int), 0, 0)
 
     results.model_assess(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True,
-                         print_loss=True, log_path=log_path, img_path=get_img_path('risk_N.png'), rng=seed)
+                         print_loss=True, log_path=log_path, img_path=get_img_path('risk_N'), rng=seed)
 
 # Squared-Error vs. prior localization alpha_0
 if 'risk_a0_leg_N' in sim_names:
@@ -158,6 +158,6 @@ if 'risk_a0_leg_N' in sim_names:
 
     dir_predictor.model_assess(model, {'alpha_0': np.logspace(0., 5., 60)}, n_train, n_test, n_mc, verbose=True,
                                plot_loss=True, print_loss=True, log_path=log_path,
-                               img_path=get_img_path('risk_a0_leg_N.png'), rng=seed)
+                               img_path=get_img_path('risk_a0_leg_N'), rng=seed)
 
     plt.gca().set_xscale('log')
