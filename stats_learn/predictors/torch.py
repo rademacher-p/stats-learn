@@ -62,7 +62,7 @@ class LitMLP(pl.LightningModule):
         Keyword arguments for optimizer instantiation.
 
     """
-    def __init__(self, layer_sizes, activation=nn.ReLU(), loss_func=functional.mse_loss, optim_cls=torch.optim.Adam,
+    def __init__(self, layer_sizes, activation=nn.ReLU, loss_func=functional.mse_loss, optim_cls=torch.optim.Adam,
                  optim_params=None):
         super().__init__()
 
