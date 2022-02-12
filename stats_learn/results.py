@@ -63,21 +63,25 @@ def _file_logger(file, file_format):
 def _log_and_fig(message, log_path, ax, img_path):
     """Save figure, add figure to message format and log."""
 
+    log_path = Path(log_path)
     file_format = '\n# %(asctime)s\n%(message)s\n'
     if img_path is not None:
         img_path = Path(img_path)
         img_path.parent.mkdir(parents=True, exist_ok=True)
 
-        log_path = Path(log_path)
-        str_ = img_path.relative_to(log_path.parent).as_posix()
-        file_format += f"\n![]({str_})\n"
-
         fig = ax.figure
         fig.savefig(img_path)
+        fig.savefig(img_path.parent / f"{img_path.stem}.png")  # save PNG for Markdown log
         if pickle_figs:
             mpl_file = img_path.parent / f"{img_path.stem}.mpl"
             with open(mpl_file, 'wb') as f:
                 pickle.dump(fig, f)
+
+        # str_ = img_path.relative_to(log_path.parent).as_posix()
+        # file_format += f"\n![]({str_})\n"
+        img_path_rel = img_path.relative_to(log_path.parent)
+        img_path_png = img_path_rel.parent / f"{img_path_rel.stem}.png"
+        file_format += f"\n![]({img_path_png.as_posix()})\n"
 
     with _file_logger(log_path, file_format) as logger_:
         logger_.info(message)

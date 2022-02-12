@@ -42,7 +42,7 @@ def main(dirs):
                 ax.set_title(title)
             # End mods
 
-            fig.savefig(subdir / f"{filepath.stem}.png")
+            fig.savefig(subdir / filepath.stem)
             mpl_file = subdir / filepath.name
             with open(mpl_file, 'wb') as f:
                 pickle.dump(fig, f)
@@ -63,9 +63,9 @@ def label_update(label):
 
 if __name__ == '__main__':
     # dirs_ = [
-    #     '../../docs/Figures/Discrete/SE/reg_func',
-    #     # '../../docs/Figures/Discrete/SE/reg_var',
-    #     # '../../docs/Figures/Discretization/SE/reg_var',
+    #     '../docs/Figures/Discrete/SE/reg_func',
+    #     # '../docs/Figures/Discrete/SE/reg_var',
+    #     # '../docs/Figures/Discretization/SE/reg_var',
     # ]
     # main(dirs_)
 
