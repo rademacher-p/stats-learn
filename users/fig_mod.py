@@ -4,7 +4,7 @@ from pathlib import Path
 from matplotlib import pyplot as plt
 
 # plt.style.use('images/style.mplstyle')
-plt.style.use(['images/style.mplstyle', 'images/IEEE.mplstyle'])
+plt.style.use(['images/style.mplstyle', 'images/double.mplstyle'])
 
 plt.matplotlib.interactive(False)
 
@@ -19,10 +19,11 @@ def main(dirs):
                 fig = pickle.load(f)
 
             # Modifications
-
             fig.set_size_inches(*plt.rcParams['figure.figsize'])
             for ax in fig.axes:
                 ax.grid(plt.rcParams['axes.grid'])
+
+                plt.setp(ax.spines.values(), linewidth=plt.rcParams['axes.linewidth'])
 
                 ax.tick_params(which='both', reset=True)
                 if plt.rcParams['xtick.minor.visible'] and plt.rcParams['ytick.minor.visible']:
@@ -32,40 +33,31 @@ def main(dirs):
                 ax.set_ylabel(ax.get_ylabel(), fontsize=plt.rcParams['axes.labelsize'])
                 ax.set_title(ax.get_title(), fontsize=plt.rcParams['axes.titlesize'])
 
-                # TODO: redraw artists with new linewidths, markersizes, etc.
+                for line in ax.get_lines():
+                    line.set_linewidth(plt.rcParams['lines.linewidth'])
+                    line.set_markersize(plt.rcParams['lines.markersize'])
 
                 handles, labels = ax.get_legend_handles_labels()
-                if labels[-1] == '$D$':
-                    handles = handles[-1:] + handles[:-1]
-                    labels = labels[-1:] + labels[:-1]
+                ax.get_legend().remove()
                 ax.legend(handles, labels)
-
             # End mods
 
             fig.savefig(subdir / filepath.stem)
+            fig.savefig(subdir / f"{filepath.stem}.png")
             mpl_file = subdir / filepath.name
             with open(mpl_file, 'wb') as f:
                 pickle.dump(fig, f)
 
-        # plt.show()
-
-
-def label_update(label):
-    label = label.replace(r'\Dir', r'\mathrm{Dir}')
-    if label == r'$f_{\Theta}(\theta)$':
-        label = r'$f^*(\theta)$'
-
-    if label == r'$f^*(\theta)$':
-        label = r'$f^*(\rho)$'
-
-    return label
-
 
 if __name__ == '__main__':
     # dirs_ = [
+    #     '../docs/Figures/Continuous/SE',
+    #     '../docs/Figures/Discrete/model_est',
+    #     '../docs/Figures/Discrete/SE/consistency',
     #     '../docs/Figures/Discrete/SE/reg_func',
-    #     # '../docs/Figures/Discrete/SE/reg_var',
-    #     # '../docs/Figures/Discretization/SE/reg_var',
+    #     '../docs/Figures/Discrete/SE/reg_var',
+    #     '../docs/Figures/Discretization/SE/consistency',
+    #     '../docs/Figures/Discretization/SE/reg_var',
     # ]
     # main(dirs_)
 

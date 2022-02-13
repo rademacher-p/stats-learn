@@ -30,11 +30,12 @@ def main(dirs):
                 if ylabel == r'$R(f;\theta)$':
                     ax.set_ylabel(r'$R(f;\rho)$')
 
+                for line in ax.get_lines():
+                    label = label_update(line.get_label())
+                    line.set_label(label)
+
                 handles, labels = ax.get_legend_handles_labels()
-                labels = list(map(label_update, labels))
-                if labels[-1] == '$D$':
-                    handles = handles[-1:] + handles[:-1]
-                    labels = labels[-1:] + labels[:-1]
+                ax.get_legend().remove()
                 ax.legend(handles, labels)
 
                 title = ax.get_title()
@@ -43,18 +44,16 @@ def main(dirs):
             # End mods
 
             fig.savefig(subdir / filepath.stem)
+            fig.savefig(subdir / f"{filepath.stem}.png")
             mpl_file = subdir / filepath.name
             with open(mpl_file, 'wb') as f:
                 pickle.dump(fig, f)
-
-        # plt.show()
 
 
 def label_update(label):
     label = label.replace(r'\Dir', r'\mathrm{Dir}')
     if label == r'$f_{\Theta}(\theta)$':
         label = r'$f^*(\theta)$'
-
     if label == r'$f^*(\theta)$':
         label = r'$f^*(\rho)$'
 
@@ -63,9 +62,13 @@ def label_update(label):
 
 if __name__ == '__main__':
     # dirs_ = [
+    #     '../docs/Figures/Continuous/SE',
+    #     '../docs/Figures/Discrete/model_est',
+    #     '../docs/Figures/Discrete/SE/consistency',
     #     '../docs/Figures/Discrete/SE/reg_func',
-    #     # '../docs/Figures/Discrete/SE/reg_var',
-    #     # '../docs/Figures/Discretization/SE/reg_var',
+    #     '../docs/Figures/Discrete/SE/reg_var',
+    #     '../docs/Figures/Discretization/SE/consistency',
+    #     '../docs/Figures/Discretization/SE/reg_var',
     # ]
     # main(dirs_)
 
