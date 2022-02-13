@@ -77,8 +77,6 @@ def _log_and_fig(message, log_path, ax, img_path):
             with open(mpl_file, 'wb') as f:
                 pickle.dump(fig, f)
 
-        # str_ = img_path.relative_to(log_path.parent).as_posix()
-        # file_format += f"\n![]({str_})\n"
         img_path_rel = img_path.relative_to(log_path.parent)
         img_path_png = img_path_rel.parent / f"{img_path_rel.stem}.png"
         file_format += f"\n![]({img_path_png.as_posix()})\n"
