@@ -125,20 +125,21 @@ class Base(ABC):
     def make_axes(self):  # TODO: axes kwargs
         """Create axes for plotting."""
 
-        if self.shape == ():
-            _, ax = plt.subplots()
-            ax.set(xlabel='$x$', ylabel='$y$')
-        elif self.shape == (2,):
-            _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-            ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$y$')
+        with plt.rc_context({'axes.xmargin': 0}):
+            if self.shape == ():
+                _, ax = plt.subplots()
+                ax.set(xlabel='$x$', ylabel='$y$')
+            elif self.shape == (2,):
+                _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+                ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$y$')
 
-            ax.set_prop_cycle('color', ['1f77b4', 'ff7f0e', '2ca02c', 'd62728', '9467bd', '8c564b', 'e377c2',
-                                        '7f7f7f', 'bcbd22', '17becf'])
-        elif self.shape == (3,):
-            _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-            ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
-        else:
-            raise NotImplementedError('Plotting only supported for 1- and 2- dimensional data.')
+                ax.set_prop_cycle('color', ['1f77b4', 'ff7f0e', '2ca02c', 'd62728', '9467bd', '8c564b', 'e377c2',
+                                            '7f7f7f', 'bcbd22', '17becf'])
+            elif self.shape == (3,):
+                _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+                ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
+            else:
+                raise NotImplementedError('Plotting only supported for 1- and 2- dimensional data.')
 
         return ax
 
