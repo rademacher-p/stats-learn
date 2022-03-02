@@ -1,10 +1,11 @@
-Welcome to Statistical Learning's documentation!
-================================================
+Statistical Learning package documentation
+==========================================
 
 .. note::
    This project is under active development.
 
 The :mod:`stats_learn` package provides a framework to explore statistical learning with a Bayesian focus.
+See :doc:`usage` to get started and :doc:`stats_learn` to explore the API.
 
 A variety of :ref:`random elements <random.elements>` :math:`\xrm \in \Xcal` are implemented in the
 :mod:`random.elements <stats_learn.random.elements>` submodule. Similar to other
