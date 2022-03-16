@@ -2,7 +2,7 @@ import math
 # import pickle
 
 import numpy as np
-# from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
 
 from sklearn.neural_network import MLPRegressor
 
@@ -19,8 +19,9 @@ from stats_learn.predictors.torch import LitMLP, LitPredictor, reset_weights
 
 np.set_printoptions(precision=3)
 
-# plt.style.use('../images/style.mplstyle')
-# plt.rc('text.latex', preamble=r"\usepackage{PhDmath,bm}")
+plt.style.use('../images/style.mplstyle')
+plt.rc('text', usetex=False)
+# plt.rc('text.latex', preamble=r"\usepackage{PhDmath}")
 
 # seed = None
 seed = 12345

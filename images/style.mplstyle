@@ -25,5 +25,6 @@ ytick.right : True
 ytick.minor.visible : True
 
 # axes.grid : True
+axes3d.grid : False
 
 # legend.frameon : False

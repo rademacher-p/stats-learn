@@ -757,7 +757,7 @@ class Simplex(Continuous):
         else:
             raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
-    def plot(self, f, x=None, ax=None, label=None, **kwargs):
+    def plot(self, f, x=None, ax=None, label=None, **scatter_kwargs):
         if ax is None:
             ax = self.make_axes()
 
@@ -765,12 +765,12 @@ class Simplex(Continuous):
         if len(set_shape) != 1:
             raise ValueError()
 
-        kwargs = {'label': label, 's': 5, 'c': y} | kwargs
+        scatter_kwargs = {'label': label, 's': 5, 'c': y} | scatter_kwargs
 
         if self.shape == (2,):
-            plt_data = ax.scatter(x[:, 0], x[:, 1], **kwargs)
+            plt_data = ax.scatter(x[:, 0], x[:, 1], **scatter_kwargs)
         elif self.shape == (3,):
-            plt_data = ax.scatter(x[:, 0], x[:, 1], x[:, 2], **kwargs)
+            plt_data = ax.scatter(x[:, 0], x[:, 1], x[:, 2], **scatter_kwargs)
         else:
             raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 

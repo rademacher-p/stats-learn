@@ -3,9 +3,7 @@ from pathlib import Path
 
 from matplotlib import pyplot as plt
 
-# plt.style.use('images/style.mplstyle')
 plt.style.use(['images/style.mplstyle', 'images/double.mplstyle'])
-
 plt.matplotlib.interactive(False)
 
 
@@ -50,21 +48,21 @@ def main(dirs):
 
 
 if __name__ == '__main__':
-    # dirs_ = [
-    #     '../docs/Figures/Continuous/SE',
-    #     '../docs/Figures/Discrete/model_est',
-    #     '../docs/Figures/Discrete/SE/consistency',
-    #     '../docs/Figures/Discrete/SE/reg_func',
-    #     '../docs/Figures/Discrete/SE/reg_var',
-    #     '../docs/Figures/Discretization/SE/consistency',
-    #     '../docs/Figures/Discretization/SE/reg_var',
-    # ]
-    # main(dirs_)
+    dirs_ = [
+        '../docs/Figures/Continuous/SE',
+        '../docs/Figures/Discrete/model_est',
+        '../docs/Figures/Discrete/SE/consistency',
+        '../docs/Figures/Discrete/SE/reg_func',
+        '../docs/Figures/Discrete/SE/reg_var',
+        '../docs/Figures/Discretization/SE/consistency',
+        '../docs/Figures/Discretization/SE/reg_var',
+    ]
+    main(dirs_)
 
-    import argparse
-
-    parser = argparse.ArgumentParser(description='Update `matplotlib` figures')
-    parser.add_argument('dirs', type=str, nargs='+', help='Directories in which to find MPL files')
-    args = parser.parse_args()
-
-    main(args.dirs)
+    # import argparse
+    #
+    # parser = argparse.ArgumentParser(description='Update `matplotlib` figures')
+    # parser.add_argument('dirs', type=str, nargs='+', help='Directories in which to find MPL files')
+    # args = parser.parse_args()
+    #
+    # main(args.dirs)
