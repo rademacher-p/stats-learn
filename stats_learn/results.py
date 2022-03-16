@@ -30,6 +30,7 @@ else:
 
 
 pickle_figs = True
+log_fmt = '\n# %(asctime)s\n%(message)s\n'
 date_fmt = '%Y-%m-%d %H:%M:%S'
 file_log_mode = 'a'
 
@@ -37,7 +38,7 @@ file_log_mode = 'a'
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 out_handler = logging.StreamHandler(stream=sys.stdout)
-out_formatter = logging.Formatter('\n# %(asctime)s\n%(message)s\n', datefmt=date_fmt)
+out_formatter = logging.Formatter(log_fmt, datefmt=date_fmt)
 out_handler.setFormatter(out_formatter)
 logger.addHandler(out_handler)
 
@@ -63,8 +64,7 @@ def _file_logger(file, file_format):
 def _log_and_fig(message, log_path, ax, img_path):
     """Save figure, add figure to message format and log."""
 
-    log_path = Path(log_path)
-    file_format = '\n# %(asctime)s\n%(message)s\n'
+    file_format = log_fmt
     if img_path is not None:
         img_path = Path(img_path)
         img_path.parent.mkdir(parents=True, exist_ok=True)
@@ -77,9 +77,11 @@ def _log_and_fig(message, log_path, ax, img_path):
             with open(mpl_file, 'wb') as f:
                 pickle.dump(fig, f)
 
-        img_path_rel = img_path.relative_to(log_path.parent)
-        img_path_png = img_path_rel.parent / f"{img_path_rel.stem}.png"
-        file_format += f"\n![]({img_path_png.as_posix()})\n"
+        if log_path is not None:
+            log_path = Path(log_path)
+            img_path_rel = img_path.relative_to(log_path.parent)
+            img_path_png = img_path_rel.parent / f"{img_path_rel.stem}.png"
+            file_format += f"\n![]({img_path_png.as_posix()})\n"
 
     with _file_logger(log_path, file_format) as logger_:
         logger_.info(message)
