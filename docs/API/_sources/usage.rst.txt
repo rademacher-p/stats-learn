@@ -1,5 +1,5 @@
-Usage
-=====
+User Guide
+==========
 
 Installation
 ------------

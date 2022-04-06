@@ -1,187 +1,191 @@
 
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
-<head>
-  <meta charset="utf-8" />
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>bayes &mdash; Statistical Learning  documentation</title>
-  
 
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>bayes &#8212; Statistical Learning  documentation</title>
     
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="predictors" href="stats_learn.predictors.html" />
-    <link rel="prev" title="stats_learn" href="stats_learn.html" /> 
-</head>
-
-<body class="wy-body-for-nav">
-
-   
-  <div class="wy-grid-for-nav">
+    <link rel="prev" title="stats_learn" href="stats_learn.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-          
 
-          
-            <a href="index.html" class="icon icon-home"> Statistical Learning
-          
-
-          
-          </a>
-
-          
-            
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="stats_learn.html">stats_learn</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">bayes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-stats_learn.bayes.elements">elements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-stats_learn.bayes.models">models</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="stats_learn.predictors.html">predictors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="stats_learn.random.html">random</a></li>
-<li class="toctree-l2"><a class="reference internal" href="stats_learn.html#module-stats_learn.loss_funcs">loss_funcs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="stats_learn.html#module-stats_learn.preprocessing">preprocessing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="stats_learn.html#module-stats_learn.results">results</a></li>
-<li class="toctree-l2"><a class="reference internal" href="stats_learn.html#module-stats_learn.spaces">spaces</a></li>
-<li class="toctree-l2"><a class="reference internal" href="stats_learn.html#module-stats_learn.util">util</a></li>
-</ul>
-</li>
-</ul>
-
-            
-          
-        </div>
-        
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Statistical Learning</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
+    <!-- Google Analytics -->
     
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="stats_learn.html">stats_learn</a> &raquo;</li>
-        
-      <li>bayes</li>
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
     
     
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="_sources/stats_learn.bayes.rst.txt" rel="nofollow"> View page source</a>
-          
-        
-      </li>
+<a class="navbar-brand" href="index.html">
+<p class="title">Statistical Learning</p>
+</a>
+
     
-  </ul>
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
   
-  <hr/>
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="usage.html">
+  User Guide
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="stats_learn.html">
+  stats_learn
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
             
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   bayes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="stats_learn.predictors.html">
+   predictors
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="stats_learn.random.html">
+   random
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-stats_learn.bayes.elements">
+   elements
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-stats_learn.bayes.models">
+   models
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <div class="section" id="module-stats_learn.bayes">
-<span id="bayes"></span><h1>bayes<a class="headerlink" href="#module-stats_learn.bayes" title="Permalink to this headline">¶</a></h1>
+<span id="bayes"></span><h1>bayes<a class="headerlink" href="#module-stats_learn.bayes" title="Permalink to this headline">#</a></h1>
 <div class="section" id="module-stats_learn.bayes.elements">
-<span id="elements"></span><span id="bayes-elements"></span><h2>elements<a class="headerlink" href="#module-stats_learn.bayes.elements" title="Permalink to this headline">¶</a></h2>
+<span id="elements"></span><span id="bayes-elements"></span><h2>elements<a class="headerlink" href="#module-stats_learn.bayes.elements" title="Permalink to this headline">#</a></h2>
 <p>Bayesian random elements with prior sampling and posterior fitting.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Base">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">stats_learn.bayes.elements.</span></span><span class="sig-name descname"><span class="pre">Base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prior</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.Base" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.bayes.elements.</span></span><span class="sig-name descname"><span class="pre">Base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prior</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.Base" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="stats_learn.html#stats_learn.util.RandomGeneratorMixin" title="stats_learn.util.RandomGeneratorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.util.RandomGeneratorMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
 <p>Base class for Bayesian random elements.</p>
 <dl class="field-list simple">
@@ -194,7 +198,7 @@
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Base.prior">
-<span class="sig-name descname"><span class="pre">prior</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Base.prior" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">prior</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Base.prior" title="Permalink to this definition">#</a></dt>
 <dd><p>Random element characterizing the prior distribution of the element parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -205,26 +209,23 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Base.can_warm_start">
-<span class="sig-name descname"><span class="pre">can_warm_start</span></span><em class="property"> <span class="pre">=</span> <span class="pre">False</span></em><a class="headerlink" href="#stats_learn.bayes.elements.Base.can_warm_start" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">can_warm_start</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#stats_learn.bayes.elements.Base.can_warm_start" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Base.dtype">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Base.dtype" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Base.dtype" title="Permalink to this definition">#</a></dt>
 <dd><p>Data type of random elements.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>np.dtype</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.dtype</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Base.fit">
-<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.Base.fit" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.Base.fit" title="Permalink to this definition">#</a></dt>
 <dd><p>Refine the posterior using observations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -238,33 +239,30 @@
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Base.ndim">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Base.ndim" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Base.ndim" title="Permalink to this definition">#</a></dt>
 <dd><p>Dimensionality of random elements.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>int</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Base.random_model">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">random_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.Base.random_model" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">random_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.Base.random_model" title="Permalink to this definition">#</a></dt>
 <dd><p>Generate a random element with a randomly selected parameterization.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Base.reset">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.Base.reset" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.Base.reset" title="Permalink to this definition">#</a></dt>
 <dd><p>Restore unfit prior state.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Base.sample">
-<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.Base.sample" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.Base.sample" title="Permalink to this definition">#</a></dt>
 <dd><p>Randomly generate elements.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -284,42 +282,33 @@
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Base.shape">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Base.shape" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Base.shape" title="Permalink to this definition">#</a></dt>
 <dd><p>Shape of the random elements.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>tuple</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Base.size">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Base.size" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Base.size" title="Permalink to this definition">#</a></dt>
 <dd><p>Size of random elements.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>int</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Base.space">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">space</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Base.space" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">space</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Base.space" title="Permalink to this definition">#</a></dt>
 <dd><p>The domain.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="stats_learn.html#stats_learn.spaces.Base" title="stats_learn.spaces.Base">spaces.Base</a></p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="stats_learn.html#stats_learn.spaces.Base" title="stats_learn.spaces.Base">spaces.Base</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -328,7 +317,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Dirichlet">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">stats_learn.bayes.elements.</span></span><span class="sig-name descname"><span class="pre">Dirichlet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prior_mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.Dirichlet" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.bayes.elements.</span></span><span class="sig-name descname"><span class="pre">Dirichlet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prior_mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.Dirichlet" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stats_learn.bayes.elements.Base" title="stats_learn.bayes.elements.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.bayes.elements.Base</span></code></a></p>
 <p>Generic random element whose distribution is characterized by a Dirichlet process.</p>
 <dl class="field-list simple">
@@ -342,41 +331,41 @@
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Dirichlet.alpha_0">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">alpha_0</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Dirichlet.alpha_0" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">alpha_0</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Dirichlet.alpha_0" title="Permalink to this definition">#</a></dt>
 <dd><p>Dirichlet localization (i.e. concentration) parameter.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Dirichlet.can_warm_start">
-<span class="sig-name descname"><span class="pre">can_warm_start</span></span><em class="property"> <span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#stats_learn.bayes.elements.Dirichlet.can_warm_start" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">can_warm_start</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#stats_learn.bayes.elements.Dirichlet.can_warm_start" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Dirichlet.emp_dist">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">emp_dist</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Dirichlet.emp_dist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">emp_dist</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Dirichlet.emp_dist" title="Permalink to this definition">#</a></dt>
 <dd><p>The empirical distribution formed by observations.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Dirichlet.n">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Dirichlet.n" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Dirichlet.n" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Dirichlet.prior_mean">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">prior_mean</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Dirichlet.prior_mean" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">prior_mean</span></span><a class="headerlink" href="#stats_learn.bayes.elements.Dirichlet.prior_mean" title="Permalink to this definition">#</a></dt>
 <dd><p>Random element characterizing the mean of the Dirichlet process.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Dirichlet.random_model">
-<span class="sig-name descname"><span class="pre">random_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.Dirichlet.random_model" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">random_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.Dirichlet.random_model" title="Permalink to this definition">#</a></dt>
 <dd><p>Generate a random element with a randomly selected parameterization.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.Dirichlet.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.Dirichlet.reset" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.Dirichlet.reset" title="Permalink to this definition">#</a></dt>
 <dd><p>Restore unfit prior state.</p>
 </dd></dl>
 
@@ -384,7 +373,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.NormalLinear">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">stats_learn.bayes.elements.</span></span><span class="sig-name descname"><span class="pre">NormalLinear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prior_mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([0.])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([[1.]])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_singular</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.NormalLinear" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.bayes.elements.</span></span><span class="sig-name descname"><span class="pre">NormalLinear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prior_mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([0.])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([[1.]])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_singular</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.NormalLinear" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stats_learn.bayes.elements.Base" title="stats_learn.bayes.elements.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.bayes.elements.Base</span></code></a></p>
 <p>Normal random variable with mean defined in terms of basis tensors and weights characterized by a Normal
 distribution.</p>
@@ -402,46 +391,46 @@ distribution.</p>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.NormalLinear.basis">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">basis</span></span><a class="headerlink" href="#stats_learn.bayes.elements.NormalLinear.basis" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">basis</span></span><a class="headerlink" href="#stats_learn.bayes.elements.NormalLinear.basis" title="Permalink to this definition">#</a></dt>
 <dd><p>Basis tensors, such that <cite>mean = basis &#64; weights</cite>.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.NormalLinear.can_warm_start">
-<span class="sig-name descname"><span class="pre">can_warm_start</span></span><em class="property"> <span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#stats_learn.bayes.elements.NormalLinear.can_warm_start" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">can_warm_start</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#stats_learn.bayes.elements.NormalLinear.can_warm_start" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.NormalLinear.cov">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">cov</span></span><a class="headerlink" href="#stats_learn.bayes.elements.NormalLinear.cov" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cov</span></span><a class="headerlink" href="#stats_learn.bayes.elements.NormalLinear.cov" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.NormalLinear.prior">
-<span class="sig-name descname"><span class="pre">prior</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="stats_learn.random.html#stats_learn.random.elements.Normal" title="stats_learn.random.elements.Normal"><span class="pre">stats_learn.random.elements.Normal</span></a></em><a class="headerlink" href="#stats_learn.bayes.elements.NormalLinear.prior" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">prior</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="stats_learn.random.html#stats_learn.random.elements.Normal" title="stats_learn.random.elements.Normal"><span class="pre">stats_learn.random.elements.Normal</span></a></em><a class="headerlink" href="#stats_learn.bayes.elements.NormalLinear.prior" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.NormalLinear.prior_cov">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">prior_cov</span></span><a class="headerlink" href="#stats_learn.bayes.elements.NormalLinear.prior_cov" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">prior_cov</span></span><a class="headerlink" href="#stats_learn.bayes.elements.NormalLinear.prior_cov" title="Permalink to this definition">#</a></dt>
 <dd><p>Access the covariance of the <cite>prior</cite>.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.NormalLinear.prior_mean">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">prior_mean</span></span><a class="headerlink" href="#stats_learn.bayes.elements.NormalLinear.prior_mean" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">prior_mean</span></span><a class="headerlink" href="#stats_learn.bayes.elements.NormalLinear.prior_mean" title="Permalink to this definition">#</a></dt>
 <dd><p>Access the mean of the <cite>prior</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.NormalLinear.random_model">
-<span class="sig-name descname"><span class="pre">random_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.NormalLinear.random_model" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">random_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.NormalLinear.random_model" title="Permalink to this definition">#</a></dt>
 <dd><p>Generate a random element with a randomly selected parameterization.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.elements.NormalLinear.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.NormalLinear.reset" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.elements.NormalLinear.reset" title="Permalink to this definition">#</a></dt>
 <dd><p>Restore unfit prior state.</p>
 </dd></dl>
 
@@ -449,12 +438,12 @@ distribution.</p>
 
 </div>
 <div class="section" id="module-stats_learn.bayes.models">
-<span id="models"></span><span id="bayes-models"></span><h2>models<a class="headerlink" href="#module-stats_learn.bayes.models" title="Permalink to this headline">¶</a></h2>
+<span id="models"></span><span id="bayes-models"></span><h2>models<a class="headerlink" href="#module-stats_learn.bayes.models" title="Permalink to this headline">#</a></h2>
 <p>Bayesian random models of jointly distributed <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/> and <img class="math" src="_images/math/e7aef02edc78c428596f814d49189687b8551a04.png" alt="\yrm" style="vertical-align: -4px"/> elements with prior sampling and posterior
 fitting.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Base">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">stats_learn.bayes.models.</span></span><span class="sig-name descname"><span class="pre">Base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prior</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Base" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.bayes.models.</span></span><span class="sig-name descname"><span class="pre">Base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prior</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Base" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="stats_learn.html#stats_learn.util.RandomGeneratorMixin" title="stats_learn.util.RandomGeneratorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.util.RandomGeneratorMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
 <p>Base class for Bayesian random models.</p>
 <dl class="field-list simple">
@@ -467,26 +456,23 @@ fitting.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Base.can_warm_start">
-<span class="sig-name descname"><span class="pre">can_warm_start</span></span><em class="property"> <span class="pre">=</span> <span class="pre">False</span></em><a class="headerlink" href="#stats_learn.bayes.models.Base.can_warm_start" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">can_warm_start</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#stats_learn.bayes.models.Base.can_warm_start" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Base.dtype">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#stats_learn.bayes.models.Base.dtype" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#stats_learn.bayes.models.Base.dtype" title="Permalink to this definition">#</a></dt>
 <dd><p>Data type of random models.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>dict of np.dtype</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict of np.dtype</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Base.fit">
-<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Base.fit" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Base.fit" title="Permalink to this definition">#</a></dt>
 <dd><p>Refine the posterior using observations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -500,33 +486,30 @@ fitting.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Base.ndim">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#stats_learn.bayes.models.Base.ndim" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#stats_learn.bayes.models.Base.ndim" title="Permalink to this definition">#</a></dt>
 <dd><p>Dimensionality of random models.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>dict of int</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict of int</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Base.random_model">
-<span class="sig-name descname"><span class="pre">random_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Base.random_model" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">random_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Base.random_model" title="Permalink to this definition">#</a></dt>
 <dd><p>Generate a random element with a randomly selected parameterization.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Base.reset">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Base.reset" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Base.reset" title="Permalink to this definition">#</a></dt>
 <dd><p>Restore unfit prior state.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Base.sample">
-<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Base.sample" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Base.sample" title="Permalink to this definition">#</a></dt>
 <dd><p>Randomly generate elements.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -546,49 +529,40 @@ fitting.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Base.shape">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#stats_learn.bayes.models.Base.shape" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#stats_learn.bayes.models.Base.shape" title="Permalink to this definition">#</a></dt>
 <dd><p>Shape of the random models.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>dict of tuple</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict of tuple</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Base.size">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#stats_learn.bayes.models.Base.size" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#stats_learn.bayes.models.Base.size" title="Permalink to this definition">#</a></dt>
 <dd><p>Size of random models.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>dict of int</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict of int</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Base.space">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">space</span></span><a class="headerlink" href="#stats_learn.bayes.models.Base.space" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">space</span></span><a class="headerlink" href="#stats_learn.bayes.models.Base.space" title="Permalink to this definition">#</a></dt>
 <dd><p>The domain.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>dict of spaces.Base</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict of spaces.Base</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Base.tex_params">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">tex_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Base.tex_params" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tex_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Base.tex_params" title="Permalink to this definition">#</a></dt>
 <dd><p>Format attributes as strings for LaTeX.</p>
 </dd></dl>
 
@@ -596,7 +570,7 @@ fitting.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Dirichlet">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">stats_learn.bayes.models.</span></span><span class="sig-name descname"><span class="pre">Dirichlet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prior_mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Dirichlet" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.bayes.models.</span></span><span class="sig-name descname"><span class="pre">Dirichlet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prior_mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Dirichlet" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stats_learn.bayes.models.Base" title="stats_learn.bayes.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.bayes.models.Base</span></code></a></p>
 <p>Generic random model whose joint distribution is characterized by a Dirichlet process.</p>
 <dl class="field-list simple">
@@ -610,47 +584,47 @@ fitting.</p>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Dirichlet.alpha_0">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">alpha_0</span></span><a class="headerlink" href="#stats_learn.bayes.models.Dirichlet.alpha_0" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">alpha_0</span></span><a class="headerlink" href="#stats_learn.bayes.models.Dirichlet.alpha_0" title="Permalink to this definition">#</a></dt>
 <dd><p>Dirichlet localization (i.e. concentration) parameter.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Dirichlet.can_warm_start">
-<span class="sig-name descname"><span class="pre">can_warm_start</span></span><em class="property"> <span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#stats_learn.bayes.models.Dirichlet.can_warm_start" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">can_warm_start</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#stats_learn.bayes.models.Dirichlet.can_warm_start" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Dirichlet.emp_dist">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">emp_dist</span></span><a class="headerlink" href="#stats_learn.bayes.models.Dirichlet.emp_dist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">emp_dist</span></span><a class="headerlink" href="#stats_learn.bayes.models.Dirichlet.emp_dist" title="Permalink to this definition">#</a></dt>
 <dd><p>The empirical distribution formed by observations.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Dirichlet.n">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#stats_learn.bayes.models.Dirichlet.n" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#stats_learn.bayes.models.Dirichlet.n" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Dirichlet.prior_mean">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">prior_mean</span></span><a class="headerlink" href="#stats_learn.bayes.models.Dirichlet.prior_mean" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">prior_mean</span></span><a class="headerlink" href="#stats_learn.bayes.models.Dirichlet.prior_mean" title="Permalink to this definition">#</a></dt>
 <dd><p>Random model characterizing the mean of the Dirichlet process.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Dirichlet.random_model">
-<span class="sig-name descname"><span class="pre">random_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Dirichlet.random_model" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">random_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Dirichlet.random_model" title="Permalink to this definition">#</a></dt>
 <dd><p>Generate a random model with a randomly selected parameterization.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Dirichlet.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Dirichlet.reset" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Dirichlet.reset" title="Permalink to this definition">#</a></dt>
 <dd><p>Restore unfit prior state.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.Dirichlet.tex_params">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">tex_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Dirichlet.tex_params" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tex_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.Dirichlet.tex_params" title="Permalink to this definition">#</a></dt>
 <dd><p>Format attributes as strings for LaTeX.</p>
 </dd></dl>
 
@@ -658,7 +632,7 @@ fitting.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.NormalLinear">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">stats_learn.bayes.models.</span></span><span class="sig-name descname"><span class="pre">NormalLinear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prior_mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([0.])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([[1.]])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis_y_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_y_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Normal(mean=0.0,</span> <span class="pre">cov=1.0)</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_singular</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.bayes.models.</span></span><span class="sig-name descname"><span class="pre">NormalLinear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prior_mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([0.])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([[1.]])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis_y_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_y_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Normal(mean=0.0,</span> <span class="pre">cov=1.0)</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_singular</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stats_learn.bayes.models.Base" title="stats_learn.bayes.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.bayes.models.Base</span></code></a></p>
 <p>Random model characterized by a Normal conditional distribution with mean defined in terms of basis functions
 and weights characterized by a Normal distribution.</p>
@@ -667,7 +641,7 @@ and weights characterized by a Normal distribution.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prior_mean</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Mean of Normal prior random variable.</p></li>
 <li><p><strong>prior_cov</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Covariance of Normal prior random variable.</p></li>
-<li><p><strong>basis_y_x</strong> (<em>iterable of callable</em><em>, </em><em>optional</em>) – Basis functions. Defaults to polynomial functions.</p></li>
+<li><p><strong>basis_y_x</strong> (<em>Collection of callable</em><em>, </em><em>optional</em>) – Basis functions. Defaults to polynomial functions.</p></li>
 <li><p><strong>cov_y_x</strong> (<em>float</em><em> or </em><em>numpy.ndarray</em><em>, </em><em>optional</em>) – Conditional covariance of Normal distributions.</p></li>
 <li><p><strong>model_x</strong> (<a class="reference internal" href="stats_learn.random.html#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><em>stats_learn.random.elements.Base</em></a><em>, </em><em>optional</em>) – Random variable characterizing the marginal distribution of <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/>.</p></li>
 <li><p><strong>allow_singular</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to allow a singular prior covariance matrix.</p></li>
@@ -677,59 +651,59 @@ and weights characterized by a Normal distribution.</p>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.NormalLinear.basis_y_x">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">basis_y_x</span></span><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.basis_y_x" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">basis_y_x</span></span><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.basis_y_x" title="Permalink to this definition">#</a></dt>
 <dd><p>Basis functions.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.NormalLinear.can_warm_start">
-<span class="sig-name descname"><span class="pre">can_warm_start</span></span><em class="property"> <span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.can_warm_start" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">can_warm_start</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.can_warm_start" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.NormalLinear.cov_y_x">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">cov_y_x</span></span><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.cov_y_x" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cov_y_x</span></span><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.cov_y_x" title="Permalink to this definition">#</a></dt>
 <dd><p>Covariance tensor characterizing fixed variance of <img class="math" src="_images/math/e7aef02edc78c428596f814d49189687b8551a04.png" alt="\yrm" style="vertical-align: -4px"/>.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.NormalLinear.model_x">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">model_x</span></span><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.model_x" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">model_x</span></span><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.model_x" title="Permalink to this definition">#</a></dt>
 <dd><p>Random variable characterizing the marginal distribution of <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/>.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.NormalLinear.prior">
-<span class="sig-name descname"><span class="pre">prior</span></span><em class="property"><span class="pre">:</span> <a class="reference internal" href="stats_learn.random.html#stats_learn.random.elements.Normal" title="stats_learn.random.elements.Normal"><span class="pre">stats_learn.random.elements.Normal</span></a></em><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.prior" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">prior</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="stats_learn.random.html#stats_learn.random.elements.Normal" title="stats_learn.random.elements.Normal"><span class="pre">stats_learn.random.elements.Normal</span></a></em><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.prior" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.NormalLinear.prior_cov">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">prior_cov</span></span><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.prior_cov" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">prior_cov</span></span><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.prior_cov" title="Permalink to this definition">#</a></dt>
 <dd><p>Access the covariance of the <cite>prior</cite>.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.NormalLinear.prior_mean">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">prior_mean</span></span><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.prior_mean" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">prior_mean</span></span><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.prior_mean" title="Permalink to this definition">#</a></dt>
 <dd><p>Access the mean of the <cite>prior</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.NormalLinear.random_model">
-<span class="sig-name descname"><span class="pre">random_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.random_model" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">random_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.random_model" title="Permalink to this definition">#</a></dt>
 <dd><p>Generate a random element with a randomly selected parameterization.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.NormalLinear.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.reset" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.reset" title="Permalink to this definition">#</a></dt>
 <dd><p>Restore unfit prior state.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.bayes.models.NormalLinear.tex_params">
-<span class="sig-name descname"><span class="pre">tex_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.tex_params" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">tex_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.bayes.models.NormalLinear.tex_params" title="Permalink to this definition">#</a></dt>
 <dd><p>Format attributes as strings for LaTeX.</p>
 </dd></dl>
 
@@ -739,51 +713,51 @@ and weights characterized by a Normal distribution.</p>
 </div>
 
 
-           </div>
-           
-          </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="stats_learn.predictors.html" class="btn btn-neutral float-right" title="predictors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="stats_learn.html" class="btn btn-neutral float-left" title="stats_learn" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-    </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Paul Rademacher.
-
-    </p>
-  </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="stats_learn.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">stats_learn</p>
         </div>
+    </a>
+    <a class='right-next' id="next-link" href="stats_learn.predictors.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">predictors</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
       </div>
-
-    </section>
-
-  </div>
+    </div>
   
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-  
-  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
     
-   
-
-</body>
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2021, Paul Rademacher.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
 </html>
