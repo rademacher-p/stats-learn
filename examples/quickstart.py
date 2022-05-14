@@ -1,5 +1,9 @@
+import matplotlib.pyplot as plt
+
 from stats_learn import bayes, random, results
 from stats_learn.predictors import BayesRegressor, ModelRegressor
+
+plt.interactive(True)
 
 model = random.models.NormalLinear(weights=[1, 1])
 

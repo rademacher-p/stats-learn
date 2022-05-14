@@ -334,3 +334,5 @@ if "risk_T_leg_a0" in sim_names:
     )
 
     plt.xscale("log", base=2)
+
+plt.show()

@@ -40,8 +40,12 @@ Training and testing data are randomly generated using the model `sample` method
 using its `evaluate` method. Once the learning `norm_predictor` is `fit` to the data, its squared-error loss is reduced.
 
 ```python
-from stats_learn import random, bayes
-from stats_learn.predictors import ModelRegressor, BayesRegressor
+import matplotlib.pyplot as plt
+
+from stats_learn import bayes, random, results
+from stats_learn.predictors import BayesRegressor, ModelRegressor
+
+plt.interactive(True)
 
 model = random.models.NormalLinear(weights=[1, 1])
 

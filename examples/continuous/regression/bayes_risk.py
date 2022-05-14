@@ -89,3 +89,5 @@ if "risk_bayes_N_leg_a0" in sim_names:
         img_path=get_img_path("risk_bayes_N_leg_a0"),
         rng=seed,
     )
+
+plt.show()

@@ -4,7 +4,6 @@ from pathlib import Path
 from matplotlib import pyplot as plt
 
 plt.style.use("images/style.mplstyle")
-plt.matplotlib.interactive(False)
 
 
 def main(dirs):

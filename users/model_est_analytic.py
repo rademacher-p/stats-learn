@@ -81,3 +81,5 @@ title = f"$N = {n}$"
 # title = r'$\alpha_0 = {}$'.format(alpha_0)
 
 ax.set(xlabel="$y$", title=title)
+
+plt.show()

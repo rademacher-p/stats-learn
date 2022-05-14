@@ -284,7 +284,7 @@ temp = [
     # *(zip(dir_predictors, dir_params_full)),
     # (norm_predictor, norm_params),
     # (skl_predictor, None),
-    # *((predictor, None) for predictor in lit_predictors),
+    *((predictor, None) for predictor in lit_predictors),
 ]
 predictors, params = zip(*temp)
 
@@ -311,7 +311,7 @@ y_stats_full, loss_full = results.model_assess(
     rng=seed,
 )
 
-# plt.show()
+plt.show()
 
 # y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
 #                                                  verbose=True, plot_loss=True, print_loss=True,

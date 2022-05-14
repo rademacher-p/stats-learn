@@ -8,3 +8,4 @@ scikit-learn
 torch
 pytorch-lightning
 tensorboard
+pyqt5

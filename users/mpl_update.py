@@ -5,7 +5,6 @@ from matplotlib import pyplot as plt
 
 plt.style.use(["images/style.mplstyle"])
 # plt.style.use(['images/style.mplstyle', 'images/double.mplstyle'])
-plt.matplotlib.interactive(False)
 
 
 def main(dirs):

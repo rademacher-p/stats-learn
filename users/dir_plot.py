@@ -167,3 +167,5 @@ if __name__ == "__main__":
 
 # dir_prior.plot_prob(ax=ax[0])
 # dir_post.plot_prob(ax=ax[1])
+
+plt.show()

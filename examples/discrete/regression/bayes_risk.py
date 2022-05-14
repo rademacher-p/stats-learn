@@ -118,3 +118,5 @@ if "risk_bayes_a0_leg_N" in sim_names:
     )
 
     plt.gca().set_xscale("log")
+
+plt.show()

@@ -201,3 +201,5 @@ if "risk_N" in sim_names:
         img_path=get_img_path("risk_N"),
         rng=seed,
     )
+
+plt.show()
