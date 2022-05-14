@@ -20,7 +20,7 @@ from stats_learn.predictors.torch import LitMLP, LitPredictor, reset_weights
 
 np.set_printoptions(precision=3)
 
-plt.style.use("../images/style.mplstyle")
+plt.style.use("images/style.mplstyle")
 plt.rc("text", usetex=False)
 # plt.rc('text.latex', preamble=r"\usepackage{PhDmath}")
 
