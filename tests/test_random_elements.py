@@ -16,8 +16,6 @@ from stats_learn.random.elements import (
     NormalLinear,
 )
 
-plt.matplotlib.interactive(False)
-
 rng = np.random.default_rng()
 
 RE_set = [

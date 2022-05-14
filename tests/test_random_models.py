@@ -11,8 +11,6 @@ from stats_learn.random.models import (
     NormalLinear,
 )
 
-plt.matplotlib.interactive(False)
-
 RM_set = [
     (
         DataConditional,
