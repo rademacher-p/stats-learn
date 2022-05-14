@@ -23,6 +23,8 @@ plt.style.use("images/style.mplstyle")
 plt.rc("text", usetex=False)
 # plt.rc('text.latex', preamble=r"\usepackage{PhDmath}")
 
+save_dir = "users/temp/"
+
 # seed = None
 seed = 12345
 
@@ -238,7 +240,7 @@ for weight_decay in weight_decays:
             "train_loss", min_delta=1e-6, patience=10000, check_on_train_epoch_end=True
         ),
         "checkpoint_callback": False,
-        "logger": pl_loggers.TensorBoardLogger("temp/logs/", name=logger_name),
+        "logger": pl_loggers.TensorBoardLogger(save_dir + "logs/", name=logger_name),
         "weights_summary": None,
         "gpus": torch.cuda.device_count(),
     }
@@ -282,15 +284,15 @@ temp = [
     # *(zip(dir_predictors, dir_params_full)),
     # (norm_predictor, norm_params),
     # (skl_predictor, None),
-    *((predictor, None) for predictor in lit_predictors),
+    # *((predictor, None) for predictor in lit_predictors),
 ]
 predictors, params = zip(*temp)
 
 
 # log_path = None
 # img_path = None
-log_path = "temp/log.md"
-img_path = f"temp/images/{get_now()}"
+log_path = save_dir + "log.md"
+img_path = save_dir + f"images/{get_now()}"
 
 
 y_stats_full, loss_full = results.model_assess(
@@ -308,6 +310,8 @@ y_stats_full, loss_full = results.model_assess(
     img_path=img_path,
     rng=seed,
 )
+
+# plt.show()
 
 # y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
 #                                                  verbose=True, plot_loss=True, print_loss=True,
