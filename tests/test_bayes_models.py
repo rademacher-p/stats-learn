@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from stats_learn import random
-from stats_learn.bayes.models import NormalLinear, Dirichlet
+from stats_learn.bayes.models import Dirichlet, NormalLinear
 
 plt.matplotlib.interactive(False)
 

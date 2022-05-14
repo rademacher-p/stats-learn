@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from stats_learn import spaces, random
+from stats_learn import random, spaces
 
 plt.style.use("images/style.mplstyle")
 

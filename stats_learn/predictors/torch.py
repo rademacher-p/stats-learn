@@ -8,7 +8,7 @@ import pytorch_lightning as pl
 import torch
 from torch import nn
 from torch.nn import functional
-from torch.utils.data import TensorDataset, DataLoader
+from torch.utils.data import DataLoader, TensorDataset
 
 from stats_learn.loss_funcs import loss_se
 from stats_learn.predictors.base import Base

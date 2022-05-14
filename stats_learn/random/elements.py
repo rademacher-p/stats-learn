@@ -6,16 +6,12 @@ from numbers import Integral
 from typing import Optional, Union
 
 import numpy as np
-from scipy.special import gammaln, xlogy, xlog1py, betaln
+from scipy.special import betaln, gammaln, xlog1py, xlogy
 from scipy.stats._multivariate import _PSD
 
 from stats_learn import spaces
-from stats_learn.util import (
-    RandomGeneratorMixin,
-    check_data_shape,
-    check_valid_pmf,
-    vectorize_func,
-)
+from stats_learn.util import (RandomGeneratorMixin, check_data_shape,
+                              check_valid_pmf, vectorize_func)
 
 
 class Base(RandomGeneratorMixin, ABC):

@@ -1,5 +1,5 @@
-from stats_learn import random, bayes, results
-from stats_learn.predictors import ModelRegressor, BayesRegressor
+from stats_learn import bayes, random, results
+from stats_learn.predictors import BayesRegressor, ModelRegressor
 
 model = random.models.NormalLinear(weights=[1, 1])
 

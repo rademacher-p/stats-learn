@@ -5,9 +5,8 @@ from abc import ABC, abstractmethod
 import numpy as np
 from scipy.stats._multivariate import _PSD
 
-from stats_learn import spaces, random
+from stats_learn import random, spaces
 from stats_learn.util import RandomGeneratorMixin
-
 
 # TODO: rename `model` attributes to `element`? Find common term for both?
 

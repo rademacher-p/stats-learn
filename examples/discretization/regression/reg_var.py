@@ -8,13 +8,11 @@ from matplotlib import pyplot as plt
 from pytorch_lightning.callbacks import EarlyStopping
 from pytorch_lightning.utilities.seed import seed_everything
 
-from stats_learn import random, bayes, results
-from stats_learn.predictors import ModelRegressor, BayesRegressor
+from stats_learn import bayes, random, results
+from stats_learn.predictors import BayesRegressor, ModelRegressor
 from stats_learn.predictors.torch import LitMLP, LitPredictor
-from stats_learn.preprocessing import make_clipper
-from stats_learn.preprocessing import make_discretizer
+from stats_learn.preprocessing import make_clipper, make_discretizer
 from stats_learn.util import get_now
-
 
 # # Input
 parser = argparse.ArgumentParser(

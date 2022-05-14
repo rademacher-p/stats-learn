@@ -2,19 +2,11 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from stats_learn import spaces
-from stats_learn.random.elements import (
-    BaseRV,
-    Deterministic,
-    FiniteGeneric,
-    Dirichlet,
-    Empirical,
-    DirichletEmpirical,
-    DirichletEmpiricalScalar,
-    Normal,
-    NormalLinear,
-    DataEmpirical,
-    Mixture,
-)
+from stats_learn.random.elements import (BaseRV, DataEmpirical, Deterministic,
+                                         Dirichlet, DirichletEmpirical,
+                                         DirichletEmpiricalScalar, Empirical,
+                                         FiniteGeneric, Mixture, Normal,
+                                         NormalLinear)
 
 plt.matplotlib.interactive(False)
 

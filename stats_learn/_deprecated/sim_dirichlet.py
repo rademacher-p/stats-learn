@@ -1,19 +1,19 @@
 import itertools
 
-import numpy as np
-from numpy import random
 import matplotlib.pyplot as plt
+import numpy as np
+from main import learn_eval_mc_bayes
+from numpy import random
+from thesis.bayes.models import DirichletFiniteYcXModelBayesNew
+from thesis.predictors import ModelClassifier
+from thesis.util.func_obj import FiniteDomainFunc
 
 # from scipy.stats._multivariate import multi_rv_generic
 # from scipy._lib._util import check_random_state
 # from mpl_toolkits.mplot3d import Axes3D
 
-from main import learn_eval_mc_bayes
 
-from thesis.bayes.models import DirichletFiniteYcXModelBayesNew
-from thesis.predictors import ModelClassifier
 
-from thesis.util.func_obj import FiniteDomainFunc
 
 
 supp_y = np.array(["a", "b"])

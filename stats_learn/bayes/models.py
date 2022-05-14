@@ -3,16 +3,15 @@ Bayesian random models of jointly distributed :math:`\xrm` and :math:`\yrm` elem
 fitting.
 """
 
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from typing import Dict, Optional
 
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy.stats._multivariate import _PSD
 
-from stats_learn import spaces, random
+from stats_learn import random, spaces
 from stats_learn.util import RandomGeneratorMixin, vectorize_func
-
 
 # TODO: Add deterministic DEP to effect a DP realization and sample!!
 

@@ -2,13 +2,12 @@ r"""Random models of jointly distributed :math:`\xrm` and :math:`\yrm` elements 
 
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Optional, Dict
+from typing import Dict, Optional
 
 import numpy as np
 
-from stats_learn import spaces, random
+from stats_learn import random, spaces
 from stats_learn.util import RandomGeneratorMixin, vectorize_func
-
 
 # TODO: add marginal/conditional prob methods
 

@@ -4,11 +4,10 @@ from pathlib import Path
 import numpy as np
 from matplotlib import pyplot as plt
 
-from stats_learn import random, bayes, results
-from stats_learn.predictors import ModelRegressor, BayesRegressor
+from stats_learn import bayes, random, results
+from stats_learn.predictors import BayesRegressor, ModelRegressor
 from stats_learn.preprocessing import make_discretizer, prob_disc
 from stats_learn.util import get_now
-
 
 # # Input
 parser = argparse.ArgumentParser(

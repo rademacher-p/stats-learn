@@ -1,7 +1,6 @@
 """Assessment tools for learning and prediction performance."""
 
 import inspect
-
 # from warnings import warn
 import logging
 import math
@@ -10,7 +9,7 @@ import sys
 from contextlib import contextmanager
 from itertools import product
 from pathlib import Path
-from typing import Union, Collection
+from typing import Collection, Union
 
 import numpy as np
 import pandas as pd

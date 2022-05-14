@@ -6,8 +6,8 @@ from typing import Union
 
 import numpy as np
 
-from stats_learn import spaces, random, bayes, results
-from stats_learn.loss_funcs import loss_se, loss_01
+from stats_learn import bayes, random, results, spaces
+from stats_learn.loss_funcs import loss_01, loss_se
 
 
 # Base and Mixin classes

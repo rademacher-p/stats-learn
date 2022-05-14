@@ -1,10 +1,2 @@
-from . import (
-    random,
-    bayes,
-    predictors,
-    loss_funcs,
-    preprocessing,
-    results,
-    spaces,
-    util,
-)
+from . import (bayes, loss_funcs, predictors, preprocessing, random, results,
+               spaces, util)

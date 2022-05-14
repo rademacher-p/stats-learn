@@ -2,14 +2,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from stats_learn import random
-from stats_learn.random.models import (
-    MixinRVy,
-    DataConditional,
-    ClassConditional,
-    NormalLinear,
-    DataEmpirical,
-    Mixture,
-)
+from stats_learn.random.models import (ClassConditional, DataConditional,
+                                       DataEmpirical, MixinRVy, Mixture,
+                                       NormalLinear)
 
 plt.matplotlib.interactive(False)
 

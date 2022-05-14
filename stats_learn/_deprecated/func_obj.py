@@ -1,9 +1,8 @@
-import operator
 import math
+import operator
 
-import numpy as np
 import matplotlib.pyplot as plt
-
+import numpy as np
 from thesis.util.generic import check_set_shape, vectorize_func
 
 # TODO: getter and setters?

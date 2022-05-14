@@ -5,15 +5,13 @@ Random element objects.
 # TODO: docstrings?
 import math
 
-import numpy as np
-from scipy.stats._multivariate import multi_rv_generic
-from scipy.special import gammaln, xlogy, xlog1py, betaln
 import matplotlib.pyplot as plt
-
+import numpy as np
+from scipy.special import betaln, gammaln, xlog1py, xlogy
+from scipy.stats._multivariate import multi_rv_generic
+from thesis._deprecated.func_obj import FiniteDomainFunc
 from thesis.util.generic import check_data_shape, check_valid_pmf
 from thesis.util.math import simplex_round
-from thesis._deprecated.func_obj import FiniteDomainFunc
-
 
 #%% Base RE classes
 
