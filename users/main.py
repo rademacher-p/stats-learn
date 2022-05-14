@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt
 from pytorch_lightning.callbacks import EarlyStopping
 from pytorch_lightning.utilities.seed import seed_everything
 from sklearn.neural_network import MLPRegressor
+
 from stats_learn import bayes, random, results
 from stats_learn.predictors import BayesRegressor, ModelRegressor
 from stats_learn.predictors.torch import LitMLP, LitPredictor, reset_weights

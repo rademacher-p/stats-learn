@@ -3,6 +3,7 @@ from pathlib import Path
 
 import numpy as np
 from matplotlib import pyplot as plt
+
 from stats_learn import results
 from stats_learn.bayes import models as bayes_models
 from stats_learn.predictors.base import BayesRegressor, ModelRegressor

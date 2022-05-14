@@ -13,9 +13,6 @@ from thesis.util.func_obj import FiniteDomainFunc
 # from mpl_toolkits.mplot3d import Axes3D
 
 
-
-
-
 supp_y = np.array(["a", "b"])
 # supp_y = np.arange(2) / 2
 supp_x = np.arange(2) / 2

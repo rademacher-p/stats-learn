@@ -12,10 +12,14 @@ from thesis.bayes import models as bayes_models
 from thesis.predictors import Bayes as BayesPredictor
 from thesis.predictors import BayesClassifier, BayesRegressor
 from thesis.predictors import Model as ModelPredictor
-from thesis.predictors import (ModelClassifier, ModelRegressor,
-                               loss_eval_compare, plot_loss_eval_compare,
-                               plot_predict_stats_compare,
-                               predict_stats_compare)
+from thesis.predictors import (
+    ModelClassifier,
+    ModelRegressor,
+    loss_eval_compare,
+    plot_loss_eval_compare,
+    plot_predict_stats_compare,
+    predict_stats_compare,
+)
 from thesis.random import elements as rand_elements
 from thesis.random import models as rand_models
 
