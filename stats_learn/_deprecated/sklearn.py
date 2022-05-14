@@ -19,7 +19,9 @@ class SKLPredictor(Base):  # TODO: rework for new reset/fit functionality
         super().__init__(loss_func, space, proc_funcs, name)
 
         self.estimator = estimator
-        self.can_warm_start = hasattr(self.estimator, 'warm_start')  # TODO: bugged if estimator is `Pipeline`?
+        self.can_warm_start = hasattr(
+            self.estimator, "warm_start"
+        )  # TODO: bugged if estimator is `Pipeline`?
 
     @property
     def _model_obj(self):
@@ -30,10 +32,12 @@ class SKLPredictor(Base):  # TODO: rework for new reset/fit functionality
             setattr(self.estimator, key, value)
 
     def reset(self):
-        self.estimator = skl.base.clone(self.estimator)  # manually reset learner if `fit` is not called
+        self.estimator = skl.base.clone(
+            self.estimator
+        )  # manually reset learner if `fit` is not called
 
     def _fit(self, d):
-        x, y = d['x'].reshape(-1, 1), d['y']
+        x, y = d["x"].reshape(-1, 1), d["y"]
         self.estimator.fit(x, y)
 
     # def _fit(self, d, warm_start):

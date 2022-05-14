@@ -4,10 +4,10 @@ from stats_learn.predictors import ModelRegressor, BayesRegressor
 model = random.models.NormalLinear(weights=[1, 1])
 
 # Predictors
-opt_predictor = ModelRegressor(model, name='Optimal')
+opt_predictor = ModelRegressor(model, name="Optimal")
 
 norm_model = bayes.models.NormalLinear(prior_mean=[0, 0], prior_cov=1)
-norm_predictor = BayesRegressor(norm_model, name='Normal')
+norm_predictor = BayesRegressor(norm_model, name="Normal")
 
 # Results
 seed = 12345
@@ -30,15 +30,36 @@ print(f"Trained learner loss = {loss_fit:.3f}")
 
 # Results
 predictors = [opt_predictor, norm_predictor]
-params = [None, {'prior_cov': [.01, .1, 1]}]
+params = [None, {"prior_cov": [0.01, 0.1, 1]}]
 
 # Sample regressor realizations
 results.data_assess(predictors, d_train, d_test, params, verbose=True, plot_fit=True)
 
 # Prediction mean/variance
-results.model_assess(predictors, model, params, n_train, n_test, n_mc=1000, stats=('mean', 'std'), verbose=True,
-                     plot_stats=True, print_loss=True, rng=seed)
+results.model_assess(
+    predictors,
+    model,
+    params,
+    n_train,
+    n_test,
+    n_mc=1000,
+    stats=("mean", "std"),
+    verbose=True,
+    plot_stats=True,
+    print_loss=True,
+    rng=seed,
+)
 
 # Squared-Error vs. training data volume
 n_train = range(0, 100, 5)
-results.model_assess(predictors, model, params, n_train, n_test, n_mc=1000, verbose=True, plot_loss=True, rng=seed)
+results.model_assess(
+    predictors,
+    model,
+    params,
+    n_train,
+    n_test,
+    n_mc=1000,
+    verbose=True,
+    plot_loss=True,
+    rng=seed,
+)

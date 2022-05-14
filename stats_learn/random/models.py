@@ -32,7 +32,7 @@ class Base(RandomGeneratorMixin, ABC):
 
     def __init__(self, rng=None):
         super().__init__(rng)
-        self._space = {'x': None, 'y': None}
+        self._space = {"x": None, "y": None}
 
         self._model_x = None
         self._mode_x = None
@@ -143,7 +143,7 @@ class Base(RandomGeneratorMixin, ABC):
         np.ndarray
 
         """
-        return vectorize_func(self._mode_y_x_single, self.shape['x'])(x)
+        return vectorize_func(self._mode_y_x_single, self.shape["x"])(x)
 
     def _mode_y_x_single(self, x):
         pass
@@ -164,7 +164,7 @@ class Base(RandomGeneratorMixin, ABC):
         matplotlib.artist.Artist or tuple of matplotlib.artist.Artist
 
         """
-        return self.space['x'].plot(self.mode_y_x, x, ax)
+        return self.space["x"].plot(self.mode_y_x, x, ax)
 
     sample = random.elements.Base.sample
 
@@ -172,7 +172,9 @@ class Base(RandomGeneratorMixin, ABC):
         d_x = np.array(self.model_x.sample(n, rng=rng))
         d_y = np.array([self.model_y_x(x).sample(rng=rng) for x in d_x])
 
-        return np.array(list(zip(d_x, d_y)), dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
+        return np.array(
+            list(zip(d_x, d_y)), dtype=[(c, self.dtype[c], self.shape[c]) for c in "xy"]
+        )
 
 
 class MixinRVx:
@@ -212,7 +214,7 @@ class MixinRVy:
         np.ndarray
 
         """
-        return vectorize_func(self._mean_y_x_single, self.shape['x'])(x)
+        return vectorize_func(self._mean_y_x_single, self.shape["x"])(x)
 
     def _mean_y_x_single(self, x):
         pass
@@ -233,7 +235,7 @@ class MixinRVy:
         matplotlib.artist.Artist or tuple of matplotlib.artist.Artist
 
         """
-        return self.space['x'].plot(self.mean_y_x, x, ax)
+        return self.space["x"].plot(self.mean_y_x, x, ax)
 
     def cov_y_x(self, x):
         r"""
@@ -249,7 +251,7 @@ class MixinRVy:
         np.ndarray
 
         """
-        return vectorize_func(self._cov_y_x_single, self.shape['x'])(x)
+        return vectorize_func(self._cov_y_x_single, self.shape["x"])(x)
 
     def _cov_y_x_single(self, x):
         pass
@@ -270,7 +272,7 @@ class MixinRVy:
         matplotlib.artist.Artist or tuple of matplotlib.artist.Artist
 
         """
-        return self.space['x'].plot(self.cov_y_x, x, ax)
+        return self.space["x"].plot(self.cov_y_x, x, ax)
 
 
 class BaseRVx(MixinRVx, Base):
@@ -385,6 +387,7 @@ class DataConditional(Base):
         Random number generator seed or object.
 
     """
+
     def __new__(cls, dists, model_x, rng=None):
         is_numeric_y = all(isinstance(dist, random.elements.MixinRV) for dist in dists)
         if isinstance(model_x, random.elements.MixinRV):
@@ -404,13 +407,13 @@ class DataConditional(Base):
         self._dists = list(dists)
         self._model_x = model_x
 
-        self._space['x'] = self.model_x.space
-        if not isinstance(self.space['x'], spaces.FiniteGeneric):
+        self._space["x"] = self.model_x.space
+        if not isinstance(self.space["x"], spaces.FiniteGeneric):
             raise ValueError(f"Data space must be finite.")
-        elif self.space['x'].set_shape != (len(self.dists),):
+        elif self.space["x"].set_shape != (len(self.dists),):
             raise ValueError("Data space set shape must match number of distributions.")
 
-        self._space['y'] = spaces.check_spaces(self.dists)
+        self._space["y"] = spaces.check_spaces(self.dists)
 
     @classmethod
     def from_finite(cls, dists, values_x, p_x=None, rng=None):
@@ -466,9 +469,15 @@ class DataConditional(Base):
         # if not isinstance(model_x.space, spaces.FiniteGeneric):
         #     raise ValueError("`model_x` must have `FiniteGeneric` space.")
         if np.isinf(alpha_0):
-            dists = [random.elements.EmpiricalScalar(func(x), n - 1) for x in model_x.space.values]
+            dists = [
+                random.elements.EmpiricalScalar(func(x), n - 1)
+                for x in model_x.space.values
+            ]
         else:
-            dists = [random.elements.DirichletEmpiricalScalar(func(x), alpha_0, n - 1) for x in model_x.space.values]
+            dists = [
+                random.elements.DirichletEmpiricalScalar(func(x), alpha_0, n - 1)
+                for x in model_x.space.values
+            ]
         return cls(dists, model_x, rng)
 
     @classmethod
@@ -496,14 +505,13 @@ class DataConditional(Base):
         """
 
         def poly_func(x):
-            return sum(w * x ** i for i, w in enumerate(weights))
+            return sum(w * x**i for i, w in enumerate(weights))
 
         return cls.from_mean_emp(alpha_0, n, poly_func, model_x, rng)
 
     def __eq__(self, other):
         if isinstance(other, DataConditional):
-            return (self.model_x == other.model_x
-                    and self.dists == other.dists)
+            return self.model_x == other.model_x and self.dists == other.dists
         return NotImplemented
 
     def __deepcopy__(self, memodict=None):
@@ -529,7 +537,7 @@ class DataConditional(Base):
         return self.model_x.mode
 
     def _get_idx_x(self, x):
-        return self.space['x'].values.tolist().index(x)
+        return self.space["x"].values.tolist().index(x)
 
     def model_y_x(self, x):
         return self.dists[self._get_idx_x(x)]
@@ -542,7 +550,7 @@ class DataConditionalRVx(MixinRVx, DataConditional):
     model_x: random.elements.BaseRV
 
     def _get_idx_x(self, x):
-        return np.flatnonzero(np.isclose(x, self.space['x'].values)).item()
+        return np.flatnonzero(np.isclose(x, self.space["x"].values)).item()
 
     @property
     def mean_x(self):
@@ -579,23 +587,26 @@ class ClassConditional(MixinRVx, Base):
         Random number generator seed or object.
 
     """
+
     def __init__(self, dists, model_y, rng=None):
         super().__init__(rng)
 
         self._dists = list(dists)
         self._model_y = model_y
 
-        self._space['y'] = self.model_y.space
-        if not isinstance(self.space['y'], spaces.FiniteGeneric):
+        self._space["y"] = self.model_y.space
+        if not isinstance(self.space["y"], spaces.FiniteGeneric):
             raise ValueError(f"Class space must be finite.")
-        elif self.space['y'].set_shape != (len(self.dists),):
-            raise ValueError("Class space set shape must match number of distributions.")
+        elif self.space["y"].set_shape != (len(self.dists),):
+            raise ValueError(
+                "Class space set shape must match number of distributions."
+            )
         # elif not np.issubdtype(self.space['y'].dtype, 'U'):  # TODO: deprecate dtype enforce
         #     raise ValueError("Space must be categorical")
 
         self._p_y = None
 
-        self._space['x'] = spaces.check_spaces(self.dists)
+        self._space["x"] = spaces.check_spaces(self.dists)
 
     @classmethod
     def from_finite(cls, dists, values_y, p_y=None, rng=None):
@@ -618,7 +629,9 @@ class ClassConditional(MixinRVx, Base):
         ClassConditional
 
         """
-        model_y = random.elements.FiniteGeneric(values_y, p_y)  # TODO: shouldn't enforce dtype
+        model_y = random.elements.FiniteGeneric(
+            values_y, p_y
+        )  # TODO: shouldn't enforce dtype
         # model_y = random.elements.FiniteGeneric(np.array(values_y, dtype='U').flatten(), p_y)
         return cls(dists, model_y, rng)
 
@@ -629,7 +642,7 @@ class ClassConditional(MixinRVx, Base):
     def p_y(self):
         r"""The marginal probabilities for values :math:`y`."""
         if self._p_y is None:
-            self._p_y = self.model_y.prob(self.space['y'].x_plt)
+            self._p_y = self.model_y.prob(self.space["y"].x_plt)
         return self._p_y
         # return self.model_y.p
 
@@ -665,22 +678,24 @@ class ClassConditional(MixinRVx, Base):
 
     def mode_y_x(self, x):
         temp = np.array([dist.prob(x) * p for dist, p in zip(self.dists, self.p_y)])
-        return self.space['y'].values[temp.argmax(axis=0)]
+        return self.space["y"].values[temp.argmax(axis=0)]
 
     def model_y_x(self, x):
         temp = np.array([dist.prob(x) * p for dist, p in zip(self.dists, self.p_y)])
         p_y_x = temp / temp.sum()
-        return random.elements.FiniteGeneric(self.space['y'].values, p_y_x)
+        return random.elements.FiniteGeneric(self.space["y"].values, p_y_x)
 
     def model_x_y(self, y):
-        idx = self.space['y'].values.tolist().index(y)
+        idx = self.space["y"].values.tolist().index(y)
         return self.dists[idx]
 
     def _sample(self, n, rng):
         d_y = np.array(self.model_y.sample(n, rng=rng))
         d_x = np.array([self.model_x_y(y).sample(rng=rng) for y in d_y])
 
-        return np.array(list(zip(d_x, d_y)), dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
+        return np.array(
+            list(zip(d_x, d_y)), dtype=[(c, self.dtype[c], self.shape[c]) for c in "xy"]
+        )
 
 
 class BetaLinear(MixinRVx, MixinRVy, Base):
@@ -703,11 +718,18 @@ class BetaLinear(MixinRVx, MixinRVy, Base):
 
     # TODO: DRY with NormalLinear
 
-    def __init__(self, weights=(0.,), basis_y_x=None, alpha_y_x=2., model_x=random.elements.Beta(), rng=None):
+    def __init__(
+        self,
+        weights=(0.0,),
+        basis_y_x=None,
+        alpha_y_x=2.0,
+        model_x=random.elements.Beta(),
+        rng=None,
+    ):
         super().__init__(rng)
 
-        self._space['x'] = model_x.space
-        self._space['y'] = spaces.Box((0, 1))
+        self._space["x"] = model_x.space
+        self._space["y"] = spaces.Box((0, 1))
 
         self.model_x = model_x
 
@@ -715,16 +737,22 @@ class BetaLinear(MixinRVx, MixinRVy, Base):
         self.alpha_y_x = alpha_y_x
 
         if basis_y_x is None:
+
             def power_func(i):
-                return vectorize_func(lambda x: np.full(self.shape['y'], (x ** i).mean()), shape=self.shape['x'])
+                return vectorize_func(
+                    lambda x: np.full(self.shape["y"], (x**i).mean()),
+                    shape=self.shape["x"],
+                )
 
             self._basis_y_x = tuple(power_func(i) for i in range(len(self.weights)))
         else:
             self._basis_y_x = basis_y_x
 
     def __repr__(self):
-        return f"BetaLinear(model_x={self.model_x}, basis_y_x={self.basis_y_x}, " \
-               f"weights={self.weights}, alpha_y_x={self.alpha_y_x})"
+        return (
+            f"BetaLinear(model_x={self.model_x}, basis_y_x={self.basis_y_x}, "
+            f"weights={self.weights}, alpha_y_x={self.alpha_y_x})"
+        )
 
     @property
     def basis_y_x(self):
@@ -752,7 +780,9 @@ class BetaLinear(MixinRVx, MixinRVy, Base):
         return self.model_x.cov
 
     def mean_y_x(self, x):
-        return sum(weight * func(x) for weight, func in zip(self.weights, self._basis_y_x))
+        return sum(
+            weight * func(x) for weight, func in zip(self.weights, self._basis_y_x)
+        )
 
     def cov_y_x(self, x):
         mean = self.mean_y_x(x)
@@ -783,7 +813,15 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
         Random number generator seed or object.
 
     """
-    def __init__(self, weights=(0.,), basis_y_x=None, cov_y_x=1., model_x=random.elements.Normal(), rng=None):
+
+    def __init__(
+        self,
+        weights=(0.0,),
+        basis_y_x=None,
+        cov_y_x=1.0,
+        model_x=random.elements.Normal(),
+        rng=None,
+    ):
         super().__init__(rng)
 
         self.model_x = model_x
@@ -792,16 +830,22 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
         self.cov_y_x_ = cov_y_x
 
         if basis_y_x is None:
+
             def power_func(i):
-                return vectorize_func(lambda x: np.full(self.shape['y'], (x ** i).mean()), shape=self.shape['x'])
+                return vectorize_func(
+                    lambda x: np.full(self.shape["y"], (x**i).mean()),
+                    shape=self.shape["x"],
+                )
 
             self._basis_y_x = tuple(power_func(i) for i in range(len(self.weights)))
         else:
             self._basis_y_x = basis_y_x
 
     def __repr__(self):
-        return f"NormalModel(model_x={self.model_x}, basis_y_x={self.basis_y_x}, " \
-               f"weights={self.weights}, cov_y_x={self._cov_repr})"
+        return (
+            f"NormalModel(model_x={self.model_x}, basis_y_x={self.basis_y_x}, "
+            f"weights={self.weights}, cov_y_x={self._cov_repr})"
+        )
 
     @property
     def basis_y_x(self):
@@ -815,7 +859,7 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
     @model_x.setter
     def model_x(self, model_x):
         self._model_x = model_x
-        self._space['x'] = model_x.space
+        self._space["x"] = model_x.space
 
     @property
     def mode_x(self):
@@ -844,10 +888,12 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
             self._cov_y_x_single = lambda x: self._cov_repr
             _temp = self._cov_repr.shape
 
-        self._space['y'] = spaces.Euclidean(_temp[:int(len(_temp) / 2)])
+        self._space["y"] = spaces.Euclidean(_temp[: int(len(_temp) / 2)])
 
     def mean_y_x(self, x):
-        return sum(weight * func(x) for weight, func in zip(self.weights, self._basis_y_x))
+        return sum(
+            weight * func(x) for weight, func in zip(self.weights, self._basis_y_x)
+        )
 
     def mode_y_x(self, x):
         return self.mean_y_x(x)
@@ -874,20 +920,21 @@ class DataEmpirical(Base):
         Random number generator seed or object.
 
     """
+
     def __new__(cls, values, counts, space=None, rng=None):
         if space is not None:
-            dtype = {c: space[c].dtype for c in 'xy'}
+            dtype = {c: space[c].dtype for c in "xy"}
         else:
             _dtype = np.array(values).dtype
-            dtype = {c: _dtype[c].base for c in 'xy'}
+            dtype = {c: _dtype[c].base for c in "xy"}
 
-        if np.issubdtype(dtype['x'], np.number):
-            if np.issubdtype(dtype['y'], np.number):
+        if np.issubdtype(dtype["x"], np.number):
+            if np.issubdtype(dtype["y"], np.number):
                 return super().__new__(DataEmpiricalRVxy)
             else:
                 return super().__new__(DataEmpiricalRVx)
         else:
-            if np.issubdtype(dtype['y'], np.number):
+            if np.issubdtype(dtype["y"], np.number):
                 return super().__new__(DataEmpiricalRVy)
             else:
                 return super().__new__(cls)
@@ -898,7 +945,7 @@ class DataEmpirical(Base):
         values, counts = map(np.array, (values, counts))
         if space is None:
             dtype = np.array(values).dtype
-            for c in 'xy':
+            for c in "xy":
                 if np.issubdtype(dtype[c].base, np.number):
                     self._space[c] = spaces.Euclidean(dtype[c].shape)
                 else:
@@ -906,11 +953,11 @@ class DataEmpirical(Base):
         else:
             self._space = space
 
-        self._model_x = random.elements.DataEmpirical([], [], space=self.space['x'])
+        self._model_x = random.elements.DataEmpirical([], [], space=self.space["x"])
         self._models_y_x = []
 
         self.n = 0
-        self.data = self._structure_data({'x': [], 'y': []}, [])
+        self.data = self._structure_data({"x": [], "y": []}, [])
         self.add_values(values, counts)
 
     def __repr__(self):
@@ -942,10 +989,17 @@ class DataEmpirical(Base):
         return np.unique(d, return_counts=True, axis=0)
 
     def _structure_data(self, values, counts):
-        return np.array(list(zip(values['x'], values['y'], counts)),
-                        dtype=[('x', self.dtype['x'], self.shape['x']),
-                               ('y', self.dtype['y'], self.shape['y']),
-                               ('n', int,)])
+        return np.array(
+            list(zip(values["x"], values["y"], counts)),
+            dtype=[
+                ("x", self.dtype["x"], self.shape["x"]),
+                ("y", self.dtype["y"], self.shape["y"]),
+                (
+                    "n",
+                    int,
+                ),
+            ],
+        )
 
     def add_data(self, d):
         """
@@ -981,24 +1035,30 @@ class DataEmpirical(Base):
         # Increment existing value counts, flag new values
         idx_new = []
         for i, (value, count) in enumerate(zip(values, counts)):
-            idx = np.flatnonzero(value == self.data[['x', 'y']])
+            idx = np.flatnonzero(value == self.data[["x", "y"]])
             if idx.size == 1:
-                self.data['n'][idx.item()] += count
+                self.data["n"][idx.item()] += count
             else:
                 idx_new.append(i)
 
         if len(idx_new) > 0:
-            self.data = np.concatenate((self.data, self._structure_data(values[idx_new], counts[idx_new])))
+            self.data = np.concatenate(
+                (self.data, self._structure_data(values[idx_new], counts[idx_new]))
+            )
 
-        _, idx = np.unique(values['x'], axis=0, return_index=True)
-        values_x_unique = values['x'][np.sort(idx)]
+        _, idx = np.unique(values["x"], axis=0, return_index=True)
+        values_x_unique = values["x"][np.sort(idx)]
         for x_add in values_x_unique:
-            idx_match = np.flatnonzero(np.all(x_add == values['x'], axis=tuple(range(1, 1 + self.ndim['x']))))
-            values_y, counts_y = values['y'][idx_match], counts[idx_match]
+            idx_match = np.flatnonzero(
+                np.all(x_add == values["x"], axis=tuple(range(1, 1 + self.ndim["x"])))
+            )
+            values_y, counts_y = values["y"][idx_match], counts[idx_match]
 
             idx = self._model_x._get_idx(x_add)
             if idx is None:
-                self._models_y_x.append(random.elements.DataEmpirical(values_y, counts_y, self.space['y']))
+                self._models_y_x.append(
+                    random.elements.DataEmpirical(values_y, counts_y, self.space["y"])
+                )
             else:
                 self._models_y_x[idx].add_values(values_y, counts_y)
 
@@ -1007,14 +1067,18 @@ class DataEmpirical(Base):
         self._update_attr()
 
     def _update_attr(self):
-        self._p = self.data['n'] / self.n
+        self._p = self.data["n"] / self.n
 
     @property
     def mode_x(self):
         return self.model_x.mode
 
     def _get_idx_x(self, x):
-        idx = np.flatnonzero(np.all(x == self.model_x.data['x'], axis=tuple(range(1, 1 + self.ndim['x']))))
+        idx = np.flatnonzero(
+            np.all(
+                x == self.model_x.data["x"], axis=tuple(range(1, 1 + self.ndim["x"]))
+            )
+        )
         if idx.size == 1:
             return idx.item()
         elif idx.size == 0:
@@ -1027,7 +1091,7 @@ class DataEmpirical(Base):
         if idx is not None:
             return self._models_y_x[idx]
         else:
-            return random.elements.DataEmpirical([], [], space=self.space['y'])
+            return random.elements.DataEmpirical([], [], space=self.space["y"])
 
     def _mode_y_x_single(self, x):
         idx = self._get_idx_x(x)
@@ -1037,7 +1101,7 @@ class DataEmpirical(Base):
             return np.nan
 
     def _sample(self, size, rng):
-        return rng.choice(self.data[['x', 'y']], size, p=self._p)
+        return rng.choice(self.data[["x", "y"]], size, p=self._p)
 
 
 class DataEmpiricalRVx(MixinRVx, DataEmpirical):
@@ -1084,6 +1148,7 @@ class Mixture(Base):
         Random number generator seed or object.
 
     """
+
     # TODO: special implementation for FiniteGeneric? get modes, etc?
 
     def __new__(cls, dists, weights, rng=None):
@@ -1131,7 +1196,9 @@ class Mixture(Base):
 
         self._update_attr()
 
-    def set_dist_attr(self, idx, **dist_kwargs):  # TODO: improved implementation w/ direct self.dists access?
+    def set_dist_attr(
+        self, idx, **dist_kwargs
+    ):  # TODO: improved implementation w/ direct self.dists access?
         """
         Set attributes of a distribution.
 
@@ -1179,7 +1246,12 @@ class Mixture(Base):
             if self._idx_nonzero.size == 1:
                 self._model_x = self._dists[self._idx_nonzero.item()].model_x
             else:
-                args = zip(*[(self.dists[i].model_x, self.weights[i]) for i in self._idx_nonzero])
+                args = zip(
+                    *[
+                        (self.dists[i].model_x, self.weights[i])
+                        for i in self._idx_nonzero
+                    ]
+                )
                 self._model_x = random.elements.Mixture(*args)
 
         return self._model_x
@@ -1197,16 +1269,25 @@ class Mixture(Base):
         if idx_nonzero.size == 1:
             return self._dists[idx_nonzero.item()].model_y_x(x)
         else:
-            args = zip(*[(self.dists[i].model_y_x(x), _weights[i]) for i in idx_nonzero])
+            args = zip(
+                *[(self.dists[i].model_y_x(x), _weights[i]) for i in idx_nonzero]
+            )
             return random.elements.Mixture(*args)
 
     def _weights_y_x(self, x):
-        return np.array([w * dist.model_x.prob(x) for w, dist in zip(self.weights, self.dists)])
+        return np.array(
+            [w * dist.model_x.prob(x) for w, dist in zip(self.weights, self.dists)]
+        )
 
     def _sample(self, n, rng):
         idx_rng = rng.choice(self.n_dists, size=n, p=self._p)
-        out = np.array([tuple(np.empty(self.shape[c], self.dtype[c]) for c in 'xy') for _ in range(n)],
-                       dtype=[(c, self.dtype[c], self.shape[c]) for c in 'xy'])
+        out = np.array(
+            [
+                tuple(np.empty(self.shape[c], self.dtype[c]) for c in "xy")
+                for _ in range(n)
+            ],
+            dtype=[(c, self.dtype[c], self.shape[c]) for c in "xy"],
+        )
         for i, dist in enumerate(self.dists):
             idx = np.flatnonzero(i == idx_rng)
             if idx.size > 0:
@@ -1224,7 +1305,9 @@ class MixtureRVx(MixinRVx, Mixture):
         super()._update_attr()
 
         # self._mean_x = sum(self._p[i] * self.dists[i].mean_x for i in self._idx_nonzero)
-        self._mean_x = np.nansum([prob * dist.mean_x for prob, dist in zip(self._p, self.dists)])
+        self._mean_x = np.nansum(
+            [prob * dist.mean_x for prob, dist in zip(self._p, self.dists)]
+        )
 
 
 class MixtureRVy(MixinRVy, Mixture):
@@ -1244,7 +1327,9 @@ class MixtureRVy(MixinRVy, Mixture):
         # idx_nonzero = np.flatnonzero(p_y_x)
         # return sum(p_y_x[i] * self.dists[i].mean_y_x(x) for i in idx_nonzero)
 
-        temp = np.array([prob * dist.mean_y_x(x) for prob, dist in zip(p_y_x, self.dists)])
+        temp = np.array(
+            [prob * dist.mean_y_x(x) for prob, dist in zip(p_y_x, self.dists)]
+        )
         return np.nansum(temp, axis=0)
 
 

@@ -62,8 +62,15 @@ class LitMLP(pl.LightningModule):
         Keyword arguments for optimizer instantiation.
 
     """
-    def __init__(self, layer_sizes, activation=nn.ReLU, loss_func=functional.mse_loss, optim_cls=torch.optim.Adam,
-                 optim_params=None):
+
+    def __init__(
+        self,
+        layer_sizes,
+        activation=nn.ReLU,
+        loss_func=functional.mse_loss,
+        optim_cls=torch.optim.Adam,
+        optim_params=None,
+    ):
         super().__init__()
 
         self.model = build_mlp(layer_sizes, activation)
@@ -85,7 +92,7 @@ class LitMLP(pl.LightningModule):
         x, y = batch
         y_hat = self(x)
         loss = self.loss_func(y_hat, y)
-        self.log('train_loss', loss)
+        self.log("train_loss", loss)
         return loss
 
     def configure_optimizers(self):
@@ -94,7 +101,7 @@ class LitMLP(pl.LightningModule):
 
 def reset_weights(model):
     """Reset weights of PyTorch module."""
-    if hasattr(model, 'reset_parameters'):
+    if hasattr(model, "reset_parameters"):
         model.reset_parameters()
 
 
@@ -117,7 +124,16 @@ class LitPredictor(Base):
     name : str, optional
 
     """
-    def __init__(self, model, space, trainer_params=None, reset_func=None, proc_funcs=(), name=None):
+
+    def __init__(
+        self,
+        model,
+        space,
+        trainer_params=None,
+        reset_func=None,
+        proc_funcs=(),
+        name=None,
+    ):
         loss_func = loss_se  # TODO: Generalize!
         super().__init__(loss_func, space, proc_funcs, name)
 
@@ -129,7 +145,9 @@ class LitPredictor(Base):
         elif callable(reset_func):
             self.reset_func = reset_func
         else:
-            raise TypeError("Reset function must be a callable for application to `nn.Module.apply`.")
+            raise TypeError(
+                "Reset function must be a callable for application to `nn.Module.apply`."
+            )
 
         self.can_warm_start = False  # TODO: actually can, but `assess` results are better with full datasets!
 
@@ -155,13 +173,15 @@ class LitPredictor(Base):
         return x[..., np.newaxis] if x.ndim == 1 else x
 
     def _fit(self, d):
-        x, y = map(self._unscalar, (d['x'], d['y']))
+        x, y = map(self._unscalar, (d["x"], d["y"]))
         x, y = map(partial(torch.tensor, dtype=torch.float32), (x, y))
         ds = TensorDataset(x, y)
 
         batch_size = len(x)  # TODO: no mini-batching! Allow user specification.
 
-        dl = DataLoader(ds, batch_size, shuffle=True, pin_memory=pin_memory, num_workers=num_workers)
+        dl = DataLoader(
+            ds, batch_size, shuffle=True, pin_memory=pin_memory, num_workers=num_workers
+        )
 
         self.trainer.fit(self.model, dl)
 
@@ -169,5 +189,5 @@ class LitPredictor(Base):
         x = self._unscalar(x)
         x = torch.tensor(x, requires_grad=False, dtype=torch.float32)
         y_hat = self.model(x).detach().numpy()
-        y_hat = y_hat.reshape(-1, *self.shape['y'])
+        y_hat = y_hat.reshape(-1, *self.shape["y"])
         return y_hat

@@ -50,6 +50,7 @@ class Base(ABC):
         Data type of the space values.
 
     """
+
     def __init__(self, shape, dtype):
         self._shape = tuple(shape)
         self._size = math.prod(self._shape)
@@ -125,21 +126,36 @@ class Base(ABC):
     def make_axes(self):  # TODO: axes kwargs
         """Create axes for plotting."""
 
-        with plt.rc_context({'axes.xmargin': 0}):
+        with plt.rc_context({"axes.xmargin": 0}):
             if self.shape == ():
                 _, ax = plt.subplots()
-                ax.set(xlabel='$x$', ylabel='$y$')
+                ax.set(xlabel="$x$", ylabel="$y$")
             elif self.shape == (2,):
-                _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$y$')
+                _, ax = plt.subplots(subplot_kw={"projection": "3d"})
+                ax.set(xlabel="$x_1$", ylabel="$x_2$", zlabel="$y$")
 
-                ax.set_prop_cycle('color', ['1f77b4', 'ff7f0e', '2ca02c', 'd62728', '9467bd', '8c564b', 'e377c2',
-                                            '7f7f7f', 'bcbd22', '17becf'])
+                ax.set_prop_cycle(
+                    "color",
+                    [
+                        "1f77b4",
+                        "ff7f0e",
+                        "2ca02c",
+                        "d62728",
+                        "9467bd",
+                        "8c564b",
+                        "e377c2",
+                        "7f7f7f",
+                        "bcbd22",
+                        "17becf",
+                    ],
+                )
             elif self.shape == (3,):
-                _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
+                _, ax = plt.subplots(subplot_kw={"projection": "3d"})
+                ax.set(xlabel="$x_1$", ylabel="$x_2$", zlabel="$x_3$")
             else:
-                raise NotImplementedError('Plotting only supported for 1- and 2- dimensional data.')
+                raise NotImplementedError(
+                    "Plotting only supported for 1- and 2- dimensional data."
+                )
 
         return ax
 
@@ -201,8 +217,8 @@ class Base(ABC):
 
         if len(set_shape) == 1 and self.shape == ():
             kwargs_base = {
-                'marker': '.' if isinstance(self, Discrete) else '',
-                'linestyle': '-',
+                "marker": "." if isinstance(self, Discrete) else "",
+                "linestyle": "-",
             }
             kwargs = kwargs_base | kwargs
 
@@ -218,8 +234,13 @@ class Base(ABC):
             plt_data = ax.plot(x[..., 0], x[..., 1], y, label=label, **kwargs)
 
         elif len(set_shape) == 2 and self.shape == (2,):
-            plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, shade=False, label=label, **kwargs)
-            plt_data._facecolors2d, plt_data._edgecolors2d = plt_data._facecolor3d, plt_data._edgecolor3d
+            plt_data = ax.plot_surface(
+                x[..., 0], x[..., 1], y, shade=False, label=label, **kwargs
+            )
+            plt_data._facecolors2d, plt_data._edgecolors2d = (
+                plt_data._facecolor3d,
+                plt_data._edgecolor3d,
+            )
             # FIXME: use MAYAVI package for 3D??
             # plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, cmap='viridis')
             # plt_data = ax.plot_wireframe(x[..., 0], x[..., 1], y, label=label)
@@ -266,7 +287,9 @@ class Base(ABC):
         pass  # TODO
 
     def moment(self, f, order=1, center=False):
-        if not np.issubdtype(self.dtype, np.number):  # TODO: dispatch to subclass with __new__? use mixin?
+        if not np.issubdtype(
+            self.dtype, np.number
+        ):  # TODO: dispatch to subclass with __new__? use mixin?
             raise TypeError("Moments only supported for numeric spaces.")
 
         if order == 1 and not center:
@@ -277,6 +300,7 @@ class Base(ABC):
 
 class Discrete(Base, ABC):
     """Base class for discrete spaces."""
+
     pass
 
     # def plot_xy(self, x, y, y_std=None, y_std_hi=None, ax=None, label=None, **error_kwargs):
@@ -332,6 +356,7 @@ class Discrete(Base, ABC):
 
 class Finite(Discrete, ABC):
     """Base class for finite spaces."""
+
     pass
 
 
@@ -347,6 +372,7 @@ class FiniteGeneric(Finite):
         Shape of the space values.
 
     """
+
     def __init__(self, values, shape=()):  # TODO: flatten and ignore set shape?
 
         self.values = np.array(values)
@@ -372,7 +398,7 @@ class FiniteGeneric(Finite):
         if len(vecs) == 1:
             return cls(vecs, ())
         else:
-            grid = np.stack(np.meshgrid(*vecs, indexing='ij'), axis=-1)
+            grid = np.stack(np.meshgrid(*vecs, indexing="ij"), axis=-1)
             return cls(grid, shape=(len(vecs),))
 
     @classmethod
@@ -453,14 +479,16 @@ class Continuous(Base, ABC):
 
     @property
     def optimize_kwargs(self):
-        return {'x0': np.zeros(self.shape), 'bounds': None, 'constraints': ()}
+        return {"x0": np.zeros(self.shape), "bounds": None, "constraints": ()}
 
     def _minimize(self, f):  # TODO: add `brute` method option?
 
         # FIXME: add stepsize dependence on lims
         kwargs = self.optimize_kwargs.copy()
-        x0 = kwargs.pop('x0')
-        return optimize.basinhopping(f, x0, niter=100, T=1., stepsize=4., minimizer_kwargs=kwargs).x.reshape(self.shape)
+        x0 = kwargs.pop("x0")
+        return optimize.basinhopping(
+            f, x0, niter=100, T=1.0, stepsize=4.0, minimizer_kwargs=kwargs
+        ).x.reshape(self.shape)
 
         # if self.ndim == 0:
         #     return optimize.minimize_scalar(f, bounds=self.optimize_kwargs['bounds'])
@@ -470,8 +498,8 @@ class Continuous(Base, ABC):
         #     raise ValueError
 
     def integrate(self, f):
-        y_shape = f(self.optimize_kwargs['x0']).shape
-        ranges = self.optimize_kwargs['bounds']
+        y_shape = f(self.optimize_kwargs["x0"]).shape
+        ranges = self.optimize_kwargs["bounds"]
         if y_shape == ():
             return integrate.nquad(lambda *args: f(list(args)), ranges)[0]
         else:
@@ -499,6 +527,7 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
         Lower and upper limits for each dimension.
 
     """
+
     def __init__(self, lims):
         self.lims = lims
         super().__init__(shape=self.lims.shape[:-1])
@@ -514,13 +543,19 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
     def __contains__(self, item):
         item = np.array(item)
         if item.shape == self.shape and item.dtype == self.dtype:
-            return (item >= self.lims[..., 0]).all() and (item <= self.lims[..., 1]).all()
+            return (item >= self.lims[..., 0]).all() and (
+                item <= self.lims[..., 1]
+            ).all()
         else:
             return False
 
     @property
     def optimize_kwargs(self):  # bounds reshaped for scipy optimizer
-        return {'x0': self.lims_plot.mean(-1), 'bounds': self.lims.reshape(-1, 2), 'constraints': ()}
+        return {
+            "x0": self.lims_plot.mean(-1),
+            "bounds": self.lims.reshape(-1, 2),
+            "constraints": (),
+        }
 
     @property
     def lims(self):
@@ -569,7 +604,7 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
             return np.linspace(*lims, n, endpoint=endpoint)
         elif lims.ndim == 2 and lims.shape[-1] == 2:
             x_dim = [np.linspace(*lims_i, n, endpoint=endpoint) for lims_i in lims]
-            return np.stack(np.meshgrid(*x_dim, indexing='ij'), axis=-1)
+            return np.stack(np.meshgrid(*x_dim, indexing="ij"), axis=-1)
         else:
             raise ValueError("Shape must be (2,) or (*, 2)")
 
@@ -592,6 +627,7 @@ class Euclidean(Box):
         Shape of the space values.
 
     """
+
     def __init__(self, shape):
         if isinstance(shape, (Integral, np.integer)):
             shape = (shape,)
@@ -619,7 +655,7 @@ class Euclidean(Box):
     @property
     def optimize_kwargs(self):
         kwargs = super().optimize_kwargs
-        kwargs['bounds'] = None
+        kwargs["bounds"] = None
         return kwargs
 
     @property
@@ -642,6 +678,7 @@ class Simplex(Continuous):
         Shape of the space values.
 
     """
+
     # TODO: add integration and mode finding
 
     def __init__(self, shape):
@@ -659,10 +696,11 @@ class Simplex(Continuous):
     def __contains__(self, item):
         item = np.array(item)
         if item.shape == self.shape and item.dtype == self.dtype:
-            conditions = ((item >= np.zeros(self.shape)).all(),
-                          (item <= np.ones(self.shape)).all(),
-                          np.allclose(item.sum(), 1., rtol=1e-9),
-                          )
+            conditions = (
+                (item >= np.zeros(self.shape)).all(),
+                (item <= np.ones(self.shape)).all(),
+                np.allclose(item.sum(), 1.0, rtol=1e-9),
+            )
             return all(conditions)
         else:
             return False
@@ -718,7 +756,9 @@ class Simplex(Continuous):
             hull_mask = hull_mask.flatten()
 
         if n < sum(hull_mask.flatten()):
-            raise ValueError("Input 'n' must meet or exceed the number of True values in 'hull_mask'.")
+            raise ValueError(
+                "Input 'n' must meet or exceed the number of True values in 'hull_mask'."
+            )
 
         if d == 1:
             return np.array(1).reshape(shape)
@@ -747,15 +787,17 @@ class Simplex(Continuous):
     def make_axes(self):
         if self.shape == (2,):
             _, ax = plt.subplots()
-            ax.set(xlabel='$x_1$', ylabel='$x_2$')
+            ax.set(xlabel="$x_1$", ylabel="$x_2$")
             return ax
         elif self.shape == (3,):
-            _, ax = plt.subplots(subplot_kw={'projection': '3d'})
+            _, ax = plt.subplots(subplot_kw={"projection": "3d"})
             ax.view_init(35, 45)
-            ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
+            ax.set(xlabel="$x_1$", ylabel="$x_2$", zlabel="$x_3$")
             return ax
         else:
-            raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
+            raise NotImplementedError(
+                "Plot method only supported for 2- and 3-dimensional data."
+            )
 
     def plot(self, f, x=None, ax=None, label=None, **scatter_kwargs):
         if ax is None:
@@ -765,17 +807,19 @@ class Simplex(Continuous):
         if len(set_shape) != 1:
             raise ValueError()
 
-        scatter_kwargs = {'label': label, 's': 5, 'c': y} | scatter_kwargs
+        scatter_kwargs = {"label": label, "s": 5, "c": y} | scatter_kwargs
 
         if self.shape == (2,):
             plt_data = ax.scatter(x[:, 0], x[:, 1], **scatter_kwargs)
         elif self.shape == (3,):
             plt_data = ax.scatter(x[:, 0], x[:, 1], x[:, 2], **scatter_kwargs)
         else:
-            raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
+            raise NotImplementedError(
+                "Plot method only supported for 2- and 3-dimensional data."
+            )
 
         c_bar = plt.colorbar(plt_data, ax=ax)
-        c_bar.set_label('$y$')
+        c_bar.set_label("$y$")
 
         return plt_data
 
@@ -792,6 +836,7 @@ class SimplexDiscrete(Simplex):
         Shape of the space values.
 
     """
+
     def __init__(self, n, shape):
         self.n = n
         super().__init__(shape)
@@ -807,11 +852,12 @@ class SimplexDiscrete(Simplex):
     def __contains__(self, item):
         item = np.array(item)
         if item.shape == self.shape and item.dtype == self.dtype:
-            conditions = ((item >= np.zeros(self.shape)).all(),
-                          (item <= np.ones(self.shape)).all(),
-                          np.allclose(item.sum(), 1., rtol=1e-9),
-                          (np.minimum((self.n * item) % 1, (-self.n * item) % 1) < 1e-9).all(),
-                          )
+            conditions = (
+                (item >= np.zeros(self.shape)).all(),
+                (item <= np.ones(self.shape)).all(),
+                np.allclose(item.sum(), 1.0, rtol=1e-9),
+                (np.minimum((self.n * item) % 1, (-self.n * item) % 1) < 1e-9).all(),
+            )
             return all(conditions)
         else:
             return False

@@ -9,7 +9,7 @@ import numpy as np
 
 def get_now():
     """Get ISO datetime in format compatible with Windows filename."""
-    return datetime.now().replace(microsecond=0).isoformat().replace(':', '_')
+    return datetime.now().replace(microsecond=0).isoformat().replace(":", "_")
 
 
 class RandomGeneratorMixin:
@@ -22,6 +22,7 @@ class RandomGeneratorMixin:
         Random number generator seed or object.
 
     """
+
     def __init__(self, rng=None):
         self.rng = rng
 
@@ -59,10 +60,14 @@ class RandomGeneratorMixin:
             return np.random.default_rng()
         elif isinstance(rng, (Integral, np.integer)):
             return np.random.default_rng(rng)
-        elif isinstance(rng, np.random.Generator) or isinstance(rng, np.random.RandomState):
+        elif isinstance(rng, np.random.Generator) or isinstance(
+            rng, np.random.RandomState
+        ):
             return rng
         else:
-            raise TypeError("Input must be None, int, or a valid NumPy random number generator.")
+            raise TypeError(
+                "Input must be None, int, or a valid NumPy random number generator."
+            )
 
 
 def check_data_shape(x, shape=()):
@@ -129,8 +134,11 @@ def check_valid_pmf(p, shape=None, full_support=False, tol=1e-9):
         if np.min(p) < 0:
             raise ValueError("Each entry in 'p' must be non-negative.")
 
-    if not np.allclose(p.reshape(*set_shape, -1).sum(-1), 1., rtol=tol):
-        raise ValueError("The input 'p' must lie within the normal simplex, but p.sum() = %s." % p.sum())
+    if not np.allclose(p.reshape(*set_shape, -1).sum(-1), 1.0, rtol=tol):
+        raise ValueError(
+            "The input 'p' must lie within the normal simplex, but p.sum() = %s."
+            % p.sum()
+        )
 
     if shape is None:
         return p

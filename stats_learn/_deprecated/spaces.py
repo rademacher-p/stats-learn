@@ -1,6 +1,6 @@
 class Categorical(Finite):
     def __init__(self, values):
-        self.values = np.sort(np.array(values, dtype='U').flatten())
+        self.values = np.sort(np.array(values, dtype="U").flatten())
         super().__init__((), self.values.dtype)
 
         if len(self.values) != len(np.unique(self.values)):
@@ -41,7 +41,7 @@ class Categorical(Finite):
         return ax.stem(x, y, use_line_collection=True, label=label)
 
 
-class Grid(Finite):     # FIXME: 1-D special?
+class Grid(Finite):  # FIXME: 1-D special?
     def __new__(cls, *vecs):
         if len(vecs) == 1:
             return super().__new__(Grid1D)
@@ -50,7 +50,9 @@ class Grid(Finite):     # FIXME: 1-D special?
 
     def __init__(self, *vecs):
         # self.vecs = list(map(lambda v: np.sort(np.array(v, dtype=np.float).flatten()), vecs))
-        self.vecs = tuple(np.sort(np.array(list(vec), dtype=np.float).flatten()) for vec in vecs)
+        self.vecs = tuple(
+            np.sort(np.array(list(vec), dtype=np.float).flatten()) for vec in vecs
+        )
         super().__init__((len(self.vecs),), np.float)
 
         self.set_shape = tuple(vec.size for vec in self.vecs)
@@ -95,24 +97,35 @@ class Grid(Finite):     # FIXME: 1-D special?
         set_ndim = len(set_shape)
         if set_ndim == 1 and self.shape == ():
             # return ax.stem(x, y, use_line_collection=True, label=label)
-            return ax.plot(x, y, '.', label=label)
+            return ax.plot(x, y, ".", label=label)
 
         elif set_ndim == 2 and self.shape == (2,):
             # return ax.bar3d(x[..., 0].flatten(), x[..., 1].flatten(), 0, 1, 1, y.flatten(), shade=True)
-            return ax.plot(x[..., 0].flatten(), x[..., 1].flatten(), y.flatten(), marker='.', linestyle='', label=label)
+            return ax.plot(
+                x[..., 0].flatten(),
+                x[..., 1].flatten(),
+                y.flatten(),
+                marker=".",
+                linestyle="",
+                label=label,
+            )
 
         elif set_ndim == 3 and self.shape == (3,):
-            plt_data = ax.scatter(x[..., 0], x[..., 1], x[..., 2], s=15, c=y, label=label)
+            plt_data = ax.scatter(
+                x[..., 0], x[..., 1], x[..., 2], s=15, c=y, label=label
+            )
             c_bar = plt.colorbar(plt_data, ax=ax)
-            c_bar.set_label('$y$')
+            c_bar.set_label("$y$")
 
             return plt_data
 
         else:
-            raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
+            raise NotImplementedError(
+                "Plot method only implemented for 1- and 2- dimensional data."
+            )
 
 
-class Grid1D(Grid):     # FIXME: DRY from categorical?
+class Grid1D(Grid):  # FIXME: DRY from categorical?
     def __init__(self, vec):
         self.vec = np.sort(np.array(list(vec), dtype=np.float).flatten())
         super().__init__((len(self.vecs),), np.float)
@@ -159,4 +172,4 @@ class Grid1D(Grid):     # FIXME: DRY from categorical?
         if len(set_shape) != 1:
             raise ValueError("Input 'x' must be 1-D")
 
-        return ax.plot(x, y, '.', label=label)
+        return ax.plot(x, y, ".", label=label)

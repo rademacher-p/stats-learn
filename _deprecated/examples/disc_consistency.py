@@ -13,12 +13,18 @@ from stats_learn.util import get_now
 
 
 # # Input
-parser = argparse.ArgumentParser(description='Example: consistent discretized regressor on a continuous domain')
-parser.add_argument('-m', '--mc', type=int, default=1, help='Number of Monte Carlo iterations')
-parser.add_argument('-l', '--log_path', type=str, default=None, help='Path to log file')
-parser.add_argument('-i', '--save_img', action="store_true", help='Save images to log')
-parser.add_argument('--style', type=str, default=None, help='Path to .mplstyle Matplotlib style')
-parser.add_argument('--seed', type=int, default=None, help='RNG seed')
+parser = argparse.ArgumentParser(
+    description="Example: consistent discretized regressor on a continuous domain"
+)
+parser.add_argument(
+    "-m", "--mc", type=int, default=1, help="Number of Monte Carlo iterations"
+)
+parser.add_argument("-l", "--log_path", type=str, default=None, help="Path to log file")
+parser.add_argument("-i", "--save_img", action="store_true", help="Save images to log")
+parser.add_argument(
+    "--style", type=str, default=None, help="Path to .mplstyle Matplotlib style"
+)
+parser.add_argument("--seed", type=int, default=None, help="RNG seed")
 
 args = parser.parse_args()
 
@@ -30,9 +36,12 @@ if log_path is not None and args.save_img:
 
     def get_img_path(filename):
         return img_dir / filename
+
 else:
+
     def get_img_path(filename):
         return None
+
 
 if args.style is not None:
     plt.style.use(args.style)
@@ -51,20 +60,22 @@ def clairvoyant_func(x):
 model_x = rand_elements.Uniform([0, 1])
 
 alpha_y_x = 1 / var_y_x_const - 1
-model = rand_models.BetaLinear(weights=[1], basis_y_x=[clairvoyant_func], alpha_y_x=alpha_y_x, model_x=model_x)
+model = rand_models.BetaLinear(
+    weights=[1], basis_y_x=[clairvoyant_func], alpha_y_x=alpha_y_x, model_x=model_x
+)
 
-opt_predictor = ModelRegressor(model, name=r'$f^*(\theta)$')
+opt_predictor = ModelRegressor(model, name=r"$f^*(\theta)$")
 
 
 # # Learners
-w_prior = [.5, 0]
+w_prior = [0.5, 0]
 
 # Dirichlet
 n_t_iter = [4, 128, 4096]
 # n_t_iter = [2, 4, 8, 16]
 # n_t_iter = 2 ** np.arange(1, 14)
 
-alpha_0_norm = .1
+alpha_0_norm = 0.1
 # alpha_0_norm = 250
 dir_params_full = [None for __ in n_t_iter]
 dir_predictors = []
@@ -73,13 +84,24 @@ for n_t in n_t_iter:
     counts = prob_disc(values_t.shape)
 
     prior_mean_x = rand_elements.DataEmpirical(values_t, counts, space=model_x.space)
-    prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x,
-                                        model_x=prior_mean_x)
+    prior_mean = rand_models.BetaLinear(
+        weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x, model_x=prior_mean_x
+    )
 
     dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=alpha_0_norm * n_t)
 
-    name_ = r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{n_t}$" + r", $\alpha_0 / |\mathcal{T}| = " + f"{alpha_0_norm}$"
-    dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=[make_discretizer(values_t)], name=name_)
+    name_ = (
+        r"$\mathrm{Dir}$, $|\mathcal{T}| = "
+        + f"{n_t}$"
+        + r", $\alpha_0 / |\mathcal{T}| = "
+        + f"{alpha_0_norm}$"
+    )
+    dir_predictor = BayesRegressor(
+        dir_model,
+        space=model.space,
+        proc_funcs=[make_discretizer(values_t)],
+        name=name_,
+    )
 
     dir_predictors.append(dir_predictor)
 
@@ -114,11 +136,12 @@ for n_t in n_t_iter:
 
 
 # Normal-prior LR
-norm_model = bayes_models.NormalLinear(prior_mean=w_prior, prior_cov=.1, cov_y_x=.1, model_x=model_x,
-                                       allow_singular=True)
-norm_predictor = BayesRegressor(norm_model, space=model.space, name=r'$\mathcal{N}$')
+norm_model = bayes_models.NormalLinear(
+    prior_mean=w_prior, prior_cov=0.1, cov_y_x=0.1, model_x=model_x, allow_singular=True
+)
+norm_predictor = BayesRegressor(norm_model, space=model.space, name=r"$\mathcal{N}$")
 
-norm_params = {'prior_cov': [.1, .001]}
+norm_params = {"prior_cov": [0.1, 0.001]}
 
 #
 temp = [
@@ -165,7 +188,6 @@ n_test = 1000
 #
 # results.assess_compare(predictors, model, params, n_train, n_test, n_mc, verbose=True, plot_loss=True, print_loss=True,
 #                        log_path=log_path, img_path=get_img_path('risk_N_leg_T.png'), rng=seed)
-
 
 
 # n_t_iter = [2, 4, 8, 16]
@@ -281,7 +303,7 @@ scale_alpha = True  # interpret `alpha_0` parameter as normalized w.r.t. discret
 
 # dir_params = {'alpha_0': [10]}
 # dir_params = {'alpha_0': [.1]}
-dir_params = {'alpha_0': [.1, 10]}
+dir_params = {"alpha_0": [0.1, 10]}
 # dir_params = {'alpha_0': np.logspace(-3, 3, 60)}
 
 dir_params_full = [dir_params.copy() for __ in n_t_iter]
@@ -289,27 +311,39 @@ dir_predictors = []
 for n_t, _params in zip(n_t_iter, dir_params_full):
     values_t = np.linspace(*model_x.lims, n_t)
 
-    prior_mean_x = rand_elements.DataEmpirical(values_t, counts=prob_disc(values_t.shape), space=model_x.space)
-    prior_mean = rand_models.BetaLinear(weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x,
-                                        model_x=prior_mean_x)
+    prior_mean_x = rand_elements.DataEmpirical(
+        values_t, counts=prob_disc(values_t.shape), space=model_x.space
+    )
+    prior_mean = rand_models.BetaLinear(
+        weights=w_prior, basis_y_x=None, alpha_y_x=alpha_y_x, model_x=prior_mean_x
+    )
 
     dir_model = bayes_models.Dirichlet(prior_mean, alpha_0=10)
 
-    name_ = r'$\mathrm{Dir}$, $|\mathcal{T}| = ' + f"{n_t}$"
+    name_ = r"$\mathrm{Dir}$, $|\mathcal{T}| = " + f"{n_t}$"
 
-    dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=[make_discretizer(values_t)], name=name_)
+    dir_predictor = BayesRegressor(
+        dir_model,
+        space=model.space,
+        proc_funcs=[make_discretizer(values_t)],
+        name=name_,
+    )
 
     dir_predictors.append(dir_predictor)
 
     if scale_alpha and _params is not None:
-        _params['alpha_0'] = n_t * np.array(_params['alpha_0'])
+        _params["alpha_0"] = n_t * np.array(_params["alpha_0"])
 
 
 n_train = [0, 4, 40, 400]
-results.plot_risk_disc(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, ax=None)
-plt.xscale('log', base=2)
+results.plot_risk_disc(
+    dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, ax=None
+)
+plt.xscale("log", base=2)
 
 
 n_train = 400
-results.plot_risk_disc(dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, ax=None)
-plt.xscale('log', base=2)
+results.plot_risk_disc(
+    dir_predictors, model, dir_params_full, n_train, n_test, n_mc, verbose=True, ax=None
+)
+plt.xscale("log", base=2)

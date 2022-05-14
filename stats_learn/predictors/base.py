@@ -25,6 +25,7 @@ class Base(ABC):
     name : str, optional
 
     """
+
     def __init__(self, loss_func, space=None, proc_funcs=(), name=None):
         self.loss_func = loss_func
 
@@ -33,7 +34,7 @@ class Base(ABC):
         if isinstance(proc_funcs, dict):
             self.proc_funcs = proc_funcs
         else:
-            self.proc_funcs = {'pre': list(proc_funcs), 'post': []}
+            self.proc_funcs = {"pre": list(proc_funcs), "post": []}
         self.name = str(name)
 
         self.model = None  # `random.models.Base` object used to generate predictions
@@ -47,17 +48,23 @@ class Base(ABC):
             self._space = self._model_obj.space
         return self._space
 
-    shape = property(lambda self: {key: space.shape for key, space in self.space.items()})
+    shape = property(
+        lambda self: {key: space.shape for key, space in self.space.items()}
+    )
     size = property(lambda self: {key: space.size for key, space in self.space.items()})
     ndim = property(lambda self: {key: space.ndim for key, space in self.space.items()})
-    dtype = property(lambda self: {key: space.dtype for key, space in self.space.items()})
+    dtype = property(
+        lambda self: {key: space.dtype for key, space in self.space.items()}
+    )
 
     @property
     @abstractmethod
     def _model_obj(self):
         raise NotImplementedError
 
-    def set_params(self, **kwargs):  # TODO: improve? wrapper to ignore non-changing param set?
+    def set_params(
+        self, **kwargs
+    ):  # TODO: improve? wrapper to ignore non-changing param set?
         """Set parameters of the learning model object."""
         for key, value in kwargs.items():
             setattr(self._model_obj, key, value)
@@ -66,18 +73,21 @@ class Base(ABC):
         return self._model_obj.tex_params(key, value)
 
     def _proc_x(self, x):
-        for func in self.proc_funcs['pre']:
+        for func in self.proc_funcs["pre"]:
             x = func(x)
         return x
 
     def _proc_y(self, y):
-        for func in self.proc_funcs['post']:
+        for func in self.proc_funcs["post"]:
             y = func(y)
         return y
 
     def _proc_data(self, d):
-        x, y = self._proc_x(d['x']), self._proc_y(d['y'])
-        dtype = [('x', d.dtype['x'].base, x.shape[1:]), ('y', d.dtype['y'].base, y.shape[1:])]
+        x, y = self._proc_x(d["x"]), self._proc_y(d["y"])
+        dtype = [
+            ("x", d.dtype["x"].base, x.shape[1:]),
+            ("y", d.dtype["y"].base, y.shape[1:]),
+        ]
         return np.array(list(zip(x, y)), dtype=dtype)
 
     def fit(self, d=None, warm_start=False):
@@ -167,7 +177,7 @@ class Base(ABC):
             Empirical risk (i.e. average test loss).
 
         """
-        loss = self.loss_func(self.predict(d['x']), d['y'], shape=self.shape['y'])
+        loss = self.loss_func(self.predict(d["x"]), d["y"], shape=self.shape["y"])
         return loss.mean()
 
     def evaluate_from_model(self, model, n_test=1, n_mc=1, rng=None):
@@ -217,11 +227,21 @@ class Base(ABC):
         matplotlib.artist.Artist or tuple of matplotlib.artist.Artist
 
         """
-        return self.space['x'].plot(self.predict, x, ax=ax, label=label)
+        return self.space["x"].plot(self.predict, x, ax=ax, label=label)
 
     # Assessment
-    def data_assess(self, d_train=None, d_test=None, params=None, x=None, verbose=False, plot_fit=False, log_path=None,
-                    img_path=None, ax=None):
+    def data_assess(
+        self,
+        d_train=None,
+        d_test=None,
+        params=None,
+        x=None,
+        verbose=False,
+        plot_fit=False,
+        log_path=None,
+        img_path=None,
+        ax=None,
+    ):
         """
         Assess predictor using a single dataset.
 
@@ -252,11 +272,37 @@ class Base(ABC):
             Empirical risk values for each parameterization.
 
         """
-        return results.data_assess([self], d_train, d_test, [params], x, verbose, plot_fit, log_path, img_path, ax)
+        return results.data_assess(
+            [self],
+            d_train,
+            d_test,
+            [params],
+            x,
+            verbose,
+            plot_fit,
+            log_path,
+            img_path,
+            ax,
+        )
 
-    def model_assess(self, model=None, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False,
-                     plot_stats=False, plot_loss=False, print_loss=False, log_path=None, img_path=None, ax=None,
-                     rng=None):
+    def model_assess(
+        self,
+        model=None,
+        params=None,
+        n_train=0,
+        n_test=0,
+        n_mc=1,
+        x=None,
+        stats=None,
+        verbose=False,
+        plot_stats=False,
+        plot_loss=False,
+        print_loss=False,
+        log_path=None,
+        img_path=None,
+        ax=None,
+        rng=None,
+    ):
         """
         Assess predictor using Monte Carlo simulation of prediction statistics and empirical risk.
 
@@ -303,41 +349,99 @@ class Base(ABC):
         """
         if model is None:
             model = self._model_obj
-        out = results.model_assess([self], model, [params], n_train, n_test, n_mc, x, stats, verbose, plot_stats,
-                                   plot_loss, print_loss, log_path, img_path, ax, rng)
+        out = results.model_assess(
+            [self],
+            model,
+            [params],
+            n_train,
+            n_test,
+            n_mc,
+            x,
+            stats,
+            verbose,
+            plot_stats,
+            plot_loss,
+            print_loss,
+            log_path,
+            img_path,
+            ax,
+            rng,
+        )
         return map(itemgetter(0), out)
 
     # Assessment shortcuts
-    def predict_stats(self, model=None, params=None, n_train=0, n_mc=1, x=None, stats=('mode',), verbose=False):
+    def predict_stats(
+        self,
+        model=None,
+        params=None,
+        n_train=0,
+        n_mc=1,
+        x=None,
+        stats=("mode",),
+        verbose=False,
+    ):
         if model is None:
             model = self._model_obj
-        return results.predict_stats([self], model, [params], n_train, n_mc, x, stats, verbose)[0]
+        return results.predict_stats(
+            [self], model, [params], n_train, n_mc, x, stats, verbose
+        )[0]
 
-    def plot_predict_stats(self, model=None, params=None, n_train=0, n_mc=1, x=None, do_std=False, verbose=False,
-                           ax=None):
+    def plot_predict_stats(
+        self,
+        model=None,
+        params=None,
+        n_train=0,
+        n_mc=1,
+        x=None,
+        do_std=False,
+        verbose=False,
+        ax=None,
+    ):
         if model is None:
             model = self._model_obj
-        return results.plot_predict_stats([self], model, [params], n_train, n_mc, x, do_std, verbose, ax)
+        return results.plot_predict_stats(
+            [self], model, [params], n_train, n_mc, x, do_std, verbose, ax
+        )
 
-    def risk_eval_sim(self, model=None, params=None, n_train=0, n_test=1, n_mc=1, verbose=False):
+    def risk_eval_sim(
+        self, model=None, params=None, n_train=0, n_test=1, n_mc=1, verbose=False
+    ):
         if model is None:
             model = self._model_obj
-        return results.risk_eval_sim([self], model, [params], n_train, n_test, n_mc, verbose)[0]
+        return results.risk_eval_sim(
+            [self], model, [params], n_train, n_test, n_mc, verbose
+        )[0]
 
-    def plot_risk_eval_sim(self, model=None, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None):
+    def plot_risk_eval_sim(
+        self,
+        model=None,
+        params=None,
+        n_train=0,
+        n_test=1,
+        n_mc=1,
+        verbose=False,
+        ax=None,
+    ):
         if model is None:
             model = self._model_obj
-        return results.plot_risk_eval_sim([self], model, [params], n_train, n_test, n_mc, verbose, ax)
+        return results.plot_risk_eval_sim(
+            [self], model, [params], n_train, n_test, n_mc, verbose, ax
+        )
 
     # Analytical evaluation
-    def risk_eval_analytic(self, model=None, params=None, n_train=0, n_test=1, verbose=False):
+    def risk_eval_analytic(
+        self, model=None, params=None, n_train=0, n_test=1, verbose=False
+    ):
         if model is None:
             model = self._model_obj
-        return results.risk_eval_analytic([self], model, [params], n_train, n_test, verbose)[0]
+        return results.risk_eval_analytic(
+            [self], model, [params], n_train, n_test, verbose
+        )[0]
 
 
 class ClassifierMixin:
     """Uses model conditional mode to minimize 0-1 loss."""
+
     model: random.models.Base
 
     def _predict(self, x):
@@ -346,6 +450,7 @@ class ClassifierMixin:
 
 class RegressorMixin:
     """Uses model conditional mean to minimize squared-error loss."""
+
     model: Union[random.models.Base, random.models.MixinRVy]
 
     def _predict(self, x):
@@ -369,6 +474,7 @@ class Model(Base):
     name : str, optional
 
     """
+
     def __init__(self, model, loss_func, space=None, proc_funcs=(), name=None):
         super().__init__(loss_func, space, proc_funcs, name)
         self.model = model
@@ -405,6 +511,7 @@ class ModelClassifier(ClassifierMixin, Model):
     name : str, optional
 
     """
+
     def __init__(self, model, space=None, proc_funcs=(), name=None):
         super().__init__(model, loss_01, space, proc_funcs, name)
 
@@ -424,6 +531,7 @@ class ModelRegressor(RegressorMixin, Model):
     name : str, optional
 
     """
+
     def __init__(self, model, space=None, proc_funcs=(), name=None):
         super().__init__(model, loss_se, space, proc_funcs, name)
 
@@ -452,8 +560,8 @@ class ModelRegressor(RegressorMixin, Model):
         n_train = np.array(n_train)
 
         if isinstance(model, random.models.BaseRVy):
-            if isinstance(model.space['x'], spaces.FiniteGeneric):
-                x = model.space['x'].values_flat
+            if isinstance(model.space["x"], spaces.FiniteGeneric):
+                x = model.space["x"].values_flat
 
                 p_x = model.model_x.prob(x)
 
@@ -486,6 +594,7 @@ class Bayes(Base):
     name : str, optional
 
     """
+
     def __init__(self, bayes_model, loss_func, space=None, proc_funcs=(), name=None):
         super().__init__(loss_func, space, proc_funcs, name=name)
 
@@ -496,7 +605,9 @@ class Bayes(Base):
         self.prior = self.bayes_model.prior
         self.posterior = self.bayes_model.posterior
 
-        self.model = self.bayes_model.posterior_model  # updates in-place with set_params() and fit()
+        self.model = (
+            self.bayes_model.posterior_model
+        )  # updates in-place with set_params() and fit()
 
         self.fit()
 
@@ -530,6 +641,7 @@ class BayesClassifier(ClassifierMixin, Bayes):
     name : str, optional
 
     """
+
     def __init__(self, bayes_model, space=None, proc_funcs=(), name=None):
         super().__init__(bayes_model, loss_01, space, proc_funcs, name)
 
@@ -549,6 +661,7 @@ class BayesRegressor(RegressorMixin, Bayes):
     name : str, optional
 
     """
+
     def __init__(self, bayes_model, space=None, proc_funcs=(), name=None):
         super().__init__(bayes_model, loss_se, space, proc_funcs, name)
 
@@ -577,21 +690,27 @@ class BayesRegressor(RegressorMixin, Bayes):
         n_train = np.array(n_train)
 
         if isinstance(model, (random.models.Base, random.models.MixinRVy)):
-            if (isinstance(model.space['x'], spaces.FiniteGeneric)
-                    and isinstance(self.bayes_model, bayes.models.Dirichlet)):
+            if isinstance(model.space["x"], spaces.FiniteGeneric) and isinstance(
+                self.bayes_model, bayes.models.Dirichlet
+            ):
 
-                x = model.space['x'].values_flat
+                x = model.space["x"].values_flat
 
                 p_x = model.model_x.prob(x)
-                alpha_x = self.bayes_model.alpha_0 * self.bayes_model.prior_mean.model_x.prob(x)
+                alpha_x = (
+                    self.bayes_model.alpha_0
+                    * self.bayes_model.prior_mean.model_x.prob(x)
+                )
 
                 cov_y_x = model.cov_y_x(x)
-                bias_sq = (self.bayes_model.prior_mean.mean_y_x(x) - model.mean_y_x(x)) ** 2
+                bias_sq = (
+                    self.bayes_model.prior_mean.mean_y_x(x) - model.mean_y_x(x)
+                ) ** 2
 
                 w_cov = np.zeros((n_train.size, p_x.size))
                 w_bias = np.zeros((n_train.size, p_x.size))
                 for i_n, n_i in enumerate(n_train.flatten()):
-                    rv = random.elements.Binomial(.5, n_i)
+                    rv = random.elements.Binomial(0.5, n_i)
                     values = rv.space.values
                     for i_x, (p_i, a_i) in enumerate(zip(p_x, alpha_x)):
                         rv.p = p_i
@@ -600,7 +719,7 @@ class BayesRegressor(RegressorMixin, Bayes):
                         den = (a_i + values) ** 2
 
                         w_cov[i_n, i_x] = (p_rv / den * values).sum()
-                        w_bias[i_n, i_x] = (p_rv / den * a_i ** 2).sum()
+                        w_bias[i_n, i_x] = (p_rv / den * a_i**2).sum()
 
                 risk = np.dot(cov_y_x * (1 + w_cov) + bias_sq * w_bias, p_x)
 
@@ -610,20 +729,29 @@ class BayesRegressor(RegressorMixin, Bayes):
 
         elif isinstance(model, bayes.models.Base):
 
-            if (isinstance(model.space['x'], spaces.FiniteGeneric)
-                    and isinstance(self.bayes_model, bayes.models.Dirichlet)):
+            if isinstance(model.space["x"], spaces.FiniteGeneric) and isinstance(
+                self.bayes_model, bayes.models.Dirichlet
+            ):
 
-                if (isinstance(model, bayes.models.Dirichlet) and model.alpha_0 == self.bayes_model.alpha_0
-                        and model.prior_mean == self.bayes_model.prior_mean and n_test == 1):
+                if (
+                    isinstance(model, bayes.models.Dirichlet)
+                    and model.alpha_0 == self.bayes_model.alpha_0
+                    and model.prior_mean == self.bayes_model.prior_mean
+                    and n_test == 1
+                ):
                     # Minimum Bayesian squared-error
 
-                    x = model.space['x'].values_flat
+                    x = model.space["x"].values_flat
 
                     alpha_0 = self.bayes_model.alpha_0
                     alpha_m = self.bayes_model.prior_mean.model_x.prob(x)
-                    weights = (alpha_m + 1 / (alpha_0 + n_train[..., np.newaxis])) / (alpha_m + 1 / alpha_0)
+                    weights = (alpha_m + 1 / (alpha_0 + n_train[..., np.newaxis])) / (
+                        alpha_m + 1 / alpha_0
+                    )
 
-                    return np.dot(weights * self.bayes_model.prior_mean.cov_y_x(x), alpha_m)
+                    return np.dot(
+                        weights * self.bayes_model.prior_mean.cov_y_x(x), alpha_m
+                    )
                 else:
                     raise NotImplementedError
             else:

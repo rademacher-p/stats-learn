@@ -34,12 +34,11 @@ class EuclideanSupp(BaseSupp):
 
 class FiniteSupp(BaseSupp):
     def __init__(self, vals):
-        self.vals = np.asaray(vals)     # TODO: multidim?
-
-
+        self.vals = np.asaray(vals)  # TODO: multidim?
 
 
 #%% Function objs
+
 
 class BaseFunc(object):
     # def __init__(self):
@@ -130,25 +129,30 @@ class FiniteDomainFunc(object):
 
     def _f(self, x):
         x_flat = np.asarray(x).flatten()
-        _out = self._val_flat[(x_flat == self._supp_flat).all(-1)].reshape(self.data_shape_y)
+        _out = self._val_flat[(x_flat == self._supp_flat).all(-1)].reshape(
+            self.data_shape_y
+        )
         _out = _out.tolist()
-        return _out     # TODO: exception if not in support
+        return _out  # TODO: exception if not in support
 
     def __call__(self, x):
         return vectorize_func(self._f, self.data_shape_x)(x)
 
 
 class FiniteDomainNumericFunc(FiniteDomainFunc):
-
     def __init__(self, supp, val, set_shape=None):
         super().__init__(supp, val, set_shape)
 
     def _op_checker(self, other, op):
         if isinstance(other, FiniteDomainNumericFunc):
             if (self.supp == other.supp).all():
-                return FiniteDomainNumericFunc(self.supp, op(self.val, other.val), self.set_shape)
+                return FiniteDomainNumericFunc(
+                    self.supp, op(self.val, other.val), self.set_shape
+                )
         elif type(other) == float:
-            return FiniteDomainNumericFunc(self.supp, op(self.val, other), self.set_shape)
+            return FiniteDomainNumericFunc(
+                self.supp, op(self.val, other), self.set_shape
+            )
 
     def __add__(self, other):
         return self._op_checker(other, operator.add)
@@ -216,13 +220,15 @@ class FiniteDomainNumericFunc(FiniteDomainFunc):
         if len(self.set_shape) == 1 and self.data_shape_x == ():
             if ax is None:
                 _, ax = plt.subplots()
-                ax.set(xlabel='$x$', ylabel='$y$')
+                ax.set(xlabel="$x$", ylabel="$y$")
 
             plt_data = ax.stem(self._supp, self._val, use_line_collection=True)
 
             return plt_data
         else:
-            raise NotImplementedError('Plot method only implemented for 1-dimensional data.')
+            raise NotImplementedError(
+                "Plot method only implemented for 1-dimensional data."
+            )
 
 
 class FiniteNumericDomainNumericFunc(FiniteDomainNumericFunc):
@@ -240,11 +246,13 @@ class FiniteNumericDomainNumericFunc(FiniteDomainNumericFunc):
     def _update_attr(self):
         super()._update_attr()
 
-        _mean_flat = (self._supp_flat[..., np.newaxis] * self._val_flat[:, np.newaxis]).sum(0)
+        _mean_flat = (
+            self._supp_flat[..., np.newaxis] * self._val_flat[:, np.newaxis]
+        ).sum(0)
         self._m1 = _mean_flat.reshape(self.data_shape_x + self.data_shape_y)
 
         ctr_flat = self._supp_flat[..., np.newaxis] - _mean_flat[np.newaxis]
-        outer_flat = (ctr_flat[:, np.newaxis] * ctr_flat[:, :, np.newaxis])
+        outer_flat = ctr_flat[:, np.newaxis] * ctr_flat[:, :, np.newaxis]
         _temp = (outer_flat * self._val_flat[:, np.newaxis, np.newaxis]).sum(axis=0)
         self._m2c = _temp.reshape(2 * self.data_shape_x + self.data_shape_y)
 
@@ -260,21 +268,34 @@ class FiniteNumericDomainNumericFunc(FiniteDomainNumericFunc):
         elif set_ndim in [2, 3]:
             if set_ndim == 2 and self.data_shape_x == (2,):
                 if ax is None:
-                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$y$')
+                    _, ax = plt.subplots(subplot_kw={"projection": "3d"})
+                    ax.set(xlabel="$x_1$", ylabel="$x_2$", zlabel="$y$")
 
-                plt_data = ax.bar3d(self._supp[..., 0].flatten(),
-                                    self._supp[..., 1].flatten(), 0, 1, 1, self._val_flat.flatten(), shade=True)
+                plt_data = ax.bar3d(
+                    self._supp[..., 0].flatten(),
+                    self._supp[..., 1].flatten(),
+                    0,
+                    1,
+                    1,
+                    self._val_flat.flatten(),
+                    shade=True,
+                )
 
             elif set_ndim == 3 and self.data_shape_x == (3,):
                 if ax is None:
-                    _, ax = plt.subplots(subplot_kw={'projection': '3d'})
-                    ax.set(xlabel='$x_1$', ylabel='$x_2$', zlabel='$x_3$')
+                    _, ax = plt.subplots(subplot_kw={"projection": "3d"})
+                    ax.set(xlabel="$x_1$", ylabel="$x_2$", zlabel="$x_3$")
 
-                plt_data = ax.scatter(self._supp[..., 0], self._supp[..., 1], self._supp[..., 2], s=15, c=self._val)
+                plt_data = ax.scatter(
+                    self._supp[..., 0],
+                    self._supp[..., 1],
+                    self._supp[..., 2],
+                    s=15,
+                    c=self._val,
+                )
 
                 c_bar = plt.colorbar(plt_data)
-                c_bar.set_label('$y$')
+                c_bar.set_label("$y$")
 
             else:
                 raise ValueError
@@ -282,8 +303,9 @@ class FiniteNumericDomainNumericFunc(FiniteDomainNumericFunc):
             return plt_data
 
         else:
-            raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
-
+            raise NotImplementedError(
+                "Plot method only implemented for 1- and 2- dimensional data."
+            )
 
 
 # #

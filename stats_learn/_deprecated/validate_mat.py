@@ -11,10 +11,18 @@ from matplotlib import pyplot as plt
 
 from thesis.random import elements as rand_elements, models as rand_models
 from thesis.bayes import models as bayes_models
-from thesis.predictors import (ModelRegressor, BayesRegressor, ModelClassifier, BayesClassifier,
-                               Model as ModelPredictor, Bayes as BayesPredictor,
-                               plot_loss_eval_compare, plot_predict_stats_compare,
-                               loss_eval_compare, predict_stats_compare)
+from thesis.predictors import (
+    ModelRegressor,
+    BayesRegressor,
+    ModelClassifier,
+    BayesClassifier,
+    Model as ModelPredictor,
+    Bayes as BayesPredictor,
+    plot_loss_eval_compare,
+    plot_predict_stats_compare,
+    loss_eval_compare,
+    predict_stats_compare,
+)
 
 # plt.style.use('seaborn')
 
@@ -84,28 +92,34 @@ from thesis.predictors import (ModelRegressor, BayesRegressor, ModelClassifier, 
 #%% Sim
 
 # True model
-model_x = rand_elements.FiniteRV([0, .5], p=None)
+model_x = rand_elements.FiniteRV([0, 0.5], p=None)
 
-model = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
+model = rand_models.DataConditional(
+    [rand_elements.Finite([0, 0.5], [p, 1 - p]) for p in (0.5, 0.5)], model_x
+)
 
 # model = bayes_models.Dirichlet(model, alpha_0=3)
 
 
 # Optimal learner
 if isinstance(model, rand_models.Base):
-    opt_predictor = ModelRegressor(model, name=r'$f_{\Theta}$')
+    opt_predictor = ModelRegressor(model, name=r"$f_{\Theta}$")
 elif isinstance(model, bayes_models.Base):
-    opt_predictor = BayesRegressor(model, name=r'$f^*$')
+    opt_predictor = BayesRegressor(model, name=r"$f^*$")
 else:
     raise TypeError
 
 
 # Dirichlet learner
-prior_mean = rand_models.DataConditional([rand_elements.Finite([0, .5], [p, 1 - p]) for p in (.5, .5)], model_x)
-dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=3), name='Dir')
+prior_mean = rand_models.DataConditional(
+    [rand_elements.Finite([0, 0.5], [p, 1 - p]) for p in (0.5, 0.5)], model_x
+)
+dir_predictor = BayesRegressor(
+    bayes_models.Dirichlet(prior_mean, alpha_0=3), name="Dir"
+)
 
 # dir_params = None
-dir_params = {'alpha_0': [2, 16]}
+dir_params = {"alpha_0": [2, 16]}
 # dir_params = {'alpha_0': .001 + np.arange(2, 4, .2)}
 
 # print(dir_predictor.loss_eval(model, dir_params, n_train, n_test=1, n_mc=20000, verbose=True, rng=None))
@@ -127,8 +141,17 @@ predictors = [
 params = [None, dir_params]
 
 
-plot_loss_eval_compare(predictors, model, params, n_train=n_train, n_test=1, n_mc=4000,
-                       verbose=True, ax=None, rng=None)
+plot_loss_eval_compare(
+    predictors,
+    model,
+    params,
+    n_train=n_train,
+    n_test=1,
+    n_mc=4000,
+    verbose=True,
+    ax=None,
+    rng=None,
+)
 # plot_predict_stats_compare(predictors, model, params, x=None, n_train=n_train, n_mc=300, do_std=True,
 #                            verbose=True, ax=None, rng=None)
 
@@ -142,4 +165,4 @@ elif isinstance(model, bayes_models.Base):
 else:
     raise TypeError
 
-print('Done')
+print("Done")

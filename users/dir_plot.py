@@ -5,11 +5,11 @@ import numpy as np
 
 from stats_learn import spaces, random
 
-plt.style.use('../images/style.mplstyle')
+plt.style.use("../images/style.mplstyle")
 # plt.style.use(['../images/style.mplstyle', '../images/double.mplstyle'])
 
 # plt.rc('text', usetex=False)
-plt.rc('text.latex', preamble=r"\usepackage{PhDmath}")
+plt.rc("text.latex", preamble=r"\usepackage{PhDmath}")
 # plt.rcParams['xtick.minor.visible'] = False
 # plt.rcParams['ytick.minor.visible'] = False
 
@@ -22,19 +22,21 @@ n_plot = 100
 s = 5
 
 
-def plot_dirs(dirs, n_plot=None, titles=None, orient='v', same_cm=True):
+def plot_dirs(dirs, n_plot=None, titles=None, orient="v", same_cm=True):
 
     n_dirs = len(dirs)
     if titles is None:
         titles = [None for __ in range(n_dirs)]
 
     fig_kwargs = {}
-    if orient == 'v':
+    if orient == "v":
         subplot_shape = (n_dirs, 1)
-        fig_kwargs['figsize'] = [5.2, 7.8]
+        fig_kwargs["figsize"] = [5.2, 7.8]
     else:
         subplot_shape = (1, n_dirs)
-    fig, axes = plt.subplots(*subplot_shape, subplot_kw={'projection': '3d'}, **fig_kwargs)
+    fig, axes = plt.subplots(
+        *subplot_shape, subplot_kw={"projection": "3d"}, **fig_kwargs
+    )
 
     space = spaces.check_spaces(dirs)
 
@@ -44,7 +46,9 @@ def plot_dirs(dirs, n_plot=None, titles=None, orient='v', same_cm=True):
         space.n_plot = n_plot
 
     for dir_i in dirs:
-        dir_i.space.x_plt = space.make_grid(space.n_plot, space.shape, hull_mask=(dir_i.mean < 1 / dir_i.alpha_0))
+        dir_i.space.x_plt = space.make_grid(
+            space.n_plot, space.shape, hull_mask=(dir_i.mean < 1 / dir_i.alpha_0)
+        )
 
     x_vec = [dir_i.space.x_plt for dir_i in dirs]
     y_vec = [dir_i.prob(dir_i.space.x_plt) for dir_i in dirs]
@@ -93,9 +97,9 @@ def plot_dirs(dirs, n_plot=None, titles=None, orient='v', same_cm=True):
 
         ax.view_init(45, 45)
 
-        ax.set_xlabel(r'$\theta(\Ycal_1, \Xcal_1)$')
-        ax.set_ylabel(r'$\theta(\Ycal_2, \Xcal_1)$')
-        ax.set_zlabel(r'$\theta(\Ycal_3, \Xcal_1)$')
+        ax.set_xlabel(r"$\theta(\Ycal_1, \Xcal_1)$")
+        ax.set_ylabel(r"$\theta(\Ycal_2, \Xcal_1)$")
+        ax.set_zlabel(r"$\theta(\Ycal_3, \Xcal_1)$")
         # ax.set_xlabel(r'$\thetac(\Ycal_1; x)$')
         # ax.set_ylabel(r'$\thetac(\Ycal_2; x)$')
         # ax.set_zlabel(r'$\thetac(\Ycal_3; x)$')
@@ -114,16 +118,16 @@ def localization():
     alpha_0_vec = [1e2, 1e-2]
     dirs = [random.elements.Dirichlet(mean, alpha_0) for alpha_0 in alpha_0_vec]
 
-    titles = [r'$\alpha_0 \to \infty$', r'$\alpha_0 \to 0$']
+    titles = [r"$\alpha_0 \to \infty$", r"$\alpha_0 \to 0$"]
     # titles = [r'$\alpha_0 \alpham(x) \to \infty$', r'$\alpha_0 \alpham(x) \to 0$']
     # titles = [r'$\alpha_0 \alpham(x) = ' + f'{alpha_0}$' for alpha_0 in alpha_0_vec]
 
     # plot_dirs(dirs, n_plot=n_plot, titles=titles, orient='v', same_cm=False, cm_hack=[1])
-    plot_dirs(dirs, n_plot=n_plot, titles=titles, orient='v', same_cm=False)
+    plot_dirs(dirs, n_plot=n_plot, titles=titles, orient="v", same_cm=False)
 
 
 def prior_post():
-    mean = np.array([.4, .3, .3])
+    mean = np.array([0.4, 0.3, 0.3])
     alpha_0 = 6
     dir_prior = random.elements.Dirichlet(mean, alpha_0)
 
@@ -136,15 +140,18 @@ def prior_post():
 
     dirs = [dir_prior, dir_post]
 
-    titles = [r'$\text{Prior}: \alpha = ' + f'{tuple(np.round(np.array(mean) * 100) / 100)}$',
-              r'$\text{Posterior}: \psi = ' + f'{tuple(np.round(np.array(psi) * 100) / 100)}$']
+    titles = [
+        r"$\text{Prior}: \alpha = " + f"{tuple(np.round(np.array(mean) * 100) / 100)}$",
+        r"$\text{Posterior}: \psi = "
+        + f"{tuple(np.round(np.array(psi) * 100) / 100)}$",
+    ]
     # titles = [r'$\text{Prior}: \alphac(x) = ' + f'{tuple(np.round(np.array(mean) * 100) / 100)}$',
     #           r'$\text{Posterior}: \psic(x) = ' + f'{tuple(np.round(np.array(psi) * 100) / 100)}$']
 
-    plot_dirs(dirs, n_plot=n_plot, titles=titles, orient='v', same_cm=True)
+    plot_dirs(dirs, n_plot=n_plot, titles=titles, orient="v", same_cm=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # localization()
     prior_post()
 

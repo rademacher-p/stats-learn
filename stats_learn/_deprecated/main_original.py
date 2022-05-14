@@ -1,4 +1,3 @@
-
 #%% Continuous sets
 
 # theta_m = stats.beta(a=.9, b=.9)
@@ -55,7 +54,7 @@
 
 #%% Discrete sets
 
-supp_y = np.array(['a', 'b'])
+supp_y = np.array(["a", "b"])
 # supp_y = np.arange(2) / 2
 supp_x = np.arange(2) / 2
 # supp_x = np.arange(6).reshape(3, 2)
@@ -66,19 +65,33 @@ i_split_y, i_split_x = supp_y.ndim, supp_x.ndim - 0
 supp_shape_y, data_shape_y = supp_y.shape[:i_split_y], supp_y.shape[i_split_y:]
 supp_shape_x, data_shape_x = supp_x.shape[:i_split_x], supp_x.shape[i_split_x:]
 
-supp_yx = np.array(list(itertools.product(supp_y.reshape((-1,) + data_shape_y), supp_x.reshape((-1,) + data_shape_x))),
-                   dtype=[('y', supp_y.dtype, data_shape_y),
-                          ('x', supp_x.dtype, data_shape_x)]).reshape(supp_shape_y + supp_shape_x)
+supp_yx = np.array(
+    list(
+        itertools.product(
+            supp_y.reshape((-1,) + data_shape_y), supp_x.reshape((-1,) + data_shape_x)
+        )
+    ),
+    dtype=[("y", supp_y.dtype, data_shape_y), ("x", supp_x.dtype, data_shape_x)],
+).reshape(supp_shape_y + supp_shape_x)
 
-supp_xy = np.array(list(itertools.product(supp_x.reshape((-1,) + data_shape_x), supp_y.reshape((-1,) + data_shape_y))),
-                   dtype=[('x', supp_x.dtype, data_shape_x),
-                          ('y', supp_y.dtype, data_shape_y)]).reshape(supp_shape_x + supp_shape_y)
+supp_xy = np.array(
+    list(
+        itertools.product(
+            supp_x.reshape((-1,) + data_shape_x), supp_y.reshape((-1,) + data_shape_y)
+        )
+    ),
+    dtype=[("x", supp_x.dtype, data_shape_x), ("y", supp_y.dtype, data_shape_y)],
+).reshape(supp_shape_x + supp_shape_y)
 
-supp_x_s = np.array(list(itertools.product(supp_x.reshape((-1,) + data_shape_x))),
-                    dtype=[('x', supp_x.dtype, data_shape_x)]).reshape(supp_shape_x)
+supp_x_s = np.array(
+    list(itertools.product(supp_x.reshape((-1,) + data_shape_x))),
+    dtype=[("x", supp_x.dtype, data_shape_x)],
+).reshape(supp_shape_x)
 
-supp_y_s = np.array(list(itertools.product(supp_y.reshape((-1,) + data_shape_y))),
-                    dtype=[('y', supp_y.dtype, data_shape_y)]).reshape(supp_shape_y)
+supp_y_s = np.array(
+    list(itertools.product(supp_y.reshape((-1,) + data_shape_y))),
+    dtype=[("y", supp_y.dtype, data_shape_y)],
+).reshape(supp_shape_y)
 
 
 # alpha_0 = 10 * supp_yx.size

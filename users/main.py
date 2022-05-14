@@ -1,4 +1,5 @@
 import math
+
 # import pickle
 
 import numpy as np
@@ -19,8 +20,8 @@ from stats_learn.predictors.torch import LitMLP, LitPredictor, reset_weights
 
 np.set_printoptions(precision=3)
 
-plt.style.use('../images/style.mplstyle')
-plt.rc('text', usetex=False)
+plt.style.use("../images/style.mplstyle")
+plt.rc("text", usetex=False)
 # plt.rc('text.latex', preamble=r"\usepackage{PhDmath}")
 
 # seed = None
@@ -34,6 +35,7 @@ def make_inv_trig(shape=()):
     def sin_orig(x):
         axis = tuple(range(-len(shape), 0))
         return 1 / (2 + np.sin(2 * np.pi * x.mean(axis)))
+
     return sin_orig
 
 
@@ -43,6 +45,7 @@ def make_rand_discrete(n, rng):
 
     def rand_discrete(x):
         return _rand_vals[x]
+
     return rand_discrete
 
 
@@ -50,11 +53,11 @@ def make_rand_discrete(n, rng):
 n_x = 128
 
 # var_y_x_const = 1 / (n_x-1)
-var_y_x_const = 1/5
+var_y_x_const = 1 / 5
 # var_y_x_const = 1/125
 
-alpha_y_x_d = (1-var_y_x_const) / (np.float64(var_y_x_const) - 1/(n_x-1))
-alpha_y_x_beta = 1/var_y_x_const - 1
+alpha_y_x_d = (1 - var_y_x_const) / (np.float64(var_y_x_const) - 1 / (n_x - 1))
+alpha_y_x_beta = 1 / var_y_x_const - 1
 
 
 # True model
@@ -64,7 +67,7 @@ shape_x = ()
 size_x = math.prod(shape_x)
 lims_x = np.broadcast_to([0, 1], (*shape_x, 2))
 
-w_model = [.5]
+w_model = [0.5]
 
 nonlinear_model = make_inv_trig(shape_x)
 # nonlinear_model = make_rand_discrete(n_x, rng=seed)
@@ -72,7 +75,9 @@ nonlinear_model = make_inv_trig(shape_x)
 
 model_x = random.elements.FiniteGeneric.from_grid([0, 1], n_x)
 # model = random.models.DataConditional.from_mean_poly_emp(n_x, alpha_y_x_d, w_model, model_x)
-model = random.models.DataConditional.from_mean_emp(alpha_y_x_d, n_x, nonlinear_model, model_x)
+model = random.models.DataConditional.from_mean_emp(
+    alpha_y_x_d, n_x, nonlinear_model, model_x
+)
 
 # model_x = random.elements.Uniform(lims_x)
 # # model = random.models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
@@ -83,14 +88,14 @@ model = random.models.DataConditional.from_mean_emp(alpha_y_x_d, n_x, nonlinear_
 
 # model = bayes.models.Dirichlet(model, alpha_0=4e2)
 if isinstance(model, bayes.models.Base):
-    opt_predictor = BayesRegressor(model, name=r'$f_\uptheta$')
+    opt_predictor = BayesRegressor(model, name=r"$f_\uptheta$")
 else:
-    opt_predictor = ModelRegressor(model, name=r'$f^*(\rho)$')
+    opt_predictor = ModelRegressor(model, name=r"$f^*(\rho)$")
 
 
 # # Bayesian learners
 
-w_prior = [.5, 0]
+w_prior = [0.5, 0]
 # w_prior = [1, 0]
 # w_prior = [0, 1]
 
@@ -98,7 +103,9 @@ w_prior = [.5, 0]
 # Dirichlet learner
 proc_funcs = []
 
-prior_mean = random.models.DataConditional.from_mean_poly_emp(alpha_y_x_d, n_x, w_prior, model_x)
+prior_mean = random.models.DataConditional.from_mean_poly_emp(
+    alpha_y_x_d, n_x, w_prior, model_x
+)
 # _func = lambda x: .5*(1-np.sin(2*np.pi*x))
 # prior_mean = random.models.DataConditional.from_mean_emp(n_x, alpha_y_x_d, _func, model_x)
 
@@ -115,10 +122,12 @@ prior_mean = random.models.DataConditional.from_mean_poly_emp(alpha_y_x_d, n_x, 
 
 
 dir_model = bayes.models.Dirichlet(prior_mean, alpha_0=10)
-dir_predictor = BayesRegressor(dir_model, space=model.space, proc_funcs=proc_funcs, name=r'$\mathrm{Dir}$')
+dir_predictor = BayesRegressor(
+    dir_model, space=model.space, proc_funcs=proc_funcs, name=r"$\mathrm{Dir}$"
+)
 
 # dir_params = {}
-dir_params = {'alpha_0': [10, 1000]}
+dir_params = {"alpha_0": [10, 1000]}
 # dir_params = {'alpha_0': [.001]}
 # dir_params = {'alpha_0': [20]}
 # dir_params = {'alpha_0': [.01, 100]}
@@ -131,8 +140,10 @@ dir_params = {'alpha_0': [10, 1000]}
 
 
 if isinstance(model, bayes.models.Dirichlet):  # add true bayes model concentration
-    if model.alpha_0 not in dir_params['alpha_0']:
-        dir_params['alpha_0'] = np.sort(np.concatenate((dir_params['alpha_0'], [model.alpha_0])))
+    if model.alpha_0 not in dir_params["alpha_0"]:
+        dir_params["alpha_0"] = np.sort(
+            np.concatenate((dir_params["alpha_0"], [model.alpha_0]))
+        )
 
 
 # Normal learner
@@ -154,14 +165,21 @@ basis_y_x = None
 # basis_y_x = [make_square_func(value) for value in values_t]
 
 # proc_funcs = []
-proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
+proc_funcs = {"pre": [], "post": [make_clipper(lims_x)]}
 
-norm_model = bayes.models.NormalLinear(prior_mean=w_prior_norm, prior_cov=.1, basis_y_x=basis_y_x, cov_y_x=.1,
-                                       model_x=model_x)
-norm_predictor = BayesRegressor(norm_model, space=model.space, proc_funcs=proc_funcs, name=r'$\mathcal{N}$')
+norm_model = bayes.models.NormalLinear(
+    prior_mean=w_prior_norm,
+    prior_cov=0.1,
+    basis_y_x=basis_y_x,
+    cov_y_x=0.1,
+    model_x=model_x,
+)
+norm_predictor = BayesRegressor(
+    norm_model, space=model.space, proc_funcs=proc_funcs, name=r"$\mathcal{N}$"
+)
 
 # norm_params = {}
-norm_params = {'prior_cov': [.1, .001]}
+norm_params = {"prior_cov": [0.1, 0.001]}
 # norm_params = {'prior_cov': [1e6]}
 # norm_params = {'prior_cov': [.1 / (.001 / n_x)]}
 # norm_params = {'prior_cov': [.1 / (20 / n_t)]}
@@ -175,10 +193,19 @@ norm_params = {'prior_cov': [.1, .001]}
 # skl_estimator, _name = GaussianProcessRegressor(), 'GP'
 
 # _solver_kwargs = {'solver': 'sgd', 'learning_rate': 'adaptive', 'learning_rate_init': 1e-1, 'n_iter_no_change': 20}
-_solver_kwargs = {'solver': 'adam', 'learning_rate_init': 1e-3, 'n_iter_no_change': 200}
+_solver_kwargs = {"solver": "adam", "learning_rate_init": 1e-3, "n_iter_no_change": 200}
 # _solver_kwargs = {'solver': 'lbfgs', }
-skl_estimator, skl_name = MLPRegressor(hidden_layer_sizes=[1000, 200, 100], alpha=0, verbose=True,
-                                       max_iter=5000, tol=1e-8, **_solver_kwargs), 'MLP'
+skl_estimator, skl_name = (
+    MLPRegressor(
+        hidden_layer_sizes=[1000, 200, 100],
+        alpha=0,
+        verbose=True,
+        max_iter=5000,
+        tol=1e-8,
+        **_solver_kwargs,
+    ),
+    "MLP",
+)
 
 # TODO: try Adaboost, RandomForest, GP, BayesianRidge, KNeighbors, SVR
 
@@ -194,29 +221,30 @@ weight_decays = [1e-3]
 # weight_decays = [0., 1e-3]
 
 # proc_funcs = []
-proc_funcs = {'pre': [], 'post': [make_clipper(lims_x)]}
+proc_funcs = {"pre": [], "post": [make_clipper(lims_x)]}
 
 lit_predictors = []
 for weight_decay in weight_decays:
     layer_sizes = [500, 500, 500, 500]
-    optim_params = {'lr': 1e-3, 'weight_decay': weight_decay}
+    optim_params = {"lr": 1e-3, "weight_decay": weight_decay}
 
     logger_name = f"MLP {'-'.join(map(str, layer_sizes))}, lambda {weight_decay}"
     # lit_name = r"$\text{{MLP}} {}$, $\lambda = {}$".format('-'.join(map(str, layer_sizes)),
     #                                                      optim_params['weight_decay'])
-    lit_name = r"$\mathrm{MLP}$, " + fr"$\lambda = {weight_decay}$"
+    lit_name = r"$\mathrm{MLP}$, " + rf"$\lambda = {weight_decay}$"
 
     trainer_params = {
-        'max_epochs': 50000,
-        'callbacks': EarlyStopping('train_loss', min_delta=1e-6, patience=10000, check_on_train_epoch_end=True),
-        'checkpoint_callback': False,
-        'logger': pl_loggers.TensorBoardLogger('temp/logs/', name=logger_name),
-        'weights_summary': None,
-        'gpus': torch.cuda.device_count(),
+        "max_epochs": 50000,
+        "callbacks": EarlyStopping(
+            "train_loss", min_delta=1e-6, patience=10000, check_on_train_epoch_end=True
+        ),
+        "checkpoint_callback": False,
+        "logger": pl_loggers.TensorBoardLogger("temp/logs/", name=logger_name),
+        "weights_summary": None,
+        "gpus": torch.cuda.device_count(),
     }
 
-    lit_model = LitMLP([model.size['x'], *layer_sizes, 1], optim_params=optim_params)
-
+    lit_model = LitMLP([model.size["x"], *layer_sizes, 1], optim_params=optim_params)
 
     def reset_func(model_):
         model_.apply(reset_weights)
@@ -224,9 +252,11 @@ for weight_decay in weight_decays:
             # for p in model_.parameters():  # DO NOT USE: breaks gradient descent!
             #     p.data.fill_(0.)
             #     raise Exception
-            model_.model[-1].bias.fill_(.5)
+            model_.model[-1].bias.fill_(0.5)
 
-    lit_predictor = LitPredictor(lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name)
+    lit_predictor = LitPredictor(
+        lit_model, model.space, trainer_params, reset_func, proc_funcs, name=lit_name
+    )
 
     lit_predictors.append(lit_predictor)
 
@@ -260,13 +290,25 @@ predictors, params = zip(*temp)
 
 # log_path = None
 # img_path = None
-log_path = 'temp/log.md'
-img_path = f'temp/images/{get_now()}'
+log_path = "temp/log.md"
+img_path = f"temp/images/{get_now()}"
 
 
-y_stats_full, loss_full = results.model_assess(predictors, model, params, n_train, n_test, n_mc,
-                                               stats=('mean', 'std'), verbose=True, plot_stats=True, print_loss=True,
-                                               log_path=log_path, img_path=img_path, rng=seed)
+y_stats_full, loss_full = results.model_assess(
+    predictors,
+    model,
+    params,
+    n_train,
+    n_test,
+    n_mc,
+    stats=("mean", "std"),
+    verbose=True,
+    plot_stats=True,
+    print_loss=True,
+    log_path=log_path,
+    img_path=img_path,
+    rng=seed,
+)
 
 # y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
 #                                                  verbose=True, plot_loss=True, print_loss=True,

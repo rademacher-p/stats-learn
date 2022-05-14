@@ -1,7 +1,9 @@
 class DataSet(Base):
     # TODO: update with `deque` changes from CRM
 
-    def __init__(self, data, space=None, iter_mode='once', shuffle_mode='never', rng=None):
+    def __init__(
+        self, data, space=None, iter_mode="once", shuffle_mode="never", rng=None
+    ):
         """
         Model from data.
 
@@ -26,18 +28,20 @@ class DataSet(Base):
         if space is not None:
             self._space = space
         else:
-            for c in 'xy':
+            for c in "xy":
                 dtype = data.dtype[c]
                 if np.issubdtype(dtype.base, np.number):
                     self._space[c] = spaces.Euclidean(dtype.shape)
                 else:
-                    self._space[c] = spaces.FiniteGeneric(data[c], shape=dtype.shape)  # TODO: check...
+                    self._space[c] = spaces.FiniteGeneric(
+                        data[c], shape=dtype.shape
+                    )  # TODO: check...
 
         self.iter_mode = iter_mode
         self.shuffle_mode = shuffle_mode
 
         self.idx = None
-        self.restart(shuffle=(self.shuffle_mode in {'once', 'repeat'}))
+        self.restart(shuffle=(self.shuffle_mode in {"once", "repeat"}))
 
     def __repr__(self):
         return f"DataSet({len(self.data)})"
@@ -46,13 +50,20 @@ class DataSet(Base):
         raise NotImplementedError
 
     @classmethod
-    def from_xy(cls, x, y, space=None, iter_mode='once', shuffle_mode='never', rng=None):
-        data = np.array(list(zip(x, y)), dtype=[('x', x.dtype, x.shape[1:]), ('y', y.dtype, y.shape[1:])])
+    def from_xy(
+        cls, x, y, space=None, iter_mode="once", shuffle_mode="never", rng=None
+    ):
+        data = np.array(
+            list(zip(x, y)),
+            dtype=[("x", x.dtype, x.shape[1:]), ("y", y.dtype, y.shape[1:])],
+        )
 
         return cls(data, space, iter_mode, shuffle_mode, rng)
 
     @classmethod
-    def from_csv(cls, path, y_name, space=None, iter_mode='once', shuffle_mode='never', rng=None):
+    def from_csv(
+        cls, path, y_name, space=None, iter_mode="once", shuffle_mode="never", rng=None
+    ):
         df_x = pd.read_csv(path)
         df_y = df_x.pop(y_name)
         x, y = df_x.to_numpy(), df_y.to_numpy()
@@ -70,12 +81,12 @@ class DataSet(Base):
 
     def _sample(self, n, rng):
         if self.idx + n > len(self.data):
-            if self.iter_mode == 'once':
+            if self.iter_mode == "once":
                 raise ValueError("DataSet model is exhausted.")
-            elif self.iter_mode == 'repeat':
-                self.restart(shuffle=(self.shuffle_mode == 'repeat'), rng=rng)
+            elif self.iter_mode == "repeat":
+                self.restart(shuffle=(self.shuffle_mode == "repeat"), rng=rng)
                 # TODO: use trailing samples?
 
-        out = self.data[self.idx:self.idx+n]
+        out = self.data[self.idx : self.idx + n]
         self.idx += n
         return out

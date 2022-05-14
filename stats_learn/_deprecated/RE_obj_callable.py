@@ -17,13 +17,14 @@ from thesis._deprecated.func_obj import FiniteDomainFunc
 
 #%% Base RE classes
 
+
 class BaseRE(multi_rv_generic):
     """
     Base class for generic random element objects.
     """
 
     def __init__(self, rng=None):
-        super().__init__(rng)      # may be None or int for legacy numpy rng
+        super().__init__(rng)  # may be None or int for legacy numpy rng
 
         self._data_shape = None
         self._mode = None
@@ -87,7 +88,7 @@ class DiscreteRE(BaseRE):
         _out = []
         for x_i in x.reshape((-1,) + self._data_shape):
             _out.append(self._pmf_single(x_i))
-        return np.asarray(_out)         # returned array may be flattened over 'set_shape'
+        return np.asarray(_out)  # returned array may be flattened over 'set_shape'
 
     def _pmf_single(self, x):
         raise NotImplementedError("Method must be overwritten.")
@@ -116,7 +117,7 @@ class ContinuousRV(BaseRV):
         _out = []
         for x_i in x.reshape((-1,) + self._data_shape):
             _out.append(self._pdf_single(x_i))
-        return np.asarray(_out)     # returned array may be flattened
+        return np.asarray(_out)  # returned array may be flattened
 
     def _pdf_single(self, x):
         raise NotImplementedError("Method must be overwritten.")
@@ -125,12 +126,13 @@ class ContinuousRV(BaseRV):
 
 #%% Specific RE's
 
+
 class FiniteRE(DiscreteRE):
     """
     Generic RE drawn from a finite support set using an explicitly defined PMF.
     """
 
-    def __new__(cls, pmf, rng=None):    # TODO: function type check
+    def __new__(cls, pmf, rng=None):  # TODO: function type check
         if np.issubdtype(pmf.supp.dtype, np.number):
             return super().__new__(FiniteRV)
         else:
@@ -156,7 +158,7 @@ class FiniteRE(DiscreteRE):
     def p(self):
         return self._p
 
-    @p.setter   # TODO: pmf setter? or just p?
+    @p.setter  # TODO: pmf setter? or just p?
     def p(self, p):
         self.pmf.val = p
         self._update_attr()
@@ -197,7 +199,6 @@ class FiniteRV(FiniteRE, DiscreteRV):
         self._cov = self.pmf.m2c
 
 
-
 # s = np.random.random((4, 3, 2, 2))
 # pp = np.random.random((4, 3))
 # pp = pp / pp.sum()
@@ -211,7 +212,6 @@ class FiniteRV(FiniteRE, DiscreteRV):
 # f2 = FiniteRE.gen_func(s, p)
 # f2.pmf(f2.rvs(4))
 # f2.plot_pmf()
-
 
 
 def _dirichlet_check_alpha_0(alpha_0):
@@ -241,8 +241,10 @@ def _dirichlet_check_input(x, alpha_0, mean):
 
     # if np.logical_and(x == 0, mean < 1 / alpha_0).any():
     if np.logical_and(x.val == 0, mean.val < 1 / alpha_0).any():
-        raise ValueError("Each element in 'x' must be greater than "
-                         "zero if the corresponding mean element is less than 1 / alpha_0.")
+        raise ValueError(
+            "Each element in 'x' must be greater than "
+            "zero if the corresponding mean element is less than 1 / alpha_0."
+        )
 
     return x
 
@@ -290,28 +292,38 @@ class DirichletRV(ContinuousRV):
         self._data_size = math.prod(self._data_shape)
 
         if self._mean.min > 1 / self._alpha_0:
-            self._mode = (self._mean - 1 / self._alpha_0) / (1 - self._data_size / self._alpha_0)
+            self._mode = (self._mean - 1 / self._alpha_0) / (
+                1 - self._data_size / self._alpha_0
+            )
         else:
             # warnings.warn("Mode method currently supported for mean > 1/alpha_0 only")Myq.L
-            self._mode = None       # TODO: complete with general formula
+            self._mode = None  # TODO: complete with general formula
 
         # TODO: IMPLEMENT COV
         # self._cov = (diag_gen(self._mean) - outer_gen(self._mean, self._mean)) / (self._alpha_0 + 1)
 
-        self._log_pdf_coef = gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean.val))
+        self._log_pdf_coef = gammaln(self._alpha_0) - np.sum(
+            gammaln(self._alpha_0 * self._mean.val)
+        )
 
     def _rvs(self, size=(), random_state=None):
-        vals = random_state.dirichlet(self._alpha_0 * self._mean.val.flatten(), size).reshape(size + self._data_shape)
+        vals = random_state.dirichlet(
+            self._alpha_0 * self._mean.val.flatten(), size
+        ).reshape(size + self._data_shape)
         if size == ():
             return FiniteDomainFunc(self.mean.supp, vals)
         else:
             return [FiniteDomainFunc(self.mean.supp, val) for val in vals]
 
-    def pdf(self, x):   # overwrites base methods...
+    def pdf(self, x):  # overwrites base methods...
         x = _dirichlet_check_input(x, self._alpha_0, self._mean)
 
-        log_pdf = self._log_pdf_coef + np.sum(xlogy(self._alpha_0 * self._mean.val - 1, x.val)
-                                              .reshape(-1, self._data_size), -1)
+        log_pdf = self._log_pdf_coef + np.sum(
+            xlogy(self._alpha_0 * self._mean.val - 1, x.val).reshape(
+                -1, self._data_size
+            ),
+            -1,
+        )
         return np.exp(log_pdf)
 
     # def plot_pdf(self, x, ax=None):   TODO
@@ -367,7 +379,6 @@ class DirichletRV(ContinuousRV):
 # d.cov
 # d.rvs()
 # d.pdf(d.rvs())
-
 
 
 def _empirical_check_n(n):
@@ -429,8 +440,9 @@ class EmpiricalRV(DiscreteRV):
         self._data_shape = self._mean.set_shape
         self._data_size = self._mean.size
 
-        self._mode = ((self._n * self._mean) // 1) + FiniteDomainFunc(self._mean.supp,
-                                                                      simplex_round((self._n * self._mean.val) % 1))
+        self._mode = ((self._n * self._mean) // 1) + FiniteDomainFunc(
+            self._mean.supp, simplex_round((self._n * self._mean.val) % 1)
+        )
 
         # TODO: IMPLEMENT COV
         # self._cov = (diag_gen(self._mean) - outer_gen(self._mean, self._mean)) / self._n
@@ -438,7 +450,9 @@ class EmpiricalRV(DiscreteRV):
         self._log_pmf_coef = gammaln(self._n + 1)
 
     def _rvs(self, size=(), random_state=None):
-        vals = random_state.multinomial(self._n, self._mean.val.flatten(), size).reshape(size + self._data_shape)
+        vals = random_state.multinomial(
+            self._n, self._mean.val.flatten(), size
+        ).reshape(size + self._data_shape)
         if size == ():
             return FiniteDomainFunc(self.mean.supp, vals)
         else:
@@ -447,8 +461,9 @@ class EmpiricalRV(DiscreteRV):
     def pmf(self, x):
         x = _empirical_check_input(x, self._n, self._mean)
 
-        log_pmf = self._log_pmf_coef + (xlogy(self._n * x.val, self._mean.val)
-                                        - gammaln(self._n * x.val + 1)).reshape(-1, self._data_size).sum(axis=-1)
+        log_pmf = self._log_pmf_coef + (
+            xlogy(self._n * x.val, self._mean.val) - gammaln(self._n * x.val + 1)
+        ).reshape(-1, self._data_size).sum(axis=-1)
         return np.exp(log_pmf)
 
     # def plot_pmf(self, ax=None):
@@ -483,6 +498,7 @@ class EmpiricalRV(DiscreteRV):
     #
     #     else:
     #         raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
+
 
 # rng = np.random.default_rng()
 # n = 10
@@ -548,8 +564,12 @@ class DirichletEmpiricalRV(DiscreteRV):
         # self._cov = ((1/self._n + 1/self._alpha_0) / (1 + 1/self._alpha_0)
         #              * (diag_gen(self._mean) - outer_gen(self._mean, self._mean)))
 
-        self._log_pmf_coef = (gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean.val))
-                              + gammaln(self._n + 1) - gammaln(self._alpha_0 + self._n))
+        self._log_pmf_coef = (
+            gammaln(self._alpha_0)
+            - np.sum(gammaln(self._alpha_0 * self._mean.val))
+            + gammaln(self._n + 1)
+            - gammaln(self._alpha_0 + self._n)
+        )
 
     def _rvs(self, size=(), random_state=None):
         # return rng.multinomial(self._n, self._mean.flatten(), size).reshape(size + self._shape) / self._n
@@ -558,8 +578,10 @@ class DirichletEmpiricalRV(DiscreteRV):
     def pmf(self, x):
         x = _empirical_check_input(x, self._n, self._mean)
 
-        log_pmf = self._log_pmf_coef + (gammaln(self._alpha_0 * self._mean.val + self._n * x)
-                                        - gammaln(self._n * x + 1)).reshape(-1, self._data_size).sum(axis=-1)
+        log_pmf = self._log_pmf_coef + (
+            gammaln(self._alpha_0 * self._mean.val + self._n * x)
+            - gammaln(self._n * x + 1)
+        ).reshape(-1, self._data_size).sum(axis=-1)
         return np.exp(log_pmf)
 
     # def plot_pmf(self, ax=None):        # TODO: reused code. define simplex plot_xy outside!
@@ -595,6 +617,7 @@ class DirichletEmpiricalRV(DiscreteRV):
     #     else:
     #         raise NotImplementedError('Plot method only supported for 2- and 3-dimensional data.')
 
+
 # rng = np.random.default_rng()
 # n = 10
 # a0 = 600
@@ -610,7 +633,7 @@ class DirichletEmpiricalRV(DiscreteRV):
 # d.pmf(d.rvs(4).reshape((2, 2) + d.mean.shape))
 
 
-class EmpiricalRP(DiscreteRV):      # CONTINUOUS
+class EmpiricalRP(DiscreteRV):  # CONTINUOUS
     """
     Empirical random process, continuous support.
     """
@@ -658,9 +681,11 @@ class EmpiricalRP(DiscreteRV):      # CONTINUOUS
         # self._log_pmf_coef = gammaln(self._n + 1)
 
     def _rvs(self, size=(), random_state=None):
-        raise NotImplementedError   # FIXME
+        raise NotImplementedError  # FIXME
 
-        vals = random_state.multinomial(self._n, self._mean.val.flatten(), size).reshape(size + self._shape)
+        vals = random_state.multinomial(
+            self._n, self._mean.val.flatten(), size
+        ).reshape(size + self._shape)
         if size == ():
             return FiniteDomainFunc(self.mean.supp, vals)
         else:
@@ -672,7 +697,6 @@ class EmpiricalRP(DiscreteRV):      # CONTINUOUS
     #     log_pmf = self._log_pmf_coef + (xlogy(self._n * x.val, self._mean.val)
     #                                     - gammaln(self._n * x.val + 1)).reshape(-1, self._size).sum(axis=-1)
     #     return np.exp(log_pmf)
-
 
 
 class SampsDE(BaseRE):
@@ -709,7 +733,7 @@ class SampsDE(BaseRE):
         emp = []
         for n in range(self.n):
             p_mean = 1 / (1 + n / self.alpha_0)
-            if random_state.choice([True, False], p=[p_mean, 1-p_mean]):
+            if random_state.choice([True, False], p=[p_mean, 1 - p_mean]):
                 # Sample from mean dist
                 emp.append([self.mean.rvs(), 1])
             else:
@@ -728,7 +752,6 @@ class SampsDE(BaseRE):
 # m = FiniteRE.gen_func(s, p)
 # dd = SampsDE(10, 5, m)
 # print(dd.rvs())
-
 
 
 class BetaRV(ContinuousRV):
@@ -779,24 +802,30 @@ class BetaRV(ContinuousRV):
             if self._b > 1:
                 self._mode = 0
             elif self._a == 1 and self._b == 1:
-                self._mode = 0      # any in unit interval
+                self._mode = 0  # any in unit interval
             else:
-                self._mode = 0      # any in {0,1}
+                self._mode = 0  # any in {0,1}
 
         self._mean = self._a / (self._a + self._b)
-        self._cov = self._a * self._b / (self._a + self._b)**2 / (self._a + self._b + 1)
+        self._cov = (
+            self._a * self._b / (self._a + self._b) ** 2 / (self._a + self._b + 1)
+        )
 
     def _rvs(self, size=(), random_state=None):
         return random_state.beta(self._a, self._b, size)
 
     def _pdf(self, x):
-        log_pdf = xlog1py(self._b - 1.0, -x) + xlogy(self._a - 1.0, x) - betaln(self._a, self._b)
+        log_pdf = (
+            xlog1py(self._b - 1.0, -x)
+            + xlogy(self._a - 1.0, x)
+            - betaln(self._a, self._b)
+        )
         return np.exp(log_pdf)
 
     def plot_pdf(self, n_plt, ax=None):
         if ax is None:
             _, ax = plt.subplots()
-            ax.set(xlabel='$x$', ylabel='$P_{\mathrm{x}}(x)$')
+            ax.set(xlabel="$x$", ylabel="$P_{\mathrm{x}}(x)$")
 
         x_plt = np.linspace(0, 1, n_plt + 1, endpoint=True)
         plt_data = ax.plot(x_plt, self.pdf(x_plt))

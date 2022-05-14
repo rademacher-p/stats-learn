@@ -14,7 +14,17 @@ from stats_learn.util.base import check_data_shape
 # TODO: LOTS of D.R.Y. fixes can be performed!!
 
 
-def combined_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1, x=None, stats=None, verbose=False):
+def combined_compare(
+    predictors,
+    model,
+    params=None,
+    n_train=0,
+    n_test=0,
+    n_mc=1,
+    x=None,
+    stats=None,
+    verbose=False,
+):
     # uses Welford's online algorithm https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
 
     if params is None:
@@ -30,22 +40,22 @@ def combined_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1
         stats = set()
     else:
         stats = set(stats)
-    if 'std' in stats:
-        stats.add('cov')
-    if 'cov' in stats:
-        stats.add('mean')
+    if "std" in stats:
+        stats.add("cov")
+    if "cov" in stats:
+        stats.add("mean")
 
-    do_stats = 'mean' in stats
+    do_stats = "mean" in stats
     do_loss = n_test > 0
 
     if do_stats:
         if x is None:
             # space_x = check_spaces_x(predictors)
-            space_x = model.space['x']
+            space_x = model.space["x"]
             x = space_x.x_plt
 
         shape, size, ndim = model.shape, model.size, model.ndim
-        x, set_shape = check_data_shape(x, shape['x'])
+        x, set_shape = check_data_shape(x, shape["x"])
 
     # Initialize arrays
     loss_full = []
@@ -60,44 +70,54 @@ def combined_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1
 
     _samp, dtype = [], []
     for stat in stats:
-        if stat in {'mode', 'median', 'mean'}:
-            stat_shape = set_shape + shape['y']
-        elif stat in {'std', 'cov'}:
-            stat_shape = set_shape + 2 * shape['y']
+        if stat in {"mode", "median", "mean"}:
+            stat_shape = set_shape + shape["y"]
+        elif stat in {"std", "cov"}:
+            stat_shape = set_shape + 2 * shape["y"]
         else:
             raise ValueError
         _samp.append(np.zeros(stat_shape))
-        dtype.append((stat, np.float64, stat_shape))  # TODO: dtype float? need model dtype attribute?!
+        dtype.append(
+            (stat, np.float64, stat_shape)
+        )  # TODO: dtype float? need model dtype attribute?!
 
-    y_stats_full = [np.tile(np.array(tuple(_samp), dtype=dtype), reps=(len(n_train), *loss.shape[1:]))
-                    for loss in loss_full]
+    y_stats_full = [
+        np.tile(
+            np.array(tuple(_samp), dtype=dtype), reps=(len(n_train), *loss.shape[1:])
+        )
+        for loss in loss_full
+    ]
 
     # Generate random data and make predictions
     def _update_stats(array, y, i):
         stats_ = array.dtype.names
-        if 'mean' in stats_:
-            _mean_prev = array['mean']
-            array['mean'] += (y - _mean_prev) / (i + 1)
-            if 'cov' in stats_:
-                _temp_1 = (y - _mean_prev).reshape(math.prod(set_shape), size['y'])
-                _temp_2 = (y - array['mean']).reshape(math.prod(set_shape), size['y'])
-                _temp = np.array([np.tensordot(t1, t2, 0) for t1, t2 in zip(_temp_1, _temp_2)])
-                array['cov'] += _temp.reshape(set_shape + 2 * shape['y'])
+        if "mean" in stats_:
+            _mean_prev = array["mean"]
+            array["mean"] += (y - _mean_prev) / (i + 1)
+            if "cov" in stats_:
+                _temp_1 = (y - _mean_prev).reshape(math.prod(set_shape), size["y"])
+                _temp_2 = (y - array["mean"]).reshape(math.prod(set_shape), size["y"])
+                _temp = np.array(
+                    [np.tensordot(t1, t2, 0) for t1, t2 in zip(_temp_1, _temp_2)]
+                )
+                array["cov"] += _temp.reshape(set_shape + 2 * shape["y"])
 
     for i_mc in range(n_mc):
         if verbose:
-            print(f"Stats/loss iteration: {i_mc + 1}/{n_mc}", end='\r')
+            print(f"Stats/loss iteration: {i_mc + 1}/{n_mc}", end="\r")
 
         d = model.rvs(n_test + n_train[-1])
         d_test, d_train = d[:n_test], d[n_test:]
 
-        for predictor, params, y_stats, loss in zip(predictors, params_full, y_stats_full, loss_full):
+        for predictor, params, y_stats, loss in zip(
+            predictors, params_full, y_stats_full, loss_full
+        ):
             for i_n in range(len(n_train)):
                 if i_n == 0 or not predictor.can_warm_start:
                     slice_ = slice(0, n_train[i_n])
                     warm_start = False  # resets learner for new iteration
                 else:  # fit with incremental data partitions
-                    slice_ = slice(n_train[i_n-1], n_train[i_n])
+                    slice_ = slice(n_train[i_n - 1], n_train[i_n])
                     warm_start = True
 
                 predictor.fit(d_train[slice_], warm_start=warm_start)
@@ -122,12 +142,12 @@ def combined_compare(predictors, model, params=None, n_train=0, n_test=0, n_mc=1
                         if do_loss:
                             loss[idx] += predictor.evaluate(d_test)
 
-    if 'cov' in stats:
+    if "cov" in stats:
         for y_stats in y_stats_full:
-            y_stats['cov'] /= n_mc
-    if 'std' in stats:
+            y_stats["cov"] /= n_mc
+    if "std" in stats:
         for y_stats in y_stats_full:
-            y_stats['std'] = np.sqrt(y_stats['cov'])
+            y_stats["std"] = np.sqrt(y_stats["cov"])
 
     # loss_full = [loss.mean() for loss in loss_full]
     loss_full = [loss / n_mc for loss in loss_full]
@@ -146,9 +166,11 @@ def plot_fit_compare(predictors, d, params=None, ax=None):
         params_full = [item if item is not None else {} for item in params]
 
     if ax is None:
-        ax = predictors[0].space['x'].make_axes()  # use first predictors space by default
+        ax = (
+            predictors[0].space["x"].make_axes()
+        )  # use first predictors space by default
 
-    ax.scatter(d['x'], d['y'], c='k', marker='.', label=None)
+    ax.scatter(d["x"], d["y"], c="k", marker=".", label=None)
 
     for predictor, params in zip(predictors, params_full):
         predictor.fit(d)
@@ -156,12 +178,17 @@ def plot_fit_compare(predictors, d, params=None, ax=None):
             predictor.plot_predict(ax=ax, label=predictor.name)
         elif len(params) == 1:
             param_name, param_vals = list(params.items())[0]
-            labels = [f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals]
+            labels = [
+                f"{predictor.name}, {predictor.tex_params(param_name, val)}"
+                for val in param_vals
+            ]
             for param_val, label in zip(param_vals, labels):
                 predictor.set_params(**{param_name: param_val})
                 predictor.plot_predict(ax=ax, label=label)
         else:
-            raise NotImplementedError("Only up to one varying parameter currently supported.")
+            raise NotImplementedError(
+                "Only up to one varying parameter currently supported."
+            )
 
         # predictor.plot_predict(ax=ax, label=predictor.name)
 
@@ -171,10 +198,28 @@ def plot_fit_compare(predictors, d, params=None, ax=None):
         ax.set(title=predictors[0].name)
 
 
-def predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=None, stats=('mode',), verbose=False):
+def predict_stats_compare(
+    predictors,
+    model,
+    params=None,
+    n_train=0,
+    n_mc=1,
+    x=None,
+    stats=("mode",),
+    verbose=False,
+):
 
-    y_stats_full, __ = combined_compare(predictors, model, params, n_train, n_test=0, n_mc=n_mc, x=x, stats=stats,
-                                        verbose=verbose)
+    y_stats_full, __ = combined_compare(
+        predictors,
+        model,
+        params,
+        n_train,
+        n_test=0,
+        n_mc=n_mc,
+        x=x,
+        stats=stats,
+        verbose=verbose,
+    )
 
     return y_stats_full
 
@@ -271,7 +316,9 @@ def predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=N
     # return y_stats_full
 
 
-def _plot_stats(y_stats_full, space_x, predictors, params_full, n_train=0, x=None, ax=None):
+def _plot_stats(
+    y_stats_full, space_x, predictors, params_full, n_train=0, x=None, ax=None
+):
     if x is None:
         x = space_x.x_plt
 
@@ -282,9 +329,9 @@ def _plot_stats(y_stats_full, space_x, predictors, params_full, n_train=0, x=Non
         n_train = [n_train]
 
     names = y_stats_full[0].dtype.names
-    if 'mean' not in names:
+    if "mean" not in names:
         raise ValueError("Need mean in stats")
-    do_std = 'std' in names
+    do_std = "std" in names
 
     out = []
     if len(predictors) == 1:
@@ -307,7 +354,9 @@ def _plot_stats(y_stats_full, space_x, predictors, params_full, n_train=0, x=Non
                     title += f", {predictor.tex_params(param_name, param_vals[0])}"
                 else:
                     # labels = [f"${param_name} = {val}$" for val in param_vals]
-                    labels = [f"{predictor.tex_params(param_name, val)}" for val in param_vals]
+                    labels = [
+                        f"{predictor.tex_params(param_name, val)}" for val in param_vals
+                    ]
             elif len(param_vals) == 1:
                 y_stats = y_stats.squeeze(axis=1)
                 labels = [f"$N = {n}$" for n in n_train]
@@ -316,11 +365,13 @@ def _plot_stats(y_stats_full, space_x, predictors, params_full, n_train=0, x=Non
             else:
                 raise NotImplementedError
         else:
-            raise NotImplementedError("Only up to one varying parameter currently supported.")
+            raise NotImplementedError(
+                "Only up to one varying parameter currently supported."
+            )
 
         for y_stat, label in zip(y_stats, labels):
-            y_mean = y_stat['mean']
-            y_std = y_stat['std'] if do_std else None
+            y_mean = y_stat["mean"]
+            y_std = y_stat["std"] if do_std else None
             plt_data = space_x.plot_xy(x, y_mean, y_std, ax=ax, label=label)
             out.append(plt_data)
 
@@ -333,15 +384,20 @@ def _plot_stats(y_stats_full, space_x, predictors, params_full, n_train=0, x=Non
             # lens = [1 if len(p) == 0 else len(list(p.values())[0]) for p in params_full]
             # n_lines = sum(lens)
 
-            title = f'$N = {n_train[0]}$'
-            for predictor, params, y_stats in zip(predictors, params_full, y_stats_full):
+            title = f"$N = {n_train[0]}$"
+            for predictor, params, y_stats in zip(
+                predictors, params_full, y_stats_full
+            ):
                 if len(params) == 0:
                     labels = [predictor.name]
                 elif len(params) == 1:
                     y_stats = y_stats.squeeze(0)
                     param_name, param_vals = list(params.items())[0]
                     # labels = [f"{predictor.name}, ${param_name} = {val}$" for val in param_vals]
-                    labels = [f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals]
+                    labels = [
+                        f"{predictor.name}, {predictor.tex_params(param_name, val)}"
+                        for val in param_vals
+                    ]
                 else:
                     raise ValueError
 
@@ -356,12 +412,14 @@ def _plot_stats(y_stats_full, space_x, predictors, params_full, n_train=0, x=Non
                 #     out.append(plt_data)
 
                 for y_stat, label in zip(y_stats, labels):
-                    y_mean = y_stat['mean']
-                    y_std = y_stat['std'] if do_std else None
+                    y_mean = y_stat["mean"]
+                    y_std = y_stat["std"] if do_std else None
                     plt_data = space_x.plot_xy(x, y_mean, y_std, ax=ax, label=label)
                     out.append(plt_data)
         else:
-            raise ValueError("Plotting not supported for multiple predictors and multiple values of n_train.")
+            raise ValueError(
+                "Plotting not supported for multiple predictors and multiple values of n_train."
+            )
 
         ax.legend()
 
@@ -370,16 +428,27 @@ def _plot_stats(y_stats_full, space_x, predictors, params_full, n_train=0, x=Non
     return out
 
 
-def plot_predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1, x=None, do_std=False, verbose=False,
-                               ax=None):
+def plot_predict_stats_compare(
+    predictors,
+    model,
+    params=None,
+    n_train=0,
+    n_mc=1,
+    x=None,
+    do_std=False,
+    verbose=False,
+    ax=None,
+):
 
     # space_x = check_spaces_x(predictors)
-    space_x = model.space['x']
+    space_x = model.space["x"]
     if x is None:
         x = space_x.x_plt
 
-    stats = ('mean', 'std') if do_std else ('mean',)  # TODO: generalize for mode, etc.
-    y_stats_full = predict_stats_compare(predictors, model, params, n_train, n_mc, x, stats, verbose)
+    stats = ("mean", "std") if do_std else ("mean",)  # TODO: generalize for mode, etc.
+    y_stats_full = predict_stats_compare(
+        predictors, model, params, n_train, n_mc, x, stats, verbose
+    )
 
     # if ax is None:
     #     ax = space_x.make_axes()
@@ -479,8 +548,8 @@ def plot_predict_stats_compare(predictors, model, params=None, n_train=0, n_mc=1
 
 
 def _print_risk(predictors, params, n_train, losses, file=None):
-    title = ''
-    index_n = pd.Index(n_train, name='N')
+    title = ""
+    index_n = pd.Index(n_train, name="N")
     if len(predictors) == 1:
         predictor, param, loss = predictors[0], params[0], losses[0]
         if len(param) == 0:
@@ -494,7 +563,9 @@ def _print_risk(predictors, params, n_train, losses, file=None):
             # title = predictor.name
             df = pd.DataFrame(loss, index_n, columns=index_param)
         else:
-            raise NotImplementedError("Only up to one varying parameter currently supported.")
+            raise NotImplementedError(
+                "Only up to one varying parameter currently supported."
+            )
     else:
         data = []
         columns = []
@@ -505,9 +576,16 @@ def _print_risk(predictors, params, n_train, losses, file=None):
             elif len(param) == 1:
                 data.append(loss)
                 param_name, param_vals = list(param.items())[0]
-                columns.extend([f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals])
+                columns.extend(
+                    [
+                        f"{predictor.name}, {predictor.tex_params(param_name, val)}"
+                        for val in param_vals
+                    ]
+                )
             else:
-                raise NotImplementedError("Only up to one varying parameter currently supported.")
+                raise NotImplementedError(
+                    "Only up to one varying parameter currently supported."
+                )
 
         data = np.concatenate(data, axis=1)
         df = pd.DataFrame(data, index_n, columns)
@@ -515,11 +593,15 @@ def _print_risk(predictors, params, n_train, losses, file=None):
     df = df.transpose()
 
     print(title)
-    print(df.to_markdown(tablefmt='github', floatfmt='.3f'), file=file)
+    print(df.to_markdown(tablefmt="github", floatfmt=".3f"), file=file)
 
 
-def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False):
-    __, loss_full = combined_compare(predictors, model, params, n_train, n_test, n_mc, verbose=verbose)
+def risk_eval_sim_compare(
+    predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False
+):
+    __, loss_full = combined_compare(
+        predictors, model, params, n_train, n_test, n_mc, verbose=verbose
+    )
 
     return loss_full
 
@@ -575,7 +657,9 @@ def risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n
     # return loss_full
 
 
-def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, verbose=False):
+def risk_eval_comp_compare(
+    predictors, model, params=None, n_train=0, n_test=1, verbose=False
+):
 
     if params is None:
         params_full = [{} for _ in predictors]
@@ -599,7 +683,9 @@ def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, 
                 predictor.set_params(**dict(zip(params.keys(), param_vals)))
 
                 idx_p = np.unravel_index(i_v, loss.shape[1:])
-                idx = (np.arange(len(n_train)),) + tuple([k for _ in range(len(n_train))] for k in idx_p)
+                idx = (np.arange(len(n_train)),) + tuple(
+                    [k for _ in range(len(n_train))] for k in idx_p
+                )
                 loss[idx] = predictor.evaluate_comp(model, n_train, n_test)
                 # loss[:, np.unravel_index(i_v, loss.shape[2:])] = predictor.evaluate_comp(model, n_train)
 
@@ -612,7 +698,9 @@ def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, 
     return loss_full
 
 
-def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0, ax=None):
+def _plot_risk_eval_compare(
+    losses, do_bayes, predictors, params=None, n_train=0, ax=None
+):
     if params is None:
         params_full = [{} for _ in predictors]
     else:
@@ -624,9 +712,9 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
     if ax is None:
         _, ax = plt.subplots()
         if do_bayes:
-            ylabel = r'$\Rcal(f)$'
+            ylabel = r"$\Rcal(f)$"
         else:
-            ylabel = r'$\Rcal_{\Theta}(f;\theta)$'
+            ylabel = r"$\Rcal_{\Theta}(f;\theta)$"
         ax.set(ylabel=ylabel)
 
     out = []
@@ -636,7 +724,7 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
 
         if len(params) == 0:
             loss = loss[np.newaxis]
-            xlabel, x_plt = '$N$', n_train
+            xlabel, x_plt = "$N$", n_train
             labels = [None]
         elif len(params) == 1:
             param_name, param_vals = list(params.items())[0]
@@ -649,16 +737,20 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
                     labels = [f"$N = {n}$" for n in n_train]
             else:
                 loss = np.transpose(loss)
-                xlabel, x_plt = '$N$', n_train
+                xlabel, x_plt = "$N$", n_train
                 if len(param_vals) == 1:
                     # title += f", {param_name} = {param_vals[0]}"
                     title += f", {predictor.tex_params(param_name, param_vals[0])}"
                     labels = [None]
                 else:
                     # labels = [f"{param_name} = {val}" for val in param_vals]
-                    labels = [f"{predictor.tex_params(param_name, val)}" for val in param_vals]
+                    labels = [
+                        f"{predictor.tex_params(param_name, val)}" for val in param_vals
+                    ]
         else:
-            raise NotImplementedError("Only up to one varying parameter currently supported.")
+            raise NotImplementedError(
+                "Only up to one varying parameter currently supported."
+            )
 
         for loss_plt, label in zip(loss, labels):
             plt_data = ax.plot(x_plt, loss_plt, label=label)
@@ -667,7 +759,11 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
         if labels != [None]:
             ax.legend()
     else:
-        if all_equal(params.keys() for params in params_full) and len(n_train) == 1 and len(params_full[0]) == 1:
+        if (
+            all_equal(params.keys() for params in params_full)
+            and len(n_train) == 1
+            and len(params_full[0]) == 1
+        ):
             # Plot versus parameter for multiple predictors of same type
 
             title = f"$N = {n_train[0]}$"
@@ -686,8 +782,8 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
                 ax.legend()
 
         else:
-            title = ''
-            xlabel, x_plt = '$N$', n_train
+            title = ""
+            xlabel, x_plt = "$N$", n_train
             for predictor, params, loss in zip(predictors, params_full, losses):
                 if len(params) == 0:
                     loss = loss[np.newaxis]
@@ -696,9 +792,14 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
                     loss = np.transpose(loss)
                     param_name, param_vals = list(params.items())[0]
                     # labels = [f"{predictor.name}, {param_name} = {val}" for val in param_vals]
-                    labels = [f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals]
+                    labels = [
+                        f"{predictor.name}, {predictor.tex_params(param_name, val)}"
+                        for val in param_vals
+                    ]
                 else:
-                    raise NotImplementedError("Only up to one varying parameter currently supported.")
+                    raise NotImplementedError(
+                        "Only up to one varying parameter currently supported."
+                    )
 
                 for loss_plt, label in zip(loss, labels):
                     plt_data = ax.plot(x_plt, loss_plt, label=label)
@@ -712,19 +813,27 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
     return out
 
 
-def plot_risk_eval_sim_compare(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None):
-    losses = risk_eval_sim_compare(predictors, model, params, n_train, n_test, n_mc, verbose)
+def plot_risk_eval_sim_compare(
+    predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None
+):
+    losses = risk_eval_sim_compare(
+        predictors, model, params, n_train, n_test, n_mc, verbose
+    )
     do_bayes = isinstance(model, bayes_models.Base)
     return _plot_risk_eval_compare(losses, do_bayes, predictors, params, n_train, ax)
 
 
-def plot_risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, verbose=False, ax=None):
+def plot_risk_eval_comp_compare(
+    predictors, model, params=None, n_train=0, n_test=1, verbose=False, ax=None
+):
     losses = risk_eval_comp_compare(predictors, model, params, n_train, n_test, verbose)
     do_bayes = isinstance(model, bayes_models.Base)
     return _plot_risk_eval_compare(losses, do_bayes, predictors, params, n_train, ax)
 
 
-def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500, verbose=True, ax=None):
+def plot_risk_disc(
+    predictors, model, params=None, n_train=0, n_test=1, n_mc=500, verbose=True, ax=None
+):
     if params is None:
         params_full = [{} for _ in predictors]
     else:
@@ -734,7 +843,9 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
         raise ValueError
     # TODO: check models for equality
 
-    losses = risk_eval_sim_compare(predictors, model, params, n_train, n_test, n_mc, verbose)
+    losses = risk_eval_sim_compare(
+        predictors, model, params, n_train, n_test, n_mc, verbose
+    )
 
     if isinstance(n_train, (Integral, np.integer)):
         n_train = [n_train]
@@ -742,17 +853,19 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
     if ax is None:
         _, ax = plt.subplots()
         if isinstance(model, bayes_models.Base):
-            ylabel = r'$\Rcal(f)$'
+            ylabel = r"$\Rcal(f)$"
         else:
-            ylabel = r'$\Rcal_{\Theta}(f;\theta)$'
+            ylabel = r"$\Rcal_{\Theta}(f;\theta)$"
         ax.set(ylabel=ylabel)
 
     loss = np.stack(losses, axis=-1)
     params = params_full[0]
 
-    x_plt = np.array([len(pr.model.space['x'].values) for pr in predictors])  # discretization set size
+    x_plt = np.array(
+        [len(pr.model.space["x"].values) for pr in predictors]
+    )  # discretization set size
     # title = str(predictors[0].name)
-    title = r'$\Dir$'
+    title = r"$\Dir$"
 
     out = []
     if len(params) == 0:
@@ -772,7 +885,9 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
         elif len(n_train) == 1 and len(param_vals) > 1:
             loss = loss.squeeze(axis=0)
             title += f", $N = {n_train[0]}$"
-            labels = [f"{predictors[0].tex_params(param_name, val)}" for val in param_vals]
+            labels = [
+                f"{predictors[0].tex_params(param_name, val)}" for val in param_vals
+            ]
         else:
             raise ValueError
 
@@ -780,13 +895,13 @@ def plot_risk_disc(predictors, model, params=None, n_train=0, n_test=1, n_mc=500
         raise ValueError
 
     for loss_plt, label in zip(loss, labels):
-        plt_data = ax.plot(x_plt, loss_plt, label=label, marker='.')
+        plt_data = ax.plot(x_plt, loss_plt, label=label, marker=".")
         out.append(plt_data)
 
     if labels != [None]:
         ax.legend()
 
-    ax.set(xlabel=r'$|\Tcal|$')
+    ax.set(xlabel=r"$|\Tcal|$")
     ax.set_title(title)
 
     return out

@@ -3,7 +3,7 @@ from pathlib import Path
 
 from matplotlib import pyplot as plt
 
-plt.style.use(['images/style.mplstyle'])
+plt.style.use(["images/style.mplstyle"])
 # plt.style.use(['images/style.mplstyle', 'images/double.mplstyle'])
 plt.matplotlib.interactive(False)
 
@@ -11,10 +11,10 @@ plt.matplotlib.interactive(False)
 def main(dirs):
     for dir_ in dirs:
         dir_ = Path(dir_)
-        subdir = dir_ / 'temp_dicts'
+        subdir = dir_ / "temp_dicts"
         subdir.mkdir()
-        for filepath in dir_.glob('*.mpl'):
-            with filepath.open('rb') as f:
+        for filepath in dir_.glob("*.mpl"):
+            with filepath.open("rb") as f:
                 fig = pickle.load(f)
 
             # Modifications
@@ -40,23 +40,23 @@ def main(dirs):
                 # yminorticklabels=ax.get_yminorticklabels(),
             )
 
-            for line in a['lines']:
+            for line in a["lines"]:
                 line.remove()
             # a['legend'].remove()
-            for c in a['collections']:
+            for c in a["collections"]:
                 # c.remove()
                 c.axes = None
 
             mpl_file = subdir / filepath.name
-            with open(mpl_file, 'wb') as f:
+            with open(mpl_file, "wb") as f:
                 pickle.dump(a, f)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     dirs_ = [
         # '../docs/Figures/Continuous/SE',
         # '../docs/Figures/Discrete/model_est',
-        '../docs/Figures/Discrete/SE/consistency',
+        "../docs/Figures/Discrete/SE/consistency",
         # '../docs/Figures/Discrete/SE/reg_func',
         # '../docs/Figures/Discrete/SE/reg_var',
         # '../docs/Figures/Discretization/SE/consistency',

@@ -28,7 +28,9 @@ def make_discretizer(vals):  # TODO: use sklearn.preprocessing.KBinsDiscretizer?
     size = math.prod(shape)
 
     if shape == ():
-        vals = np.sort(vals)[::-1]  # trick to break ties towards higher values, for subsets closed on the lower end
+        vals = np.sort(vals)[
+            ::-1
+        ]  # trick to break ties towards higher values, for subsets closed on the lower end
     vals_flat = vals.reshape(-1, size)
 
     def discretizer(x):
@@ -51,7 +53,7 @@ def prob_disc(shape):
     n = np.zeros(p.size)
     for i, size in zip(idx, shape):
         n += np.all([i > 0, i < size - 1], axis=0)
-    p[idx] = 2 ** n
+    p[idx] = 2**n
     return p
 
 

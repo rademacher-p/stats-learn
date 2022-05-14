@@ -7,9 +7,21 @@ from stats_learn.bayes.elements import NormalLinear, Dirichlet
 plt.matplotlib.interactive(False)
 
 RE_set = [
-    (NormalLinear, dict(prior_mean=np.ones(2), prior_cov=10 * np.eye(2), basis=[[1, 0], [0, 1], [1, 1]],
-                        cov=np.eye(3))),
-    (Dirichlet, dict(prior_mean=random.elements.FiniteGeneric(['a', 'b'], [.2, .8]), alpha_0=10)),
+    (
+        NormalLinear,
+        dict(
+            prior_mean=np.ones(2),
+            prior_cov=10 * np.eye(2),
+            basis=[[1, 0], [0, 1], [1, 1]],
+            cov=np.eye(3),
+        ),
+    ),
+    (
+        Dirichlet,
+        dict(
+            prior_mean=random.elements.FiniteGeneric(["a", "b"], [0.2, 0.8]), alpha_0=10
+        ),
+    ),
 ]
 
 
@@ -28,5 +40,5 @@ def test():
         b.posterior_model
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test()

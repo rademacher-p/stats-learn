@@ -36,5 +36,5 @@ def test_main():  # TODO: test with assertions
     print(x_c)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_main()

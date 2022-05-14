@@ -1,10 +1,13 @@
-
 class DirichletFiniteYcXModelBayesNew(Base):
     def __init__(self, alpha_0, mean_x, mean_y_x, rng_model=None, rng_prior=None):
         model_gen = rand_models.DataConditional.finite_model
-        model_kwargs = {'rng': rng_model}
-        prior = {'p_x': RE_obj_callable.DirichletRV(alpha_0, mean_x, rng_prior),
-                 'p_y_x': lambda x: RE_obj_callable.DirichletRV(alpha_0 * mean_x(x), mean_y_x(x), rng_prior)}
+        model_kwargs = {"rng": rng_model}
+        prior = {
+            "p_x": RE_obj_callable.DirichletRV(alpha_0, mean_x, rng_prior),
+            "p_y_x": lambda x: RE_obj_callable.DirichletRV(
+                alpha_0 * mean_x(x), mean_y_x(x), rng_prior
+            ),
+        }
         super().__init__(model_gen, model_kwargs, prior)
 
         self.alpha_0 = alpha_0
@@ -17,12 +20,12 @@ class DirichletFiniteYcXModelBayesNew(Base):
         self._data_shape_y = mean_y_x.val.flatten()[0].data_shape_x
 
     def random_model(self, rng=None):
-        p_x = self.prior['p_x'].rvs(rng=rng)
+        p_x = self.prior["p_x"].rvs(rng=rng)
 
-        val = []        # FIXME: better way?
+        val = []  # FIXME: better way?
         for x_flat in self._mean_x._supp_flat:
             x = x_flat.reshape(self._data_shape_x)
-            val.append(self.prior['p_y_x'](x).rvs(rng=rng))
+            val.append(self.prior["p_y_x"](x).rvs(rng=rng))
         val = np.array(val).reshape(self._mean_x.set_shape)
         p_y_x = FiniteDomainFunc(self._supp_x, val)
 
@@ -33,23 +36,26 @@ class DirichletFiniteYcXModelBayesNew(Base):
         if n == 0:
             return self.model_gen(p_x=self._mean_x, p_y_x=self._mean_y_x)
 
-        emp_dist_x = FiniteDomainFunc(self._supp_x,
-                                      empirical_pmf(d['x'], self._supp_x, self._data_shape_x))
+        emp_dist_x = FiniteDomainFunc(
+            self._supp_x, empirical_pmf(d["x"], self._supp_x, self._data_shape_x)
+        )
 
         c_prior_x = 1 / (1 + n / self.alpha_0)
         p_x = c_prior_x * self._mean_x + (1 - c_prior_x) * emp_dist_x
 
         def emp_dist_y_x(x):
             x = np.asarray(x)
-            d_match = d[np.all(x.flatten() == d['x'].reshape(n, -1), axis=-1)].squeeze()
-            return FiniteDomainFunc(self._supp_y,
-                                    empirical_pmf(d_match['y'], self._supp_y, self._data_shape_y))
+            d_match = d[np.all(x.flatten() == d["x"].reshape(n, -1), axis=-1)].squeeze()
+            return FiniteDomainFunc(
+                self._supp_y,
+                empirical_pmf(d_match["y"], self._supp_y, self._data_shape_y),
+            )
 
-        def p_y_x(x):   # TODO: arithmetic of functionals?!?
+        def p_y_x(x):  # TODO: arithmetic of functionals?!?
             c_prior_y = 1 / (1 + (n * emp_dist_x(x)) / (self.alpha_0 * self._mean_x(x)))
             return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist_y_x(x)
 
-        return self.model_gen(p_x=p_x, p_y_x=p_y_x)     # TODO: RE obj or just func obj?
+        return self.model_gen(p_x=p_x, p_y_x=p_y_x)  # TODO: RE obj or just func obj?
 
     def predictive_dist(self, d):
         n = d.size
@@ -58,21 +64,24 @@ class DirichletFiniteYcXModelBayesNew(Base):
 
         def p_y_x(x):
             x = np.asarray(x)
-            d_match = d[np.all(x.flatten() == d['x'].reshape(n, -1), axis=-1)].squeeze()
+            d_match = d[np.all(x.flatten() == d["x"].reshape(n, -1), axis=-1)].squeeze()
             n_match = d_match.size
             if n_match == 0:
                 return self._mean_y_x(x)
 
             c_prior_y = 1 / (1 + n_match / (self.alpha_0 * self._mean_x(x)))
-            emp_dist = FiniteDomainFunc(self._supp_y, empirical_pmf(d_match['y'], self._supp_y, self._data_shape_y))
+            emp_dist = FiniteDomainFunc(
+                self._supp_y,
+                empirical_pmf(d_match["y"], self._supp_y, self._data_shape_y),
+            )
             return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist
 
         # return p_y_x
 
         def model_y_x(x):
             return RE_obj_callable.FiniteRE(p_y_x(x))
-        return model_y_x
 
+        return model_y_x
 
 
 #%% Without func objects
@@ -80,16 +89,16 @@ class FiniteYcXModelBayes(Base):
     def __init__(self, supp_x, supp_y, prior, rng_model=None):
         model_gen = rand_models.DataConditional.finite_model_orig
         # model_kwargs = {'rng': rng_model}
-        model_kwargs = {'supp_x': supp_x['x'], 'supp_y': supp_y['y'], 'rng': rng_model}
+        model_kwargs = {"supp_x": supp_x["x"], "supp_y": supp_y["y"], "rng": rng_model}
         super().__init__(model_gen, model_kwargs, prior)
 
         self.supp_x = supp_x
-        self.supp_y = supp_y        # TODO: Assumed to be my SL structured array!
+        self.supp_y = supp_y  # TODO: Assumed to be my SL structured array!
 
         self._supp_shape_x = supp_x.shape
         self._supp_shape_y = supp_y.shape
-        self._data_shape_x = supp_x.dtype['x'].shape
-        self._data_shape_y = supp_y.dtype['y'].shape
+        self._data_shape_x = supp_x.dtype["x"].shape
+        self._data_shape_y = supp_y.dtype["y"].shape
 
     def random_model(self):
         raise NotImplementedError("Method must be overwritten.")
@@ -111,8 +120,12 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
         def _mean_y_x(x):
             x = np.asarray(x)
             _mean_flat = self.mean.reshape((-1,) + self._supp_shape_y)
-            _mean_slice = _mean_flat[np.all(x.flatten()
-                                            == self.supp_x['x'].reshape(self.supp_x.size, -1), axis=-1)].squeeze(axis=0)
+            _mean_slice = _mean_flat[
+                np.all(
+                    x.flatten() == self.supp_x["x"].reshape(self.supp_x.size, -1),
+                    axis=-1,
+                )
+            ].squeeze(axis=0)
             mean_y = _mean_slice / _mean_slice.sum()
             return mean_y
 
@@ -128,8 +141,12 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
         def p_y_x(x):
             x = np.asarray(x)
             _p_flat = p.reshape((-1,) + self._supp_shape_y)
-            _p_slice = _p_flat[np.all(x.flatten()
-                                      == self.supp_x['x'].reshape(self.supp_x.size, -1), axis=-1)].squeeze(axis=0)
+            _p_slice = _p_flat[
+                np.all(
+                    x.flatten() == self.supp_x["x"].reshape(self.supp_x.size, -1),
+                    axis=-1,
+                )
+            ].squeeze(axis=0)
             p_y = _p_slice / _p_slice.sum()
             return p_y
 
@@ -141,26 +158,29 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
         if n == 0:
             p_x, p_y_x = self._mean_x, self._mean_y_x
         else:
-            emp_dist_x = empirical_pmf(d['x'], self.supp_x['x'], self._data_shape_x)
+            emp_dist_x = empirical_pmf(d["x"], self.supp_x["x"], self._data_shape_x)
 
             def emp_dist_y_x(x):
                 x = np.asarray(x)
-                d_match = d[np.all(x.flatten() == d['x'].reshape(n, -1), axis=-1)].squeeze()
-                return empirical_pmf(d_match['y'], self.supp_y['y'], self._data_shape_y)
+                d_match = d[
+                    np.all(x.flatten() == d["x"].reshape(n, -1), axis=-1)
+                ].squeeze()
+                return empirical_pmf(d_match["y"], self.supp_y["y"], self._data_shape_y)
 
             c_prior_x = 1 / (1 + n / self.alpha_0)
             p_x = c_prior_x * self._mean_x + (1 - c_prior_x) * emp_dist_x
 
             def p_y_x(x):
                 x = np.asarray(x)
-                i = (self.supp_x['x'].reshape(self._supp_shape_x + (-1,)) == x.flatten()).all(-1)
-                c_prior_y = 1 / (1 + (n * emp_dist_x[i]) / (self.alpha_0 * self._mean_x[i]))
+                i = (
+                    self.supp_x["x"].reshape(self._supp_shape_x + (-1,)) == x.flatten()
+                ).all(-1)
+                c_prior_y = 1 / (
+                    1 + (n * emp_dist_x[i]) / (self.alpha_0 * self._mean_x[i])
+                )
                 return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist_y_x(x)
 
         return self.model_gen(p_x=p_x, p_y_x=p_y_x)
-
-
-
 
 
 # #%%
@@ -250,8 +270,6 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #         return self._model_gen(p_x=p_x, p_y_x=p_y_x)
 
 
-
-
 # ###
 # class BayesRE:
 #     def __init__(self, bayes_model, rand_kwargs, model_gen, model_kwargs=None):
@@ -289,14 +307,6 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #         model_kwargs = {'supp': supp['x'], 'supp_y': supp_y['y'], 'rng': rng}
 #
 #         return cls(bayes_model, rand_kwargs, model_gen, model_kwargs)
-
-
-
-
-
-
-
-
 
 
 # def bayes_re(model_gen, bayes_model, rand_kwargs, model_kwargs=None):
@@ -381,12 +391,6 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #     return bayes_re2(model_gen, bayes_model)
 
 
-
-
-
-
-
-
 #%% Boneyard
 
 # class BayesRE:
@@ -422,7 +426,6 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #         self.p = self.rng_prior()
 #
 # f = FiniteREPrior(['a','b'])
-
 
 
 # class Prior:
@@ -486,11 +489,6 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 #     def random_model(self):
 #         self.bayes_model.rvs()
 #         return None
-
-
-
-
-
 
 
 # class FiniteREPrior(Prior):

@@ -10,7 +10,12 @@ from scipy.special import gammaln, xlogy, xlog1py, betaln
 from scipy.stats._multivariate import _PSD
 
 from stats_learn import spaces
-from stats_learn.util import RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func
+from stats_learn.util import (
+    RandomGeneratorMixin,
+    check_data_shape,
+    check_valid_pmf,
+    vectorize_func,
+)
 
 
 class Base(RandomGeneratorMixin, ABC):
@@ -23,6 +28,7 @@ class Base(RandomGeneratorMixin, ABC):
         Random number generator seed or object.
 
     """
+
     def __init__(self, rng=None):
         super().__init__(rng)
 
@@ -116,7 +122,9 @@ class Base(RandomGeneratorMixin, ABC):
         # if x is None:
         #     x = self.space.x_plt  # TODO: add default x_plt
 
-        return vectorize_func(self._prob_single, self.shape)(x)  # TODO: decorator? better way?
+        return vectorize_func(self._prob_single, self.shape)(
+            x
+        )  # TODO: decorator? better way?
 
     def _prob_single(self, x):
         pass
@@ -168,7 +176,9 @@ class Base(RandomGeneratorMixin, ABC):
 
         rng = self._get_rng(rng)
         samples = self._sample(math.prod(shape), rng)
-        return samples.reshape(shape + samples.shape[1:])  # TODO: use np.asscalar if possible?
+        return samples.reshape(
+            shape + samples.shape[1:]
+        )  # TODO: use np.asscalar if possible?
 
     @abstractmethod
     def _sample(self, n, rng):
@@ -221,6 +231,7 @@ class BaseRV(MixinRV, Base, ABC):
         Random number generator seed or object.
 
     """
+
     def __init__(self, rng=None):
         super().__init__(rng)
 
@@ -240,6 +251,7 @@ class Deterministic(Base):
         Random number generator seed or object.
 
     """
+
     # TODO: redundant, just use FiniteGeneric? or change to ContinuousRV for integration? General dirac mix?
 
     def __new__(cls, value, rng=None):
@@ -269,7 +281,9 @@ class Deterministic(Base):
         return np.broadcast_to(self._value, (n, *self.shape))
 
     def prob(self, x):
-        return np.where(np.all(x.reshape(-1, self.size) == self._value.flatten(), axis=-1), 1., 0.)
+        return np.where(
+            np.all(x.reshape(-1, self.size) == self._value.flatten(), axis=-1), 1.0, 0.0
+        )
 
 
 class DeterministicRV(MixinRV, Deterministic):
@@ -303,6 +317,7 @@ class FiniteGeneric(Base):
         Random number generator seed or object.
 
     """
+
     space: spaces.FiniteGeneric
 
     # TODO: DRY - use stat approx from the FiniteGeneric space's methods?
@@ -324,7 +339,7 @@ class FiniteGeneric(Base):
         else:
             p = np.array(p)
 
-        self._space = spaces.FiniteGeneric(values, shape=values.shape[p.ndim:])
+        self._space = spaces.FiniteGeneric(values, shape=values.shape[p.ndim :])
         self.p = p
 
     def __eq__(self, other):
@@ -439,7 +454,10 @@ class FiniteGenericRV(MixinRV, FiniteGeneric):
     def cov(self):
         if self._cov is None:
             ctr = self._values_flat - self.mean
-            self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p_flat, ctr))
+            self._cov = sum(
+                p_i * np.tensordot(ctr_i, ctr_i, 0)
+                for p_i, ctr_i in zip(self._p_flat, ctr)
+            )
 
         return self._cov
 
@@ -457,6 +475,7 @@ class Dirichlet(BaseRV):
         Random number generator seed or object.
 
     """
+
     space: spaces.Simplex
 
     def __init__(self, mean, alpha_0, rng=None):
@@ -493,35 +512,48 @@ class Dirichlet(BaseRV):
     # Attribute Updates
     def _update_attr(self):
         if np.min(self._mean) > 1 / self._alpha_0:
-            self._mode = (self._mean - 1 / self._alpha_0) / (1 - self.size / self._alpha_0)
+            self._mode = (self._mean - 1 / self._alpha_0) / (
+                1 - self.size / self._alpha_0
+            )
         else:
             # warnings.warn("Mode method currently supported for mean > 1/alpha_0 only")
             self._mode = None  # TODO: complete with general formula
 
-        self._cov = (np.diagflat(self._mean).reshape(2 * self.shape)
-                     - np.tensordot(self._mean, self._mean, 0)) / (self._alpha_0 + 1)
+        self._cov = (
+            np.diagflat(self._mean).reshape(2 * self.shape)
+            - np.tensordot(self._mean, self._mean, 0)
+        ) / (self._alpha_0 + 1)
 
-        self._log_prob_coef = gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
+        self._log_prob_coef = gammaln(self._alpha_0) - np.sum(
+            gammaln(self._alpha_0 * self._mean)
+        )
 
         self.space.x_plt = None
 
     def _sample(self, n, rng):
-        return rng.dirichlet(self._alpha_0 * self._mean.flatten(), size=n).reshape(n, *self.shape)
+        return rng.dirichlet(self._alpha_0 * self._mean.flatten(), size=n).reshape(
+            n, *self.shape
+        )
 
     def prob(self, x):
         x, set_shape = check_valid_pmf(x, shape=self.shape)
 
         if np.logical_and(x == 0, self.mean < 1 / self.alpha_0).any():
-            raise ValueError("Each element in 'x' must be greater than "
-                             "zero if the corresponding mean element is less than 1 / alpha_0.")
+            raise ValueError(
+                "Each element in 'x' must be greater than "
+                "zero if the corresponding mean element is less than 1 / alpha_0."
+            )
 
-        log_prob = self._log_prob_coef + np.sum(xlogy(self._alpha_0 * self._mean - 1, x).reshape(-1, self.size), -1)
+        log_prob = self._log_prob_coef + np.sum(
+            xlogy(self._alpha_0 * self._mean - 1, x).reshape(-1, self.size), -1
+        )
         return np.exp(log_prob).reshape(set_shape)
 
     def plot_prob(self, x=None, ax=None, **kwargs):
         if x is None and self.space._x_plt is None:
-            self.space.x_plt = self.space.make_grid(self.space.n_plot, self.shape,
-                                                    hull_mask=(self.mean < 1 / self.alpha_0))
+            self.space.x_plt = self.space.make_grid(
+                self.space.n_plot, self.shape, hull_mask=(self.mean < 1 / self.alpha_0)
+            )
         return self.space.plot(self.prob, x, ax)
 
 
@@ -538,6 +570,7 @@ class Empirical(BaseRV):
         Random number generator seed or object.
 
     """
+
     def __init__(self, mean, n, rng=None):
         super().__init__(rng)
 
@@ -578,8 +611,10 @@ class Empirical(BaseRV):
         # self._mode = ((self._n * self._mean) // 1) + simplex_round((self._n * self._mean) % 1)  # FIXME: broken
         self._mode = None
 
-        self._cov = (np.diagflat(self._mean).reshape(2 * self.shape)
-                     - np.tensordot(self._mean, self._mean, 0)) / self._n
+        self._cov = (
+            np.diagflat(self._mean).reshape(2 * self.shape)
+            - np.tensordot(self._mean, self._mean, 0)
+        ) / self._n
 
     @staticmethod
     def simplex_round(x):  # TODO: delete?
@@ -601,15 +636,21 @@ class Empirical(BaseRV):
         return out.reshape(x.shape)
 
     def _sample(self, n, rng):
-        return rng.multinomial(self._n, self._mean.flatten(), size=n).reshape(n, *self.shape) / self._n
+        return (
+            rng.multinomial(self._n, self._mean.flatten(), size=n).reshape(
+                n, *self.shape
+            )
+            / self._n
+        )
 
     def prob(self, x):
         x, set_shape = check_valid_pmf(x, shape=self.shape)
         if (np.minimum((self._n * x) % 1, (-self._n * x) % 1) > 1e-9).any():
             raise ValueError("Each entry in 'x' must be a multiple of 1/n.")
 
-        log_prob = self._log_prob_coef + (xlogy(self._n * x, self._mean)
-                                          - gammaln(self._n * x + 1)).reshape(-1, self.size).sum(axis=-1)
+        log_prob = self._log_prob_coef + (
+            xlogy(self._n * x, self._mean) - gammaln(self._n * x + 1)
+        ).reshape(-1, self.size).sum(axis=-1)
         return np.exp(log_prob).reshape(set_shape)
 
 
@@ -628,6 +669,7 @@ class DirichletEmpirical(BaseRV):
         Random number generator seed or object.
 
     """
+
     def __init__(self, mean, alpha_0, n, rng=None):
         super().__init__(rng)
         self._space = spaces.SimplexDiscrete(n, np.array(mean).shape)
@@ -638,7 +680,9 @@ class DirichletEmpirical(BaseRV):
         self._update_attr()
 
     def __repr__(self):
-        return f"DirichletEmpirical(mean={self.mean}, alpha_0={self.alpha_0}, n={self.n})"
+        return (
+            f"DirichletEmpirical(mean={self.mean}, alpha_0={self.alpha_0}, n={self.n})"
+        )
 
     # Input properties
     @property
@@ -676,23 +720,38 @@ class DirichletEmpirical(BaseRV):
     def _update_attr(self):
         # TODO: mode?
 
-        self._cov = ((self._n + self._alpha_0) / self._n / (1 + self._alpha_0)
-                     * (np.diagflat(self._mean).reshape(2 * self.shape) - np.tensordot(self._mean, self._mean, 0)))
+        self._cov = (
+            (self._n + self._alpha_0)
+            / self._n
+            / (1 + self._alpha_0)
+            * (
+                np.diagflat(self._mean).reshape(2 * self.shape)
+                - np.tensordot(self._mean, self._mean, 0)
+            )
+        )
 
-        self._log_prob_coef = (gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
-                               + gammaln(self._n + 1) - gammaln(self._alpha_0 + self._n))
+        self._log_prob_coef = (
+            gammaln(self._alpha_0)
+            - np.sum(gammaln(self._alpha_0 * self._mean))
+            + gammaln(self._n + 1)
+            - gammaln(self._alpha_0 + self._n)
+        )
 
     def _sample(self, n, rng):
         theta_flat = rng.dirichlet(self._alpha_0 * self._mean.flatten())
-        return rng.multinomial(self._n, theta_flat, size=n).reshape(n, *self.shape) / self._n
+        return (
+            rng.multinomial(self._n, theta_flat, size=n).reshape(n, *self.shape)
+            / self._n
+        )
 
     def prob(self, x):
         x, set_shape = check_valid_pmf(x, shape=self.shape)
         if (np.minimum((self._n * x) % 1, (-self._n * x) % 1) > 1e-9).any():
             raise ValueError("Each entry in 'x' must be a multiple of 1/n.")
 
-        log_prob = self._log_prob_coef + (gammaln(self._alpha_0 * self._mean + self._n * x)
-                                          - gammaln(self._n * x + 1)).reshape(-1, self.size).sum(axis=-1)
+        log_prob = self._log_prob_coef + (
+            gammaln(self._alpha_0 * self._mean + self._n * x) - gammaln(self._n * x + 1)
+        ).reshape(-1, self.size).sum(axis=-1)
         return np.exp(log_prob).reshape(set_shape)
 
 
@@ -715,6 +774,7 @@ class DirichletEmpiricalScalar(BaseRV):
     Equivalent to the first element of a 2-dimensional `DirichletEmpirical` random variable.
 
     """
+
     def __init__(self, mean, alpha_0, n, rng=None):
         super().__init__(rng)
 
@@ -784,7 +844,8 @@ class Beta(BaseRV):
     Defaults to uniform.
 
     """
-    def __init__(self, a=1., b=1., rng=None):
+
+    def __init__(self, a=1.0, b=1.0, rng=None):
         super().__init__(rng)
         self._space = spaces.Box((0, 1))
 
@@ -799,7 +860,7 @@ class Beta(BaseRV):
         return f"Beta({self.a}, {self.b})"
 
     @classmethod
-    def from_mean(cls, mean=.5, alpha_0=2, rng=None):
+    def from_mean(cls, mean=0.5, alpha_0=2, rng=None):
         """
         Create Beta RV using mean and total concentration.
 
@@ -865,14 +926,18 @@ class Beta(BaseRV):
                 self._mode = 0  # any in {0,1}
 
         self._mean = self._a / a0
-        self._cov = self._a * self._b / a0 ** 2 / (a0 + 1)
+        self._cov = self._a * self._b / a0**2 / (a0 + 1)
 
     def _sample(self, n, rng):
         return rng.beta(self._a, self._b, size=n)
 
     def prob(self, x):
         x = np.array(x)
-        log_prob = xlog1py(self._b - 1.0, -x) + xlogy(self._a - 1.0, x) - betaln(self._a, self._b)
+        log_prob = (
+            xlog1py(self._b - 1.0, -x)
+            + xlogy(self._a - 1.0, x)
+            - betaln(self._a, self._b)
+        )
         return np.exp(log_prob)
 
 
@@ -890,6 +955,7 @@ class Binomial(BaseRV):
         Random number generator seed or object.
 
     """
+
     def __init__(self, p, n, rng=None):
         super().__init__(rng)
         self._space = spaces.FiniteGeneric(np.arange(n + 1))
@@ -949,7 +1015,7 @@ class Binomial(BaseRV):
 
     def prob(self, x):
         x = np.floor(x)
-        combiln = (gammaln(self._n + 1) - (gammaln(x + 1) + gammaln(self._n - x + 1)))
+        combiln = gammaln(self._n + 1) - (gammaln(x + 1) + gammaln(self._n - x + 1))
         log_prob = combiln + xlogy(x, self._p) + xlog1py(self._n - x, -self._p)
         return np.exp(log_prob)
 
@@ -971,6 +1037,7 @@ class EmpiricalScalar(Binomial):
     Equivalent to the first element of a 2-dimensional `Empirical` random variable.
 
     """
+
     def __init__(self, mean, n, rng=None):
         super().__init__(mean, n, rng)
         if self.n == 0:
@@ -989,7 +1056,7 @@ class EmpiricalScalar(Binomial):
         super()._update_attr()
         self._mode /= self._n
         self._mean /= self._n
-        self._cov /= (self._n ** 2)
+        self._cov /= self._n**2
 
     def _sample(self, n, rng):
         return super()._sample(n, rng) / self._n
@@ -1011,6 +1078,7 @@ class Uniform(BaseRV):
         Random number generator seed or object.
 
     """
+
     space: spaces.Box
 
     def __init__(self, lims, rng=None):
@@ -1042,7 +1110,9 @@ class Uniform(BaseRV):
     def _sample(self, n, rng):
         a_flat = self.lims[..., 0].flatten()
         b_flat = self.lims[..., 1].flatten()
-        _temp = np.stack(tuple(rng.uniform(a, b, size=n) for a, b in zip(a_flat, b_flat)), axis=-1)
+        _temp = np.stack(
+            tuple(rng.uniform(a, b, size=n) for a, b in zip(a_flat, b_flat)), axis=-1
+        )
         return _temp.reshape((n, *self.shape))
 
     def prob(self, x):
@@ -1069,7 +1139,8 @@ class Normal(BaseRV):
         Random number generator seed or object.
 
     """
-    def __init__(self, mean=0., cov=1., *, allow_singular=True, rng=None):
+
+    def __init__(self, mean=0.0, cov=1.0, *, allow_singular=True, rng=None):
         super().__init__(rng)
         self.allow_singular = allow_singular
 
@@ -1095,7 +1166,7 @@ class Normal(BaseRV):
 
         self._mode = self._mean
 
-        if hasattr(self, '_cov'):
+        if hasattr(self, "_cov"):
             self._set_lims_plot()  # avoids call before cov is set
 
     @property
@@ -1122,7 +1193,9 @@ class Normal(BaseRV):
         self._set_lims_plot()
 
     def _sample(self, n, rng):
-        return rng.multivariate_normal(self._mean_flat, self._cov_flat, size=n).reshape(n, *self.shape)
+        return rng.multivariate_normal(self._mean_flat, self._cov_flat, size=n).reshape(
+            n, *self.shape
+        )
 
     def prob(self, x):
         x, set_shape = check_data_shape(x, self.shape)
@@ -1136,10 +1209,17 @@ class Normal(BaseRV):
     def _set_lims_plot(self):
         if self.shape in {(), (2,)}:
             if self.shape == ():
-                lims = self._mean.item() + np.array([-1, 1]) * 3 * np.sqrt(self._cov.item())
+                lims = self._mean.item() + np.array([-1, 1]) * 3 * np.sqrt(
+                    self._cov.item()
+                )
             else:  # self.shape == (2,):
-                lims = [(self._mean[i] - 3 * np.sqrt(self._cov[i, i]), self._mean[i] + 3 * np.sqrt(self._cov[i, i]))
-                        for i in range(2)]
+                lims = [
+                    (
+                        self._mean[i] - 3 * np.sqrt(self._cov[i, i]),
+                        self._mean[i] + 3 * np.sqrt(self._cov[i, i]),
+                    )
+                    for i in range(2)
+                ]
 
             self._space.lims_plot = lims
 
@@ -1160,10 +1240,11 @@ class NormalLinear(Normal):
         Random number generator seed or object.
 
     """
+
     # TODO: rework, only allow weights and cov to be set?
     # FIXME: NOT BASIS (incomplete). Rename dictionary?
 
-    def __init__(self, weights=(0.,), basis=np.ones(1), cov=(1.,), rng=None):
+    def __init__(self, weights=(0.0,), basis=np.ones(1), cov=(1.0,), rng=None):
         self._basis = np.array(basis)
 
         _mean_temp = np.empty(self._basis.shape[:-1])
@@ -1172,7 +1253,9 @@ class NormalLinear(Normal):
         self.weights = weights
 
     def __repr__(self):
-        return f"NormalLinear(weights={self.weights}, basis={self.basis}, cov={self.cov})"
+        return (
+            f"NormalLinear(weights={self.weights}, basis={self.basis}, cov={self.cov})"
+        )
 
     @property
     def weights(self):
@@ -1208,6 +1291,7 @@ class DataEmpirical(Base):
         Random number generator seed or object.
 
     """
+
     # TODO: subclass for FiniteGeneric space?
 
     def __new__(cls, values, counts, space=None, rng=None):
@@ -1272,10 +1356,21 @@ class DataEmpirical(Base):
         return np.unique(d, return_counts=True, axis=0)
 
     def _structure_data(self, values, counts):
-        return np.array(list(zip(values, counts)), dtype=[('x', self.dtype, self.shape), ('n', np.int32,)])
+        return np.array(
+            list(zip(values, counts)),
+            dtype=[
+                ("x", self.dtype, self.shape),
+                (
+                    "n",
+                    np.int32,
+                ),
+            ],
+        )
 
     def _get_idx(self, x):
-        idx = np.flatnonzero(np.all(x == self.data['x'], axis=tuple(range(1, 1 + self.ndim))))
+        idx = np.flatnonzero(
+            np.all(x == self.data["x"], axis=tuple(range(1, 1 + self.ndim)))
+        )
         if idx.size == 1:
             return idx.item()
         elif idx.size == 0:
@@ -1319,17 +1414,19 @@ class DataEmpirical(Base):
         for i, (value, count) in enumerate(zip(values, counts)):
             idx = self._get_idx(value)
             if idx is not None:
-                self.data['n'][idx] += count
+                self.data["n"][idx] += count
             else:
                 idx_new.append(i)
 
         if len(idx_new) > 0:
-            self.data = np.concatenate((self.data, self._structure_data(values[idx_new], counts[idx_new])))
+            self.data = np.concatenate(
+                (self.data, self._structure_data(values[idx_new], counts[idx_new]))
+            )
 
         self._update_attr()
 
     def _update_attr(self):
-        self._p = self.data['n'] / self.n
+        self._p = self.data["n"] / self.n
 
         self._mode = None
         # self._mode = self.data['x'][self.data['n'].argmax()]
@@ -1339,12 +1436,12 @@ class DataEmpirical(Base):
     @property
     def mode(self):
         if self._mode is None:
-            self._mode = self.data['x'][self.data['n'].argmax()]
+            self._mode = self.data["x"][self.data["n"].argmax()]
 
         return self._mode
 
     def _sample(self, size, rng):
-        return rng.choice(self.data['x'], size, p=self._p)
+        return rng.choice(self.data["x"], size, p=self._p)
 
     def _prob_single(self, x):
         idx = self._get_idx(x)
@@ -1355,18 +1452,20 @@ class DataEmpirical(Base):
             if isinstance(self.space, spaces.Continuous):
                 delta = 1e250  # large value approximating the value of the Dirac delta function at zero
             else:
-                delta = 1.
+                delta = 1.0
 
             return self._p[idx] * delta
         else:
-            return 0.
+            return 0.0
 
     def plot_prob(self, x=None, ax=None, **kwargs):
         if x is None and self.space.x_plt is None:
             # self.space.set_x_plot()
             if isinstance(self.space, spaces.Continuous) and self.shape in {()}:
                 # add empirical values to the plot (so impulses are not missed)
-                self.space.x_plt = np.sort(np.unique(np.concatenate((self.space.x_plt, self.data['x']))))
+                self.space.x_plt = np.sort(
+                    np.unique(np.concatenate((self.space.x_plt, self.data["x"])))
+                )
 
         return self.space.plot(self.prob, x, ax)
 
@@ -1390,15 +1489,17 @@ class DataEmpiricalRV(MixinRV, DataEmpirical):
     @property
     def mean(self):
         if self._mean is None:
-            self._mean = np.tensordot(self._p, self.data['x'], axes=(0, 0))
+            self._mean = np.tensordot(self._p, self.data["x"], axes=(0, 0))
 
         return self._mean
 
     @property
     def cov(self):
         if self._cov is None:
-            ctr = self.data['x'] - self.mean
-            self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p, ctr))
+            ctr = self.data["x"] - self.mean
+            self._cov = sum(
+                p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p, ctr)
+            )
             # TODO: try np.einsum?
 
         return self._cov
@@ -1418,6 +1519,7 @@ class Mixture(Base):
         Random number generator seed or object.
 
     """
+
     # TODO: special implementation for FiniteGeneric? get modes, etc?
 
     def __new__(cls, dists, weights, rng=None):
@@ -1537,7 +1639,7 @@ class Mixture(Base):
                 x = self.space.x_plt
                 for dist in dists_nonzero:
                     if isinstance(dist, DataEmpirical):
-                        x = np.concatenate((x, dist.data['x']))
+                        x = np.concatenate((x, dist.data["x"]))
 
                 self.space.x_plt = np.sort(np.unique(x))
 

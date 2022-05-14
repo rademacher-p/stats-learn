@@ -3,26 +3,26 @@ from matplotlib import pyplot as plt
 
 from stats_learn import spaces, random
 
-plt.style.use('images/style.mplstyle')
+plt.style.use("images/style.mplstyle")
 
-if plt.rcParams['text.usetex'] and 'upgreek' in plt.rcParams['text.latex.preamble']:
-    str_p_opt = r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \uprho}$'
-    str_p_bayes = r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \uppsi}$'
+if plt.rcParams["text.usetex"] and "upgreek" in plt.rcParams["text.latex.preamble"]:
+    str_p_opt = r"$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \uprho}$"
+    str_p_bayes = r"$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \uppsi}$"
 else:
-    str_p_opt = r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \rho}$'
-    str_p_bayes = r'$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \psi}$'
+    str_p_opt = r"$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \rho}$"
+    str_p_bayes = r"$\mathrm{P}_{\mathrm{y} | \mathrm{x}, \psi}$"
 
 
 # # Model and prior mean
 n_x = 60
 
 n = 500
-model = random.elements.EmpiricalScalar(.7, n_x)
-p_x = .5
+model = random.elements.EmpiricalScalar(0.7, n_x)
+p_x = 0.5
 
 alpha_0 = 10
-alpha = random.elements.EmpiricalScalar(.3, n_x)
-alpha_x = .5
+alpha = random.elements.EmpiricalScalar(0.3, n_x)
+alpha_x = 0.5
 
 
 # # Make axes, plot model
@@ -37,7 +37,7 @@ space.plot_xy(y, model_pr, y_std=np.zeros(y.shape), ax=ax, label=str_p_opt)
 # # Plot learner bias/var
 
 # for n in [1, 100]:
-for alpha_0 in [.1, 10]:
+for alpha_0 in [0.1, 10]:
 
     n_pr = np.arange(n + 1)
     model_x_pr = random.elements.Binomial(p_x, n).prob(n_pr)
@@ -60,7 +60,7 @@ for alpha_0 in [.1, 10]:
                 idx = values > p
                 cov_hi[n, i] = np.dot(emp_pr[idx], (values[idx] - p) ** 2)
 
-        gamma = 1 / (1 + n / (alpha_0*alpha_x))
+        gamma = 1 / (1 + n / (alpha_0 * alpha_x))
         cov_lo[n] *= (1 - gamma) ** 2
         cov_hi[n] *= (1 - gamma) ** 2
 
@@ -68,16 +68,16 @@ for alpha_0 in [.1, 10]:
     cov_hi = np.tensordot(model_x_pr, cov_hi, axes=(0, 0))
 
     cov = cov_lo + cov_hi
-    err = np.sqrt((bias ** 2 + cov).sum())
+    err = np.sqrt((bias**2 + cov).sum())
 
-    label = str_p_bayes + r', $\alpha_0={}$'.format(alpha_0)
+    label = str_p_bayes + r", $\alpha_0={}$".format(alpha_0)
     # label = str_p_bayes + f', $N={n}$'
     space.plot_xy(y, mean, np.sqrt(cov_lo), np.sqrt(cov_hi), ax=ax, label=label)
 
 ax.legend()
-ax.set_ylim(bottom=0.)
+ax.set_ylim(bottom=0.0)
 
-title = f'$N = {n}$'
+title = f"$N = {n}$"
 # title = r'$\alpha_0 = {}$'.format(alpha_0)
 
-ax.set(xlabel='$y$', title=title)
+ax.set(xlabel="$y$", title=title)

@@ -1,4 +1,3 @@
-
 def vectorize_func_dec(shape):  # TODO: use?
     def wrapper(func):
         @wraps(func)

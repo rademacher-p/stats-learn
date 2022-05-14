@@ -29,6 +29,7 @@ class Base(RandomGeneratorMixin, ABC):
         Random element characterizing the prior distribution of the element parameters.
 
     """
+
     can_warm_start = False
 
     def __init__(self, prior=None, rng=None):
@@ -161,11 +162,20 @@ class NormalLinear(Base):
         Random number generator seed or object.
 
     """
+
     prior: random.elements.Normal
     can_warm_start = True
 
-    def __init__(self, prior_mean=np.zeros(1), prior_cov=np.eye(1), basis=None, cov=1., *, allow_singular=True,
-                 rng=None):
+    def __init__(
+        self,
+        prior_mean=np.zeros(1),
+        prior_cov=np.eye(1),
+        basis=None,
+        cov=1.0,
+        *,
+        allow_singular=True,
+        rng=None,
+    ):
         # Prior
         prior = random.elements.Normal(prior_mean, prior_cov)
         super().__init__(prior, rng)
@@ -175,12 +185,16 @@ class NormalLinear(Base):
         self.allow_singular = allow_singular
 
         _temp = np.array(cov).shape
-        self._space = spaces.Euclidean(_temp[:int(len(_temp) / 2)])
+        self._space = spaces.Euclidean(_temp[: int(len(_temp) / 2)])
 
         # Model
         if basis is None:
-            self._basis = np.concatenate((np.eye(self.prior.size),
-                                          np.zeros((self.size - self.prior.size, self.prior.size))))
+            self._basis = np.concatenate(
+                (
+                    np.eye(self.prior.size),
+                    np.zeros((self.size - self.prior.size, self.prior.size)),
+                )
+            )
         else:
             self._basis = np.array(basis)
 
@@ -199,8 +213,8 @@ class NormalLinear(Base):
         """Generate a random element with a randomly selected parameterization."""
         rng = self._get_rng(rng)
 
-        model_kwargs = {'basis': self.basis, 'cov': self.cov, 'rng': rng}
-        rand_kwargs = {'weights': self.prior.sample(rng=rng)}
+        model_kwargs = {"basis": self.basis, "cov": self.cov, "rng": rng}
+        rand_kwargs = {"weights": self.prior.sample(rng=rng)}
 
         return random.elements.NormalLinear(**model_kwargs, **rand_kwargs)
 
@@ -223,25 +237,36 @@ class NormalLinear(Base):
         self.posterior.cov = self.prior_cov
 
         kwargs = self._prior_model_kwargs.copy()
-        del kwargs['basis']
+        del kwargs["basis"]
         for key, value in kwargs.items():
             setattr(self.posterior_model, key, value)
 
     @property
     def _prior_model_kwargs(self):
-        return {'weights': self.prior_mean, 'basis': self.basis, 'cov': self._prior_model_cov}
+        return {
+            "weights": self.prior_mean,
+            "basis": self.basis,
+            "cov": self._prior_model_cov,
+        }
 
     def _update_posterior(self, mean_only=False):
         if not mean_only:
-            self.posterior.cov = np.linalg.inv(self._cov_prior_inv
-                                               + self._n * self._basis_white.T @ self._basis_white)
-            self.posterior_model.cov = self._make_posterior_model_cov(self.posterior.cov)
+            self.posterior.cov = np.linalg.inv(
+                self._cov_prior_inv + self._n * self._basis_white.T @ self._basis_white
+            )
+            self.posterior_model.cov = self._make_posterior_model_cov(
+                self.posterior.cov
+            )
 
-        self.posterior.mean = self.posterior.cov @ (self._cov_prior_inv @ self.prior_mean + self._mean_data_temp)
+        self.posterior.mean = self.posterior.cov @ (
+            self._cov_prior_inv @ self.prior_mean + self._mean_data_temp
+        )
         self.posterior_model.weights = self.posterior.mean
 
     def _make_posterior_model_cov(self, cov_weight):
-        return self.cov + (self.basis @ cov_weight @ self.basis.T).reshape(2 * self.shape)
+        return self.cov + (self.basis @ cov_weight @ self.basis.T).reshape(
+            2 * self.shape
+        )
 
     # Model parameters
     @property
@@ -255,7 +280,9 @@ class NormalLinear(Base):
 
     def _set_cov(self, value):
         self._cov = np.array(value)
-        self._prec_U = _PSD(self._cov.reshape(2 * (self.size,)), allow_singular=self.allow_singular).U
+        self._prec_U = _PSD(
+            self._cov.reshape(2 * (self.size,)), allow_singular=self.allow_singular
+        ).U
         self._basis_white = np.dot(self.basis.T, self._prec_U).T
 
     @cov.setter
@@ -304,6 +331,7 @@ class Dirichlet(Base):
         Random number generator seed or object.
 
     """
+
     can_warm_start = True
 
     def __init__(self, prior_mean, alpha_0, rng=None):
@@ -311,14 +339,18 @@ class Dirichlet(Base):
         self._space = prior_mean.space
 
         _emp_dist = random.elements.DataEmpirical([], [], space=self.space)
-        self.posterior_model = random.elements.Mixture([prior_mean, _emp_dist], [alpha_0, _emp_dist.n])
+        self.posterior_model = random.elements.Mixture(
+            [prior_mean, _emp_dist], [alpha_0, _emp_dist.n]
+        )
 
     def __repr__(self):
         return f"Dirichlet(alpha_0={self.alpha_0}, n={self.n}, prior_mean={self.prior_mean})"
 
     def __setattr__(self, name, value):
-        if name.startswith('prior_mean.'):
-            self.posterior_model.set_dist_attr(0, **{name.replace('prior_mean.', ''): value})
+        if name.startswith("prior_mean."):
+            self.posterior_model.set_dist_attr(
+                0, **{name.replace("prior_mean.", ""): value}
+            )
         else:
             super().__setattr__(name, value)
 
@@ -361,7 +393,9 @@ class Dirichlet(Base):
         _out = np.empty((n, *self.shape), dtype=self.space.dtype)
         for i in range(n):
             if rng.random() <= self.alpha_0 / (self.alpha_0 + i):
-                _out[i] = self.prior_mean.sample(rng=rng)  # sample from mean distribution
+                _out[i] = self.prior_mean.sample(
+                    rng=rng
+                )  # sample from mean distribution
             else:
                 _out[i] = rng.choice(_out[:i])
 
