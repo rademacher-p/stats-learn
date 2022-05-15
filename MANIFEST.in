@@ -1,2 +1,4 @@
-include docs/API/* examples/* images/* tests/*
-recursive-include docs/API *
+include requirements.txt matplotlibrc
+include examples/* images/* tests/*
+include docs/make.bat docs/Makefile
+recursive-include docs/source *

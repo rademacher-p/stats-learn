@@ -20,11 +20,10 @@ The package can be installed locally using
 ```
 pip install <path>
 ```
-where the `<path>` is the directory containing `setup.cfg` (and this README). Note that the
-[editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be used to track any package modifications.
+where `<path>` is the top-level directory containing `setup.cfg` (and this README). Note that the [editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be used to track any package modifications.
 
 ## Documentation
-API documentation is provided locally at `docs/API/index.html`
+API documentation can be generated using the `sphinx` package and the `sphinx-rtd-theme`, both installable using `pip`. To build the HTML documentation, run `make html` from the `docs/` folder; the top level document will be `docs/build/html/index.html`
 
 ## Quickstart
 A basic example of model creation, learner definition, and performance assessment is shown below. The `model` 
@@ -42,7 +41,7 @@ using its `evaluate` method. Once the learning `norm_predictor` is `fit` to the 
 ```python
 import matplotlib.pyplot as plt
 
-from stats_learn import bayes, random, results
+from stats_learn import bayes, random
 from stats_learn.predictors import BayesRegressor, ModelRegressor
 
 plt.interactive(True)
@@ -97,12 +96,33 @@ params = [None, {'prior_cov': [.01, .1, 1]}]
 results.data_assess(predictors, d_train, d_test, params, verbose=True, plot_fit=True)
 
 # Prediction mean/variance
-results.model_assess(predictors, model, params, n_train, n_test, n_mc=10, stats=('mean', 'std'), verbose=True,
-                     plot_stats=True, print_loss=True, rng=seed)
+results.model_assess(
+    predictors,
+    model,
+    params,
+    n_train,
+    n_test,
+    n_mc=1000,
+    stats=("mean", "std"),
+    verbose=True,
+    plot_stats=True,
+    print_loss=True,
+    rng=seed,
+)
 
 # Squared-Error vs. training data volume
 n_train = range(0, 100, 5)
-results.model_assess(predictors, model, params, n_train, n_test, n_mc=10, verbose=True, plot_loss=True, rng=seed)
+results.model_assess(
+    predictors,
+    model,
+    params,
+    n_train,
+    n_test,
+    n_mc=1000,
+    verbose=True,
+    plot_loss=True,
+    rng=seed,
+)
 ```
 
 Output:

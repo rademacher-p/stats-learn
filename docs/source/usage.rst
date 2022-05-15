@@ -30,8 +30,12 @@ squared-error loss is reduced.
 
 .. code-block::
 
-    from stats_learn import random, bayes
-    from stats_learn.predictors import ModelRegressor, BayesRegressor
+    import matplotlib.pyplot as plt
+
+    from stats_learn import bayes, random
+    from stats_learn.predictors import BayesRegressor, ModelRegressor
+
+    plt.interactive(True)
 
     model = random.models.NormalLinear(weights=[1, 1])
 
@@ -85,12 +89,33 @@ for both visualization of both the prediction statistics and of the average loss
     results.data_assess(predictors, d_train, d_test, params, verbose=True, plot_fit=True)
 
     # Prediction mean/variance
-    results.model_assess(predictors, model, params, n_train, n_test, n_mc=10, stats=('mean', 'std'), verbose=True,
-                         plot_stats=True, print_loss=True, rng=seed)
+    results.model_assess(
+        predictors,
+        model,
+        params,
+        n_train,
+        n_test,
+        n_mc=1000,
+        stats=("mean", "std"),
+        verbose=True,
+        plot_stats=True,
+        print_loss=True,
+        rng=seed,
+    )
 
     # Squared-Error vs. training data volume
     n_train = range(0, 100, 5)
-    results.model_assess(predictors, model, params, n_train, n_test, n_mc=10, verbose=True, plot_loss=True, rng=seed)
+    results.model_assess(
+        predictors,
+        model,
+        params,
+        n_train,
+        n_test,
+        n_mc=1000,
+        verbose=True,
+        plot_loss=True,
+        rng=seed,
+    )
 
 Output:
 
