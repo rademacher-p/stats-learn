@@ -10,3 +10,10 @@ torch
 pytorch-lightning
 scikit-learn
 tensorboard
+pytest
+pylint
+black
+isort
+flake8
+flake8-bugbear
+pep8-naming
