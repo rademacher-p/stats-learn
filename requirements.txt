@@ -1,11 +1,11 @@
 numpy
 scipy
 matplotlib
+pyqt5
 pandas
 tabulate
 more-itertools
-scikit-learn
 torch
 pytorch-lightning
+scikit-learn
 tensorboard
-pyqt5

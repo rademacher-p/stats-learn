@@ -6,7 +6,6 @@ import torch
 from matplotlib import pyplot as plt
 from pytorch_lightning.callbacks import EarlyStopping
 from pytorch_lightning.utilities.seed import seed_everything
-from sklearn.neural_network import MLPRegressor
 
 from stats_learn import bayes, random, results
 from stats_learn.predictors import BayesRegressor, ModelRegressor
@@ -14,6 +13,7 @@ from stats_learn.predictors.torch import LitMLP, LitPredictor, reset_weights
 from stats_learn.preprocessing import make_clipper
 from stats_learn.util import get_now
 
+# from sklearn.neural_network import MLPRegressor
 # import pickle
 
 
@@ -189,26 +189,26 @@ norm_params = {"prior_cov": [0.1, 0.001]}
 
 
 # # Scikit-Learn
-# skl_estimator, _name = LinearRegression(), 'LR'
-# skl_estimator, _name = SGDRegressor(max_iter=1000, tol=None), 'SGD'
-# skl_estimator, _name = GaussianProcessRegressor(), 'GP'
+# # skl_estimator, _name = LinearRegression(), 'LR'
+# # skl_estimator, _name = SGDRegressor(max_iter=1000, tol=None), 'SGD'
+# # skl_estimator, _name = GaussianProcessRegressor(), 'GP'
 
-# _solver_kwargs = {'solver': 'sgd', 'learning_rate': 'adaptive', 'learning_rate_init': 1e-1, 'n_iter_no_change': 20}
-_solver_kwargs = {"solver": "adam", "learning_rate_init": 1e-3, "n_iter_no_change": 200}
-# _solver_kwargs = {'solver': 'lbfgs', }
-skl_estimator, skl_name = (
-    MLPRegressor(
-        hidden_layer_sizes=[1000, 200, 100],
-        alpha=0,
-        verbose=True,
-        max_iter=5000,
-        tol=1e-8,
-        **_solver_kwargs,
-    ),
-    "MLP",
-)
+# # _solver_kwargs = {'solver': 'sgd', 'learning_rate': 'adaptive', 'learning_rate_init': 1e-1, 'n_iter_no_change': 20}
+# _solver_kwargs = {"solver": "adam", "learning_rate_init": 1e-3, "n_iter_no_change": 200}
+# # _solver_kwargs = {'solver': 'lbfgs', }
+# skl_estimator, skl_name = (
+#     MLPRegressor(
+#         hidden_layer_sizes=[1000, 200, 100],
+#         alpha=0,
+#         verbose=True,
+#         max_iter=5000,
+#         tol=1e-8,
+#         **_solver_kwargs,
+#     ),
+#     "MLP",
+# )
 
-# TODO: try Adaboost, RandomForest, GP, BayesianRidge, KNeighbors, SVR
+# # TODO: try Adaboost, RandomForest, GP, BayesianRidge, KNeighbors, SVR
 
 # skl_estimator = Pipeline([('scaler', StandardScaler()), ('regressor', skl_estimator)])
 # skl_predictor = SKLPredictor(skl_estimator, space=model.space, name=skl_name)
