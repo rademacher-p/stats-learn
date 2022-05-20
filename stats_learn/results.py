@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from more_itertools import all_equal
+from tqdm import trange
 
 from stats_learn import bayes
 from stats_learn.util import check_data_shape
@@ -677,9 +678,9 @@ def model_assess(
                 )
                 array["cov"] += _temp.reshape(set_shape + 2 * shape["y"])
 
-    for i_mc in range(n_mc):
-        if verbose:
-            print(f"MC iteration: {i_mc + 1}/{n_mc}")
+    for i_mc in trange(n_mc, desc="MC iteration", disable=not verbose):
+        # if verbose:
+        #     print(f"MC iteration: {i_mc + 1}/{n_mc}")
 
         d = model.sample(n_train[-1] + n_test)
         d_train, d_test = d[: n_train[-1]], d[n_train[-1] :]
