@@ -7,6 +7,7 @@ matplotlib==3.5.2
 PyQt5==5.15.6
 pandas==1.4.2
 tabulate==0.8.9
+tqdm==4.64.0
 more-itertools==8.13.0
 torch==1.11.0
 pytorch-lightning==1.6.3
