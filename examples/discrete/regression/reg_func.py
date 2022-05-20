@@ -21,9 +21,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     "sims", nargs="*", choices=["fit", "predict", "risk_N"], help=f"Simulations to run"
 )
-parser.add_argument(
-    "-m", "--mc", type=int, default=1, help="Number of Monte Carlo iterations"
-)
+parser.add_argument("-m", "--mc", type=int, default=1, help="Number of Monte Carlo iterations")
 parser.add_argument("-l", "--log_path", default=None, help="Path to log file")
 parser.add_argument("-i", "--save_img", action="store_true", help="Save images to log")
 parser.add_argument("--style", default=None, help="Path to .mplstyle Matplotlib style")
@@ -70,9 +68,7 @@ def clairvoyant_func(x):
 model_x = random.elements.FiniteGeneric.from_grid([0, 1], n_x, p=None)
 
 alpha_y_x = (1 - var_y_x_const) / (np.float64(var_y_x_const) - 1 / (n_y - 1))
-model = random.models.DataConditional.from_mean_emp(
-    alpha_y_x, n_y, clairvoyant_func, model_x
-)
+model = random.models.DataConditional.from_mean_emp(alpha_y_x, n_y, clairvoyant_func, model_x)
 
 opt_predictor = ModelRegressor(model, name=r"$f^*(\rho)$")
 
@@ -80,9 +76,7 @@ opt_predictor = ModelRegressor(model, name=r"$f^*(\rho)$")
 # # Learners
 
 # Dirichlet
-prior_mean = random.models.DataConditional.from_mean_emp(
-    alpha_y_x, n_y, lambda x: 0.5, model_x
-)
+prior_mean = random.models.DataConditional.from_mean_emp(alpha_y_x, n_y, lambda x: 0.5, model_x)
 dir_model = bayes.models.Dirichlet(prior_mean, alpha_0=10)
 
 dir_predictor = BayesRegressor(dir_model, space=model.space, name=r"$\mathrm{Dir}$")

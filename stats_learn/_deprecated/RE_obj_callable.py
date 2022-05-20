@@ -290,9 +290,7 @@ class DirichletRV(ContinuousRV):
         self._data_size = math.prod(self._data_shape)
 
         if self._mean.min > 1 / self._alpha_0:
-            self._mode = (self._mean - 1 / self._alpha_0) / (
-                1 - self._data_size / self._alpha_0
-            )
+            self._mode = (self._mean - 1 / self._alpha_0) / (1 - self._data_size / self._alpha_0)
         else:
             # warnings.warn("Mode method currently supported for mean > 1/alpha_0 only")Myq.L
             self._mode = None  # TODO: complete with general formula
@@ -305,9 +303,9 @@ class DirichletRV(ContinuousRV):
         )
 
     def _rvs(self, size=(), random_state=None):
-        vals = random_state.dirichlet(
-            self._alpha_0 * self._mean.val.flatten(), size
-        ).reshape(size + self._data_shape)
+        vals = random_state.dirichlet(self._alpha_0 * self._mean.val.flatten(), size).reshape(
+            size + self._data_shape
+        )
         if size == ():
             return FiniteDomainFunc(self.mean.supp, vals)
         else:
@@ -317,9 +315,7 @@ class DirichletRV(ContinuousRV):
         x = _dirichlet_check_input(x, self._alpha_0, self._mean)
 
         log_pdf = self._log_pdf_coef + np.sum(
-            xlogy(self._alpha_0 * self._mean.val - 1, x.val).reshape(
-                -1, self._data_size
-            ),
+            xlogy(self._alpha_0 * self._mean.val - 1, x.val).reshape(-1, self._data_size),
             -1,
         )
         return np.exp(log_pdf)
@@ -448,9 +444,9 @@ class EmpiricalRV(DiscreteRV):
         self._log_pmf_coef = gammaln(self._n + 1)
 
     def _rvs(self, size=(), random_state=None):
-        vals = random_state.multinomial(
-            self._n, self._mean.val.flatten(), size
-        ).reshape(size + self._data_shape)
+        vals = random_state.multinomial(self._n, self._mean.val.flatten(), size).reshape(
+            size + self._data_shape
+        )
         if size == ():
             return FiniteDomainFunc(self.mean.supp, vals)
         else:
@@ -577,8 +573,7 @@ class DirichletEmpiricalRV(DiscreteRV):
         x = _empirical_check_input(x, self._n, self._mean)
 
         log_pmf = self._log_pmf_coef + (
-            gammaln(self._alpha_0 * self._mean.val + self._n * x)
-            - gammaln(self._n * x + 1)
+            gammaln(self._alpha_0 * self._mean.val + self._n * x) - gammaln(self._n * x + 1)
         ).reshape(-1, self._data_size).sum(axis=-1)
         return np.exp(log_pmf)
 
@@ -681,9 +676,9 @@ class EmpiricalRP(DiscreteRV):  # CONTINUOUS
     def _rvs(self, size=(), random_state=None):
         raise NotImplementedError  # FIXME
 
-        vals = random_state.multinomial(
-            self._n, self._mean.val.flatten(), size
-        ).reshape(size + self._shape)
+        vals = random_state.multinomial(self._n, self._mean.val.flatten(), size).reshape(
+            size + self._shape
+        )
         if size == ():
             return FiniteDomainFunc(self.mean.supp, vals)
         else:
@@ -805,19 +800,13 @@ class BetaRV(ContinuousRV):
                 self._mode = 0  # any in {0,1}
 
         self._mean = self._a / (self._a + self._b)
-        self._cov = (
-            self._a * self._b / (self._a + self._b) ** 2 / (self._a + self._b + 1)
-        )
+        self._cov = self._a * self._b / (self._a + self._b) ** 2 / (self._a + self._b + 1)
 
     def _rvs(self, size=(), random_state=None):
         return random_state.beta(self._a, self._b, size)
 
     def _pdf(self, x):
-        log_pdf = (
-            xlog1py(self._b - 1.0, -x)
-            + xlogy(self._a - 1.0, x)
-            - betaln(self._a, self._b)
-        )
+        log_pdf = xlog1py(self._b - 1.0, -x) + xlogy(self._a - 1.0, x) - betaln(self._a, self._b)
         return np.exp(log_pdf)
 
     def plot_pdf(self, n_plt, ax=None):

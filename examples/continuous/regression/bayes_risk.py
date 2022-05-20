@@ -12,12 +12,8 @@ from stats_learn.util import get_now
 parser = argparse.ArgumentParser(
     description="Example: Bayesian risk for Dirichlet regressor on a continuous domain"
 )
-parser.add_argument(
-    "sims", nargs="*", choices=["risk_bayes_N_leg_a0"], help=f"Simulations to run"
-)
-parser.add_argument(
-    "-m", "--mc", type=int, default=1, help="Number of Monte Carlo iterations"
-)
+parser.add_argument("sims", nargs="*", choices=["risk_bayes_N_leg_a0"], help=f"Simulations to run")
+parser.add_argument("-m", "--mc", type=int, default=1, help="Number of Monte Carlo iterations")
 parser.add_argument("-l", "--log_path", default=None, help="Path to log file")
 parser.add_argument("-i", "--save_img", action="store_true", help="Save images to log")
 parser.add_argument("--style", default=None, help="Path to .mplstyle Matplotlib style")
@@ -57,9 +53,7 @@ w_model = [0.5]
 model_x = random.elements.Uniform([0, 1])
 
 alpha_y_x = 1 / var_y_x_const - 1
-prior_mean = random.models.BetaLinear(
-    weights=w_model, alpha_y_x=alpha_y_x, model_x=model_x
-)
+prior_mean = random.models.BetaLinear(weights=w_model, alpha_y_x=alpha_y_x, model_x=model_x)
 model = bayes.models.Dirichlet(prior_mean, alpha_0=4e2)
 
 

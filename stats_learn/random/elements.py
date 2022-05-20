@@ -122,9 +122,7 @@ class Base(RandomGeneratorMixin, ABC):
         # if x is None:
         #     x = self.space.x_plt  # TODO: add default x_plt
 
-        return vectorize_func(self._prob_single, self.shape)(
-            x
-        )  # TODO: decorator? better way?
+        return vectorize_func(self._prob_single, self.shape)(x)  # TODO: decorator? better way?
 
     def _prob_single(self, x):
         pass
@@ -176,9 +174,7 @@ class Base(RandomGeneratorMixin, ABC):
 
         rng = self._get_rng(rng)
         samples = self._sample(math.prod(shape), rng)
-        return samples.reshape(
-            shape + samples.shape[1:]
-        )  # TODO: use np.asscalar if possible?
+        return samples.reshape(shape + samples.shape[1:])  # TODO: use np.asscalar if possible?
 
     @abstractmethod
     def _sample(self, n, rng):
@@ -455,8 +451,7 @@ class FiniteGenericRV(MixinRV, FiniteGeneric):
         if self._cov is None:
             ctr = self._values_flat - self.mean
             self._cov = sum(
-                p_i * np.tensordot(ctr_i, ctr_i, 0)
-                for p_i, ctr_i in zip(self._p_flat, ctr)
+                p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p_flat, ctr)
             )
 
         return self._cov
@@ -512,9 +507,7 @@ class Dirichlet(BaseRV):
     # Attribute Updates
     def _update_attr(self):
         if np.min(self._mean) > 1 / self._alpha_0:
-            self._mode = (self._mean - 1 / self._alpha_0) / (
-                1 - self.size / self._alpha_0
-            )
+            self._mode = (self._mean - 1 / self._alpha_0) / (1 - self.size / self._alpha_0)
         else:
             # warnings.warn("Mode method currently supported for mean > 1/alpha_0 only")
             self._mode = None  # TODO: complete with general formula
@@ -524,16 +517,12 @@ class Dirichlet(BaseRV):
             - np.tensordot(self._mean, self._mean, 0)
         ) / (self._alpha_0 + 1)
 
-        self._log_prob_coef = gammaln(self._alpha_0) - np.sum(
-            gammaln(self._alpha_0 * self._mean)
-        )
+        self._log_prob_coef = gammaln(self._alpha_0) - np.sum(gammaln(self._alpha_0 * self._mean))
 
         self.space.x_plt = None
 
     def _sample(self, n, rng):
-        return rng.dirichlet(self._alpha_0 * self._mean.flatten(), size=n).reshape(
-            n, *self.shape
-        )
+        return rng.dirichlet(self._alpha_0 * self._mean.flatten(), size=n).reshape(n, *self.shape)
 
     def prob(self, x):
         x, set_shape = check_valid_pmf(x, shape=self.shape)
@@ -637,10 +626,7 @@ class Empirical(BaseRV):
 
     def _sample(self, n, rng):
         return (
-            rng.multinomial(self._n, self._mean.flatten(), size=n).reshape(
-                n, *self.shape
-            )
-            / self._n
+            rng.multinomial(self._n, self._mean.flatten(), size=n).reshape(n, *self.shape) / self._n
         )
 
     def prob(self, x):
@@ -680,9 +666,7 @@ class DirichletEmpirical(BaseRV):
         self._update_attr()
 
     def __repr__(self):
-        return (
-            f"DirichletEmpirical(mean={self.mean}, alpha_0={self.alpha_0}, n={self.n})"
-        )
+        return f"DirichletEmpirical(mean={self.mean}, alpha_0={self.alpha_0}, n={self.n})"
 
     # Input properties
     @property
@@ -739,10 +723,7 @@ class DirichletEmpirical(BaseRV):
 
     def _sample(self, n, rng):
         theta_flat = rng.dirichlet(self._alpha_0 * self._mean.flatten())
-        return (
-            rng.multinomial(self._n, theta_flat, size=n).reshape(n, *self.shape)
-            / self._n
-        )
+        return rng.multinomial(self._n, theta_flat, size=n).reshape(n, *self.shape) / self._n
 
     def prob(self, x):
         x, set_shape = check_valid_pmf(x, shape=self.shape)
@@ -933,11 +914,7 @@ class Beta(BaseRV):
 
     def prob(self, x):
         x = np.array(x)
-        log_prob = (
-            xlog1py(self._b - 1.0, -x)
-            + xlogy(self._a - 1.0, x)
-            - betaln(self._a, self._b)
-        )
+        log_prob = xlog1py(self._b - 1.0, -x) + xlogy(self._a - 1.0, x) - betaln(self._a, self._b)
         return np.exp(log_prob)
 
 
@@ -1110,9 +1087,7 @@ class Uniform(BaseRV):
     def _sample(self, n, rng):
         a_flat = self.lims[..., 0].flatten()
         b_flat = self.lims[..., 1].flatten()
-        _temp = np.stack(
-            tuple(rng.uniform(a, b, size=n) for a, b in zip(a_flat, b_flat)), axis=-1
-        )
+        _temp = np.stack(tuple(rng.uniform(a, b, size=n) for a, b in zip(a_flat, b_flat)), axis=-1)
         return _temp.reshape((n, *self.shape))
 
     def prob(self, x):
@@ -1209,9 +1184,7 @@ class Normal(BaseRV):
     def _set_lims_plot(self):
         if self.shape in {(), (2,)}:
             if self.shape == ():
-                lims = self._mean.item() + np.array([-1, 1]) * 3 * np.sqrt(
-                    self._cov.item()
-                )
+                lims = self._mean.item() + np.array([-1, 1]) * 3 * np.sqrt(self._cov.item())
             else:  # self.shape == (2,):
                 lims = [
                     (
@@ -1253,9 +1226,7 @@ class NormalLinear(Normal):
         self.weights = weights
 
     def __repr__(self):
-        return (
-            f"NormalLinear(weights={self.weights}, basis={self.basis}, cov={self.cov})"
-        )
+        return f"NormalLinear(weights={self.weights}, basis={self.basis}, cov={self.cov})"
 
     @property
     def weights(self):
@@ -1368,9 +1339,7 @@ class DataEmpirical(Base):
         )
 
     def _get_idx(self, x):
-        idx = np.flatnonzero(
-            np.all(x == self.data["x"], axis=tuple(range(1, 1 + self.ndim)))
-        )
+        idx = np.flatnonzero(np.all(x == self.data["x"], axis=tuple(range(1, 1 + self.ndim))))
         if idx.size == 1:
             return idx.item()
         elif idx.size == 0:
@@ -1450,7 +1419,9 @@ class DataEmpirical(Base):
 
             # FIXME: delta use needs to account for space dimensionality!?
             if isinstance(self.space, spaces.Continuous):
-                delta = 1e250  # large value approximating the value of the Dirac delta function at zero
+                delta = (
+                    1e250  # large value approximating the value of the Dirac delta function at zero
+                )
             else:
                 delta = 1.0
 
@@ -1497,9 +1468,7 @@ class DataEmpiricalRV(MixinRV, DataEmpirical):
     def cov(self):
         if self._cov is None:
             ctr = self.data["x"] - self.mean
-            self._cov = sum(
-                p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p, ctr)
-            )
+            self._cov = sum(p_i * np.tensordot(ctr_i, ctr_i, 0) for p_i, ctr_i in zip(self._p, ctr))
             # TODO: try np.einsum?
 
         return self._cov

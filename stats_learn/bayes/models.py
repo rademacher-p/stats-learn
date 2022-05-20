@@ -191,9 +191,7 @@ class NormalLinear(Base):
         self.allow_singular = allow_singular
 
         # Prior
-        prior = random.elements.Normal(
-            prior_mean, prior_cov, allow_singular=self.allow_singular
-        )
+        prior = random.elements.Normal(prior_mean, prior_cov, allow_singular=self.allow_singular)
         super().__init__(prior, rng)
         if self.prior.ndim > 1:
             raise ValueError
@@ -259,9 +257,7 @@ class NormalLinear(Base):
         self._cov_data_inv += sum(psi_i @ psi_i.T for psi_i in psi_white)
 
         y_white = np.dot(d["y"].reshape(len(d), self.size["y"]), self._prec_U_y_x)
-        self._mean_data_temp += sum(
-            psi_i @ y_i for psi_i, y_i in zip(psi_white, y_white)
-        )
+        self._mean_data_temp += sum(psi_i @ y_i for psi_i, y_i in zip(psi_white, y_white))
 
         self._update_posterior()
 
@@ -286,9 +282,7 @@ class NormalLinear(Base):
     def _update_posterior(self, mean_only=False):
         if not mean_only:
             self.posterior.cov = np.linalg.inv(self._cov_prior_inv + self._cov_data_inv)
-            self.posterior_model.cov_y_x_ = self._make_posterior_model_cov(
-                self.posterior.cov
-            )
+            self.posterior_model.cov_y_x_ = self._make_posterior_model_cov(self.posterior.cov)
 
         self.posterior.mean = self.posterior.cov @ (
             self._cov_prior_inv @ self.prior_mean + self._mean_data_temp
@@ -300,9 +294,7 @@ class NormalLinear(Base):
             psi_x = np.array([func(x) for func in self.basis_y_x]).reshape(
                 self.prior.size, self.size["y"]
             )
-            return self.cov_y_x + (psi_x.T @ cov_weight @ psi_x).reshape(
-                2 * self.shape["y"]
-            )
+            return self.cov_y_x + (psi_x.T @ cov_weight @ psi_x).reshape(2 * self.shape["y"])
 
         return cov_y_x
 
@@ -428,9 +420,7 @@ class Dirichlet(Base):
 
     def __setattr__(self, name, value):
         if name.startswith("prior_mean."):
-            self.posterior_model.set_dist_attr(
-                0, **{name.replace("prior_mean.", ""): value}
-            )
+            self.posterior_model.set_dist_attr(0, **{name.replace("prior_mean.", ""): value})
         else:
             super().__setattr__(name, value)
 
@@ -471,17 +461,12 @@ class Dirichlet(Base):
         # Samples directly from the marginal Dirichlet-Empirical data distribution
 
         _out = np.array(
-            [
-                tuple(np.empty(self.shape[c], self.dtype[c]) for c in "xy")
-                for _ in range(n)
-            ],
+            [tuple(np.empty(self.shape[c], self.dtype[c]) for c in "xy") for _ in range(n)],
             dtype=[(c, self.dtype[c], self.shape[c]) for c in "xy"],
         )
         for i in range(n):
             if rng.random() <= (1 + i / self.alpha_0) ** -1:
-                _out[i] = self.prior_mean.sample(
-                    rng=rng
-                )  # sample from mean distribution
+                _out[i] = self.prior_mean.sample(rng=rng)  # sample from mean distribution
             else:
                 _out[i] = rng.choice(_out[:i])
 

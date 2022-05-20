@@ -47,8 +47,7 @@ RM_set = [
         Mixture,
         {
             "dists": [
-                NormalLinear(basis_y_x=(lambda x: x,), weights=(w,), cov_y_x=10)
-                for w in [0, 4]
+                NormalLinear(basis_y_x=(lambda x: x,), weights=(w,), cov_y_x=10) for w in [0, 4]
             ],
             "weights": [5, 8],
         },

@@ -34,9 +34,7 @@ def plot_dirs(dirs, n_plot=None, titles=None, orient="v", same_cm=True):
         fig_kwargs["figsize"] = [5.2, 7.8]
     else:
         subplot_shape = (1, n_dirs)
-    fig, axes = plt.subplots(
-        *subplot_shape, subplot_kw={"projection": "3d"}, **fig_kwargs
-    )
+    fig, axes = plt.subplots(*subplot_shape, subplot_kw={"projection": "3d"}, **fig_kwargs)
 
     space = spaces.check_spaces(dirs)
 
@@ -142,8 +140,7 @@ def prior_post():
 
     titles = [
         r"$\text{Prior}: \alpha = " + f"{tuple(np.round(np.array(mean) * 100) / 100)}$",
-        r"$\text{Posterior}: \psi = "
-        + f"{tuple(np.round(np.array(psi) * 100) / 100)}$",
+        r"$\text{Posterior}: \psi = " + f"{tuple(np.round(np.array(psi) * 100) / 100)}$",
     ]
     # titles = [r'$\text{Prior}: \alphac(x) = ' + f'{tuple(np.round(np.array(mean) * 100) / 100)}$',
     #           r'$\text{Posterior}: \psic(x) = ' + f'{tuple(np.round(np.array(psi) * 100) / 100)}$']

@@ -16,8 +16,7 @@ from stats_learn.util import get_now
 
 # # Input
 parser = argparse.ArgumentParser(
-    description="Example: discretized regularization against overfitting "
-    "on a continuous domain"
+    description="Example: discretized regularization against overfitting " "on a continuous domain"
 )
 parser.add_argument(
     "sims",
@@ -32,9 +31,7 @@ parser.add_argument(
     ],
     help=f"Simulations to run",
 )
-parser.add_argument(
-    "-m", "--mc", type=int, default=1, help="Number of Monte Carlo iterations"
-)
+parser.add_argument("-m", "--mc", type=int, default=1, help="Number of Monte Carlo iterations")
 parser.add_argument("-l", "--log_path", default=None, help="Path to log file")
 parser.add_argument("-i", "--save_img", action="store_true", help="Save images to log")
 parser.add_argument("--style", default=None, help="Path to .mplstyle Matplotlib style")
@@ -105,9 +102,7 @@ for n_t in n_t_iter:
         values_t = np.linspace(*model_x.lims, n_t, endpoint=False) + 0.5 / n_t
         counts = np.ones_like(values_t)
 
-        prior_mean_x = random.elements.DataEmpirical(
-            values_t, counts, space=model_x.space
-        )
+        prior_mean_x = random.elements.DataEmpirical(values_t, counts, space=model_x.space)
         prior_mean = random.models.BetaLinear(
             weights=[1],
             basis_y_x=[prior_func],

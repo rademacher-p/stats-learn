@@ -48,23 +48,17 @@ class Base(ABC):
             self._space = self._model_obj.space
         return self._space
 
-    shape = property(
-        lambda self: {key: space.shape for key, space in self.space.items()}
-    )
+    shape = property(lambda self: {key: space.shape for key, space in self.space.items()})
     size = property(lambda self: {key: space.size for key, space in self.space.items()})
     ndim = property(lambda self: {key: space.ndim for key, space in self.space.items()})
-    dtype = property(
-        lambda self: {key: space.dtype for key, space in self.space.items()}
-    )
+    dtype = property(lambda self: {key: space.dtype for key, space in self.space.items()})
 
     @property
     @abstractmethod
     def _model_obj(self):
         raise NotImplementedError
 
-    def set_params(
-        self, **kwargs
-    ):  # TODO: improve? wrapper to ignore non-changing param set?
+    def set_params(self, **kwargs):  # TODO: improve? wrapper to ignore non-changing param set?
         """Set parameters of the learning model object."""
         for key, value in kwargs.items():
             setattr(self._model_obj, key, value)
@@ -382,9 +376,7 @@ class Base(ABC):
     ):
         if model is None:
             model = self._model_obj
-        return results.predict_stats(
-            [self], model, [params], n_train, n_mc, x, stats, verbose
-        )[0]
+        return results.predict_stats([self], model, [params], n_train, n_mc, x, stats, verbose)[0]
 
     def plot_predict_stats(
         self,
@@ -403,14 +395,10 @@ class Base(ABC):
             [self], model, [params], n_train, n_mc, x, do_std, verbose, ax
         )
 
-    def risk_eval_sim(
-        self, model=None, params=None, n_train=0, n_test=1, n_mc=1, verbose=False
-    ):
+    def risk_eval_sim(self, model=None, params=None, n_train=0, n_test=1, n_mc=1, verbose=False):
         if model is None:
             model = self._model_obj
-        return results.risk_eval_sim(
-            [self], model, [params], n_train, n_test, n_mc, verbose
-        )[0]
+        return results.risk_eval_sim([self], model, [params], n_train, n_test, n_mc, verbose)[0]
 
     def plot_risk_eval_sim(
         self,
@@ -429,14 +417,10 @@ class Base(ABC):
         )
 
     # Analytical evaluation
-    def risk_eval_analytic(
-        self, model=None, params=None, n_train=0, n_test=1, verbose=False
-    ):
+    def risk_eval_analytic(self, model=None, params=None, n_train=0, n_test=1, verbose=False):
         if model is None:
             model = self._model_obj
-        return results.risk_eval_analytic(
-            [self], model, [params], n_train, n_test, verbose
-        )[0]
+        return results.risk_eval_analytic([self], model, [params], n_train, n_test, verbose)[0]
 
 
 class ClassifierMixin:
@@ -697,15 +681,10 @@ class BayesRegressor(RegressorMixin, Bayes):
                 x = model.space["x"].values_flat
 
                 p_x = model.model_x.prob(x)
-                alpha_x = (
-                    self.bayes_model.alpha_0
-                    * self.bayes_model.prior_mean.model_x.prob(x)
-                )
+                alpha_x = self.bayes_model.alpha_0 * self.bayes_model.prior_mean.model_x.prob(x)
 
                 cov_y_x = model.cov_y_x(x)
-                bias_sq = (
-                    self.bayes_model.prior_mean.mean_y_x(x) - model.mean_y_x(x)
-                ) ** 2
+                bias_sq = (self.bayes_model.prior_mean.mean_y_x(x) - model.mean_y_x(x)) ** 2
 
                 w_cov = np.zeros((n_train.size, p_x.size))
                 w_bias = np.zeros((n_train.size, p_x.size))
@@ -749,9 +728,7 @@ class BayesRegressor(RegressorMixin, Bayes):
                         alpha_m + 1 / alpha_0
                     )
 
-                    return np.dot(
-                        weights * self.bayes_model.prior_mean.cov_y_x(x), alpha_m
-                    )
+                    return np.dot(weights * self.bayes_model.prior_mean.cov_y_x(x), alpha_m)
                 else:
                     raise NotImplementedError
             else:

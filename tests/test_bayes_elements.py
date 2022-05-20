@@ -16,9 +16,7 @@ RE_set = [
     ),
     (
         Dirichlet,
-        dict(
-            prior_mean=random.elements.FiniteGeneric(["a", "b"], [0.2, 0.8]), alpha_0=10
-        ),
+        dict(prior_mean=random.elements.FiniteGeneric(["a", "b"], [0.2, 0.8]), alpha_0=10),
     ),
 ]
 

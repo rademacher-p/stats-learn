@@ -23,10 +23,7 @@ def main(dirs):
                 plt.setp(ax.spines.values(), linewidth=plt.rcParams["axes.linewidth"])
 
                 ax.tick_params(which="both", reset=True)
-                if (
-                    plt.rcParams["xtick.minor.visible"]
-                    and plt.rcParams["ytick.minor.visible"]
-                ):
+                if plt.rcParams["xtick.minor.visible"] and plt.rcParams["ytick.minor.visible"]:
                     ax.minorticks_on()
 
                 ax.set_xlabel(ax.get_xlabel(), fontsize=plt.rcParams["axes.labelsize"])

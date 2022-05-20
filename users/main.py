@@ -76,9 +76,7 @@ nonlinear_model = make_inv_trig(shape_x)
 
 model_x = random.elements.FiniteGeneric.from_grid([0, 1], n_x)
 # model = random.models.DataConditional.from_mean_poly_emp(n_x, alpha_y_x_d, w_model, model_x)
-model = random.models.DataConditional.from_mean_emp(
-    alpha_y_x_d, n_x, nonlinear_model, model_x
-)
+model = random.models.DataConditional.from_mean_emp(alpha_y_x_d, n_x, nonlinear_model, model_x)
 
 # model_x = random.elements.Uniform(lims_x)
 # # model = random.models.BetaLinear(weights=w_model, basis_y_x=None, alpha_y_x=alpha_y_x_beta, model_x=model_x)
@@ -104,9 +102,7 @@ w_prior = [0.5, 0]
 # Dirichlet learner
 proc_funcs = []
 
-prior_mean = random.models.DataConditional.from_mean_poly_emp(
-    alpha_y_x_d, n_x, w_prior, model_x
-)
+prior_mean = random.models.DataConditional.from_mean_poly_emp(alpha_y_x_d, n_x, w_prior, model_x)
 # _func = lambda x: .5*(1-np.sin(2*np.pi*x))
 # prior_mean = random.models.DataConditional.from_mean_emp(n_x, alpha_y_x_d, _func, model_x)
 
@@ -142,9 +138,7 @@ dir_params = {"alpha_0": [10, 1000]}
 
 if isinstance(model, bayes.models.Dirichlet):  # add true bayes model concentration
     if model.alpha_0 not in dir_params["alpha_0"]:
-        dir_params["alpha_0"] = np.sort(
-            np.concatenate((dir_params["alpha_0"], [model.alpha_0]))
-        )
+        dir_params["alpha_0"] = np.sort(np.concatenate((dir_params["alpha_0"], [model.alpha_0])))
 
 
 # Normal learner
