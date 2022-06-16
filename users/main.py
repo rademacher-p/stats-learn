@@ -5,6 +5,7 @@ import pytorch_lightning.loggers as pl_loggers
 import torch
 from matplotlib import pyplot as plt
 from pytorch_lightning.callbacks import EarlyStopping
+from pytorch_lightning.strategies import DDPSpawnStrategy
 from pytorch_lightning.utilities.seed import seed_everything
 
 from stats_learn import bayes, random, results
@@ -233,10 +234,10 @@ for weight_decay in weight_decays:
         "callbacks": EarlyStopping(
             "train_loss", min_delta=1e-6, patience=10000, check_on_train_epoch_end=True
         ),
-        "checkpoint_callback": False,
+        "enable_checkpointing": False,
         "logger": pl_loggers.TensorBoardLogger(save_dir + "logs/", name=logger_name),
-        "weights_summary": None,
-        "gpus": torch.cuda.device_count(),
+        "accelerator": "auto",
+        # "strategy": DDPSpawnStrategy(find_unused_parameters=False),
     }
 
     lit_model = LitMLP([model.size["x"], *layer_sizes, 1], optim_params=optim_params)
@@ -289,23 +290,24 @@ log_path = save_dir + "log.md"
 img_path = save_dir + f"images/{get_now()}"
 
 
-y_stats_full, loss_full = results.model_assess(
-    predictors,
-    model,
-    params,
-    n_train,
-    n_test,
-    n_mc,
-    stats=("mean", "std"),
-    verbose=True,
-    plot_stats=True,
-    print_loss=True,
-    log_path=log_path,
-    img_path=img_path,
-    rng=seed,
-)
+if __name__ == "__main__":
+    y_stats_full, loss_full = results.model_assess(
+        predictors,
+        model,
+        params,
+        n_train,
+        n_test,
+        n_mc,
+        stats=("mean", "std"),
+        verbose=True,
+        plot_stats=True,
+        print_loss=True,
+        log_path=log_path,
+        img_path=img_path,
+        rng=seed,
+    )
 
-plt.show()
+    plt.show()
 
 # y_stats_full, loss_full = results.assess_compare(predictors, model, params, n_train, n_test, n_mc,
 #                                                  verbose=True, plot_loss=True, print_loss=True,
