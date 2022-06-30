@@ -29,7 +29,7 @@ parser.add_argument(
         "risk_a0norm_leg_T",
         "risk_T_leg_N",
     ],
-    help=f"Simulations to run",
+    help="Simulations to run",
 )
 parser.add_argument("-m", "--mc", type=int, default=1, help="Number of Monte Carlo iterations")
 parser.add_argument("-l", "--log_path", default=None, help="Path to log file")

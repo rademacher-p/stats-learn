@@ -12,7 +12,7 @@ from stats_learn.util import get_now
 parser = argparse.ArgumentParser(
     description="Example: Bayesian risk for Dirichlet regressor on a continuous domain"
 )
-parser.add_argument("sims", nargs="*", choices=["risk_bayes_N_leg_a0"], help=f"Simulations to run")
+parser.add_argument("sims", nargs="*", choices=["risk_bayes_N_leg_a0"], help="Simulations to run")
 parser.add_argument("-m", "--mc", type=int, default=1, help="Number of Monte Carlo iterations")
 parser.add_argument("-l", "--log_path", default=None, help="Path to log file")
 parser.add_argument("-i", "--save_img", action="store_true", help="Save images to log")

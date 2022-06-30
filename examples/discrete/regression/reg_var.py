@@ -22,7 +22,7 @@ parser.add_argument(
     "sims",
     nargs="*",
     choices=["fit", "predict", "risk_N", "risk_a0_leg_N"],
-    help=f"Simulations to run",
+    help="Simulations to run",
 )
 parser.add_argument("-m", "--mc", type=int, default=1, help="Number of Monte Carlo iterations")
 parser.add_argument("-l", "--log_path", default=None, help="Path to log file")
