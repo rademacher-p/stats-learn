@@ -6,7 +6,7 @@ import numpy as np
 from stats_learn import random, spaces
 
 plt.style.use("images/style.mplstyle")
-# plt.style.use(['images/style.mplstyle', 'images/double.mplstyle'])
+# plt.style.use(['images/style.mplstyle', 'images/ieee.mplstyle'])
 
 # plt.rc('text', usetex=False)
 plt.rc("text.latex", preamble=r"\usepackage{PhDmath}")
