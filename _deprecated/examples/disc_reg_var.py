@@ -22,10 +22,10 @@ parser = argparse.ArgumentParser(
     description="Example: discretized regularization against overfitting " "on a continuous domain"
 )
 parser.add_argument("-m", "--mc", type=int, default=1, help="Number of Monte Carlo iterations")
-parser.add_argument("-l", "--log_path", type=str, default=None, help="Path to log file")
+parser.add_argument("-l", "--log_path", type=str, help="Path to log file")
 parser.add_argument("-i", "--save_img", action="store_true", help="Save images to log")
-parser.add_argument("--style", type=str, default=None, help="Path to Matplotlib style")
-parser.add_argument("--seed", type=int, default=None, help="RNG seed")
+parser.add_argument("--style", type=str, help="Path to Matplotlib style")
+parser.add_argument("--seed", type=int, help="RNG seed")
 
 args = parser.parse_args()
 
