@@ -16,7 +16,7 @@ parser.add_argument("sims", nargs="*", choices=["risk_bayes_N_leg_a0"], help="Si
 parser.add_argument("-m", "--mc", type=int, default=1, help="Number of Monte Carlo iterations")
 parser.add_argument("-l", "--log_path", help="Path to log file")
 parser.add_argument("-i", "--save_img", action="store_true", help="Save images to log")
-parser.add_argument("--style", help="Path to Matplotlib style")
+parser.add_argument("--style", nargs="*", help="Paths to Matplotlib style sheets")
 parser.add_argument("--seed", type=int, help="RNG seed")
 
 args = parser.parse_args()
