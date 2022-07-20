@@ -61,7 +61,7 @@ if __name__ == "__main__":
     # import argparse
     #
     # parser = argparse.ArgumentParser(description='Update `matplotlib` figures')
-    # parser.add_argument('dirs', type=str, nargs='+', help='Directories in which to find MPL files')
+    # parser.add_argument('dirs', nargs='+', help='Directories in which to find MPL files')
     # args = parser.parse_args()
     #
     # main(args.dirs)
