@@ -5,6 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
             "name": "Python -i: Current File",
             "type": "python",
             "request": "launch",
@@ -16,12 +24,29 @@
             ]
         },
         {
-            "name": "Python: Current File",
+            "name": "consistency (d)",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "examples/discrete/regression/consistency.py",
             "console": "integratedTerminal",
-            "justMyCode": true
+            "justMyCode": false,
+            "args": [
+                "fit",
+                // "predict_a0",
+                // "predict_N",
+                // "risk_N_leg_a0",
+                // "risk_a0_leg_N"
+                "--mc",
+                "2",
+                "--log_path",
+                "examples/discrete/regression/temp/consistency/log.md",
+                "-i",
+                "--style",
+                "images/style.mplstyle",
+                "images/ieee.mplstyle",
+                "--seed",
+                "12345",
+            ],
         },
     ]
 }
