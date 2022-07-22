@@ -16,8 +16,10 @@ from stats_learn.predictors.base import Base
 num_workers = 0
 # num_workers = os.cpu_count()
 
-pin_memory = True
-# pin_memory = False
+pin_memory = False
+# pin_memory = True
+
+persistent_workers = False
 
 
 def build_mlp(layer_sizes, activation=nn.ReLU, last_act=False):
@@ -119,6 +121,8 @@ class LitPredictor(Base):
         The domain for :math:`\xrm` and :math:`\yrm`. Defaults to the model's space.
     trainer_params : dict, optional
         Keyword arguments for `pl.Trainer` instantiation.
+    dl_kwargs : dict, optional
+        Keyword arguments for `DataLoader` instantiation.
     reset_func : callable, optional
         Function that calls `model` and resets to unfit state.
     proc_funcs : Collection of callable of dict of Collection of callable
@@ -132,6 +136,7 @@ class LitPredictor(Base):
         model,
         space,
         trainer_params=None,
+        dl_kwargs=None,
         reset_func=None,
         proc_funcs=(),
         name=None,
@@ -141,6 +146,9 @@ class LitPredictor(Base):
 
         self.model = model
         self.trainer_params = trainer_params
+        if dl_kwargs is None:
+            dl_kwargs = {}
+        self.dl_kwargs = dl_kwargs
 
         if reset_func is None:
             self.reset_func = lambda model_: model_.apply(reset_weights)
@@ -184,7 +192,10 @@ class LitPredictor(Base):
         batch_size = len(x)  # TODO: no mini-batching! Allow user specification.
 
         dl = DataLoader(
-            ds, batch_size, shuffle=True, pin_memory=pin_memory, num_workers=num_workers
+            ds,
+            batch_size,
+            shuffle=True,
+            **self.dl_kwargs,
         )
 
         self.trainer.fit(self.model, dl)
