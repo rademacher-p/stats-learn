@@ -16,14 +16,14 @@ well as provide visualizations and Markdown-formatted output. Furthermore, they 
 across a set of hyperparameter values.
 
 ## Installation
-The `stats_learn` package can installed directly from GitHub using
+The `stats_learn` package is developed for Python 3.9. It can installed directly from GitHub using
 ```
-pip install git+https://github.com/rademacher-p/stats-learn.git
+pip install git+https://github.com/rademacher-p/stats-learn.git#egg=stats_learn
 ```
 To install a specific version or branch, specify a ref as detailed [here](https://pip.pypa.io/en/stable/topics/vcs-support/). Alternatively, the package can be installed locally using
 ```
 git clone https://github.com/rademacher-p/stats-learn.git
-pip install .
+pip install stats-learn/
 ```
 Note that with both methods, the [editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be included to track any package modifications.
 
