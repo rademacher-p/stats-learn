@@ -1,6 +1,8 @@
 r"""
-Bayesian random models of jointly distributed :math:`\xrm` and :math:`\yrm` elements with prior sampling and posterior
-fitting.
+Bayesian random models.
+
+Consist of jointly distributed random elements :math:`\xrm` and :math:`\yrm` with prior sampling
+and posterior fitting.
 """
 
 from abc import ABC, abstractmethod
@@ -152,8 +154,9 @@ class Base(RandomGeneratorMixin, ABC):
 
 class NormalLinear(Base):
     r"""
-    Random model characterized by a Normal conditional distribution with mean defined in terms of basis functions
-    and weights characterized by a Normal distribution.
+    Random model characterized by a Normal conditional distribution with mean linear in basis weights.
+
+    User defines basis functions and parameterizes Normal prior distribution for weights.
 
     Parameters
     ----------
@@ -173,6 +176,7 @@ class NormalLinear(Base):
         Random number generator seed or object.
 
     """
+
     prior: random.elements.Normal
     can_warm_start = True
 

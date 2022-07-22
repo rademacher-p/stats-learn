@@ -24,6 +24,7 @@ def check_spaces(spaces):
     Parameters
     ----------
     spaces : Collection
+        Spaces to check.
 
     Returns
     -------
@@ -124,7 +125,6 @@ class Base(ABC):
 
     def make_axes(self):  # TODO: axes kwargs
         """Create axes for plotting."""
-
         with plt.rc_context({"axes.xmargin": 0}):
             if self.shape == ():
                 _, ax = plt.subplots()
@@ -167,6 +167,7 @@ class Base(ABC):
         x : array_like, optional
             Values to plot against. Defaults to `self.x_plt`.
         ax : matplotlib.axes.Axes, optional
+            Axes.
         label : str, optional
             Label for matplotlib.artist.Artist
         kwargs : dict, optional
@@ -195,6 +196,7 @@ class Base(ABC):
         y_std_hi : array_like, optional
             Upper standard deviation, if different from lower defined in `y_std`.
         ax : matplotlib.axes.Axes, optional
+            Axes.
         label : str, optional
             Label for matplotlib.artist.Artist\
         kwargs : dict, optional
@@ -257,7 +259,6 @@ class Base(ABC):
 
     def _eval_func(self, f, x=None):
         """Evaluate callable."""
-
         if x is None:
             x = self.x_plt
 
@@ -469,7 +470,7 @@ class FiniteGeneric(Finite):
 
 class Continuous(Base, ABC):
     def __init__(self, shape):
-        """Base class for continuous spaces."""
+        """Abstract base class for continuous spaces."""
         super().__init__(shape, np.float64)
 
     @property
@@ -588,7 +589,6 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
         numpy.ndarray
 
         """
-
         lims = np.array(lims)
         # if not (lims[..., 0] <= lims[..., 1]).all():
         #     raise ValueError("Upper values must meet or exceed lower values.")
@@ -727,7 +727,6 @@ class Simplex(Continuous):
         numpy.ndarray
 
         """
-
         if type(n) is not int or n < 1:
             raise TypeError("Input 'n' must be a positive integer")
 

@@ -1,5 +1,4 @@
 import numpy as np
-from matplotlib import pyplot as plt
 
 from stats_learn import random
 from stats_learn.bayes.elements import Dirichlet, NormalLinear

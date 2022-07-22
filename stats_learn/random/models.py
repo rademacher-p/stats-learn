@@ -27,6 +27,7 @@ class Base(RandomGeneratorMixin, ABC):
     assumed that the former is observed while the latter is not.
 
     """
+
     _space: Dict[str, Optional[spaces.Base]]
 
     def __init__(self, rng=None):
@@ -106,7 +107,7 @@ class Base(RandomGeneratorMixin, ABC):
     @abstractmethod
     def model_y_x(self, x):
         r"""
-        Generate the conditional random element :math:`\yrm` given :math:`x`
+        Generate the conditional random element :math:`\yrm` given :math:`x`.
 
         Parameters
         ----------
@@ -706,8 +707,9 @@ class BetaLinear(MixinRVx, MixinRVy, Base):
         Random variable characterizing the marginal distribution of :math:`\xrm`.
     rng : int or np.random.RandomState or np.random.Generator, optional
         Random number generator seed or object.
-    """
 
+    """
+    
     # TODO: DRY with NormalLinear
 
     def __init__(

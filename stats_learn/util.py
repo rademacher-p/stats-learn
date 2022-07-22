@@ -35,7 +35,7 @@ class RandomGeneratorMixin:
         self._rng = self.make_rng(value)
 
     def _get_rng(self, rng=None):
-        """Returns own RNG or makes a new one."""
+        """Return own RNG or make a new one."""
         if rng is None:
             return self._rng
         else:
@@ -68,11 +68,12 @@ class RandomGeneratorMixin:
 
 def check_data_shape(x, shape=()):
     """
-    Checks that trailing elements of array shape match desired data shape.
+    Check that trailing elements of array shape match desired data shape.
 
     Parameters
     ----------
     x : array_like
+        The array.
     shape : tuple, optional
         Shape of data tensors.
 
@@ -102,6 +103,7 @@ def check_valid_pmf(p, shape=None, full_support=False, tol=1e-9):
     Parameters
     ----------
     p : array_like
+        The array.
     shape : tuple, optional
         Shape of PMF tensors.
     full_support : bool, optional
@@ -148,6 +150,7 @@ def vectorize_func(func, shape):
     Parameters
     ----------
     func : callable
+        Function to vectorize.
     shape : tuple, optional
         Shape of data tensors.
 

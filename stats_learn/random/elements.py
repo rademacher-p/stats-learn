@@ -1213,7 +1213,7 @@ class NormalLinear(Normal):
     # TODO: rework, only allow weights and cov to be set?
     # FIXME: NOT BASIS (incomplete). Rename dictionary?
 
-    def __init__(self, weights=(0.0,), basis=(1.,), cov=(1.0,), rng=None):
+    def __init__(self, weights=(0.0,), basis=(1.0,), cov=(1.0,), rng=None):
         self._basis = np.array(basis)
 
         _mean_temp = np.empty(self._basis.shape[:-1])

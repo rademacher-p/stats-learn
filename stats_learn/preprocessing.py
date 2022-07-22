@@ -47,7 +47,6 @@ def make_discretizer(vals):  # TODO: use sklearn.preprocessing.KBinsDiscretizer?
 
 def prob_disc(shape):
     """Create (unnormalized) probability array for a discretization grid. Lower edge/corner probabilities."""
-
     p = np.ones(shape)
     idx = np.nonzero(p)
     n = np.zeros(p.size)

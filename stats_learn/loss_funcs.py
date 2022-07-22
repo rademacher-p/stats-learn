@@ -35,7 +35,7 @@ def _check_inputs(h, y, shape):
 
 def loss_se(y_est, y, shape=()):
     """
-    The squared-error loss function.
+    Squared-error loss function.
 
     Parameters
     ----------
@@ -58,7 +58,7 @@ def loss_se(y_est, y, shape=()):
 
 def loss_01(y_hyp, y, shape=()):
     """
-    The zero-one loss function.
+    Zero-one loss function.
 
     Parameters
     ----------

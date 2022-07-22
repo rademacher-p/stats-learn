@@ -1,10 +1,7 @@
 # Statistical Learning
 **Note**: This project is under active development.
 
-This package provides a framework to explore statistical learning with a Bayesian focus. It implements a variety of
-`random.elements`, as well as `random.models` of data for supervised learning. The `bayes` subpackage
-implements similar elements/models with `prior` attributes to statistically characterize parameter uncertainty and
-`fit` methods to adapt posteriors.
+This Python package provides a framework to explore statistical learning with a Bayesian focus. It implements a variety of `random.elements`, as well as `random.models` of data for supervised learning. The `bayes` subpackage implements similar elements/models with `prior` attributes to statistically characterize parameter uncertainty and `fit` methods to adapt posteriors.
 
 For supervised learning, the `predictors` subpackage provides objects that use these statistical models to define
 inference and decision functions. Additionally, customization enables comparison with learning objects from popular
