@@ -142,8 +142,9 @@ class Base(RandomGeneratorMixin, ABC):
 
 class NormalLinear(Base):
     """
-    Normal random variable with mean defined in terms of basis tensors and weights characterized by a Normal
-    distribution.
+    Normal random variable with a mean linear in basis weights.
+
+    User defines basis tensors and parameterizes Normal prior distribution for weights.
 
     Parameters
     ----------
@@ -167,8 +168,8 @@ class NormalLinear(Base):
 
     def __init__(
         self,
-        prior_mean=np.zeros(1),
-        prior_cov=np.eye(1),
+        prior_mean=(0.,),
+        prior_cov=((1.,),),
         basis=None,
         cov=1.0,
         *,

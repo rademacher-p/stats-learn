@@ -408,7 +408,7 @@ class DataConditional(Base):
 
         self._space["x"] = self.model_x.space
         if not isinstance(self.space["x"], spaces.FiniteGeneric):
-            raise ValueError(f"Data space must be finite.")
+            raise ValueError("Data space must be finite.")
         elif self.space["x"].set_shape != (len(self.dists),):
             raise ValueError("Data space set shape must match number of distributions.")
 
@@ -592,7 +592,7 @@ class ClassConditional(MixinRVx, Base):
 
         self._space["y"] = self.model_y.space
         if not isinstance(self.space["y"], spaces.FiniteGeneric):
-            raise ValueError(f"Class space must be finite.")
+            raise ValueError("Class space must be finite.")
         elif self.space["y"].set_shape != (len(self.dists),):
             raise ValueError("Class space set shape must match number of distributions.")
         # elif not np.issubdtype(self.space['y'].dtype, 'U'):  # TODO: deprecate dtype enforce
@@ -715,11 +715,13 @@ class BetaLinear(MixinRVx, MixinRVy, Base):
         weights=(0.0,),
         basis_y_x=None,
         alpha_y_x=2.0,
-        model_x=random.elements.Beta(),
+        model_x=None,
         rng=None,
     ):
         super().__init__(rng)
 
+        if model_x is None:
+            model_x = random.elements.Beta()
         self._space["x"] = model_x.space
         self._space["y"] = spaces.Box((0, 1))
 
@@ -809,11 +811,13 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
         weights=(0.0,),
         basis_y_x=None,
         cov_y_x=1.0,
-        model_x=random.elements.Normal(),
+        model_x=None,
         rng=None,
     ):
         super().__init__(rng)
 
+        if model_x is None:
+            model_x = random.elements.Normal()
         self.model_x = model_x
 
         self.weights = weights

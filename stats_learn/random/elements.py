@@ -10,12 +10,7 @@ from scipy.special import betaln, gammaln, xlog1py, xlogy
 from scipy.stats._multivariate import _PSD
 
 from stats_learn import spaces
-from stats_learn.util import (
-    RandomGeneratorMixin,
-    check_data_shape,
-    check_valid_pmf,
-    vectorize_func,
-)
+from stats_learn.util import RandomGeneratorMixin, check_data_shape, check_valid_pmf, vectorize_func
 
 
 class Base(RandomGeneratorMixin, ABC):
@@ -116,7 +111,6 @@ class Base(RandomGeneratorMixin, ABC):
             subclass.
 
         """
-
         # TODO: perform input checks using `space.__contains__`?
 
         # if x is None:
@@ -136,6 +130,7 @@ class Base(RandomGeneratorMixin, ABC):
         x : array_like, optional
             Random element domain values.
         ax : matplotlib.axes.Axes, optional
+            Axes.
         kwargs : dict, optional
             Additional keyword arguments for `self.space.plot` method.
 
@@ -848,6 +843,7 @@ class Beta(BaseRV):
         Parameters
         ----------
         mean : float, optional
+            Mean of the distribution.
         alpha_0 : float, optional
             Total concentration. Conceptually identical to `Dirichlet` parameter.
         rng : int or np.random.RandomState or np.random.Generator, optional
@@ -1217,7 +1213,7 @@ class NormalLinear(Normal):
     # TODO: rework, only allow weights and cov to be set?
     # FIXME: NOT BASIS (incomplete). Rename dictionary?
 
-    def __init__(self, weights=(0.0,), basis=np.ones(1), cov=(1.0,), rng=None):
+    def __init__(self, weights=(0.0,), basis=(1.,), cov=(1.0,), rng=None):
         self._basis = np.array(basis)
 
         _mean_temp = np.empty(self._basis.shape[:-1])

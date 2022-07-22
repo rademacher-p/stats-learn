@@ -213,6 +213,7 @@ class Base(ABC):
         x : array_like, optional
             Values to plot against. Defaults to `self.x_plt`.
         ax : matplotlib.axes.Axes, optional
+            Axes.
         label : str, optional
             Label for matplotlib.artist.Artist
 

@@ -47,8 +47,7 @@ logger.addHandler(out_handler)
 
 @contextmanager
 def _file_logger(file, file_format):
-    """Adds temporary FileHandler to logger."""
-
+    """Add temporary FileHandler to logger."""
     if file is not None:
         file = Path(file)
         file.parent.mkdir(parents=True, exist_ok=True)
@@ -65,7 +64,6 @@ def _file_logger(file, file_format):
 
 def _log_and_fig(message, log_path, ax, img_path):
     """Save figure, add figure to message format and log."""
-
     file_format = log_fmt
     if img_path is not None:
         img_path = Path(img_path)
@@ -92,7 +90,6 @@ def _log_and_fig(message, log_path, ax, img_path):
 # Printing/plotting helper functions
 def _print_risk(predictors, params, n_train, losses):
     """Create Markdown format table of empirical risk for various predictors."""
-
     title = ""
     index_n = pd.Index(n_train, name="N")
     if len(predictors) == 1:
@@ -143,8 +140,7 @@ def _plot_predict_stats(
     x=None,
     ax=None,
 ):
-    """Plots prediction statistics for various predictors and parameterizations."""
-
+    """Plot prediction statistics for various predictors and parameterizations."""
     if x is None:
         x = space_x.x_plt
 
@@ -251,8 +247,7 @@ def _plot_predict_stats(
 def _plot_risk_eval_compare(
     losses, predictors, params=None, n_train: Union[int, Collection] = 0, ax=None
 ):
-    """Plots empirical risk for various predictors and parameterizations."""
-
+    """Plot empirical risk for various predictors and parameterizations."""
     if params is None:
         params_full = [{} for _ in predictors]
     else:
@@ -372,6 +367,7 @@ def data_assess(
     Parameters
     ----------
     predictors : Collection of stats_learn.predictors.Base
+        Predictors to assess.
     d_train : array_like, optional
         Training data.
     d_test : array_like, optional
@@ -521,6 +517,7 @@ def model_assess(
     Parameters
     ----------
     predictors : Collection of stats_learn.predictors.Base
+        Predictors to assess.
     model : stats_learn.random.models.Base or stats_learn.bayes.models.Base
         Data-generating model.
     params : Collection of dict, optional
@@ -566,7 +563,6 @@ def model_assess(
     Uses Welford's online algorithm https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
 
     """
-
     # TODO: add mode!!!
     # TODO: train/test loss results?
 
@@ -607,7 +603,7 @@ def model_assess(
         if x is None:
             x = space_x.x_plt
 
-        shape, size, ndim = model.shape, model.size, model.ndim
+        shape, size, _ = model.shape, model.size, model.ndim
         x, set_shape = check_data_shape(x, shape["x"])
 
     # Initialize arrays
@@ -807,7 +803,6 @@ def plot_risk_eval_sim(
 # Additional utilities
 def risk_eval_analytic(predictors, model, params=None, n_train=0, n_test=1, verbose=False):
     """Assess various predictors using analytical risk calculation."""
-
     if params is None:
         params_full = [{} for _ in predictors]
     else:
@@ -847,7 +842,6 @@ def plot_risk_disc(
     predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=True, ax=None
 ):
     """Plot risk against discretization set cardinality."""
-
     # TODO: integrate logging code? Cleanup!
 
     n_t_iter = np.array(
@@ -868,12 +862,20 @@ def plot_risk_disc(
         a0_full = np.array([params["alpha_0"] for params in params_full])
         if all(all_equal(arr) for arr in a0_full.transpose()):
             params = {"alpha_0": a0_full[0]}
-            tex_map = lambda x: r"$\alpha_0 = " + f"{x}$"
+            # tex_map = lambda x: r"$\alpha_0 = " + f"{x}$"
+
+            def tex_map(x):
+                return r"$\alpha_0 = " + f"{x}$"
+
         else:
             a0_full_norm = a0_full / n_t_iter[..., np.newaxis]
             if all(all_equal(arr) for arr in a0_full_norm.transpose()):
                 params = {"alpha_0": a0_full_norm[0]}
-                tex_map = lambda x: r"$\alpha_0 / |\mathcal{T}| = " + f"{x}$"
+                # tex_map = lambda x: r"$\alpha_0 / |\mathcal{T}| = " + f"{x}$"
+
+                def tex_map(x):
+                    return r"$\alpha_0 / |\mathcal{T}| = " + f"{x}$"
+
             else:
                 raise ValueError
     else:

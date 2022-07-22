@@ -29,6 +29,7 @@ def build_mlp(layer_sizes, activation=nn.ReLU, last_act=False):
     layer_sizes : Collection of int
         Hidden layer sizes.
     activation : nn.Module, optional
+        The activation function.
     last_act : bool, optional
         Include final activation function.
 
@@ -54,6 +55,7 @@ class LitMLP(pl.LightningModule):
     layer_sizes : Collection of int
         Hidden layer sizes.
     activation : nn.Module, optional
+        The activation function.
     loss_func : callable, optional
         The loss function for network training.
     optim_cls : class, optional

@@ -178,11 +178,11 @@ class NormalLinear(Base):
 
     def __init__(
         self,
-        prior_mean=np.zeros(1),
-        prior_cov=np.eye(1),
+        prior_mean=(0.,),
+        prior_cov=((1.,),),
         basis_y_x=None,
         cov_y_x=1.0,
-        model_x=random.elements.Normal(),
+        model_x=None,
         *,
         allow_singular=True,
         rng=None,
@@ -197,6 +197,8 @@ class NormalLinear(Base):
             raise ValueError
 
         # Model
+        if model_x is None:
+            model_x = random.elements.Normal()
         self._model_x = model_x
         self._space["x"] = model_x.space
 
