@@ -1,5 +1,11 @@
 # Statistical Learning
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6886844.svg)](https://doi.org/10.5281/zenodo.6886844)
+<a href="https://gitpod.io/#https://github.com/rademacher-p/stats-learn">
+  <img
+    src="https://img.shields.io/badge/Contribute%20with-Gitpod-908a85?logo=gitpod"
+    alt="Contribute with Gitpod"
+  />
+</a>
 
 **Note**: This project is under active development.
 
@@ -15,6 +21,8 @@ well as provide visualizations and Markdown-formatted output. Furthermore, they 
 across a set of hyperparameter values.
 
 ## Installation
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/rademacher-p/stats-learn)
+
 The `stats_learn` package is developed for Python 3.9. It can installed directly from GitHub using
 ```
 pip install git+https://github.com/rademacher-p/stats-learn.git#egg=stats_learn
