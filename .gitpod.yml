@@ -8,11 +8,12 @@ tasks:
       python -m venv .venv
       source .venv/bin/activate
       python -m pip install --upgrade pip wheel setuptools
-      pip install -e stats-learn/
-      pip install -r stats-learn/requirements.txt
+      pip install -e .
+      pip install -r requirements.txt
   - command: |
       echo 'start script'
       source .venv/bin/activate
+      python examples/quickstart.py
 
 ports:
   - port: 3000
