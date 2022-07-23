@@ -25,3 +25,7 @@ vscode:
     - donjayamanne.python-extension-pack
     - eamodio.gitlens
     - donjayamanne.githistory
+
+github:
+  prebuilds:
+    branches: true
