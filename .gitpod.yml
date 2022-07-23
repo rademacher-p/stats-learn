@@ -4,10 +4,16 @@
 
 tasks:
   - init: |
+      echo 'init script'
       python -m venv .venv
       source .venv/bin/activate
       python -m pip install --upgrade pip wheel setuptools
       pip install stats-learn/
       pip install -r stats-learn/requirements.txt
-  # - command: |
-  #     source venv/bin/activate
+  - command: |
+      echo 'start script'
+      source .venv/bin/activate
+
+ports:
+  - port: 3000
+    onOpen: open-preview
