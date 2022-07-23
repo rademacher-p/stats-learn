@@ -18,3 +18,10 @@ tasks:
 ports:
   - port: 3000
     onOpen: open-preview
+
+vscode:
+  extensions:
+    - ms-python.python
+    - donjayamanne.python-extension-pack
+    - eamodio.gitlens
+    - donjayamanne.githistory
