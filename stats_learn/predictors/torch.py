@@ -13,14 +13,6 @@ from torch.utils.data import DataLoader, TensorDataset
 from stats_learn.loss_funcs import loss_se
 from stats_learn.predictors.base import Base
 
-num_workers = 0
-# num_workers = os.cpu_count()
-
-pin_memory = False
-# pin_memory = True
-
-persistent_workers = False
-
 
 def build_mlp(layer_sizes, activation=nn.ReLU, last_act=False):
     """
