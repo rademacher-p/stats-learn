@@ -8,7 +8,7 @@ tasks:
       python -m venv .venv
       source .venv/bin/activate
       python -m pip install --upgrade pip wheel setuptools
-      pip install stats-learn/
+      pip install -e stats-learn/
       pip install -r stats-learn/requirements.txt
   - command: |
       echo 'start script'
