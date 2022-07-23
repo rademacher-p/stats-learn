@@ -10,7 +10,7 @@ tasks:
       python -m pip install --upgrade pip wheel setuptools
       pip install -e .
       pip install -r requirements.txt
-  - command: |
+    command: |
       echo 'start script'
       source .venv/bin/activate
       python examples/quickstart.py
