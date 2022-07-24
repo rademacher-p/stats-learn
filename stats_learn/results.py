@@ -31,7 +31,7 @@ else:
     str_risk_bayes = r"$R_\theta(f)$"
 
 
-pickle_figs = True
+pickle_figs = False
 log_fmt = "\n# %(asctime)s\n%(message)s\n"
 date_fmt = "%Y-%m-%d %H:%M:%S"
 file_log_mode = "a"
@@ -71,7 +71,6 @@ def _log_and_fig(message, log_path, ax, img_path):
 
         fig = ax.figure
         fig.savefig(img_path)
-        fig.savefig(img_path.parent / f"{img_path.stem}.png")  # save PNG for Markdown log
         if pickle_figs:
             mpl_file = img_path.parent / f"{img_path.stem}.mpl"
             with open(mpl_file, "wb") as f:
@@ -80,6 +79,7 @@ def _log_and_fig(message, log_path, ax, img_path):
         if log_path is not None:
             log_path = Path(log_path)
             img_path_rel = img_path.relative_to(log_path.parent)
+            fig.savefig(img_path.parent / f"{img_path.stem}.png")
             img_path_png = img_path_rel.parent / f"{img_path_rel.stem}.png"
             file_format += f"\n![]({img_path_png.as_posix()})\n"
 

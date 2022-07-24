@@ -30,12 +30,8 @@ squared-error loss is reduced.
 
 .. code-block::
 
-    import matplotlib.pyplot as plt
-
     from stats_learn import bayes, random
     from stats_learn.predictors import BayesRegressor, ModelRegressor
-
-    plt.interactive(True)
 
     model = random.models.NormalLinear(weights=[1, 1])
 
@@ -119,8 +115,6 @@ for both visualization of both the prediction statistics and of the average loss
 
 Output:
 
-.. image:: ../../images/ex_basic_fit.png
-
 .. code-block:: none
 
     |                                 |    10 |
@@ -130,7 +124,7 @@ Output:
     | Normal, $\Sigma_\theta = 0.100$ | 2.034 |
     | Normal, $\Sigma_\theta = 1.000$ | 0.951 |
 
-.. image:: ../../images/ex_basic_stats.png
+.. image:: ../../images/ex_fit.png
 
 .. code-block:: none
 
@@ -141,4 +135,6 @@ Output:
     | Normal, $\Sigma_\theta = 0.100$ | 1.629 |
     | Normal, $\Sigma_\theta = 1.000$ | 1.205 |
 
-.. image:: ../../images/ex_basic_loss.png
+.. image:: ../../images/ex_stats.png
+
+.. image:: ../../images/ex_loss.png

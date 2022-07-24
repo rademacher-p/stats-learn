@@ -51,12 +51,8 @@ Training and testing data are randomly generated using the model `sample` method
 using its `evaluate` method. Once the learning `norm_predictor` is `fit` to the data, its squared-error loss is reduced.
 
 ```python
-import matplotlib.pyplot as plt
-
 from stats_learn import bayes, random
 from stats_learn.predictors import BayesRegressor, ModelRegressor
-
-plt.interactive(True)
 
 model = random.models.NormalLinear(weights=[1, 1])
 
@@ -139,8 +135,6 @@ results.model_assess(
 
 Output:
 
-![Fitting](images/ex_basic_fit.png)
-
 |                                 |    10 |
 |---------------------------------|-------|
 | Optimal                         | 0.549 |
@@ -148,7 +142,7 @@ Output:
 | Normal, $\Sigma_\theta = 0.100$ | 2.034 |
 | Normal, $\Sigma_\theta = 1.000$ | 0.951 |
 
-![Prediction statistics](images/ex_basic_stats.png)
+![Fitting](images/ex_fit.png)
 
 |                                 |    10 |
 |---------------------------------|-------|
@@ -157,7 +151,9 @@ Output:
 | Normal, $\Sigma_\theta = 0.100$ | 1.629 |
 | Normal, $\Sigma_\theta = 1.000$ | 1.205 |
 
-![Empirical risk](images/ex_basic_loss.png)
+![Prediction statistics](images/ex_stats.png)
+
+![Empirical risk](images/ex_loss.png)
 
 ## Examples
 Scripts for reproduction of results are located in the `examples` directory. They can be invoked from the

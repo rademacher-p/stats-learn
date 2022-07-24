@@ -1,9 +1,5 @@
-import matplotlib.pyplot as plt
-
 from stats_learn import bayes, random, results
 from stats_learn.predictors import BayesRegressor, ModelRegressor
-
-plt.interactive(True)
 
 model = random.models.NormalLinear(weights=[1, 1])
 
@@ -37,7 +33,9 @@ predictors = [opt_predictor, norm_predictor]
 params = [None, {"prior_cov": [0.01, 0.1, 1]}]
 
 # Sample regressor realizations
-results.data_assess(predictors, d_train, d_test, params, verbose=True, plot_fit=True)
+results.data_assess(
+    predictors, d_train, d_test, params, verbose=True, plot_fit=True, img_path="fit.png"
+)
 
 # Prediction mean/variance
 results.model_assess(
@@ -51,6 +49,7 @@ results.model_assess(
     verbose=True,
     plot_stats=True,
     print_loss=True,
+    img_path="stats.png",
     rng=seed,
 )
 
@@ -65,5 +64,6 @@ results.model_assess(
     n_mc=1000,
     verbose=True,
     plot_loss=True,
+    img_path="loss.png",
     rng=seed,
 )
