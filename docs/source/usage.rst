@@ -36,10 +36,10 @@ squared-error loss is reduced.
     model = random.models.NormalLinear(weights=[1, 1])
 
     # Predictors
-    opt_predictor = ModelRegressor(model, name='Optimal')
+    opt_predictor = ModelRegressor(model, name="Optimal")
 
     norm_model = bayes.models.NormalLinear(prior_mean=[0, 0], prior_cov=1)
-    norm_predictor = BayesRegressor(norm_model, name='Normal')
+    norm_predictor = BayesRegressor(norm_model, name="Normal")
 
     # Results
     seed = 12345
@@ -79,10 +79,12 @@ for both visualization of both the prediction statistics and of the average loss
     from stats_learn import results
 
     predictors = [opt_predictor, norm_predictor]
-    params = [None, {'prior_cov': [.01, .1, 1]}]
+    params = [None, {"prior_cov": [0.01, 0.1, 1]}]
 
     # Sample regressor realizations
-    results.data_assess(predictors, d_train, d_test, params, verbose=True, plot_fit=True)
+    results.data_assess(
+        predictors, d_train, d_test, params, verbose=True, plot_fit=True, img_path="fit.png"
+    )
 
     # Prediction mean/variance
     results.model_assess(
@@ -96,6 +98,7 @@ for both visualization of both the prediction statistics and of the average loss
         verbose=True,
         plot_stats=True,
         print_loss=True,
+        img_path="stats.png",
         rng=seed,
     )
 
@@ -110,6 +113,7 @@ for both visualization of both the prediction statistics and of the average loss
         n_mc=1000,
         verbose=True,
         plot_loss=True,
+        img_path="loss.png",
         rng=seed,
     )
 
