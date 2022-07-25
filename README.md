@@ -9,7 +9,7 @@
 
 **Note**: This project is under active development.
 
-This Python package provides a framework to explore statistical learning with a Bayesian focus. It implements a variety of `random.elements`, as well as `random.models` of data for supervised learning. The `bayes` subpackage implements similar elements/models with `prior` attributes to statistically characterize parameter uncertainty and `fit` methods to adapt posteriors.
+This [Python](https://www.python.org) package provides a framework to explore statistical learning with a Bayesian focus. It implements a variety of `random.elements`, as well as `random.models` of data for supervised learning. The `bayes` subpackage implements similar elements/models with `prior` attributes to statistically characterize parameter uncertainty and `fit` methods to adapt posteriors.
 
 For supervised learning, the `predictors` subpackage provides objects that use these statistical models to define
 inference and decision functions. Additionally, customization enables comparison with learning objects from popular
@@ -23,7 +23,7 @@ across a set of hyperparameter values.
 ## Installation
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/rademacher-p/stats-learn)
 
-The `stats_learn` package is developed for Python 3.9. It can installed directly from GitHub using
+The `stats_learn` package is developed for Python [3.9](https://www.python.org/downloads/). It can installed directly from GitHub using
 ```
 pip install git+https://github.com/rademacher-p/stats-learn.git#egg=stats_learn
 ```
