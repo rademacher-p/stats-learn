@@ -1,5 +1,4 @@
-image:
-  file: .gitpod.Dockerfile
+image: gitpod/workspace-python-3.9:2022-07-26-05-11-39
 
 tasks:
   - init: |
