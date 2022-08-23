@@ -18,7 +18,7 @@ Also included (in the `results` submodule) are various functions that enable fai
 ## Installation
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/rademacher-p/stats-learn)
 
-The `stats_learn` package is developed for [Python 3.9](https://www.python.org/downloads/). It can installed directly from GitHub using
+The `stats_learn` package is developed for [Python 3.9](https://www.python.org/downloads/). Best practice is to first create a [virtual environment](https://docs.python.org/3/tutorial/venv.html). The package can then be installed directly from GitHub using
 ```
 pip install git+https://github.com/rademacher-p/stats-learn.git#egg=stats_learn
 ```
