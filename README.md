@@ -11,14 +11,9 @@
 
 This Python package provides a framework to explore statistical learning with a Bayesian focus. It implements a variety of `random.elements`, as well as `random.models` of data for supervised learning. The `bayes` subpackage implements similar elements/models with `prior` attributes to statistically characterize parameter uncertainty and `fit` methods to adapt posteriors.
 
-For supervised learning, the `predictors` subpackage provides objects that use these statistical models to define
-inference and decision functions. Additionally, customization enables comparison with learning objects from popular
-machine learning packages. The `predictors.torch` submodule uses [PyTorch](https://pytorch.org/)
-(and [PyTorch Lightning](https://www.pytorchlightning.ai/)) to implement neural networks in the `stats_learn` API.
+For supervised learning, the `predictors` subpackage provides objects that use these statistical models to define inference and decision functions. Additionally, customization enables comparison with learning objects from popular machine learning packages. The `predictors.torch` submodule uses [PyTorch](https://pytorch.org/) (and [PyTorch Lightning](https://www.pytorchlightning.ai/)) to implement neural networks in the `stats_learn` API.
 
-Also included (in the `results` submodule) are various functions that enable fair and reproducible evaluations, as
-well as provide visualizations and Markdown-formatted output. Furthermore, they allow efficient assessments for learners
-across a set of hyperparameter values.
+Also included (in the `results` submodule) are various functions that enable fair and reproducible evaluations, as well as provide visualizations and Markdown-formatted output. Furthermore, they allow efficient assessments for learners across a set of hyperparameter values.
 
 ## Installation
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/rademacher-p/stats-learn)
@@ -38,17 +33,11 @@ Note that with both methods, the [editable option](https://pip.pypa.io/en/stable
 API documentation can be generated using the `sphinx` package and the `sphinx-rtd-theme`, both installable using `pip`. To build the HTML documentation, run `make html` from the `docs/` folder; the top level document will be `docs/build/html/index.html`
 
 ## Quickstart
-A basic example of model creation, learner definition, and performance assessment is shown below. The `model`
-attribute defines a jointly Normal distribution where the expected value of `y` conditioned on `x` is characterized
-by a polynomial function.
+A basic example of model creation, learner definition, and performance assessment is shown below. The `model` attribute defines a jointly Normal distribution where the expected value of `y` conditioned on `x` is characterized by a polynomial function.
 
-Two different predictors are instantiated. First, the `opt_predictor` uses knowledge of the `model` to
-determine the optimal `predict` function. Second, a learning regressor is formulated using a Bayesian data
-model `norm_model`; this object implements a Normal distribution `norm_model.prior` to characterize uncertainty about
-the true model `weights`.
+Two different predictors are instantiated. First, the `opt_predictor` uses knowledge of the `model` to determine the optimal `predict` function. Second, a learning regressor is formulated using a Bayesian data model `norm_model`; this object implements a Normal distribution `norm_model.prior` to characterize uncertainty about the true model `weights`.
 
-Training and testing data are randomly generated using the model `sample` method and each predictor is assessed
-using its `evaluate` method. Once the learning `norm_predictor` is `fit` to the data, its squared-error loss is reduced.
+Training and testing data are randomly generated using the model `sample` method and each predictor is assessed using its `evaluate` method. Once the learning `norm_predictor` is `fit` to the data, its squared-error loss is reduced.
 
 ```python
 from stats_learn import bayes, random
@@ -88,11 +77,7 @@ Prior learner loss = 3.413
 Trained learner loss = 0.951
 ```
 
-The code below can be executed after the previous snippet. The `data_assess` function provides replication of the
-functionality above, including a loss table and a graphic showing how the `predict` functions fit the training data.
-The `model_assess` function performs Monte Carlo approximation of the expected loss by repeatedly generating and
-evaluating on new datasets, enabling statistically meaningful evaluation. Observe that it can be used for both
-visualization of both the prediction statistics and of the average loss.
+The code below can be executed after the previous snippet. The `data_assess` function provides replication of the functionality above, including a loss table and a graphic showing how the `predict` functions fit the training data. The `model_assess` function performs Monte Carlo approximation of the expected loss by repeatedly generating and evaluating on new datasets, enabling statistically meaningful evaluation. Observe that it can be used for both visualization of both the prediction statistics and of the average loss.
 
 ```python
 from stats_learn import results
