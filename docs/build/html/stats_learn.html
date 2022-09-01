@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>stats_learn &mdash; Statistical Learning  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="bayes" href="stats_learn.bayes.html" />
+    <link rel="prev" title="User Guide" href="usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Statistical Learning
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">stats_learn</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="stats_learn.bayes.html">bayes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats_learn.predictors.html">predictors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats_learn.random.html">random</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stats_learn.loss_funcs">loss_funcs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stats_learn.preprocessing">preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stats_learn.results">results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stats_learn.spaces">spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stats_learn.util">util</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Statistical Learning</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>stats_learn</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/stats_learn.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-stats_learn">
+<span id="stats-learn"></span><h1>stats_learn<a class="headerlink" href="#module-stats_learn" title="Permalink to this headline"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="stats_learn.bayes.html">bayes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="stats_learn.bayes.html#module-stats_learn.bayes.elements">elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats_learn.bayes.html#module-stats_learn.bayes.models">models</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="stats_learn.predictors.html">predictors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="stats_learn.predictors.html#module-stats_learn.predictors.base">base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats_learn.predictors.html#module-stats_learn.predictors.torch">torch</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="stats_learn.random.html">random</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="stats_learn.random.html#module-stats_learn.random.elements">elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats_learn.random.html#module-stats_learn.random.models">models</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<section id="module-stats_learn.loss_funcs">
+<span id="loss-funcs"></span><h2>loss_funcs<a class="headerlink" href="#module-stats_learn.loss_funcs" title="Permalink to this headline"></a></h2>
+<p>Loss functions for regression and classification.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.loss_funcs.loss_01">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.loss_funcs.</span></span><span class="sig-name descname"><span class="pre">loss_01</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_hyp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.loss_funcs.loss_01" title="Permalink to this definition"></a></dt>
+<dd><p>Zero-one loss function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y_hyp</strong> (<em>array_like</em>) – The hypotheses</p></li>
+<li><p><strong>y</strong> (<em>array_like</em>) – The targets.</p></li>
+<li><p><strong>shape</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Shape of data tensors.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The zero-one losses.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.loss_funcs.loss_se">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.loss_funcs.</span></span><span class="sig-name descname"><span class="pre">loss_se</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_est</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.loss_funcs.loss_se" title="Permalink to this definition"></a></dt>
+<dd><p>Squared-error loss function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y_est</strong> (<em>array_like</em>) – The predictors.</p></li>
+<li><p><strong>y</strong> (<em>array_like</em>) – The targets.</p></li>
+<li><p><strong>shape</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Shape of data tensors.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The squared-error losses.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-stats_learn.preprocessing">
+<span id="preprocessing"></span><h2>preprocessing<a class="headerlink" href="#module-stats_learn.preprocessing" title="Permalink to this headline"></a></h2>
+<p>Functions for preprocessing observations before training/prediction.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.preprocessing.make_clipper">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.preprocessing.</span></span><span class="sig-name descname"><span class="pre">make_clipper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lims</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.preprocessing.make_clipper" title="Permalink to this definition"></a></dt>
+<dd><p>Create a function that clips inputs into a closed box space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>lims</strong> (<em>array_like</em>) – Array of lower and upper bounds to clip inputs to.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Clipping function.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.preprocessing.make_discretizer">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.preprocessing.</span></span><span class="sig-name descname"><span class="pre">make_discretizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vals</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.preprocessing.make_discretizer" title="Permalink to this definition"></a></dt>
+<dd><p>Create a rounding discretization function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vals</strong> (<em>array_like</em>) – Values to which to round.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The rounding function.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.preprocessing.prob_disc">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.preprocessing.</span></span><span class="sig-name descname"><span class="pre">prob_disc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.preprocessing.prob_disc" title="Permalink to this definition"></a></dt>
+<dd><p>Create (unnormalized) probability array for a discretization grid. Lower edge/corner probabilities.</p>
+</dd></dl>
+
+</section>
+<section id="module-stats_learn.results">
+<span id="results"></span><h2>results<a class="headerlink" href="#module-stats_learn.results" title="Permalink to this headline"></a></h2>
+<p>Assessment tools for learning and prediction performance.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.results.data_assess">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.results.</span></span><span class="sig-name descname"><span class="pre">data_assess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_fit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.results.data_assess" title="Permalink to this definition"></a></dt>
+<dd><p>Assess and compare various predictors using a single dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>predictors</strong> (<em>Collection of stats_learn.predictors.Base</em>) – Predictors to assess.</p></li>
+<li><p><strong>d_train</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Training data.</p></li>
+<li><p><strong>d_test</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Testing data.</p></li>
+<li><p><strong>params</strong> (<em>Collection of dict</em><em>, </em><em>optional</em>) – Predictor parameters to evaluate. Each element corresponds to an element of <cite>predictors</cite> and contains an
+optional dictionary mapping parameter names to various values. Outer product of each parameter array is
+assessed.</p></li>
+<li><p><strong>x</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Values of observed element to use for assessment of prediction statistics.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Enables iteration print-out.</p></li>
+<li><p><strong>plot_fit</strong> (<em>bool</em><em>, </em><em>optional</em>) – Enables plotting of fit predictors.</p></li>
+<li><p><strong>log_path</strong> (<em>os.PathLike</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – File for saving printed loss table and image path in Markdown format.</p></li>
+<li><p><strong>img_path</strong> (<em>os.PathLike</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – Directory for saving generated images.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em><em>, </em><em>optional</em>) – Axes onto which stats/losses are plotted.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Empirical risk values for each predictor and parameterization.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.results.model_assess">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.results.</span></span><span class="sig-name descname"><span class="pre">model_assess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.results.model_assess" title="Permalink to this definition"></a></dt>
+<dd><p>Assess and compare various predictors using Monte Carlo simulation of prediction statistics and empirical risk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>predictors</strong> (<em>Collection of stats_learn.predictors.Base</em>) – Predictors to assess.</p></li>
+<li><p><strong>model</strong> (<a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><em>stats_learn.random.models.Base</em></a><em> or </em><a class="reference internal" href="stats_learn.bayes.html#stats_learn.bayes.models.Base" title="stats_learn.bayes.models.Base"><em>stats_learn.bayes.models.Base</em></a>) – Data-generating model.</p></li>
+<li><p><strong>params</strong> (<em>Collection of dict</em><em>, </em><em>optional</em>) – Predictor parameters to evaluate. Each element corresponds to an element of <cite>predictors</cite> and contains an
+optional dictionary mapping parameter names to various values. Outer product of each parameter array is
+assessed.</p></li>
+<li><p><strong>n_train</strong> (<em>int</em><em> or </em><em>Collection of int</em><em>, </em><em>optional</em>) – Training data volume.</p></li>
+<li><p><strong>n_test</strong> (<em>int</em><em>, </em><em>optional</em>) – Test data volume.</p></li>
+<li><p><strong>n_mc</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of Monte Carlo simulation iterations.</p></li>
+<li><p><strong>x</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Values of observed element to use for assessment of prediction statistics.</p></li>
+<li><p><strong>stats</strong> (<em>Collection of str</em><em>, </em><em>optional</em>) – Names of the statistics to generate, e.g. ‘mean’, ‘std’, ‘cov’, ‘mode’, etc.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Enables iteration print-out.</p></li>
+<li><p><strong>plot_stats</strong> (<em>bool</em><em>, </em><em>optional</em>) – Enables plotting of prediction statistics.</p></li>
+<li><p><strong>plot_loss</strong> (<em>bool</em><em>, </em><em>optional</em>) – Enables plotting of average loss.</p></li>
+<li><p><strong>print_loss</strong> (<em>bool</em><em>, </em><em>optional</em>) – Enables print-out of average loss table.</p></li>
+<li><p><strong>log_path</strong> (<em>os.PathLike</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – File for saving printed loss table and image path in Markdown format.</p></li>
+<li><p><strong>img_path</strong> (<em>os.PathLike</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – Directory for saving generated images.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em><em>, </em><em>optional</em>) – Axes onto which stats/losses are plotted.</p></li>
+<li><p><strong>rng</strong> (<em>int</em><em> or </em><em>np.random.RandomState</em><em> or </em><em>np.random.Generator</em><em>, </em><em>optional</em>) – Random number generator seed or object.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>list of ndarray</em> – One item per predictor containing prediction statistics for each parameterization.</p></li>
+<li><p><em>list of ndarray</em> – One item per predictor containing empirical risk values for each parameterization.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Uses Welford’s online algorithm <a class="reference external" href="https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance">https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.results.plot_predict_stats">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.results.</span></span><span class="sig-name descname"><span class="pre">plot_predict_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.results.plot_predict_stats" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.results.plot_risk_disc">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.results.</span></span><span class="sig-name descname"><span class="pre">plot_risk_disc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.results.plot_risk_disc" title="Permalink to this definition"></a></dt>
+<dd><p>Plot risk against discretization set cardinality.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.results.plot_risk_eval_sim">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.results.</span></span><span class="sig-name descname"><span class="pre">plot_risk_eval_sim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.results.plot_risk_eval_sim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.results.predict_stats">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.results.</span></span><span class="sig-name descname"><span class="pre">predict_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.results.predict_stats" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.results.risk_eval_analytic">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.results.</span></span><span class="sig-name descname"><span class="pre">risk_eval_analytic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.results.risk_eval_analytic" title="Permalink to this definition"></a></dt>
+<dd><p>Assess various predictors using analytical risk calculation.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.results.risk_eval_sim">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.results.</span></span><span class="sig-name descname"><span class="pre">risk_eval_sim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.results.risk_eval_sim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-stats_learn.spaces">
+<span id="spaces"></span><h2>spaces<a class="headerlink" href="#module-stats_learn.spaces" title="Permalink to this headline"></a></h2>
+<p>Spaces for extrema-finding, integration, plotting, etc.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.spaces.Base">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">Base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Base" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Base class for spaces.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>shape</strong> (<em>tuple</em>) – Shape of the space values.</p></li>
+<li><p><strong>dtype</strong> (<em>type</em>) – Data type of the space values.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.Base.argmax">
+<span class="sig-name descname"><span class="pre">argmax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Base.argmax" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.Base.argmin">
+<span class="sig-name descname"><span class="pre">argmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Base.argmin" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.spaces.Base.dtype">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#stats_learn.spaces.Base.dtype" title="Permalink to this definition"></a></dt>
+<dd><p>Data type of the space values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.dtype</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.Base.integrate">
+<span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Base.integrate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.Base.make_axes">
+<span class="sig-name descname"><span class="pre">make_axes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Base.make_axes" title="Permalink to this definition"></a></dt>
+<dd><p>Create axes for plotting.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.Base.moment">
+<span class="sig-name descname"><span class="pre">moment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Base.moment" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.spaces.Base.ndim">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#stats_learn.spaces.Base.ndim" title="Permalink to this definition"></a></dt>
+<dd><p>Dimensionality of the space values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.Base.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Base.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Plot a function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> (<em>callable</em>) – The function to plot.</p></li>
+<li><p><strong>x</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Values to plot against. Defaults to <cite>self.x_plt</cite>.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em><em>, </em><em>optional</em>) – Axes.</p></li>
+<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – Label for matplotlib.artist.Artist</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional plotting keyword arguments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>matplotlib.artist.Artist or tuple of matplotlib.artist.Artist</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.Base.plot_xy">
+<span class="sig-name descname"><span class="pre">plot_xy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_std_hi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Base.plot_xy" title="Permalink to this definition"></a></dt>
+<dd><p>Plot an array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array_like</em>) – Domain (i.e. space) values.</p></li>
+<li><p><strong>y</strong> (<em>array_like</em>) – Range values.</p></li>
+<li><p><strong>y_std</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Standard deviation for error plotting.</p></li>
+<li><p><strong>y_std_hi</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Upper standard deviation, if different from lower defined in <cite>y_std</cite>.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em><em>, </em><em>optional</em>) – Axes.</p></li>
+<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – Label for matplotlib.artist.Artist        kwargs : dict, optional
+Additional plotting keyword arguments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>matplotlib.artist.Artist or tuple of matplotlib.artist.Artist</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.Base.set_x_plot">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_x_plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Base.set_x_plot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.spaces.Base.shape">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#stats_learn.spaces.Base.shape" title="Permalink to this definition"></a></dt>
+<dd><p>Shape of the space values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.spaces.Base.size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#stats_learn.spaces.Base.size" title="Permalink to this definition"></a></dt>
+<dd><p>Size of the space values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.spaces.Base.x_plt">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">x_plt</span></span><a class="headerlink" href="#stats_learn.spaces.Base.x_plt" title="Permalink to this definition"></a></dt>
+<dd><p>Array of default values for plotting routines.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.spaces.Box">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">Box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lims</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Box" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Continuous" title="stats_learn.spaces.Continuous"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.spaces.Continuous</span></code></a></p>
+<p>Orthotope space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>lims</strong> (<em>array_like</em>) – Lower and upper limits for each dimension.</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.spaces.Box.lims">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lims</span></span><a class="headerlink" href="#stats_learn.spaces.Box.lims" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.spaces.Box.lims_plot">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lims_plot</span></span><a class="headerlink" href="#stats_learn.spaces.Box.lims_plot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.Box.make_grid">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">make_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Box.make_grid" title="Permalink to this definition"></a></dt>
+<dd><p>Make a equally-spaced grid of tensors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lims</strong> (<em>array_like</em>) – Lower and upper limits for each dimension.</p></li>
+<li><p><strong>n</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of points defining the plot grid.</p></li>
+<li><p><strong>endpoint</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the upper limit values are included in the grid.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.spaces.Box.optimize_kwargs">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">optimize_kwargs</span></span><a class="headerlink" href="#stats_learn.spaces.Box.optimize_kwargs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.Box.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Box.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Plot a function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> (<em>callable</em>) – The function to plot.</p></li>
+<li><p><strong>x</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Values to plot against. Defaults to <cite>self.x_plt</cite>.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em><em>, </em><em>optional</em>) – Axes.</p></li>
+<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – Label for matplotlib.artist.Artist</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional plotting keyword arguments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>matplotlib.artist.Artist or tuple of matplotlib.artist.Artist</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.Box.set_x_plot">
+<span class="sig-name descname"><span class="pre">set_x_plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Box.set_x_plot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.spaces.Continuous">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">Continuous</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Continuous" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Base" title="stats_learn.spaces.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.spaces.Base</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.Continuous.integrate">
+<span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Continuous.integrate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.spaces.Continuous.optimize_kwargs">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">optimize_kwargs</span></span><a class="headerlink" href="#stats_learn.spaces.Continuous.optimize_kwargs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.spaces.Discrete">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">Discrete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Discrete" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Base" title="stats_learn.spaces.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.spaces.Base</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Base class for discrete spaces.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.spaces.Euclidean">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">Euclidean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Euclidean" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Box" title="stats_learn.spaces.Box"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.spaces.Box</span></code></a></p>
+<p>A Euclidean space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>shape</strong> (<em>tuple</em>) – Shape of the space values.</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.spaces.Euclidean.lims_plot">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lims_plot</span></span><a class="headerlink" href="#stats_learn.spaces.Euclidean.lims_plot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.spaces.Euclidean.optimize_kwargs">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">optimize_kwargs</span></span><a class="headerlink" href="#stats_learn.spaces.Euclidean.optimize_kwargs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.spaces.Finite">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">Finite</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Finite" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Discrete" title="stats_learn.spaces.Discrete"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.spaces.Discrete</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Base class for finite spaces.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.spaces.FiniteGeneric">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">FiniteGeneric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.FiniteGeneric" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Finite" title="stats_learn.spaces.Finite"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.spaces.Finite</span></code></a></p>
+<p>Finite-dimensional space with specified values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>values</strong> (<em>array_like</em>) – Explicit elements of space.</p></li>
+<li><p><strong>shape</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Shape of the space values.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.FiniteGeneric.from_grid">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.FiniteGeneric.from_grid" title="Permalink to this definition"></a></dt>
+<dd><p>Define support as grid over a Box space.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.FiniteGeneric.from_outer">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_outer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">vecs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.FiniteGeneric.from_outer" title="Permalink to this definition"></a></dt>
+<dd><p>Define support as outer product of tensors.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.FiniteGeneric.integrate">
+<span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.FiniteGeneric.integrate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.FiniteGeneric.set_x_plot">
+<span class="sig-name descname"><span class="pre">set_x_plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.FiniteGeneric.set_x_plot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.spaces.FiniteGeneric.values_flat">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">values_flat</span></span><a class="headerlink" href="#stats_learn.spaces.FiniteGeneric.values_flat" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.spaces.Simplex">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">Simplex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Simplex" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Continuous" title="stats_learn.spaces.Continuous"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.spaces.Continuous</span></code></a></p>
+<p>A simplex space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>shape</strong> (<em>tuple</em>) – Shape of the space values.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.Simplex.make_axes">
+<span class="sig-name descname"><span class="pre">make_axes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Simplex.make_axes" title="Permalink to this definition"></a></dt>
+<dd><p>Create axes for plotting.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.Simplex.make_grid">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">make_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hull_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Simplex.make_grid" title="Permalink to this definition"></a></dt>
+<dd><p>Make a equally-spaced grid of tensors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of points defining the plot grid.</p></li>
+<li><p><strong>shape</strong> (<em>tuple</em>) – Shape of the space values.</p></li>
+<li><p><strong>hull_mask</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Where True, defines boundaries to exclude.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.spaces.Simplex.n_plot">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_plot</span></span><a class="headerlink" href="#stats_learn.spaces.Simplex.n_plot" title="Permalink to this definition"></a></dt>
+<dd><p>Number of points defining the default plot grid.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.Simplex.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">scatter_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Simplex.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Plot a function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> (<em>callable</em>) – The function to plot.</p></li>
+<li><p><strong>x</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Values to plot against. Defaults to <cite>self.x_plt</cite>.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em><em>, </em><em>optional</em>) – Axes.</p></li>
+<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – Label for matplotlib.artist.Artist</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional plotting keyword arguments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>matplotlib.artist.Artist or tuple of matplotlib.artist.Artist</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.spaces.Simplex.set_x_plot">
+<span class="sig-name descname"><span class="pre">set_x_plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Simplex.set_x_plot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.spaces.SimplexDiscrete">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">SimplexDiscrete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.SimplexDiscrete" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Simplex" title="stats_learn.spaces.Simplex"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.spaces.Simplex</span></code></a></p>
+<p>Finite grid over Simplex space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em>) – Number of points defining the grid.</p></li>
+<li><p><strong>shape</strong> (<em>tuple</em>) – Shape of the space values.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.spaces.SimplexDiscrete.n_plot">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_plot</span></span><a class="headerlink" href="#stats_learn.spaces.SimplexDiscrete.n_plot" title="Permalink to this definition"></a></dt>
+<dd><p>Number of points defining the default plot grid.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.spaces.check_spaces">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">check_spaces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spaces</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.check_spaces" title="Permalink to this definition"></a></dt>
+<dd><p>Check spaces for equivalence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>spaces</strong> (<em>Collection</em>) – Spaces to check.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A space instance.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#stats_learn.spaces.Base" title="stats_learn.spaces.Base">Base</a> or dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-stats_learn.util">
+<span id="util"></span><h2>util<a class="headerlink" href="#module-stats_learn.util" title="Permalink to this headline"></a></h2>
+<p>Common utilities.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.util.RandomGeneratorMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.util.</span></span><span class="sig-name descname"><span class="pre">RandomGeneratorMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.util.RandomGeneratorMixin" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Provides a RNG property and methods for seeding.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rng</strong> (<em>int</em><em> or </em><em>np.random.RandomState</em><em> or </em><em>np.random.Generator</em><em>, </em><em>optional</em>) – Random number generator seed or object.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.util.RandomGeneratorMixin.make_rng">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">make_rng</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.util.RandomGeneratorMixin.make_rng" title="Permalink to this definition"></a></dt>
+<dd><p>Return a random number generator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rng</strong> (<em>int</em><em> or </em><em>np.random.RandomState</em><em> or </em><em>np.random.Generator</em><em>, </em><em>optional</em>) – Random number generator seed or object.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>np.random.Generator</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.util.RandomGeneratorMixin.rng">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rng</span></span><a class="headerlink" href="#stats_learn.util.RandomGeneratorMixin.rng" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.util.check_data_shape">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.util.</span></span><span class="sig-name descname"><span class="pre">check_data_shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.util.check_data_shape" title="Permalink to this definition"></a></dt>
+<dd><p>Check that trailing elements of array shape match desired data shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array_like</em>) – The array.</p></li>
+<li><p><strong>shape</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Shape of data tensors.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>numpy.ndarray</em> – The data tensor as a NumPy array.</p></li>
+<li><p><em>tuple</em> – The shape of the data set (i.e., the leading elements of the array shape).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.util.check_valid_pmf">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.util.</span></span><span class="sig-name descname"><span class="pre">check_valid_pmf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_support</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-09</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.util.check_valid_pmf" title="Permalink to this definition"></a></dt>
+<dd><p>Check that array is a valid probability mass function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<em>array_like</em>) – The array.</p></li>
+<li><p><strong>shape</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Shape of PMF tensors.</p></li>
+<li><p><strong>full_support</strong> (<em>bool</em><em>, </em><em>optional</em>) – Raises <cite>ValueError</cite> if the PMF is not full-support (i.e. if any elements are zero)</p></li>
+<li><p><strong>tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for ensuring PMF sums to unity.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>numpy.ndarray</em> – The PMF as a NumPy array.</p></li>
+<li><p><em>tuple, optional</em> – The shape of the set of PMFs (i.e., the leading elements of the array shape).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.util.get_now">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.util.</span></span><span class="sig-name descname"><span class="pre">get_now</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.util.get_now" title="Permalink to this definition"></a></dt>
+<dd><p>Get ISO datetime in format compatible with Windows filename.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.util.vectorize_func">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.util.</span></span><span class="sig-name descname"><span class="pre">vectorize_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.util.vectorize_func" title="Permalink to this definition"></a></dt>
+<dd><p>Vectorize a callable according to specified input shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<em>callable</em>) – Function to vectorize.</p></li>
+<li><p><strong>shape</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Shape of data tensors.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>function</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage.html" class="btn btn-neutral float-left" title="User Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="stats_learn.bayes.html" class="btn btn-neutral float-right" title="bayes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Paul Rademacher.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>predictors &mdash; Statistical Learning  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="random" href="stats_learn.random.html" />
+    <link rel="prev" title="bayes" href="stats_learn.bayes.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Statistical Learning
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="stats_learn.html">stats_learn</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="stats_learn.bayes.html">bayes</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">predictors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-stats_learn.predictors.base">base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-stats_learn.predictors.torch">torch</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="stats_learn.random.html">random</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats_learn.html#module-stats_learn.loss_funcs">loss_funcs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats_learn.html#module-stats_learn.preprocessing">preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats_learn.html#module-stats_learn.results">results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats_learn.html#module-stats_learn.spaces">spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats_learn.html#module-stats_learn.util">util</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Statistical Learning</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="stats_learn.html">stats_learn</a> &raquo;</li>
+      <li>predictors</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/stats_learn.predictors.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-stats_learn.predictors">
+<span id="predictors"></span><h1>predictors<a class="headerlink" href="#module-stats_learn.predictors" title="Permalink to this headline"></a></h1>
+<section id="module-stats_learn.predictors.base">
+<span id="base"></span><h2>base<a class="headerlink" href="#module-stats_learn.predictors.base" title="Permalink to this headline"></a></h2>
+<p>Fixed and learning predictors for supervised learning applications.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.predictors.base.</span></span><span class="sig-name descname"><span class="pre">Base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proc_funcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Base" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Base class for supervised learning predictors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>loss_func</strong> (<em>callable</em>) – </p></li>
+<li><p><strong>space</strong> (<em>dict</em><em>, </em><em>optional</em>) – The domain for <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/> and <img class="math" src="_images/math/e7aef02edc78c428596f814d49189687b8551a04.png" alt="\yrm" style="vertical-align: -4px"/>. Defaults to the model’s space.</p></li>
+<li><p><strong>proc_funcs</strong> (<em>Collection of callable of dict of Collection of callable</em>) – Sequentially-invoked preprocessing functions for <img class="math" src="_images/math/03dc989cff006fa3f36960d82c9c42891df6313e.png" alt="x" style="vertical-align: 0px"/> and <img class="math" src="_images/math/ac81156a8df1ef8e899e1e420f9c9ae412a3a8bc.png" alt="y" style="vertical-align: -4px"/> values.</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.data_assess">
+<span class="sig-name descname"><span class="pre">data_assess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_fit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Base.data_assess" title="Permalink to this definition"></a></dt>
+<dd><p>Assess predictor using a single dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d_train</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Training data.</p></li>
+<li><p><strong>d_test</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Testing data.</p></li>
+<li><p><strong>params</strong> (<em>dict</em><em>, </em><em>optional</em>) – Predictor parameters to evaluate. Outer product of each parameter array is assessed.</p></li>
+<li><p><strong>x</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Values of observed element to use for assessment of prediction statistics.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Enables iteration print-out.</p></li>
+<li><p><strong>plot_fit</strong> (<em>bool</em><em>, </em><em>optional</em>) – Enables plotting of fit predictors.</p></li>
+<li><p><strong>log_path</strong> (<em>os.PathLike</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – File for saving printed loss table and image path in Markdown format.</p></li>
+<li><p><strong>img_path</strong> (<em>os.PathLike</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – Directory for saving generated images.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em><em>, </em><em>optional</em>) – Axes onto which stats/losses are plotted.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Empirical risk values for each parameterization.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.dtype">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#stats_learn.predictors.base.Base.dtype" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Base.evaluate" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate predictor using test data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<em>np.ndarray</em>) – The test data.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Empirical risk (i.e. average test loss).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.evaluate_from_model">
+<span class="sig-name descname"><span class="pre">evaluate_from_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Base.evaluate_from_model" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate predictor using test data randomly drawn from a given data model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><em>stats_learn.random.models.Base</em></a>) – Model for training data generation.</p></li>
+<li><p><strong>n_test</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of test samples.</p></li>
+<li><p><strong>n_mc</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of Monte Carlo simulation iterations.</p></li>
+<li><p><strong>rng</strong> (<em>int</em><em> or </em><em>np.random.RandomState</em><em> or </em><em>np.random.Generator</em><em>, </em><em>optional</em>) – Random number generator seed or object.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Empirical risk (i.e. average test loss).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Base.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Refine the learning model using observations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – The training data.</p></li>
+<li><p><strong>warm_start</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <cite>False</cite>, <cite>reset</cite> is invoked to restore unfit state.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.fit_from_model">
+<span class="sig-name descname"><span class="pre">fit_from_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Base.fit_from_model" title="Permalink to this definition"></a></dt>
+<dd><p>Refine the learning model using data randomly drawn from a model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><em>stats_learn.random.models.Base</em></a>) – Model for training data generation.</p></li>
+<li><p><strong>n_train</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of training samples.</p></li>
+<li><p><strong>warm_start</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <cite>False</cite>, <cite>reset</cite> is invoked to restore unfit state.</p></li>
+<li><p><strong>rng</strong> (<em>int</em><em> or </em><em>np.random.RandomState</em><em> or </em><em>np.random.Generator</em><em>, </em><em>optional</em>) – Random number generator seed or object.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.model_assess">
+<span class="sig-name descname"><span class="pre">model_assess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Base.model_assess" title="Permalink to this definition"></a></dt>
+<dd><p>Assess predictor using Monte Carlo simulation of prediction statistics and empirical risk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><em>stats_learn.random.models.Base</em></a><em> or </em><a class="reference internal" href="stats_learn.bayes.html#stats_learn.bayes.models.Base" title="stats_learn.bayes.models.Base"><em>stats_learn.bayes.models.Base</em></a>) – Data-generating model.</p></li>
+<li><p><strong>params</strong> (<em>Collection of dict</em><em>, </em><em>optional</em>) – Predictor parameters to evaluate. Outer product of each parameter array is assessed.</p></li>
+<li><p><strong>n_train</strong> (<em>int</em><em> or </em><em>Collection of int</em><em>, </em><em>optional</em>) – Training data volume.</p></li>
+<li><p><strong>n_test</strong> (<em>int</em><em>, </em><em>optional</em>) – Test data volume.</p></li>
+<li><p><strong>n_mc</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of Monte Carlo simulation iterations.</p></li>
+<li><p><strong>x</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Values of observed element to use for assessment of prediction statistics.</p></li>
+<li><p><strong>stats</strong> (<em>Collection of str</em><em>, </em><em>optional</em>) – Names of the statistics to generate, e.g. ‘mean’, ‘std’, ‘cov’, ‘mode’, etc.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Enables iteration print-out.</p></li>
+<li><p><strong>plot_stats</strong> (<em>bool</em><em>, </em><em>optional</em>) – Enables plotting of prediction statistics.</p></li>
+<li><p><strong>plot_loss</strong> (<em>bool</em><em>, </em><em>optional</em>) – Enables plotting of average loss.</p></li>
+<li><p><strong>print_loss</strong> (<em>bool</em><em>, </em><em>optional</em>) – Enables print-out of average loss table.</p></li>
+<li><p><strong>log_path</strong> (<em>os.PathLike</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – File for saving printed loss table and image path in Markdown format.</p></li>
+<li><p><strong>img_path</strong> (<em>os.PathLike</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – Directory for saving generated images.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em><em>, </em><em>optional</em>) – Axes onto which stats/losses are plotted.</p></li>
+<li><p><strong>rng</strong> (<em>int</em><em> or </em><em>np.random.RandomState</em><em> or </em><em>np.random.Generator</em><em>, </em><em>optional</em>) – Random number generator seed or object.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>ndarray</em> – Prediction statistics for each parameterization.</p></li>
+<li><p><em>ndarray</em> – Empirical risk values for each parameterization.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.ndim">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#stats_learn.predictors.base.Base.ndim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.plot_predict">
+<span class="sig-name descname"><span class="pre">plot_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Base.plot_predict" title="Permalink to this definition"></a></dt>
+<dd><p>Plot prediction function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Values to plot against. Defaults to <cite>self.x_plt</cite>.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em><em>, </em><em>optional</em>) – Axes.</p></li>
+<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – Label for matplotlib.artist.Artist</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>matplotlib.artist.Artist or tuple of matplotlib.artist.Artist</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.plot_predict_stats">
+<span class="sig-name descname"><span class="pre">plot_predict_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Base.plot_predict_stats" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.plot_risk_eval_sim">
+<span class="sig-name descname"><span class="pre">plot_risk_eval_sim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Base.plot_risk_eval_sim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Base.predict" title="Permalink to this definition"></a></dt>
+<dd><p>Generate predictions for given <img class="math" src="_images/math/03dc989cff006fa3f36960d82c9c42891df6313e.png" alt="x" style="vertical-align: 0px"/> values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>array_like</em>) – Observed random element values.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Prediction values.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.predict_stats">
+<span class="sig-name descname"><span class="pre">predict_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('mode',)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Base.predict_stats" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.reset">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Base.reset" title="Permalink to this definition"></a></dt>
+<dd><p>Restore unfit prior state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.risk_eval_analytic">
+<span class="sig-name descname"><span class="pre">risk_eval_analytic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Base.risk_eval_analytic" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.risk_eval_sim">
+<span class="sig-name descname"><span class="pre">risk_eval_sim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Base.risk_eval_sim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Base.set_params" title="Permalink to this definition"></a></dt>
+<dd><p>Set parameters of the learning model object.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.shape">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#stats_learn.predictors.base.Base.shape" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#stats_learn.predictors.base.Base.size" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.space">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">space</span></span><a class="headerlink" href="#stats_learn.predictors.base.Base.space" title="Permalink to this definition"></a></dt>
+<dd><p>The domain for <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/> and <img class="math" src="_images/math/e7aef02edc78c428596f814d49189687b8551a04.png" alt="\yrm" style="vertical-align: -4px"/>. Defaults to the model’s space.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Base.tex_params">
+<span class="sig-name descname"><span class="pre">tex_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Base.tex_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Bayes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.predictors.base.</span></span><span class="sig-name descname"><span class="pre">Bayes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bayes_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proc_funcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Bayes" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.predictors.base.Base" title="stats_learn.predictors.base.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.predictors.base.Base</span></code></a></p>
+<p>Predictor based on Bayesian data model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bayes_model</strong> (<a class="reference internal" href="stats_learn.bayes.html#stats_learn.bayes.models.Base" title="stats_learn.bayes.models.Base"><em>stats_learn.bayes.models.Base</em></a>) – Bayes model used for fitting and to generate predictions.</p></li>
+<li><p><strong>loss_func</strong> (<em>callable</em>) – </p></li>
+<li><p><strong>space</strong> (<em>dict</em><em>, </em><em>optional</em>) – The domain for <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/> and <img class="math" src="_images/math/e7aef02edc78c428596f814d49189687b8551a04.png" alt="\yrm" style="vertical-align: -4px"/>. Defaults to the model’s space.</p></li>
+<li><p><strong>proc_funcs</strong> (<em>Collection of callable of dict of Collection of callable</em>) – Sequentially-invoked preprocessing functions for <img class="math" src="_images/math/03dc989cff006fa3f36960d82c9c42891df6313e.png" alt="x" style="vertical-align: 0px"/> and <img class="math" src="_images/math/ac81156a8df1ef8e899e1e420f9c9ae412a3a8bc.png" alt="y" style="vertical-align: -4px"/> values.</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Bayes.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Bayes.reset" title="Permalink to this definition"></a></dt>
+<dd><p>Invoke reset of the Bayesian model.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.BayesClassifier">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.predictors.base.</span></span><span class="sig-name descname"><span class="pre">BayesClassifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bayes_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proc_funcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.BayesClassifier" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.predictors.base.ClassifierMixin" title="stats_learn.predictors.base.ClassifierMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.predictors.base.ClassifierMixin</span></code></a>, <a class="reference internal" href="#stats_learn.predictors.base.Bayes" title="stats_learn.predictors.base.Bayes"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.predictors.base.Bayes</span></code></a></p>
+<p>Classifier based on Bayesian data model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bayes_model</strong> (<a class="reference internal" href="stats_learn.bayes.html#stats_learn.bayes.models.Base" title="stats_learn.bayes.models.Base"><em>stats_learn.bayes.models.Base</em></a>) – Bayes model used for fitting and to generate predictions.</p></li>
+<li><p><strong>space</strong> (<em>dict</em><em>, </em><em>optional</em>) – The domain for <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/> and <img class="math" src="_images/math/e7aef02edc78c428596f814d49189687b8551a04.png" alt="\yrm" style="vertical-align: -4px"/>. Defaults to the model’s space.</p></li>
+<li><p><strong>proc_funcs</strong> (<em>Collection of callable of dict of Collection of callable</em>) – Sequentially-invoked preprocessing functions for <img class="math" src="_images/math/03dc989cff006fa3f36960d82c9c42891df6313e.png" alt="x" style="vertical-align: 0px"/> and <img class="math" src="_images/math/ac81156a8df1ef8e899e1e420f9c9ae412a3a8bc.png" alt="y" style="vertical-align: -4px"/> values.</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.BayesClassifier.model">
+<span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><span class="pre">stats_learn.random.models.Base</span></a></em><a class="headerlink" href="#stats_learn.predictors.base.BayesClassifier.model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.BayesRegressor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.predictors.base.</span></span><span class="sig-name descname"><span class="pre">BayesRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bayes_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proc_funcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.BayesRegressor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.predictors.base.RegressorMixin" title="stats_learn.predictors.base.RegressorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.predictors.base.RegressorMixin</span></code></a>, <a class="reference internal" href="#stats_learn.predictors.base.Bayes" title="stats_learn.predictors.base.Bayes"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.predictors.base.Bayes</span></code></a></p>
+<p>Regressor based on Bayesian data model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bayes_model</strong> (<a class="reference internal" href="stats_learn.bayes.html#stats_learn.bayes.models.Base" title="stats_learn.bayes.models.Base"><em>stats_learn.bayes.models.Base</em></a>) – Bayes model used for fitting and to generate predictions.</p></li>
+<li><p><strong>space</strong> (<em>dict</em><em>, </em><em>optional</em>) – The domain for <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/> and <img class="math" src="_images/math/e7aef02edc78c428596f814d49189687b8551a04.png" alt="\yrm" style="vertical-align: -4px"/>. Defaults to the model’s space.</p></li>
+<li><p><strong>proc_funcs</strong> (<em>Collection of callable of dict of Collection of callable</em>) – Sequentially-invoked preprocessing functions for <img class="math" src="_images/math/03dc989cff006fa3f36960d82c9c42891df6313e.png" alt="x" style="vertical-align: 0px"/> and <img class="math" src="_images/math/ac81156a8df1ef8e899e1e420f9c9ae412a3a8bc.png" alt="y" style="vertical-align: -4px"/> values.</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.BayesRegressor.evaluate_analytic">
+<span class="sig-name descname"><span class="pre">evaluate_analytic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.BayesRegressor.evaluate_analytic" title="Permalink to this definition"></a></dt>
+<dd><p>Analytically calculate risk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><em>stats_learn.random.models.Base</em></a>) – Model for training data generation.</p></li>
+<li><p><strong>n_train</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of training samples.</p></li>
+<li><p><strong>n_test</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of testing samples.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Analytical risk.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.BayesRegressor.model">
+<span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><span class="pre">stats_learn.random.models.Base</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.MixinRVy" title="stats_learn.random.models.MixinRVy"><span class="pre">stats_learn.random.models.MixinRVy</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#stats_learn.predictors.base.BayesRegressor.model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.ClassifierMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.predictors.base.</span></span><span class="sig-name descname"><span class="pre">ClassifierMixin</span></span><a class="headerlink" href="#stats_learn.predictors.base.ClassifierMixin" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Uses model conditional mode to minimize 0-1 loss.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.ClassifierMixin.model">
+<span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><span class="pre">stats_learn.random.models.Base</span></a></em><a class="headerlink" href="#stats_learn.predictors.base.ClassifierMixin.model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Model">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.predictors.base.</span></span><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proc_funcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Model" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.predictors.base.Base" title="stats_learn.predictors.base.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.predictors.base.Base</span></code></a></p>
+<p>Predictor based on fixed data model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><em>stats_learn.random.models.Base</em></a>) – Fixed model used to generate predictions.</p></li>
+<li><p><strong>loss_func</strong> (<em>callable</em>) – </p></li>
+<li><p><strong>space</strong> (<em>dict</em><em>, </em><em>optional</em>) – The domain for <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/> and <img class="math" src="_images/math/e7aef02edc78c428596f814d49189687b8551a04.png" alt="\yrm" style="vertical-align: -4px"/>. Defaults to the model’s space.</p></li>
+<li><p><strong>proc_funcs</strong> (<em>Collection of callable of dict of Collection of callable</em>) – Sequentially-invoked preprocessing functions for <img class="math" src="_images/math/03dc989cff006fa3f36960d82c9c42891df6313e.png" alt="x" style="vertical-align: 0px"/> and <img class="math" src="_images/math/ac81156a8df1ef8e899e1e420f9c9ae412a3a8bc.png" alt="y" style="vertical-align: -4px"/> values.</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Model.fit_from_model">
+<span class="sig-name descname"><span class="pre">fit_from_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Model.fit_from_model" title="Permalink to this definition"></a></dt>
+<dd><p>Refine the learning model using data randomly drawn from a model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><em>stats_learn.random.models.Base</em></a>) – Model for training data generation.</p></li>
+<li><p><strong>n_train</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of training samples.</p></li>
+<li><p><strong>warm_start</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <cite>False</cite>, <cite>reset</cite> is invoked to restore unfit state.</p></li>
+<li><p><strong>rng</strong> (<em>int</em><em> or </em><em>np.random.RandomState</em><em> or </em><em>np.random.Generator</em><em>, </em><em>optional</em>) – Random number generator seed or object.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.Model.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.Model.reset" title="Permalink to this definition"></a></dt>
+<dd><p>Restore unfit prior state.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.ModelClassifier">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.predictors.base.</span></span><span class="sig-name descname"><span class="pre">ModelClassifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proc_funcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.ModelClassifier" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.predictors.base.ClassifierMixin" title="stats_learn.predictors.base.ClassifierMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.predictors.base.ClassifierMixin</span></code></a>, <a class="reference internal" href="#stats_learn.predictors.base.Model" title="stats_learn.predictors.base.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.predictors.base.Model</span></code></a></p>
+<p>Classifier based on fixed data model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><em>stats_learn.random.models.Base</em></a>) – Fixed model used to generate predictions.</p></li>
+<li><p><strong>space</strong> (<em>dict</em><em>, </em><em>optional</em>) – The domain for <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/> and <img class="math" src="_images/math/e7aef02edc78c428596f814d49189687b8551a04.png" alt="\yrm" style="vertical-align: -4px"/>. Defaults to the model’s space.</p></li>
+<li><p><strong>proc_funcs</strong> (<em>Collection of callable of dict of Collection of callable</em>) – Sequentially-invoked preprocessing functions for <img class="math" src="_images/math/03dc989cff006fa3f36960d82c9c42891df6313e.png" alt="x" style="vertical-align: 0px"/> and <img class="math" src="_images/math/ac81156a8df1ef8e899e1e420f9c9ae412a3a8bc.png" alt="y" style="vertical-align: -4px"/> values.</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.ModelClassifier.model">
+<span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><span class="pre">stats_learn.random.models.Base</span></a></em><a class="headerlink" href="#stats_learn.predictors.base.ModelClassifier.model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.ModelRegressor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.predictors.base.</span></span><span class="sig-name descname"><span class="pre">ModelRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proc_funcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.ModelRegressor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.predictors.base.RegressorMixin" title="stats_learn.predictors.base.RegressorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.predictors.base.RegressorMixin</span></code></a>, <a class="reference internal" href="#stats_learn.predictors.base.Model" title="stats_learn.predictors.base.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.predictors.base.Model</span></code></a></p>
+<p>Regressor based on fixed data model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><em>stats_learn.random.models.Base</em></a>) – Fixed model used to generate predictions.</p></li>
+<li><p><strong>space</strong> (<em>dict</em><em>, </em><em>optional</em>) – The domain for <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/> and <img class="math" src="_images/math/e7aef02edc78c428596f814d49189687b8551a04.png" alt="\yrm" style="vertical-align: -4px"/>. Defaults to the model’s space.</p></li>
+<li><p><strong>proc_funcs</strong> (<em>Collection of callable of dict of Collection of callable</em>) – Sequentially-invoked preprocessing functions for <img class="math" src="_images/math/03dc989cff006fa3f36960d82c9c42891df6313e.png" alt="x" style="vertical-align: 0px"/> and <img class="math" src="_images/math/ac81156a8df1ef8e899e1e420f9c9ae412a3a8bc.png" alt="y" style="vertical-align: -4px"/> values.</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.ModelRegressor.evaluate_analytic">
+<span class="sig-name descname"><span class="pre">evaluate_analytic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.base.ModelRegressor.evaluate_analytic" title="Permalink to this definition"></a></dt>
+<dd><p>Analytically calculate risk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><em>stats_learn.random.models.Base</em></a>) – Model for training data generation.</p></li>
+<li><p><strong>n_train</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of training samples.</p></li>
+<li><p><strong>n_test</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of testing samples.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Analytical risk.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.ModelRegressor.model">
+<span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><span class="pre">stats_learn.random.models.Base</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.MixinRVy" title="stats_learn.random.models.MixinRVy"><span class="pre">stats_learn.random.models.MixinRVy</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#stats_learn.predictors.base.ModelRegressor.model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.RegressorMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.predictors.base.</span></span><span class="sig-name descname"><span class="pre">RegressorMixin</span></span><a class="headerlink" href="#stats_learn.predictors.base.RegressorMixin" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Uses model conditional mean to minimize squared-error loss.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stats_learn.predictors.base.RegressorMixin.model">
+<span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><span class="pre">stats_learn.random.models.Base</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.MixinRVy" title="stats_learn.random.models.MixinRVy"><span class="pre">stats_learn.random.models.MixinRVy</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#stats_learn.predictors.base.RegressorMixin.model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-stats_learn.predictors.torch">
+<span id="torch"></span><span id="predictors-torch"></span><h2>torch<a class="headerlink" href="#module-stats_learn.predictors.torch" title="Permalink to this headline"></a></h2>
+<p>Learning predictors using PyTorch networks.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.predictors.torch.LitMLP">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.predictors.torch.</span></span><span class="sig-name descname"><span class="pre">LitMLP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_sizes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation=&lt;class</span> <span class="pre">'torch.nn.modules.activation.ReLU'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_func=&lt;function</span> <span class="pre">mse_loss&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_cls=&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_params=None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.torch.LitMLP" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.core.lightning.LightningModule</span></code></p>
+<p>PyTorch-Lightning sequential MLP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>layer_sizes</strong> (<em>Collection of int</em>) – Hidden layer sizes.</p></li>
+<li><p><strong>activation</strong> (<em>nn.Module</em><em>, </em><em>optional</em>) – The activation function.</p></li>
+<li><p><strong>loss_func</strong> (<em>callable</em><em>, </em><em>optional</em>) – The loss function for network training.</p></li>
+<li><p><strong>optim_cls</strong> (<em>class</em><em>, </em><em>optional</em>) – The optimizer class.</p></li>
+<li><p><strong>optim_params</strong> (<em>dict</em><em>, </em><em>optional</em>) – Keyword arguments for optimizer instantiation.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.torch.LitMLP.configure_optimizers">
+<span class="sig-name descname"><span class="pre">configure_optimizers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.torch.LitMLP.configure_optimizers" title="Permalink to this definition"></a></dt>
+<dd><p>Choose what optimizers and learning-rate schedulers to use in your optimization.
+Normally you’d need one. But in the case of GANs or similar you might have multiple.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>Any of these 6 options.</p>
+<ul class="simple">
+<li><p><strong>Single optimizer</strong>.</p></li>
+<li><p><strong>List or Tuple</strong> of optimizers.</p></li>
+<li><p><strong>Two lists</strong> - The first list has multiple optimizers, and the second has multiple LR schedulers
+(or multiple <code class="docutils literal notranslate"><span class="pre">lr_scheduler_config</span></code>).</p></li>
+<li><p><strong>Dictionary</strong>, with an <code class="docutils literal notranslate"><span class="pre">&quot;optimizer&quot;</span></code> key, and (optionally) a <code class="docutils literal notranslate"><span class="pre">&quot;lr_scheduler&quot;</span></code>
+key whose value is a single LR scheduler or <code class="docutils literal notranslate"><span class="pre">lr_scheduler_config</span></code>.</p></li>
+<li><p><strong>Tuple of dictionaries</strong> as described above, with an optional <code class="docutils literal notranslate"><span class="pre">&quot;frequency&quot;</span></code> key.</p></li>
+<li><p><strong>None</strong> - Fit will run without any optimizer.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p>The <code class="docutils literal notranslate"><span class="pre">lr_scheduler_config</span></code> is a dictionary which contains the scheduler and its associated configuration.
+The default configuration is shown below.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">lr_scheduler_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># REQUIRED: The scheduler instance</span>
+    <span class="s2">&quot;scheduler&quot;</span><span class="p">:</span> <span class="n">lr_scheduler</span><span class="p">,</span>
+    <span class="c1"># The unit of the scheduler&#39;s step size, could also be &#39;step&#39;.</span>
+    <span class="c1"># &#39;epoch&#39; updates the scheduler on epoch end whereas &#39;step&#39;</span>
+    <span class="c1"># updates it after a optimizer update.</span>
+    <span class="s2">&quot;interval&quot;</span><span class="p">:</span> <span class="s2">&quot;epoch&quot;</span><span class="p">,</span>
+    <span class="c1"># How many epochs/steps should pass between calls to</span>
+    <span class="c1"># `scheduler.step()`. 1 corresponds to updating the learning</span>
+    <span class="c1"># rate after every epoch/step.</span>
+    <span class="s2">&quot;frequency&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="c1"># Metric to to monitor for schedulers like `ReduceLROnPlateau`</span>
+    <span class="s2">&quot;monitor&quot;</span><span class="p">:</span> <span class="s2">&quot;val_loss&quot;</span><span class="p">,</span>
+    <span class="c1"># If set to `True`, will enforce that the value specified &#39;monitor&#39;</span>
+    <span class="c1"># is available when the scheduler is updated, thus stopping</span>
+    <span class="c1"># training if not found. If set to `False`, it will only produce a warning</span>
+    <span class="s2">&quot;strict&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="c1"># If using the `LearningRateMonitor` callback to monitor the</span>
+    <span class="c1"># learning rate progress, this keyword can be used to specify</span>
+    <span class="c1"># a custom logged name</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>When there are schedulers in which the <code class="docutils literal notranslate"><span class="pre">.step()</span></code> method is conditioned on a value, such as the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.optim.lr_scheduler.ReduceLROnPlateau</span></code> scheduler, Lightning requires that the
+<code class="docutils literal notranslate"><span class="pre">lr_scheduler_config</span></code> contains the keyword <code class="docutils literal notranslate"><span class="pre">&quot;monitor&quot;</span></code> set to the metric name that the scheduler
+should be conditioned on.</p>
+<p>Metrics can be made available to monitor by simply logging it using
+<code class="docutils literal notranslate"><span class="pre">self.log('metric_to_track',</span> <span class="pre">metric_val)</span></code> in your <code class="xref py py-class docutils literal notranslate"><span class="pre">LightningModule</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">frequency</span></code> value specified in a dict along with the <code class="docutils literal notranslate"><span class="pre">optimizer</span></code> key is an int corresponding
+to the number of sequential batches optimized with the specific optimizer.
+It should be given to none or to all of the optimizers.
+There is a difference between passing multiple optimizers in a list,
+and passing multiple optimizers in dictionaries with a frequency of 1:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>In the former case, all optimizers will operate on the given batch in each optimization step.</p></li>
+<li><p>In the latter, only one optimizer will operate on the given batch at every step.</p></li>
+</ul>
+</div></blockquote>
+<p>This is different from the <code class="docutils literal notranslate"><span class="pre">frequency</span></code> value specified in the <code class="docutils literal notranslate"><span class="pre">lr_scheduler_config</span></code> mentioned above.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">optimizer_one</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+    <span class="n">optimizer_two</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="n">optimizer_one</span><span class="p">,</span> <span class="s2">&quot;frequency&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="n">optimizer_two</span><span class="p">,</span> <span class="s2">&quot;frequency&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+<p>In this example, the first optimizer will be used for the first 5 steps,
+the second optimizer for the next 10 steps and that cycle will continue.
+If an LR scheduler is specified for an optimizer using the <code class="docutils literal notranslate"><span class="pre">lr_scheduler</span></code> key in the above dict,
+the scheduler will only be updated when its optimizer is being used.</p>
+</div>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># most cases. no learning rate scheduler</span>
+<span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
+
+<span class="c1"># multiple optimizer case (e.g.: GAN)</span>
+<span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">gen_opt</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_gen</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+    <span class="n">dis_opt</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dis</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gen_opt</span><span class="p">,</span> <span class="n">dis_opt</span>
+
+<span class="c1"># example with learning rate schedulers</span>
+<span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">gen_opt</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_gen</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+    <span class="n">dis_opt</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dis</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
+    <span class="n">dis_sch</span> <span class="o">=</span> <span class="n">CosineAnnealing</span><span class="p">(</span><span class="n">dis_opt</span><span class="p">,</span> <span class="n">T_max</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">gen_opt</span><span class="p">,</span> <span class="n">dis_opt</span><span class="p">],</span> <span class="p">[</span><span class="n">dis_sch</span><span class="p">]</span>
+
+<span class="c1"># example with step-based learning rate schedulers</span>
+<span class="c1"># each optimizer has its own scheduler</span>
+<span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">gen_opt</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_gen</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+    <span class="n">dis_opt</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dis</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
+    <span class="n">gen_sch</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;scheduler&#39;</span><span class="p">:</span> <span class="n">ExponentialLR</span><span class="p">(</span><span class="n">gen_opt</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">),</span>
+        <span class="s1">&#39;interval&#39;</span><span class="p">:</span> <span class="s1">&#39;step&#39;</span>  <span class="c1"># called after each training step</span>
+    <span class="p">}</span>
+    <span class="n">dis_sch</span> <span class="o">=</span> <span class="n">CosineAnnealing</span><span class="p">(</span><span class="n">dis_opt</span><span class="p">,</span> <span class="n">T_max</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span> <span class="c1"># called every epoch</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">gen_opt</span><span class="p">,</span> <span class="n">dis_opt</span><span class="p">],</span> <span class="p">[</span><span class="n">gen_sch</span><span class="p">,</span> <span class="n">dis_sch</span><span class="p">]</span>
+
+<span class="c1"># example with optimizer frequencies</span>
+<span class="c1"># see training procedure in `Improved Training of Wasserstein GANs`, Algorithm 1</span>
+<span class="c1"># https://arxiv.org/abs/1704.00028</span>
+<span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">gen_opt</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_gen</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+    <span class="n">dis_opt</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dis</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
+    <span class="n">n_critic</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="p">{</span><span class="s1">&#39;optimizer&#39;</span><span class="p">:</span> <span class="n">dis_opt</span><span class="p">,</span> <span class="s1">&#39;frequency&#39;</span><span class="p">:</span> <span class="n">n_critic</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;optimizer&#39;</span><span class="p">:</span> <span class="n">gen_opt</span><span class="p">,</span> <span class="s1">&#39;frequency&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Some things to know:</p>
+<ul class="simple">
+<li><p>Lightning calls <code class="docutils literal notranslate"><span class="pre">.backward()</span></code> and <code class="docutils literal notranslate"><span class="pre">.step()</span></code> on each optimizer and learning rate scheduler as needed.</p></li>
+<li><p>If you use 16-bit precision (<code class="docutils literal notranslate"><span class="pre">precision=16</span></code>), Lightning will automatically handle the optimizers.</p></li>
+<li><p>If you use multiple optimizers, <a class="reference internal" href="#stats_learn.predictors.torch.LitMLP.training_step" title="stats_learn.predictors.torch.LitMLP.training_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">training_step()</span></code></a> will have an additional <code class="docutils literal notranslate"><span class="pre">optimizer_idx</span></code> parameter.</p></li>
+<li><p>If you use <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.optim.LBFGS</span></code>, Lightning handles the closure function automatically for you.</p></li>
+<li><p>If you use multiple optimizers, gradients will be calculated only for the parameters of current optimizer
+at each training step.</p></li>
+<li><p>If you need to control how often those optimizers step or override the default <code class="docutils literal notranslate"><span class="pre">.step()</span></code> schedule,
+override the <code class="xref py py-meth docutils literal notranslate"><span class="pre">optimizer_step()</span></code> hook.</p></li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.torch.LitMLP.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.torch.LitMLP.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Same as <code class="xref py py-meth docutils literal notranslate"><span class="pre">torch.nn.Module.forward()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> – Whatever you decide to pass into the forward method.</p></li>
+<li><p><strong>**kwargs</strong> – Keyword arguments are also possible.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Your model’s output</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="stats_learn.predictors.torch.LitMLP.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#stats_learn.predictors.torch.LitMLP.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.torch.LitMLP.training_step">
+<span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.torch.LitMLP.training_step" title="Permalink to this definition"></a></dt>
+<dd><p>Here you compute and return the training loss and some additional metrics for e.g.
+the progress bar or logger.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code> | (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>, …) | [<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>, …]) – The output of your <code class="xref py py-class docutils literal notranslate"><span class="pre">DataLoader</span></code>. A tensor, tuple or list.</p></li>
+<li><p><strong>batch_idx</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>) – Integer displaying index of this batch</p></li>
+<li><p><strong>optimizer_idx</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>) – When using multiple optimizers, this argument will also be present.</p></li>
+<li><p><strong>hiddens</strong> (<code class="docutils literal notranslate"><span class="pre">Any</span></code>) – Passed in if
+<a href="#id1"><span class="problematic" id="id2">:paramref:`~pytorch_lightning.core.lightning.LightningModule.truncated_bptt_steps`</span></a> &gt; 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>Any of.</p>
+<ul class="simple">
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code> - The loss tensor</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dict</span></code> - A dictionary. Can include any keys, but must include the key <code class="docutils literal notranslate"><span class="pre">'loss'</span></code></p></li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">None</span></code> - Training will skip to the next batch. This is only for automatic optimization.</dt><dd><p>This is not supported for multi-GPU, TPU, IPU, or DeepSpeed.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p>
+</dd>
+</dl>
+<p>In this step you’d normally do the forward pass and calculate the loss for a batch.
+You can also do fancier things like multiple forward passes or something model specific.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">batch</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">loss</span>
+</pre></div>
+</div>
+<p>If you define multiple optimizers, this step will be called with an additional
+<code class="docutils literal notranslate"><span class="pre">optimizer_idx</span></code> parameter.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Multiple optimizers (e.g.: GANs)</span>
+<span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">optimizer_idx</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">optimizer_idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># do training_step with encoder</span>
+        <span class="o">...</span>
+    <span class="k">if</span> <span class="n">optimizer_idx</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># do training_step with decoder</span>
+        <span class="o">...</span>
+</pre></div>
+</div>
+<p>If you add truncated back propagation through time you will also get an additional
+argument with the hidden states of the previous step.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Truncated back-propagation through time</span>
+<span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">hiddens</span><span class="p">):</span>
+    <span class="c1"># hiddens are the hidden states from the previous truncated backprop step</span>
+    <span class="n">out</span><span class="p">,</span> <span class="n">hiddens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">hiddens</span><span class="p">)</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="o">...</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">loss</span><span class="p">,</span> <span class="s2">&quot;hiddens&quot;</span><span class="p">:</span> <span class="n">hiddens</span><span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The loss value shown in the progress bar is smoothed (averaged) over the last values,
+so it differs from the actual loss returned in train/validation step.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stats_learn.predictors.torch.LitPredictor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.predictors.torch.</span></span><span class="sig-name descname"><span class="pre">LitPredictor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainer_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dl_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proc_funcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.torch.LitPredictor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.predictors.base.Base" title="stats_learn.predictors.base.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.predictors.base.Base</span></code></a></p>
+<p>Regressor using PyTorch module.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>pl.LightningModule</em>) – The PyTorch-Lightning module used for prediction.</p></li>
+<li><p><strong>space</strong> (<em>dict</em><em>, </em><em>optional</em>) – The domain for <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/> and <img class="math" src="_images/math/e7aef02edc78c428596f814d49189687b8551a04.png" alt="\yrm" style="vertical-align: -4px"/>. Defaults to the model’s space.</p></li>
+<li><p><strong>trainer_params</strong> (<em>dict</em><em>, </em><em>optional</em>) – Keyword arguments for <cite>pl.Trainer</cite> instantiation.</p></li>
+<li><p><strong>dl_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Keyword arguments for <cite>DataLoader</cite> instantiation.</p></li>
+<li><p><strong>reset_func</strong> (<em>callable</em><em>, </em><em>optional</em>) – Function that calls <cite>model</cite> and resets to unfit state.</p></li>
+<li><p><strong>proc_funcs</strong> (<em>Collection of callable of dict of Collection of callable</em>) – Sequentially-invoked preprocessing functions for <img class="math" src="_images/math/03dc989cff006fa3f36960d82c9c42891df6313e.png" alt="x" style="vertical-align: 0px"/> and <img class="math" src="_images/math/ac81156a8df1ef8e899e1e420f9c9ae412a3a8bc.png" alt="y" style="vertical-align: -4px"/> values.</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.torch.LitPredictor.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.torch.LitPredictor.reset" title="Permalink to this definition"></a></dt>
+<dd><p>Restore unfit prior state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stats_learn.predictors.torch.LitPredictor.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.torch.LitPredictor.set_params" title="Permalink to this definition"></a></dt>
+<dd><p>Set parameters of the learning model object.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.predictors.torch.build_mlp">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.predictors.torch.</span></span><span class="sig-name descname"><span class="pre">build_mlp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_sizes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation=&lt;class</span> <span class="pre">'torch.nn.modules.activation.ReLU'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_act=False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.torch.build_mlp" title="Permalink to this definition"></a></dt>
+<dd><p>PyTorch sequential MLP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>layer_sizes</strong> (<em>Collection of int</em>) – Hidden layer sizes.</p></li>
+<li><p><strong>activation</strong> (<em>nn.Module</em><em>, </em><em>optional</em>) – The activation function.</p></li>
+<li><p><strong>last_act</strong> (<em>bool</em><em>, </em><em>optional</em>) – Include final activation function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>nn.Sequential</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stats_learn.predictors.torch.reset_weights">
+<span class="sig-prename descclassname"><span class="pre">stats_learn.predictors.torch.</span></span><span class="sig-name descname"><span class="pre">reset_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.predictors.torch.reset_weights" title="Permalink to this definition"></a></dt>
+<dd><p>Reset weights of PyTorch module.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="stats_learn.bayes.html" class="btn btn-neutral float-left" title="bayes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="stats_learn.random.html" class="btn btn-neutral float-right" title="random" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Paul Rademacher.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

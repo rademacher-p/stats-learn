@@ -235,3 +235,7 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+
+# Re-add Sphinx build for GitHub Pages
+!docs/build/

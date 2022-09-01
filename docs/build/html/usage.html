@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Guide &mdash; Statistical Learning  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="stats_learn" href="stats_learn.html" />
+    <link rel="prev" title="Statistical Learning package documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Statistical Learning
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quickstart">Quickstart</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="stats_learn.html">stats_learn</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Statistical Learning</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>User Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="user-guide">
+<h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline"></a></h1>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
+<p>To use Statistical Learning, first install the local package using pip:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install &lt;path&gt;
+</pre></div>
+</div>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">&lt;path&gt;</span></code> should point to the top-level directory containing <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code>.</p>
+</section>
+<section id="quickstart">
+<h2>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline"></a></h2>
+<p>A basic example of model creation, learner definition, and performance assessment is shown below. The <code class="docutils literal notranslate"><span class="pre">model</span></code>
+attribute defines a jointly Normal distribution where the expected value of <code class="docutils literal notranslate"><span class="pre">y</span></code> conditioned on <code class="docutils literal notranslate"><span class="pre">x</span></code> is
+characterized by a polynomial function.</p>
+<p>Two different predictors are instantiated. First, the <code class="docutils literal notranslate"><span class="pre">opt_predictor</span></code> uses knowledge of the <cite>model</cite> to
+determine the optimal <code class="docutils literal notranslate"><span class="pre">predict</span></code> function. Second, a learning regressor is formulated using a Bayesian data
+model <code class="docutils literal notranslate"><span class="pre">norm_model</span></code>; this object implements a Normal distribution <code class="docutils literal notranslate"><span class="pre">norm_model.prior</span></code> to characterize
+uncertainty about the true model <code class="docutils literal notranslate"><span class="pre">weights</span></code>.</p>
+<p>Training and testing data are randomly generated using the model <code class="docutils literal notranslate"><span class="pre">sample</span></code> method and each predictor is assessed
+using its <code class="docutils literal notranslate"><span class="pre">evaluate</span></code> method. Once the learning <code class="docutils literal notranslate"><span class="pre">norm_predictor</span></code> is <code class="docutils literal notranslate"><span class="pre">fit</span></code> to the data, its
+squared-error loss is reduced.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">stats_learn</span> <span class="kn">import</span> <span class="n">bayes</span><span class="p">,</span> <span class="n">random</span>
+<span class="kn">from</span> <span class="nn">stats_learn.predictors</span> <span class="kn">import</span> <span class="n">BayesRegressor</span><span class="p">,</span> <span class="n">ModelRegressor</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">NormalLinear</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Predictors</span>
+<span class="n">opt_predictor</span> <span class="o">=</span> <span class="n">ModelRegressor</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Optimal&quot;</span><span class="p">)</span>
+
+<span class="n">norm_model</span> <span class="o">=</span> <span class="n">bayes</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">NormalLinear</span><span class="p">(</span><span class="n">prior_mean</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">prior_cov</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">norm_predictor</span> <span class="o">=</span> <span class="n">BayesRegressor</span><span class="p">(</span><span class="n">norm_model</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Normal&quot;</span><span class="p">)</span>
+
+<span class="c1"># Results</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">12345</span>
+<span class="n">n_train</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">n_test</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="n">d</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n_train</span> <span class="o">+</span> <span class="n">n_test</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+<span class="n">d_train</span><span class="p">,</span> <span class="n">d_test</span> <span class="o">=</span> <span class="n">d</span><span class="p">[:</span><span class="n">n_train</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="n">n_train</span><span class="p">:]</span>
+
+<span class="n">loss_min</span> <span class="o">=</span> <span class="n">opt_predictor</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">d_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Minimum loss = </span><span class="si">{</span><span class="n">loss_min</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">loss_prior</span> <span class="o">=</span> <span class="n">norm_predictor</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">d_test</span><span class="p">)</span>  <span class="c1"># use the prior distribution</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Untrained learner loss = </span><span class="si">{</span><span class="n">loss_prior</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">norm_predictor</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">d_train</span><span class="p">)</span>  <span class="c1"># fit the posterior distribution</span>
+<span class="n">loss_fit</span> <span class="o">=</span> <span class="n">norm_predictor</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">d_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Trained learner loss = </span><span class="si">{</span><span class="n">loss_fit</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Output:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Minimum loss = 0.549
+Prior learner loss = 3.413
+Trained learner loss = 0.951
+</pre></div>
+</div>
+<p>The code below can be executed after the previous snippet. The <code class="code docutils literal notranslate"><span class="pre">data_assess</span></code> function provides replication of the
+functionality above, including a loss table and a graphic showing how the <code class="code docutils literal notranslate"><span class="pre">predict</span></code> functions fit the training
+data. The <code class="code docutils literal notranslate"><span class="pre">model_assess</span></code> function performs Monte Carlo approximation of the expected loss by repeatedly
+generating and evaluating on new datasets, enabling statistically meaningful evaluation. Observe that it can be used
+for both visualization of both the prediction statistics and of the average loss.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">stats_learn</span> <span class="kn">import</span> <span class="n">results</span>
+
+<span class="n">predictors</span> <span class="o">=</span> <span class="p">[</span><span class="n">opt_predictor</span><span class="p">,</span> <span class="n">norm_predictor</span><span class="p">]</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;prior_cov&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]}]</span>
+
+<span class="c1"># Sample regressor realizations</span>
+<span class="n">results</span><span class="o">.</span><span class="n">data_assess</span><span class="p">(</span>
+    <span class="n">predictors</span><span class="p">,</span> <span class="n">d_train</span><span class="p">,</span> <span class="n">d_test</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">plot_fit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">img_path</span><span class="o">=</span><span class="s2">&quot;fit.png&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Prediction mean/variance</span>
+<span class="n">results</span><span class="o">.</span><span class="n">model_assess</span><span class="p">(</span>
+    <span class="n">predictors</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">,</span>
+    <span class="n">n_train</span><span class="p">,</span>
+    <span class="n">n_test</span><span class="p">,</span>
+    <span class="n">n_mc</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">stats</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">),</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">plot_stats</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">print_loss</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">img_path</span><span class="o">=</span><span class="s2">&quot;stats.png&quot;</span><span class="p">,</span>
+    <span class="n">rng</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Squared-Error vs. training data volume</span>
+<span class="n">n_train</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">results</span><span class="o">.</span><span class="n">model_assess</span><span class="p">(</span>
+    <span class="n">predictors</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">,</span>
+    <span class="n">n_train</span><span class="p">,</span>
+    <span class="n">n_test</span><span class="p">,</span>
+    <span class="n">n_mc</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">plot_loss</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">img_path</span><span class="o">=</span><span class="s2">&quot;loss.png&quot;</span><span class="p">,</span>
+    <span class="n">rng</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Output:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|                                 |    10 |
+|---------------------------------|-------|
+| Optimal                         | 0.549 |
+| Normal, $\Sigma_\theta = 0.010$ | 3.171 |
+| Normal, $\Sigma_\theta = 0.100$ | 2.034 |
+| Normal, $\Sigma_\theta = 1.000$ | 0.951 |
+</pre></div>
+</div>
+<img alt="_images/ex_fit.png" src="_images/ex_fit.png" />
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|                                 |    10 |
+|---------------------------------|-------|
+| Optimal                         | 1.005 |
+| Normal, $\Sigma_\theta = 0.010$ | 2.689 |
+| Normal, $\Sigma_\theta = 0.100$ | 1.629 |
+| Normal, $\Sigma_\theta = 1.000$ | 1.205 |
+</pre></div>
+</div>
+<img alt="_images/ex_stats.png" src="_images/ex_stats.png" />
+<img alt="_images/ex_loss.png" src="_images/ex_loss.png" />
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Statistical Learning package documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="stats_learn.html" class="btn btn-neutral float-right" title="stats_learn" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Paul Rademacher.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
