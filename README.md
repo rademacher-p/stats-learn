@@ -30,7 +30,9 @@ pip install stats-learn/
 Note that with both methods, the [editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be included to track any package modifications.
 
 ## Documentation
-API documentation can be generated using the `sphinx` package and the `sphinx-rtd-theme`, both installable using `pip`. To build the HTML documentation, run `make html` from the `docs/` folder; the top level document will be `docs/build/html/index.html`
+Package documentation is available [here](https://rademacher-p.github.io/stats-learn/).
+
+Alternatively, the docs can be generated using the `sphinx` package and the `sphinx-rtd-theme`, both installable using `pip`. To build the HTML documentation, run `make html` from the `docs/` folder; the top level document will be `docs/build/html/index.html`
 
 ## Quickstart
 A basic example of model creation, learner definition, and performance assessment is shown below. The `model` attribute defines a jointly Normal distribution where the expected value of `y` conditioned on `x` is characterized by a polynomial function.
@@ -124,8 +126,8 @@ results.model_assess(
 
 Output:
 
-|                                 |    10 |
-|---------------------------------|-------|
+|                                 | 10    |
+| ------------------------------- | ----- |
 | Optimal                         | 0.549 |
 | Normal, $\Sigma_\theta = 0.010$ | 3.171 |
 | Normal, $\Sigma_\theta = 0.100$ | 2.034 |
@@ -133,8 +135,8 @@ Output:
 
 ![Fitting](images/ex_fit.png)
 
-|                                 |    10 |
-|---------------------------------|-------|
+|                                 | 10    |
+| ------------------------------- | ----- |
 | Optimal                         | 1.005 |
 | Normal, $\Sigma_\theta = 0.010$ | 2.689 |
 | Normal, $\Sigma_\theta = 0.100$ | 1.629 |
