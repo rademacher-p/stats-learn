@@ -39,7 +39,6 @@ version = "0.1.1-alpha"
 # addopts = "-p no:warnings"
 filterwarnings = [
   "ignore::DeprecationWarning",
-  "ignore::pytorch_lightning.utilities.warnings.LightningDeprecationWarning", # "ignore::UserWarning",
 ]
 testpaths = ["tests"]
 
