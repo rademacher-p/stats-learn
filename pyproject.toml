@@ -5,6 +5,36 @@ requires = [
   "wheel",
 ]
 
+[project]
+authors = [
+  {name = "Paul Rademacher", email = "paul.rademacher@nrl.navy.mil"},
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+dependencies = [
+  "numpy>=1.22.3",
+  "scipy>=1.8.0",
+  "matplotlib>=3.5.2",
+  "pandas>=1.4.2",
+  "tabulate>=0.8.9",
+  "tqdm>=4.64.0",
+  "more-itertools>=8.13.0",
+  "torch>=1.11.0",
+  "pytorch-lightning>=1.6.3",
+]
+description = "Statistical learning with a Bayesian focus"
+name = "stats-learn"
+readme = "README.md"
+requires-python = ">=3.9"
+version = "0.1.1-alpha"
+
+[project.urls]
+"Bug Tracker" = "https://github.com/rademacher-p/stats-learn/issues"
+"Homepage" = "https://github.com/rademacher-p/stats-learn"
+
 [tool.pytest.ini_options]
 # addopts = "-p no:warnings"
 filterwarnings = [
