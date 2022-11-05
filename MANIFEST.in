@@ -1,4 +1,0 @@
-include requirements.txt
-include examples/* images/* tests/*
-include docs/make.bat docs/Makefile
-recursive-include docs/source *

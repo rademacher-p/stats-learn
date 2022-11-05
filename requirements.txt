@@ -1,4 +1,4 @@
---extra-index-url https://download.pytorch.org/whl/cu113
+--extra-index-url https://download.pytorch.org/whl/cu117
 
 # Package
 numpy>=1.22.3
@@ -29,3 +29,4 @@ build>=0.7.0
 jupyterlab>=3.4.2
 torch-tb-profiler>=0.4.0
 ipywidgets>=7.7.0
+hatch>=1.6.3

@@ -1,14 +1,9 @@
 [build-system]
-build-backend = "setuptools.build_meta"
-requires = [
-  "setuptools>=42",
-  "wheel",
-]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
-authors = [
-  {name = "Paul Rademacher", email = "paul.rademacher@nrl.navy.mil"},
-]
+authors = [{ name = "Paul Rademacher", email = "paul.rademacher@nrl.navy.mil" }]
 classifiers = [
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: MIT License",
@@ -35,11 +30,13 @@ version = "0.1.1-alpha"
 "Bug Tracker" = "https://github.com/rademacher-p/stats-learn/issues"
 "Homepage" = "https://github.com/rademacher-p/stats-learn"
 
+[tool.hatch.build]
+ignore-vcs = true
+sources = ["src"]
+packages = ["src/stats_learn"]
+
 [tool.pytest.ini_options]
-# addopts = "-p no:warnings"
-filterwarnings = [
-  "ignore::DeprecationWarning",
-]
+filterwarnings = ["ignore::DeprecationWarning"]
 testpaths = ["tests"]
 
 [tool.black]
@@ -50,12 +47,6 @@ line_length = 100
 profile = "black"
 
 [tool.pydocstyle] # parameter check D417 not working
-add-ignore = [
-  "D1",
-  "D403",
-]
-add-select = [
-  "D413",
-  "D417",
-]
+add-ignore = ["D1", "D403"]
+add-select = ["D413", "D417"]
 convention = "numpy"
