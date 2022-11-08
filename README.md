@@ -17,14 +17,14 @@ Also included (in the `results` submodule) are various functions that enable fai
 
 The `stats_learn` package is developed for [Python](https://www.python.org/downloads/) 3.9 or higher. Best practice is to first create a [virtual environment](https://docs.python.org/3/tutorial/venv.html). The package can then be installed directly from GitHub using
 ```
-pip install git+https://github.com/rademacher-p/stats-learn.git
+pip install git+https://github.com/rademacher-p/stats-learn
 ```
-To install a specific version or branch, specify a ref as detailed [here](https://pip.pypa.io/en/stable/topics/vcs-support/). Alternatively, the package can be installed locally using
+To install a specific version or branch, [specify a ref](https://pip.pypa.io/en/stable/topics/vcs-support/). Alternatively, the package can be installed locally using
 ```
-git clone https://github.com/rademacher-p/stats-learn.git
+git clone https://github.com/rademacher-p/stats-learn
 pip install stats-learn/
 ```
-Note that with both methods, the [editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be included to track any package modifications.
+Note that with both methods, the [editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be included to track any package modifications. To install optional developer packages, specify the `dev` [extra](https://peps.python.org/pep-0508/#extras), as exemplified [here](https://pip.pypa.io/en/stable/cli/pip_install/).
 
 ## Documentation
 Package documentation is available [here](https://rademacher-p.github.io/stats-learn/).
