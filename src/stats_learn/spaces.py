@@ -151,7 +151,9 @@ class Base(ABC):
                 _, ax = plt.subplots(subplot_kw={"projection": "3d"})
                 ax.set(xlabel="$x_1$", ylabel="$x_2$", zlabel="$x_3$")
             else:
-                raise NotImplementedError("Plotting only supported for 1- and 2- dimensional data.")
+                raise NotImplementedError(
+                    "Plotting only supported for 1- and 2- dimensional data."
+                )
 
         return ax
 
@@ -232,7 +234,9 @@ class Base(ABC):
             plt_data = ax.plot(x[..., 0], x[..., 1], y, label=label, **kwargs)
 
         elif len(set_shape) == 2 and self.shape == (2,):
-            plt_data = ax.plot_surface(x[..., 0], x[..., 1], y, shade=False, label=label, **kwargs)
+            plt_data = ax.plot_surface(
+                x[..., 0], x[..., 1], y, shade=False, label=label, **kwargs
+            )
             plt_data._facecolors2d, plt_data._edgecolors2d = (
                 plt_data._facecolor3d,
                 plt_data._edgecolor3d,
@@ -269,8 +273,10 @@ class Base(ABC):
 
         return x, y, set_shape
 
+    # TODO
+    @abstractmethod
     def _minimize(self, f):
-        pass  # TODO
+        raise NotImplementedError
 
     def argmin(self, f):
         return self._minimize(f)
@@ -278,8 +284,10 @@ class Base(ABC):
     def argmax(self, f):
         return self.argmin(lambda x: -1 * f(x))
 
+    # TODO
+    @abstractmethod
     def integrate(self, f):
-        pass  # TODO
+        raise NotImplementedError
 
     def moment(self, f, order=1, center=False):
         if not np.issubdtype(
@@ -499,8 +507,13 @@ class Continuous(Base, ABC):
             return integrate.nquad(lambda *args: f(list(args)), ranges)[0]
         else:
             out = np.empty(self.size)
+
+            def _make_func(i):
+                return lambda *args: f(list(args))[i]
+
             for i in range(self.size):
-                out[i] = integrate.nquad(lambda *args: f(list(args))[i], ranges)[0]
+                out[i] = integrate.nquad(_make_func(i), ranges)[0]
+                # out[i] = integrate.nquad(lambda *args: f(list(args))[i], ranges)[0]
 
             return out
 
@@ -538,7 +551,11 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
     def __contains__(self, item):
         item = np.array(item)
         if item.shape == self.shape and item.dtype == self.dtype:
-            return (item >= self.lims[..., 0]).all() and (item <= self.lims[..., 1]).all()
+            conditions = [
+                (item >= self.lims[..., 0]).all(),
+                (item <= self.lims[..., 1]).all(),
+            ]
+            return all(conditions)
         else:
             return False
 
@@ -786,7 +803,9 @@ class Simplex(Continuous):
             ax.set(xlabel="$x_1$", ylabel="$x_2$", zlabel="$x_3$")
             return ax
         else:
-            raise NotImplementedError("Plot method only supported for 2- and 3-dimensional data.")
+            raise NotImplementedError(
+                "Plot method only supported for 2- and 3-dimensional data."
+            )
 
     def plot(self, f, x=None, ax=None, label=None, **scatter_kwargs):
         if ax is None:
@@ -803,7 +822,9 @@ class Simplex(Continuous):
         elif self.shape == (3,):
             plt_data = ax.scatter(x[:, 0], x[:, 1], x[:, 2], **scatter_kwargs)
         else:
-            raise NotImplementedError("Plot method only supported for 2- and 3-dimensional data.")
+            raise NotImplementedError(
+                "Plot method only supported for 2- and 3-dimensional data."
+            )
 
         c_bar = plt.colorbar(plt_data, ax=ax)
         c_bar.set_label("$y$")

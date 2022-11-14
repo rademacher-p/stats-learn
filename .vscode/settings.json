@@ -1,6 +1,6 @@
 {
     "editor.rulers": [
-        100
+        88
     ],
     "editor.formatOnSave": true,
     "python.formatting.provider": "black",

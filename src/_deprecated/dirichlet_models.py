@@ -162,7 +162,9 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 
             def emp_dist_y_x(x):
                 x = np.asarray(x)
-                d_match = d[np.all(x.flatten() == d["x"].reshape(n, -1), axis=-1)].squeeze()
+                d_match = d[
+                    np.all(x.flatten() == d["x"].reshape(n, -1), axis=-1)
+                ].squeeze()
                 return empirical_pmf(d_match["y"], self.supp_y["y"], self._data_shape_y)
 
             c_prior_x = 1 / (1 + n / self.alpha_0)
@@ -170,8 +172,12 @@ class DirichletFiniteYcXModelBayes(FiniteYcXModelBayes):
 
             def p_y_x(x):
                 x = np.asarray(x)
-                i = (self.supp_x["x"].reshape(self._supp_shape_x + (-1,)) == x.flatten()).all(-1)
-                c_prior_y = 1 / (1 + (n * emp_dist_x[i]) / (self.alpha_0 * self._mean_x[i]))
+                i = (
+                    self.supp_x["x"].reshape(self._supp_shape_x + (-1,)) == x.flatten()
+                ).all(-1)
+                c_prior_y = 1 / (
+                    1 + (n * emp_dist_x[i]) / (self.alpha_0 * self._mean_x[i])
+                )
                 return c_prior_y * self._mean_y_x(x) + (1 - c_prior_y) * emp_dist_y_x(x)
 
         return self.model_gen(p_x=p_x, p_y_x=p_y_x)

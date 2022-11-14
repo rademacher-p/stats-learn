@@ -1,7 +1,9 @@
 class DataSet(Base):
     # TODO: update with `deque` changes from CRM
 
-    def __init__(self, data, space=None, iter_mode="once", shuffle_mode="never", rng=None):
+    def __init__(
+        self, data, space=None, iter_mode="once", shuffle_mode="never", rng=None
+    ):
         """
         Model from data.
 
@@ -48,7 +50,9 @@ class DataSet(Base):
         raise NotImplementedError
 
     @classmethod
-    def from_xy(cls, x, y, space=None, iter_mode="once", shuffle_mode="never", rng=None):
+    def from_xy(
+        cls, x, y, space=None, iter_mode="once", shuffle_mode="never", rng=None
+    ):
         data = np.array(
             list(zip(x, y)),
             dtype=[("x", x.dtype, x.shape[1:]), ("y", y.dtype, y.shape[1:])],
@@ -57,7 +61,9 @@ class DataSet(Base):
         return cls(data, space, iter_mode, shuffle_mode, rng)
 
     @classmethod
-    def from_csv(cls, path, y_name, space=None, iter_mode="once", shuffle_mode="never", rng=None):
+    def from_csv(
+        cls, path, y_name, space=None, iter_mode="once", shuffle_mode="never", rng=None
+    ):
         df_x = pd.read_csv(path)
         df_y = df_x.pop(y_name)
         x, y = df_x.to_numpy(), df_y.to_numpy()

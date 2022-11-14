@@ -50,7 +50,9 @@ class Grid(Finite):  # FIXME: 1-D special?
 
     def __init__(self, *vecs):
         # self.vecs = list(map(lambda v: np.sort(np.array(v, dtype=np.float).flatten()), vecs))
-        self.vecs = tuple(np.sort(np.array(list(vec), dtype=np.float).flatten()) for vec in vecs)
+        self.vecs = tuple(
+            np.sort(np.array(list(vec), dtype=np.float).flatten()) for vec in vecs
+        )
         super().__init__((len(self.vecs),), np.float)
 
         self.set_shape = tuple(vec.size for vec in self.vecs)
@@ -109,7 +111,9 @@ class Grid(Finite):  # FIXME: 1-D special?
             )
 
         elif set_ndim == 3 and self.shape == (3,):
-            plt_data = ax.scatter(x[..., 0], x[..., 1], x[..., 2], s=15, c=y, label=label)
+            plt_data = ax.scatter(
+                x[..., 0], x[..., 1], x[..., 2], s=15, c=y, label=label
+            )
             c_bar = plt.colorbar(plt_data, ax=ax)
             c_bar.set_label("$y$")
 
