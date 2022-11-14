@@ -59,11 +59,7 @@ packages = ["src/stats_learn"]
 filterwarnings = ["ignore::DeprecationWarning"]
 testpaths = ["tests"]
 
-[tool.black]
-line-length = 100
-
 [tool.isort]
-line_length = 100
 profile = "black"
 
 [tool.pydocstyle] # parameter check D417 not working

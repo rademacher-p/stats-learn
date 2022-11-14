@@ -113,7 +113,9 @@ else:
 prior_mean = rand_models.DataConditional(
     [rand_elements.Finite([0, 0.5], [p, 1 - p]) for p in (0.5, 0.5)], model_x
 )
-dir_predictor = BayesRegressor(bayes_models.Dirichlet(prior_mean, alpha_0=3), name="Dir")
+dir_predictor = BayesRegressor(
+    bayes_models.Dirichlet(prior_mean, alpha_0=3), name="Dir"
+)
 
 # dir_params = None
 dir_params = {"alpha_0": [2, 16]}
