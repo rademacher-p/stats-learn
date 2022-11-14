@@ -12,14 +12,13 @@ from itertools import product
 from pathlib import Path
 from typing import Collection, Union
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
 from more_itertools import all_equal
-from tqdm import trange
-
 from stats_learn import bayes
 from stats_learn.util import check_data_shape
+from tqdm import trange
 
 # from pytorch_lightning.utilities.seed import seed_everything
 

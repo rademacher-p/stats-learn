@@ -6,8 +6,8 @@ import datetime
 from copy import deepcopy
 from typing import Iterable
 
+import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import pyplot as plt
 from thesis.bayes import models as bayes_models
 from thesis.predictors import Bayes as BayesPredictor
 from thesis.predictors import BayesClassifier, BayesRegressor

@@ -8,10 +8,9 @@ and posterior fitting.
 from abc import ABC, abstractmethod
 from typing import Dict, Optional
 
+import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import pyplot as plt
 from scipy.stats._multivariate import _PSD
-
 from stats_learn import random, spaces
 from stats_learn.util import RandomGeneratorMixin, vectorize_func
 

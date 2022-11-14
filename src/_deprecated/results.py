@@ -2,11 +2,10 @@ import math
 from itertools import product
 from numbers import Integral
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
 from more_itertools import all_equal
-
 from stats_learn.bayes import models as bayes_models
 from stats_learn.util.base import check_data_shape
 
