@@ -273,8 +273,10 @@ class Base(ABC):
 
         return x, y, set_shape
 
+    # TODO
+    @abstractmethod
     def _minimize(self, f):
-        pass  # TODO
+        raise NotImplementedError
 
     def argmin(self, f):
         return self._minimize(f)
@@ -282,8 +284,10 @@ class Base(ABC):
     def argmax(self, f):
         return self.argmin(lambda x: -1 * f(x))
 
+    # TODO
+    @abstractmethod
     def integrate(self, f):
-        pass  # TODO
+        raise NotImplementedError
 
     def moment(self, f, order=1, center=False):
         if not np.issubdtype(
@@ -503,8 +507,13 @@ class Continuous(Base, ABC):
             return integrate.nquad(lambda *args: f(list(args)), ranges)[0]
         else:
             out = np.empty(self.size)
+
+            def _make_func(i):
+                return lambda *args: f(list(args))[i]
+
             for i in range(self.size):
-                out[i] = integrate.nquad(lambda *args: f(list(args))[i], ranges)[0]
+                out[i] = integrate.nquad(_make_func(i), ranges)[0]
+                # out[i] = integrate.nquad(lambda *args: f(list(args))[i], ranges)[0]
 
             return out
 

@@ -157,8 +157,9 @@ class Base(ABC):
         y = self._proc_y(y)
         return y
 
+    @abstractmethod
     def _predict(self, x):
-        pass
+        raise NotImplementedError
 
     def evaluate(self, d):
         """

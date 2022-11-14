@@ -22,8 +22,9 @@ class Base(RandomGeneratorMixin, ABC):
 
     Notes
     -----
-    Implements a joint distribution between an random elements :math:`\xrm` and `\yrm`. For supervised learning, it is
-    assumed that the former is observed while the latter is not.
+    Implements a joint distribution between an random elements :math:`\xrm` and `\yrm`.
+    For supervised learning, it is assumed that the former is observed while the latter
+    is not.
 
     """
 
@@ -379,7 +380,8 @@ class DataConditional(Base):
     Parameters
     ----------
     dists : Collection of random.elements.Base
-        Explicit conditional random elements characterizing :math:`\yrm` for each possible value of :math:`x`.
+        Explicit conditional random elements characterizing :math:`\yrm` for each
+        possible value of :math:`x`.
     model_x : stats_learn.random.elements.Base
         Random variable characterizing the marginal distribution of :math:`\xrm`.
     rng : int or np.random.RandomState or np.random.Generator, optional
@@ -422,7 +424,8 @@ class DataConditional(Base):
         Parameters
         ----------
         dists : Collection of random.elements.Base
-            Explicit conditional random elements characterizing :math:`\yrm` for each possible value of :math:`x`.
+            Explicit conditional random elements characterizing :math:`\yrm` for each
+            possible value of :math:`x`.
         values_x : array_like
             Explicit domain values for :math:`x`.
         p_x : array_like, optional
@@ -579,7 +582,8 @@ class ClassConditional(MixinRVx, Base):
     Parameters
     ----------
     dists : Collection of random.elements.Base
-        Explicit conditional random elements characterizing :math:`\xrm` for each possible value of :math:`y`.
+        Explicit conditional random elements characterizing :math:`\xrm` for each
+        possible value of :math:`y`.
     model_y : stats_learn.random.elements.Base
         Random variable characterizing the marginal distribution of :math:`\yrm`.
     rng : int or np.random.RandomState or np.random.Generator, optional
