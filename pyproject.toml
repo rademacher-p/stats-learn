@@ -59,15 +59,17 @@ packages = ["src/stats_learn"]
 filterwarnings = ["ignore::DeprecationWarning"]
 testpaths = ["tests"]
 
-# [tool.black]
-# extend-exclude = ["src/main.py"] # need regex
-
 [tool.isort]
 profile = "black"
 skip_gitignore = "true"
-skip_glob = ["lib/*"]
 
-[tool.pydocstyle] # parameter check D417 not working
-add-ignore = ["D1", "D403"]
-add-select = ["D413", "D417"]
+[tool.pydocstyle]
+add-ignore = [
+  "D1",   # Missing docstrings
+  "D403", # First word of the first line should be properly capitalized
+]
+add-select = [
+  "D413", # Missing blank line after last section
+  "D417", # Missing argument descriptions in the docstring (not working?)
+]
 convention = "numpy"
