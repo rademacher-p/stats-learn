@@ -59,8 +59,13 @@ packages = ["src/stats_learn"]
 filterwarnings = ["ignore::DeprecationWarning"]
 testpaths = ["tests"]
 
+# [tool.black]
+# extend-exclude = ["src/main.py"] # need regex
+
 [tool.isort]
 profile = "black"
+skip_gitignore = "true"
+skip_glob = ["lib/*"]
 
 [tool.pydocstyle] # parameter check D417 not working
 add-ignore = ["D1", "D403"]
