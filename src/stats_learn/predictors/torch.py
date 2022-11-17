@@ -6,11 +6,12 @@ from functools import partial
 import numpy as np
 import pytorch_lightning as pl
 import torch
-from stats_learn.loss_funcs import loss_se
-from stats_learn.predictors.base import Base
 from torch import nn
 from torch.nn import functional
 from torch.utils.data import DataLoader, TensorDataset
+
+from stats_learn.loss_funcs import loss_se
+from stats_learn.predictors.base import Base
 
 
 def build_mlp(layer_sizes, activation=nn.ReLU, last_act=False):

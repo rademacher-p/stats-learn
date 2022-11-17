@@ -8,6 +8,7 @@ from typing import Optional, Union
 import numpy as np
 from scipy.special import betaln, gammaln, xlog1py, xlogy
 from scipy.stats._multivariate import _PSD
+
 from stats_learn import spaces
 from stats_learn.util import (
     RandomGeneratorMixin,

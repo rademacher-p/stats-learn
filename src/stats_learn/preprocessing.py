@@ -3,6 +3,7 @@
 import math
 
 import numpy as np
+
 from stats_learn.util import check_data_shape
 
 

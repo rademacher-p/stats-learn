@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from more_itertools import all_equal
 from scipy import integrate, optimize
+
 from stats_learn.util import check_data_shape
 
 # TODO: generalize plotting for non-numeric values (e.g. mode_y_x)

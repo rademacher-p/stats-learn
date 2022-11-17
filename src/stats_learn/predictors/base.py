@@ -5,6 +5,7 @@ from operator import itemgetter
 from typing import Union
 
 import numpy as np
+
 from stats_learn import bayes, random, results, spaces
 from stats_learn.loss_funcs import loss_01, loss_se
 

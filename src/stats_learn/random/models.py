@@ -5,6 +5,7 @@ from copy import deepcopy
 from typing import Dict, Optional
 
 import numpy as np
+
 from stats_learn import random, spaces
 from stats_learn.util import RandomGeneratorMixin, vectorize_func
 
