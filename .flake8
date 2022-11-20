@@ -5,3 +5,4 @@ extend-ignore =
     E501,
 extend-select = B950
 extend-exclude = .venv,lib
+statistics = True
