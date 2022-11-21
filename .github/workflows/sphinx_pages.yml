@@ -40,7 +40,7 @@ jobs:
           python -m pip install .[dev]
       - name: Build with Sphinx
         run: |
-          sudo apt-get texlive
+          sudo apt-get install texlive
           cd docs
           make html
       - name: Upload artifact
