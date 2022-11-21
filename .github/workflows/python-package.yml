@@ -6,8 +6,10 @@ name: Python package
 on:
   push:
     branches: ["master"]
+    paths: ["src/stats_learn/**"]
   pull_request:
     branches: ["master"]
+    paths: ["src/stats_learn/**"]
 
 jobs:
   build:
