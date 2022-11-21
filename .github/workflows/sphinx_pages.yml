@@ -28,6 +28,14 @@ jobs:
         uses: actions/checkout@v3
       - name: Setup Pages
         uses: actions/configure-pages@v2
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install Sphinx>=4.5.0 sphinx-rtd-theme>=1.0.0
       - name: Build with Sphinx
         run: |
           cd docs
