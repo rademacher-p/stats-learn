@@ -1,4 +1,4 @@
-name: Deploy Sphinx with GitHub Pages dependencies preinstalled
+name: Build/deploy Sphinx docs
 
 on:
   # Runs on pushes targeting the default branch
@@ -35,7 +35,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install Sphinx>=4.5.0 sphinx-rtd-theme>=1.0.0
+          python -m pip install -r requirements.txt
+          python -m pip install .[dev]
       - name: Build with Sphinx
         run: |
           cd docs

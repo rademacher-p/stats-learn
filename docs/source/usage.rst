@@ -10,7 +10,7 @@ To use Statistical Learning, first install the local package using pip:
 
    pip install <path>
 
-Note that ``<path>`` should point to the top-level directory containing ``setup.cfg``.
+Note that ``<path>`` should point to the top-level directory containing ``pyproject.toml``.
 
 Quickstart
 ----------
