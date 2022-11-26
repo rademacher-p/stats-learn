@@ -35,13 +35,13 @@ jobs:
         run: flake8 src/stats_learn/
         continue-on-error: true
       - name: Run tests and collect coverage
-        run: pytest --cov
+        run: pytest --cov=src/stats_learn/ --cov-report=xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
-        # with:
-        #   token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-        #   files: ./coverage1.xml,./coverage2.xml # optional
-        #   flags: unittests # optional
-        #   name: codecov-umbrella # optional
-        #   fail_ci_if_error: true # optional (default = false)
-        #   verbose: true # optional (default = false)
+        with:
+          # token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          # files: ./coverage1.xml,./coverage2.xml # optional
+          # flags: unittests # optional
+          # name: codecov-umbrella # optional
+          fail_ci_if_error: true # optional (default = false)
+          verbose: true # optional (default = false)
