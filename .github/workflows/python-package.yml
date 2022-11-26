@@ -10,6 +10,7 @@ on:
   pull_request:
     branches: ["main"]
     paths: ["src/stats_learn/**"]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -33,5 +34,14 @@ jobs:
       - name: Lint with flake8
         run: flake8 src/stats_learn/
         continue-on-error: true
-      - name: Test with pytest
-        run: pytest tests/
+      - name: Run tests and collect coverage
+        run: pytest --cov
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        # with:
+        #   token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+        #   files: ./coverage1.xml,./coverage2.xml # optional
+        #   flags: unittests # optional
+        #   name: codecov-umbrella # optional
+        #   fail_ci_if_error: true # optional (default = false)
+        #   verbose: true # optional (default = false)
