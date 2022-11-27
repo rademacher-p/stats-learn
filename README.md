@@ -4,6 +4,7 @@
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-908a85?logo=gitpod)](https://gitpod.io/#https://github.com/rademacher-p/stats-learn)
 ![CI](https://github.com/rademacher-p/stats-learn/actions/workflows/CI.yml/badge.svg)
+[![codecov](https://codecov.io/github/rademacher-p/stats-learn/branch/main/graph/badge.svg?token=4U2OKN862G)](https://codecov.io/github/rademacher-p/stats-learn)
 
 **Note**: This project is under active development.
 

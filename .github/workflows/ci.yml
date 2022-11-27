@@ -5,7 +5,7 @@ name: CI
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "dev"]
     paths: ["src/stats_learn/**"]
   pull_request:
     branches: ["main"]
@@ -36,12 +36,12 @@ jobs:
         run: flake8 src/stats_learn/
         continue-on-error: true
       - name: Run tests and collect coverage
-        run: pytest --cov=src/stats_learn/ --cov-report=xml
+        run: pytest --cov=src/stats_learn/ --cov-report=xml:tests/coverage.xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
           # token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-          files: ./coverage.xml # optional
+          files: tests/coverage.xml # optional
           # flags: unittests # optional
           # name: codecov-umbrella # optional
           fail_ci_if_error: true # optional (default = false)
