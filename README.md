@@ -1,10 +1,10 @@
 # Statistical Learning
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6886844.svg)](https://doi.org/10.5281/zenodo.6886844)
+![CI](https://github.com/rademacher-p/stats-learn/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/github/rademacher-p/stats-learn/branch/main/graph/badge.svg?token=4U2OKN862G)](https://codecov.io/github/rademacher-p/stats-learn)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6886844.svg)](https://doi.org/10.5281/zenodo.6886844)
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-908a85?logo=gitpod)](https://gitpod.io/#https://github.com/rademacher-p/stats-learn)
-![CI](https://github.com/rademacher-p/stats-learn/actions/workflows/CI.yml/badge.svg)
-[![codecov](https://codecov.io/github/rademacher-p/stats-learn/branch/main/graph/badge.svg?token=4U2OKN862G)](https://codecov.io/github/rademacher-p/stats-learn)
 
 **Note**: This project is under active development.
 
@@ -15,8 +15,6 @@ For supervised learning, the `predictors` subpackage provides objects that use t
 Also included (in the `results` submodule) are various functions that enable fair and reproducible evaluations, as well as provide visualizations and Markdown-formatted output. Furthermore, they allow efficient assessments for learners across a set of hyperparameter values.
 
 ## Installation
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/rademacher-p/stats-learn)
-
 The `stats_learn` package is developed for [Python](https://www.python.org/downloads/) 3.8-3.10. Best practice is to first create a [virtual environment](https://docs.python.org/3/tutorial/venv.html). The package can then be installed directly from GitHub using
 ```
 pip install git+https://github.com/rademacher-p/stats-learn
