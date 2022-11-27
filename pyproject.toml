@@ -57,7 +57,7 @@ sources = ["src"]
 packages = ["src/stats_learn"]
 
 [tool.pytest.ini_options]
-addopts = ["--cov=src/stats_learn/", "--cov-report=xml"]
+addopts = ["--cov=src/stats_learn/", "--cov-report=term", "--cov-report=xml"]
 filterwarnings = ["ignore::DeprecationWarning"]
 testpaths = ["tests"]
 
