@@ -14,7 +14,9 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -60,8 +62,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>User Guide</li>
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">User Guide</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -72,27 +74,20 @@
            <div itemprop="articleBody">
              
   <section id="user-guide">
-<h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline"></a></h1>
+<h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this heading"></a></h1>
 <section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
 <p>To use Statistical Learning, first install the local package using pip:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install &lt;path&gt;
 </pre></div>
 </div>
-<p>Note that <code class="docutils literal notranslate"><span class="pre">&lt;path&gt;</span></code> should point to the top-level directory containing <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code>.</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">&lt;path&gt;</span></code> should point to the top-level directory containing <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>.</p>
 </section>
 <section id="quickstart">
-<h2>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline"></a></h2>
-<p>A basic example of model creation, learner definition, and performance assessment is shown below. The <code class="docutils literal notranslate"><span class="pre">model</span></code>
-attribute defines a jointly Normal distribution where the expected value of <code class="docutils literal notranslate"><span class="pre">y</span></code> conditioned on <code class="docutils literal notranslate"><span class="pre">x</span></code> is
-characterized by a polynomial function.</p>
-<p>Two different predictors are instantiated. First, the <code class="docutils literal notranslate"><span class="pre">opt_predictor</span></code> uses knowledge of the <cite>model</cite> to
-determine the optimal <code class="docutils literal notranslate"><span class="pre">predict</span></code> function. Second, a learning regressor is formulated using a Bayesian data
-model <code class="docutils literal notranslate"><span class="pre">norm_model</span></code>; this object implements a Normal distribution <code class="docutils literal notranslate"><span class="pre">norm_model.prior</span></code> to characterize
-uncertainty about the true model <code class="docutils literal notranslate"><span class="pre">weights</span></code>.</p>
-<p>Training and testing data are randomly generated using the model <code class="docutils literal notranslate"><span class="pre">sample</span></code> method and each predictor is assessed
-using its <code class="docutils literal notranslate"><span class="pre">evaluate</span></code> method. Once the learning <code class="docutils literal notranslate"><span class="pre">norm_predictor</span></code> is <code class="docutils literal notranslate"><span class="pre">fit</span></code> to the data, its
-squared-error loss is reduced.</p>
+<h2>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this heading"></a></h2>
+<p>A basic example of model creation, learner definition, and performance assessment is shown below. The <code class="docutils literal notranslate"><span class="pre">model</span></code> attribute defines a jointly Normal distribution where the expected value of <code class="docutils literal notranslate"><span class="pre">y</span></code> conditioned on <code class="docutils literal notranslate"><span class="pre">x</span></code> is characterized by a polynomial function.</p>
+<p>Two different predictors are instantiated. First, the <code class="docutils literal notranslate"><span class="pre">opt_predictor</span></code> uses knowledge of the <cite>model</cite> to determine the optimal <code class="docutils literal notranslate"><span class="pre">predict</span></code> function. Second, a learning regressor is formulated using a Bayesian data model <code class="docutils literal notranslate"><span class="pre">norm_model</span></code>; this object implements a Normal distribution <code class="docutils literal notranslate"><span class="pre">norm_model.prior</span></code> to characterize uncertainty about the true model <code class="docutils literal notranslate"><span class="pre">weights</span></code>.</p>
+<p>Training and testing data are randomly generated using the model <code class="docutils literal notranslate"><span class="pre">sample</span></code> method and each predictor is assessed using its <code class="docutils literal notranslate"><span class="pre">evaluate</span></code> method. Once the learning <code class="docutils literal notranslate"><span class="pre">norm_predictor</span></code> is <code class="docutils literal notranslate"><span class="pre">fit</span></code> to the data, its squared-error loss is reduced.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">stats_learn</span> <span class="kn">import</span> <span class="n">bayes</span><span class="p">,</span> <span class="n">random</span>
 <span class="kn">from</span> <span class="nn">stats_learn.predictors</span> <span class="kn">import</span> <span class="n">BayesRegressor</span><span class="p">,</span> <span class="n">ModelRegressor</span>
 
@@ -129,11 +124,7 @@ Prior learner loss = 3.413
 Trained learner loss = 0.951
 </pre></div>
 </div>
-<p>The code below can be executed after the previous snippet. The <code class="code docutils literal notranslate"><span class="pre">data_assess</span></code> function provides replication of the
-functionality above, including a loss table and a graphic showing how the <code class="code docutils literal notranslate"><span class="pre">predict</span></code> functions fit the training
-data. The <code class="code docutils literal notranslate"><span class="pre">model_assess</span></code> function performs Monte Carlo approximation of the expected loss by repeatedly
-generating and evaluating on new datasets, enabling statistically meaningful evaluation. Observe that it can be used
-for both visualization of both the prediction statistics and of the average loss.</p>
+<p>The code below can be executed after the previous snippet. The <code class="code docutils literal notranslate"><span class="pre">data_assess</span></code> function provides replication of the functionality above, including a loss table and a graphic showing how the <code class="code docutils literal notranslate"><span class="pre">predict</span></code> functions fit the training data. The <code class="code docutils literal notranslate"><span class="pre">model_assess</span></code> function performs Monte Carlo approximation of the expected loss by repeatedly generating and evaluating on new datasets, enabling statistically meaningful evaluation. Observe that it can be used for both visualization of both the prediction statistics and of the average loss.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">stats_learn</span> <span class="kn">import</span> <span class="n">results</span>
 
 <span class="n">predictors</span> <span class="o">=</span> <span class="p">[</span><span class="n">opt_predictor</span><span class="p">,</span> <span class="n">norm_predictor</span><span class="p">]</span>

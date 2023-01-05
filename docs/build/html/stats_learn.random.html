@@ -14,7 +14,9 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -43,8 +45,54 @@
 <li class="toctree-l2"><a class="reference internal" href="stats_learn.bayes.html">bayes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats_learn.predictors.html">predictors</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">random</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-stats_learn.random.elements">elements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-stats_learn.random.models">models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-stats_learn.random.elements">elements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.Base"><code class="docutils literal notranslate"><span class="pre">Base</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.BaseRV"><code class="docutils literal notranslate"><span class="pre">BaseRV</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.Beta"><code class="docutils literal notranslate"><span class="pre">Beta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.Binomial"><code class="docutils literal notranslate"><span class="pre">Binomial</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.DataEmpirical"><code class="docutils literal notranslate"><span class="pre">DataEmpirical</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.DataEmpiricalRV"><code class="docutils literal notranslate"><span class="pre">DataEmpiricalRV</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.Deterministic"><code class="docutils literal notranslate"><span class="pre">Deterministic</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.DeterministicRV"><code class="docutils literal notranslate"><span class="pre">DeterministicRV</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.Dirichlet"><code class="docutils literal notranslate"><span class="pre">Dirichlet</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.DirichletEmpirical"><code class="docutils literal notranslate"><span class="pre">DirichletEmpirical</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.DirichletEmpiricalScalar"><code class="docutils literal notranslate"><span class="pre">DirichletEmpiricalScalar</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.Empirical"><code class="docutils literal notranslate"><span class="pre">Empirical</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.EmpiricalScalar"><code class="docutils literal notranslate"><span class="pre">EmpiricalScalar</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.FiniteGeneric"><code class="docutils literal notranslate"><span class="pre">FiniteGeneric</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.FiniteGenericRV"><code class="docutils literal notranslate"><span class="pre">FiniteGenericRV</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.MixinRV"><code class="docutils literal notranslate"><span class="pre">MixinRV</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.Mixture"><code class="docutils literal notranslate"><span class="pre">Mixture</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.MixtureRV"><code class="docutils literal notranslate"><span class="pre">MixtureRV</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.Normal"><code class="docutils literal notranslate"><span class="pre">Normal</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.NormalLinear"><code class="docutils literal notranslate"><span class="pre">NormalLinear</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.elements.Uniform"><code class="docutils literal notranslate"><span class="pre">Uniform</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-stats_learn.random.models">models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.Base"><code class="docutils literal notranslate"><span class="pre">Base</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.BaseRVx"><code class="docutils literal notranslate"><span class="pre">BaseRVx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.BaseRVxy"><code class="docutils literal notranslate"><span class="pre">BaseRVxy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.BaseRVy"><code class="docutils literal notranslate"><span class="pre">BaseRVy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.BetaLinear"><code class="docutils literal notranslate"><span class="pre">BetaLinear</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.ClassConditional"><code class="docutils literal notranslate"><span class="pre">ClassConditional</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.DataConditional"><code class="docutils literal notranslate"><span class="pre">DataConditional</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.DataConditionalRVx"><code class="docutils literal notranslate"><span class="pre">DataConditionalRVx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.DataConditionalRVxy"><code class="docutils literal notranslate"><span class="pre">DataConditionalRVxy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.DataConditionalRVy"><code class="docutils literal notranslate"><span class="pre">DataConditionalRVy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.DataEmpirical"><code class="docutils literal notranslate"><span class="pre">DataEmpirical</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.DataEmpiricalRVx"><code class="docutils literal notranslate"><span class="pre">DataEmpiricalRVx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.DataEmpiricalRVxy"><code class="docutils literal notranslate"><span class="pre">DataEmpiricalRVxy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.DataEmpiricalRVy"><code class="docutils literal notranslate"><span class="pre">DataEmpiricalRVy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.MixinRVx"><code class="docutils literal notranslate"><span class="pre">MixinRVx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.MixinRVy"><code class="docutils literal notranslate"><span class="pre">MixinRVy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.Mixture"><code class="docutils literal notranslate"><span class="pre">Mixture</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.MixtureRVx"><code class="docutils literal notranslate"><span class="pre">MixtureRVx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.MixtureRVxy"><code class="docutils literal notranslate"><span class="pre">MixtureRVxy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.MixtureRVy"><code class="docutils literal notranslate"><span class="pre">MixtureRVy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.random.models.NormalLinear"><code class="docutils literal notranslate"><span class="pre">NormalLinear</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="stats_learn.html#module-stats_learn.loss_funcs">loss_funcs</a></li>
@@ -69,9 +117,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="stats_learn.html">stats_learn</a> &raquo;</li>
-      <li>random</li>
+      <li><a href="index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="stats_learn.html">stats_learn</a></li>
+      <li class="breadcrumb-item active">random</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/stats_learn.random.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -82,14 +130,14 @@
            <div itemprop="articleBody">
              
   <section id="module-stats_learn.random">
-<span id="random"></span><h1>random<a class="headerlink" href="#module-stats_learn.random" title="Permalink to this headline"></a></h1>
+<span id="random"></span><h1>random<a class="headerlink" href="#module-stats_learn.random" title="Permalink to this heading"></a></h1>
 <section id="module-stats_learn.random.elements">
-<span id="elements"></span><span id="random-elements"></span><h2>elements<a class="headerlink" href="#module-stats_learn.random.elements" title="Permalink to this headline"></a></h2>
+<span id="elements"></span><span id="random-elements"></span><h2>elements<a class="headerlink" href="#module-stats_learn.random.elements" title="Permalink to this heading"></a></h2>
 <p>Random elements and variables with random sampling, statistic generation, and visualization tools.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.Base">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">Base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.Base" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="stats_learn.html#stats_learn.util.RandomGeneratorMixin" title="stats_learn.util.RandomGeneratorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.util.RandomGeneratorMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="stats_learn.html#stats_learn.util.RandomGeneratorMixin" title="stats_learn.util.RandomGeneratorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomGeneratorMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
 <p>Base class for random elements.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -218,7 +266,7 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.BaseRV">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">BaseRV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.BaseRV" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.MixinRV" title="stats_learn.random.elements.MixinRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.MixinRV</span></code></a>, <a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.Base</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.MixinRV" title="stats_learn.random.elements.MixinRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRV</span></code></a>, <a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
 <p>Base class for random variables (numeric).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -230,7 +278,7 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.Beta">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">Beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.Beta" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.BaseRV" title="stats_learn.random.elements.BaseRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.BaseRV</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.BaseRV" title="stats_learn.random.elements.BaseRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseRV</span></code></a></p>
 <p>Beta random variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -298,7 +346,7 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.Binomial">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">Binomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.Binomial" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.BaseRV" title="stats_learn.random.elements.BaseRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.BaseRV</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.BaseRV" title="stats_learn.random.elements.BaseRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseRV</span></code></a></p>
 <p>Binomial random variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -344,7 +392,7 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.DataEmpirical">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">DataEmpirical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.DataEmpirical" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.Base</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
 <p>A random element drawn from an empirical distribution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -428,7 +476,7 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.DataEmpiricalRV">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">DataEmpiricalRV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.DataEmpiricalRV" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.MixinRV" title="stats_learn.random.elements.MixinRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.MixinRV</span></code></a>, <a class="reference internal" href="#stats_learn.random.elements.DataEmpirical" title="stats_learn.random.elements.DataEmpirical"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.DataEmpirical</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.MixinRV" title="stats_learn.random.elements.MixinRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRV</span></code></a>, <a class="reference internal" href="#stats_learn.random.elements.DataEmpirical" title="stats_learn.random.elements.DataEmpirical"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataEmpirical</span></code></a></p>
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.random.elements.DataEmpiricalRV.cov">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cov</span></span><a class="headerlink" href="#stats_learn.random.elements.DataEmpiricalRV.cov" title="Permalink to this definition"></a></dt>
@@ -446,7 +494,7 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.Deterministic">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">Deterministic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.Deterministic" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.Base</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
 <p>Deterministic random element.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -485,7 +533,7 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.DeterministicRV">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">DeterministicRV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.DeterministicRV" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.MixinRV" title="stats_learn.random.elements.MixinRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.MixinRV</span></code></a>, <a class="reference internal" href="#stats_learn.random.elements.Deterministic" title="stats_learn.random.elements.Deterministic"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.Deterministic</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.MixinRV" title="stats_learn.random.elements.MixinRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRV</span></code></a>, <a class="reference internal" href="#stats_learn.random.elements.Deterministic" title="stats_learn.random.elements.Deterministic"><code class="xref py py-class docutils literal notranslate"><span class="pre">Deterministic</span></code></a></p>
 <p>Deterministic random variable.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.random.elements.DeterministicRV.value">
@@ -498,7 +546,7 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.Dirichlet">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">Dirichlet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.Dirichlet" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.BaseRV" title="stats_learn.random.elements.BaseRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.BaseRV</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.BaseRV" title="stats_learn.random.elements.BaseRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseRV</span></code></a></p>
 <p>Dirichlet random process, finite-domain realizations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -562,7 +610,7 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.DirichletEmpirical">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">DirichletEmpirical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.DirichletEmpirical" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.BaseRV" title="stats_learn.random.elements.BaseRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.BaseRV</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.BaseRV" title="stats_learn.random.elements.BaseRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseRV</span></code></a></p>
 <p>Dirichlet-Empirical random process, finite-domain realizations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -615,7 +663,7 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.DirichletEmpiricalScalar">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">DirichletEmpiricalScalar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.DirichletEmpiricalScalar" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.BaseRV" title="stats_learn.random.elements.BaseRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.BaseRV</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.BaseRV" title="stats_learn.random.elements.BaseRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseRV</span></code></a></p>
 <p>Scalar Dirichlet-Empirical random variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -676,7 +724,7 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.Empirical">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">Empirical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.Empirical" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.BaseRV" title="stats_learn.random.elements.BaseRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.BaseRV</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.BaseRV" title="stats_learn.random.elements.BaseRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseRV</span></code></a></p>
 <p>Empirical random process, finite-domain realizations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -727,7 +775,7 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.EmpiricalScalar">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">EmpiricalScalar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.EmpiricalScalar" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.Binomial" title="stats_learn.random.elements.Binomial"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.Binomial</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.Binomial" title="stats_learn.random.elements.Binomial"><code class="xref py py-class docutils literal notranslate"><span class="pre">Binomial</span></code></a></p>
 <p>Scalar empirical random variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -763,7 +811,7 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.FiniteGeneric">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">FiniteGeneric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.FiniteGeneric" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.Base</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
 <p>Finite-domain random element with specified domain and probabilities.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -817,7 +865,7 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.FiniteGenericRV">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">FiniteGenericRV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.FiniteGenericRV" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.MixinRV" title="stats_learn.random.elements.MixinRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.MixinRV</span></code></a>, <a class="reference internal" href="#stats_learn.random.elements.FiniteGeneric" title="stats_learn.random.elements.FiniteGeneric"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.FiniteGeneric</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.MixinRV" title="stats_learn.random.elements.MixinRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRV</span></code></a>, <a class="reference internal" href="#stats_learn.random.elements.FiniteGeneric" title="stats_learn.random.elements.FiniteGeneric"><code class="xref py py-class docutils literal notranslate"><span class="pre">FiniteGeneric</span></code></a></p>
 <p>Finite-domain random variable with specified domain and probabilities.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.random.elements.FiniteGenericRV.cov">
@@ -855,12 +903,12 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.Mixture">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">Mixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.Mixture" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.Base</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
 <p>Mixture of random elements.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dists</strong> (<em>Collection of Base</em>) – The random elements to be mixed.</p></li>
+<li><p><strong>dists</strong> (<em>Collection</em><em> of </em><a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><em>Base</em></a>) – The random elements to be mixed.</p></li>
 <li><p><strong>weights</strong> (<em>array_like</em>) – The weights combining the random elements.</p></li>
 <li><p><strong>rng</strong> (<em>np.random.Generator</em><em> or </em><em>int</em><em>, </em><em>optional</em>) – Random number generator seed or object.</p></li>
 </ul>
@@ -958,7 +1006,7 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.MixtureRV">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">MixtureRV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.MixtureRV" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.MixinRV" title="stats_learn.random.elements.MixinRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.MixinRV</span></code></a>, <a class="reference internal" href="#stats_learn.random.elements.Mixture" title="stats_learn.random.elements.Mixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.Mixture</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.MixinRV" title="stats_learn.random.elements.MixinRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRV</span></code></a>, <a class="reference internal" href="#stats_learn.random.elements.Mixture" title="stats_learn.random.elements.Mixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mixture</span></code></a></p>
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.random.elements.MixtureRV.mean">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mean</span></span><a class="headerlink" href="#stats_learn.random.elements.MixtureRV.mean" title="Permalink to this definition"></a></dt>
@@ -970,12 +1018,12 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.Normal">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">Normal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_singular</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.Normal" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.BaseRV" title="stats_learn.random.elements.BaseRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.BaseRV</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.BaseRV" title="stats_learn.random.elements.BaseRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseRV</span></code></a></p>
 <p>Normal random variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mean</strong> (<em>float</em><em> or </em><em>Collection of float</em>) – </p></li>
+<li><p><strong>mean</strong> (<em>float</em><em> or </em><em>Collection</em><em> of </em><em>float</em>) – </p></li>
 <li><p><strong>cov</strong> (<em>float</em><em> or </em><em>numpy.ndarray</em>) – Covariance tensor.</p></li>
 <li><p><strong>allow_singular</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to allow a singular covariance matrix.</p></li>
 <li><p><strong>rng</strong> (<em>np.random.Generator</em><em> or </em><em>int</em><em>, </em><em>optional</em>) – Random number generator seed or object.</p></li>
@@ -1017,7 +1065,7 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.NormalLinear">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">NormalLinear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1.0,)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1.0,)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.NormalLinear" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.Normal" title="stats_learn.random.elements.Normal"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.Normal</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.Normal" title="stats_learn.random.elements.Normal"><code class="xref py py-class docutils literal notranslate"><span class="pre">Normal</span></code></a></p>
 <p>Normal random variable with mean defined in terms of basis tensors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1046,7 +1094,7 @@ subclass.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.elements.Uniform">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.elements.</span></span><span class="sig-name descname"><span class="pre">Uniform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.elements.Uniform" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.BaseRV" title="stats_learn.random.elements.BaseRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.elements.BaseRV</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.elements.BaseRV" title="stats_learn.random.elements.BaseRV"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseRV</span></code></a></p>
 <p>Uniform random variable over a Box space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1084,12 +1132,12 @@ subclass.</p>
 
 </section>
 <section id="module-stats_learn.random.models">
-<span id="models"></span><span id="random-models"></span><h2>models<a class="headerlink" href="#module-stats_learn.random.models" title="Permalink to this headline"></a></h2>
+<span id="models"></span><span id="random-models"></span><h2>models<a class="headerlink" href="#module-stats_learn.random.models" title="Permalink to this heading"></a></h2>
 <p>Random models of jointly distributed <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/> and <img class="math" src="_images/math/e7aef02edc78c428596f814d49189687b8551a04.png" alt="\yrm" style="vertical-align: -4px"/> elements for supervised learning.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.Base">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">Base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.Base" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="stats_learn.html#stats_learn.util.RandomGeneratorMixin" title="stats_learn.util.RandomGeneratorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.util.RandomGeneratorMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="stats_learn.html#stats_learn.util.RandomGeneratorMixin" title="stats_learn.util.RandomGeneratorMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomGeneratorMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
 <p>Base class for random supervised learning models.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1097,8 +1145,9 @@ subclass.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>Implements a joint distribution between an random elements <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/> and <cite>yrm</cite>. For supervised learning, it is
-assumed that the former is observed while the latter is not.</p>
+<p>Implements a joint distribution between an random elements <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/> and <cite>yrm</cite>.
+For supervised learning, it is assumed that the former is observed while the latter
+is not.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.random.models.Base.dtype">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#stats_learn.random.models.Base.dtype" title="Permalink to this definition"></a></dt>
@@ -1229,7 +1278,7 @@ assumed that the former is observed while the latter is not.</p>
 <dd><p>The domain.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict of spaces.Base</p>
+<dd class="field-odd"><p>dict of <a class="reference internal" href="stats_learn.html#stats_learn.spaces.Base" title="stats_learn.spaces.Base">spaces.Base</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1239,7 +1288,7 @@ assumed that the former is observed while the latter is not.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.BaseRVx">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">BaseRVx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.BaseRVx" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVx" title="stats_learn.random.models.MixinRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.MixinRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.Base</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVx" title="stats_learn.random.models.MixinRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.random.models.BaseRVx.model_y_x">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">model_y_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.BaseRVx.model_y_x" title="Permalink to this definition"></a></dt>
@@ -1262,7 +1311,7 @@ assumed that the former is observed while the latter is not.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.BaseRVxy">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">BaseRVxy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.BaseRVxy" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVx" title="stats_learn.random.models.MixinRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.MixinRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.MixinRVy" title="stats_learn.random.models.MixinRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.MixinRVy</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.Base</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVx" title="stats_learn.random.models.MixinRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.MixinRVy" title="stats_learn.random.models.MixinRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRVy</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.random.models.BaseRVxy.model_y_x">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">model_y_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.BaseRVxy.model_y_x" title="Permalink to this definition"></a></dt>
@@ -1285,7 +1334,7 @@ assumed that the former is observed while the latter is not.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.BaseRVy">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">BaseRVy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.BaseRVy" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVy" title="stats_learn.random.models.MixinRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.MixinRVy</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.Base</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVy" title="stats_learn.random.models.MixinRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRVy</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.random.models.BaseRVy.model_y_x">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">model_y_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.BaseRVy.model_y_x" title="Permalink to this definition"></a></dt>
@@ -1308,13 +1357,13 @@ assumed that the former is observed while the latter is not.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.BetaLinear">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">BetaLinear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis_y_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_y_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.BetaLinear" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVx" title="stats_learn.random.models.MixinRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.MixinRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.MixinRVy" title="stats_learn.random.models.MixinRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.MixinRVy</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.Base</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVx" title="stats_learn.random.models.MixinRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.MixinRVy" title="stats_learn.random.models.MixinRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRVy</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
 <p>Model characterized by a Beta conditional distribution with mean defined in terms of basis functions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>weights</strong> (<em>array_like</em>) – The weights combining the basis functions into the conditional mean function.</p></li>
-<li><p><strong>basis_y_x</strong> (<em>Collection of callable</em><em>, </em><em>optional</em>) – Basis functions. Defaults to polynomial functions.</p></li>
+<li><p><strong>basis_y_x</strong> (<em>Collection</em><em> of </em><em>callable</em><em>, </em><em>optional</em>) – Basis functions. Defaults to polynomial functions.</p></li>
 <li><p><strong>alpha_y_x</strong> (<em>float</em><em>, </em><em>optional</em>) – Total conditional Beta concentration. Defaults to uniform.</p></li>
 <li><p><strong>model_x</strong> (<a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><em>stats_learn.random.elements.Base</em></a>) – Random variable characterizing the marginal distribution of <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/>.</p></li>
 <li><p><strong>rng</strong> (<em>int</em><em> or </em><em>np.random.RandomState</em><em> or </em><em>np.random.Generator</em><em>, </em><em>optional</em>) – Random number generator seed or object.</p></li>
@@ -1401,12 +1450,13 @@ assumed that the former is observed while the latter is not.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.ClassConditional">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">ClassConditional</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.ClassConditional" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVx" title="stats_learn.random.models.MixinRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.MixinRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.Base</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVx" title="stats_learn.random.models.MixinRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
 <p>Model with a finite-domain random element <img class="math" src="_images/math/e7aef02edc78c428596f814d49189687b8551a04.png" alt="\yrm" style="vertical-align: -4px"/> and explicit conditional distributions of <img class="math" src="_images/math/03dc989cff006fa3f36960d82c9c42891df6313e.png" alt="x" style="vertical-align: 0px"/>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dists</strong> (<em>Collection of random.elements.Base</em>) – Explicit conditional random elements characterizing <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/> for each possible value of <img class="math" src="_images/math/ac81156a8df1ef8e899e1e420f9c9ae412a3a8bc.png" alt="y" style="vertical-align: -4px"/>.</p></li>
+<li><p><strong>dists</strong> (<em>Collection</em><em> of </em><a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><em>random.elements.Base</em></a>) – Explicit conditional random elements characterizing <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/> for each
+possible value of <img class="math" src="_images/math/ac81156a8df1ef8e899e1e420f9c9ae412a3a8bc.png" alt="y" style="vertical-align: -4px"/>.</p></li>
 <li><p><strong>model_y</strong> (<a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><em>stats_learn.random.elements.Base</em></a>) – Random variable characterizing the marginal distribution of <img class="math" src="_images/math/e7aef02edc78c428596f814d49189687b8551a04.png" alt="\yrm" style="vertical-align: -4px"/>.</p></li>
 <li><p><strong>rng</strong> (<em>int</em><em> or </em><em>np.random.RandomState</em><em> or </em><em>np.random.Generator</em><em>, </em><em>optional</em>) – Random number generator seed or object.</p></li>
 </ul>
@@ -1430,7 +1480,7 @@ assumed that the former is observed while the latter is not.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dists</strong> (<em>Collection of random.elements.Base</em>) – Explicit conditional random elements characterizing <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/> for each possible value of <img class="math" src="_images/math/ac81156a8df1ef8e899e1e420f9c9ae412a3a8bc.png" alt="y" style="vertical-align: -4px"/>.</p></li>
+<li><p><strong>dists</strong> (<em>Collection</em><em> of </em><a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><em>random.elements.Base</em></a>) – Explicit conditional random elements characterizing <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/> for each possible value of <img class="math" src="_images/math/ac81156a8df1ef8e899e1e420f9c9ae412a3a8bc.png" alt="y" style="vertical-align: -4px"/>.</p></li>
 <li><p><strong>values_y</strong> (<em>array_like</em>) – Explicit domain values for <img class="math" src="_images/math/ac81156a8df1ef8e899e1e420f9c9ae412a3a8bc.png" alt="y" style="vertical-align: -4px"/>.</p></li>
 <li><p><strong>p_y</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Probabilities for each value <img class="math" src="_images/math/ac81156a8df1ef8e899e1e420f9c9ae412a3a8bc.png" alt="y" style="vertical-align: -4px"/> in the domain. Defaults to uniform.</p></li>
 <li><p><strong>rng</strong> (<em>int</em><em> or </em><em>np.random.RandomState</em><em> or </em><em>np.random.Generator</em><em>, </em><em>optional</em>) – Random number generator seed or object.</p></li>
@@ -1512,12 +1562,13 @@ assumed that the former is observed while the latter is not.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.DataConditional">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">DataConditional</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.DataConditional" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.Base</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
 <p>Model with a finite-domain random element <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/> and explicit conditional distributions of <img class="math" src="_images/math/ac81156a8df1ef8e899e1e420f9c9ae412a3a8bc.png" alt="y" style="vertical-align: -4px"/>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dists</strong> (<em>Collection of random.elements.Base</em>) – Explicit conditional random elements characterizing <img class="math" src="_images/math/e7aef02edc78c428596f814d49189687b8551a04.png" alt="\yrm" style="vertical-align: -4px"/> for each possible value of <img class="math" src="_images/math/03dc989cff006fa3f36960d82c9c42891df6313e.png" alt="x" style="vertical-align: 0px"/>.</p></li>
+<li><p><strong>dists</strong> (<em>Collection</em><em> of </em><a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><em>random.elements.Base</em></a>) – Explicit conditional random elements characterizing <img class="math" src="_images/math/e7aef02edc78c428596f814d49189687b8551a04.png" alt="\yrm" style="vertical-align: -4px"/> for each
+possible value of <img class="math" src="_images/math/03dc989cff006fa3f36960d82c9c42891df6313e.png" alt="x" style="vertical-align: 0px"/>.</p></li>
 <li><p><strong>model_x</strong> (<a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><em>stats_learn.random.elements.Base</em></a>) – Random variable characterizing the marginal distribution of <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/>.</p></li>
 <li><p><strong>rng</strong> (<em>int</em><em> or </em><em>np.random.RandomState</em><em> or </em><em>np.random.Generator</em><em>, </em><em>optional</em>) – Random number generator seed or object.</p></li>
 </ul>
@@ -1535,7 +1586,8 @@ assumed that the former is observed while the latter is not.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dists</strong> (<em>Collection of random.elements.Base</em>) – Explicit conditional random elements characterizing <img class="math" src="_images/math/e7aef02edc78c428596f814d49189687b8551a04.png" alt="\yrm" style="vertical-align: -4px"/> for each possible value of <img class="math" src="_images/math/03dc989cff006fa3f36960d82c9c42891df6313e.png" alt="x" style="vertical-align: 0px"/>.</p></li>
+<li><p><strong>dists</strong> (<em>Collection</em><em> of </em><a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><em>random.elements.Base</em></a>) – Explicit conditional random elements characterizing <img class="math" src="_images/math/e7aef02edc78c428596f814d49189687b8551a04.png" alt="\yrm" style="vertical-align: -4px"/> for each
+possible value of <img class="math" src="_images/math/03dc989cff006fa3f36960d82c9c42891df6313e.png" alt="x" style="vertical-align: 0px"/>.</p></li>
 <li><p><strong>values_x</strong> (<em>array_like</em>) – Explicit domain values for <img class="math" src="_images/math/03dc989cff006fa3f36960d82c9c42891df6313e.png" alt="x" style="vertical-align: 0px"/>.</p></li>
 <li><p><strong>p_x</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Probabilities for each value <img class="math" src="_images/math/03dc989cff006fa3f36960d82c9c42891df6313e.png" alt="x" style="vertical-align: 0px"/> in the domain. Defaults to uniform.</p></li>
 <li><p><strong>rng</strong> (<em>int</em><em> or </em><em>np.random.RandomState</em><em> or </em><em>np.random.Generator</em><em>, </em><em>optional</em>) – Random number generator seed or object.</p></li>
@@ -1623,7 +1675,7 @@ assumed that the former is observed while the latter is not.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.DataConditionalRVx">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">DataConditionalRVx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.DataConditionalRVx" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVx" title="stats_learn.random.models.MixinRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.MixinRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.DataConditional" title="stats_learn.random.models.DataConditional"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.DataConditional</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVx" title="stats_learn.random.models.MixinRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.DataConditional" title="stats_learn.random.models.DataConditional"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataConditional</span></code></a></p>
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.random.models.DataConditionalRVx.cov_x">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cov_x</span></span><a class="headerlink" href="#stats_learn.random.models.DataConditionalRVx.cov_x" title="Permalink to this definition"></a></dt>
@@ -1641,19 +1693,19 @@ assumed that the former is observed while the latter is not.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.DataConditionalRVxy">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">DataConditionalRVxy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.DataConditionalRVxy" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.DataConditionalRVy" title="stats_learn.random.models.DataConditionalRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.DataConditionalRVy</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.DataConditionalRVx" title="stats_learn.random.models.DataConditionalRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.DataConditionalRVx</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.DataConditionalRVy" title="stats_learn.random.models.DataConditionalRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataConditionalRVy</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.DataConditionalRVx" title="stats_learn.random.models.DataConditionalRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataConditionalRVx</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.DataConditionalRVy">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">DataConditionalRVy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.DataConditionalRVy" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVy" title="stats_learn.random.models.MixinRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.MixinRVy</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.DataConditional" title="stats_learn.random.models.DataConditional"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.DataConditional</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVy" title="stats_learn.random.models.MixinRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRVy</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.DataConditional" title="stats_learn.random.models.DataConditional"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataConditional</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.DataEmpirical">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">DataEmpirical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.DataEmpirical" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.Base</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
 <p>A random model drawn from an empirical distribution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1736,7 +1788,7 @@ assumed that the former is observed while the latter is not.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.DataEmpiricalRVx">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">DataEmpiricalRVx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.DataEmpiricalRVx" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVx" title="stats_learn.random.models.MixinRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.MixinRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.DataEmpirical" title="stats_learn.random.models.DataEmpirical"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.DataEmpirical</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVx" title="stats_learn.random.models.MixinRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.DataEmpirical" title="stats_learn.random.models.DataEmpirical"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataEmpirical</span></code></a></p>
 <dl class="py property">
 <dt class="sig sig-object py" id="stats_learn.random.models.DataEmpiricalRVx.cov_x">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cov_x</span></span><a class="headerlink" href="#stats_learn.random.models.DataEmpiricalRVx.cov_x" title="Permalink to this definition"></a></dt>
@@ -1754,13 +1806,13 @@ assumed that the former is observed while the latter is not.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.DataEmpiricalRVxy">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">DataEmpiricalRVxy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.DataEmpiricalRVxy" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.DataEmpiricalRVx" title="stats_learn.random.models.DataEmpiricalRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.DataEmpiricalRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.DataEmpiricalRVy" title="stats_learn.random.models.DataEmpiricalRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.DataEmpiricalRVy</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.DataEmpiricalRVx" title="stats_learn.random.models.DataEmpiricalRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataEmpiricalRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.DataEmpiricalRVy" title="stats_learn.random.models.DataEmpiricalRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataEmpiricalRVy</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.DataEmpiricalRVy">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">DataEmpiricalRVy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.DataEmpiricalRVy" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVy" title="stats_learn.random.models.MixinRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.MixinRVy</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.DataEmpirical" title="stats_learn.random.models.DataEmpirical"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.DataEmpirical</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVy" title="stats_learn.random.models.MixinRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRVy</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.DataEmpirical" title="stats_learn.random.models.DataEmpirical"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataEmpirical</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
@@ -1864,12 +1916,12 @@ assumed that the former is observed while the latter is not.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.Mixture">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">Mixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.Mixture" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.Base</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
 <p>Mixture of random models.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dists</strong> (<em>Collection of Base</em>) – The random models to be mixed.</p></li>
+<li><p><strong>dists</strong> (<em>Collection</em><em> of </em><a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><em>Base</em></a>) – The random models to be mixed.</p></li>
 <li><p><strong>weights</strong> (<em>array_like</em>) – The weights combining the random models.</p></li>
 <li><p><strong>rng</strong> (<em>np.random.Generator</em><em> or </em><em>int</em><em>, </em><em>optional</em>) – Random number generator seed or object.</p></li>
 </ul>
@@ -1954,19 +2006,19 @@ assumed that the former is observed while the latter is not.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.MixtureRVx">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">MixtureRVx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.MixtureRVx" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVx" title="stats_learn.random.models.MixinRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.MixinRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.Mixture" title="stats_learn.random.models.Mixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.Mixture</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVx" title="stats_learn.random.models.MixinRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.Mixture" title="stats_learn.random.models.Mixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mixture</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.MixtureRVxy">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">MixtureRVxy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.MixtureRVxy" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixtureRVx" title="stats_learn.random.models.MixtureRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.MixtureRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.MixtureRVy" title="stats_learn.random.models.MixtureRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.MixtureRVy</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixtureRVx" title="stats_learn.random.models.MixtureRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixtureRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.MixtureRVy" title="stats_learn.random.models.MixtureRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixtureRVy</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.MixtureRVy">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">MixtureRVy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.MixtureRVy" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVy" title="stats_learn.random.models.MixinRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.MixinRVy</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.Mixture" title="stats_learn.random.models.Mixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.Mixture</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVy" title="stats_learn.random.models.MixinRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRVy</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.Mixture" title="stats_learn.random.models.Mixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mixture</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.random.models.MixtureRVy.mean_y_x">
 <span class="sig-name descname"><span class="pre">mean_y_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.MixtureRVy.mean_y_x" title="Permalink to this definition"></a></dt>
@@ -1986,13 +2038,13 @@ assumed that the former is observed while the latter is not.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.random.models.NormalLinear">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.random.models.</span></span><span class="sig-name descname"><span class="pre">NormalLinear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis_y_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_y_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.random.models.NormalLinear" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVx" title="stats_learn.random.models.MixinRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.MixinRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.MixinRVy" title="stats_learn.random.models.MixinRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.MixinRVy</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.random.models.Base</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.random.models.MixinRVx" title="stats_learn.random.models.MixinRVx"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRVx</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.MixinRVy" title="stats_learn.random.models.MixinRVy"><code class="xref py py-class docutils literal notranslate"><span class="pre">MixinRVy</span></code></a>, <a class="reference internal" href="#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
 <p>Model characterized by a Normal conditional distribution with mean defined in terms of basis functions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>weights</strong> (<em>array_like</em>) – The weights combining the basis functions into the conditional mean function.</p></li>
-<li><p><strong>basis_y_x</strong> (<em>Collection of callable</em><em>, </em><em>optional</em>) – Basis functions. Defaults to polynomial functions.</p></li>
+<li><p><strong>basis_y_x</strong> (<em>Collection</em><em> of </em><em>callable</em><em>, </em><em>optional</em>) – Basis functions. Defaults to polynomial functions.</p></li>
 <li><p><strong>cov_y_x</strong> (<em>float</em><em> or </em><em>callable</em><em>, </em><em>optional</em>) – Conditional covariance of Normal distributions.</p></li>
 <li><p><strong>model_x</strong> (<a class="reference internal" href="#stats_learn.random.elements.Base" title="stats_learn.random.elements.Base"><em>stats_learn.random.elements.Base</em></a>) – Random variable characterizing the marginal distribution of <img class="math" src="_images/math/27e2160dee09df3773c4961a8f7eb0c4f1126adf.png" alt="\xrm" style="vertical-align: 0px"/>.</p></li>
 <li><p><strong>rng</strong> (<em>int</em><em> or </em><em>np.random.RandomState</em><em> or </em><em>np.random.Generator</em><em>, </em><em>optional</em>) – Random number generator seed or object.</p></li>

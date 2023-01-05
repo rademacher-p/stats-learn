@@ -14,7 +14,9 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -44,11 +46,101 @@
 <li class="toctree-l2"><a class="reference internal" href="stats_learn.bayes.html">bayes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats_learn.predictors.html">predictors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats_learn.random.html">random</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-stats_learn.loss_funcs">loss_funcs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-stats_learn.preprocessing">preprocessing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-stats_learn.results">results</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-stats_learn.spaces">spaces</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-stats_learn.util">util</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stats_learn.loss_funcs">loss_funcs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.loss_funcs.loss_01"><code class="docutils literal notranslate"><span class="pre">loss_01()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.loss_funcs.loss_se"><code class="docutils literal notranslate"><span class="pre">loss_se()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stats_learn.preprocessing">preprocessing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.preprocessing.make_clipper"><code class="docutils literal notranslate"><span class="pre">make_clipper()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.preprocessing.make_discretizer"><code class="docutils literal notranslate"><span class="pre">make_discretizer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.preprocessing.prob_disc"><code class="docutils literal notranslate"><span class="pre">prob_disc()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stats_learn.results">results</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.results.data_assess"><code class="docutils literal notranslate"><span class="pre">data_assess()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.results.model_assess"><code class="docutils literal notranslate"><span class="pre">model_assess()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.results.plot_predict_stats"><code class="docutils literal notranslate"><span class="pre">plot_predict_stats()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.results.plot_risk_disc"><code class="docutils literal notranslate"><span class="pre">plot_risk_disc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.results.plot_risk_eval_sim"><code class="docutils literal notranslate"><span class="pre">plot_risk_eval_sim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.results.predict_stats"><code class="docutils literal notranslate"><span class="pre">predict_stats()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.results.risk_eval_analytic"><code class="docutils literal notranslate"><span class="pre">risk_eval_analytic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.results.risk_eval_sim"><code class="docutils literal notranslate"><span class="pre">risk_eval_sim()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stats_learn.spaces">spaces</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.spaces.Base"><code class="docutils literal notranslate"><span class="pre">Base</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Base.argmax"><code class="docutils literal notranslate"><span class="pre">Base.argmax()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Base.argmin"><code class="docutils literal notranslate"><span class="pre">Base.argmin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Base.dtype"><code class="docutils literal notranslate"><span class="pre">Base.dtype</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Base.integrate"><code class="docutils literal notranslate"><span class="pre">Base.integrate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Base.make_axes"><code class="docutils literal notranslate"><span class="pre">Base.make_axes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Base.moment"><code class="docutils literal notranslate"><span class="pre">Base.moment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Base.ndim"><code class="docutils literal notranslate"><span class="pre">Base.ndim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Base.plot"><code class="docutils literal notranslate"><span class="pre">Base.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Base.plot_xy"><code class="docutils literal notranslate"><span class="pre">Base.plot_xy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Base.set_x_plot"><code class="docutils literal notranslate"><span class="pre">Base.set_x_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Base.shape"><code class="docutils literal notranslate"><span class="pre">Base.shape</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Base.size"><code class="docutils literal notranslate"><span class="pre">Base.size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Base.x_plt"><code class="docutils literal notranslate"><span class="pre">Base.x_plt</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.spaces.Box"><code class="docutils literal notranslate"><span class="pre">Box</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Box.lims"><code class="docutils literal notranslate"><span class="pre">Box.lims</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Box.lims_plot"><code class="docutils literal notranslate"><span class="pre">Box.lims_plot</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Box.make_grid"><code class="docutils literal notranslate"><span class="pre">Box.make_grid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Box.optimize_kwargs"><code class="docutils literal notranslate"><span class="pre">Box.optimize_kwargs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Box.plot"><code class="docutils literal notranslate"><span class="pre">Box.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Box.set_x_plot"><code class="docutils literal notranslate"><span class="pre">Box.set_x_plot()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.spaces.Continuous"><code class="docutils literal notranslate"><span class="pre">Continuous</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Continuous.integrate"><code class="docutils literal notranslate"><span class="pre">Continuous.integrate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Continuous.optimize_kwargs"><code class="docutils literal notranslate"><span class="pre">Continuous.optimize_kwargs</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.spaces.Discrete"><code class="docutils literal notranslate"><span class="pre">Discrete</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.spaces.Euclidean"><code class="docutils literal notranslate"><span class="pre">Euclidean</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Euclidean.lims_plot"><code class="docutils literal notranslate"><span class="pre">Euclidean.lims_plot</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Euclidean.optimize_kwargs"><code class="docutils literal notranslate"><span class="pre">Euclidean.optimize_kwargs</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.spaces.Finite"><code class="docutils literal notranslate"><span class="pre">Finite</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.spaces.FiniteGeneric"><code class="docutils literal notranslate"><span class="pre">FiniteGeneric</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.FiniteGeneric.from_grid"><code class="docutils literal notranslate"><span class="pre">FiniteGeneric.from_grid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.FiniteGeneric.from_outer"><code class="docutils literal notranslate"><span class="pre">FiniteGeneric.from_outer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.FiniteGeneric.integrate"><code class="docutils literal notranslate"><span class="pre">FiniteGeneric.integrate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.FiniteGeneric.set_x_plot"><code class="docutils literal notranslate"><span class="pre">FiniteGeneric.set_x_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.FiniteGeneric.values_flat"><code class="docutils literal notranslate"><span class="pre">FiniteGeneric.values_flat</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.spaces.Simplex"><code class="docutils literal notranslate"><span class="pre">Simplex</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Simplex.make_axes"><code class="docutils literal notranslate"><span class="pre">Simplex.make_axes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Simplex.make_grid"><code class="docutils literal notranslate"><span class="pre">Simplex.make_grid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Simplex.n_plot"><code class="docutils literal notranslate"><span class="pre">Simplex.n_plot</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Simplex.plot"><code class="docutils literal notranslate"><span class="pre">Simplex.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.Simplex.set_x_plot"><code class="docutils literal notranslate"><span class="pre">Simplex.set_x_plot()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.spaces.SimplexDiscrete"><code class="docutils literal notranslate"><span class="pre">SimplexDiscrete</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.spaces.SimplexDiscrete.n_plot"><code class="docutils literal notranslate"><span class="pre">SimplexDiscrete.n_plot</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.spaces.check_spaces"><code class="docutils literal notranslate"><span class="pre">check_spaces()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stats_learn.util">util</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.util.RandomGeneratorMixin"><code class="docutils literal notranslate"><span class="pre">RandomGeneratorMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.util.RandomGeneratorMixin.make_rng"><code class="docutils literal notranslate"><span class="pre">RandomGeneratorMixin.make_rng()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats_learn.util.RandomGeneratorMixin.rng"><code class="docutils literal notranslate"><span class="pre">RandomGeneratorMixin.rng</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.util.check_data_shape"><code class="docutils literal notranslate"><span class="pre">check_data_shape()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.util.check_valid_pmf"><code class="docutils literal notranslate"><span class="pre">check_valid_pmf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.util.get_now"><code class="docutils literal notranslate"><span class="pre">get_now()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stats_learn.util.vectorize_func"><code class="docutils literal notranslate"><span class="pre">vectorize_func()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -66,8 +158,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>stats_learn</li>
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">stats_learn</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/stats_learn.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -78,7 +170,7 @@
            <div itemprop="articleBody">
              
   <section id="module-stats_learn">
-<span id="stats-learn"></span><h1>stats_learn<a class="headerlink" href="#module-stats_learn" title="Permalink to this headline"></a></h1>
+<span id="stats-learn"></span><h1>stats_learn<a class="headerlink" href="#module-stats_learn" title="Permalink to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="stats_learn.bayes.html">bayes</a><ul>
@@ -99,7 +191,7 @@
 </ul>
 </div>
 <section id="module-stats_learn.loss_funcs">
-<span id="loss-funcs"></span><h2>loss_funcs<a class="headerlink" href="#module-stats_learn.loss_funcs" title="Permalink to this headline"></a></h2>
+<span id="loss-funcs"></span><h2>loss_funcs<a class="headerlink" href="#module-stats_learn.loss_funcs" title="Permalink to this heading"></a></h2>
 <p>Loss functions for regression and classification.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="stats_learn.loss_funcs.loss_01">
@@ -145,7 +237,7 @@
 
 </section>
 <section id="module-stats_learn.preprocessing">
-<span id="preprocessing"></span><h2>preprocessing<a class="headerlink" href="#module-stats_learn.preprocessing" title="Permalink to this headline"></a></h2>
+<span id="preprocessing"></span><h2>preprocessing<a class="headerlink" href="#module-stats_learn.preprocessing" title="Permalink to this heading"></a></h2>
 <p>Functions for preprocessing observations before training/prediction.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="stats_learn.preprocessing.make_clipper">
@@ -189,7 +281,7 @@
 
 </section>
 <section id="module-stats_learn.results">
-<span id="results"></span><h2>results<a class="headerlink" href="#module-stats_learn.results" title="Permalink to this headline"></a></h2>
+<span id="results"></span><h2>results<a class="headerlink" href="#module-stats_learn.results" title="Permalink to this heading"></a></h2>
 <p>Assessment tools for learning and prediction performance.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="stats_learn.results.data_assess">
@@ -198,10 +290,10 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>predictors</strong> (<em>Collection of stats_learn.predictors.Base</em>) – Predictors to assess.</p></li>
+<li><p><strong>predictors</strong> (<em>Collection</em><em> of </em><em>stats_learn.predictors.Base</em>) – Predictors to assess.</p></li>
 <li><p><strong>d_train</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Training data.</p></li>
 <li><p><strong>d_test</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Testing data.</p></li>
-<li><p><strong>params</strong> (<em>Collection of dict</em><em>, </em><em>optional</em>) – Predictor parameters to evaluate. Each element corresponds to an element of <cite>predictors</cite> and contains an
+<li><p><strong>params</strong> (<em>Collection</em><em> of </em><em>dict</em><em>, </em><em>optional</em>) – Predictor parameters to evaluate. Each element corresponds to an element of <cite>predictors</cite> and contains an
 optional dictionary mapping parameter names to various values. Outer product of each parameter array is
 assessed.</p></li>
 <li><p><strong>x</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Values of observed element to use for assessment of prediction statistics.</p></li>
@@ -228,16 +320,16 @@ assessed.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>predictors</strong> (<em>Collection of stats_learn.predictors.Base</em>) – Predictors to assess.</p></li>
+<li><p><strong>predictors</strong> (<em>Collection</em><em> of </em><em>stats_learn.predictors.Base</em>) – Predictors to assess.</p></li>
 <li><p><strong>model</strong> (<a class="reference internal" href="stats_learn.random.html#stats_learn.random.models.Base" title="stats_learn.random.models.Base"><em>stats_learn.random.models.Base</em></a><em> or </em><a class="reference internal" href="stats_learn.bayes.html#stats_learn.bayes.models.Base" title="stats_learn.bayes.models.Base"><em>stats_learn.bayes.models.Base</em></a>) – Data-generating model.</p></li>
-<li><p><strong>params</strong> (<em>Collection of dict</em><em>, </em><em>optional</em>) – Predictor parameters to evaluate. Each element corresponds to an element of <cite>predictors</cite> and contains an
+<li><p><strong>params</strong> (<em>Collection</em><em> of </em><em>dict</em><em>, </em><em>optional</em>) – Predictor parameters to evaluate. Each element corresponds to an element of <cite>predictors</cite> and contains an
 optional dictionary mapping parameter names to various values. Outer product of each parameter array is
 assessed.</p></li>
-<li><p><strong>n_train</strong> (<em>int</em><em> or </em><em>Collection of int</em><em>, </em><em>optional</em>) – Training data volume.</p></li>
+<li><p><strong>n_train</strong> (<em>int</em><em> or </em><em>Collection</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Training data volume.</p></li>
 <li><p><strong>n_test</strong> (<em>int</em><em>, </em><em>optional</em>) – Test data volume.</p></li>
 <li><p><strong>n_mc</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of Monte Carlo simulation iterations.</p></li>
 <li><p><strong>x</strong> (<em>array_like</em><em>, </em><em>optional</em>) – Values of observed element to use for assessment of prediction statistics.</p></li>
-<li><p><strong>stats</strong> (<em>Collection of str</em><em>, </em><em>optional</em>) – Names of the statistics to generate, e.g. ‘mean’, ‘std’, ‘cov’, ‘mode’, etc.</p></li>
+<li><p><strong>stats</strong> (<em>Collection</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Names of the statistics to generate, e.g. ‘mean’, ‘std’, ‘cov’, ‘mode’, etc.</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Enables iteration print-out.</p></li>
 <li><p><strong>plot_stats</strong> (<em>bool</em><em>, </em><em>optional</em>) – Enables plotting of prediction statistics.</p></li>
 <li><p><strong>plot_loss</strong> (<em>bool</em><em>, </em><em>optional</em>) – Enables plotting of average loss.</p></li>
@@ -294,12 +386,12 @@ assessed.</p></li>
 
 </section>
 <section id="module-stats_learn.spaces">
-<span id="spaces"></span><h2>spaces<a class="headerlink" href="#module-stats_learn.spaces" title="Permalink to this headline"></a></h2>
+<span id="spaces"></span><h2>spaces<a class="headerlink" href="#module-stats_learn.spaces" title="Permalink to this heading"></a></h2>
 <p>Spaces for extrema-finding, integration, plotting, etc.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.spaces.Base">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">Base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Base" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
 <p>Base class for spaces.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -332,7 +424,7 @@ assessed.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.spaces.Base.integrate">
-<span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Base.integrate" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Base.integrate" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -437,7 +529,7 @@ Additional plotting keyword arguments.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.spaces.Box">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">Box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lims</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Box" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Continuous" title="stats_learn.spaces.Continuous"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.spaces.Continuous</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Continuous" title="stats_learn.spaces.Continuous"><code class="xref py py-class docutils literal notranslate"><span class="pre">Continuous</span></code></a></p>
 <p>Orthotope space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -507,7 +599,7 @@ Additional plotting keyword arguments.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.spaces.Continuous">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">Continuous</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Continuous" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Base" title="stats_learn.spaces.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.spaces.Base</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Base" title="stats_learn.spaces.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="stats_learn.spaces.Continuous.integrate">
 <span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Continuous.integrate" title="Permalink to this definition"></a></dt>
@@ -523,14 +615,14 @@ Additional plotting keyword arguments.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.spaces.Discrete">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">Discrete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Discrete" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Base" title="stats_learn.spaces.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.spaces.Base</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Base" title="stats_learn.spaces.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
 <p>Base class for discrete spaces.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.spaces.Euclidean">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">Euclidean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Euclidean" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Box" title="stats_learn.spaces.Box"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.spaces.Box</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Box" title="stats_learn.spaces.Box"><code class="xref py py-class docutils literal notranslate"><span class="pre">Box</span></code></a></p>
 <p>A Euclidean space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -552,14 +644,14 @@ Additional plotting keyword arguments.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.spaces.Finite">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">Finite</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Finite" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Discrete" title="stats_learn.spaces.Discrete"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.spaces.Discrete</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Discrete" title="stats_learn.spaces.Discrete"><code class="xref py py-class docutils literal notranslate"><span class="pre">Discrete</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
 <p>Base class for finite spaces.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.spaces.FiniteGeneric">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">FiniteGeneric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.FiniteGeneric" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Finite" title="stats_learn.spaces.Finite"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.spaces.Finite</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Finite" title="stats_learn.spaces.Finite"><code class="xref py py-class docutils literal notranslate"><span class="pre">Finite</span></code></a></p>
 <p>Finite-dimensional space with specified values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -601,7 +693,7 @@ Additional plotting keyword arguments.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.spaces.Simplex">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">Simplex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.Simplex" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Continuous" title="stats_learn.spaces.Continuous"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.spaces.Continuous</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Continuous" title="stats_learn.spaces.Continuous"><code class="xref py py-class docutils literal notranslate"><span class="pre">Continuous</span></code></a></p>
 <p>A simplex space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -668,7 +760,7 @@ Additional plotting keyword arguments.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.spaces.SimplexDiscrete">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats_learn.spaces.</span></span><span class="sig-name descname"><span class="pre">SimplexDiscrete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stats_learn.spaces.SimplexDiscrete" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Simplex" title="stats_learn.spaces.Simplex"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats_learn.spaces.Simplex</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stats_learn.spaces.Simplex" title="stats_learn.spaces.Simplex"><code class="xref py py-class docutils literal notranslate"><span class="pre">Simplex</span></code></a></p>
 <p>Finite grid over Simplex space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -705,7 +797,7 @@ Additional plotting keyword arguments.</p></li>
 
 </section>
 <section id="module-stats_learn.util">
-<span id="util"></span><h2>util<a class="headerlink" href="#module-stats_learn.util" title="Permalink to this headline"></a></h2>
+<span id="util"></span><h2>util<a class="headerlink" href="#module-stats_learn.util" title="Permalink to this heading"></a></h2>
 <p>Common utilities.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stats_learn.util.RandomGeneratorMixin">
