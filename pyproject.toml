@@ -53,7 +53,6 @@ dev = [
 
 [tool.hatch.build]
 ignore-vcs = true
-sources = ["src"]
 packages = ["src/stats_learn"]
 
 [tool.pytest.ini_options]
