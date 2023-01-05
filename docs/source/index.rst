@@ -17,7 +17,7 @@ To deploy statistical models in supervised learning applications, the :mod:`pred
 The package also includes the :mod:`results <stats_learn.results>` submodule, which provides various functions that enable fair and reproducible evaluations, as well as provide visualizations and Markdown-formatted output. The :func:`data_assess <stats_learn.results.data_assess>` function allows evaluation against a fixed dataset; the :func:`model_assess <stats_learn.results.model_assess>` function effects Monte Carlo approximation of the expected loss by using a specified model to randomly generate datasets for evaluation. These functions also allow each learner to be assessed over a set of hyperparameter values, performing computationally efficient retraining when possible.
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
    :caption: Contents:
 
    usage
