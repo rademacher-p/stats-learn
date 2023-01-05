@@ -1,31 +1,31 @@
---extra-index-url https://download.pytorch.org/whl/cu113
+--extra-index-url https://download.pytorch.org/whl/cu117
 
 # Package
-numpy==1.22.3
-scipy==1.8.0
-matplotlib==3.5.2
-pandas==1.4.2
-tabulate==0.8.9
-tqdm==4.64.0
-more-itertools==8.13.0
-torch==1.11.0
-pytorch-lightning==1.6.3
+numpy>=1.22.3
+scipy>=1.8.0
+matplotlib>=3.5.2
+pandas>=1.4.2
+tabulate>=0.8.9
+tqdm>=4.64.0
+more-itertools>=8.13.0
+torch>=1.11.0
+pytorch-lightning>=1.6.3
 
 # Development
-scikit-learn==1.1.0
-tensorboard==2.9.1
-pytest==7.1.2
-PyQt5==5.15.6
-toml==0.10.2
-black==22.3.0
-isort==5.10.1
-flake8==4.0.1
-flake8-bugbear==22.4.25
-pep8-naming==0.12.1
-pydocstyle==6.1.1
-Sphinx==4.5.0
-sphinx-rtd-theme==1.0.0
-build==0.7.0
-jupyterlab==3.4.2
-torch-tb-profiler==0.4.0
-ipywidgets==7.7.0
+pytest>=7.1.2
+pytest-cov>=4.0.0
+toml>=0.10.2
+black>=22.3.0
+isort>=5.10.1
+flake8>=4.0.1
+flake8-bugbear>=22.4.25
+pep8-naming>=0.12.1
+pydocstyle>=6.1.1
+build>=0.7.0
+ipywidgets>=7.7.0
+hatch>=1.6.3
+Sphinx>=4.5.0
+sphinx-rtd-theme>=1.0.0
+PyQt5>=5.15.6
+tensorboard>=2.9.1
+torch-tb-profiler>=0.4.0

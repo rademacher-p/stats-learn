@@ -1,32 +1,80 @@
 [build-system]
-build-backend = "setuptools.build_meta"
-requires = [
-  "setuptools>=42",
-  "wheel",
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+authors = [{ name = "Paul Rademacher", email = "paul.rademacher@nrl.navy.mil" }]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
 ]
+dependencies = [
+  "numpy>=1.22.3",
+  "scipy>=1.8.0",
+  "matplotlib>=3.5.2",
+  "pandas>=1.4.2",
+  "tabulate>=0.8.9",
+  "tqdm>=4.64.0",
+  "more-itertools>=8.13.0",
+  "torch>=1.11.0",
+  "pytorch-lightning>=1.6.3",
+]
+description = "Statistical learning with a Bayesian focus"
+name = "stats-learn"
+readme = "README.md"
+requires-python = ">=3.8, <3.11"
+version = "0.1.2a0"
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.1.2",
+  "pytest-cov>=4.0.0",
+  "toml>=0.10.2",
+  "black>=22.3.0",
+  "isort>=5.10.1",
+  "flake8>=4.0.1",
+  "flake8-bugbear>=22.4.25",
+  "pep8-naming>=0.12.1",
+  "pydocstyle>=6.1.1",
+  "build>=0.7.0",
+  "ipywidgets>=7.7.0",
+  "hatch>=1.6.3",
+  "Sphinx>=4.5.0",
+  "sphinx-rtd-theme>=1.0.0",
+  "PyQt5>=5.15.6",
+  "tensorboard>=2.9.1",
+  "torch-tb-profiler>=0.4.0",
+]
+
+[project.urls]
+"Bug Tracker" = "https://github.com/rademacher-p/stats-learn/issues"
+"Homepage" = "https://github.com/rademacher-p/stats-learn"
+
+[tool.hatch.build]
+ignore-vcs = true
+sources = ["src"]
+packages = ["src/stats_learn"]
 
 [tool.pytest.ini_options]
-# addopts = "-p no:warnings"
-filterwarnings = [
-  "ignore::DeprecationWarning",
-  "ignore::pytorch_lightning.utilities.warnings.LightningDeprecationWarning", # "ignore::UserWarning",
-]
-testpaths = ["tests"]
+addopts = ["--cov=src/stats_learn/"]
+filterwarnings = ["ignore::DeprecationWarning"]
+testpaths = ["tests/"]
 
-[tool.black]
-line-length = 100
+[tool.coverage.run]
+data_file = "tests/.coverage"
 
 [tool.isort]
-line_length = 100
 profile = "black"
+skip_gitignore = "true"
 
-[tool.pydocstyle] # parameter check D417 not working
+[tool.pydocstyle]
 add-ignore = [
-  "D1",
-  "D403",
+  "D1",   # Missing docstrings
+  "D403", # First word of the first line should be properly capitalized
 ]
 add-select = [
-  "D413",
-  "D417",
+  "D413", # Missing blank line after last section
+  "D417", # Missing argument descriptions in the docstring (not working?)
 ]
 convention = "numpy"

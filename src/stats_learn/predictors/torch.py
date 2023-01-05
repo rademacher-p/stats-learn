@@ -151,9 +151,8 @@ class LitPredictor(Base):
                 "Reset function must be a callable for application to `nn.Module.apply`."
             )
 
-        self.can_warm_start = (
-            False  # TODO: actually can, but `assess` results are better with full datasets!
-        )
+        self.can_warm_start = False
+        # TODO: actually can, but `assess` results are better with full datasets!
 
         self.reset()
 

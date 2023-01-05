@@ -60,10 +60,12 @@ class RandomGeneratorMixin:
             return np.random.default_rng()
         elif isinstance(rng, (Integral, np.integer)):
             return np.random.default_rng(rng)
-        elif isinstance(rng, np.random.Generator) or isinstance(rng, np.random.RandomState):
+        elif isinstance(rng, (np.random.Generator, np.random.RandomState)):
             return rng
         else:
-            raise TypeError("Input must be None, int, or a valid NumPy random number generator.")
+            raise TypeError(
+                "Input must be None, int, or a valid NumPy random number generator."
+            )
 
 
 def check_data_shape(x, shape=()):
@@ -134,7 +136,7 @@ def check_valid_pmf(p, shape=None, full_support=False, tol=1e-9):
 
     if not np.allclose(p.reshape(*set_shape, -1).sum(-1), 1.0, rtol=tol):
         raise ValueError(
-            "The input 'p' must lie within the normal simplex, but p.sum() = %s." % p.sum()
+            f"The input 'p' must lie within the normal simplex, but p.sum() = {p.sum()}."
         )
 
     if shape is None:

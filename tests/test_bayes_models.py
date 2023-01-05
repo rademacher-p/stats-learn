@@ -21,7 +21,9 @@ RM_set = [
                 weights=(2,),
                 basis_y_x=(lambda x: 1,),
                 cov_y_x=0.1,
-                model_x=random.elements.FiniteGeneric(np.linspace(0, 1, 10, endpoint=False)),
+                model_x=random.elements.FiniteGeneric(
+                    np.linspace(0, 1, 10, endpoint=False)
+                ),
             ),
             alpha_0=1,
         ),

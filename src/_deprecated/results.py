@@ -2,9 +2,9 @@ import math
 from itertools import product
 from numbers import Integral
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
 from more_itertools import all_equal
 
 from stats_learn.bayes import models as bayes_models
@@ -76,13 +76,12 @@ def combined_compare(
         else:
             raise ValueError
         _samp.append(np.zeros(stat_shape))
-        dtype.append(
-            (stat, np.float64, stat_shape)
-        )  # TODO: dtype float? need model dtype attribute?!
+        dtype.append((stat, np.float64, stat_shape))
+        # TODO: dtype float? need model dtype attribute?!
 
+    temp = np.array(tuple(_samp), dtype=dtype)
     y_stats_full = [
-        np.tile(np.array(tuple(_samp), dtype=dtype), reps=(len(n_train), *loss.shape[1:]))
-        for loss in loss_full
+        np.tile(temp, reps=(len(n_train), *loss.shape[1:])) for loss in loss_full
     ]
 
     # Generate random data and make predictions
@@ -94,7 +93,9 @@ def combined_compare(
             if "cov" in stats_:
                 _temp_1 = (y - _mean_prev).reshape(math.prod(set_shape), size["y"])
                 _temp_2 = (y - array["mean"]).reshape(math.prod(set_shape), size["y"])
-                _temp = np.array([np.tensordot(t1, t2, 0) for t1, t2 in zip(_temp_1, _temp_2)])
+                _temp = np.array(
+                    [np.tensordot(t1, t2, 0) for t1, t2 in zip(_temp_1, _temp_2)]
+                )
                 array["cov"] += _temp.reshape(set_shape + 2 * shape["y"])
 
     for i_mc in range(n_mc):
@@ -161,7 +162,8 @@ def plot_fit_compare(predictors, d, params=None, ax=None):
         params_full = [item if item is not None else {} for item in params]
 
     if ax is None:
-        ax = predictors[0].space["x"].make_axes()  # use first predictors space by default
+        # use first predictors space by default
+        ax = predictors[0].space["x"].make_axes()
 
     ax.scatter(d["x"], d["y"], c="k", marker=".", label=None)
 
@@ -172,13 +174,16 @@ def plot_fit_compare(predictors, d, params=None, ax=None):
         elif len(params) == 1:
             param_name, param_vals = list(params.items())[0]
             labels = [
-                f"{predictor.name}, {predictor.tex_params(param_name, val)}" for val in param_vals
+                f"{predictor.name}, {predictor.tex_params(param_name, val)}"
+                for val in param_vals
             ]
             for param_val, label in zip(param_vals, labels):
                 predictor.set_params(**{param_name: param_val})
                 predictor.plot_predict(ax=ax, label=label)
         else:
-            raise NotImplementedError("Only up to one varying parameter currently supported.")
+            raise NotImplementedError(
+                "Only up to one varying parameter currently supported."
+            )
 
         # predictor.plot_predict(ax=ax, label=predictor.name)
 
@@ -306,7 +311,9 @@ def predict_stats_compare(
     # return y_stats_full
 
 
-def _plot_stats(y_stats_full, space_x, predictors, params_full, n_train=0, x=None, ax=None):
+def _plot_stats(
+    y_stats_full, space_x, predictors, params_full, n_train=0, x=None, ax=None
+):
     if x is None:
         x = space_x.x_plt
 
@@ -342,7 +349,9 @@ def _plot_stats(y_stats_full, space_x, predictors, params_full, n_train=0, x=Non
                     title += f", {predictor.tex_params(param_name, param_vals[0])}"
                 else:
                     # labels = [f"${param_name} = {val}$" for val in param_vals]
-                    labels = [f"{predictor.tex_params(param_name, val)}" for val in param_vals]
+                    labels = [
+                        f"{predictor.tex_params(param_name, val)}" for val in param_vals
+                    ]
             elif len(param_vals) == 1:
                 y_stats = y_stats.squeeze(axis=1)
                 labels = [f"$N = {n}$" for n in n_train]
@@ -351,7 +360,9 @@ def _plot_stats(y_stats_full, space_x, predictors, params_full, n_train=0, x=Non
             else:
                 raise NotImplementedError
         else:
-            raise NotImplementedError("Only up to one varying parameter currently supported.")
+            raise NotImplementedError(
+                "Only up to one varying parameter currently supported."
+            )
 
         for y_stat, label in zip(y_stats, labels):
             y_mean = y_stat["mean"]
@@ -369,7 +380,9 @@ def _plot_stats(y_stats_full, space_x, predictors, params_full, n_train=0, x=Non
             # n_lines = sum(lens)
 
             title = f"$N = {n_train[0]}$"
-            for predictor, params, y_stats in zip(predictors, params_full, y_stats_full):
+            for predictor, params, y_stats in zip(
+                predictors, params_full, y_stats_full
+            ):
                 if len(params) == 0:
                     labels = [predictor.name]
                 elif len(params) == 1:
@@ -545,7 +558,9 @@ def _print_risk(predictors, params, n_train, losses, file=None):
             # title = predictor.name
             df = pd.DataFrame(loss, index_n, columns=index_param)
         else:
-            raise NotImplementedError("Only up to one varying parameter currently supported.")
+            raise NotImplementedError(
+                "Only up to one varying parameter currently supported."
+            )
     else:
         data = []
         columns = []
@@ -563,7 +578,9 @@ def _print_risk(predictors, params, n_train, losses, file=None):
                     ]
                 )
             else:
-                raise NotImplementedError("Only up to one varying parameter currently supported.")
+                raise NotImplementedError(
+                    "Only up to one varying parameter currently supported."
+                )
 
         data = np.concatenate(data, axis=1)
         df = pd.DataFrame(data, index_n, columns)
@@ -635,7 +652,9 @@ def risk_eval_sim_compare(
     # return loss_full
 
 
-def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, verbose=False):
+def risk_eval_comp_compare(
+    predictors, model, params=None, n_train=0, n_test=1, verbose=False
+):
 
     if params is None:
         params_full = [{} for _ in predictors]
@@ -674,7 +693,9 @@ def risk_eval_comp_compare(predictors, model, params=None, n_train=0, n_test=1, 
     return loss_full
 
 
-def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0, ax=None):
+def _plot_risk_eval_compare(
+    losses, do_bayes, predictors, params=None, n_train=0, ax=None
+):
     if params is None:
         params_full = [{} for _ in predictors]
     else:
@@ -718,9 +739,13 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
                     labels = [None]
                 else:
                     # labels = [f"{param_name} = {val}" for val in param_vals]
-                    labels = [f"{predictor.tex_params(param_name, val)}" for val in param_vals]
+                    labels = [
+                        f"{predictor.tex_params(param_name, val)}" for val in param_vals
+                    ]
         else:
-            raise NotImplementedError("Only up to one varying parameter currently supported.")
+            raise NotImplementedError(
+                "Only up to one varying parameter currently supported."
+            )
 
         for loss_plt, label in zip(loss, labels):
             plt_data = ax.plot(x_plt, loss_plt, label=label)
@@ -786,7 +811,9 @@ def _plot_risk_eval_compare(losses, do_bayes, predictors, params=None, n_train=0
 def plot_risk_eval_sim_compare(
     predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None
 ):
-    losses = risk_eval_sim_compare(predictors, model, params, n_train, n_test, n_mc, verbose)
+    losses = risk_eval_sim_compare(
+        predictors, model, params, n_train, n_test, n_mc, verbose
+    )
     do_bayes = isinstance(model, bayes_models.Base)
     return _plot_risk_eval_compare(losses, do_bayes, predictors, params, n_train, ax)
 
@@ -811,7 +838,9 @@ def plot_risk_disc(
         raise ValueError
     # TODO: check models for equality
 
-    losses = risk_eval_sim_compare(predictors, model, params, n_train, n_test, n_mc, verbose)
+    losses = risk_eval_sim_compare(
+        predictors, model, params, n_train, n_test, n_mc, verbose
+    )
 
     if isinstance(n_train, (Integral, np.integer)):
         n_train = [n_train]
@@ -851,7 +880,9 @@ def plot_risk_disc(
         elif len(n_train) == 1 and len(param_vals) > 1:
             loss = loss.squeeze(axis=0)
             title += f", $N = {n_train[0]}$"
-            labels = [f"{predictors[0].tex_params(param_name, val)}" for val in param_vals]
+            labels = [
+                f"{predictors[0].tex_params(param_name, val)}" for val in param_vals
+            ]
         else:
             raise ValueError
 

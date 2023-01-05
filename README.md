@@ -1,13 +1,11 @@
 # Statistical Learning
+![CI](https://github.com/rademacher-p/stats-learn/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/github/rademacher-p/stats-learn/branch/main/graph/badge.svg?token=4U2OKN862G)](https://codecov.io/github/rademacher-p/stats-learn)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6886844.svg)](https://doi.org/10.5281/zenodo.6886844)
-<a href="https://gitpod.io/#https://github.com/rademacher-p/stats-learn">
-  <img
-    src="https://img.shields.io/badge/Contribute%20with-Gitpod-908a85?logo=gitpod"
-    alt="Contribute with Gitpod"
-  />
-</a>
 
-**Note**: This project is under active development.
+**Note**: This project is under active development. :construction:
 
 This Python package provides a framework to explore statistical learning with a Bayesian focus. It implements a variety of `random.elements`, as well as `random.models` of data for supervised learning. The `bayes` subpackage implements similar elements/models with `prior` attributes to statistically characterize parameter uncertainty and `fit` methods to adapt posteriors.
 
@@ -16,18 +14,16 @@ For supervised learning, the `predictors` subpackage provides objects that use t
 Also included (in the `results` submodule) are various functions that enable fair and reproducible evaluations, as well as provide visualizations and Markdown-formatted output. Furthermore, they allow efficient assessments for learners across a set of hyperparameter values.
 
 ## Installation
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/rademacher-p/stats-learn)
-
-The `stats_learn` package is developed for [Python 3.9](https://www.python.org/downloads/). Best practice is to first create a [virtual environment](https://docs.python.org/3/tutorial/venv.html). The package can then be installed directly from GitHub using
+The `stats_learn` package is developed for [Python](https://www.python.org/downloads/) 3.8-3.10. Best practice is to first create a [virtual environment](https://docs.python.org/3/tutorial/venv.html). The package can then be installed directly from GitHub using
 ```
-pip install git+https://github.com/rademacher-p/stats-learn.git#egg=stats_learn
+pip install git+https://github.com/rademacher-p/stats-learn
 ```
-To install a specific version or branch, specify a ref as detailed [here](https://pip.pypa.io/en/stable/topics/vcs-support/). Alternatively, the package can be installed locally using
+To install a specific version or branch, [specify a ref](https://pip.pypa.io/en/stable/topics/vcs-support/). Alternatively, the package can be installed locally using
 ```
-git clone https://github.com/rademacher-p/stats-learn.git
+git clone https://github.com/rademacher-p/stats-learn
 pip install stats-learn/
 ```
-Note that with both methods, the [editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be included to track any package modifications.
+Note that with both methods, the [editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be included to track any package modifications. To install optional developer packages, specify the `dev` [extra](https://peps.python.org/pep-0508/#extras), as exemplified [here](https://pip.pypa.io/en/stable/cli/pip_install/).
 
 ## Documentation
 Package documentation is available [here](https://rademacher-p.github.io/stats-learn/).

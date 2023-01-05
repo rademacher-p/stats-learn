@@ -12,14 +12,13 @@ from itertools import product
 from pathlib import Path
 from typing import Collection, Union
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
 from more_itertools import all_equal
-from tqdm import trange
-
 from stats_learn import bayes
 from stats_learn.util import check_data_shape
+from tqdm import trange
 
 # from pytorch_lightning.utilities.seed import seed_everything
 
@@ -104,7 +103,9 @@ def _print_risk(predictors, params, n_train, losses):
             title += f"{predictor.name}, varying {param_name}\n\n"
             df = pd.DataFrame(loss, index_n, columns=index_param)
         else:
-            raise NotImplementedError("Only up to one varying parameter currently supported.")
+            raise NotImplementedError(
+                "Only up to one varying parameter currently supported."
+            )
     else:
         data = []
         columns = []
@@ -122,7 +123,9 @@ def _print_risk(predictors, params, n_train, losses):
                     ]
                 )
             else:
-                raise NotImplementedError("Only up to one varying parameter currently supported.")
+                raise NotImplementedError(
+                    "Only up to one varying parameter currently supported."
+                )
 
         data = np.concatenate(data, axis=1)
         df = pd.DataFrame(data, index_n, columns)
@@ -180,7 +183,10 @@ def _plot_predict_stats(
                     labels = [None]
                     title += f", {predictor.tex_params(param_name, param_vals[0])}"
                 else:
-                    labels = [f"{predictor.tex_params(param_name, value)}" for value in param_vals]
+                    labels = [
+                        f"{predictor.tex_params(param_name, value)}"
+                        for value in param_vals
+                    ]
             elif len(param_vals) == 1:
                 y_stats = y_stats.squeeze(axis=1)
                 labels = [f"$N = {n}$" for n in n_train]
@@ -188,7 +194,9 @@ def _plot_predict_stats(
             else:
                 raise NotImplementedError
         else:
-            raise NotImplementedError("Only up to one varying parameter currently supported.")
+            raise NotImplementedError(
+                "Only up to one varying parameter currently supported."
+            )
 
         for y_stat, label in zip(y_stats, labels):
             y_mean = y_stat["mean"]
@@ -206,7 +214,9 @@ def _plot_predict_stats(
             # n_lines = sum(lens)
 
             title = f"$N = {n_train[0]}$"
-            for predictor, params, y_stats in zip(predictors, params_full, y_stats_full):
+            for predictor, params, y_stats in zip(
+                predictors, params_full, y_stats_full
+            ):
                 if len(params) == 0:
                     labels = [predictor.name]
                 elif len(params) == 1:
@@ -286,9 +296,14 @@ def _plot_risk_eval_compare(
                     title += f", {predictor.tex_params(param_name, param_vals[0])}"
                     labels = [None]
                 else:
-                    labels = [f"{predictor.tex_params(param_name, value)}" for value in param_vals]
+                    labels = [
+                        f"{predictor.tex_params(param_name, value)}"
+                        for value in param_vals
+                    ]
         else:
-            raise NotImplementedError("Only up to one varying parameter currently supported.")
+            raise NotImplementedError(
+                "Only up to one varying parameter currently supported."
+            )
 
         for loss_plt, label in zip(loss, labels):
             plt_data = ax.plot(x_plt, loss_plt, label=label)
@@ -403,7 +418,8 @@ def data_assess(
     # TODO: check all space equivalence? Catch exception, default to first space?
 
     if d_train is None:
-        d_train = np.array([], dtype=[(c, space[c].dtype, space[c].shape) for c in "xy"])
+        _dtype = [(c, space[c].dtype, space[c].shape) for c in "xy"]
+        d_train = np.array([], dtype=_dtype)
     if d_test is None:
         d_test = np.array([], dtype=[(c, space[c].dtype, space[c].shape) for c in "xy"])
 
@@ -475,7 +491,9 @@ def data_assess(
                     idx = (0, *np.unravel_index(i_v, loss.shape[1:]))
                     loss[idx] += predictor.evaluate(d_test)
         else:
-            raise NotImplementedError("Only up to one varying parameter currently supported.")
+            raise NotImplementedError(
+                "Only up to one varying parameter currently supported."
+            )
 
     if plot_fit:
         title = f"$N = {n_train}$"
@@ -569,7 +587,9 @@ def model_assess(
     # TODO: train/test loss results?
 
     if plot_stats and plot_loss:
-        raise NotImplementedError("Cannot plot prediction statistics and losses at once.")
+        raise NotImplementedError(
+            "Cannot plot prediction statistics and losses at once."
+        )
 
     # if rng is not None and any(isinstance(predictor, LitPredictor) for predictor in predictors):  # FIXME
     #     if isinstance(rng, int):
@@ -631,9 +651,9 @@ def model_assess(
             (stat, np.float64, stat_shape)
         )  # TODO: dtype float? need model dtype attribute?!
 
+    _temp = np.array(tuple(samp), dtype=dtype)
     y_stats_full = [
-        np.tile(np.array(tuple(samp), dtype=dtype), reps=(len(n_train), *loss.shape[1:]))
-        for loss in loss_full
+        np.tile(_temp, reps=(len(n_train), *loss.shape[1:])) for loss in loss_full
     ]
 
     # Generate random data and make predictions
@@ -645,7 +665,9 @@ def model_assess(
             if "cov" in stats_:
                 _temp_1 = (y - _mean_prev).reshape(math.prod(set_shape), size["y"])
                 _temp_2 = (y - array["mean"]).reshape(math.prod(set_shape), size["y"])
-                _temp = np.array([np.tensordot(t1, t2, 0) for t1, t2 in zip(_temp_1, _temp_2)])
+                _temp = np.array(
+                    [np.tensordot(t1, t2, 0) for t1, t2 in zip(_temp_1, _temp_2)]
+                )
                 array["cov"] += _temp.reshape(set_shape + 2 * shape["y"])
 
     for i_mc in trange(n_mc, desc="MC iteration", disable=not verbose):
@@ -703,7 +725,9 @@ def model_assess(
 
     # Plot
     if do_stats and plot_stats:
-        _plot_predict_stats(y_stats_full, space_x, predictors, params_full, n_train, x, ax)
+        _plot_predict_stats(
+            y_stats_full, space_x, predictors, params_full, n_train, x, ax
+        )
         ax = plt.gca()
     elif do_loss and plot_loss:
         _plot_risk_eval_compare(loss_full, predictors, params_full, n_train, ax)
@@ -714,7 +738,7 @@ def model_assess(
         img_path = None
 
     # Logging
-    message = f"- Seed = {rng}\n" f"- Test samples: {n_test}\n" f"- MC iterations: {n_mc}"
+    message = f"- Seed = {rng}\n- Test samples: {n_test}\n- MC iterations: {n_mc}"
     if do_loss and print_loss:
         message += f"\n\n{_print_risk(predictors, params_full, n_train, loss_full)}"
 
@@ -771,7 +795,9 @@ def plot_predict_stats(
     )
 
 
-def risk_eval_sim(predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False):
+def risk_eval_sim(
+    predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False
+):
     __, loss_full = model_assess(
         predictors,
         model,
@@ -803,7 +829,9 @@ def plot_risk_eval_sim(
 
 
 # Additional utilities
-def risk_eval_analytic(predictors, model, params=None, n_train=0, n_test=1, verbose=False):
+def risk_eval_analytic(
+    predictors, model, params=None, n_train=0, n_test=1, verbose=False
+):
     """Assess various predictors using analytical risk calculation."""
     if params is None:
         params_full = [{} for _ in predictors]
@@ -883,7 +911,9 @@ def plot_risk_disc(
     else:
         raise ValueError
 
-    __, losses = model_assess(predictors, model, params_full, n_train, n_test, n_mc, verbose)
+    __, losses = model_assess(
+        predictors, model, params_full, n_train, n_test, n_mc, verbose
+    )
 
     n_train = np.array(n_train).reshape(-1)
 

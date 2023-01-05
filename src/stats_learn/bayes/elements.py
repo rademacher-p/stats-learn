@@ -168,8 +168,8 @@ class NormalLinear(Base):
 
     def __init__(
         self,
-        prior_mean=(0.,),
-        prior_cov=((1.,),),
+        prior_mean=(0.0,),
+        prior_cov=((1.0,),),
         basis=None,
         cov=1.0,
         *,
@@ -254,7 +254,9 @@ class NormalLinear(Base):
             self.posterior.cov = np.linalg.inv(
                 self._cov_prior_inv + self._n * self._basis_white.T @ self._basis_white
             )
-            self.posterior_model.cov = self._make_posterior_model_cov(self.posterior.cov)
+            self.posterior_model.cov = self._make_posterior_model_cov(
+                self.posterior.cov
+            )
 
         self.posterior.mean = self.posterior.cov @ (
             self._cov_prior_inv @ self.prior_mean + self._mean_data_temp
@@ -262,7 +264,8 @@ class NormalLinear(Base):
         self.posterior_model.weights = self.posterior.mean
 
     def _make_posterior_model_cov(self, cov_weight):
-        return self.cov + (self.basis @ cov_weight @ self.basis.T).reshape(2 * self.shape)
+        cov_add = (self.basis @ cov_weight @ self.basis.T).reshape(2 * self.shape)
+        return self.cov + cov_add
 
     # Model parameters
     @property
@@ -344,7 +347,8 @@ class Dirichlet(Base):
 
     def __setattr__(self, name, value):
         if name.startswith("prior_mean."):
-            self.posterior_model.set_dist_attr(0, **{name.replace("prior_mean.", ""): value})
+            _kwargs = {name.replace("prior_mean.", ""): value}
+            self.posterior_model.set_dist_attr(0, **_kwargs)
         else:
             super().__setattr__(name, value)
 
@@ -387,7 +391,8 @@ class Dirichlet(Base):
         _out = np.empty((n, *self.shape), dtype=self.space.dtype)
         for i in range(n):
             if rng.random() <= self.alpha_0 / (self.alpha_0 + i):
-                _out[i] = self.prior_mean.sample(rng=rng)  # sample from mean distribution
+                # sample from mean distribution
+                _out[i] = self.prior_mean.sample(rng=rng)
             else:
                 _out[i] = rng.choice(_out[:i])
 
