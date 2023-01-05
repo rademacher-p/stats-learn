@@ -7,7 +7,7 @@ stats\_learn
    :show-inheritance:
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
    stats_learn.bayes
    stats_learn.predictors
