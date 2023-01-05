@@ -15,18 +15,11 @@ Note that ``<path>`` should point to the top-level directory containing ``pyproj
 Quickstart
 ----------
 
-A basic example of model creation, learner definition, and performance assessment is shown below. The ``model``
-attribute defines a jointly Normal distribution where the expected value of ``y`` conditioned on ``x`` is
-characterized by a polynomial function.
+A basic example of model creation, learner definition, and performance assessment is shown below. The ``model`` attribute defines a jointly Normal distribution where the expected value of ``y`` conditioned on ``x`` is characterized by a polynomial function.
 
-Two different predictors are instantiated. First, the ``opt_predictor`` uses knowledge of the `model` to
-determine the optimal ``predict`` function. Second, a learning regressor is formulated using a Bayesian data
-model ``norm_model``; this object implements a Normal distribution ``norm_model.prior`` to characterize
-uncertainty about the true model ``weights``.
+Two different predictors are instantiated. First, the ``opt_predictor`` uses knowledge of the `model` to determine the optimal ``predict`` function. Second, a learning regressor is formulated using a Bayesian data model ``norm_model``; this object implements a Normal distribution ``norm_model.prior`` to characterize uncertainty about the true model ``weights``.
 
-Training and testing data are randomly generated using the model ``sample`` method and each predictor is assessed
-using its ``evaluate`` method. Once the learning ``norm_predictor`` is ``fit`` to the data, its
-squared-error loss is reduced.
+Training and testing data are randomly generated using the model ``sample`` method and each predictor is assessed using its ``evaluate`` method. Once the learning ``norm_predictor`` is ``fit`` to the data, its squared-error loss is reduced.
 
 .. code-block::
 
@@ -68,11 +61,7 @@ Output:
     Prior learner loss = 3.413
     Trained learner loss = 0.951
 
-The code below can be executed after the previous snippet. The :code:`data_assess` function provides replication of the
-functionality above, including a loss table and a graphic showing how the :code:`predict` functions fit the training
-data. The :code:`model_assess` function performs Monte Carlo approximation of the expected loss by repeatedly
-generating and evaluating on new datasets, enabling statistically meaningful evaluation. Observe that it can be used
-for both visualization of both the prediction statistics and of the average loss.
+The code below can be executed after the previous snippet. The :code:`data_assess` function provides replication of the functionality above, including a loss table and a graphic showing how the :code:`predict` functions fit the training data. The :code:`model_assess` function performs Monte Carlo approximation of the expected loss by repeatedly generating and evaluating on new datasets, enabling statistically meaningful evaluation. Observe that it can be used for both visualization of both the prediction statistics and of the average loss.
 
 .. code-block::
 
