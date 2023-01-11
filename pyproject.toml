@@ -55,6 +55,9 @@ dev = [
 ignore-vcs = true
 packages = ["src/stats_learn"]
 
+[tool.hatch.envs.default.env-vars]
+PIP_EXTRA_INDEX_URL = "https://download.pytorch.org/whl/cu117"
+
 [tool.pytest.ini_options]
 addopts = ["--cov=src/stats_learn/"]
 filterwarnings = ["ignore::DeprecationWarning"]
