@@ -74,6 +74,12 @@ data_file = "tests/.coverage"
 profile = "black"
 skip_gitignore = "true"
 
+# [tool.pydocstyle]
+# add-ignore = [
+#   "D1",   # Missing docstrings
+#   "D403", # First word of the first line should be properly capitalized
+# ]
+# convention = "google"
 [tool.pydocstyle]
 add-ignore = [
   "D1",   # Missing docstrings
@@ -84,3 +90,6 @@ add-select = [
   "D417", # Missing argument descriptions in the docstring (not working?)
 ]
 convention = "numpy"
+
+[tool.mypy]
+plugins = "numpy.typing.mypy_plugin"

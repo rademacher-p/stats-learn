@@ -33,12 +33,15 @@ extensions = [
     "sphinx.ext.imgmath",
 ]
 
+# autodoc_default_options = {"special-members": "__call__"}
+# autodoc_member_order = "bysource"
+
+napoleon_include_init_with_doc = True
+napoleon_include_special_with_doc = True
+
 imgmath_use_preview = True
 imgmath_latex_preamble = r"\usepackage{PhDmath}"
 
-autodoc_default_options = {
-    "special-members": "__call__",
-}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
