@@ -52,15 +52,18 @@ dev = [
 "Bug Tracker" = "https://github.com/rademacher-p/stats-learn/issues"
 "Homepage" = "https://github.com/rademacher-p/stats-learn"
 
-[tool.hatch.envs.default.env-vars]
-PIP_EXTRA_INDEX_URL = "https://download.pytorch.org/whl/cu117"
-
-[tool.hatch.envs.default]
-features = ["dev"]
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.hatch.build]
 ignore-vcs = true
 packages = ["src/stats_learn"]
+
+[tool.hatch.envs.default]
+features = ["dev"]
+
+[tool.hatch.envs.default.env-vars]
+PIP_EXTRA_INDEX_URL = "https://download.pytorch.org/whl/cu117"
 
 [tool.pytest.ini_options]
 addopts = ["--cov=src/stats_learn/"]
