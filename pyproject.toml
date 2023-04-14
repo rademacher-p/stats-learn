@@ -33,6 +33,7 @@ dev = [
   "toml>=0.10.2",
   "black>=22.3.0",
   "isort>=5.10.1",
+  "mypy>=1.0.0",
   "flake8>=4.0.1",
   "flake8-bugbear>=22.4.25",
   "pep8-naming>=0.12.1",
@@ -41,7 +42,7 @@ dev = [
   "ipywidgets>=7.7.0",
   "hatch>=1.6.3",
   "Sphinx>=4.5.0",
-  "sphinx-rtd-theme>=1.0.0",
+  "furo>=2023.3.27",
   "PyQt5>=5.15.6",
   "tensorboard>=2.9.1",
   "torch-tb-profiler>=0.4.0",
@@ -51,10 +52,18 @@ dev = [
 "Bug Tracker" = "https://github.com/rademacher-p/stats-learn/issues"
 "Homepage" = "https://github.com/rademacher-p/stats-learn"
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
 [tool.hatch.build]
 ignore-vcs = true
-sources = ["src"]
 packages = ["src/stats_learn"]
+
+[tool.hatch.envs.default]
+features = ["dev"]
+
+[tool.hatch.envs.default.env-vars]
+PIP_EXTRA_INDEX_URL = "https://download.pytorch.org/whl/cu117"
 
 [tool.pytest.ini_options]
 addopts = ["--cov=src/stats_learn/"]
@@ -68,6 +77,12 @@ data_file = "tests/.coverage"
 profile = "black"
 skip_gitignore = "true"
 
+# [tool.pydocstyle]
+# add-ignore = [
+#   "D1",   # Missing docstrings
+#   "D403", # First word of the first line should be properly capitalized
+# ]
+# convention = "google"
 [tool.pydocstyle]
 add-ignore = [
   "D1",   # Missing docstrings
@@ -78,3 +93,6 @@ add-select = [
   "D417", # Missing argument descriptions in the docstring (not working?)
 ]
 convention = "numpy"
+
+[tool.mypy]
+plugins = "numpy.typing.mypy_plugin"

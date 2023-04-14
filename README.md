@@ -5,7 +5,7 @@
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6886844.svg)](https://doi.org/10.5281/zenodo.6886844)
 
-**Note**: This project is under active development. :construction:
+> **Note**: This project is under active development. :construction:
 
 This Python package provides a framework to explore statistical learning with a Bayesian focus. It implements a variety of `random.elements`, as well as `random.models` of data for supervised learning. The `bayes` subpackage implements similar elements/models with `prior` attributes to statistically characterize parameter uncertainty and `fit` methods to adapt posteriors.
 
@@ -23,7 +23,7 @@ To install a specific version or branch, [specify a ref](https://pip.pypa.io/en/
 git clone https://github.com/rademacher-p/stats-learn
 pip install stats-learn/
 ```
-Note that with both methods, the [editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be included to track any package modifications. To install optional developer packages, specify the `dev` [extra](https://peps.python.org/pep-0508/#extras), as exemplified [here](https://pip.pypa.io/en/stable/cli/pip_install/).
+Note that with both methods, the [editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be included to track any package modifications. To install optional developer packages, specify the `dev` [extra](https://peps.python.org/pep-0508/#extras), as exemplified [here](https://pip.pypa.io/en/stable/cli/pip_install/). The project management tool [hatch](https://hatch.pypa.io/) is recommended to simplify local installation.
 
 ## Documentation
 Package documentation is available [here](https://rademacher-p.github.io/stats-learn/).
