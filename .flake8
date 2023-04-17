@@ -1,8 +1,0 @@
-[flake8]
-max-line-length = 88
-extend-ignore =
-    E203,  # whitespace before ‘,’, ‘;’, or ‘:’
-    E501,  # line too long
-extend-select = B950  # Bugbear line too long w/ margin
-extend-exclude = .venv,.hatch,lib
-statistics = True
