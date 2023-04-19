@@ -36,6 +36,7 @@ dev = [
   "pytest-cov>=4.0.0",
   "Sphinx>=4.5.0",
   "furo>=2023.3.27",
+  "ipython>=8.12.0",
   "ipywidgets>=7.7.0",
   "ipykernel>=6.22.0",
   "PyQt5>=5.15.6",
@@ -50,9 +51,9 @@ dev = [
 [tool.hatch.metadata]
 allow-direct-references = true
 
-# [tool.hatch.build]
-# ignore-vcs = true
-# packages = ["src/stats_learn"]
+[tool.hatch.build]
+ignore-vcs = true
+packages = ["src/stats_learn"]
 
 [tool.hatch.envs.default]
 features = ["dev"]
