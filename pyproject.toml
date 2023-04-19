@@ -63,17 +63,20 @@ PIP_EXTRA_INDEX_URL = "https://download.pytorch.org/whl/cu118"
 [tool.ruff]
 src = ["src"]
 select = [
-  "F", # pyflakes
-  "E", # pycodestyle
-  "W", # pycodestyle
+  "F",   # pyflakes
+  "E",   # pycodestyle
+  "W",   # pycodestyle
   "C90", # mccabe
-  "I", # isort
-  "N", # pep8-naming
-  "D", # pydocstyle
-  "B", # bugbear
-  # "UP", # pyupgrade
+  "I",   # isort
+  "N",   # pep8-naming
+  "D",   # pydocstyle
+  "B",   # bugbear
+  "UP",  # pyupgrade
 ]
-ignore = ["D1", "B905"]
+ignore = [
+  "D1",   # missing docstrings
+  "B905", # zip w/o explicit `strict=`
+]
 
 [tool.ruff.pydocstyle]
 convention = "numpy"
