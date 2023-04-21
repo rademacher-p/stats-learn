@@ -1,6 +1,32 @@
 {
     "recommendations": [
+        "visualstudioexptteam.vscodeintellicode",
+        "visualstudioexptteam.intellicode-api-usage-examples",
+        "ms-vscode.live-server",
+        "ms-vsliveshare.vsliveshare",
+        "albert.tabout",
+        //
+        "eamodio.gitlens",
+        "codezombiech.gitignore",
+        "github.vscode-pull-request-github",
+        "ms-azuretools.vscode-docker",
+        //
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "donjayamanne.python-environment-manager",
+        "njpwerner.autodocstring",
         "ms-python.black-formatter",
         "charliermarsh.ruff",
+        "ms-toolsai.jupyter",
+        "ms-toolsai.vscode-jupyter-cell-tags",
+        "ms-toolsai.jupyter-renderers",
+        "ms-toolsai.vscode-jupyter-slideshow",
+        //
+        "yzhang.markdown-all-in-one",
+        "bierner.markdown-emoji",
+        "redhat.vscode-yaml",
+        "tamasfe.even-better-toml",
+        "mechatroner.rainbow-csv",
+        "tomoki1207.pdf",
     ]
 }
