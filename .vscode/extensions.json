@@ -27,6 +27,6 @@
         "redhat.vscode-yaml",
         "tamasfe.even-better-toml",
         "mechatroner.rainbow-csv",
-        "tomoki1207.pdf",
+        // "tomoki1207.pdf",
     ]
 }
