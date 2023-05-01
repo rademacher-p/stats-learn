@@ -1,3 +1,6 @@
+.hatch/
+.ruff_cache/
+
 ### github/gitignore/blob/main/Global/JetBrains.gitignore
 #.idea/
 
