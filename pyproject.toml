@@ -27,6 +27,11 @@ requires-python = ">=3.8, <3.11"
 version = "0.1.2a0"
 
 [project.optional-dependencies]
+extras = [
+  "tensorboard>=2.9.1",
+  "torch-tb-profiler>=0.4.0",
+  "PyQt5>=5.15.6",
+]
 dev = [
   "black>=22.3.0",
   "ruff>=0.0.261",
@@ -39,9 +44,6 @@ dev = [
   "ipython>=8.12.0",
   "ipywidgets>=7.7.0",
   "ipykernel>=6.22.0",
-  "PyQt5>=5.15.6",
-  "tensorboard>=2.9.1",
-  "torch-tb-profiler>=0.4.0",
 ]
 
 [project.urls]
@@ -56,7 +58,8 @@ ignore-vcs = true
 packages = ["src/stats_learn"]
 
 [tool.hatch.envs.default]
-features = ["dev"]
+features = ["extras", "dev"]
+post-install-commands = ["mypy --install-types"]
 
 [tool.hatch.envs.default.env-vars]
 PIP_EXTRA_INDEX_URL = "https://download.pytorch.org/whl/cu118"
