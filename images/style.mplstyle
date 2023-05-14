@@ -14,7 +14,7 @@ mathtext.fontset : dejavuserif
 # mathtext.fontset : cm
 
 text.usetex : True
-text.latex.preamble : \usepackage{amsmath,amssymb,upgreek,bm}
+text.latex.preamble : \usepackage{amsmath,amssymb,amsfonts,upgreek,bm}
 
 xtick.direction : in
 xtick.top : True

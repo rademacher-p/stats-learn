@@ -110,7 +110,7 @@ class LitPredictor(Base):
     model : pl.LightningModule
         The PyTorch-Lightning module used for prediction.
     space : dict, optional
-        The domain for :math:`\xrm` and :math:`\yrm`. Defaults to the model's space.
+        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the model's space.
     trainer_params : dict, optional
         Keyword arguments for `pl.Trainer` instantiation.
     dl_kwargs : dict, optional

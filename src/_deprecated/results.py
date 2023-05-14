@@ -203,7 +203,6 @@ def predict_stats_compare(
     stats=("mode",),
     verbose=False,
 ):
-
     y_stats_full, __ = combined_compare(
         predictors,
         model,
@@ -434,7 +433,6 @@ def plot_predict_stats_compare(
     verbose=False,
     ax=None,
 ):
-
     # space_x = check_spaces_x(predictors)
     space_x = model.space["x"]
     if x is None:
@@ -655,7 +653,6 @@ def risk_eval_sim_compare(
 def risk_eval_comp_compare(
     predictors, model, params=None, n_train=0, n_test=1, verbose=False
 ):
-
     if params is None:
         params_full = [{} for _ in predictors]
     else:
@@ -707,9 +704,9 @@ def _plot_risk_eval_compare(
     if ax is None:
         _, ax = plt.subplots()
         if do_bayes:
-            ylabel = r"$\Rcal(f)$"
+            ylabel = r"$\mathcal{R}(f)$"
         else:
-            ylabel = r"$\Rcal_{\Theta}(f;\theta)$"
+            ylabel = r"$\mathcal{R}_{\Theta}(f;\theta)$"
         ax.set(ylabel=ylabel)
 
     out = []
@@ -848,9 +845,9 @@ def plot_risk_disc(
     if ax is None:
         _, ax = plt.subplots()
         if isinstance(model, bayes_models.Base):
-            ylabel = r"$\Rcal(f)$"
+            ylabel = r"$\mathcal{R}(f)$"
         else:
-            ylabel = r"$\Rcal_{\Theta}(f;\theta)$"
+            ylabel = r"$\mathcal{R}_{\Theta}(f;\theta)$"
         ax.set(ylabel=ylabel)
 
     loss = np.stack(losses, axis=-1)
@@ -860,7 +857,7 @@ def plot_risk_disc(
         [len(pr.model.space["x"].values) for pr in predictors]
     )  # discretization set size
     # title = str(predictors[0].name)
-    title = r"$\Dir$"
+    title = r"$\mathrm{Dir}$"
 
     out = []
     if len(params) == 0:
@@ -896,13 +893,13 @@ def plot_risk_disc(
     if labels != [None]:
         ax.legend()
 
-    ax.set(xlabel=r"$|\Tcal|$")
+    ax.set(xlabel=r"$|\mathcal{T}|$")
     ax.set_title(title)
 
     return out
 
 
-#%% Before warm-start fitting
+# %% Before warm-start fitting
 
 # def predict_stats_compare(predictors, model, params=None, x=None, n_train=0, n_mc=1, stats=('mode',), verbose=False):
 #
@@ -992,7 +989,7 @@ def plot_risk_disc(
 #     return y_stats_full
 
 
-#%% Pre- warm-start functionality loops for predict and loss
+# %% Pre- warm-start functionality loops for predict and loss
 
 # d = model.rvs(n_train[-1])
 # d_iter = np.split(d, n_train[:-1])

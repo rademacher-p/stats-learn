@@ -1,7 +1,7 @@
 r"""
 Bayesian random models.
 
-Consist of jointly distributed random elements :math:`\xrm` and :math:`\yrm` with prior sampling
+Consist of jointly distributed random elements :math:`\mathrm{x}` and :math:`\mathrm{y}` with prior sampling
 and posterior fitting.
 """
 
@@ -169,7 +169,7 @@ class NormalLinear(Base):
     cov_y_x : float or numpy.ndarray, optional
         Conditional covariance of Normal distributions.
     model_x : stats_learn.random.elements.Base, optional
-        Random variable characterizing the marginal distribution of :math:`\xrm`.
+        Random variable characterizing the marginal distribution of :math:`\mathrm{x}`.
     allow_singular : bool, optional
         Whether to allow a singular prior covariance matrix.
     rng : np.random.Generator or int, optional
@@ -191,7 +191,6 @@ class NormalLinear(Base):
         allow_singular=True,
         rng=None,
     ):
-
         self.allow_singular = allow_singular
 
         # Prior
@@ -314,7 +313,7 @@ class NormalLinear(Base):
     # Model parameters
     @property
     def model_x(self):
-        r"""Random variable characterizing the marginal distribution of :math:`\xrm`."""
+        r"""Random variable characterizing the marginal distribution of :math:`\mathrm{x}`."""
         return self._model_x
 
     @model_x.setter
@@ -329,7 +328,7 @@ class NormalLinear(Base):
 
     @property
     def cov_y_x(self):
-        r"""Covariance tensor characterizing fixed variance of :math:`\yrm`."""
+        r"""Covariance tensor characterizing fixed variance of :math:`\mathrm{y}`."""
         return self._cov_y_x
 
     def _set_cov_y_x(self, value):

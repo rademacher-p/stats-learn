@@ -40,7 +40,11 @@ napoleon_include_init_with_doc = True
 napoleon_include_special_with_doc = True
 
 imgmath_use_preview = True
-imgmath_latex_preamble = r"\usepackage{PhDmath}"
+imgmath_latex_preamble = r"""
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage[retainorgcmds]{IEEEtrantools}
+\usepackage{upgreek}
+"""
 
 
 # Add any paths that contain templates here, relative to this directory.
