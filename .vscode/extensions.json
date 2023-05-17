@@ -1,16 +1,19 @@
 {
     "recommendations": [
+        // Editing
         "visualstudioexptteam.vscodeintellicode",
         "visualstudioexptteam.intellicode-api-usage-examples",
         "ms-vscode.live-server",
         "ms-vsliveshare.vsliveshare",
         "albert.tabout",
-        //
+        "Gruntfuggly.todo-tree",
+        // Git + Docker
         "eamodio.gitlens",
         "codezombiech.gitignore",
         "github.vscode-pull-request-github",
+        "github.vscode-github-actions",
         "ms-azuretools.vscode-docker",
-        //
+        // Python
         "ms-python.python",
         "ms-python.vscode-pylance",
         "donjayamanne.python-environment-manager",
@@ -21,7 +24,7 @@
         "ms-toolsai.vscode-jupyter-cell-tags",
         "ms-toolsai.jupyter-renderers",
         "ms-toolsai.vscode-jupyter-slideshow",
-        //
+        // Languages
         "yzhang.markdown-all-in-one",
         "bierner.markdown-emoji",
         "redhat.vscode-yaml",
