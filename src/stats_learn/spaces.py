@@ -32,7 +32,7 @@ def check_spaces(spaces):
         A space instance.
 
     """
-    if all_equal((obj.space for obj in spaces)):
+    if all_equal(obj.space for obj in spaces):
         return spaces[0].space
     else:
         raise ValueError("All objects must have the same space attribute.")
