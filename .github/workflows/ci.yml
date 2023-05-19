@@ -5,10 +5,10 @@ name: CI
 
 on:
   push:
-    branches: [$default-branch]
+    branches: ["main"]
     paths: ["src/stats_learn/**"]
   pull_request:
-    branches: [$default-branch]
+    branches: ["main"]
     paths: ["src/stats_learn/**"]
   workflow_dispatch:
 
