@@ -109,7 +109,8 @@ def check_valid_pmf(p, shape=None, full_support=False, tol=1e-9):
     shape : tuple, optional
         Shape of PMF tensors.
     full_support : bool, optional
-        Raises `ValueError` if the PMF is not full-support (i.e. if any elements are zero)
+        Raises `ValueError` if the PMF is not full-support (i.e. if any elements are
+        zero)
     tol : float, optional
         Tolerance for ensuring PMF sums to unity.
 
