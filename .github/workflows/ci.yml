@@ -5,10 +5,10 @@ name: CI
 
 on:
   push:
-    branches: ["main", "dev"]
+    branches: [$default-branch]
     paths: ["src/stats_learn/**"]
   pull_request:
-    branches: ["main"]
+    branches: [$default-branch]
     paths: ["src/stats_learn/**"]
   workflow_dispatch:
 
@@ -32,8 +32,8 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
           python -m pip install -e .[dev]
-      - name: Lint with flake8
-        run: flake8 src/stats_learn/
+      - name: Lint with ruff
+        run: ruff --format=github src/stats_learn/
         continue-on-error: true
       - name: Run tests and collect coverage
         run: pytest --cov=src/stats_learn/ --cov-report=xml:tests/coverage.xml
