@@ -19,6 +19,7 @@
         "donjayamanne.python-environment-manager",
         "njpwerner.autodocstring",
         "ms-python.black-formatter",
+        "ms-python.mypy-type-checker",
         "charliermarsh.ruff",
         "ms-toolsai.jupyter",
         "ms-toolsai.vscode-jupyter-cell-tags",
