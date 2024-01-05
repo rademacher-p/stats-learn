@@ -1,9 +1,8 @@
-"""Random elements and variables with random sampling, statistic generation, and visualization tools."""
+"""Random elements with sampling, statistic generation, and visualization tools."""
 
 import math
 from abc import ABC, abstractmethod
 from numbers import Integral
-from typing import Optional, Union
 
 import numpy as np
 from scipy.special import betaln, gammaln, xlog1py, xlogy
@@ -112,8 +111,8 @@ class Base(RandomGeneratorMixin, ABC):
         Returns
         -------
         np.ndarray
-            Probability mass if `self.space` is a `spaces.Discrete` subclass; probability density if `spaces.Continuous`
-            subclass.
+            Probability mass if `self.space` is a `spaces.Discrete` subclass;
+            probability density if `spaces.Continuous` subclass.
 
         """
         # TODO: perform input checks using `space.__contains__`?
@@ -166,7 +165,7 @@ class Base(RandomGeneratorMixin, ABC):
         """
         if size is None:
             shape = ()
-        elif isinstance(size, (Integral, np.integer)):
+        elif isinstance(size, Integral | np.integer):
             shape = (size,)
         elif isinstance(size, tuple):
             shape = size
@@ -202,8 +201,8 @@ class Base(RandomGeneratorMixin, ABC):
 class MixinRV:
     """Mixin class for random variables (numeric domain)."""
 
-    _mean: Optional[Union[float, np.ndarray]]
-    _cov: Optional[Union[float, np.ndarray]]
+    _mean: float | np.ndarray | None
+    _cov: float | np.ndarray | None
 
     # mean = property(lambda self: self._mean)
     # cov = property(lambda self: self._cov)
@@ -250,7 +249,9 @@ class Deterministic(Base):
 
     """
 
-    # TODO: redundant, just use FiniteGeneric? or change to ContinuousRV for integration? General dirac mix?
+    # TODO: redundant, just use FiniteGeneric?
+    # TODO: change to ContinuousRV for integration?
+    # TODO: General dirac mix?
 
     def __new__(cls, value, rng=None):
         if np.issubdtype(np.array(value).dtype, np.number):
@@ -605,7 +606,9 @@ class Empirical(BaseRV):
     def _update_attr(self):
         self._log_prob_coef = gammaln(self._n + 1)
 
-        # self._mode = ((self._n * self._mean) // 1) + simplex_round((self._n * self._mean) % 1)  # FIXME: broken
+        # self._mode = ((self._n * self._mean) // 1) + simplex_round(
+        #     (self._n * self._mean) % 1
+        # )  # FIXME: broken
         self._mode = None
 
         self._cov = (
@@ -762,7 +765,8 @@ class DirichletEmpiricalScalar(BaseRV):
 
     Notes
     -----
-    Equivalent to the first element of a 2-dimensional `DirichletEmpirical` random variable.
+    Equivalent to the first element of a 2-dimensional `DirichletEmpirical` random
+    variable.
 
     """
 
@@ -773,7 +777,8 @@ class DirichletEmpiricalScalar(BaseRV):
         self._space = spaces.FiniteGeneric(np.arange(n + 1) / n)
 
     def __repr__(self):
-        return f"DirichletEmpiricalScalar(mean={self.mean}, alpha_0={self.alpha_0}, n={self.n})"
+        param_strs = (f"{s}= {getattr(self, s)}" for s in ["mean", "alpha_0", "n"])
+        return f"DirichletEmpiricalScalar({', '.join(param_strs)})"
 
     # Input properties
     @property
@@ -1109,7 +1114,7 @@ class Uniform(BaseRV):
 
     def prob(self, x):
         x, set_shape = check_data_shape(x, self.shape)
-        if not np.all((x >= self.lims[..., 0])) and np.all((x <= self.lims[..., 1])):
+        if not np.all(x >= self.lims[..., 0]) and np.all(x <= self.lims[..., 1]):
             raise ValueError(f"Values must be in interval {self.lims}")
 
         pr = 1 / np.prod(self.lims[..., 1] - self.lims[..., 0])
@@ -1441,8 +1446,7 @@ class DataEmpirical(Base):
 
             # FIXME: delta use needs to account for space dimensionality!?
             if isinstance(self.space, spaces.Continuous):
-                # large value approximating the value of the Dirac delta function at zero
-                delta = 1e250
+                delta = 1e250  # approximates Dirac delta function maximal value
             else:
                 delta = 1.0
 

@@ -7,18 +7,19 @@ import logging
 import math
 import pickle
 import sys
+from collections.abc import Collection
 from contextlib import contextmanager
 from itertools import product
 from pathlib import Path
-from typing import Collection, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from more_itertools import all_equal
+from tqdm import trange
+
 from stats_learn import bayes
 from stats_learn.util import check_data_shape
-from tqdm import trange
 
 # from pytorch_lightning.utilities.seed import seed_everything
 
@@ -141,7 +142,7 @@ def _plot_predict_stats(
     space_x,
     predictors,
     params,
-    n_train: Union[int, Collection] = 0,
+    n_train: int | Collection = 0,
     x=None,
     ax=None,
 ):
@@ -210,7 +211,8 @@ def _plot_predict_stats(
     else:
         if len(n_train) == 1:
             # TODO: enumerates and kwargs for errorbar predict. Remove??
-            # lens = [1 if len(p) == 0 else len(list(p.values())[0]) for p in params_full]
+            # lens = [1 if len(p) == 0 else len(list(p.values())[0])
+            #         for p in params_full]
             # n_lines = sum(lens)
 
             title = f"$N = {n_train[0]}$"
@@ -232,11 +234,13 @@ def _plot_predict_stats(
                 # for i_v, (y_stat, label) in enumerate(zip(y_stats, labels)):
                 #     xy_kwargs = {}
                 #     if isinstance(space_x, spaces.Discrete):
-                #         xy_kwargs['errorevery'] = (sum(lens[:i_p]) + i_v, n_lines)
-                #
-                #     y_mean = y_stat['mean']
-                #     y_std = y_stat['std'] if do_std else None
-                #     plt_data = space_x.plot_xy(x, y_mean, y_std, ax=ax, label=label, **xy_kwargs)
+                #         xy_kwargs["errorevery"] = (sum(lens[:i_p]) + i_v, n_lines)
+
+                #     y_mean = y_stat["mean"]
+                #     y_std = y_stat["std"] if do_std else None
+                #     plt_data = space_x.plot_xy(
+                #         x, y_mean, y_std, ax=ax, label=label, **xy_kwargs
+                #     )
                 #     out.append(plt_data)
 
                 for y_stat, label in zip(y_stats, labels):
@@ -246,7 +250,7 @@ def _plot_predict_stats(
                     out.append(plt_data)
         else:
             raise ValueError(
-                "Plotting not supported for multiple predictors and multiple values of n_train."
+                "Plotting not supported for >1 predictors and >1 values of n_train."
             )
 
         ax.legend()
@@ -257,7 +261,7 @@ def _plot_predict_stats(
 
 
 def _plot_risk_eval_compare(
-    losses, predictors, params=None, n_train: Union[int, Collection] = 0, ax=None
+    losses, predictors, params=None, n_train: int | Collection = 0, ax=None
 ):
     """Plot empirical risk for various predictors and parameterizations."""
     if params is None:
@@ -390,9 +394,9 @@ def data_assess(
     d_test : array_like, optional
         Testing data.
     params : Collection of dict, optional
-        Predictor parameters to evaluate. Each element corresponds to an element of `predictors` and contains an
-        optional dictionary mapping parameter names to various values. Outer product of each parameter array is
-        assessed.
+        Predictor parameters to evaluate. Each element corresponds to an element of
+        `predictors` and contains an optional dictionary mapping parameter names to
+        various values. Outer product of each parameter array is assessed.
     x : array_like, optional
         Values of observed element to use for assessment of prediction statistics.
     verbose : bool, optional
@@ -532,7 +536,9 @@ def model_assess(
     rng=None,
 ):
     """
-    Assess and compare various predictors using Monte Carlo simulation of prediction statistics and empirical risk.
+    Assess and compare various predictors via prediction statistics and empirical risk.
+
+    Uses Monte Carlo simulation.
 
     Parameters
     ----------
@@ -541,9 +547,9 @@ def model_assess(
     model : stats_learn.random.models.Base or stats_learn.bayes.models.Base
         Data-generating model.
     params : Collection of dict, optional
-        Predictor parameters to evaluate. Each element corresponds to an element of `predictors` and contains an
-        optional dictionary mapping parameter names to various values. Outer product of each parameter array is
-        assessed.
+        Predictor parameters to evaluate. Each element corresponds to an element of `
+        predictors` and contains an optional dictionary mapping parameter names to
+        various values. Outer product of each parameter array is assessed.
     n_train : int or Collection of int, optional
         Training data volume.
     n_test : int, optional
@@ -574,9 +580,9 @@ def model_assess(
     Returns
     -------
     list of ndarray
-        One item per predictor containing prediction statistics for each parameterization.
+        One item per predictor with prediction statistics for each parameterization.
     list of ndarray
-        One item per predictor containing empirical risk values for each parameterization.
+        One item per predictor with empirical risk values for each parameterization.
 
     Notes
     -----
@@ -591,7 +597,9 @@ def model_assess(
             "Cannot plot prediction statistics and losses at once."
         )
 
-    # if rng is not None and any(isinstance(predictor, LitPredictor) for predictor in predictors):  # FIXME
+    # if rng is not None and any(
+    #     isinstance(predictor, LitPredictor) for predictor in predictors
+    # ):  # FIXME
     #     if isinstance(rng, int):
     #         seed_everything(rng)
     #     else:
@@ -682,7 +690,8 @@ def model_assess(
         ):
             # if verbose:
             #     # print(f"  Predictor: {predictor.name}", end='\r')
-            #     print(f"  Predictor: {predictor.name}")  # TODO: make `verbose` int, add levels of control?
+            #     print(f"  Predictor: {predictor.name}")
+            #     # TODO: make `verbose` int, add levels of control?
 
             for i_n in range(len(n_train)):
                 if i_n == 0 or not predictor.can_warm_start:
@@ -949,7 +958,8 @@ def plot_risk_disc(
         elif len(n_train) == 1 and len(param_vals) > 1:
             loss = loss.squeeze(axis=0)
             title += f", $N = {n_train[0]}$"
-            # labels = [f"{predictors[0].tex_params(param_name, value)}" for value in param_vals]
+            # labels = [f"{predictors[0].tex_params(param_name, value)}"
+            #           for value in param_vals]
             labels = [f"{tex_map(value)}" for value in param_vals]
         else:
             raise ValueError

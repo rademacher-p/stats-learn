@@ -78,7 +78,8 @@ class LitMLP(pl.LightningModule):
 
     def forward(self, x):
         y = self.model(x)
-        # low = torch.tensor(0., dtype=torch.float32).to(y.device)  # TODO: delete clipping?
+        # low = torch.tensor(0., dtype=torch.float32).to(y.device)
+        # TODO: delete clipping?
         # high = torch.tensor(1., dtype=torch.float32).to(y.device)
         # y = torch.where(y < 0., low, y)
         # y = torch.where(y > 1., high, y)
@@ -110,7 +111,8 @@ class LitPredictor(Base):
     model : pl.LightningModule
         The PyTorch-Lightning module used for prediction.
     space : dict, optional
-        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the model's space.
+        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the
+        model's space.
     trainer_params : dict, optional
         Keyword arguments for `pl.Trainer` instantiation.
     dl_kwargs : dict, optional
@@ -148,7 +150,7 @@ class LitPredictor(Base):
             self.reset_func = reset_func
         else:
             raise TypeError(
-                "Reset function must be a callable for application to `nn.Module.apply`."
+                "Reset function must be a callable for use with `nn.Module.apply`."
             )
 
         self.can_warm_start = False

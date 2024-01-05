@@ -1,8 +1,7 @@
-r"""Random models of jointly distributed :math:`\mathrm{x}` and :math:`\mathrm{y}` elements for supervised learning."""
+r"""Models of jointly distributed REs :math:`\mathrm{x}` and :math:`\mathrm{y}`."""
 
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Dict, Optional
 
 import numpy as np
 
@@ -23,13 +22,13 @@ class Base(RandomGeneratorMixin, ABC):
 
     Notes
     -----
-    Implements a joint distribution between an random elements :math:`\mathrm{x}` and `\mathrm{y}`.
-    For supervised learning, it is assumed that the former is observed while the latter
-    is not.
+    Implements a joint distribution between an random elements :math:`\mathrm{x}` and
+    `\mathrm{y}`. For supervised learning, it is assumed that the former is observed
+    while the latter is not.
 
     """
 
-    _space: Dict[str, Optional[spaces.Base]]
+    _space: dict[str, spaces.Base | None]
 
     def __init__(self, rng=None):
         super().__init__(rng)
@@ -102,7 +101,7 @@ class Base(RandomGeneratorMixin, ABC):
 
     @property
     def model_x(self):
-        r"""Random variable characterizing the marginal distribution of :math:`\mathrm{x}`."""
+        r"""Random variable for the marginal distribution of :math:`\mathrm{x}`."""
         return self._model_x
 
     @abstractmethod
@@ -132,7 +131,7 @@ class Base(RandomGeneratorMixin, ABC):
 
     def mode_y_x(self, x):
         r"""
-        The most probable values of :math:`\mathrm{y}`, given :math:`x` values.
+        Calculate the most mode of :math:`\mathrm{y}`, given :math:`x` values.
 
         Parameters
         ----------
@@ -181,8 +180,8 @@ class Base(RandomGeneratorMixin, ABC):
 class MixinRVx:
     r"""Mixin class for observed random variables :math:`\mathrm{x}` (numeric)."""
 
-    _mean_x: Optional[np.ndarray]
-    _cov_x: Optional[np.ndarray]
+    _mean_x: np.ndarray | None
+    _cov_x: np.ndarray | None
 
     @property
     def mean_x(self):
@@ -203,7 +202,7 @@ class MixinRVy:
 
     def mean_y_x(self, x):
         r"""
-        The first moments of :math:`\mathrm{y}`, given :math:`x` values.
+        Calculate the first moments of :math:`\mathrm{y}`, given :math:`x` values.
 
         Parameters
         ----------
@@ -240,7 +239,7 @@ class MixinRVy:
 
     def cov_y_x(self, x):
         r"""
-        The second central moments of :math:`\mathrm{y}`, given :math:`x` values.
+        Calculate the covariance of :math:`\mathrm{y}`, given :math:`x` values.
 
         Parameters
         ----------
@@ -296,7 +295,8 @@ class BaseRVxy(MixinRVx, MixinRVy, Base):
 
 # class DataConditionalGeneric(Base):
 #     def __new__(cls, model_x, model_y_x, rng=None):
-#         is_numeric_y = isinstance(model_y_x(model_x.sample()), random.elements.MixinRV)
+# _samp = model_y_x(model_x.sample())
+# is_numeric_y = isinstance(_samp, random.elements.MixinRV)
 #         if isinstance(model_x, random.elements.MixinRV):
 #             if is_numeric_y:
 #                 return super().__new__(DataConditionalRVxy)
@@ -347,10 +347,11 @@ class BaseRVxy(MixinRVx, MixinRVy, Base):
 #     def from_finite(cls, dists, values_x, p_x=None, rng=None):
 #         model_x = random.elements.FiniteGeneric(values_x, p_x)
 #
-#         def model_y_x(x):
-#             eq = np.all(x == model_x.space._values_flat, axis=tuple(range(1, 1 + model_x.space.ndim)))
-#             idx = np.flatnonzero(eq).item()
-#             return dists[idx]
+# def model_y_x(x):
+#     _axis = tuple(range(1, 1 + model_x.space.ndim))
+#     eq = np.all(x == model_x.space._values_flat, axis=_axis)
+#     idx = np.flatnonzero(eq).item()
+#     return dists[idx]
 #
 #         return cls(model_x, model_y_x, rng)
 #
@@ -376,7 +377,7 @@ class BaseRVxy(MixinRVx, MixinRVy, Base):
 
 class DataConditional(Base):
     r"""
-    Model with a finite-domain random element :math:`\mathrm{x}` and explicit conditional distributions of :math:`y`.
+    Model with finite-domain :math:`\mathrm{x}` and explicit conditional distributions.
 
     Parameters
     ----------
@@ -384,7 +385,7 @@ class DataConditional(Base):
         Explicit conditional random elements characterizing :math:`\mathrm{y}` for each
         possible value of :math:`x`.
     model_x : stats_learn.random.elements.Base
-        Random variable characterizing the marginal distribution of :math:`\mathrm{x}`.
+        Random variable for the marginal distribution of :math:`\mathrm{x}`.
     rng : int or np.random.RandomState or np.random.Generator, optional
         Random number generator seed or object.
 
@@ -420,13 +421,13 @@ class DataConditional(Base):
     @classmethod
     def from_finite(cls, dists, values_x, p_x=None, rng=None):
         r"""
-        Constructor for `FiniteGeneric` marginal model of :math:`\mathrm{x}`.
+        Construct for `FiniteGeneric` marginal model of :math:`\mathrm{x}`.
 
         Parameters
         ----------
         dists : Collection of random.elements.Base
-            Explicit conditional random elements characterizing :math:`\mathrm{y}` for each
-            possible value of :math:`x`.
+            Explicit conditional random elements characterizing :math:`\mathrm{y}` for
+            each possible value of :math:`x`.
         values_x : array_like
             Explicit domain values for :math:`x`.
         p_x : array_like, optional
@@ -445,7 +446,7 @@ class DataConditional(Base):
     @classmethod
     def from_mean_emp(cls, alpha_0, n, func, model_x, rng=None):
         r"""
-        Construct Dirichlet-Empirical conditional random variables from the conditional mean function.
+        Construct DE conditional random variables from the conditional mean function.
 
         Parameters
         ----------
@@ -456,7 +457,7 @@ class DataConditional(Base):
         func : callable
             The conditional mean function.
         model_x : stats_learn.random.elements.Base
-            Random variable characterizing the marginal distribution of :math:`\mathrm{x}`.
+            Random variable for the marginal distribution of :math:`\mathrm{x}`.
         rng : int or np.random.RandomState or np.random.Generator, optional
             Random number generator seed or object.
 
@@ -486,7 +487,7 @@ class DataConditional(Base):
     @classmethod
     def from_mean_poly_emp(cls, alpha_0, n, weights, model_x, rng=None):
         r"""
-        Construct Dirichlet-Empirical conditional random variables with a polynomial conditional mean function.
+        Construct DE conditional random variables with a polynomial conditional mean.
 
         Parameters
         ----------
@@ -495,9 +496,10 @@ class DataConditional(Base):
         n : int
             Number of samples characterizing the realized empirical distributions.
         weights : array_like
-            The weights combining the polynomial functions into the conditional mean function.
+            The weights combining the polynomial functions into the conditional mean
+            function.
         model_x : stats_learn.random.elements.Base
-            Random variable characterizing the marginal distribution of :math:`\mathrm{x}`.
+            Random variable for the marginal distribution of :math:`\mathrm{x}`.
         rng : int or np.random.RandomState or np.random.Generator, optional
             Random number generator seed or object.
 
@@ -578,7 +580,7 @@ class DataConditionalRVxy(DataConditionalRVy, DataConditionalRVx):
 
 class ClassConditional(MixinRVx, Base):
     r"""
-    Model with a finite-domain random element :math:`\mathrm{y}` and explicit conditional distributions of :math:`x`.
+    Model with finite-domain RE :math:`\mathrm{y}` and explicit conditionals dists.
 
     Parameters
     ----------
@@ -586,7 +588,7 @@ class ClassConditional(MixinRVx, Base):
         Explicit conditional random elements characterizing :math:`\mathrm{x}` for each
         possible value of :math:`y`.
     model_y : stats_learn.random.elements.Base
-        Random variable characterizing the marginal distribution of :math:`\mathrm{y}`.
+        Random variable for the marginal distribution of :math:`\mathrm{y}`.
     rng : int or np.random.RandomState or np.random.Generator, optional
         Random number generator seed or object.
 
@@ -605,7 +607,8 @@ class ClassConditional(MixinRVx, Base):
             raise ValueError(
                 "Class space set shape must match number of distributions."
             )
-        # elif not np.issubdtype(self.space['y'].dtype, 'U'):  # TODO: deprecate dtype enforce
+        # elif not np.issubdtype(self.space['y'].dtype, 'U'):
+        #     # TODO: deprecate dtype enforce
         #     raise ValueError("Space must be categorical")
 
         self._p_y = None
@@ -615,12 +618,13 @@ class ClassConditional(MixinRVx, Base):
     @classmethod
     def from_finite(cls, dists, values_y, p_y=None, rng=None):
         r"""
-        Constructor for `FiniteGeneric` marginal model of :math:`\mathrm{y}`.
+        Construct for `FiniteGeneric` marginal model of :math:`\mathrm{y}`.
 
         Parameters
         ----------
         dists : Collection of random.elements.Base
-            Explicit conditional random elements characterizing :math:`\mathrm{x}` for each possible value of :math:`y`.
+            Explicit conditional random elements characterizing :math:`\mathrm{x}` for
+            each possible value of :math:`y`.
         values_y : array_like
             Explicit domain values for :math:`y`.
         p_y : array_like, optional
@@ -635,7 +639,6 @@ class ClassConditional(MixinRVx, Base):
         """
         # TODO: shouldn't enforce dtype
         model_y = random.elements.FiniteGeneric(values_y, p_y)
-        # model_y = random.elements.FiniteGeneric(np.array(values_y, dtype='U').flatten(), p_y)
         return cls(dists, model_y, rng)
 
     dists = property(lambda self: self._dists)
@@ -703,7 +706,9 @@ class ClassConditional(MixinRVx, Base):
 
 class BetaLinear(MixinRVx, MixinRVy, Base):
     r"""
-    Model characterized by a Beta conditional distribution with mean defined in terms of basis functions.
+    Model characterized by a Beta conditional distribution.
+
+    Mean defined in terms of basis functions.
 
     Parameters
     ----------
@@ -714,7 +719,7 @@ class BetaLinear(MixinRVx, MixinRVy, Base):
     alpha_y_x : float, optional
         Total conditional Beta concentration. Defaults to uniform.
     model_x : stats_learn.random.elements.Base
-        Random variable characterizing the marginal distribution of :math:`\mathrm{x}`.
+        Random variable for the marginal distribution of :math:`\mathrm{x}`.
     rng : int or np.random.RandomState or np.random.Generator, optional
         Random number generator seed or object.
 
@@ -803,7 +808,9 @@ class BetaLinear(MixinRVx, MixinRVy, Base):
 
 class NormalLinear(MixinRVx, MixinRVy, Base):
     r"""
-    Model characterized by a Normal conditional distribution with mean defined in terms of basis functions.
+    Model characterized by a Normal conditional distribution.
+
+    Mean is defined in terms of basis functions.
 
     Parameters
     ----------
@@ -814,7 +821,7 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
     cov_y_x : float or callable, optional
         Conditional covariance of Normal distributions.
     model_x : stats_learn.random.elements.Base
-        Random variable characterizing the marginal distribution of :math:`\mathrm{x}`.
+        Random variable for the marginal distribution of :math:`\mathrm{x}`.
     rng : int or np.random.RandomState or np.random.Generator, optional
         Random number generator seed or object.
 
@@ -923,7 +930,8 @@ class DataEmpirical(Base):
     counts : array_like
         The number of observations for each value.
     space : dict, optional
-        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Each defaults to a Euclidean space.
+        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Each defaults to a
+        Euclidean space.
     rng : np.random.Generator or int, optional
         Random number generator seed or object.
 
@@ -981,7 +989,8 @@ class DataEmpirical(Base):
         d : np.ndarray
             The data forming the empirical distribution.
         space : dict, optional
-            The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Each defaults to a Euclidean space.
+            The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Each defaults to
+            a Euclidean space.
         rng : np.random.Generator or int, optional
             Random number generator seed or object.
 
@@ -1307,7 +1316,8 @@ class MixtureRVx(MixinRVx, Mixture):
     def _update_attr(self):
         super()._update_attr()
 
-        # self._mean_x = sum(self._p[i] * self.dists[i].mean_x for i in self._idx_nonzero)
+        # self._mean_x = sum(self._p[i] * self.dists[i].mean_x
+        #                    for i in self._idx_nonzero)
         self._mean_x = np.nansum(
             [prob * dist.mean_x for prob, dist in zip(self._p, self.dists)]
         )

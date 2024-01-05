@@ -2,7 +2,6 @@
 
 from abc import ABC, abstractmethod
 from operator import itemgetter
-from typing import Union
 
 import numpy as np
 
@@ -19,7 +18,8 @@ class Base(ABC):
     ----------
     loss_func : callable
     space : dict, optional
-        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the model's space.
+        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the
+        model's space.
     proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
@@ -43,7 +43,10 @@ class Base(ABC):
 
     @property
     def space(self):
-        r"""The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the model's space."""
+        r"""The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`.
+
+        Defaults to the model's space.
+        """
         if self._space is None:
             self._space = self._model_obj.space
         return self._space
@@ -253,7 +256,8 @@ class Base(ABC):
         d_test : array_like, optional
             Testing data.
         params : dict, optional
-            Predictor parameters to evaluate. Outer product of each parameter array is assessed.
+            Predictor parameters to evaluate. Outer product of each parameter array is
+            assessed.
         x : array_like, optional
             Values of observed element to use for assessment of prediction statistics.
         verbose : bool, optional
@@ -305,14 +309,17 @@ class Base(ABC):
         rng=None,
     ):
         """
-        Assess predictor using Monte Carlo simulation of prediction statistics and empirical risk.
+        Assess predictor via prediction statistics and empirical risk.
+
+        Uses Monte Carlo simulation.
 
         Parameters
         ----------
         model : stats_learn.random.models.Base or stats_learn.bayes.models.Base
             Data-generating model.
         params : Collection of dict, optional
-            Predictor parameters to evaluate. Outer product of each parameter array is assessed.
+            Predictor parameters to evaluate. Outer product of each parameter array is
+            assessed.
         n_train : int or Collection of int, optional
             Training data volume.
         n_test : int, optional
@@ -452,7 +459,7 @@ class ClassifierMixin:
 class RegressorMixin:
     """Uses model conditional mean to minimize squared-error loss."""
 
-    model: Union[random.models.Base, random.models.MixinRVy]
+    model: random.models.Base | random.models.MixinRVy
 
     def _predict(self, x):
         return self.model.mean_y_x(x)
@@ -469,7 +476,8 @@ class Model(Base):
         Fixed model used to generate predictions.
     loss_func : callable
     space : dict, optional
-        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the model's space.
+        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the
+        model's space.
     proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
@@ -506,7 +514,8 @@ class ModelClassifier(ClassifierMixin, Model):
     model : stats_learn.random.models.Base
         Fixed model used to generate predictions.
     space : dict, optional
-        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the model's space.
+        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the
+        model's space.
     proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
@@ -526,7 +535,8 @@ class ModelRegressor(RegressorMixin, Model):
     model : stats_learn.random.models.Base
         Fixed model used to generate predictions.
     space : dict, optional
-        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the model's space.
+        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the
+        model's space.
     proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
@@ -589,7 +599,8 @@ class Bayes(Base):
         Bayes model used for fitting and to generate predictions.
     loss_func : callable
     space : dict, optional
-        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the model's space.
+        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the
+        model's space.
     proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
@@ -636,7 +647,8 @@ class BayesClassifier(ClassifierMixin, Bayes):
     bayes_model : stats_learn.bayes.models.Base
         Bayes model used for fitting and to generate predictions.
     space : dict, optional
-        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the model's space.
+        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the
+        model's space.
     proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
@@ -656,7 +668,8 @@ class BayesRegressor(RegressorMixin, Bayes):
     bayes_model : stats_learn.bayes.models.Base
         Bayes model used for fitting and to generate predictions.
     space : dict, optional
-        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the model's space.
+        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the
+        model's space.
     proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
@@ -691,7 +704,7 @@ class BayesRegressor(RegressorMixin, Bayes):
         n_train = np.array(n_train)
 
         prior_mean = self.bayes_model.prior_mean
-        if isinstance(model, (random.models.Base, random.models.MixinRVy)):
+        if isinstance(model, random.models.Base | random.models.MixinRVy):
             if isinstance(model.space["x"], spaces.FiniteGeneric) and isinstance(
                 self.bayes_model, bayes.models.Dirichlet
             ):

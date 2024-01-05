@@ -343,7 +343,9 @@ class Dirichlet(Base):
         )
 
     def __repr__(self):
-        return f"Dirichlet(alpha_0={self.alpha_0}, n={self.n}, prior_mean={self.prior_mean})"
+        _strs = ["alpha_0", "n", "prior_mean"]
+        param_strs = (f"{s}= {getattr(self, s)}" for s in _strs)
+        return f"Dirichlet({', '.join(param_strs)})"
 
     def __setattr__(self, name, value):
         if name.startswith("prior_mean."):

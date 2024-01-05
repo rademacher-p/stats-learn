@@ -84,6 +84,7 @@ select = [
 ignore = [
   "D1",   # missing docstrings
   "B905", # zip w/o explicit `strict=`
+  "C901", # high McCabe complexity # TODO
 ]
 
 [tool.ruff.pydocstyle]

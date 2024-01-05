@@ -58,9 +58,9 @@ class RandomGeneratorMixin:
         """
         if rng is None:
             return np.random.default_rng()
-        elif isinstance(rng, (Integral, np.integer)):
+        elif isinstance(rng, Integral | np.integer):
             return np.random.default_rng(rng)
-        elif isinstance(rng, (np.random.Generator, np.random.RandomState)):
+        elif isinstance(rng, np.random.Generator | np.random.RandomState):
             return rng
         else:
             raise TypeError(
@@ -137,7 +137,7 @@ def check_valid_pmf(p, shape=None, full_support=False, tol=1e-9):
 
     if not np.allclose(p.reshape(*set_shape, -1).sum(-1), 1.0, rtol=tol):
         raise ValueError(
-            f"The input 'p' must lie within the normal simplex, but p.sum() = {p.sum()}."
+            f"The input 'p' must lie within the normal simplex, but norm = {p.sum()}."
         )
 
     if shape is None:

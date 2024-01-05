@@ -28,9 +28,8 @@ def make_discretizer(vals):  # TODO: use sklearn.preprocessing.KBinsDiscretizer?
     size = math.prod(shape)
 
     if shape == ():
-        vals = np.sort(vals)[
-            ::-1
-        ]  # trick to break ties towards higher values, for subsets closed on the lower end
+        vals = np.sort(vals)[::-1]
+        # trick to break ties towards higher values, for subsets closed on the lower end
     vals_flat = vals.reshape(-1, size)
 
     def discretizer(x):
@@ -46,7 +45,10 @@ def make_discretizer(vals):  # TODO: use sklearn.preprocessing.KBinsDiscretizer?
 
 
 def prob_disc(shape):
-    """Create (unnormalized) probability array for a discretization grid. Lower edge/corner probabilities."""
+    """Create (unnormalized) probability array for a discretization grid.
+
+    Lower edge/corner probabilities.
+    """
     p = np.ones(shape)
     idx = np.nonzero(p)
     n = np.zeros(p.size)

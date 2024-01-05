@@ -1,12 +1,11 @@
 r"""
 Bayesian random models.
 
-Consist of jointly distributed random elements :math:`\mathrm{x}` and :math:`\mathrm{y}` with prior sampling
-and posterior fitting.
+Consist of jointly distributed random elements :math:`\mathrm{x}` and :math:`\mathrm{y}`
+with prior sampling and posterior fitting.
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -31,7 +30,7 @@ class Base(RandomGeneratorMixin, ABC):
 
     """
 
-    _space: Dict[str, Optional[spaces.Base]]
+    _space: dict[str, spaces.Base | None]
 
     can_warm_start = False
 
@@ -147,16 +146,17 @@ class Base(RandomGeneratorMixin, ABC):
     def tex_params(key, value=None):
         """Format attributes as strings for LaTeX."""
         if value is None:
-            return r"${}$".format(key)
+            return rf"${key}$"
         else:
-            return r"${} = {}$".format(key, value)
+            return rf"${key} = {value}$"
 
 
 class NormalLinear(Base):
     r"""
-    Random model characterized by a Normal conditional distribution with mean linear in basis weights.
+    Random model characterized by a Normal conditional distribution.
 
-    User defines basis functions and parameterizes Normal prior distribution for weights.
+    Mean is linear in basis weights. User defines basis functions and parameterizes
+    Normal prior distribution for weights.
 
     Parameters
     ----------
@@ -169,7 +169,7 @@ class NormalLinear(Base):
     cov_y_x : float or numpy.ndarray, optional
         Conditional covariance of Normal distributions.
     model_x : stats_learn.random.elements.Base, optional
-        Random variable characterizing the marginal distribution of :math:`\mathrm{x}`.
+        Random variable for the marginal distribution of :math:`\mathrm{x}`.
     allow_singular : bool, optional
         Whether to allow a singular prior covariance matrix.
     rng : np.random.Generator or int, optional
@@ -313,7 +313,7 @@ class NormalLinear(Base):
     # Model parameters
     @property
     def model_x(self):
-        r"""Random variable characterizing the marginal distribution of :math:`\mathrm{x}`."""
+        r"""Random variable for the marginal distribution of :math:`\mathrm{x}`."""
         return self._model_x
 
     @model_x.setter
@@ -402,7 +402,7 @@ class NormalLinear(Base):
 
 class Dirichlet(Base):
     """
-    Generic random model whose joint distribution is characterized by a Dirichlet process.
+    Generic random model whose joint distribution is a Dirichlet process.
 
     Parameters
     ----------
@@ -428,7 +428,9 @@ class Dirichlet(Base):
         )
 
     def __repr__(self):
-        return f"Dirichlet(alpha_0={self.alpha_0}, n={self.n}, prior_mean={self.prior_mean})"
+        _strs = ["alpha_0", "n", "prior_mean"]
+        param_strs = (f"{s}= {getattr(self, s)}" for s in _strs)
+        return f"Dirichlet({', '.join(param_strs)})"
 
     def __setattr__(self, name, value):
         if name.startswith("prior_mean."):

@@ -249,9 +249,13 @@ class Base(ABC):
             # if y_std is not None:
             #     if y_std_hi is None:
             #         y_std_hi = y_std
-            #
-            #     plt_data_lo = ax.plot_surface(x[..., 0], x[..., 1], y - y_std, shade=False)
-            #     plt_data_hi = ax.plot_surface(x[..., 0], x[..., 1], y + y_std_hi, shade=False)
+
+            #     plt_data_lo = ax.plot_surface(
+            #         x[..., 0], x[..., 1], y - y_std, shade=False
+            #     )
+            #     plt_data_hi = ax.plot_surface(
+            #         x[..., 0], x[..., 1], y + y_std_hi, shade=False
+            #     )
             #     plt_data = (plt_data, (plt_data_lo, plt_data_hi))
 
             plt_data = [plt_data]
@@ -307,54 +311,63 @@ class Discrete(Base, ABC):
 
     pass
 
-    # def plot_xy(self, x, y, y_std=None, y_std_hi=None, ax=None, label=None, **error_kwargs):
+    # def plot_xy(
+    #     self, x, y, y_std=None, y_std_hi=None, ax=None, label=None, **error_kwargs
+    # ):
     #     if ax is None:
     #         ax = self.make_axes()
-    #
+
     #     x, set_shape = check_data_shape(x, self.shape)
     #     if y.shape != set_shape:
     #         raise NotImplementedError
-    #
+
     #     if len(set_shape) == 1 and self.shape == ():
-    #         plt_data = ax.plot(x, y, '.', label=label)
+    #         plt_data = ax.plot(x, y, ".", label=label)
     #         if y_std is not None:
     #             if y_std_hi is None:
     #                 y_std_hi = y_std
-    #
-    #             error_kwargs = {'color': ax.lines[-1].get_color(), 'alpha': .5, 'markersize': 2}
-    #             ax.plot(x, y - y_std, '.', label=None, **error_kwargs)
-    #             ax.plot(x, y + y_std_hi, '.', label=None, **error_kwargs)
-    #
+
+    #             error_kwargs = {
+    #                 "color": ax.lines[-1].get_color(),
+    #                 "alpha": 0.5,
+    #                 "markersize": 2,
+    #             }
+    #             ax.plot(x, y - y_std, ".", label=None, **error_kwargs)
+    #             ax.plot(x, y + y_std_hi, ".", label=None, **error_kwargs)
+
     #             # format_kwargs = {'fmt': fmt}
     #             # format_kwargs.update(error_kwargs)
-    #             # plt_data = ax.errorbar(x, y, yerr=y_std, label=label, **format_kwargs)
+    #             # plt_data = ax.errorbar(x, y, yerr=y_std,
+    #             #                        label=label, **format_kwargs)
     #     else:
     #         raise NotImplementedError
-    #
+
     #     return plt_data
 
-    # def plot_xy(self, x, y, y_std=None, y_std_hi=None, ax=None, label=None, **error_kwargs):
+    # def plot_xy(
+    #     self, x, y, y_std=None, y_std_hi=None, ax=None, label=None, **error_kwargs
+    # ):
     #     if ax is None:
     #         ax = self.make_axes()
-    #
+
     #     x, set_shape = check_data_shape(x, self.shape)
     #     if y.shape != set_shape:
     #         raise NotImplementedError
-    #
+
     #     if len(set_shape) == 1 and self.shape == ():
-    #         fmt = '.'
+    #         fmt = "."
     #         if y_std is None:
     #             plt_data = ax.plot(x, y, fmt, label=label)
     #         else:
     #             if y_std_hi is not None:
     #                 y_std = np.stack((y_std, y_std_hi))
-    #
-    #             format_kwargs = {'fmt': fmt}
+
+    #             format_kwargs = {"fmt": fmt}
     #             format_kwargs.update(error_kwargs)
     #             plt_data = ax.errorbar(x, y, yerr=y_std, label=label, **format_kwargs)
     #     else:
     #         raise NotImplementedError
-    #
+
     #     return plt_data
 
 
@@ -378,7 +391,6 @@ class FiniteGeneric(Finite):
     """
 
     def __init__(self, values, shape=()):  # TODO: flatten and ignore set shape?
-
         self.values = np.array(values)
         super().__init__(shape, self.values.dtype)
 
@@ -449,31 +461,50 @@ class FiniteGeneric(Finite):
     # def plot(self, f, x=None, ax=None, label=None, **kwargs):
     #     if ax is None:
     #         ax = self.make_axes()
-    #
+
     #     x, y, set_shape = self._eval_func(f, x)
-    #
+
     #     set_ndim = len(set_shape)
     #     if set_ndim == 1 and self.shape == ():
     #         if np.issubdtype(self.dtype, np.number):
-    #             return ax.plot(x, y, '.-', label=label)
+    #             return ax.plot(x, y, ".-", label=label)
     #         else:
     #             return ax.stem(x, y, use_line_collection=True, label=label)
-    #
-    #     elif set_ndim == 2 and self.shape == (2,) and np.issubdtype(self.dtype, np.number):
-    #         # return ax.bar3d(x[..., 0].flatten(), x[..., 1].flatten(), 0, 1, 1, y.flatten(), shade=True)
-    #         return ax.plot(x[..., 0].flatten(), x[..., 1].flatten(), y.flatten(), marker='.', linestyle='',
-    #                        label=label)
-    #
-    #     elif set_ndim == 3 and self.shape == (3,) and np.issubdtype(self.dtype, np.number):
-    #         plt_data = ax.scatter(x[..., 0], x[..., 1], x[..., 2], s=15, c=y, label=label)
-    #
+
+    #     elif (
+    #         set_ndim == 2
+    #         and self.shape == (2,)
+    #         and np.issubdtype(self.dtype, np.number)
+    #     ):
+    #         # return ax.bar3d(x[..., 0].flatten(), x[..., 1].flatten(),
+    #         #                 0, 1, 1, y.flatten(), shade=True)
+    #         return ax.plot(
+    #             x[..., 0].flatten(),
+    #             x[..., 1].flatten(),
+    #             y.flatten(),
+    #             marker=".",
+    #             linestyle="",
+    #             label=label,
+    #         )
+
+    #     elif (
+    #         set_ndim == 3
+    #         and self.shape == (3,)
+    #         and np.issubdtype(self.dtype, np.number)
+    #     ):
+    #         plt_data = ax.scatter(
+    #             x[..., 0], x[..., 1], x[..., 2], s=15, c=y, label=label
+    #         )
+
     #         c_bar = plt.colorbar(plt_data, ax=ax)
-    #         c_bar.set_label('$y$')
-    #
+    #         c_bar.set_label("$y$")
+
     #         return plt_data
-    #
+
     #     else:
-    #         raise NotImplementedError('Plot method only implemented for 1- and 2- dimensional data.')
+    #         raise NotImplementedError(
+    #             "Plot method only implemented for 1- and 2- dimensional data."
+    #         )
 
 
 class Continuous(Base, ABC):
@@ -486,7 +517,6 @@ class Continuous(Base, ABC):
         return {"x0": np.zeros(self.shape), "bounds": None, "constraints": ()}
 
     def _minimize(self, f):  # TODO: add `brute` method option?
-
         # FIXME: add stepsize dependence on lims
         kwargs = self.optimize_kwargs.copy()
         x0 = kwargs.pop("x0")
@@ -521,7 +551,8 @@ class Continuous(Base, ABC):
         # if self.shape == ():
         #     return integrate.quad(f, *self.lims)[0]
         # if self.shape == (2,):
-        #     return integrate.dblquad(lambda x, y: f([x, y]), *self.lims[1], *self.lims[0])[0]
+        #     return integrate.dblquad(lambda x, y: f([x, y]),
+        #                              *self.lims[1], *self.lims[0])[0]
         # else:
         #     raise NotImplementedError        # TODO
 
@@ -639,7 +670,7 @@ class Euclidean(Box):
     """
 
     def __init__(self, shape):
-        if isinstance(shape, (Integral, np.integer)):
+        if isinstance(shape, Integral | np.integer):
             shape = (shape,)
 
         lims = np.broadcast_to([-np.inf, np.inf], (*shape, 2))
@@ -744,7 +775,7 @@ class Simplex(Continuous):
         numpy.ndarray
 
         """
-        if type(n) is not int or n < 1:
+        if not isinstance(n, int) or n < 1:
             raise TypeError("Input 'n' must be a positive integer")
 
         if type(shape) is not tuple:
@@ -766,7 +797,7 @@ class Simplex(Continuous):
 
         if n < sum(hull_mask.flatten()):
             raise ValueError(
-                "Input 'n' must meet or exceed the number of True values in 'hull_mask'."
+                "'n' must meet or exceed the number of True values in 'hull_mask'."
             )
 
         if d == 1:
