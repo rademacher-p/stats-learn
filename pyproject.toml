@@ -68,6 +68,9 @@ post-install-commands = [
   "mypy --install-types --non-interactive",
 ]
 
+[tool.black]
+force-exclude = "src/_deprecated"
+
 [tool.ruff]
 src = ["src"]
 select = [
@@ -86,12 +89,14 @@ ignore = [
   "B905", # zip w/o explicit `strict=`
   "C901", # high McCabe complexity # TODO
 ]
-exclude = ["src/_deprecated"]
+extend-exclude = ["src/_deprecated"]
+force-exclude = true
 
 [tool.ruff.pydocstyle]
 convention = "numpy"
 
 [tool.mypy]
+exclude = ["src/_deprecated"]
 plugins = "numpy.typing.mypy_plugin"
 
 [[tool.mypy.overrides]]
