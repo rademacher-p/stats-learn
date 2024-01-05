@@ -86,6 +86,7 @@ ignore = [
   "B905", # zip w/o explicit `strict=`
   "C901", # high McCabe complexity # TODO
 ]
+exclude = ["src/_deprecated"]
 
 [tool.ruff.pydocstyle]
 convention = "numpy"

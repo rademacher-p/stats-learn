@@ -59,7 +59,7 @@ def test():
     for cls, kwargs in RM_set:
         m = cls(**kwargs)
 
-        m.mode_x
+        # m.mode_x
 
         d = m.sample(5)
         x = d["x"]

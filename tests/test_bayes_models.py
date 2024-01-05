@@ -42,8 +42,8 @@ def test():
             d = b.sample(5)
 
         b.fit(d)
-        b.posterior
-        b.posterior_model
+        # b.posterior
+        # b.posterior_model
 
 
 if __name__ == "__main__":

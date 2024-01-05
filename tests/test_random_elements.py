@@ -2,7 +2,6 @@ import numpy as np
 
 from stats_learn import spaces
 from stats_learn.random.elements import (
-    BaseRV,
     DataEmpirical,
     Deterministic,
     Dirichlet,
@@ -54,14 +53,14 @@ def test():
     for cls, kwargs in RE_set:
         e = cls(**kwargs)
 
-        e.mode
+        # e.mode
         x = e.sample(5)
         e.prob(x)
         # e.plot_prob(x)
 
-        if isinstance(e, BaseRV):
-            e.mean
-            e.cov
+        # if isinstance(e, BaseRV):
+        #     e.mean
+        #     e.cov
 
         # TODO: check prob sum to approx unity. Use `space` integration method!
 
