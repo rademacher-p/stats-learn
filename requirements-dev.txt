@@ -1,0 +1,10 @@
+ipython
+black
+ruff
+mypy
+pre-commit
+hatch
+pytest
+pytest-cov
+Sphinx
+furo

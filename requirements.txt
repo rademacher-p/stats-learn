@@ -1,6 +1,3 @@
---extra-index-url https://download.pytorch.org/whl/cu117
-
-# Package
 numpy>=1.22.3
 scipy>=1.8.0
 matplotlib>=3.5.2
@@ -10,21 +7,3 @@ tqdm>=4.64.0
 more-itertools>=8.13.0
 torch>=1.11.0
 pytorch-lightning>=1.6.3
-
-# Extras
-tensorboard>=2.9.1
-torch-tb-profiler>=0.4.0
-PyQt5>=5.15.6
-
-# Development
-black>=22.3.0
-ruff>=0.0.261
-mypy>=1.0.0
-hatch>=1.6.3
-pytest>=7.1.2
-pytest-cov>=4.0.0
-Sphinx>=4.5.0
-furo>=2023.3.27
-ipython>=8.12.0
-ipywidgets>=7.7.0
-ipykernel>=6.22.0

@@ -20,12 +20,11 @@ The `stats_learn` package is developed for [Python](https://www.python.org/downl
 ```
 pip install git+https://github.com/rademacher-p/stats-learn
 ```
-To install a specific version or branch, [specify a ref](https://pip.pypa.io/en/stable/topics/vcs-support/). Alternatively, the package can be installed locally using
-```
-git clone https://github.com/rademacher-p/stats-learn
-pip install stats-learn/
-```
-Note that with both methods, the [editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be included to track any package modifications. To install optional developer packages, specify the `dev` [extra](https://peps.python.org/pep-0508/#extras), as exemplified [here](https://pip.pypa.io/en/stable/cli/pip_install/). The project management tool [hatch](https://hatch.pypa.io/) is recommended to simplify local installation.
+To install a specific version or branch, [specify a ref](https://pip.pypa.io/en/stable/topics/vcs-support/). Alternatively, the package can be installed locally using `pip install <path>`, where `<path>` is the top-level directory containing `pyproject.toml`.
+Note that with both methods, the [editable option](https://pip.pypa.io/en/stable/cli/pip_install/) can be included to track any package modifications. To install optional packages, specify [extras](https://peps.python.org/pep-0508/#extras), as exemplified [here](https://pip.pypa.io/en/stable/cli/pip_install/#examples). Developers should install the package with `pip install -e <path>[dev]` and run `pre-commit install` immediately to activate formatting/linting [hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks).
+
+The project management tool [hatch](https://hatch.pypa.io/) is recommended to simplify local installation. Simply execute `hatch shell` to create and enter a virtual environment with the package installed in development mode (editable install plus extras). Post-install commands (for `pre-commit`, `mypy`, etc.) are executed automatically.
+
 
 ## Documentation
 Package documentation is available [here](https://rademacher-p.github.io/stats-learn/).
