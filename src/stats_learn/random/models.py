@@ -166,7 +166,8 @@ class Base(RandomGeneratorMixin, ABC):
         """
         return self.space["x"].plot(self.mode_y_x, x, ax)
 
-    sample = random.elements.Base.sample
+    def sample(self, size=None, rng=None):
+        return random.elements.Base.sample(self, size, rng)
 
     def _sample(self, n, rng):
         d_x = np.array(self.model_x.sample(n, rng=rng))
@@ -552,7 +553,7 @@ class DataConditional(Base):
 
 
 class DataConditionalRVx(MixinRVx, DataConditional):
-    model_x: random.elements.BaseRV
+    # model_x: random.elements.BaseRV
 
     def _get_idx_x(self, x):
         return np.flatnonzero(np.isclose(x, self.space["x"].values)).item()

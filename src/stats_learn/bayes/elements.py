@@ -105,7 +105,8 @@ class Base(RandomGeneratorMixin, ABC):
         """Generate a random element with a randomly selected parameterization."""
         raise NotImplementedError
 
-    sample = random.elements.Base.sample
+    def sample(self, size=None, rng=None):
+        return random.elements.Base.sample(self, size, rng)
 
     def _sample(self, n, rng):
         return self.random_model(rng)._sample(n, rng)
@@ -284,7 +285,7 @@ class NormalLinear(Base):
         ).U
         self._basis_white = np.dot(self.basis.T, self._prec_U).T
 
-    @cov.setter
+    @cov.setter  # type: ignore
     def cov(self, value):
         self._set_cov(value)
         self._reset_posterior()

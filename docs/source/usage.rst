@@ -92,12 +92,12 @@ The code below can be executed after the previous snippet. The :code:`data_asses
     )
 
     # Squared-Error vs. training data volume
-    n_train = range(0, 100, 5)
+    n_train_vec = range(0, 100, 5)
     results.model_assess(
         predictors,
         model,
         params,
-        n_train,
+        n_train_vec,
         n_test,
         n_mc=1000,
         verbose=True,

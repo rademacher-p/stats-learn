@@ -878,7 +878,7 @@ class SimplexDiscrete(Simplex):
     """
 
     def __init__(self, n, shape):
-        self.n = n
+        self.n = self.n_plot = n
         super().__init__(shape)
 
     def __repr__(self):
@@ -901,7 +901,3 @@ class SimplexDiscrete(Simplex):
             return all(conditions)
         else:
             return False
-
-    @property
-    def n_plot(self):
-        return self.n

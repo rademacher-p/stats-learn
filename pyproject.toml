@@ -64,8 +64,7 @@ features = ["extras", "dev"]
 post-install-commands = [
   "pip install --upgrade pip",
   "pre-commit install",
-  "mypy src/ || true",
-  "mypy --install-types --non-interactive",
+  "mypy --install-types --non-interactive . || true",
 ]
 
 [tool.black]
@@ -99,7 +98,7 @@ exclude = ["src/_deprecated"]
 plugins = "numpy.typing.mypy_plugin"
 
 [[tool.mypy.overrides]]
-module = ["stats_learn.*"]
+module = ["stats_learn.*", "scipy.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

@@ -153,6 +153,7 @@ def _plot_predict_stats(
     if ax is None:
         ax = space_x.make_axes()
 
+    params_full: list[dict]
     if params is None:
         params_full = [{} for _ in predictors]
     else:
@@ -165,6 +166,7 @@ def _plot_predict_stats(
         raise ValueError("Need mean in stats")
     do_std = "std" in names
 
+    labels: list[str | None]
     out = []
     if len(predictors) == 1:
         predictor, params, y_stats = predictors[0], params_full[0], y_stats_full[0]
@@ -264,6 +266,7 @@ def _plot_risk_eval_compare(
     losses, predictors, params=None, n_train: int | Collection = 0, ax=None
 ):
     """Plot empirical risk for various predictors and parameterizations."""
+    params_full: list[dict]
     if params is None:
         params_full = [{} for _ in predictors]
     else:
@@ -275,6 +278,7 @@ def _plot_risk_eval_compare(
         _, ax = plt.subplots()
         ax.set(ylabel=r"$R(f; \rho)$")
 
+    labels: list[str | None]
     out = []
     if len(predictors) == 1:
         predictor, params, loss = predictors[0], params_full[0], losses[0]

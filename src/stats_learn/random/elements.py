@@ -292,7 +292,7 @@ class DeterministicRV(MixinRV, Deterministic):
     # def value(self):
     #     return self.value
 
-    @Deterministic.value.setter
+    @Deterministic.value.setter  # type: ignore
     # @value.setter
     def value(self, value):
         # super(DeterministicRV, self.__class__).value.fset(self, value)
