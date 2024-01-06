@@ -96,7 +96,6 @@ convention = "numpy"
 
 [tool.mypy]
 exclude = ["src/_deprecated"]
-# ignore_missing_imports = true
 plugins = "numpy.typing.mypy_plugin"
 
 [[tool.mypy.overrides]]
