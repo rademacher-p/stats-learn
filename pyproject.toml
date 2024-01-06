@@ -69,7 +69,7 @@ post-install-commands = [
 ]
 
 [tool.black]
-force-exclude = "src/_deprecated"
+extend-exclude = "src/_deprecated"
 
 [tool.ruff]
 src = ["src"]
@@ -90,13 +90,13 @@ ignore = [
   "C901", # high McCabe complexity # TODO
 ]
 extend-exclude = ["src/_deprecated"]
-force-exclude = true
 
 [tool.ruff.pydocstyle]
 convention = "numpy"
 
 [tool.mypy]
 exclude = ["src/_deprecated"]
+# ignore_missing_imports = true
 plugins = "numpy.typing.mypy_plugin"
 
 [[tool.mypy.overrides]]
