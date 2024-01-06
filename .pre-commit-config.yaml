@@ -27,6 +27,6 @@ repos:
       - id: mypy
         additional_dependencies:
           - "numpy"
-        # exclude: src/_deprecated
-        entry: mypy .
-        pass_filenames: false
+        exclude: src/_deprecated
+        # entry: mypy .
+        # pass_filenames: false
