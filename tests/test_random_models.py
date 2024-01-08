@@ -60,7 +60,6 @@ def test():
         m = cls(**kwargs)
 
         # m.mode_x
-
         d = m.sample(5)
         x = d["x"]
         m.mode_y_x(x)

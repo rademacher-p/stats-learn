@@ -6,10 +6,10 @@ name: CI
 on:
   push:
     branches: ["main"]
-    paths: ["src/stats_learn/**"]
+    paths: ["src/stats_learn/**", "tests/**", "examples/**"]
   pull_request:
     branches: ["main"]
-    paths: ["src/stats_learn/**"]
+    paths: ["src/stats_learn/**", "tests/**", "examples/**"]
   workflow_dispatch:
 
 jobs:
