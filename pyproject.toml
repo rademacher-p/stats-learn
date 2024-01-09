@@ -36,15 +36,16 @@ dev = [
   "hatch",
   "pytest",
   "pytest-cov",
-  "Sphinx",
-  "furo",
 ]
 extras = [
-  "tensorboard>=2.9.1",
-  "torch-tb-profiler>=0.4.0",
-  "PyQt5>=5.15.6",
-  "ipywidgets>=7.7.0",
-  "ipykernel>=6.22.0",
+  "Sphinx",
+  "furo",
+  "ipykernel",
+  "tensorboard",
+  "torch-tb-profiler",
+  "PyQt6",
+  "PyYAML",
+  "tqdm",
 ]
 
 [project.urls]

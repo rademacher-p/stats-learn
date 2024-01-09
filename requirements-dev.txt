@@ -6,5 +6,3 @@ pre-commit
 hatch
 pytest
 pytest-cov
-Sphinx
-furo
