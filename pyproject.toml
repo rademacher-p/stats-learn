@@ -63,7 +63,6 @@ packages = ["src/stats_learn"]
 python = "3.11"
 features = ["extras", "dev"]
 post-install-commands = [
-  "pip install --upgrade pip",
   "pre-commit install",
   "mypy --install-types --non-interactive . || true",
 ]
