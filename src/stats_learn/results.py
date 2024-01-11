@@ -1,8 +1,6 @@
 """Assessment tools for learning and prediction performance."""
 
 import inspect
-
-# from warnings import warn
 import logging
 import math
 import pickle
@@ -20,10 +18,6 @@ from tqdm import trange
 
 from stats_learn import bayes
 from stats_learn.util import check_data_shape
-
-# from pytorch_lightning.utilities.seed import seed_everything
-
-# from stats_learn.predictors.torch import LitPredictor
 
 if plt.rcParams["text.usetex"] and "upgreek" in plt.rcParams["text.latex.preamble"]:
     str_risk_bayes = r"$R_\uptheta(f)$"
@@ -600,14 +594,6 @@ def model_assess(
         raise NotImplementedError(
             "Cannot plot prediction statistics and losses at once."
         )
-
-    # if rng is not None and any(
-    #     isinstance(predictor, LitPredictor) for predictor in predictors
-    # ):  # FIXME
-    #     if isinstance(rng, int):
-    #         seed_everything(rng)
-    #     else:
-    #         warn("Can only seed PyTorch-Lightning with an `int` rng.")
 
     model.rng = rng
     # model.rng = RNGMix.make_rng(rng)
