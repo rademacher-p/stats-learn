@@ -36,6 +36,7 @@ dev = [
   "hatch",
   "pytest",
   "pytest-cov",
+  "pytest-xdist",
 ]
 extras = [
   "Sphinx",
@@ -102,7 +103,12 @@ module = ["stats_learn.*", "scipy.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-addopts = ["--cov=src/stats_learn/"]
+addopts = [
+  "--import-mode=importlib",
+  "--cov=src/stats_learn",
+  "--cov-report=xml:tests/coverage.xml",
+  "--numprocesses=auto",
+]
 filterwarnings = ["ignore::DeprecationWarning"]
 testpaths = ["tests/"]
 
