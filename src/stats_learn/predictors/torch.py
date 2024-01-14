@@ -40,16 +40,14 @@ def build_mlp(layer_sizes, activation=nn.ReLU, last_act=False):
     return nn.Sequential(*layers)
 
 
-class LitMLP(pl.LightningModule):
+class LitModule(pl.LightningModule):
     """
     PyTorch-Lightning sequential MLP.
 
     Parameters
     ----------
-    layer_sizes : Collection of int
-        Hidden layer sizes.
-    activation : nn.Module, optional
-        The activation function.
+    model : nn.Module
+        The neural network.
     loss_func : callable, optional
         The loss function for network training.
     optim_cls : class, optional
@@ -61,25 +59,29 @@ class LitMLP(pl.LightningModule):
 
     def __init__(
         self,
-        layer_sizes,
-        activation=nn.ReLU,
+        model,
         loss_func=functional.mse_loss,
         optim_cls=torch.optim.Adam,
         optim_params=None,
     ):
         super().__init__()
 
-        self.model = build_mlp(layer_sizes, activation)
+        self.model = model
         self.loss_func = loss_func
         self.optim_cls = optim_cls
         if optim_params is None:
             optim_params = {}
         self.optim_params = optim_params
 
+    @classmethod
+    def mlp(cls, layer_sizes, activation=nn.ReLU, *args, **kwargs):
+        model = build_mlp(layer_sizes, activation)
+        return cls(model, *args, **kwargs)
+
     def forward(self, x):
         y = self.model(x)
-        # low = torch.tensor(0., dtype=torch.float32).to(y.device)
         # TODO: delete clipping?
+        # low = torch.tensor(0., dtype=torch.float32).to(y.device)
         # high = torch.tensor(1., dtype=torch.float32).to(y.device)
         # y = torch.where(y < 0., low, y)
         # y = torch.where(y > 1., high, y)
