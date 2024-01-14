@@ -20,6 +20,7 @@
         "charliermarsh.ruff",
         "njpwerner.autodocstring",
         "ms-toolsai.jupyter",
+        "ms-toolsai.tensorboard",
         // Languages
         "yzhang.markdown-all-in-one",
         "bierner.markdown-emoji",
