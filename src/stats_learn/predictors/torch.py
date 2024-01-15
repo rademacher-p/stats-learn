@@ -79,13 +79,7 @@ class LitModule(pl.LightningModule):
         return cls(model, *args, **kwargs)
 
     def forward(self, x):
-        y = self.model(x)
-        # TODO: delete clipping?
-        # low = torch.tensor(0., dtype=torch.float32).to(y.device)
-        # high = torch.tensor(1., dtype=torch.float32).to(y.device)
-        # y = torch.where(y < 0., low, y)
-        # y = torch.where(y > 1., high, y)
-        return y
+        return self.model(x)
 
     def training_step(self, batch, batch_idx):
         x, y = batch

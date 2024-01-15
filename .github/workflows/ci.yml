@@ -38,7 +38,7 @@ jobs:
         continue-on-error: true
       - name: Run tests and collect coverage
         run: |
-          pip install pytest pytest-cov
+          pip install pytest pytest-cov pytest-xdist
           pytest --cov=src/stats_learn/ --cov-report=xml:tests/coverage.xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
