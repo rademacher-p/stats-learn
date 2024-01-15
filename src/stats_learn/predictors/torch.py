@@ -5,7 +5,7 @@ from functools import partial
 
 import numpy as np
 import pytorch_lightning as pl
-import torch
+import torch as th
 from torch import nn
 from torch.nn import functional
 from torch.utils.data import DataLoader, TensorDataset
@@ -61,7 +61,7 @@ class LitModule(pl.LightningModule):
         self,
         model,
         loss_func=functional.mse_loss,
-        optim_cls=torch.optim.Adam,
+        optim_cls=th.optim.Adam,
         optim_params=None,
     ):
         super().__init__()
@@ -175,7 +175,7 @@ class LitPredictor(Base):
 
     def _fit(self, d):
         x, y = map(self._unscalar, (d["x"], d["y"]))
-        x, y = map(partial(torch.tensor, dtype=torch.float32), (x, y))
+        x, y = map(partial(th.tensor, dtype=th.float32), (x, y))
         ds = TensorDataset(x, y)
 
         batch_size = len(x)  # TODO: no mini-batching! Allow user specification.
@@ -191,7 +191,8 @@ class LitPredictor(Base):
 
     def _predict(self, x):
         x = self._unscalar(x)
-        x = torch.tensor(x, requires_grad=False, dtype=torch.float32)
-        y_hat = self.model(x).detach().numpy()
-        y_hat = y_hat.reshape(-1, *self.shape["y"])
+        x = th.tensor(x, requires_grad=False, dtype=th.float32)
+        with th.no_grad():
+            y_hat = self.model(x)
+        y_hat = y_hat.numpy().reshape(-1, *self.shape["y"])
         return y_hat
