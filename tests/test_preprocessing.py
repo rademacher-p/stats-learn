@@ -3,11 +3,8 @@ import numpy as np
 from stats_learn.preprocessing import make_clipper, make_discretizer
 from stats_learn.spaces import Box
 
-np.set_printoptions(precision=3)
 
-
-def test_main():  # TODO: test with assertions
-    # test discretizer
+def test_discretizer():
     x = np.random.default_rng().random(10)
     print(x)
 
@@ -24,7 +21,8 @@ def test_main():  # TODO: test with assertions
     x_d = func_(x)
     print(x_d)
 
-    # test clipper
+
+def test_clipper():
     # lims = np.array((0, 1))
     lims = np.array([(0, 1), (0, 1)])
     clipper = make_clipper(lims)
@@ -37,4 +35,5 @@ def test_main():  # TODO: test with assertions
 
 
 if __name__ == "__main__":
-    test_main()
+    test_discretizer()
+    test_clipper()

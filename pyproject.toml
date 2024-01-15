@@ -103,14 +103,13 @@ module = ["stats_learn.*", "scipy.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
+testpaths = ["tests/"]
 addopts = [
   "--import-mode=importlib",
   "--cov=src/stats_learn",
   "--cov-report=xml:tests/coverage.xml",
   "--numprocesses=auto",
 ]
-filterwarnings = ["ignore::DeprecationWarning"]
-testpaths = ["tests/"]
 
 [tool.coverage.run]
 data_file = "tests/.coverage"
