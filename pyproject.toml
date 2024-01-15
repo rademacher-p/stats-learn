@@ -19,6 +19,7 @@ dependencies = [
   "more-itertools>=8.13.0",
   "torch>=1.11.0",
   "pytorch-lightning>=1.6.3",
+  "scikit-learn",
 ]
 description = "Statistical learning with a Bayesian focus"
 name = "stats-learn"
@@ -99,7 +100,7 @@ exclude = ["src/_deprecated"]
 plugins = "numpy.typing.mypy_plugin"
 
 [[tool.mypy.overrides]]
-module = ["stats_learn.*", "scipy.*"]
+module = ["stats_learn.*", "scipy.*", "sklearn.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
