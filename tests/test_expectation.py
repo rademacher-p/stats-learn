@@ -36,9 +36,19 @@ def test_expectation():
         rv = cls(**kwargs)
         mean_approx = rv.expectation(lambda x: x)
         mean_analytic = rv.mean
-        print(mean_approx, mean_analytic)
         assert np.allclose(mean_approx, mean_analytic, rtol=1e-3)
+
+
+def test_argmax():
+    for cls, kwargs in RV_set:
+        rv = cls(**kwargs)
+        mode_approx = rv.space.argmax(rv.prob)
+        mode_analytic = rv.mode
+        if mode_analytic is None:
+            continue
+        assert np.allclose(rv.prob(mode_approx), rv.prob(mode_analytic), rtol=1e-3)
 
 
 if __name__ == "__main__":
     test_expectation()
+    test_argmax()
