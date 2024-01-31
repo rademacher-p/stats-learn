@@ -780,7 +780,7 @@ class DirichletEmpiricalScalar(BaseRV):
         self._space = spaces.FiniteGeneric(np.arange(n + 1) / n)
 
     def __repr__(self):
-        param_strs = (f"{s}= {getattr(self, s)}" for s in ["mean", "alpha_0", "n"])
+        param_strs = (f"{s}={getattr(self, s)}" for s in ["mean", "alpha_0", "n"])
         return f"DirichletEmpiricalScalar({', '.join(param_strs)})"
 
     # Input properties

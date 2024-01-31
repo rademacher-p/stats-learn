@@ -445,7 +445,7 @@ class DataConditional(Base):
         return cls(dists, model_x, rng)
 
     @classmethod
-    def from_mean_emp(cls, alpha_0, n, func, model_x, rng=None):
+    def from_mean_emp(cls, alpha_0, n, mean_y_x, model_x, rng=None):
         r"""
         Construct DE conditional random variables from the conditional mean function.
 
@@ -455,7 +455,7 @@ class DataConditional(Base):
             Localization parameter.
         n : int
             Number of samples characterizing the realized empirical distributions.
-        func : callable
+        mean_y_x : callable
             The conditional mean function.
         model_x : stats_learn.random.elements.Base
             Random variable for the marginal distribution of :math:`\mathrm{x}`.
@@ -475,12 +475,12 @@ class DataConditional(Base):
         #     raise ValueError("`model_x` must have `FiniteGeneric` space.")
         if np.isinf(alpha_0):
             dists = [
-                random.elements.EmpiricalScalar(func(x), n - 1)
+                random.elements.EmpiricalScalar(mean_y_x(x), n - 1)
                 for x in model_x.space.values
             ]
         else:
             dists = [
-                random.elements.DirichletEmpiricalScalar(func(x), alpha_0, n - 1)
+                random.elements.DirichletEmpiricalScalar(mean_y_x(x), alpha_0, n - 1)
                 for x in model_x.space.values
             ]
         return cls(dists, model_x, rng)
@@ -510,10 +510,10 @@ class DataConditional(Base):
 
         """
 
-        def poly_func(x):
+        def mean_y_x(x):
             return sum(w * x**i for i, w in enumerate(weights))
 
-        return cls.from_mean_emp(alpha_0, n, poly_func, model_x, rng)
+        return cls.from_mean_emp(alpha_0, n, mean_y_x, model_x, rng)
 
     def __eq__(self, other):
         if isinstance(other, DataConditional):

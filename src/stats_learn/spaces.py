@@ -200,7 +200,7 @@ class Base(ABC):
         ax : matplotlib.axes.Axes, optional
             Axes.
         label : str, optional
-            Label for matplotlib.artist.Artist\
+            Label for matplotlib.artist.Artist
         kwargs : dict, optional
             Additional plotting keyword arguments.
 

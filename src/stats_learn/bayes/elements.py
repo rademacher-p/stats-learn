@@ -345,7 +345,7 @@ class Dirichlet(Base):
 
     def __repr__(self):
         _strs = ["alpha_0", "n", "prior_mean"]
-        param_strs = (f"{s}= {getattr(self, s)}" for s in _strs)
+        param_strs = (f"{s}={getattr(self, s)}" for s in _strs)
         return f"Dirichlet({', '.join(param_strs)})"
 
     def __setattr__(self, name, value):
