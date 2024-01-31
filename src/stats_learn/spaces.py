@@ -294,16 +294,14 @@ class Base(ABC):
     def integrate(self, f):
         raise NotImplementedError
 
-    def moment(self, f, order=1, center=False):
-        if not np.issubdtype(
-            self.dtype, np.number
-        ):  # TODO: dispatch to subclass with __new__? use mixin?
+    def moment(self, f, order=0, center=False):
+        if not np.issubdtype(self.dtype, np.number):
+            # TODO: dispatch to subclass with __new__? use mixin?
             raise TypeError("Moments only supported for numeric spaces.")
 
-        if order == 1 and not center:
-            return self.integrate(lambda x: np.array(x) * f(x))
-        else:
-            raise NotImplementedError  # TODO
+        if center:
+            raise NotImplementedError
+        return self.integrate(lambda x: (x**order) * f(x))
 
 
 class Discrete(Base, ABC):
@@ -452,8 +450,7 @@ class FiniteGeneric(Finite):
         # return self._values_flat[i_opt]
 
     def integrate(self, f):
-        y_flat = f(self._values_flat)
-        return y_flat.sum(0)
+        return sum(f(val) for val in self._values_flat)
 
     def set_x_plot(self):
         self.x_plt = self.values
@@ -520,9 +517,10 @@ class Continuous(Base, ABC):
         # FIXME: add stepsize dependence on lims
         kwargs = self.optimize_kwargs.copy()
         x0 = kwargs.pop("x0")
-        return optimize.basinhopping(
+        opt_result = optimize.basinhopping(
             f, x0, niter=100, T=1.0, stepsize=4.0, minimizer_kwargs=kwargs
-        ).x.reshape(self.shape)
+        )
+        return opt_result.x.reshape(self.shape)
 
         # if self.ndim == 0:
         #     return optimize.minimize_scalar(f, bounds=self.optimize_kwargs['bounds'])
@@ -532,15 +530,16 @@ class Continuous(Base, ABC):
         #     raise ValueError
 
     def integrate(self, f):
-        y_shape = f(self.optimize_kwargs["x0"]).shape
+        y_shape = np.array(f(self.optimize_kwargs["x0"])).shape
         ranges = self.optimize_kwargs["bounds"]
         if y_shape == ():
-            return integrate.nquad(lambda *args: f(list(args)), ranges)[0]
+            result, *_ = integrate.nquad(lambda *args: f(np.array(args)), ranges)
+            return result
         else:
             out = np.empty(self.size)
 
             def _make_func(i):
-                return lambda *args: f(list(args))[i]
+                return lambda *args: f(np.array(args))[i]
 
             for i in range(self.size):
                 out[i] = integrate.nquad(_make_func(i), ranges)[0]
@@ -594,7 +593,7 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
     @property
     def optimize_kwargs(self):  # bounds reshaped for scipy optimizer
         return {
-            "x0": self.lims_plot.mean(-1),
+            "x0": self.lims.mean(-1),
             "bounds": self.lims.reshape(-1, 2),
             "constraints": (),
         }
@@ -693,11 +692,19 @@ class Euclidean(Box):
         else:
             return False
 
+    # @property
+    # def optimize_kwargs(self):
+    #     kwargs = super().optimize_kwargs
+    #     kwargs["bounds"] = None
+    #     return kwargs
+
     @property
-    def optimize_kwargs(self):
-        kwargs = super().optimize_kwargs
-        kwargs["bounds"] = None
-        return kwargs
+    def optimize_kwargs(self):  # bounds reshaped for scipy optimizer
+        return {
+            "x0": self.lims_plot.mean(-1),
+            "bounds": self.lims_plot.reshape(-1, 2),
+            "constraints": (),
+        }
 
     @property
     def lims_plot(self):
@@ -863,8 +870,14 @@ class Simplex(Continuous):
 
         return plt_data
 
+    def _minimize(self, f):
+        raise NotImplementedError
 
-class SimplexDiscrete(Simplex):
+    def integrate(self, f):
+        raise NotImplementedError
+
+
+class SimplexDiscrete(Simplex):  # TODO: bad inheritance from `Continuous`
     """
     Finite grid over Simplex space.
 
@@ -878,8 +891,9 @@ class SimplexDiscrete(Simplex):
     """
 
     def __init__(self, n, shape):
-        self.n = self.n_plot = n
+        self.n = n
         super().__init__(shape)
+        self.n_plot = self.n
 
     def __repr__(self):
         return f"SimplexDiscrete({self.n}, {self.shape})"
@@ -901,3 +915,10 @@ class SimplexDiscrete(Simplex):
             return all(conditions)
         else:
             return False
+
+    def _minimize(self, f):
+        i_opt = np.argmin(f(self.x_plt))
+        return self.x_plt[i_opt]
+
+    def integrate(self, f):
+        return sum(f(val) for val in self.x_plt)

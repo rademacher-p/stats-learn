@@ -217,6 +217,9 @@ class MixinRV:
         """Second central moment."""
         return self._cov
 
+    def expectation(self, f):
+        return self.space.integrate(lambda x: self.prob(x) * f(x))
+
 
 class BaseRV(MixinRV, Base, ABC):
     """
@@ -1204,15 +1207,16 @@ class Normal(BaseRV):
         return np.exp(log_prob)
 
     def _set_lims_plot(self):
+        _n_std = 4
         if self.shape in {(), (2,)}:
             if self.shape == ():
-                _margin = 3 * np.sqrt(self._cov.item())
+                _margin = _n_std * np.sqrt(self._cov.item())
                 lims = self._mean.item() + np.array([-1, 1]) * _margin
             else:  # self.shape == (2,):
                 lims = [
                     (
-                        self._mean[i] - 3 * np.sqrt(self._cov[i, i]),
-                        self._mean[i] + 3 * np.sqrt(self._cov[i, i]),
+                        self._mean[i] - _n_std * np.sqrt(self._cov[i, i]),
+                        self._mean[i] + _n_std * np.sqrt(self._cov[i, i]),
                     )
                     for i in range(2)
                 ]
