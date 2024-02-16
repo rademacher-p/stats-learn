@@ -416,8 +416,13 @@ def data_assess(
     """
     # TODO: Make similar to `assess_compare` signature? Params first?
 
+    # if not all_equal(p.space for p in predictors):
+    #     raise ValueError("All predictor spaces must be equivalent.")
+    if not all_equal(p.loss_func for p in predictors):
+        raise ValueError("All predictor loss functions must be equivalent.")
+    # TODO: Take loss func as argument, instead?
+
     space = predictors[0].space  # use first predictors space by default
-    # TODO: check all space equivalence? Catch exception, default to first space?
 
     if d_train is None:
         _dtype = [(c, space[c].dtype, space[c].shape) for c in "xy"]
@@ -463,9 +468,8 @@ def data_assess(
     for predictor, params, loss in zip(predictors, params_full, loss_full):
         if verbose:
             # print(f"  Predictor: {predictor.name}", end='\r')
-            print(
-                f"  Predictor: {predictor.name}"
-            )  # TODO: make `verbose` int, add levels of control?
+            print(f"  Predictor: {predictor.name}")
+            # TODO: make `verbose` int, add levels of control?
 
         predictor.fit(d_train)
         if len(params) == 0:
@@ -590,6 +594,11 @@ def model_assess(
     # TODO: add mode!!!
     # TODO: train/test loss results?
 
+    # if not all_equal(p.space for p in predictors):
+    #     raise ValueError("All predictor spaces must be equivalent.")
+    if not all_equal(p.loss_func for p in predictors):
+        raise ValueError("All predictor loss functions must be equivalent.")
+
     if plot_stats and plot_loss:
         raise NotImplementedError(
             "Cannot plot prediction statistics and losses at once."
@@ -645,9 +654,8 @@ def model_assess(
         else:
             raise ValueError
         samp.append(np.zeros(stat_shape))
-        dtype.append(
-            (stat, np.float64, stat_shape)
-        )  # TODO: dtype float? need model dtype attribute?!
+        dtype.append((stat, np.float64, stat_shape))
+        # TODO: dtype float? need model dtype attribute?!
 
     _temp = np.array(tuple(samp), dtype=dtype)
     y_stats_full = [

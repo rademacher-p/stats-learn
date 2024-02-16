@@ -652,10 +652,6 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
         n_plt = 1000 if self.ndim == 0 else 100
         self.x_plt = self.make_grid(self.lims_plot, n_plt, endpoint=False)
 
-    def plot(self, f, x=None, ax=None, label=None, **kwargs):
-        x, y, set_shape = self._eval_func(f, x)
-        return self.plot_xy(x, y, ax=ax, label=label, **kwargs)
-
 
 class Euclidean(Box):
     """
