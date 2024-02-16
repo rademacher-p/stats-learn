@@ -475,12 +475,12 @@ class DataConditional(Base):
         #     raise ValueError("`model_x` must have `FiniteGeneric` space.")
         if np.isinf(alpha_0):
             dists = [
-                random.elements.EmpiricalScalar(mean_y_x(x), n - 1)
+                random.elements.EmpiricalScalar(mean_y_x(x), n)
                 for x in model_x.space.values
             ]
         else:
             dists = [
-                random.elements.DirichletEmpiricalScalar(mean_y_x(x), alpha_0, n - 1)
+                random.elements.DirichletEmpiricalScalar(mean_y_x(x), alpha_0, n)
                 for x in model_x.space.values
             ]
         return cls(dists, model_x, rng)
