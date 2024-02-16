@@ -304,6 +304,9 @@ class DeterministicRV(MixinRV, Deterministic):
         self._mean = self._value
         self._cov = np.zeros(2 * self.shape)
 
+    def expectation(self, f):
+        return f(self.value)
+
 
 class FiniteGeneric(Base):
     """
@@ -1504,6 +1507,9 @@ class DataEmpiricalRV(MixinRV, DataEmpirical):
 
         return self._cov
 
+    def expectation(self, f):
+        return np.tensordot(self._p, f(self.data["x"]), axes=(0, 0))
+
 
 class Mixture(Base):
     """
@@ -1663,3 +1669,6 @@ class MixtureRV(MixinRV, Mixture):
             self._mean = sum(self._p[i] * self.dists[i].mean for i in self._idx_nonzero)
 
         return self._mean
+
+    def expectation(self, f):
+        return sum(self._p[i] * self.dists[i].expectation(f) for i in self._idx_nonzero)
