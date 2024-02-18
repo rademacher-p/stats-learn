@@ -440,13 +440,14 @@ class FiniteGeneric(Finite):
             return False
 
     def _minimize(self, f):
-        i_opt = np.argmin(f(self._values_flat))
+        y = np.array(list(map(f, self._values_flat)))
+        i_opt = np.argmin(y)
         return self._values_flat[i_opt]
 
         # # ranges = (np.mgrid[:self.set_size],)
         # ranges = (slice(self.set_size), )
         # i_opt = int(optimize.brute(lambda i: f(self._values_flat[int(i)]), ranges))
-        #
+
         # return self._values_flat[i_opt]
 
     def integrate(self, f):
@@ -510,28 +511,42 @@ class Continuous(Base, ABC):
         super().__init__(shape, np.float64)
 
     @property
-    def optimize_kwargs(self):
-        return {"x0": np.zeros(self.shape), "bounds": None, "constraints": ()}
+    def _scipy_kwargs(self):
+        return {"x_init": np.zeros(self.shape), "ranges": None}
 
-    def _minimize(self, f):  # TODO: add `brute` method option?
-        # FIXME: add stepsize dependence on lims
-        kwargs = self.optimize_kwargs.copy()
-        x0 = kwargs.pop("x0")
-        opt_result = optimize.basinhopping(
-            f, x0, niter=100, T=1.0, stepsize=4.0, minimizer_kwargs=kwargs
+    def _minimize(self, f):
+        # TODO: add args for method and kwargs
+        # TODO: add stepsize dependence on lims
+
+        x = self._minimize_brute(f)
+        # x = self._minimize_basinhopping(f)
+
+        return x.reshape(self.shape)
+
+    def _minimize_brute(self, f):
+        _brute_kwargs = dict(
+            ranges=self._scipy_kwargs["ranges"],
+            Ns=10,
+            # workers=1,
+            # finish=None,
+            # finish=optimize.minimize
         )
-        return opt_result.x.reshape(self.shape)
+        return optimize.brute(f, **_brute_kwargs)
 
-        # if self.ndim == 0:
-        #     return optimize.minimize_scalar(f, bounds=self.optimize_kwargs['bounds'])
-        # elif self.ndim == 1:
-        #     return optimize.minimize(f, **self.optimize_kwargs)
-        # else:
-        #     raise ValueError
+    def _minimize_basinhopping(self, f):
+        _basin_kwargs = dict(
+            x0=self._scipy_kwargs["x_init"],
+            niter=100,
+            T=1.0,
+            stepsize=4.0,
+            minimizer_kwargs=dict(bounds=self._scipy_kwargs["ranges"]),
+        )
+        opt_result = optimize.basinhopping(f, **_basin_kwargs)
+        return opt_result.x
 
     def integrate(self, f):
-        y_shape = np.array(f(self.optimize_kwargs["x0"])).shape
-        ranges = self.optimize_kwargs["bounds"]
+        y_shape = np.array(f(self._scipy_kwargs["x_init"])).shape
+        ranges = self._scipy_kwargs["ranges"]
         if y_shape == ():
             result, *_ = integrate.nquad(lambda *args: f(np.array(args)), ranges)
             return result
@@ -591,11 +606,10 @@ class Box(Continuous):  # TODO: make Box inherit from Euclidean?
             return False
 
     @property
-    def optimize_kwargs(self):  # bounds reshaped for scipy optimizer
+    def _scipy_kwargs(self):  # bounds reshaped for scipy optimizer
         return {
-            "x0": self.lims.mean(-1),
-            "bounds": self.lims.reshape(-1, 2),
-            "constraints": (),
+            "x_init": self.lims.mean(-1),
+            "ranges": self.lims.reshape(-1, 2),
         }
 
     @property
@@ -671,7 +685,7 @@ class Euclidean(Box):
         lims = np.broadcast_to([-np.inf, np.inf], (*shape, 2))
         super().__init__(lims)
 
-        self._lims_plot = np.broadcast_to([-1, 1], shape=(*shape, 2))  # defaults
+        self._lims_plot = np.broadcast_to([0, 1], shape=(*shape, 2))
 
     def __repr__(self):
         return f"Euclidean{self.shape}"
@@ -688,18 +702,11 @@ class Euclidean(Box):
         else:
             return False
 
-    # @property
-    # def optimize_kwargs(self):
-    #     kwargs = super().optimize_kwargs
-    #     kwargs["bounds"] = None
-    #     return kwargs
-
     @property
-    def optimize_kwargs(self):  # bounds reshaped for scipy optimizer
+    def _scipy_kwargs(self):  # bounds reshaped for scipy optimizer
         return {
-            "x0": self.lims_plot.mean(-1),
-            "bounds": self.lims_plot.reshape(-1, 2),
-            "constraints": (),
+            "x_init": self.lims_plot.mean(-1),
+            "ranges": self.lims_plot.reshape(-1, 2),
         }
 
     @property
@@ -913,7 +920,8 @@ class SimplexDiscrete(Simplex):  # TODO: bad inheritance from `Continuous`
             return False
 
     def _minimize(self, f):
-        i_opt = np.argmin(f(self.x_plt))
+        y = np.array(list(map(f, self.x_plt)))
+        i_opt = np.argmin(y)
         return self.x_plt[i_opt]
 
     def integrate(self, f):

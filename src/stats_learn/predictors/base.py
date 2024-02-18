@@ -1,12 +1,14 @@
 """Fixed and learning predictors for supervised learning applications."""
 
 from abc import ABC, abstractmethod
+from functools import partial
 from operator import itemgetter
 
 import numpy as np
 
 from stats_learn import bayes, random, results, spaces
 from stats_learn.loss_funcs import loss_01, loss_se
+from stats_learn.util import vectorize_func
 
 
 # Base and Mixin classes
@@ -161,9 +163,31 @@ class Base(ABC):
         y = self._proc_y(y)
         return y
 
-    @abstractmethod
+    # @abstractmethod  # TODO
+    # def _predict(self, x):
+    #     raise NotImplementedError
+
     def _predict(self, x):
-        raise NotImplementedError
+        vec_func = vectorize_func(self._predict_single, self.shape["x"])
+        return vec_func(x)
+
+    def _predict_single(self, x):
+        model_y = self.model.model_y_x(x)
+
+        # TODO: cache predictions?
+        def _risk(h):  # TODO: memoize here?
+            loss_partial = partial(self.loss_func, h)
+            return model_y.expectation(loss_partial)
+
+        space_h = self.space["y"]
+
+        # TODO: generalize and make argument for convex closure
+        if isinstance(space_h, spaces.FiniteGeneric):
+            vals = space_h.values_flat
+            lims = vals.min(axis=0), vals.max(axis=0)
+            space_h = spaces.Box(lims)
+
+        return space_h.argmin(_risk)
 
     def evaluate(self, d):
         """
