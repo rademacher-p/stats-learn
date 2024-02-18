@@ -171,11 +171,27 @@ def vectorize_func(func, shape):
         for x_i in x.reshape((-1,) + shape):
             _out.append(func(x_i))
         _out = np.array(_out)
-
         _out = _out.reshape(set_shape + _out.shape[1:])
+
         if _out.shape == ():
             return _out.item()
         else:
             return _out
 
     return func_vec
+
+
+def make_power_func(i):
+    def _func(x):
+        return x**i
+
+        # # y = (x**i).mean()
+        # y = (x**i).sum()
+        # return np.full(out_shape, y)
+
+        # if out_shape == ():
+        #     return y
+        # else:
+        #     return np.full(out_shape, y)
+
+    return _func

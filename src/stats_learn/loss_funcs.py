@@ -53,7 +53,7 @@ def make_loss_lp(p: float):
     return loss_lp
 
 
-loss_l1 = make_loss_lp(1)
+loss_ae = make_loss_lp(1)
 loss_se = make_loss_lp(2)
 
 # def loss_se(y_est, y, shape=()):

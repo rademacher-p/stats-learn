@@ -12,7 +12,7 @@ import numpy as np
 from scipy.stats._multivariate import _PSD
 
 from stats_learn import random, spaces
-from stats_learn.util import RandomGeneratorMixin, vectorize_func
+from stats_learn.util import RandomGeneratorMixin, make_power_func
 
 # TODO: Add deterministic DEP to effect a DP realization and sample!!
 
@@ -214,16 +214,12 @@ class NormalLinear(Base):
         self._set_cov_y_x(cov_y_x)
 
         if basis_y_x is None:
+            basis_y_x = tuple(map(make_power_func, range(len(self.prior_mean))))
 
-            def power_func(i):
-                return vectorize_func(
-                    lambda x: np.full(self.shape["y"], (x**i).mean()),
-                    shape=self.shape["x"],
-                )
-
-            self._basis_y_x = tuple(power_func(i) for i in range(len(self.prior_mean)))
-        else:
-            self._basis_y_x = basis_y_x
+        self._basis_y_x = basis_y_x
+        # self._basis_y_x = tuple(
+        #     vectorize_func(f, shape=self.shape["x"]) for f in basis_y_x
+        # )
 
         self._set_prior_persistent_attr()
 
