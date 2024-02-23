@@ -1,5 +1,6 @@
 """Common utilities."""
 
+import sys
 from datetime import datetime
 from functools import wraps
 from numbers import Integral
@@ -8,8 +9,11 @@ import numpy as np
 
 
 def get_now():
-    """Get ISO datetime in format compatible with Windows filename."""
-    return datetime.now().replace(microsecond=0).isoformat().replace(":", "_")
+    """Get ISO datetime in string format."""
+    str_ = datetime.now().isoformat(timespec="seconds")
+    if sys.platform.startswith("win32"):
+        str_ = str_.replace(":", "_")
+    return str_
 
 
 class RandomGeneratorMixin:
