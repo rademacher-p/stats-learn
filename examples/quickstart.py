@@ -19,14 +19,14 @@ n_test = 20
 d = model.sample(n_train + n_test, rng=seed)
 d_train, d_test = d[:n_train], d[n_train:]
 
-loss_min = opt_predictor.evaluate(d_test, loss_func)
+loss_min = opt_predictor.evaluate(loss_func, d_test)
 print(f"Minimum loss = {loss_min:.3f}")
 
-loss_prior = norm_predictor.evaluate(d_test, loss_func)  # use the prior distribution
+loss_prior = norm_predictor.evaluate(loss_func, d_test)  # use the prior distribution
 print(f"Untrained learner loss = {loss_prior:.3f}")
 
 norm_predictor.fit(d_train)  # fit the posterior distribution
-loss_fit = norm_predictor.evaluate(d_test, loss_func)
+loss_fit = norm_predictor.evaluate(loss_func, d_test)
 print(f"Trained learner loss = {loss_fit:.3f}")
 
 

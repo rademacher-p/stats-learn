@@ -189,15 +189,15 @@ class Base(ABC):
 
         return space_h.argmin(_risk)
 
-    def evaluate(self, d, loss_func=None):
+    def evaluate(self, loss_func, d):
         """
         Evaluate predictor using test data.
 
         Parameters
         ----------
+        loss_func: callable
         d : np.ndarray
             The test data.
-        loss_func: callable, optional
 
         Returns
         -------
@@ -205,23 +205,20 @@ class Base(ABC):
             Empirical risk (i.e. average test loss).
 
         """
-        if loss_func is None:
-            loss_func = self.loss_func
-
         losses = loss_func(self.predict(d["x"]), d["y"], shape=self.shape["y"])
         return losses.mean()
 
-    def evaluate_from_model(self, model, n_test=1, loss_func=None, n_mc=1, rng=None):
+    def evaluate_from_model(self, loss_func, model, n_test=1, n_mc=1, rng=None):
         """
         Evaluate predictor using test data randomly drawn from a given data model.
 
         Parameters
         ----------
+        loss_func: callable
         model : stats_learn.random.models.Base
             Model for training data generation.
         n_test : int, optional
             Number of test samples.
-        loss_func: callable, optional
         n_mc : int, optional
             Number of Monte Carlo simulation iterations.
         rng : int or np.random.RandomState or np.random.Generator, optional
@@ -233,14 +230,11 @@ class Base(ABC):
             Empirical risk (i.e. average test loss).
 
         """
-        if loss_func is None:
-            loss_func = self.loss_func
-
         model.rng = rng
         losses = np.empty(n_mc)
         for i_mc in range(n_mc):
             d = model.sample(n_test)
-            losses[i_mc] = self.evaluate(d, loss_func)
+            losses[i_mc] = self.evaluate(loss_func, d)
 
         return losses.mean()
 
@@ -268,7 +262,7 @@ class Base(ABC):
     # Assessment
     def data_assess(
         self,
-        loss_func=None,
+        loss_func,
         d_train=None,
         d_test=None,
         params=None,
@@ -284,7 +278,7 @@ class Base(ABC):
 
         Parameters
         ----------
-        loss_func : callable, optional
+        loss_func : callable
         d_train : array_like, optional
             Training data.
         d_test : array_like, optional
@@ -311,9 +305,6 @@ class Base(ABC):
             Empirical risk values for each parameterization.
 
         """
-        if loss_func is None:
-            loss_func = self.loss_func
-
         return results.data_assess(
             [self],
             loss_func,
@@ -330,7 +321,7 @@ class Base(ABC):
 
     def model_assess(
         self,
-        loss_func=None,
+        loss_func,
         model=None,
         params=None,
         n_train=0,
@@ -354,7 +345,7 @@ class Base(ABC):
 
         Parameters
         ----------
-        loss_func : callable, optional
+        loss_func : callable
         model : stats_learn.random.models.Base or stats_learn.bayes.models.Base
             Data-generating model.
         params : Collection of dict, optional
@@ -395,8 +386,6 @@ class Base(ABC):
             Empirical risk values for each parameterization.
 
         """
-        if loss_func is None:
-            loss_func = self.loss_func
         if model is None:
             model = self._model_obj
 

@@ -477,7 +477,7 @@ def data_assess(
                 handles.extend(h)
 
             if do_loss:
-                loss[0] += predictor.evaluate(d_test, loss_func)
+                loss[0] += predictor.evaluate(loss_func, d_test)
 
         elif len(params) == 1:
             param_name, param_vals = list(params.items())[0]
@@ -494,7 +494,7 @@ def data_assess(
 
                 if do_loss:
                     idx = (0, *np.unravel_index(i_v, loss.shape[1:]))
-                    loss[idx] += predictor.evaluate(d_test, loss_func)
+                    loss[idx] += predictor.evaluate(loss_func, d_test)
         else:
             raise NotImplementedError(
                 "Only up to one varying parameter currently supported."
@@ -706,7 +706,7 @@ def model_assess(
                         _update_stats(y_stats[i_n], y_mc, i_mc)
 
                     if do_loss:
-                        loss[i_n] += predictor.evaluate(d_test, loss_func)
+                        loss[i_n] += predictor.evaluate(loss_func, d_test)
                 else:
                     for i_v, param_vals in enumerate(list(product(*params.values()))):
                         predictor.set_params(**dict(zip(params.keys(), param_vals)))
@@ -718,7 +718,7 @@ def model_assess(
                             _update_stats(y_stats[idx], y_mc, i_mc)
 
                         if do_loss:
-                            loss[idx] += predictor.evaluate(d_test, loss_func)
+                            loss[idx] += predictor.evaluate(loss_func, d_test)
 
     if "cov" in stats:
         for y_stats in y_stats_full:
