@@ -370,6 +370,7 @@ def _plot_risk_eval_compare(
 # Assessment tools
 def data_assess(
     predictors,
+    loss_func,
     d_train=None,
     d_test=None,
     params=None,
@@ -387,6 +388,7 @@ def data_assess(
     ----------
     predictors : Collection of stats_learn.predictors.Base
         Predictors to assess.
+    loss_func : callable
     d_train : array_like, optional
         Training data.
     d_test : array_like, optional
@@ -414,13 +416,10 @@ def data_assess(
         Empirical risk values for each predictor and parameterization.
 
     """
-    # TODO: Make similar to `assess_compare` signature? Params first?
+    # TODO: Make similar to `model_assess` signature? Params first?
 
     # if not all_equal(p.space for p in predictors):
     #     raise ValueError("All predictor spaces must be equivalent.")
-    if not all_equal(p.loss_func for p in predictors):
-        raise ValueError("All predictor loss functions must be equivalent.")
-    # TODO: Take loss func as argument, instead?
 
     space = predictors[0].space  # use first predictors space by default
 
@@ -478,7 +477,7 @@ def data_assess(
                 handles.extend(h)
 
             if do_loss:
-                loss[0] += predictor.evaluate(d_test)
+                loss[0] += predictor.evaluate(d_test, loss_func)
 
         elif len(params) == 1:
             param_name, param_vals = list(params.items())[0]
@@ -495,7 +494,7 @@ def data_assess(
 
                 if do_loss:
                     idx = (0, *np.unravel_index(i_v, loss.shape[1:]))
-                    loss[idx] += predictor.evaluate(d_test)
+                    loss[idx] += predictor.evaluate(d_test, loss_func)
         else:
             raise NotImplementedError(
                 "Only up to one varying parameter currently supported."
@@ -521,6 +520,7 @@ def data_assess(
 
 def model_assess(
     predictors,
+    loss_func,
     model,
     params=None,
     n_train=0,
@@ -546,6 +546,7 @@ def model_assess(
     ----------
     predictors : Collection of stats_learn.predictors.Base
         Predictors to assess.
+    loss_func : callable
     model : stats_learn.random.models.Base or stats_learn.bayes.models.Base
         Data-generating model.
     params : Collection of dict, optional
@@ -596,8 +597,6 @@ def model_assess(
 
     # if not all_equal(p.space for p in predictors):
     #     raise ValueError("All predictor spaces must be equivalent.")
-    if not all_equal(p.loss_func for p in predictors):
-        raise ValueError("All predictor loss functions must be equivalent.")
 
     if plot_stats and plot_loss:
         raise NotImplementedError(
@@ -707,7 +706,7 @@ def model_assess(
                         _update_stats(y_stats[i_n], y_mc, i_mc)
 
                     if do_loss:
-                        loss[i_n] += predictor.evaluate(d_test)
+                        loss[i_n] += predictor.evaluate(d_test, loss_func)
                 else:
                     for i_v, param_vals in enumerate(list(product(*params.values()))):
                         predictor.set_params(**dict(zip(params.keys(), param_vals)))
@@ -719,7 +718,7 @@ def model_assess(
                             _update_stats(y_stats[idx], y_mc, i_mc)
 
                         if do_loss:
-                            loss[idx] += predictor.evaluate(d_test)
+                            loss[idx] += predictor.evaluate(d_test, loss_func)
 
     if "cov" in stats:
         for y_stats in y_stats_full:
@@ -752,87 +751,6 @@ def model_assess(
     _log_and_fig(message, log_path, ax, img_path)
 
     return y_stats_full, loss_full
-
-
-# Assessment shortcuts
-def predict_stats(
-    predictors,
-    model,
-    params=None,
-    n_train=0,
-    n_mc=1,
-    x=None,
-    do_std=False,
-    verbose=False,
-):
-    stats = ["mean"]
-    if do_std:
-        stats.append("std")
-    y_stats_full, __ = model_assess(
-        predictors, model, params, n_train, n_mc=n_mc, x=x, stats=stats, verbose=verbose
-    )
-    return y_stats_full
-
-
-def plot_predict_stats(
-    predictors,
-    model,
-    params=None,
-    n_train=0,
-    n_mc=1,
-    x=None,
-    do_std=False,
-    verbose=False,
-    ax=None,
-):
-    stats = ["mean"]
-    if do_std:
-        stats.append("std")
-    return model_assess(
-        predictors,
-        model,
-        params,
-        n_train,
-        n_mc=n_mc,
-        x=x,
-        stats=stats,
-        verbose=verbose,
-        plot_stats=True,
-        ax=ax,
-    )
-
-
-def risk_eval_sim(
-    predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False
-):
-    __, loss_full = model_assess(
-        predictors,
-        model,
-        params,
-        n_train,
-        n_test,
-        n_mc,
-        verbose=verbose,
-        print_loss=True,
-    )
-    return loss_full
-
-
-def plot_risk_eval_sim(
-    predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=False, ax=None
-):
-    return model_assess(
-        predictors,
-        model,
-        params,
-        n_train,
-        n_test,
-        n_mc,
-        verbose=verbose,
-        plot_loss=True,
-        print_loss=True,
-        ax=ax,
-    )
 
 
 # Additional utilities
@@ -876,7 +794,15 @@ def risk_eval_analytic(
 
 
 def plot_risk_disc(
-    predictors, model, params=None, n_train=0, n_test=1, n_mc=1, verbose=True, ax=None
+    predictors,
+    loss_func,
+    model,
+    params=None,
+    n_train=0,
+    n_test=1,
+    n_mc=1,
+    verbose=True,
+    ax=None,
 ):
     """Plot risk against discretization set cardinality."""
     # TODO: integrate logging code? Cleanup!
@@ -919,7 +845,7 @@ def plot_risk_disc(
         raise ValueError
 
     __, losses = model_assess(
-        predictors, model, params_full, n_train, n_test, n_mc, verbose
+        predictors, loss_func, model, params_full, n_train, n_test, n_mc, verbose
     )
 
     n_train = np.array(n_train).reshape(-1)

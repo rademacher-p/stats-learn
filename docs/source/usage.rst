@@ -21,11 +21,13 @@ Two different predictors are instantiated. First, the ``opt_predictor`` uses kno
 
 Training and testing data are randomly generated using the model ``sample`` method and each predictor is assessed using its ``evaluate`` method. Once the learning ``norm_predictor`` is ``fit`` to the data, its squared-error loss is reduced.
 
-.. code-block::
+.. code-block:: python
 
     from stats_learn import bayes, random
+    from stats_learn.loss_funcs import loss_se
     from stats_learn.predictors import BayesRegressor, ModelRegressor
 
+    loss_func = loss_se
     model = random.models.NormalLinear(weights=[1, 1])
 
     # Predictors
@@ -42,14 +44,14 @@ Training and testing data are randomly generated using the model ``sample`` meth
     d = model.sample(n_train + n_test, rng=seed)
     d_train, d_test = d[:n_train], d[n_train:]
 
-    loss_min = opt_predictor.evaluate(d_test)
+    loss_min = opt_predictor.evaluate(d_test, loss_func)
     print(f"Minimum loss = {loss_min:.3f}")
 
-    loss_prior = norm_predictor.evaluate(d_test)  # use the prior distribution
+    loss_prior = norm_predictor.evaluate(d_test, loss_func)  # use the prior distribution
     print(f"Untrained learner loss = {loss_prior:.3f}")
 
     norm_predictor.fit(d_train)  # fit the posterior distribution
-    loss_fit = norm_predictor.evaluate(d_test)
+    loss_fit = norm_predictor.evaluate(d_test, loss_func)
     print(f"Trained learner loss = {loss_fit:.3f}")
 
 
@@ -63,7 +65,7 @@ Output:
 
 The code below can be executed after the previous snippet. The :code:`data_assess` function provides replication of the functionality above, including a loss table and a graphic showing how the :code:`predict` functions fit the training data. The :code:`model_assess` function performs Monte Carlo approximation of the expected loss by repeatedly generating and evaluating on new datasets, enabling statistically meaningful evaluation. Observe that it can be used for both visualization of both the prediction statistics and of the average loss.
 
-.. code-block::
+.. code-block:: python
 
     from stats_learn import results
 
@@ -72,12 +74,20 @@ The code below can be executed after the previous snippet. The :code:`data_asses
 
     # Sample regressor realizations
     results.data_assess(
-        predictors, d_train, d_test, params, verbose=True, plot_fit=True, img_path="fit.png"
+        predictors,
+        loss_func,
+        d_train,
+        d_test,
+        params,
+        verbose=True,
+        plot_fit=True,
+        img_path="fit.png",
     )
 
     # Prediction mean/variance
     results.model_assess(
         predictors,
+        loss_func,
         model,
         params,
         n_train,
@@ -95,6 +105,7 @@ The code below can be executed after the previous snippet. The :code:`data_asses
     n_train_vec = range(0, 100, 5)
     results.model_assess(
         predictors,
+        loss_func,
         model,
         params,
         n_train_vec,

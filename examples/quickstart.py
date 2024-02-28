@@ -1,6 +1,8 @@
 from stats_learn import bayes, random, results
+from stats_learn.loss_funcs import loss_se
 from stats_learn.predictors import BayesRegressor, ModelRegressor
 
+loss_func = loss_se
 model = random.models.NormalLinear(weights=[1, 1])
 
 # Predictors
@@ -17,14 +19,14 @@ n_test = 20
 d = model.sample(n_train + n_test, rng=seed)
 d_train, d_test = d[:n_train], d[n_train:]
 
-loss_min = opt_predictor.evaluate(d_test)
+loss_min = opt_predictor.evaluate(d_test, loss_func)
 print(f"Minimum loss = {loss_min:.3f}")
 
-loss_prior = norm_predictor.evaluate(d_test)  # use the prior distribution
+loss_prior = norm_predictor.evaluate(d_test, loss_func)  # use the prior distribution
 print(f"Untrained learner loss = {loss_prior:.3f}")
 
 norm_predictor.fit(d_train)  # fit the posterior distribution
-loss_fit = norm_predictor.evaluate(d_test)
+loss_fit = norm_predictor.evaluate(d_test, loss_func)
 print(f"Trained learner loss = {loss_fit:.3f}")
 
 
@@ -34,12 +36,20 @@ params = [None, {"prior_cov": [0.01, 0.1, 1]}]
 
 # Sample regressor realizations
 results.data_assess(
-    predictors, d_train, d_test, params, verbose=True, plot_fit=True, img_path="fit.png"
+    predictors,
+    loss_func,
+    d_train,
+    d_test,
+    params,
+    verbose=True,
+    plot_fit=True,
+    img_path="fit.png",
 )
 
 # Prediction mean/variance
 results.model_assess(
     predictors,
+    loss_func,
     model,
     params,
     n_train,
@@ -57,6 +67,7 @@ results.model_assess(
 n_train_vec = range(0, 100, 5)
 results.model_assess(
     predictors,
+    loss_func,
     model,
     params,
     n_train_vec,

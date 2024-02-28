@@ -176,8 +176,8 @@ class Base(ABC):
 
         # TODO: cache predictions?
         def _risk(h):  # TODO: memoize here?
-            loss_partial = partial(self.loss_func, h)
-            return model_y.expectation(loss_partial)
+            _fn = partial(self.loss_func, h)
+            return model_y.expectation(_fn)
 
         space_h = self.space["y"]
 
@@ -189,7 +189,7 @@ class Base(ABC):
 
         return space_h.argmin(_risk)
 
-    def evaluate(self, d):
+    def evaluate(self, d, loss_func=None):
         """
         Evaluate predictor using test data.
 
@@ -197,6 +197,7 @@ class Base(ABC):
         ----------
         d : np.ndarray
             The test data.
+        loss_func: callable, optional
 
         Returns
         -------
@@ -204,10 +205,13 @@ class Base(ABC):
             Empirical risk (i.e. average test loss).
 
         """
-        loss = self.loss_func(self.predict(d["x"]), d["y"], shape=self.shape["y"])
-        return loss.mean()
+        if loss_func is None:
+            loss_func = self.loss_func
 
-    def evaluate_from_model(self, model, n_test=1, n_mc=1, rng=None):
+        losses = loss_func(self.predict(d["x"]), d["y"], shape=self.shape["y"])
+        return losses.mean()
+
+    def evaluate_from_model(self, model, n_test=1, loss_func=None, n_mc=1, rng=None):
         """
         Evaluate predictor using test data randomly drawn from a given data model.
 
@@ -217,6 +221,7 @@ class Base(ABC):
             Model for training data generation.
         n_test : int, optional
             Number of test samples.
+        loss_func: callable, optional
         n_mc : int, optional
             Number of Monte Carlo simulation iterations.
         rng : int or np.random.RandomState or np.random.Generator, optional
@@ -228,13 +233,16 @@ class Base(ABC):
             Empirical risk (i.e. average test loss).
 
         """
-        model.rng = rng
-        loss = np.empty(n_mc)
-        for i_mc in range(n_mc):
-            d = model.sample(n_test)  # generate train/test data
-            loss[i_mc] = self.evaluate(d)  # make decision and assess
+        if loss_func is None:
+            loss_func = self.loss_func
 
-        return loss.mean()
+        model.rng = rng
+        losses = np.empty(n_mc)
+        for i_mc in range(n_mc):
+            d = model.sample(n_test)
+            losses[i_mc] = self.evaluate(d, loss_func)
+
+        return losses.mean()
 
     # Plotting utilities
     def plot_predict(self, x=None, ax=None, label=None):
@@ -260,6 +268,7 @@ class Base(ABC):
     # Assessment
     def data_assess(
         self,
+        loss_func=None,
         d_train=None,
         d_test=None,
         params=None,
@@ -275,6 +284,7 @@ class Base(ABC):
 
         Parameters
         ----------
+        loss_func : callable, optional
         d_train : array_like, optional
             Training data.
         d_test : array_like, optional
@@ -301,8 +311,12 @@ class Base(ABC):
             Empirical risk values for each parameterization.
 
         """
+        if loss_func is None:
+            loss_func = self.loss_func
+
         return results.data_assess(
             [self],
+            loss_func,
             d_train,
             d_test,
             [params],
@@ -316,6 +330,7 @@ class Base(ABC):
 
     def model_assess(
         self,
+        loss_func=None,
         model=None,
         params=None,
         n_train=0,
@@ -339,6 +354,7 @@ class Base(ABC):
 
         Parameters
         ----------
+        loss_func : callable, optional
         model : stats_learn.random.models.Base or stats_learn.bayes.models.Base
             Data-generating model.
         params : Collection of dict, optional
@@ -379,10 +395,14 @@ class Base(ABC):
             Empirical risk values for each parameterization.
 
         """
+        if loss_func is None:
+            loss_func = self.loss_func
         if model is None:
             model = self._model_obj
+
         out = results.model_assess(
             [self],
+            loss_func,
             model,
             [params],
             n_train,
@@ -400,65 +420,6 @@ class Base(ABC):
             rng,
         )
         return map(itemgetter(0), out)
-
-    # Assessment shortcuts
-    def predict_stats(
-        self,
-        model=None,
-        params=None,
-        n_train=0,
-        n_mc=1,
-        x=None,
-        stats=("mode",),
-        verbose=False,
-    ):
-        if model is None:
-            model = self._model_obj
-        return results.predict_stats(
-            [self], model, [params], n_train, n_mc, x, stats, verbose
-        )[0]
-
-    def plot_predict_stats(
-        self,
-        model=None,
-        params=None,
-        n_train=0,
-        n_mc=1,
-        x=None,
-        do_std=False,
-        verbose=False,
-        ax=None,
-    ):
-        if model is None:
-            model = self._model_obj
-        return results.plot_predict_stats(
-            [self], model, [params], n_train, n_mc, x, do_std, verbose, ax
-        )
-
-    def risk_eval_sim(
-        self, model=None, params=None, n_train=0, n_test=1, n_mc=1, verbose=False
-    ):
-        if model is None:
-            model = self._model_obj
-        return results.risk_eval_sim(
-            [self], model, [params], n_train, n_test, n_mc, verbose
-        )[0]
-
-    def plot_risk_eval_sim(
-        self,
-        model=None,
-        params=None,
-        n_train=0,
-        n_test=1,
-        n_mc=1,
-        verbose=False,
-        ax=None,
-    ):
-        if model is None:
-            model = self._model_obj
-        return results.plot_risk_eval_sim(
-            [self], model, [params], n_train, n_test, n_mc, verbose, ax
-        )
 
     # Analytical evaluation
     def risk_eval_analytic(
@@ -572,7 +533,7 @@ class ModelRegressor(RegressorMixin, Model):
 
     def evaluate_analytic(self, model=None, n_train=0, n_test=1):
         """
-        Analytically calculate risk.
+        Analytically calculate SE risk.
 
         Parameters
         ----------
@@ -704,7 +665,7 @@ class BayesRegressor(RegressorMixin, Bayes):
 
     def evaluate_analytic(self, model=None, n_train=0, n_test=1):
         """
-        Analytically calculate risk.
+        Analytically calculate SE risk.
 
         Parameters
         ----------

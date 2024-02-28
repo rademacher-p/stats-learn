@@ -39,9 +39,8 @@ dev = [
   "pytest-cov",
   "pytest-xdist",
 ]
+docs = ["Sphinx", "furo"]
 extras = [
-  "Sphinx",
-  "furo",
   "ipykernel",
   "tensorboard",
   "torch-tb-profiler",
@@ -63,11 +62,20 @@ packages = ["src/stats_learn"]
 
 [tool.hatch.envs.default]
 python = "3.11"
-features = ["extras", "dev"]
+pre-install-commands = ["pip install --upgrade pip"]
+
+[tool.hatch.envs.dev]
+features = ["dev", "extras"]
 post-install-commands = [
   "pre-commit install",
   "mypy --install-types --non-interactive . || true",
 ]
+
+[tool.hatch.envs.docs]
+features = ["docs"]
+
+[tool.hatch.envs.docs.scripts]
+build = "sphinx-build -M html docs/source/ docs/build/"
 
 [tool.black]
 extend-exclude = "src/_deprecated"
