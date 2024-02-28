@@ -143,13 +143,8 @@ class Base(RandomGeneratorMixin, ABC):
         """Restore unfit prior state."""
         raise NotImplementedError
 
-    @staticmethod
-    def tex_params(key, value=None):
-        """Format attributes as strings for LaTeX."""
-        if value is None:
-            return rf"${key}$"
-        else:
-            return rf"${key} = {value}$"
+    def _format_params(self, key, value=None):
+        return key, value
 
 
 class NormalLinear(Base):
@@ -366,8 +361,8 @@ class NormalLinear(Base):
         self._cov_prior_inv = np.linalg.inv(self.prior_cov)
         self._prior_model_cov = self._make_posterior_model_cov(self.prior_cov)
 
-    def tex_params(self, key, value=None):
-        """Format attributes as strings for LaTeX."""
+    def _format_params(self, key, value=None):
+        """Format attributes as strings for TeX."""
         str_theta = r"\theta"
         str_one = ""
         str_eye = ""
@@ -394,7 +389,7 @@ class NormalLinear(Base):
                 if self.prior.shape != () and val_np.shape == ():
                     value += str_eye
 
-        return super(NormalLinear, NormalLinear).tex_params(key, value)
+        return key, value
 
 
 class Dirichlet(Base):
@@ -496,8 +491,8 @@ class Dirichlet(Base):
         self.emp_dist = emp_dist  # triggers setter
 
     @staticmethod
-    def tex_params(key, value=None):
-        """Format attributes as strings for LaTeX."""
+    def _format_params(key, value=None):
+        """Format attributes as strings for TeX."""
         if key == "alpha_0":
             key = r"\alpha_0"
-        return super(Dirichlet, Dirichlet).tex_params(key, value)
+        return key, value

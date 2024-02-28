@@ -18,8 +18,7 @@ class Base(ABC):
 
     Parameters
     ----------
-    loss_func : callable
-    space : dict, optional
+    space : dict
         The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the
         model's space.
     proc_funcs : Collection of callable of dict of Collection of callable
@@ -28,10 +27,8 @@ class Base(ABC):
 
     """
 
-    def __init__(self, loss_func, space=None, proc_funcs=(), name=None):
-        self.loss_func = loss_func
-
-        self._space = space
+    def __init__(self, space, proc_funcs=(), name=None):
+        self.space = space
 
         if isinstance(proc_funcs, dict):
             self.proc_funcs = proc_funcs
@@ -39,19 +36,7 @@ class Base(ABC):
             self.proc_funcs = {"pre": list(proc_funcs), "post": []}
         self.name = str(name)
 
-        self.model = None  # `random.models.Base` object used to generate predictions
-
         self.can_warm_start = False  # enables incremental training
-
-    @property
-    def space(self):
-        r"""The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`.
-
-        Defaults to the model's space.
-        """
-        if self._space is None:
-            self._space = self._model_obj.space
-        return self._space
 
     shape = property(
         lambda self: {key: space.shape for key, space in self.space.items()}
@@ -62,19 +47,21 @@ class Base(ABC):
         lambda self: {key: space.dtype for key, space in self.space.items()}
     )
 
-    @property
     @abstractmethod
-    def _model_obj(self):
+    def set_params(self, **kwargs):
+        """Set parameters of the predictor."""
         raise NotImplementedError
 
-    # TODO: improve? wrapper to ignore non-changing param set?
-    def set_params(self, **kwargs):
-        """Set parameters of the learning model object."""
-        for key, value in kwargs.items():
-            setattr(self._model_obj, key, value)
+    def make_label(self, key, value=None):
+        """Format attributes as strings for TeX."""
+        key, value = self._format_params(key, value)
+        if value is None:
+            return rf"${key}$"
+        else:
+            return rf"${key} = {value}$"
 
-    def tex_params(self, key, value=None):
-        return self._model_obj.tex_params(key, value)
+    def _format_params(self, key, value=None):
+        return key, value
 
     def _proc_x(self, x):
         for func in self.proc_funcs["pre"]:
@@ -163,31 +150,9 @@ class Base(ABC):
         y = self._proc_y(y)
         return y
 
-    # @abstractmethod  # TODO
-    # def _predict(self, x):
-    #     raise NotImplementedError
-
+    @abstractmethod
     def _predict(self, x):
-        vec_func = vectorize_func(self._predict_single, self.shape["x"])
-        return vec_func(x)
-
-    def _predict_single(self, x):
-        model_y = self.model.model_y_x(x)
-
-        # TODO: cache predictions?
-        def _risk(h):  # TODO: memoize here?
-            _fn = partial(self.loss_func, h)
-            return model_y.expectation(_fn)
-
-        space_h = self.space["y"]
-
-        # TODO: generalize and make argument for convex closure
-        if isinstance(space_h, spaces.FiniteGeneric):
-            vals = space_h.values_flat
-            lims = vals.min(axis=0), vals.max(axis=0)
-            space_h = spaces.Box(lims)
-
-        return space_h.argmin(_risk)
+        raise NotImplementedError
 
     def evaluate(self, loss_func, d):
         """
@@ -322,7 +287,7 @@ class Base(ABC):
     def model_assess(
         self,
         loss_func,
-        model=None,
+        model,
         params=None,
         n_train=0,
         n_test=0,
@@ -386,9 +351,6 @@ class Base(ABC):
             Empirical risk values for each parameterization.
 
         """
-        if model is None:
-            model = self._model_obj
-
         out = results.model_assess(
             [self],
             loss_func,
@@ -408,14 +370,12 @@ class Base(ABC):
             ax,
             rng,
         )
-        return map(itemgetter(0), out)
+        return list(map(itemgetter(0), out))
 
     # Analytical evaluation
     def risk_eval_analytic(
-        self, model=None, params=None, n_train=0, n_test=1, verbose=False
+        self, model, params=None, n_train=0, n_test=1, verbose=False
     ):
-        if model is None:
-            model = self._model_obj
         return results.risk_eval_analytic(
             [self], model, [params], n_train, n_test, verbose
         )[0]
@@ -459,15 +419,47 @@ class Model(Base):
     """
 
     def __init__(self, model, loss_func, space=None, proc_funcs=(), name=None):
-        super().__init__(loss_func, space, proc_funcs, name)
-        self.model = model
+        if space is None:
+            space = model.space
+        super().__init__(space, proc_funcs, name)
+
+        self.model = model  # `random.models.Base` object used to generate predictions
+
+        self.loss_func = loss_func  # TODO
 
     def __repr__(self):
         return self.__class__.__name__ + f"(model={self.model})"
 
-    @property
-    def _model_obj(self):
-        return self.model
+    # TODO: improve? wrapper to ignore non-changing param set?
+    def set_params(self, **kwargs):
+        """Set parameters of the learning model object."""
+        for key, value in kwargs.items():
+            setattr(self.model, key, value)
+
+    def _format_params(self, key, value=None):
+        return self.model._format_params(key, value)
+
+    def _predict(self, x):
+        vec_func = vectorize_func(self._predict_single, self.shape["x"])
+        return vec_func(x)
+
+    def _predict_single(self, x):
+        model_y = self.model.model_y_x(x)
+
+        # TODO: cache predictions?
+        def _risk(h):  # TODO: memoize here?
+            _fn = partial(self.loss_func, h)
+            return model_y.expectation(_fn)
+
+        space_h = self.space["y"]
+
+        # TODO: generalize and make argument for convex closure
+        if isinstance(space_h, spaces.FiniteGeneric):
+            vals = space_h.values_flat
+            lims = vals.min(axis=0), vals.max(axis=0)
+            space_h = spaces.Box(lims)
+
+        return space_h.argmin(_risk)
 
     def _fit(self, d):
         pass
@@ -475,8 +467,8 @@ class Model(Base):
     def reset(self):
         pass
 
-    def fit_from_model(self, model, n_train=0, warm_start=False, rng=None):
-        pass  # skip unnecessary data generation
+    # def fit_from_model(self, model, n_train=0, warm_start=False, rng=None):
+    #     pass  # skip unnecessary data generation
 
 
 class ModelClassifier(ClassifierMixin, Model):
@@ -540,7 +532,7 @@ class ModelRegressor(RegressorMixin, Model):
 
         """
         if model is None:
-            model = self._model_obj
+            model = self.model
 
         n_train = np.array(n_train)
 
@@ -563,7 +555,7 @@ class ModelRegressor(RegressorMixin, Model):
 
 
 # Learning predictors using Bayesian data models
-class Bayes(Base):
+class Bayes(Model):
     r"""
     Predictor based on Bayesian data model.
 
@@ -582,26 +574,29 @@ class Bayes(Base):
     """
 
     def __init__(self, bayes_model, loss_func, space=None, proc_funcs=(), name=None):
-        super().__init__(loss_func, space, proc_funcs, name=name)
-
         self.bayes_model = bayes_model
+        model = self.bayes_model.posterior_model
+        # model updates in-place with set_params() and fit()
+
+        super().__init__(model, loss_func, space, proc_funcs, name=name)
 
         self.can_warm_start = self.bayes_model.can_warm_start
 
         self.prior = self.bayes_model.prior
         self.posterior = self.bayes_model.posterior
 
-        # model updates in-place with set_params() and fit()
-        self.model = self.bayes_model.posterior_model
-
         self.fit()
 
     def __repr__(self):
         return self.__class__.__name__ + f"(bayes_model={self.bayes_model})"
 
-    @property
-    def _model_obj(self):
-        return self.bayes_model
+    def set_params(self, **kwargs):
+        """Set parameters of the learning model object."""
+        for key, value in kwargs.items():
+            setattr(self.bayes_model, key, value)
+
+    def _format_params(self, key, value=None):
+        return self.bayes_model._format_params(key, value)
 
     def _fit(self, d):
         self.bayes_model.fit(d, warm_start=True)
@@ -672,7 +667,7 @@ class BayesRegressor(RegressorMixin, Bayes):
 
         """
         if model is None:
-            model = self._model_obj
+            model = self.bayes_model
 
         n_train = np.array(n_train)
 

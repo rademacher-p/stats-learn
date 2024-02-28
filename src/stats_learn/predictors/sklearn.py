@@ -3,7 +3,6 @@ import sklearn as skl
 from sklearn.exceptions import NotFittedError
 from sklearn.gaussian_process import GaussianProcessRegressor
 
-from stats_learn.loss_funcs import loss_se
 from stats_learn.predictors.base import Base
 
 
@@ -12,20 +11,11 @@ class SKLPredictor(Base):
     # FIXME: inheritance feels broken
 
     def __init__(self, estimator, space, proc_funcs=(), name=None):
-        if skl.base.is_regressor(estimator):
-            loss_func = loss_se
-        else:
-            raise ValueError("Estimator must be regressor-type.")
-
-        super().__init__(loss_func, space, proc_funcs, name)
+        super().__init__(space, proc_funcs, name)
 
         self.estimator = estimator
         # self.can_warm_start = hasattr(self.estimator, "warm_start")
         # FIXME: bugged if estimator is `Pipeline`?
-
-    @property
-    def _model_obj(self):
-        raise NotImplementedError
 
     def set_params(self, **kwargs):
         for key, value in kwargs.items():

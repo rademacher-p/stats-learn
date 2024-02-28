@@ -10,7 +10,6 @@ from torch import nn
 from torch.nn import functional
 from torch.utils.data import DataLoader, TensorDataset
 
-from stats_learn.loss_funcs import loss_se
 from stats_learn.predictors.base import Base
 
 
@@ -131,8 +130,7 @@ class LitPredictor(Base):
         proc_funcs=(),
         name=None,
     ):
-        loss_func = loss_se  # TODO: Generalize!
-        super().__init__(loss_func, space, proc_funcs, name)
+        super().__init__(space, proc_funcs, name)
 
         self.model = model
         self.trainer_params = trainer_params
@@ -153,10 +151,6 @@ class LitPredictor(Base):
         # TODO: actually can, but `assess` results are better with full datasets!
 
         self.reset()
-
-    @property
-    def _model_obj(self):
-        raise NotImplementedError
 
     def set_params(self, **kwargs):
         for key, value in kwargs.items():

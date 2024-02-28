@@ -113,7 +113,7 @@ def _print_risk(predictors, params, n_train, losses):
                 param_name, param_vals = list(param.items())[0]
                 columns.extend(
                     [
-                        f"{predictor.name}, {predictor.tex_params(param_name, value)}"
+                        f"{predictor.name}, {predictor.make_label(param_name, value)}"
                         for value in param_vals
                     ]
                 )
@@ -178,16 +178,16 @@ def _plot_predict_stats(
                 title += f", $N = {n_train[0]}$"
                 if len(param_vals) == 1:
                     labels = [None]
-                    title += f", {predictor.tex_params(param_name, param_vals[0])}"
+                    title += f", {predictor.make_label(param_name, param_vals[0])}"
                 else:
                     labels = [
-                        f"{predictor.tex_params(param_name, value)}"
+                        f"{predictor.make_label(param_name, value)}"
                         for value in param_vals
                     ]
             elif len(param_vals) == 1:
                 y_stats = y_stats.squeeze(axis=1)
                 labels = [f"$N = {n}$" for n in n_train]
-                title += f", {predictor.tex_params(param_name, param_vals[0])}"
+                title += f", {predictor.make_label(param_name, param_vals[0])}"
             else:
                 raise NotImplementedError
         else:
@@ -221,7 +221,7 @@ def _plot_predict_stats(
                     y_stats = y_stats.squeeze(0)
                     param_name, param_vals = list(params.items())[0]
                     labels = [
-                        f"{predictor.name}, {predictor.tex_params(param_name, value)}"
+                        f"{predictor.name}, {predictor.make_label(param_name, value)}"
                         for value in param_vals
                     ]
                 else:
@@ -285,7 +285,7 @@ def _plot_risk_eval_compare(
         elif len(params) == 1:
             param_name, param_vals = list(params.items())[0]
             if len(n_train) < len(param_vals):
-                xlabel, x_plt = predictor.tex_params(param_name), param_vals
+                xlabel, x_plt = predictor.make_label(param_name), param_vals
                 if len(n_train) == 1:
                     title += f", $N = {n_train[0]}$"
                     labels = [None]
@@ -295,11 +295,11 @@ def _plot_risk_eval_compare(
                 loss = np.transpose(loss)
                 xlabel, x_plt = "$N$", n_train
                 if len(param_vals) == 1:
-                    title += f", {predictor.tex_params(param_name, param_vals[0])}"
+                    title += f", {predictor.make_label(param_name, param_vals[0])}"
                     labels = [None]
                 else:
                     labels = [
-                        f"{predictor.tex_params(param_name, value)}"
+                        f"{predictor.make_label(param_name, value)}"
                         for value in param_vals
                     ]
         else:
@@ -322,7 +322,7 @@ def _plot_risk_eval_compare(
             # Plot versus parameter for multiple predictors of same type
 
             title = f"$N = {n_train[0]}$"
-            xlabel = predictors[0].tex_params(list(params_full[0].keys())[0])
+            xlabel = predictors[0].make_label(list(params_full[0].keys())[0])
 
             for predictor, params, loss in zip(predictors, params_full, losses):
                 x_plt = list(params.values())[0]
@@ -347,7 +347,7 @@ def _plot_risk_eval_compare(
                     loss = np.transpose(loss)
                     param_name, param_vals = list(params.items())[0]
                     labels = [
-                        f"{predictor.name}, {predictor.tex_params(param_name, value)}"
+                        f"{predictor.name}, {predictor.make_label(param_name, value)}"
                         for value in param_vals
                     ]
                 else:
@@ -482,7 +482,7 @@ def data_assess(
         elif len(params) == 1:
             param_name, param_vals = list(params.items())[0]
             labels = [
-                f"{predictor.name}, {predictor.tex_params(param_name, value)}"
+                f"{predictor.name}, {predictor.make_label(param_name, value)}"
                 for value in param_vals
             ]
             for i_v, (param_val, label) in enumerate(zip(param_vals, labels)):
@@ -876,13 +876,13 @@ def plot_risk_disc(
 
         if len(n_train) > 1 and len(param_vals) == 1:
             loss = loss.squeeze(axis=1)
-            # title += f", {predictors[0].tex_params(param_name, param_vals[0])}"
+            # title += f", {predictors[0].make_label(param_name, param_vals[0])}"
             title += f", {tex_map(param_vals[0])}"
             labels = [f"$N = {n}$" for n in n_train]
         elif len(n_train) == 1 and len(param_vals) > 1:
             loss = loss.squeeze(axis=0)
             title += f", $N = {n_train[0]}$"
-            # labels = [f"{predictors[0].tex_params(param_name, value)}"
+            # labels = [f"{predictors[0].make_label(param_name, value)}"
             #           for value in param_vals]
             labels = [f"{tex_map(value)}" for value in param_vals]
         else:

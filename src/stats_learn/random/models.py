@@ -177,6 +177,9 @@ class Base(RandomGeneratorMixin, ABC):
             list(zip(d_x, d_y)), dtype=[(c, self.dtype[c], self.shape[c]) for c in "xy"]
         )
 
+    def _format_params(self, key, value=None):
+        return key, value
+
 
 class MixinRVx:
     r"""Mixin class for observed random variables :math:`\mathrm{x}` (numeric)."""
