@@ -37,7 +37,7 @@ def _check_inputs(h, y, shape):
 
 
 def make_loss_lp(p: float):
-    """Make loss function for generic powers of the absolute squared-difference.
+    """Make loss function for generic powers of the absolute difference.
 
     Parameters
     ----------

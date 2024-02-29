@@ -368,6 +368,60 @@ def _plot_risk_eval_compare(
 
 
 # Assessment tools
+def evaluate(predictor, loss_func, d):
+    """
+    Evaluate predictor using test data.
+
+    Parameters
+    ----------
+    predictor : stats_learn.predictors.Base
+    loss_func : callable
+    d : np.ndarray
+        The test data.
+
+    Returns
+    -------
+    float
+        Empirical risk (i.e. average test loss).
+
+    """
+    h = predictor.predict(d["x"])
+    losses = loss_func(h, d["y"], shape=predictor.shape["y"])
+    return losses.mean()
+
+
+def evaluate_from_model(predictor, loss_func, model, n_test=1, n_mc=1, rng=None):
+    """
+    Evaluate predictor using test data randomly drawn from a given data model.
+
+    Parameters
+    ----------
+    predictor : stats_learn.predictors.Base
+    loss_func : callable
+    model : stats_learn.random.models.Base
+        Model for training data generation.
+    n_test : int, optional
+        Number of test samples.
+    n_mc : int, optional
+        Number of Monte Carlo simulation iterations.
+    rng : int or np.random.RandomState or np.random.Generator, optional
+        Random number generator seed or object.
+
+    Returns
+    -------
+    float
+        Empirical risk (i.e. average test loss).
+
+    """
+    model.rng = rng
+    losses = np.empty(n_mc)
+    for i_mc in range(n_mc):
+        d = model.sample(n_test)
+        losses[i_mc] = evaluate(predictor, loss_func, d)
+
+    return losses.mean()
+
+
 def data_assess(
     predictors,
     loss_func,
@@ -471,13 +525,14 @@ def data_assess(
             # TODO: make `verbose` int, add levels of control?
 
         predictor.fit(d_train)
+
         if len(params) == 0:
             if plot_fit:
                 h = predictor.plot_predict(x, ax=ax, label=predictor.name)
                 handles.extend(h)
 
             if do_loss:
-                loss[0] += predictor.evaluate(loss_func, d_test)
+                loss[0] += evaluate(predictor, loss_func, d_test)
 
         elif len(params) == 1:
             param_name, param_vals = list(params.items())[0]
@@ -494,7 +549,7 @@ def data_assess(
 
                 if do_loss:
                     idx = (0, *np.unravel_index(i_v, loss.shape[1:]))
-                    loss[idx] += predictor.evaluate(loss_func, d_test)
+                    loss[idx] += evaluate(predictor, loss_func, d_test)
         else:
             raise NotImplementedError(
                 "Only up to one varying parameter currently supported."
@@ -706,7 +761,7 @@ def model_assess(
                         _update_stats(y_stats[i_n], y_mc, i_mc)
 
                     if do_loss:
-                        loss[i_n] += predictor.evaluate(loss_func, d_test)
+                        loss[i_n] += evaluate(predictor, loss_func, d_test)
                 else:
                     for i_v, param_vals in enumerate(list(product(*params.values()))):
                         predictor.set_params(**dict(zip(params.keys(), param_vals)))
@@ -718,7 +773,7 @@ def model_assess(
                             _update_stats(y_stats[idx], y_mc, i_mc)
 
                         if do_loss:
-                            loss[idx] += predictor.evaluate(loss_func, d_test)
+                            loss[idx] += evaluate(predictor, loss_func, d_test)
 
     if "cov" in stats:
         for y_stats in y_stats_full:

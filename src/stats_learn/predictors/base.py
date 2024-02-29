@@ -154,55 +154,6 @@ class Base(ABC):
     def _predict(self, x):
         raise NotImplementedError
 
-    def evaluate(self, loss_func, d):
-        """
-        Evaluate predictor using test data.
-
-        Parameters
-        ----------
-        loss_func: callable
-        d : np.ndarray
-            The test data.
-
-        Returns
-        -------
-        float
-            Empirical risk (i.e. average test loss).
-
-        """
-        losses = loss_func(self.predict(d["x"]), d["y"], shape=self.shape["y"])
-        return losses.mean()
-
-    def evaluate_from_model(self, loss_func, model, n_test=1, n_mc=1, rng=None):
-        """
-        Evaluate predictor using test data randomly drawn from a given data model.
-
-        Parameters
-        ----------
-        loss_func: callable
-        model : stats_learn.random.models.Base
-            Model for training data generation.
-        n_test : int, optional
-            Number of test samples.
-        n_mc : int, optional
-            Number of Monte Carlo simulation iterations.
-        rng : int or np.random.RandomState or np.random.Generator, optional
-            Random number generator seed or object.
-
-        Returns
-        -------
-        float
-            Empirical risk (i.e. average test loss).
-
-        """
-        model.rng = rng
-        losses = np.empty(n_mc)
-        for i_mc in range(n_mc):
-            d = model.sample(n_test)
-            losses[i_mc] = self.evaluate(loss_func, d)
-
-        return losses.mean()
-
     # Plotting utilities
     def plot_predict(self, x=None, ax=None, label=None):
         """
@@ -225,6 +176,48 @@ class Base(ABC):
         return self.space["x"].plot(self.predict, x, ax=ax, label=label)
 
     # Assessment
+    def evaluate(self, loss_func, d):
+        """
+        Evaluate predictor using test data.
+
+        Parameters
+        ----------
+        loss_func : callable
+        d : np.ndarray
+            The test data.
+
+        Returns
+        -------
+        float
+            Empirical risk (i.e. average test loss).
+
+        """
+        return results.evaluate(self, loss_func, d)
+
+    def evaluate_from_model(self, loss_func, model, n_test=1, n_mc=1, rng=None):
+        """
+        Evaluate predictor using test data randomly drawn from a given data model.
+
+        Parameters
+        ----------
+        loss_func : callable
+        model : stats_learn.random.models.Base
+            Model for training data generation.
+        n_test : int, optional
+            Number of test samples.
+        n_mc : int, optional
+            Number of Monte Carlo simulation iterations.
+        rng : int or np.random.RandomState or np.random.Generator, optional
+            Random number generator seed or object.
+
+        Returns
+        -------
+        float
+            Empirical risk (i.e. average test loss).
+
+        """
+        return results.evaluate_from_model(self, loss_func, model, n_test, n_mc, rng)
+
     def data_assess(
         self,
         loss_func,
@@ -423,14 +416,12 @@ class Model(Base):
             space = model.space
         super().__init__(space, proc_funcs, name)
 
-        self.model = model  # `random.models.Base` object used to generate predictions
-
-        self.loss_func = loss_func  # TODO
+        self.model = model
+        self.loss_func = loss_func
 
     def __repr__(self):
         return self.__class__.__name__ + f"(model={self.model})"
 
-    # TODO: improve? wrapper to ignore non-changing param set?
     def set_params(self, **kwargs):
         """Set parameters of the learning model object."""
         for key, value in kwargs.items():
@@ -448,7 +439,7 @@ class Model(Base):
 
         # TODO: cache predictions?
         def _risk(h):  # TODO: memoize here?
-            _fn = partial(self.loss_func, h)
+            _fn = partial(self.loss_func, h, shape=self.shape["y"])
             return model_y.expectation(_fn)
 
         space_h = self.space["y"]
@@ -571,19 +562,22 @@ class Bayes(Model):
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 
+    Notes
+    -----
+    Prediction `model` updates in-place with `set_params` and `fit` calls.
+
     """
 
     def __init__(self, bayes_model, loss_func, space=None, proc_funcs=(), name=None):
-        self.bayes_model = bayes_model
-        model = self.bayes_model.posterior_model
-        # model updates in-place with set_params() and fit()
-
+        model = bayes_model.posterior_model
         super().__init__(model, loss_func, space, proc_funcs, name=name)
 
-        self.can_warm_start = self.bayes_model.can_warm_start
+        self.bayes_model = bayes_model
 
-        self.prior = self.bayes_model.prior
-        self.posterior = self.bayes_model.posterior
+        self.can_warm_start = bayes_model.can_warm_start
+
+        self.prior = bayes_model.prior
+        self.posterior = bayes_model.posterior
 
         self.fit()
 
