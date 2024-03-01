@@ -1,8 +1,17 @@
-from .base import BayesClassifier, BayesRegressor, ModelClassifier, ModelRegressor
+from .base import (
+    Bayes,
+    BayesClassifier,
+    BayesRegressor,
+    Model,
+    ModelClassifier,
+    ModelRegressor,
+)
 
 __all__ = [
+    "Bayes",
     "BayesClassifier",
     "BayesRegressor",
+    "Model",
     "ModelClassifier",
     "ModelRegressor",
 ]

@@ -405,19 +405,28 @@ class Model(Base):
     space : dict, optional
         The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the
         model's space.
+    space_pred : stats_learn.spaces.Base
+        The space for generated predictions. Defaults to the space of
+        :math:`\mathrm{y}`.
     proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 
     """
 
-    def __init__(self, model, loss_func, space=None, proc_funcs=(), name=None):
+    def __init__(
+        self, model, loss_func, space=None, space_pred=None, proc_funcs=(), name=None
+    ):
         if space is None:
             space = model.space
         super().__init__(space, proc_funcs, name)
 
         self.model = model
         self.loss_func = loss_func
+
+        if space_pred is None:
+            space_pred = space["y"]
+        self.space_pred = space_pred
 
     def __repr__(self):
         return self.__class__.__name__ + f"(model={self.model})"
@@ -442,15 +451,7 @@ class Model(Base):
             _fn = partial(self.loss_func, h, shape=self.shape["y"])
             return model_y.expectation(_fn)
 
-        space_h = self.space["y"]
-
-        # TODO: generalize and make argument for convex closure
-        if isinstance(space_h, spaces.FiniteGeneric):
-            vals = space_h.values_flat
-            lims = vals.min(axis=0), vals.max(axis=0)
-            space_h = spaces.Box(lims)
-
-        return space_h.argmin(_risk)
+        return self.space_pred.argmin(_risk)
 
     def _fit(self, d):
         pass
@@ -470,17 +471,14 @@ class ModelClassifier(ClassifierMixin, Model):
     ----------
     model : stats_learn.random.models.Base
         Fixed model used to generate predictions.
-    space : dict, optional
-        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the
-        model's space.
     proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 
     """
 
-    def __init__(self, model, space=None, proc_funcs=(), name=None):
-        super().__init__(model, loss_01, space, proc_funcs, name)
+    def __init__(self, model, proc_funcs=(), name=None):
+        super().__init__(model, loss_01, None, None, proc_funcs, name)
 
 
 class ModelRegressor(RegressorMixin, Model):
@@ -501,7 +499,8 @@ class ModelRegressor(RegressorMixin, Model):
     """
 
     def __init__(self, model, space=None, proc_funcs=(), name=None):
-        super().__init__(model, loss_se, space, proc_funcs, name)
+        super().__init__(model, loss_se, space, None, proc_funcs, name)
+        self.space_pred = spaces.convex_closure(self.space_pred)
 
     def evaluate_analytic(self, model=None, n_train=0, n_test=1):
         """
@@ -558,6 +557,9 @@ class Bayes(Model):
     space : dict, optional
         The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the
         model's space.
+    space_pred : stats_learn.spaces.Base
+        The space for generated predictions. Defaults to the space of
+        :math:`\mathrm{y}`.
     proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
@@ -568,9 +570,17 @@ class Bayes(Model):
 
     """
 
-    def __init__(self, bayes_model, loss_func, space=None, proc_funcs=(), name=None):
+    def __init__(
+        self,
+        bayes_model,
+        loss_func,
+        space=None,
+        space_pred=None,
+        proc_funcs=(),
+        name=None,
+    ):
         model = bayes_model.posterior_model
-        super().__init__(model, loss_func, space, proc_funcs, name=name)
+        super().__init__(model, loss_func, space, space_pred, proc_funcs, name=name)
 
         self.bayes_model = bayes_model
 
@@ -608,17 +618,14 @@ class BayesClassifier(ClassifierMixin, Bayes):
     ----------
     bayes_model : stats_learn.bayes.models.Base
         Bayes model used for fitting and to generate predictions.
-    space : dict, optional
-        The domain for :math:`\mathrm{x}` and :math:`\mathrm{y}`. Defaults to the
-        model's space.
     proc_funcs : Collection of callable of dict of Collection of callable
         Sequentially-invoked preprocessing functions for :math:`x` and :math:`y` values.
     name : str, optional
 
     """
 
-    def __init__(self, bayes_model, space=None, proc_funcs=(), name=None):
-        super().__init__(bayes_model, loss_01, space, proc_funcs, name)
+    def __init__(self, bayes_model, proc_funcs=(), name=None):
+        super().__init__(bayes_model, loss_01, None, None, proc_funcs, name)
 
 
 class BayesRegressor(RegressorMixin, Bayes):
@@ -639,7 +646,8 @@ class BayesRegressor(RegressorMixin, Bayes):
     """
 
     def __init__(self, bayes_model, space=None, proc_funcs=(), name=None):
-        super().__init__(bayes_model, loss_se, space, proc_funcs, name)
+        super().__init__(bayes_model, loss_se, space, None, proc_funcs, name)
+        self.space_pred = spaces.convex_closure(self.space_pred)
 
     def evaluate_analytic(self, model=None, n_train=0, n_test=1):
         """

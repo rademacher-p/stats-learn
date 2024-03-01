@@ -2,6 +2,7 @@
 
 import math
 from abc import ABC, abstractmethod
+from functools import singledispatch
 from numbers import Integral
 
 import matplotlib.pyplot as plt
@@ -926,3 +927,29 @@ class SimplexDiscrete(Simplex):  # TODO: bad inheritance from `Continuous`
 
     def integrate(self, f):
         return sum(f(val) for val in self.x_plt)
+
+
+@singledispatch
+def convex_closure(space: Base):
+    """Make convex closure of space.
+
+    Parameters
+    ----------
+    space : Base
+    """
+    if isinstance(space, FiniteGeneric):
+        vals = space.values_flat
+        lims = vals.min(axis=0), vals.max(axis=0)
+        space = Box(lims)
+
+
+@convex_closure.register
+def _convex_closure_finite_generic(space: FiniteGeneric):
+    vals = space.values_flat
+    lims = vals.min(axis=0), vals.max(axis=0)
+    return Box(lims)
+
+
+@convex_closure.register
+def _convex_closure_simplex_discrete(space: SimplexDiscrete):
+    return Simplex(space.shape)
