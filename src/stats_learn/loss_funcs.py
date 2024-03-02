@@ -36,17 +36,19 @@ def _check_inputs(h, y, shape):
     return h, y, set_shape
 
 
-def make_loss_lp(p: float):
+def make_loss_lp(p: float, shape=()):
     """Make loss function for generic powers of the absolute difference.
 
     Parameters
     ----------
     p : float
         The power.
+    shape : tuple
+        Shape of data tensors.
 
     """
 
-    def loss_lp(y_est, y, shape=()):
+    def loss_lp(y_est, y):
         y_est, y, set_shape = _check_inputs(y_est, y, shape)
         return (np.abs(y_est - y) ** p).reshape(*set_shape, -1).sum(-1)
 

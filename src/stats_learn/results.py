@@ -386,7 +386,7 @@ def evaluate(predictor, loss_func, d):
 
     """
     h = predictor.predict(d["x"])
-    losses = loss_func(h, d["y"], shape=predictor.shape["y"])
+    losses = loss_func(h, d["y"])
     return losses.mean()
 
 

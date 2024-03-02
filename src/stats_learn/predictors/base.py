@@ -448,7 +448,7 @@ class Model(Base):
 
         # TODO: cache predictions?
         def _risk(h):  # TODO: memoize here?
-            _fn = partial(self.loss_func, h, shape=self.shape["y"])
+            _fn = partial(self.loss_func, h)
             return model_y.expectation(_fn)
 
         return self.space_pred.argmin(_risk)
