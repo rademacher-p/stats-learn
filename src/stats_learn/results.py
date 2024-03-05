@@ -763,7 +763,7 @@ def model_assess(
                     if do_loss:
                         loss[i_n] += evaluate(predictor, loss_func, d_test)
                 else:
-                    for i_v, param_vals in enumerate(list(product(*params.values()))):
+                    for i_v, param_vals in enumerate(product(*params.values())):
                         predictor.set_params(**dict(zip(params.keys(), param_vals)))
 
                         idx = (i_n, *np.unravel_index(i_v, loss.shape[1:]))

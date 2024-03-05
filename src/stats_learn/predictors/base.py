@@ -566,7 +566,7 @@ class Bayes(Model):
 
     Notes
     -----
-    Prediction `model` updates in-place with `set_params` and `fit` calls.
+    Prediction `model` updates in-place with `set_params`, `fit`, and `reset` calls.
 
     """
 
@@ -588,8 +588,6 @@ class Bayes(Model):
 
         self.prior = bayes_model.prior
         self.posterior = bayes_model.posterior
-
-        self.fit()
 
     def __repr__(self):
         return self.__class__.__name__ + f"(bayes_model={self.bayes_model})"

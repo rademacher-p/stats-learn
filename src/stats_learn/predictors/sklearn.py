@@ -65,13 +65,13 @@ class GpSKLPredictor(SKLPredictor):
 
     def _fit(self, d):
         x, y = d["x"], d["y"]
-        y -= self.gp_mean(x)
-        self.estimator.fit(x.reshape(-1, 1), y)
+        y_res = y - self.gp_mean(x)
+        self.estimator.fit(x.reshape(-1, 1), y_res)
 
     def _predict(self, x):
         try:
-            y = self.estimator.predict(x.reshape(-1, 1))
-            y += self.gp_mean(x)
+            y_res = self.estimator.predict(x.reshape(-1, 1))
+            y = y_res + self.gp_mean(x)
             return y
         except NotFittedError:
-            return np.full(x.shape[0], np.nan)
+            return self.gp_mean(x)
