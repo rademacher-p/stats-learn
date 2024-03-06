@@ -1,7 +1,7 @@
 """Fixed and learning predictors for supervised learning applications."""
 
 from abc import ABC, abstractmethod
-from functools import partial
+from functools import cache, partial
 from operator import itemgetter
 
 import numpy as np
@@ -428,6 +428,8 @@ class Model(Base):
             space_pred = space["y"]
         self.space_pred = space_pred
 
+        self._make_predict_single()
+
     def __repr__(self):
         return self.__class__.__name__ + f"(model={self.model})"
 
@@ -436,6 +438,8 @@ class Model(Base):
         for key, value in kwargs.items():
             setattr(self.model, key, value)
 
+        self._make_predict_single()
+
     def _format_params(self, key, value=None):
         return self.model._format_params(key, value)
 
@@ -443,15 +447,29 @@ class Model(Base):
         vec_func = vectorize_func(self._predict_single, self.shape["x"])
         return vec_func(x)
 
-    def _predict_single(self, x):
-        model_y = self.model.model_y_x(x)
+    # def _predict_single(self, x):
+    #     model_y = self.model.model_y_x(x)
 
-        # TODO: cache predictions?
-        def _risk(h):  # TODO: memoize here?
-            _fn = partial(self.loss_func, h)
-            return model_y.expectation(_fn)
+    #     def _risk(h):
+    #         _fn = partial(self.loss_func, h)
+    #         return model_y.expectation(_fn)
 
-        return self.space_pred.argmin(_risk)
+    #     return self.space_pred.argmin(_risk)
+
+    def _make_predict_single(self):
+        def _fn(x):
+            model_y = self.model.model_y_x(x)
+
+            def _risk(h):
+                _fn = partial(self.loss_func, h)
+                return model_y.expectation(_fn)
+
+            return self.space_pred.argmin(_risk)
+
+        if isinstance(self.space["x"], spaces.Discrete):
+            _fn = cache(_fn)
+
+        self._predict_single = _fn
 
     def _fit(self, d):
         pass
@@ -597,15 +615,19 @@ class Bayes(Model):
         for key, value in kwargs.items():
             setattr(self.bayes_model, key, value)
 
+        self._make_predict_single()
+
     def _format_params(self, key, value=None):
         return self.bayes_model._format_params(key, value)
 
     def _fit(self, d):
         self.bayes_model.fit(d, warm_start=True)
+        self._make_predict_single()
 
     def reset(self):
         """Invoke reset of the Bayesian model."""
         self.bayes_model.reset()
+        self._make_predict_single()
 
 
 class BayesClassifier(ClassifierMixin, Bayes):
