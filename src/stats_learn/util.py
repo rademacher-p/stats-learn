@@ -187,7 +187,8 @@ def vectorize_func(func, shape):
 
 def make_power_func(i):
     def _func(x):
-        return x**i
+        # return x**i
+        return np.array(x) ** i
 
         # # y = (x**i).mean()
         # y = (x**i).sum()

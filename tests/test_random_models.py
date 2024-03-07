@@ -39,7 +39,15 @@ RM_set = [
     ),
     (
         NormalLinear,
-        dict(weights=(1, 2), cov_y_x=0.01, model_x=random.elements.Normal([0, 0])),
+        dict(
+            basis_y_x=(
+                lambda x: np.power(x, 0).sum(-1),
+                lambda x: np.power(x, 1).sum(-1),
+            ),
+            weights=(1, 2),
+            cov_y_x=0.01,
+            model_x=random.elements.Normal([0, 0]),
+        ),
     ),
     (DataEmpirical.from_data, {"d": NormalLinear().sample(10)}),
     (

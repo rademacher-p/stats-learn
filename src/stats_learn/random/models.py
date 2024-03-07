@@ -900,7 +900,7 @@ class NormalLinear(MixinRVx, MixinRVy, Base):
             self._cov_y_x_single = lambda x: self._cov_repr
             _temp = self._cov_repr.shape
 
-        self._space["y"] = spaces.Euclidean(_temp[: int(len(_temp) / 2)])
+        self._space["y"] = spaces.Euclidean(_temp[: len(_temp) // 2])
 
     def mean_y_x(self, x):
         return sum(
