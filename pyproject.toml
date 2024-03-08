@@ -57,7 +57,6 @@ extras = [
 allow-direct-references = true
 
 [tool.hatch.build]
-ignore-vcs = true
 packages = ["src/stats_learn"]
 
 [tool.hatch.envs.default]
