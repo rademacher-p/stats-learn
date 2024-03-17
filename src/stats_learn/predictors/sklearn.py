@@ -1,12 +1,17 @@
+from functools import cache, partial
+
 import numpy as np
 import sklearn as skl
 from sklearn.exceptions import NotFittedError
 from sklearn.gaussian_process import GaussianProcessRegressor
 
+from stats_learn import spaces
 from stats_learn.predictors.base import Base
+from stats_learn.random.elements import Normal
+from stats_learn.util import vectorize_func
 
 
-class SKLPredictor(Base):
+class SKLRegressor(Base):
     # TODO: rework for new reset/fit functionality
     # FIXME: inheritance feels broken
 
@@ -54,7 +59,7 @@ class SKLPredictor(Base):
             return np.full(x.shape[0], np.nan)
 
 
-class GpSKLPredictor(SKLPredictor):
+class GpSKLRegressor(SKLRegressor):
     def __init__(self, space, proc_funcs=(), name=None, skl_kwargs=None, gp_mean=None):
         if skl_kwargs is None:
             skl_kwargs = {}
@@ -70,8 +75,66 @@ class GpSKLPredictor(SKLPredictor):
 
     def _predict(self, x):
         try:
-            y_res = self.estimator.predict(x.reshape(-1, 1))
-            y = y_res + self.gp_mean(x)
-            return y
+            mean = self.estimator.predict(x.reshape(-1, 1))
+            return mean + self.gp_mean(x)
         except NotFittedError:
             return self.gp_mean(x)
+
+
+class GpSKLPredictor(GpSKLRegressor):
+    def __init__(
+        self,
+        loss_func,
+        space,
+        space_pred=None,
+        proc_funcs=(),
+        name=None,
+        skl_kwargs=None,
+        gp_mean=None,
+    ):
+        super().__init__(space, proc_funcs, name, skl_kwargs, gp_mean)
+
+        self.loss_func = loss_func
+
+        if space_pred is None:
+            space_pred = space["y"]
+        self.space_pred = space_pred
+
+        self._make_predict_single()
+
+    def set_params(self, **kwargs):
+        super().set_params(**kwargs)
+        self._make_predict_single()
+
+    def _fit(self, d):
+        super()._fit(d)
+        self._make_predict_single()
+
+    def reset(self):
+        super().reset()
+        self._make_predict_single()
+
+    def _predict(self, x):
+        vec_func = vectorize_func(self._predict_single, self.shape["x"])
+        return vec_func(x)
+
+    def _make_predict_single(self):
+        def _fn(x):
+            try:
+                mean, cov = self.estimator.predict(x.reshape(-1, 1), return_cov=True)
+                mean += self.gp_mean(x)
+            except NotFittedError:
+                mean = self.gp_mean(x)
+                cov = np.zeros(2 * mean.shape)
+            model_y = Normal(mean.item(), cov.item())
+
+            def _risk(h):
+                _fn = partial(self.loss_func, h)
+                return model_y.expectation(_fn)
+
+            return self.space_pred.argmin(_risk)
+
+        if isinstance(self.space["x"], spaces.Discrete):
+            _fn = cache(_fn)
+
+        self._predict_single = _fn
