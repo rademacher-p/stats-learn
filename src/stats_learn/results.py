@@ -139,13 +139,16 @@ def _plot_predict_stats(
     n_train: int | Collection = 0,
     x=None,
     ax=None,
+    ax_kwargs=None,
 ):
     """Plot prediction statistics for various predictors and parameterizations."""
     if x is None:
         x = space_x.x_plt
 
     if ax is None:
-        ax = space_x.make_axes()
+        if ax_kwargs is None:
+            ax_kwargs = {}
+        ax = space_x.make_axes(**ax_kwargs)
 
     params_full: list[dict]
     if params is None:
@@ -257,7 +260,12 @@ def _plot_predict_stats(
 
 
 def _plot_risk_eval_compare(
-    losses, predictors, params=None, n_train: int | Collection = 0, ax=None
+    losses,
+    predictors,
+    params=None,
+    n_train: int | Collection = 0,
+    ax=None,
+    ax_kwargs=None,
 ):
     """Plot empirical risk for various predictors and parameterizations."""
     params_full: list[dict]
@@ -269,7 +277,10 @@ def _plot_risk_eval_compare(
     n_train = np.array(n_train).reshape(-1)
 
     if ax is None:
-        _, ax = plt.subplots()
+        if ax_kwargs is None:
+            ax_kwargs = {}
+        with plt.rc_context({"axes.xmargin": 0}):
+            _, ax = plt.subplots(subplot_kw=ax_kwargs)
         ax.set(ylabel=r"$R(f; \rho)$")
 
     labels: list[str | None]
@@ -434,6 +445,7 @@ def data_assess(
     log_path=None,
     img_path=None,
     ax=None,
+    ax_kwargs=None,
 ):
     """
     Assess and compare various predictors using a single dataset.
@@ -463,6 +475,8 @@ def data_assess(
         Directory for saving generated images.
     ax : matplotlib.axes.Axes, optional
         Axes onto which stats/losses are plotted.
+    ax_kwargs : dict, optional
+        Keyworld arguments for Axes construction.
 
     Returns
     -------
@@ -506,7 +520,9 @@ def data_assess(
     handles = []
     if plot_fit:
         if ax is None:
-            ax = space["x"].make_axes()
+            if ax_kwargs is None:
+                ax_kwargs = {}
+            ax = space["x"].make_axes(**ax_kwargs)
         h_data = space["x"].plot_xy(
             d_train["x"],
             d_train["y"],
@@ -590,6 +606,7 @@ def model_assess(
     log_path=None,
     img_path=None,
     ax=None,
+    ax_kwargs=None,
     rng=None,
 ):
     """
@@ -632,6 +649,8 @@ def model_assess(
         Directory for saving generated images.
     ax : matplotlib.axes.Axes, optional
         Axes onto which stats/losses are plotted.
+    ax_kwargs : dict, optional
+        Keyworld arguments for Axes construction.
     rng : int or np.random.RandomState or np.random.Generator, optional
             Random number generator seed or object.
 
@@ -787,11 +806,13 @@ def model_assess(
     # Plot
     if do_stats and plot_stats:
         _plot_predict_stats(
-            y_stats_full, space_x, predictors, params_full, n_train, x, ax
+            y_stats_full, space_x, predictors, params_full, n_train, x, ax, ax_kwargs
         )
         ax = plt.gca()
     elif do_loss and plot_loss:
-        _plot_risk_eval_compare(loss_full, predictors, params_full, n_train, ax)
+        _plot_risk_eval_compare(
+            loss_full, predictors, params_full, n_train, ax, ax_kwargs
+        )
         ax = plt.gca()
         if isinstance(model, bayes.models.Base):
             ax.set(ylabel=str_risk_bayes)  # different notation for bayes risk

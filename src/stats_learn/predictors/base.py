@@ -230,6 +230,7 @@ class Base(ABC):
         log_path=None,
         img_path=None,
         ax=None,
+        ax_kwargs=None,
     ):
         """
         Assess predictor using a single dataset.
@@ -256,6 +257,8 @@ class Base(ABC):
             Directory for saving generated images.
         ax : matplotlib.axes.Axes, optional
             Axes onto which stats/losses are plotted.
+        ax_kwargs : dict, optional
+            Keyworld arguments for Axes construction.
 
         Returns
         -------
@@ -275,6 +278,7 @@ class Base(ABC):
             log_path,
             img_path,
             ax,
+            ax_kwargs,
         )
 
     def model_assess(
@@ -294,6 +298,7 @@ class Base(ABC):
         log_path=None,
         img_path=None,
         ax=None,
+        ax_kwargs=None,
         rng=None,
     ):
         """
@@ -333,6 +338,8 @@ class Base(ABC):
             Directory for saving generated images.
         ax : matplotlib.axes.Axes, optional
             Axes onto which stats/losses are plotted.
+        ax_kwargs : dict, optional
+            Keyworld arguments for Axes construction.
         rng : int or np.random.RandomState or np.random.Generator, optional
                 Random number generator seed or object.
 
@@ -361,6 +368,7 @@ class Base(ABC):
             log_path,
             img_path,
             ax,
+            ax_kwargs,
             rng,
         )
         return list(map(itemgetter(0), out))

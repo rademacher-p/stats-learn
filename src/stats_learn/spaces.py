@@ -124,14 +124,15 @@ class Base(ABC):
     def set_x_plot(self):
         raise NotImplementedError
 
-    def make_axes(self):  # TODO: axes kwargs
+    def make_axes(self, **kwargs):
         """Create axes for plotting."""
         with plt.rc_context({"axes.xmargin": 0}):
             if self.shape == ():
-                _, ax = plt.subplots()
+                _, ax = plt.subplots(subplot_kw=kwargs)
                 ax.set(xlabel="$x$", ylabel="$y$")
             elif self.shape == (2,):
-                _, ax = plt.subplots(subplot_kw={"projection": "3d"})
+                _kwargs = kwargs | {"projection": "3d"}
+                _, ax = plt.subplots(subplot_kw=_kwargs)
                 ax.set(xlabel="$x_1$", ylabel="$x_2$", zlabel="$y$")
 
                 ax.set_prop_cycle(
@@ -150,7 +151,8 @@ class Base(ABC):
                     ],
                 )
             elif self.shape == (3,):
-                _, ax = plt.subplots(subplot_kw={"projection": "3d"})
+                _kwargs = kwargs | {"projection": "3d"}
+                _, ax = plt.subplots(subplot_kw=_kwargs)
                 ax.set(xlabel="$x_1$", ylabel="$x_2$", zlabel="$x_3$")
             else:
                 raise NotImplementedError(
@@ -159,7 +161,7 @@ class Base(ABC):
 
         return ax
 
-    def plot(self, f, x=None, ax=None, label=None, **kwargs):
+    def plot(self, f, x=None, ax=None, ax_kwargs=None, label=None, **kwargs):
         """
         Plot a function.
 
@@ -171,6 +173,8 @@ class Base(ABC):
             Values to plot against. Defaults to `self.x_plt`.
         ax : matplotlib.axes.Axes, optional
             Axes.
+        ax_kwargs : dict, optional
+            Keyworld arguments for Axes construction.
         label : str, optional
             Label for matplotlib.artist.Artist
         kwargs : dict, optional
@@ -182,9 +186,19 @@ class Base(ABC):
 
         """
         x, y, set_shape = self._eval_func(f, x)
-        return self.plot_xy(x, y, ax=ax, label=label, **kwargs)
+        return self.plot_xy(x, y, ax=ax, ax_kwargs=ax_kwargs, label=label, **kwargs)
 
-    def plot_xy(self, x, y, y_std=None, y_std_hi=None, ax=None, label=None, **kwargs):
+    def plot_xy(
+        self,
+        x,
+        y,
+        y_std=None,
+        y_std_hi=None,
+        ax=None,
+        ax_kwargs=None,
+        label=None,
+        **kwargs,
+    ):
         """
         Plot an array.
 
@@ -200,6 +214,8 @@ class Base(ABC):
             Upper standard deviation, if different from lower defined in `y_std`.
         ax : matplotlib.axes.Axes, optional
             Axes.
+        ax_kwargs : dict, optional
+            Keyworld arguments for Axes construction.
         label : str, optional
             Label for matplotlib.artist.Artist
         kwargs : dict, optional
@@ -211,7 +227,9 @@ class Base(ABC):
 
         """
         if ax is None:
-            ax = self.make_axes()
+            if ax_kwargs is None:
+                ax_kwargs = {}
+            ax = self.make_axes(**ax_kwargs)
 
         x, set_shape = check_data_shape(x, self.shape)
         if y.shape != set_shape:
@@ -835,13 +853,14 @@ class Simplex(Continuous):
     def set_x_plot(self):
         self.x_plt = self.make_grid(self.n_plot, self._shape)
 
-    def make_axes(self):
+    def make_axes(self, **kwargs):
         if self.shape == (2,):
-            _, ax = plt.subplots()
+            _, ax = plt.subplots(subplot_kw=kwargs)
             ax.set(xlabel="$x_1$", ylabel="$x_2$")
             return ax
         elif self.shape == (3,):
-            _, ax = plt.subplots(subplot_kw={"projection": "3d"})
+            _kwargs = kwargs | {"projection": "3d"}
+            _, ax = plt.subplots(subplot_kw=_kwargs)
             ax.view_init(35, 45)
             ax.set(xlabel="$x_1$", ylabel="$x_2$", zlabel="$x_3$")
             return ax
@@ -850,9 +869,11 @@ class Simplex(Continuous):
                 "Plot method only supported for 2- and 3-dimensional data."
             )
 
-    def plot(self, f, x=None, ax=None, label=None, **scatter_kwargs):
+    def plot(self, f, x=None, ax=None, ax_kwargs=None, label=None, **scatter_kwargs):
         if ax is None:
-            ax = self.make_axes()
+            if ax_kwargs is None:
+                ax_kwargs = {}
+            ax = self.make_axes(**ax_kwargs)
 
         x, y, set_shape = self._eval_func(f, x)
         if len(set_shape) != 1:
