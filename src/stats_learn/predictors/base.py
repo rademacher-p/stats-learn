@@ -552,7 +552,7 @@ class ModelRegressor(RegressorMixin, Model):
 
         n_train = np.array(n_train)
 
-        if isinstance(model, random.models.BaseRVy):
+        if isinstance(model, random.models.MixinRVy):
             if isinstance(model.space["x"], spaces.FiniteGeneric):
                 x = model.space["x"].values_flat
 
