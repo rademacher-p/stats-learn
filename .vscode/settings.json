@@ -9,7 +9,8 @@
         "editor.defaultFormatter": "ms-python.black-formatter",
         // "editor.defaultFormatter": "charliermarsh.ruff",
     },
-    "mypy-type-checker.preferDaemon": false,
+    // "mypy-type-checker.preferDaemon": false,
+    "mypy.runUsingActiveInterpreter": true,
     "python.testing.pytestEnabled": true,
     "autoDocstring.docstringFormat": "numpy",
 }
