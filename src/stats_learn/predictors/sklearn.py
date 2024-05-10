@@ -60,13 +60,23 @@ class SKLRegressor(Base):
 
 
 class GpSKLRegressor(SKLRegressor):
-    def __init__(self, space, proc_funcs=(), name=None, skl_kwargs=None, gp_mean=None):
+    def __init__(
+        self,
+        space,
+        proc_funcs=(),
+        name=None,
+        gp_mean=None,
+        noise_var=0.0,
+        skl_kwargs=None,
+    ):
         if skl_kwargs is None:
             skl_kwargs = {}
         skl_kwargs["normalize_y"] = False
+        skl_kwargs["alpha"] = noise_var
         estimator = GaussianProcessRegressor(**skl_kwargs)
         super().__init__(estimator, space, proc_funcs, name)
         self.gp_mean = gp_mean  # TODO: vectorize?
+        self.noise_var = noise_var
 
     def _fit(self, d):
         x, y = d["x"], d["y"]
@@ -89,10 +99,11 @@ class GpSKLPredictor(GpSKLRegressor):
         space_pred=None,
         proc_funcs=(),
         name=None,
-        skl_kwargs=None,
         gp_mean=None,
+        noise_var=0.0,
+        skl_kwargs=None,
     ):
-        super().__init__(space, proc_funcs, name, skl_kwargs, gp_mean)
+        super().__init__(space, proc_funcs, name, gp_mean, noise_var, skl_kwargs)
 
         self.loss_func = loss_func
 
@@ -120,12 +131,17 @@ class GpSKLPredictor(GpSKLRegressor):
 
     def _make_predict_single(self):
         def _fn(x):
-            try:
-                mean, cov = self.estimator.predict(x.reshape(-1, 1), return_cov=True)
-                mean += self.gp_mean(x)
-            except NotFittedError:
-                mean = self.gp_mean(x)
-                cov = np.zeros(2 * mean.shape)
+            # try:
+            #     mean, cov = self.estimator.predict(x.reshape(-1, 1), return_cov=True)
+            #     mean += self.gp_mean(x)
+            #     cov += self.noise_var
+            # except NotFittedError:
+            #     mean = self.gp_mean(x)
+            #     cov = np.zeros(2 * mean.shape)
+            mean, cov = self.estimator.predict(x.reshape(-1, 1), return_cov=True)
+            mean += self.gp_mean(x)
+            cov += self.noise_var
+
             model_y = Normal(mean.item(), cov.item())
 
             def _risk(h):

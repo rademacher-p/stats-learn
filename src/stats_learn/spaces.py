@@ -550,7 +550,14 @@ class Continuous(Base, ABC):
             # finish=None,
             # finish=optimize.minimize
         )
-        return optimize.brute(f, **_brute_kwargs)
+        x = optimize.brute(f, **_brute_kwargs)
+
+        lims = _brute_kwargs.get("ranges")
+        if lims is not None:
+            a_min, a_max = zip(*lims)
+            x = np.clip(x, a_min, a_max)
+
+        return x
 
     def _minimize_basinhopping(self, f):
         _basin_kwargs = dict(
